@@ -1,0 +1,81 @@
+// Date pattern
+
+// Hide the 'spinner' for webkit
+// and also for Firefox
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type=number] {
+  -moz-appearance: textfield;
+}
+
+.form-date {
+
+  .form-group {
+    float: left;
+    width: 50px;
+
+    margin-right: 20px;
+    margin-bottom: 0;
+    clear: none;
+
+    label {
+      display: block;
+      padding-bottom: 2px;
+    }
+
+    input {
+      width: 100%;
+    }
+  }
+
+  .form-group-year-select {
+    width: 180px;
+  }
+  
+    // Django split date-time widget
+  .form-group-date {
+    width: 120px;
+  }
+  .form-group-time {
+    width: 100px;
+  }
+  @include media(mobile) {
+    .form-group-date, .form-group-time {
+      width: 40%;
+    }
+  }
+
+  // Django select date widget
+  .form-group-year-select {
+    width: 100px;
+  }
+  .form-group-month-select {
+    width: 60px;
+  }
+  .form-group-day-select {
+    width: 100px;
+  }
+  .form-group-year-select, .form-group-month-select, .form-group-day-select {
+    .form-control {
+        width: 100%;
+    }
+
+    @include media(mobile) {
+      width: 50%;
+      margin-bottom: $gutter-half;
+      clear: left;
+    }
+  }
+
+
+   @media (max-width: 640px)  {
+        .form-group-year-select, .form-group-month-select {
+              width: inherit !important;
+              clear: none !important;
+        }
+   }
+}

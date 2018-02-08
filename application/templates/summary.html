@@ -1,0 +1,17 @@
+{% extends 'govuk_template.html' %}
+{% load static %}
+{% load govuk_template_base %}
+
+<!-- Initialise error summary for page -->
+{{form.error_summary}}
+
+{% block inner_content %}
+
+<!-- templates/registration/login.html -->
+<div class="column-full">
+    <br>
+    <p>Please choose to either continue reviewing an application or to start a new review</p>
+    <br>
+      <input type="submit" class="button" value="New Application" alt='Login'>
+</div>
+{% endblock %}
