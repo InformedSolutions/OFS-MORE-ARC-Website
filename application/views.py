@@ -70,6 +70,8 @@ def get_users():
 
 
 def custom_login(request):
+    if request.user.is_authenticated():
+        return HttpResponseRedirect('/summary')
     form = AuthenticationForm()
     variables = {
         'form': form
