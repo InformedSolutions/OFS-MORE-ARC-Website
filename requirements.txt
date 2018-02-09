@@ -5,3 +5,5 @@ PyYAML
 openapi-codec
 unittest-xml-reporting
 requests
+django-govuk-template==0.4
+django-govuk-forms==0.4
