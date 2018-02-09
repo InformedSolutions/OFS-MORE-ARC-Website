@@ -69,7 +69,7 @@ def get_users():
     return users
 
 
-def login(request):
+def custom_login(request):
     form = AuthenticationForm()
     variables = {
         'form': form
