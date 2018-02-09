@@ -94,6 +94,8 @@ def login(request):
     return render(request, './registration/login.html', variables)
 
 
+
+
 def get_user(self, uidb64):
     try:
         # urlsafe_base64_decode() decodes to bytestring
@@ -104,6 +106,8 @@ def get_user(self, uidb64):
     return user
 
 
+
+# Overwrited Django Auth Form
 class AuthenticationForm(GOVUKForm):
     """
     Base class for authenticating users. Extend this to get a form that accepts
