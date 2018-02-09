@@ -24,7 +24,6 @@ def summary_page(request):
 @login_required()
 def assign_new_application(request):
     application_id = get_oldest_application_id()
-    print(application_id)
     # ArcReview.objects.all().delete()
     arc_user = ArcReview.objects.create()
     arc_user.user_id = request.user.id
@@ -33,7 +32,6 @@ def assign_new_application(request):
     arc_user.name = get_name(arc_user.application_id)
     arc_user.app_type = 'childminder'
     arc_user.save()
-    print("saved")
     return JsonResponse({'message': arc_user.application_id})
 
 
@@ -47,10 +45,8 @@ def delete_all(request):
 
 def get_assigned_apps(request):
     apps = ArcReview.objects.all()
-    print(apps)
     arr = []
     for i in apps:
-        print("ID: " + i.user_id)
         arr.append(i)
     return arr
 
