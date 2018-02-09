@@ -1,3 +1,5 @@
+import json
+
 from django.contrib.auth import authenticate
 from django.contrib.auth.forms import UsernameField, UserModel
 from django.contrib.auth.models import User
@@ -16,8 +18,11 @@ from .models import Application, ArcReview
 @login_required()
 def summary_page(request):
     apps = get_assigned_apps(request)
+
     if request.method == 'POST':
-        assign_new_application
+        response = assign_new_application(request)
+        # add row to table and reload page
+        return response
     return render(request, './summary.html')
 
 
@@ -32,7 +37,7 @@ def assign_new_application(request):
     arc_user.name = get_name(arc_user.application_id)
     arc_user.app_type = 'childminder'
     arc_user.save()
-    return JsonResponse({'message': arc_user.application_id})
+    return JsonResponse({'message':arc_user.application_id})
 
 
 @login_required()

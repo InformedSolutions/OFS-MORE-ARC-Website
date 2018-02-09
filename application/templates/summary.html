@@ -18,6 +18,9 @@
     <br>
     <p>Please choose to either continue reviewing an application or to start a new review</p>
     <br>
+    <form action="" method = "post">
+        {% csrf_token %}
       <input type="submit" class="button" value="New Application" alt='Login'>
+    </form>
 </div>
 {% endblock %}

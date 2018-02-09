@@ -80,8 +80,12 @@ WSGI_APPLICATION = 'arc_service.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'postgres',
+        'USER': 'ofsted',
+        'PASSWORD': 'OfstedB3ta',
+        'HOST': '130.130.52.132',
+        'PORT': '5462',
     }
 }
 

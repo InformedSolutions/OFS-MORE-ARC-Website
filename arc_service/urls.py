@@ -8,7 +8,6 @@ from django.contrib.auth.views import logout
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^test/', assign_new_application),
-    url('^accounts/', include('django.contrib.auth.urls')),
     url('^accounts/profile/', assign_new_application),
     url('^login/', custom_login),
     url('^logout/', logout, {'next_page': '/login/'}),
