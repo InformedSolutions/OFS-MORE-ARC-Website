@@ -32,13 +32,13 @@
           {% block proposition %}Register as a childminder{% endblock %}
         </a>
         {% block proposition_menu %}
-          {% if service_settings.has_header_links %}
+          {% if user.is_authenticated %}
             <ul id="proposition-links">
-              {% for link in service_settings.header_links.all %}
-                <li><a href="{{ link.url }}" class="{% if link.link_is_view_name and link.link == request.resolver_match.view_name %}active{% endif %}">{{ link.localised_name }}</a></li>
-              {% endfor %}
+               <li>
+                 <a href="{{ URL_PREFIX }}/logout" class="{% if link.link_is_view_name and link.link == request.resolver_match.view_name %}active{% endif %}">Logout</a>
+               </li>
             </ul>
-          {% endif %}
+            {% endif %}
         {% endblock %}
       </nav>
     </div>

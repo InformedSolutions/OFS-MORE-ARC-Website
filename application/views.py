@@ -1,5 +1,6 @@
 import json
 
+from django.conf import settings
 from django.contrib.auth import authenticate
 from django.contrib.auth.forms import UsernameField, UserModel
 from django.contrib.auth.models import User
@@ -76,7 +77,7 @@ def get_users():
 
 def custom_login(request):
     if request.user.is_authenticated():
-        return HttpResponseRedirect('/summary')
+        return HttpResponseRedirect(settings.URL_PREFIX + '/summary')
     form = AuthenticationForm()
     variables = {
         'form': form
@@ -88,7 +89,7 @@ def custom_login(request):
             user = authenticate(username=username, password=password)
             if user is not None:
                 auth_login(request, user)
-                return HttpResponseRedirect('/summary')
+                return HttpResponseRedirect(settings.URL_PREFIX + '/summary')
             else:
                 return HttpResponse("Not signed in")
         except Exception as ex:
