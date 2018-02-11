@@ -43,7 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'application',
+    'arc_application',
 ]
 
 MIDDLEWARE = [
@@ -71,8 +71,8 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'govuk_template_base.context_processors.govuk_template_base',
-                "application.middleware.globalise_url_prefix",
-                "application.middleware.globalise_server_name",
+                "arc_application.middleware.globalise_url_prefix",
+                "arc_application.middleware.globalise_server_name",
             ],
         },
     },

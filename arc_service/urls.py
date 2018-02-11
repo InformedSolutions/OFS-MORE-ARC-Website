@@ -9,7 +9,7 @@ import re
 from django.conf import settings
 from django.conf.urls import url, include
 from django.contrib import admin
-from application.views import assign_new_application, custom_login, summary_page, delete_all
+from arc_application.views import assign_new_application, custom_login, summary_page, delete_all
 from django.contrib.auth.views import logout
 
 urlpatterns = [
