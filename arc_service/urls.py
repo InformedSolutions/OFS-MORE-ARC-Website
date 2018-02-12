@@ -1,20 +1,22 @@
 """
 OFS-MORE-CCN3: Apply to be a Childminder Beta
--- URLs --
+-- urls.py --
 
 @author: Informed Solutions
 """
 import re
 
+from arc_application.views import assign_new_application, custom_login, delete_all, release_application, summary_page
+from arc_application.review import review_application
 from django.conf import settings
-from django.conf.urls import url, include
+from django.conf.urls import url
 from django.contrib import admin
-from arc_application.views import assign_new_application, custom_login, summary_page, delete_all
 from django.contrib.auth.views import logout
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'^test/', assign_new_application),
+    url(r'^release/(?P<application_id>[\w\- ]+)', release_application),
+    url(r'^review/(?P<application_id>[\w\- ]+)', review_application),
     url(r'^accounts/profile/', assign_new_application),
     url(r'^login/', custom_login),
     url(r'^logout/', logout, {'next_page': settings.URL_PREFIX + '/login/'}),

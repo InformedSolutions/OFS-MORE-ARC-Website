@@ -10,11 +10,10 @@ from django.forms import DateTimeField
 class ArcReview(models.Model):
     application_id = models.UUIDField(primary_key=True, default=uuid4)
     user_id = models.CharField(max_length=50)
-    last_accessed = DateTimeField()
-    date_submitted = DateTimeField()
+    last_accessed = models.CharField(max_length=50)
+    date_submitted = models.CharField(max_length=50)
     applicant_name = models.CharField(max_length=50)
     app_type = models.CharField(max_length=50)
-
     class Meta:
         db_table = 'ARC_REVIEW'
 

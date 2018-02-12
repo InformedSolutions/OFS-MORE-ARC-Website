@@ -1,5 +1,4 @@
-import json
-
+import datetime
 from django.conf import settings
 from django.contrib.auth import authenticate
 from django.contrib.auth.forms import UsernameField, UserModel
@@ -13,41 +12,60 @@ from govuk_forms.forms import GOVUKForm
 from django import forms
 from django.contrib.auth import login as auth_login
 
-from .models import Application, ArcReview
+from .models import Application, ArcReview, ApplicantPersonalDetails, ApplicantName
 
 
 @login_required()
 def summary_page(request):
     if has_group(request.user, 'arc'):
-        apps = get_assigned_apps(request)
-
+        entries = ArcReview.objects.filter(user_id=request.user.id).order_by('user_id')
+        variables = {
+            'entries': entries,
+        }
         if request.method == 'POST':
-            response = assign_new_application(request)
-            # add row to table and reload page
-            return response
-        return render(request, './summary.html')
-    return JsonResponse({'message':'Gotta login with correct access rights'})
+            assign_new_application(request)
+            entries = ArcReview.objects.filter(user_id=request.user.id).order_by('user_id')
+            variables = {
+                'entries': entries,
+            }
+            return render(request, './summary.html', variables)
+        return render(request, './summary.html', variables)
+    return JsonResponse({'message': 'Gotta login with correct access rights'})
 
-@login_required()
+
 def assign_new_application(request):
     if ArcReview.objects.filter(user_id=request.user.id).count() > 10:
-        return JsonResponse({'message':'Error you have already reached the maximum (10) applications'})
-    application_id = get_oldest_application_id()
-    # ArcReview.objects.all().delete()
+        return JsonResponse({'message': 'Error you have already reached the maximum (10) applications'})
+    else:
+        local_application_id = get_oldest_application_id()
+        if local_application_id == None:
+            print("No Applications Availible")
     arc_user = ArcReview.objects.create()
-    arc_user.user_id = request.user.id
-    arc_user.application_id = application_id
-    arc_user.date_submitted = ArcReview.objects.filter(pk=application_id)
-    arc_user.name = get_name(arc_user.application_id)
-    arc_user.app_type = 'childminder'
-    arc_user.save()
-    return JsonResponse({'message':arc_user.application_id})
+    if Application.objects.filter(pk=local_application_id).count() > 0:
+        application = Application.objects.get(application_id=local_application_id)
+        arc_user.date_submitted = str(application.date_updated.strftime('%d/%m/%Y'))
+        arc_user.user_id = request.user.id
+        arc_user.application_id = local_application_id
+        arc_user.app_type = 'Childminder'
+        arc_user.last_accessed = str(datetime.datetime.now().strftime('%d/%m/%Y'))
+        application = Application.objects.filter(pk=local_application_id)
+        try:
+            if ApplicantPersonalDetails.objects.filter(application_id=local_application_id).count() > 0:
+                personal_details = ApplicantPersonalDetails.objects.get(application_id=local_application_id)
+                applicant_name = ApplicantName.objects.get(personal_detail_id=personal_details.personal_detail_id)
+                arc_user.applicant_name = applicant_name.first_name +' ' + applicant_name.last_name
+        except Exception as ex:
+            print(ex)
+            arc_user.name = 'TEMP'
+        arc_user.save()
+    return JsonResponse({'message': arc_user.application_id})
 
 
 @login_required()
 def delete_all(request):
     try:
         ArcReview.objects.all().delete()
+        JsonResponse({'message':'ArcReview Table deleted'})
     except Exception as ex:
         HttpResponse(ex)
 
@@ -62,7 +80,7 @@ def get_assigned_apps(request):
 
 def get_name(application_id):
     # lookup app id, traverse throught tables and return name
-    name = ''
+    name = 'placeholder'
     return name
 
 
@@ -72,6 +90,7 @@ def get_oldest_application_id():
         if len(ArcReview.objects.filter(pk=i.application_id)) == 0:
             return i.application_id
     # if it gets to here return error, no application for review
+
 
 def get_users():
     users = User.objects.all()
@@ -101,8 +120,6 @@ def custom_login(request):
     return render(request, './registration/login.html', variables)
 
 
-
-
 def get_user(self, uidb64):
     try:
         # urlsafe_base64_decode() decodes to bytestring
@@ -112,10 +129,26 @@ def get_user(self, uidb64):
         user = None
     return user
 
+
 def has_group(user, group_name):
     group = Group.objects.get(name=group_name)
     return True if group in user.groups.all() else False
 
+def release_application(request, application_id):
+    if len(ArcReview.objects.filter(application_id=application_id))==1:
+        row = ArcReview.objects.get(application_id=application_id)
+        row.delete()
+        return HttpResponseRedirect('/arc/summary')
+    else:
+        return JsonResponse({"message": "fail"})#
+
+
+def review_application(request, application_id):
+    if len(ArcReview.objects.filter(application_id=application_id))==1:
+        row = ArcReview.objects.get(application_id=application_id)
+
+    else:
+        return JsonResponse({"message": "fail"})
 ######################################################################################################
 
 # Overwrited Django Auth Form
