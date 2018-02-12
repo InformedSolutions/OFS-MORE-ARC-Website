@@ -3,7 +3,7 @@ import json
 from django.conf import settings
 from django.contrib.auth import authenticate
 from django.contrib.auth.forms import UsernameField, UserModel
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from django.http import JsonResponse, HttpResponseRedirect, HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
@@ -18,17 +18,20 @@ from .models import Application, ArcReview
 
 @login_required()
 def summary_page(request):
-    apps = get_assigned_apps(request)
+    if has_group(request.user, 'arc'):
+        apps = get_assigned_apps(request)
 
-    if request.method == 'POST':
-        response = assign_new_application(request)
-        # add row to table and reload page
-        return response
-    return render(request, './summary.html')
-
+        if request.method == 'POST':
+            response = assign_new_application(request)
+            # add row to table and reload page
+            return response
+        return render(request, './summary.html')
+    return JsonResponse({'message':'Gotta login with correct access rights'})
 
 @login_required()
 def assign_new_application(request):
+    if ArcReview.objects.filter(user_id=request.user.id).count() > 10:
+        return JsonResponse({'message':'Error you have already reached the maximum (10) applications'})
     application_id = get_oldest_application_id()
     # ArcReview.objects.all().delete()
     arc_user = ArcReview.objects.create()
@@ -87,7 +90,7 @@ def custom_login(request):
             username = request.POST.get('username')
             password = request.POST.get('password')
             user = authenticate(username=username, password=password)
-            if user is not None:
+            if user is not None and has_group(user, 'arc'):
                 auth_login(request, user)
                 return HttpResponseRedirect(settings.URL_PREFIX + '/summary')
             else:
@@ -109,7 +112,11 @@ def get_user(self, uidb64):
         user = None
     return user
 
+def has_group(user, group_name):
+    group = Group.objects.get(name=group_name)
+    return True if group in user.groups.all() else False
 
+######################################################################################################
 
 # Overwrited Django Auth Form
 class AuthenticationForm(GOVUKForm):
