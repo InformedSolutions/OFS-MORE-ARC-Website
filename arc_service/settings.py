@@ -109,7 +109,7 @@ USE_TZ = True
 
 URL_PREFIX = '/arc'
 STATIC_URL = URL_PREFIX + '/static/'
-
+REVIEW_URL_PREFIX = '/arc/review'
 STATICFILES_FINDERS = [
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',

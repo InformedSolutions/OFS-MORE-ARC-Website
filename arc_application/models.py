@@ -14,6 +14,7 @@ class ArcReview(models.Model):
     date_submitted = models.CharField(max_length=50)
     applicant_name = models.CharField(max_length=50)
     app_type = models.CharField(max_length=50)
+
     class Meta:
         db_table = 'ARC_REVIEW'
 
@@ -230,6 +231,19 @@ class UserDetails(models.Model):
     class Meta:
         managed = False
         db_table = 'USER_DETAILS'
+
+
+class HealthDeclarationBooklet(models.Model):
+    """
+    Model for HEALTH_DECLARATION_BOOKLET table
+    """
+    hdb_id = models.UUIDField(primary_key=True, default=uuid4)
+    application_id = models.ForeignKey(Application, on_delete=models.CASCADE, db_column='application_id')
+    send_hdb_declare = models.NullBooleanField(blank=True)
+
+    class Meta:
+        managed = False
+        db_table = 'HDB'
 
 
 class AuthGroup(models.Model):
