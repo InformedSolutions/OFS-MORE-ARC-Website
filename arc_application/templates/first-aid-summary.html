@@ -119,7 +119,7 @@
     </table>
     <br>
     <div class="form-group grid-row">
-        <form action="{{ URL_PREFIX }}/task-list?id={{application_id}}" method="get">
+        <form method="get" action="{{ URL_PREFIX }}/eyfs/summary?id={{application_id}}">
             <input type="submit" class="button" value="Confirm and continue"/>
             <input type="hidden" value="{{application_id}}" name="id"/>
         </form>

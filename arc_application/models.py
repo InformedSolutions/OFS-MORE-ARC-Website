@@ -4,15 +4,44 @@ from uuid import uuid4
 
 from django.db import models
 
-from django.forms import DateTimeField
+from django.forms import DateTimeField, BooleanField
+
+
+class ArcStatus(models.Model):
+    application_id = models.UUIDField(primary_key=True, default=uuid4)
+    login_summary = BooleanField(initial=False)
+    login_email = BooleanField(initial=False)
+    login_mobile = BooleanField(initial=False)
+    login_alt_mobile = BooleanField(initial=False)
+    login_kb_question = BooleanField(initial=False)
+    login_kb_answer = BooleanField(initial=False)
+
+    personal_summary = BooleanField(initial=False)
+    personal_first_name = BooleanField(initial=False)
+    personal_middle_name = BooleanField(initial=False)
+    personal_last_name = BooleanField(initial=False)
+    personal_first_name = BooleanField(initial=False)
+    personal_dob = BooleanField(initial=False)
+    personal_address = BooleanField(initial=False)
+    personal_location = BooleanField(initial=False)
+
+
+    fist_aid_organisation = BooleanField(initial=False)
+    fist_aid_course = BooleanField(initial=False)
+    fist_aid_date = BooleanField(initial=False)
+
+    dbs_cert = BooleanField(initial=False)
+    dbs_convictions = BooleanField(initial=False)
+
+    # references and people in your home, how to do one to many in a single table?
+
+
 
 
 class ArcReview(models.Model):
     application_id = models.UUIDField(primary_key=True, default=uuid4)
     user_id = models.CharField(max_length=50)
     last_accessed = models.CharField(max_length=50)
-    date_submitted = models.CharField(max_length=50)
-    applicant_name = models.CharField(max_length=50)
     app_type = models.CharField(max_length=50)
 
     class Meta:

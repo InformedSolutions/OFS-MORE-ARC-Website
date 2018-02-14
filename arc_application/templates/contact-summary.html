@@ -14,7 +14,7 @@
         </a>
     </div>
     <div class="grid-row">
-        <h1 class="form-title heading-large">Check your answers: your login details</h1>
+        <h1 class="form-title heading-large">Review - Login Details</h1>
     </div>
     <!-- Login details -->
     <table class="check-your-answers form-group grid-row" style="table-layout: fixed; width: 100%">
@@ -102,18 +102,11 @@
     </table>
     <br>
     <div class="form-group grid-row">
-        {% if childcare_type_status == 'COMPLETED' %}
-        <form action="{{ URL_PREFIX }}/task-list?id={{application_id}}" method="get">
+
+        <form action="{{ URL_PREFIX }}/childcare/age-groups?id={{application_id}}" method="get">
             <input type="submit" class="button" value="Confirm and continue"/>
             <input type="hidden" value="{{application_id}}" name="id"/>
         </form>
-        {% endif %}
-        {% if childcare_type_status != 'COMPLETED' %}
-        <form action="{{ URL_PREFIX }}/childcare/guidance?id={{application_id}}" method="get">
-            <input type="submit" class="button" value="Confirm and continue"/>
-            <input type="hidden" value="{{application_id}}" name="id"/>
-        </form>
-        {% endif %}
     </div>
     <br>
 </div>

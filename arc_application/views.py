@@ -95,7 +95,7 @@ def get_name(application_id):
 
 
 def get_oldest_application_id():
-    application_list = Application.objects.all().order_by('date_created')
+    application_list = Application.objects.all().order_by('date_updated')
     for i in application_list:
         if len(ArcReview.objects.filter(pk=i.application_id)) == 0:
             return i.application_id
@@ -146,6 +146,8 @@ def has_group(user, group_name):
 
 
 def release_application(request, application_id):
+    print(application_id)
+    print(request.user.id)
     if len(ArcReview.objects.filter(application_id=application_id)) == 1:
         row = ArcReview.objects.get(application_id=application_id)
         row.delete()
@@ -191,7 +193,7 @@ class AuthenticationForm(GOVUKForm):
         if username is not None and password:
             self.user_cache = authenticate(self.request, username=username, password=password)
             if self.user_cache is None:
-                raise self.get_invalid_login_error()
+                raise forms.ValidationError('Please enter a valid e-mail address.')
             else:
                 self.confirm_login_allowed(self.user_cache)
 

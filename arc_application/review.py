@@ -77,11 +77,7 @@ def contact_summary(request):
             'childcare_type_status': application.childcare_type_status
         }
         return render(request, 'contact-summary.html', variables)
-    if request.method == 'POST':
-        application_id_local = request.POST["id"]
-        application = Application.objects.get(pk=application_id_local)
-        # status.update(application_id_local, 'login_details_status', 'COMPLETED')
-        return HttpResponseRedirect(settings.URL_PREFIX + '/childcare/guidance?id=' + application_id_local)
+
 
 
 def type_of_childcare_age_groups(request):
