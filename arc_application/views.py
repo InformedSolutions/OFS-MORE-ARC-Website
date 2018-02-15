@@ -203,7 +203,7 @@ class AuthenticationForm(GOVUKForm):
             self.user_cache = authenticate(self.request, username=username, password=password)
             if self.user_cache is None or not has_group(self.user_cache, settings.ARC_GROUP):
                 raise forms.ValidationError(
-                    'Email and password combination not recognised. Please try signing in again below')
+                    'Username and password combination not recognised. Please try signing in again below')
             else:
                 self.confirm_login_allowed(self.user_cache)
         return self.cleaned_data
