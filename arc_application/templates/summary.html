@@ -12,38 +12,39 @@
         <br>
         <p>Please choose to either continue reviewing an application or to start a new review</p>
         <br>
-        <form action="" method = "post">
+        <form action="" method="post">
             {% csrf_token %}
-          <input type="submit" class="button" value="New Application" alt='Login'>
+            <input type="submit" class="button" value="New Application" alt='Login'>
         </form>
     </div>
     <div>
+        {% if empty != "true" %}
         <table class="table table-hover" id="request-table">
-                    <thead>
-                    <tr>
-                        <th>App Type</th>
-                        <th>Applicant Name</th>
-                        <th>Date Submitted</th>
-                        <th>Date Accessed</th>
-                        <th></th>
-                        <th></th>
-                    </tr>
-                    </thead>
-                    <tbody>
+            <thead>
+            <tr>
+                <th>App Type</th>
+                <th>Applicant Name</th>
+                <th>Date Submitted</th>
+                <th>Date Accessed</th>
+                <th></th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
 
-                    {% for entry in entries %}
-                    <tr>
-                        <td class="col-xs-1">{{ entry.app_type }}</td>
-                        <td class="col-xs-1">{{ entry.applicant_name }}</td>
-                        <td class="col-xs-1"> {{ entry.date_submitted}} </td>
-                        <td class="col-xs-1">{{ entry.last_accessed}} </td>
-                        <td class="col-xs-4"><a href="/arc/review/?id={{entry.application_id}}">Review</a></td>
-                        <td class="col-xs-4"><a href="/arc/release/{{entry.application_id}}">Release</a></td>
-                    </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-
+            {% for entry in entries %}
+            <tr>
+                <td class="col-xs-1">{{ entry.app_type }}</td>
+                <td class="col-xs-1">{{ entry.applicant_name }}</td>
+                <td class="col-xs-1"> {{ entry.date_submitted}}</td>
+                <td class="col-xs-1">{{ entry.last_accessed}}</td>
+                <td class="col-xs-4"><a href="/arc/review/?id={{entry.application_id}}">Review</a></td>
+                <td class="col-xs-4"><a href="/arc/release/{{entry.application_id}}">Release</a></td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {% endif %}
     </div>
 </div>
 {% endblock %}

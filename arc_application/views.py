@@ -15,22 +15,26 @@ from .models import ApplicantName, ApplicantPersonalDetails, Application, ArcRev
 
 @login_required()
 def summary_page(request):
-    if has_group(request.user, 'arc'):
-        entries = ArcReview.objects.filter(user_id=request.user.id).order_by('user_id')
-        variables = {
-            'entries': entries,
-        }
+    if has_group(request.user, settings.ARC_GROUP):
         if request.method == 'POST':
             assign_new_application(request)
-            entries = ArcReview.objects.filter(user_id=request.user.id).order_by('user_id')
-            obj = []
-            for entry in entries:
-                response = get_table_data(entry)
-                obj.append(response)
+        entries = ArcReview.objects.filter(user_id=request.user.id).order_by('user_id')
+        obj = []
+        for entry in entries:
+            response = get_table_data(entry)
+            obj.append(response)
+
+        print((len(obj)))
+        if len(obj) == 0:
             variables = {
                 'entries': obj,
+                'empty': 'true'
             }
-            return render(request, './summary.html', variables)
+        else:
+            variables = {
+                'entries': obj,
+                'empty': 'false'
+            }
         return render(request, './summary.html', variables)
     return JsonResponse({'message': 'Gotta login with correct access rights'})
 
@@ -120,14 +124,15 @@ def custom_login(request):
             username = form.cleaned_data.get('username')
             password = form.cleaned_data.get('password')
             user = authenticate(username=username, password=password)
-            if user is not None and has_group(user, 'arc'):
+            if user is not None and has_group(user, settings.ARC_GROUP):
                 auth_login(request, user)
                 return HttpResponseRedirect(settings.URL_PREFIX + '/summary')
             else:
-                form.errors['username'] = {'Invalid Login Details':'invalid'}
-                form.errors['password'] = {'':'invalid'}
+                form.error_summary_title = 'There was a problem signing you in'
         except Exception as ex:
             print(ex)
+            form.error_summary_title = 'There was a problem signing you in'
+            form.get_invalid_login_error()
 
     else:
         form = AuthenticationForm()
@@ -191,16 +196,15 @@ class AuthenticationForm(GOVUKForm):
         if self.fields['username'].label is None:
             self.fields['username'].label = capfirst(self.username_field.verbose_name)
 
-
     def clean(self):
         username = self.cleaned_data.get('username')
         password = self.cleaned_data.get('password')
         if username is not None and password:
             self.user_cache = authenticate(self.request, username=username, password=password)
-            if self.user_cache is not None:
-                raise forms.ValidationError('')
+            if self.user_cache is None or not has_group(self.user_cache, settings.ARC_GROUP):
+                raise forms.ValidationError(
+                    'Email and password combination not recognised. Please try signing in again below')
             else:
-                #raise forms.ValidationError('Please enter a valid e-mail address. B')
                 self.confirm_login_allowed(self.user_cache)
         return self.cleaned_data
 

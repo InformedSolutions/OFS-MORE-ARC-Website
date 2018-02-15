@@ -3,6 +3,7 @@ import os
 # Server name for showing server that responded to request under load balancing conditions
 SERVER_LABEL = 'Test_1'
 
+ARC_GROUP = 'arc'
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
