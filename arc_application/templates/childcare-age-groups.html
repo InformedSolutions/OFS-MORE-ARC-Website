@@ -23,8 +23,9 @@
             <h1 class="form-title heading-large">
                 Ages of the children
             </h1>
-            {{form.as_div}}
-            {% csrf_token %}
+            <p>0-5 Years Old : {{ zero }}</p>
+            <p>5-8 Years Old : {{ five }}</p>
+            <p>8+ Years Old : {{ eight }}</p>
             <input type="submit" class="button" value="Save and continue" alt='Continue to declaration'>
             <input type="hidden" id="id" name="id" value="{{application_id}}"/>
         </div>

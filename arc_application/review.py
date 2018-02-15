@@ -79,7 +79,6 @@ def contact_summary(request):
         return render(request, 'contact-summary.html', variables)
 
 
-
 def type_of_childcare_age_groups(request):
     """
     Method returning the template for the Type of childcare: age groups page (for a given application) and navigating
@@ -91,9 +90,13 @@ def type_of_childcare_age_groups(request):
     current_date = datetime.datetime.today()
     if request.method == 'GET':
         application_id_local = request.GET["id"]
-        application = Application.objects.get(pk=application_id_local)
+        application = ChildcareType.objects.get(application_id=application_id_local)
+
         variables = {
-            'application_id': str(application_id_local)
+            'application_id': str(application_id_local),
+            'zero': application.zero_to_five,
+            'five': application.five_to_eight,
+            'eight': application.eight_plus,
         }
         return render(request, 'childcare-age-groups.html', variables)
 
@@ -382,6 +385,14 @@ def health_check_answers(request):
             'health_status': application.health_status,
         }
         return render(request, 'health-check-answers.html', variables)
+
+
+def declaration(request):
+    application_id_local = request.GET["id"]
+    variables = {
+        'application_id': application_id_local,
+    }
+    return render(request, 'review-confirmation.html', variables)
 
 
 def has_group(user, group_name):
