@@ -16,25 +16,36 @@ from .models import ApplicantName, ApplicantPersonalDetails, Application, ArcRev
 @login_required()
 def summary_page(request):
     if has_group(request.user, settings.ARC_GROUP):
+        error_exist = 'false'
+        error_title = ''
+        error_text = ''
+        empty = 'false'
+        assign_response = True
         if request.method == 'POST':
-            assign_new_application(request)
+            assign_response = assign_new_application(request)
         entries = ArcReview.objects.filter(user_id=request.user.id).order_by('user_id')
         obj = []
         for entry in entries:
             response = get_table_data(entry)
             obj.append(response)
-
-        print((len(obj)))
         if len(obj) == 0:
-            variables = {
+            empty = 'true'
+        if not assign_response:
+            error_exist = 'true'
+            error_title = 'No Available Applications'
+            error_text = 'There are currently no more applications ready for a review'
+        if len(obj) == 10 and request.method == 'POST':
+            error_exist = 'true'
+            error_title ='You have reached the limit'
+            error_text = 'Error, please release an application before adding a new one, there is a maximum of ten applications at once'
+        variables = {
                 'entries': obj,
-                'empty': 'true'
+                'empty': empty,
+                'error_exist': error_exist,
+                'error_title': error_title,
+                'error_text': error_text
             }
-        else:
-            variables = {
-                'entries': obj,
-                'empty': 'false'
-            }
+
         return render(request, './summary.html', variables)
     return JsonResponse({'message': 'Gotta login with correct access rights'})
 
@@ -60,7 +71,7 @@ def assign_new_application(request):
     else:
         local_application_id = get_oldest_application_id()
         if local_application_id == None:
-            print("No Applications Availible")
+            return False
 
     if Application.objects.filter(pk=local_application_id).count() > 0:
         application = Application.objects.get(application_id=local_application_id)
