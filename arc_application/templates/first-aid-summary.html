@@ -119,7 +119,8 @@
     </table>
     <br>
     <div class="form-group grid-row">
-        <form method="get" action="{{ URL_PREFIX }}/dbs-check/summary?id={{application_id}}">
+        <form method="post">
+            {% csrf_token %}
             <input type="submit" class="button" value="Confirm and continue"/>
             <input type="hidden" value="{{application_id}}" name="id"/>
         </form>

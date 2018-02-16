@@ -17,7 +17,7 @@
         </a>
     </div>
     <!-- Form -->
-    <form method="get" action="{{ URL_PREFIX }}/personal-details/summary?id={{application_id}}">
+    <form method="post">
         <!-- Content -->
         <div class="form-group grid-row">
 
@@ -34,11 +34,12 @@
                 <thead></thead>
                 <tbody>
                 <tr><td> </td><td> </td></tr>
-                <tr><td>0-5 Years Old: </td><td> {{ zero }}</td></tr>
+                <tr><td>0-5 Years Old </td><td> {{ zero }}</td></tr>
                  <tr><td>5-8 Years Old </td><td> {{ five }}</td></tr>
                  <tr><td>8+ Years Old </td><td> {{ eight }}</td></tr>
                 </tbody>
             </table>
+            {% csrf_token %}
                 <input type="submit" class="button" value="Save and continue" alt='Continue to declaration'>
                 <input type="hidden" id="id" name="id" value="{{application_id}}"/>
         </div>

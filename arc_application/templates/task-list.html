@@ -215,8 +215,15 @@
                 </tbody>
             </table>
         </div>
+        {% if all_complete == True %}
+        <div class="column-two-thirds">
+            <div class="form-group">
+                <a href="{{ URL_PREFIX }}/confirmation/?id={{application_id}}" class="button"
+                   style="margin-left: 0px;">Complete Review</a>
+            </div>
+        </div>
+        {% endif %}
     </div>
-
 </div>
 
-{% endblock %}
+    {% endblock %}

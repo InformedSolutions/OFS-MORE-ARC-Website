@@ -16,6 +16,7 @@ def task_list(request):
     if has_group(request.user, 'arc'):
         if request.method == 'GET':
             application_id = request.GET['id']
+            print(application_id)
             application = ArcStatus.objects.get(application_id=application_id)
 
             application_status_context = dict({
@@ -29,6 +30,9 @@ def task_list(request):
                 'reference_status': application.references_review,
                 'people_in_home_status': application.people_in_home_review,
                 'declaration_status': application.declaration_review,
+                'all_complete': False,
+                'declaration_status':False
+
             })
 
             temp_context = application_status_context
@@ -38,7 +42,7 @@ def task_list(request):
                 application_status_context['all_complete'] = False
             else:
                 application_status_context['all_complete'] = True
-                application_status_context['declaration_status'] = application.declarations_status
+                application_status_context['declaration_status'] = application.declaration_review
                 if application_status_context['declaration_status'] == 'COMPLETED':
                     application_status_context['confirm_details'] = True
                 else:
@@ -55,25 +59,32 @@ def contact_summary(request):
     """
     if request.method == 'GET':
         application_id_local = request.GET["id"]
-        application = Application.objects.get(pk=application_id_local)
-        login_id = application.login_id
-        user_details = UserDetails.objects.get(login_id=login_id)
-        email = user_details.email
-        mobile_number = user_details.mobile_number
-        add_phone_number = user_details.add_phone_number
-        security_question = user_details.security_question
-        security_answer = user_details.security_answer
-        variables = {
-            'application_id': application_id_local,
-            'email': email,
-            'mobile_number': mobile_number,
-            'add_phone_number': add_phone_number,
-            'security_question': security_question,
-            'security_answer': security_answer,
-            'login_details_status': application.login_details_status,
-            'childcare_type_status': application.childcare_type_status
-        }
-        return render(request, 'contact-summary.html', variables)
+    elif request.method == 'POST':
+        application_id_local = request.POST["id"]
+        status = ArcStatus.objects.get(pk=application_id_local)
+        status.login_details_review = 'COMPLETED'
+        status.save()
+        return HttpResponseRedirect(settings.URL_PREFIX + '/childcare/age-groups?id=' + application_id_local)
+
+    application = Application.objects.get(pk=application_id_local)
+    login_id = application.login_id
+    user_details = UserDetails.objects.get(login_id=login_id)
+    email = user_details.email
+    mobile_number = user_details.mobile_number
+    add_phone_number = user_details.add_phone_number
+    security_question = user_details.security_question
+    security_answer = user_details.security_answer
+    variables = {
+        'application_id': application_id_local,
+        'email': email,
+        'mobile_number': mobile_number,
+        'add_phone_number': add_phone_number,
+        'security_question': security_question,
+        'security_answer': security_answer,
+        'login_details_status': application.login_details_status,
+        'childcare_type_status': application.childcare_type_status
+    }
+    return render(request, 'contact-summary.html', variables)
 
 
 def type_of_childcare_age_groups(request):
@@ -84,18 +95,24 @@ def type_of_childcare_age_groups(request):
     :param request: a request object used to generate the HttpResponse
     :return: an HttpResponse object with the rendered Type of childcare: age groups template
     """
-    current_date = datetime.datetime.today()
     if request.method == 'GET':
         application_id_local = request.GET["id"]
-        application = ChildcareType.objects.get(application_id=application_id_local)
+    elif request.method == 'POST':
+        application_id_local = request.POST["id"]
+        status = ArcStatus.objects.get(pk=application_id_local)
+        status.childcare_type_review = 'COMPLETED'
+        status.save()
+        return HttpResponseRedirect(settings.URL_PREFIX + '/personal-details/summary?id=' + application_id_local)
+    application_id_local = request.GET["id"]
+    application = ChildcareType.objects.get(application_id=application_id_local)
 
-        variables = {
-            'application_id': str(application_id_local),
-            'zero': application.zero_to_five,
-            'five': application.five_to_eight,
-            'eight': application.eight_plus,
-        }
-        return render(request, 'childcare-age-groups.html', variables)
+    variables = {
+        'application_id': str(application_id_local),
+        'zero': application.zero_to_five,
+        'five': application.five_to_eight,
+        'eight': application.eight_plus,
+    }
+    return render(request, 'childcare-age-groups.html', variables)
 
 
 def personal_details_summary(request):
@@ -107,52 +124,59 @@ def personal_details_summary(request):
     """
     if request.method == 'GET':
         application_id_local = request.GET["id"]
-        personal_detail_id = ApplicantPersonalDetails.objects.get(application_id=application_id_local)
-        birth_day = personal_detail_id.birth_day
-        birth_month = personal_detail_id.birth_month
-        birth_year = personal_detail_id.birth_year
-        applicant_name_record = ApplicantName.objects.get(personal_detail_id=personal_detail_id)
-        first_name = applicant_name_record.first_name
-        middle_names = applicant_name_record.middle_names
-        last_name = applicant_name_record.last_name
-        applicant_home_address_record = ApplicantHomeAddress.objects.get(personal_detail_id=personal_detail_id,
-                                                                         current_address=True)
-        street_line1 = applicant_home_address_record.street_line1
-        street_line2 = applicant_home_address_record.street_line2
-        town = applicant_home_address_record.town
-        county = applicant_home_address_record.county
-        postcode = applicant_home_address_record.postcode
-        location_of_childcare = applicant_home_address_record.childcare_address
-        applicant_childcare_address_record = ApplicantHomeAddress.objects.get(personal_detail_id=personal_detail_id,
-                                                                              childcare_address=True)
-        childcare_street_line1 = applicant_childcare_address_record.street_line1
-        childcare_street_line2 = applicant_childcare_address_record.street_line2
-        childcare_town = applicant_childcare_address_record.town
-        childcare_county = applicant_childcare_address_record.county
-        childcare_postcode = applicant_childcare_address_record.postcode
-        application = Application.objects.get(pk=application_id_local)
-        variables = {
-            'application_id': application_id_local,
-            'first_name': first_name,
-            'middle_names': middle_names,
-            'last_name': last_name,
-            'birth_day': birth_day,
-            'birth_month': birth_month,
-            'birth_year': birth_year,
-            'street_line1': street_line1,
-            'street_line2': street_line2,
-            'town': town,
-            'county': county,
-            'postcode': postcode,
-            'location_of_childcare': location_of_childcare,
-            'childcare_street_line1': childcare_street_line1,
-            'childcare_street_line2': childcare_street_line2,
-            'childcare_town': childcare_town,
-            'childcare_county': childcare_county,
-            'childcare_postcode': childcare_postcode,
-            'personal_details_status': application.personal_details_status
-        }
-        return render(request, 'personal-details-summary.html', variables)
+    elif request.method == 'POST':
+        application_id_local = request.POST["id"]
+        status = ArcStatus.objects.get(pk=application_id_local)
+        status.personal_details_review = 'COMPLETED'
+        status.save()
+        return HttpResponseRedirect(settings.URL_PREFIX + '/first-aid/summary?id=' + application_id_local)
+    application_id_local = request.GET["id"]
+    personal_detail_id = ApplicantPersonalDetails.objects.get(application_id=application_id_local)
+    birth_day = personal_detail_id.birth_day
+    birth_month = personal_detail_id.birth_month
+    birth_year = personal_detail_id.birth_year
+    applicant_name_record = ApplicantName.objects.get(personal_detail_id=personal_detail_id)
+    first_name = applicant_name_record.first_name
+    middle_names = applicant_name_record.middle_names
+    last_name = applicant_name_record.last_name
+    applicant_home_address_record = ApplicantHomeAddress.objects.get(personal_detail_id=personal_detail_id,
+                                                                     current_address=True)
+    street_line1 = applicant_home_address_record.street_line1
+    street_line2 = applicant_home_address_record.street_line2
+    town = applicant_home_address_record.town
+    county = applicant_home_address_record.county
+    postcode = applicant_home_address_record.postcode
+    location_of_childcare = applicant_home_address_record.childcare_address
+    applicant_childcare_address_record = ApplicantHomeAddress.objects.get(personal_detail_id=personal_detail_id,
+                                                                          childcare_address=True)
+    childcare_street_line1 = applicant_childcare_address_record.street_line1
+    childcare_street_line2 = applicant_childcare_address_record.street_line2
+    childcare_town = applicant_childcare_address_record.town
+    childcare_county = applicant_childcare_address_record.county
+    childcare_postcode = applicant_childcare_address_record.postcode
+    application = Application.objects.get(pk=application_id_local)
+    variables = {
+        'application_id': application_id_local,
+        'first_name': first_name,
+        'middle_names': middle_names,
+        'last_name': last_name,
+        'birth_day': birth_day,
+        'birth_month': birth_month,
+        'birth_year': birth_year,
+        'street_line1': street_line1,
+        'street_line2': street_line2,
+        'town': town,
+        'county': county,
+        'postcode': postcode,
+        'location_of_childcare': location_of_childcare,
+        'childcare_street_line1': childcare_street_line1,
+        'childcare_street_line2': childcare_street_line2,
+        'childcare_town': childcare_town,
+        'childcare_county': childcare_county,
+        'childcare_postcode': childcare_postcode,
+        'personal_details_status': application.personal_details_status
+    }
+    return render(request, 'personal-details-summary.html', variables)
 
 
 def first_aid_training_summary(request):
@@ -164,23 +188,28 @@ def first_aid_training_summary(request):
     """
     if request.method == 'GET':
         application_id_local = request.GET["id"]
-        training_organisation = FirstAidTraining.objects.get(application_id=application_id_local).training_organisation
-        training_course = FirstAidTraining.objects.get(application_id=application_id_local).course_title
-        certificate_day = FirstAidTraining.objects.get(application_id=application_id_local).course_day
-        certificate_month = FirstAidTraining.objects.get(application_id=application_id_local).course_month
-        certificate_year = FirstAidTraining.objects.get(application_id=application_id_local).course_year
-        application = Application.objects.get(pk=application_id_local)
-        variables = {
-            'application_id': application_id_local,
-            'training_organisation': training_organisation,
-            'training_course': training_course,
-            'certificate_day': certificate_day,
-            'certificate_month': certificate_month,
-            'certificate_year': certificate_year,
-            'first_aid_training_status': application.first_aid_training_status
-        }
-        return render(request, 'first-aid-summary.html', variables)
-
+    elif request.method == 'POST':
+        application_id_local = request.POST["id"]
+        status = ArcStatus.objects.get(pk=application_id_local)
+        status.first_aid_review = 'COMPLETED'
+        status.save()
+        return HttpResponseRedirect(settings.URL_PREFIX + '/dbs-check/summary?id=' + application_id_local)
+    training_organisation = FirstAidTraining.objects.get(application_id=application_id_local).training_organisation
+    training_course = FirstAidTraining.objects.get(application_id=application_id_local).course_title
+    certificate_day = FirstAidTraining.objects.get(application_id=application_id_local).course_day
+    certificate_month = FirstAidTraining.objects.get(application_id=application_id_local).course_month
+    certificate_year = FirstAidTraining.objects.get(application_id=application_id_local).course_year
+    application = Application.objects.get(pk=application_id_local)
+    variables = {
+        'application_id': application_id_local,
+        'training_organisation': training_organisation,
+        'training_course': training_course,
+        'certificate_day': certificate_day,
+        'certificate_month': certificate_month,
+        'certificate_year': certificate_year,
+        'first_aid_training_status': application.first_aid_training_status
+    }
+    return render(request, 'first-aid-summary.html', variables)
 
 
 def dbs_check_summary(request):
@@ -192,19 +221,25 @@ def dbs_check_summary(request):
     """
     if request.method == 'GET':
         application_id_local = request.GET["id"]
-        criminal_record_check = CriminalRecordCheck.objects.get(application_id=application_id_local)
-        dbs_certificate_number = criminal_record_check.dbs_certificate_number
-        cautions_convictions = criminal_record_check.cautions_convictions
-        send_certificate_declare = criminal_record_check.send_certificate_declare
-        application = Application.objects.get(pk=application_id_local)
-        variables = {
-            'application_id': application_id_local,
-            'dbs_certificate_number': dbs_certificate_number,
-            'cautions_convictions': cautions_convictions,
-            'criminal_record_check_status': application.criminal_record_check_status,
-            'declaration': send_certificate_declare
-        }
-        return render(request, 'dbs-check-summary.html', variables)
+    elif request.method == 'POST':
+        application_id_local = request.POST["id"]
+        status = ArcStatus.objects.get(pk=application_id_local)
+        status.dbs_review = 'COMPLETED'
+        status.save()
+        return HttpResponseRedirect(settings.URL_PREFIX + '/health/check-answers?id=' + application_id_local)
+    criminal_record_check = CriminalRecordCheck.objects.get(application_id=application_id_local)
+    dbs_certificate_number = criminal_record_check.dbs_certificate_number
+    cautions_convictions = criminal_record_check.cautions_convictions
+    send_certificate_declare = criminal_record_check.send_certificate_declare
+    application = Application.objects.get(pk=application_id_local)
+    variables = {
+        'application_id': application_id_local,
+        'dbs_certificate_number': dbs_certificate_number,
+        'cautions_convictions': cautions_convictions,
+        'criminal_record_check_status': application.criminal_record_check_status,
+        'declaration': send_certificate_declare
+    }
+    return render(request, 'dbs-check-summary.html', variables)
 
 
 def references_summary(request):
@@ -216,66 +251,72 @@ def references_summary(request):
     """
     if request.method == 'GET':
         application_id_local = request.GET["id"]
-        first_reference_record = Reference.objects.get(application_id=application_id_local, reference=1)
-        second_reference_record = Reference.objects.get(application_id=application_id_local, reference=2)
-        first_reference_first_name = first_reference_record.first_name
-        first_reference_last_name = first_reference_record.last_name
-        first_reference_relationship = first_reference_record.relationship
-        first_reference_years_known = first_reference_record.years_known
-        first_reference_months_known = first_reference_record.months_known
-        first_reference_street_line1 = first_reference_record.street_line1
-        first_reference_street_line2 = first_reference_record.street_line2
-        first_reference_town = first_reference_record.town
-        first_reference_county = first_reference_record.county
-        first_reference_country = first_reference_record.country
-        first_reference_postcode = first_reference_record.postcode
-        first_reference_phone_number = first_reference_record.phone_number
-        first_reference_email = first_reference_record.email
-        second_reference_first_name = second_reference_record.first_name
-        second_reference_last_name = second_reference_record.last_name
-        second_reference_relationship = second_reference_record.relationship
-        second_reference_years_known = second_reference_record.years_known
-        second_reference_months_known = second_reference_record.months_known
-        second_reference_street_line1 = second_reference_record.street_line1
-        second_reference_street_line2 = second_reference_record.street_line2
-        second_reference_town = second_reference_record.town
-        second_reference_county = second_reference_record.county
-        second_reference_country = second_reference_record.country
-        second_reference_postcode = second_reference_record.postcode
-        second_reference_phone_number = second_reference_record.phone_number
-        second_reference_email = second_reference_record.email
-        application = Application.objects.get(pk=application_id_local)
-        variables = {
-            'application_id': application_id_local,
-            'first_reference_first_name': first_reference_first_name,
-            'first_reference_last_name': first_reference_last_name,
-            'first_reference_relationship': first_reference_relationship,
-            'first_reference_years_known': first_reference_years_known,
-            'first_reference_months_known': first_reference_months_known,
-            'first_reference_street_line1': first_reference_street_line1,
-            'first_reference_street_line2': first_reference_street_line2,
-            'first_reference_town': first_reference_town,
-            'first_reference_county': first_reference_county,
-            'first_reference_country': first_reference_country,
-            'first_reference_postcode': first_reference_postcode,
-            'first_reference_phone_number': first_reference_phone_number,
-            'first_reference_email': first_reference_email,
-            'second_reference_first_name': second_reference_first_name,
-            'second_reference_last_name': second_reference_last_name,
-            'second_reference_relationship': second_reference_relationship,
-            'second_reference_years_known': second_reference_years_known,
-            'second_reference_months_known': second_reference_months_known,
-            'second_reference_street_line1': second_reference_street_line1,
-            'second_reference_street_line2': second_reference_street_line2,
-            'second_reference_town': second_reference_town,
-            'second_reference_county': second_reference_county,
-            'second_reference_country': second_reference_country,
-            'second_reference_postcode': second_reference_postcode,
-            'second_reference_phone_number': second_reference_phone_number,
-            'second_reference_email': second_reference_email,
-            'references_status': application.references_status
-        }
-        return render(request, 'references-summary.html', variables)
+    elif request.method == 'POST':
+        application_id_local = request.POST["id"]
+        status = ArcStatus.objects.get(pk=application_id_local)
+        status.references_review = 'COMPLETED'
+        status.save()
+        return HttpResponseRedirect(settings.URL_PREFIX + '/other-people/summary?id=' + application_id_local)
+    first_reference_record = Reference.objects.get(application_id=application_id_local, reference=1)
+    second_reference_record = Reference.objects.get(application_id=application_id_local, reference=2)
+    first_reference_first_name = first_reference_record.first_name
+    first_reference_last_name = first_reference_record.last_name
+    first_reference_relationship = first_reference_record.relationship
+    first_reference_years_known = first_reference_record.years_known
+    first_reference_months_known = first_reference_record.months_known
+    first_reference_street_line1 = first_reference_record.street_line1
+    first_reference_street_line2 = first_reference_record.street_line2
+    first_reference_town = first_reference_record.town
+    first_reference_county = first_reference_record.county
+    first_reference_country = first_reference_record.country
+    first_reference_postcode = first_reference_record.postcode
+    first_reference_phone_number = first_reference_record.phone_number
+    first_reference_email = first_reference_record.email
+    second_reference_first_name = second_reference_record.first_name
+    second_reference_last_name = second_reference_record.last_name
+    second_reference_relationship = second_reference_record.relationship
+    second_reference_years_known = second_reference_record.years_known
+    second_reference_months_known = second_reference_record.months_known
+    second_reference_street_line1 = second_reference_record.street_line1
+    second_reference_street_line2 = second_reference_record.street_line2
+    second_reference_town = second_reference_record.town
+    second_reference_county = second_reference_record.county
+    second_reference_country = second_reference_record.country
+    second_reference_postcode = second_reference_record.postcode
+    second_reference_phone_number = second_reference_record.phone_number
+    second_reference_email = second_reference_record.email
+    application = Application.objects.get(pk=application_id_local)
+    variables = {
+        'application_id': application_id_local,
+        'first_reference_first_name': first_reference_first_name,
+        'first_reference_last_name': first_reference_last_name,
+        'first_reference_relationship': first_reference_relationship,
+        'first_reference_years_known': first_reference_years_known,
+        'first_reference_months_known': first_reference_months_known,
+        'first_reference_street_line1': first_reference_street_line1,
+        'first_reference_street_line2': first_reference_street_line2,
+        'first_reference_town': first_reference_town,
+        'first_reference_county': first_reference_county,
+        'first_reference_country': first_reference_country,
+        'first_reference_postcode': first_reference_postcode,
+        'first_reference_phone_number': first_reference_phone_number,
+        'first_reference_email': first_reference_email,
+        'second_reference_first_name': second_reference_first_name,
+        'second_reference_last_name': second_reference_last_name,
+        'second_reference_relationship': second_reference_relationship,
+        'second_reference_years_known': second_reference_years_known,
+        'second_reference_months_known': second_reference_months_known,
+        'second_reference_street_line1': second_reference_street_line1,
+        'second_reference_street_line2': second_reference_street_line2,
+        'second_reference_town': second_reference_town,
+        'second_reference_county': second_reference_county,
+        'second_reference_country': second_reference_country,
+        'second_reference_postcode': second_reference_postcode,
+        'second_reference_phone_number': second_reference_phone_number,
+        'second_reference_email': second_reference_email,
+        'references_status': application.references_status
+    }
+    return render(request, 'references-summary.html', variables)
 
 
 def other_people_summary(request):
@@ -287,59 +328,65 @@ def other_people_summary(request):
     """
     if request.method == 'GET':
         application_id_local = request.GET["id"]
-        adults_list = AdultInHome.objects.filter(application_id=application_id_local).order_by('adult')
-        adult_name_list = []
-        adult_birth_day_list = []
-        adult_birth_month_list = []
-        adult_birth_year_list = []
-        adult_relationship_list = []
-        adult_dbs_list = []
-        adult_permission_list = []
-        children_list = ChildInHome.objects.filter(application_id=application_id_local).order_by('child')
-        child_name_list = []
-        child_birth_day_list = []
-        child_birth_month_list = []
-        child_birth_year_list = []
-        child_relationship_list = []
-        application = Application.objects.get(pk=application_id_local)
-        for adult in adults_list:
-            if adult.middle_names != '':
-                name = adult.first_name + ' ' + adult.middle_names + ' ' + adult.last_name
-            elif adult.middle_names == '':
-                name = adult.first_name + ' ' + adult.last_name
-            adult_name_list.append(name)
-            adult_birth_day_list.append(adult.birth_day)
-            adult_birth_month_list.append(adult.birth_month)
-            adult_birth_year_list.append(adult.birth_year)
-            adult_relationship_list.append(adult.relationship)
-            adult_dbs_list.append(adult.dbs_certificate_number)
-            adult_permission_list.append(adult.permission_declare)
-        adult_lists = zip(adult_name_list, adult_birth_day_list, adult_birth_month_list, adult_birth_year_list,
-                          adult_relationship_list, adult_dbs_list, adult_permission_list)
-        for child in children_list:
-            if child.middle_names != '':
-                name = child.first_name + ' ' + child.middle_names + ' ' + child.last_name
-            elif child.middle_names == '':
-                name = child.first_name + ' ' + child.last_name
-            child_name_list.append(name)
-            child_birth_day_list.append(child.birth_day)
-            child_birth_month_list.append(child.birth_month)
-            child_birth_year_list.append(child.birth_year)
-            child_relationship_list.append(child.relationship)
-        child_lists = zip(child_name_list, child_birth_day_list, child_birth_month_list, child_birth_year_list,
-                          child_relationship_list)
-        variables = {
-            'application_id': application_id_local,
-            'adults_in_home': application.adults_in_home,
-            'children_in_home': application.children_in_home,
-            'number_of_adults': adults_list.count(),
-            'number_of_children': children_list.count(),
-            'adult_lists': adult_lists,
-            'child_lists': child_lists,
-            'turning_16': application.children_turning_16,
-            'people_in_home_status': application.people_in_home_status
-        }
-        return render(request, 'other-people-summary.html', variables)
+    elif request.method == 'POST':
+        application_id_local = request.POST["id"]
+        status = ArcStatus.objects.get(pk=application_id_local)
+        status.people_in_home_review = 'COMPLETED'
+        status.save()
+        return HttpResponseRedirect(settings.URL_PREFIX + '/declaration?id=' + application_id_local)
+    adults_list = AdultInHome.objects.filter(application_id=application_id_local).order_by('adult')
+    adult_name_list = []
+    adult_birth_day_list = []
+    adult_birth_month_list = []
+    adult_birth_year_list = []
+    adult_relationship_list = []
+    adult_dbs_list = []
+    adult_permission_list = []
+    children_list = ChildInHome.objects.filter(application_id=application_id_local).order_by('child')
+    child_name_list = []
+    child_birth_day_list = []
+    child_birth_month_list = []
+    child_birth_year_list = []
+    child_relationship_list = []
+    application = Application.objects.get(pk=application_id_local)
+    for adult in adults_list:
+        if adult.middle_names != '':
+            name = adult.first_name + ' ' + adult.middle_names + ' ' + adult.last_name
+        elif adult.middle_names == '':
+            name = adult.first_name + ' ' + adult.last_name
+        adult_name_list.append(name)
+        adult_birth_day_list.append(adult.birth_day)
+        adult_birth_month_list.append(adult.birth_month)
+        adult_birth_year_list.append(adult.birth_year)
+        adult_relationship_list.append(adult.relationship)
+        adult_dbs_list.append(adult.dbs_certificate_number)
+        adult_permission_list.append(adult.permission_declare)
+    adult_lists = zip(adult_name_list, adult_birth_day_list, adult_birth_month_list, adult_birth_year_list,
+                      adult_relationship_list, adult_dbs_list, adult_permission_list)
+    for child in children_list:
+        if child.middle_names != '':
+            name = child.first_name + ' ' + child.middle_names + ' ' + child.last_name
+        elif child.middle_names == '':
+            name = child.first_name + ' ' + child.last_name
+        child_name_list.append(name)
+        child_birth_day_list.append(child.birth_day)
+        child_birth_month_list.append(child.birth_month)
+        child_birth_year_list.append(child.birth_year)
+        child_relationship_list.append(child.relationship)
+    child_lists = zip(child_name_list, child_birth_day_list, child_birth_month_list, child_birth_year_list,
+                      child_relationship_list)
+    variables = {
+        'application_id': application_id_local,
+        'adults_in_home': application.adults_in_home,
+        'children_in_home': application.children_in_home,
+        'number_of_adults': adults_list.count(),
+        'number_of_children': children_list.count(),
+        'adult_lists': adult_lists,
+        'child_lists': child_lists,
+        'turning_16': application.children_turning_16,
+        'people_in_home_status': application.people_in_home_status
+    }
+    return render(request, 'other-people-summary.html', variables)
 
 
 def health_check_answers(request):
@@ -362,7 +409,14 @@ def health_check_answers(request):
 
 
 def declaration(request):
-    application_id_local = request.GET["id"]
+    if request.method == 'GET':
+        application_id_local = request.GET["id"]
+    elif request.method == 'POST':
+        application_id_local = request.POST["id"]
+        status = ArcStatus.objects.get(pk=application_id_local)
+        status.declaration_review = 'COMPLETED'
+        status.save()
+        return HttpResponseRedirect(settings.URL_PREFIX + '/review?id=' + application_id_local)
     # Retrieve all information related to the application from the database
     application = Application.objects.get(application_id=application_id_local)
     login_detail_id = application.login_id
@@ -500,7 +554,6 @@ def declaration(request):
         'child_lists': child_lists,
         'turning_16': application.children_turning_16,
     }
-
 
     return render(request, 'declaration-summary.html', variables)
 

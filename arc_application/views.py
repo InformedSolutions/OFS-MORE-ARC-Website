@@ -82,7 +82,10 @@ def assign_new_application(request):
         arc_user.last_accessed = str(application.date_updated.strftime('%d/%m/%Y'))
         arc_user.user_id = request.user.id
         arc_user.app_type = 'Childminder'
-        if ArcStatus.objects.filter(pk=local_application_id).count !=1:
+        arc_user.save()
+        if ArcStatus.objects.filter(application_id=local_application_id).exists:
+            status = ArcStatus.objects.get(application_id=local_application_id)
+        else:
             status = ArcStatus.objects.create(application_id=local_application_id)
             status.login_details_review = "NOT_STARTED"
             status.childcare_type_review = "NOT_STARTED"
@@ -91,11 +94,11 @@ def assign_new_application(request):
             status.dbs_review = "NOT_STARTED"
             status.health_review = "NOT_STARTED"
             status.references_review = "NOT_STARTED"
-            status.people_in_home_review ="NOT_STARTED"
-            status.declaration_review ="NOT_STARTED"
+            status.people_in_home_review = "NOT_STARTED"
+            status.declaration_review = "NOT_STARTED"
             status.save()
 
-        arc_user.save()
+
 
         return JsonResponse({'message': arc_user.application_id})
 
@@ -183,8 +186,6 @@ def has_group(user, group_name):
 
 
 def release_application(request, application_id):
-    print(application_id)
-    print(request.user.id)
     if len(ArcReview.objects.filter(application_id=application_id)) == 1:
         row = ArcReview.objects.get(application_id=application_id)
         row.delete()
