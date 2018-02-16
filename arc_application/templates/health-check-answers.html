@@ -51,7 +51,8 @@
     </table>
     <br>
     <div class="form-group grid-row">
-        <form action="{{ URL_PREFIX }}/references/summary?id={{application_id}}" method="get">
+        <form method="post">
+            {% csrf_token %}
             <input type="submit" class="button" value="Confirm and continue"/>
             <input type="hidden" value="{{application_id}}" name="id"/>
         </form>

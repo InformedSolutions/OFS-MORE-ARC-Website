@@ -31,7 +31,7 @@ def task_list(request):
                 'people_in_home_status': application.people_in_home_review,
                 'declaration_status': application.declaration_review,
                 'all_complete': False,
-                'declaration_status':False
+                'declaration_status': False
 
             })
 
@@ -398,14 +398,20 @@ def health_check_answers(request):
     """
     if request.method == 'GET':
         application_id_local = request.GET["id"]
-        send_hdb_declare = HealthDeclarationBooklet.objects.get(application_id=application_id_local).send_hdb_declare
-        application = Application.objects.get(pk=application_id_local)
-        variables = {
-            'application_id': application_id_local,
-            'send_hdb_declare': send_hdb_declare,
-            'health_status': application.health_status,
-        }
-        return render(request, 'health-check-answers.html', variables)
+    elif request.method == 'POST':
+        application_id_local = request.POST["id"]
+        status = ArcStatus.objects.get(pk=application_id_local)
+        status.health_review = 'COMPLETED'
+        status.save()
+        return HttpResponseRedirect(settings.URL_PREFIX + '/references/summary?id=' + application_id_local)
+    send_hdb_declare = HealthDeclarationBooklet.objects.get(application_id=application_id_local).send_hdb_declare
+    application = Application.objects.get(pk=application_id_local)
+    variables = {
+        'application_id': application_id_local,
+        'send_hdb_declare': send_hdb_declare,
+        'health_status': application.health_status,
+    }
+    return render(request, 'health-check-answers.html', variables)
 
 
 def declaration(request):
