@@ -16,7 +16,6 @@ def task_list(request):
     if has_group(request.user, 'arc'):
         if request.method == 'GET':
             application_id = request.GET['id']
-            print(application_id)
             application = ArcStatus.objects.get(application_id=application_id)
 
             application_status_context = dict({
@@ -30,24 +29,19 @@ def task_list(request):
                 'reference_status': application.references_review,
                 'people_in_home_status': application.people_in_home_review,
                 'declaration_status': application.declaration_review,
-                'all_complete': False,
-                'declaration_status': False
+                'all_complete': True,
 
             })
 
             temp_context = application_status_context
             del temp_context['declaration_status']
-            # Enable/disable Declarations and Confirm your details tasks depending on task completion
-            if ('NOT_STARTED' in temp_context.values()) or ('IN_PROGRESS' in temp_context.values()):
-                application_status_context['all_complete'] = False
+
+            application_status_context['declaration_status'] = application.declaration_review
+            if application_status_context['declaration_status'] == 'COMPLETED':
+                application_status_context['confirm_details'] = True
             else:
-                application_status_context['all_complete'] = True
-                application_status_context['declaration_status'] = application.declaration_review
-                if application_status_context['declaration_status'] == 'COMPLETED':
-                    application_status_context['confirm_details'] = True
-                else:
-                    application_status_context['confirm_details'] = False
-        return render(request, 'task-list.html', application_status_context)
+                application_status_context['confirm_details'] = False
+    return render(request, 'task-list.html', application_status_context)
 
 
 def contact_summary(request):

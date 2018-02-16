@@ -181,37 +181,26 @@
                         {% endif %}
                     </td>
                 </tr>
-                {% if all_complete == False %}
-                <tr id="reviewInactive">
-                    <td class="task" style="padding-right: 10px; word-wrap: break-word;">
-                        <span>
-                            <span style="color: #BFC1C3; float: left; width: 66.66667%;">Declaration</span><strong
-                                class="task-finished task-do-last" style="margin-left: 12.371%;">Do last</strong>
-                        </span>
-                    </td>
-                </tr>
-                {% elif all_complete == True %}
                 <tr id="review">
                     <td class="task" style="padding-right: 10px; word-wrap: break-word;">
                         {% if declaration_status == 'NOT_STARTED' %}
                         <a href="{{ URL_PREFIX }}/declaration?id={{application_id}}">
-                            <span class="task-name">Declaration and payment</span><strong
+                            <span class="task-name">Declaration</span><strong
                                 class="task-finished task-to-do">To do</strong>
                         </a>
                         {% elif declaration_status == 'FLAGGED' %}
                         <a href="{{ URL_PREFIX }}/declaration?id={{application_id}}">
-                            <span class="task-name">Declaration and payment</span><strong
+                            <span class="task-name">Declaration</span><strong
                                 class="task-finished task-to-do">Flagged</strong>
                         </a>
                         {% elif declaration_status == 'COMPLETED' %}
                         <a href="{{ URL_PREFIX }}/declaration?id={{application_id}}">
-                            <span class="task-name">Declaration and payment</span><strong
+                            <span class="task-name">Declaration</span><strong
                                 class="task-finished">Reviewed</strong>
                         </a>
                         {% endif %}
                     </td>
                 </tr>
-                {% endif %}
                 </tbody>
             </table>
         </div>
