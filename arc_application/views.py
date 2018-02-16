@@ -83,24 +83,24 @@ def assign_new_application(request):
         arc_user.user_id = request.user.id
         arc_user.app_type = 'Childminder'
         arc_user.save()
-        if ArcStatus.objects.filter(application_id=local_application_id).exists:
+        try:
             status = ArcStatus.objects.get(application_id=local_application_id)
-        else:
+        except Exception as ex:
+            print(ex)
             status = ArcStatus.objects.create(application_id=local_application_id)
-            status.login_details_review = "NOT_STARTED"
-            status.childcare_type_review = "NOT_STARTED"
-            status.personal_details_review = "NOT_STARTED"
-            status.first_aid_review = "NOT_STARTED"
-            status.dbs_review = "NOT_STARTED"
-            status.health_review = "NOT_STARTED"
-            status.references_review = "NOT_STARTED"
-            status.people_in_home_review = "NOT_STARTED"
-            status.declaration_review = "NOT_STARTED"
-            status.save()
+        status.login_details_review = "NOT_STARTED"
+        status.childcare_type_review = "NOT_STARTED"
+        status.personal_details_review = "NOT_STARTED"
+        status.first_aid_review = "NOT_STARTED"
+        status.dbs_review = "NOT_STARTED"
+        status.health_review = "NOT_STARTED"
+        status.references_review = "NOT_STARTED"
+        status.people_in_home_review = "NOT_STARTED"
+        status.declaration_review = "NOT_STARTED"
+        status.save()
 
 
-
-        return JsonResponse({'message': arc_user.application_id})
+    return JsonResponse({'message': arc_user.application_id})
 
 
 @login_required()

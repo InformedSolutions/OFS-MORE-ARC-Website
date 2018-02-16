@@ -1,7 +1,6 @@
 xmlrunner/
 logs/
 arc_service/settings.py
-arc_application/migrations
 arc_application/__pycache__
 ### Python ###
 # Byte-compiled / optimized / DLL files
