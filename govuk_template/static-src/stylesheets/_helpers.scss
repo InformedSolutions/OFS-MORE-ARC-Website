@@ -14,3 +14,7 @@ $base-font-size: 16;
 
   @return $px / $base * 1em;
 }
+
+.top-padded {
+  padding-top: 1.5em;
+}
