@@ -1,6 +1,7 @@
 {% extends 'govuk_template.html' %}
 {% load static %}
 {% load govuk_template_base %}
+{% block page_title %}Applications{% endblock %}
 
 <!-- Initialise error summary for page -->
 {{form.error_summary}}
@@ -21,7 +22,6 @@
     <!-- templates/registration/login.html -->
         <h2 class="heading-large">Applications</h2>
         <p>Please choose to either continue reviewing an application or to start a new review</p>
-        <br>
         <form action="" method="post">
             {% csrf_token %}
             <input type="submit" class="button" value="New Application" alt='Login'>
