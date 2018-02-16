@@ -26,7 +26,7 @@
             {% csrf_token %}
             <input type="submit" class="button" value="New Application" alt='Login'>
         </form>
-    <div>
+    <div class="top-padded">
         {% if empty != "true" %}
         <p>Please select the application you wish to review from the table below</p>
         <table class="table table-hover" id="request-table">

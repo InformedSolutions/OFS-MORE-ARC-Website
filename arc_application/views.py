@@ -30,14 +30,14 @@ def summary_page(request):
             obj.append(response)
         if len(obj) == 0:
             empty = 'true'
+        if assign_response == 'LIMIT_REACHED':
+            error_exist = 'true'
+            error_title = 'You have reached the limit'
+            error_text = 'You have already reached the maximum (' + str(settings.APPLICATION_LIMIT) + ') applications'
         if not assign_response:
             error_exist = 'true'
             error_title = 'No Available Applications'
             error_text = 'There are currently no more applications ready for a review'
-        if len(obj) == 10 and request.method == 'POST':
-            error_exist = 'true'
-            error_title = 'You have reached the limit'
-            error_text = 'Error, please release an application before adding a new one, there is a maximum of ten applications at once'
         variables = {
             'entries': obj,
             'empty': empty,
@@ -67,12 +67,13 @@ def get_table_data(obj):
 
 
 def assign_new_application(request):
-    if ArcReview.objects.filter(user_id=request.user.id).count() > 10:
-        return JsonResponse({'message': 'Error you have already reached the maximum (10) applications'})
-    else:
-        local_application_id = get_oldest_application_id()
-        if local_application_id == None:
-            return False
+    if ArcReview.objects.filter(user_id=request.user.id).count() == settings.APPLICATION_LIMIT:
+        return 'LIMIT_REACHED'
+
+    local_application_id = get_oldest_application_id()
+
+    if local_application_id is None:
+        return False
 
     if Application.objects.filter(pk=local_application_id).count() > 0:
         application = Application.objects.get(application_id=local_application_id)
@@ -81,7 +82,6 @@ def assign_new_application(request):
         arc_user.last_accessed = str(application.date_updated.strftime('%d/%m/%Y'))
         arc_user.user_id = request.user.id
         arc_user.app_type = 'Childminder'
-        application = Application.objects.filter(pk=local_application_id)
         arc_user.save()
 
         return JsonResponse({'message': arc_user.application_id})
@@ -112,10 +112,10 @@ def get_name(application_id):
 
 def get_oldest_application_id():
     application_list = Application.objects.all().order_by('date_submitted')
-    for i in application_list:
-        if len(ArcReview.objects.filter(pk=i.application_id)) == 0:
-            return i.application_id
-    # if it gets to here return error, no application for review
+    for application in application_list:
+        # If application is submitted and not already assigned to another ARC user
+        if application.date_submitted is not None and len(ArcReview.objects.filter(pk=application.application_id)) == 0:
+            return application.application_id
 
 
 def get_users():
