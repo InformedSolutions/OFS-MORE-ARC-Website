@@ -111,7 +111,7 @@ def get_name(application_id):
 
 
 def get_oldest_application_id():
-    application_list = Application.objects.all().order_by('date_submitted')
+    application_list = Application.objects.exclude(date_submitted=None)
     for application in application_list:
         # If application is submitted and not already assigned to another ARC user
         if application.date_submitted is not None and len(ArcReview.objects.filter(pk=application.application_id)) == 0:

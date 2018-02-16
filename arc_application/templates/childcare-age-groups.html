@@ -20,14 +20,27 @@
     <form method="get" action="{{ URL_PREFIX }}/personal-details/summary?id={{application_id}}">
         <!-- Content -->
         <div class="form-group grid-row">
-            <h1 class="form-title heading-large">
-                Ages of the children
-            </h1>
-            <p>0-5 Years Old : {{ zero }}</p>
-            <p>5-8 Years Old : {{ five }}</p>
-            <p>8+ Years Old : {{ eight }}</p>
-            <input type="submit" class="button" value="Save and continue" alt='Continue to declaration'>
-            <input type="hidden" id="id" name="id" value="{{application_id}}"/>
+
+            <thead>
+        <tr>
+            <th colspan="2">
+                <div class="heading-large">
+                    Ages of the children
+                </div>
+            </th>
+        </tr>
+        </thead>
+            <table class="check-your-answers form-group grid-row" style="table-layout: fixed; width: 100%">
+                <thead></thead>
+                <tbody>
+                <tr><td> </td><td> </td></tr>
+                <tr><td>0-5 Years Old: </td><td> {{ zero }}</td></tr>
+                 <tr><td>5-8 Years Old </td><td> {{ five }}</td></tr>
+                 <tr><td>8+ Years Old </td><td> {{ eight }}</td></tr>
+                </tbody>
+            </table>
+                <input type="submit" class="button" value="Save and continue" alt='Continue to declaration'>
+                <input type="hidden" id="id" name="id" value="{{application_id}}"/>
         </div>
         </br>
         <!-- Return to task list -->

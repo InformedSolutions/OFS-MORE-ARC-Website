@@ -368,7 +368,7 @@ def declaration(request):
     application_id_local = request.GET["id"]
     # Retrieve all information related to the application from the database
     application = Application.objects.get(application_id=application_id_local)
-    login_detail_id = application.login_id.login_id
+    login_detail_id = application.login_id
     login_record = UserDetails.objects.get(login_id=login_detail_id)
     childcare_record = ChildcareType.objects.get(application_id=application_id_local)
     applicant_record = ApplicantPersonalDetails.objects.get(application_id=application_id_local)
@@ -381,7 +381,6 @@ def declaration(request):
     first_aid_record = FirstAidTraining.objects.get(application_id=application_id_local)
     dbs_record = CriminalRecordCheck.objects.get(application_id=application_id_local)
     hdb_record = HealthDeclarationBooklet.objects.get(application_id=application_id_local)
-    eyfs_record = EYFS.objects.get(application_id=application_id_local)
     first_reference_record = Reference.objects.get(application_id=application_id_local, reference=1)
     second_reference_record = Reference.objects.get(application_id=application_id_local, reference=2)
     # Retrieve lists of adults and children, ordered by adult/child number for iteration by the HTML
@@ -470,9 +469,6 @@ def declaration(request):
         'cautions_convictions': dbs_record.cautions_convictions,
         'declaration': dbs_record.send_certificate_declare,
         'send_hdb_declare': hdb_record.send_hdb_declare,
-        'eyfs_understand': eyfs_record.eyfs_understand,
-        'eyfs_training_declare': eyfs_record.eyfs_training_declare,
-        'eyfs_questions_declare': eyfs_record.eyfs_questions_declare,
         'first_reference_first_name': first_reference_record.first_name,
         'first_reference_last_name': first_reference_record.last_name,
         'first_reference_relationship': first_reference_record.relationship,
