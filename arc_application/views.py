@@ -23,7 +23,7 @@ def summary_page(request):
         assign_response = True
         if request.method == 'POST':
             assign_response = assign_new_application(request)
-        entries = ArcReview.objects.filter(user_id=request.user.id).order_by('user_id')
+        entries = ArcReview.objects.filter(user_id=request.user.id)
         obj = []
         for entry in entries:
             response = get_table_data(entry)
@@ -36,18 +36,19 @@ def summary_page(request):
             error_text = 'There are currently no more applications ready for a review'
         if len(obj) == 10 and request.method == 'POST':
             error_exist = 'true'
-            error_title ='You have reached the limit'
+            error_title = 'You have reached the limit'
             error_text = 'Error, please release an application before adding a new one, there is a maximum of ten applications at once'
         variables = {
-                'entries': obj,
-                'empty': empty,
-                'error_exist': error_exist,
-                'error_title': error_title,
-                'error_text': error_text
-            }
+            'entries': obj,
+            'empty': empty,
+            'error_exist': error_exist,
+            'error_title': error_title,
+            'error_text': error_text
+        }
 
         return render(request, './summary.html', variables)
-    return JsonResponse({'message': 'Gotta login with correct access rights'})
+    else:
+        return HttpResponseRedirect(settings.URL_PREFIX + '/login/')
 
 
 def get_table_data(obj):
@@ -55,7 +56,7 @@ def get_table_data(obj):
     if Application.objects.filter(pk=local_application_id).count() > 0:
         obj.application = Application.objects.get(application_id=local_application_id)
         arc_user = ArcReview.objects.get(application_id=local_application_id)
-        obj.date_submitted = 'which value to use?'
+        obj.date_submitted = obj.application.date_submitted
         obj.last_accessed = arc_user.last_accessed
         obj.app_type = 'Childminder'
     if ApplicantPersonalDetails.objects.filter(application_id=local_application_id).count() > 0:
@@ -110,7 +111,7 @@ def get_name(application_id):
 
 
 def get_oldest_application_id():
-    application_list = Application.objects.all().order_by('date_updated')
+    application_list = Application.objects.all().order_by('date_submitted')
     for i in application_list:
         if len(ArcReview.objects.filter(pk=i.application_id)) == 0:
             return i.application_id
@@ -123,7 +124,7 @@ def get_users():
 
 
 def custom_login(request):
-    if request.user.is_authenticated():
+    if has_group(request.user, settings.ARC_GROUP) and request.user.is_authenticated():
         return HttpResponseRedirect(settings.URL_PREFIX + '/summary')
     if request.method == 'POST':
         form = AuthenticationForm(data=request.POST)
@@ -176,7 +177,7 @@ def release_application(request, application_id):
         row.delete()
         return HttpResponseRedirect('/arc/summary')
     else:
-        return JsonResponse({"message": "fail"})  #
+        return JsonResponse({"message": "fail"})
 
 
 ######################################################################################################

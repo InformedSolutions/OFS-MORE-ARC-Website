@@ -139,6 +139,7 @@ class Application(models.Model):
     inspect_home_declare = models.NullBooleanField()
     interview_declare = models.NullBooleanField()
     information_correct_declare = models.NullBooleanField()
+    date_submitted = models.DateTimeField(blank=True, null=True)
 
     class Meta:
         managed = False
