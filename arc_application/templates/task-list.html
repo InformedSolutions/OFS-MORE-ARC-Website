@@ -105,26 +105,6 @@
                         {% endif %}
                     </td>
                 </tr>
-                <tr id="eyfs">
-                    <td class="task" style="padding-right: 10px; word-wrap: break-word;">
-                        {% if eyfs_training_status == 'NOT_STARTED' %}
-                        <a href="{{ URL_PREFIX }}/eyfs/guidance?id={{application_id}}">
-                            <span class="task-name">Early years knowledge</span><strong
-                                class="task-finished task-to-do">To do</strong>
-                        </a>
-                        {% elif eyfs_training_status == 'IN_PROGRESS' %}
-                        <a href="{{ URL_PREFIX }}/eyfs/guidance?id={{application_id}}">
-                            <span class="task-name">Early years knowledge</span><strong
-                                class="task-finished task-in-progress">Flagged</strong>
-                        </a>
-                        {% elif eyfs_training_status == 'COMPLETED' %}
-                        <a href="{{ URL_PREFIX }}/eyfs/summary?id={{application_id}}">
-                            <span class="task-name">Early years knowledge</span><strong
-                                class="task-finished">Reviewed</strong>
-                        </a>
-                        {% endif %}
-                    </td>
-                </tr>
                 <tr id="dbs">
                     <td class="task" style="padding-right: 10px; word-wrap: break-word;">
                         {% if criminal_record_check_status == 'NOT_STARTED' %}

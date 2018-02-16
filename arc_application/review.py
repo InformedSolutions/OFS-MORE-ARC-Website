@@ -185,29 +185,6 @@ def first_aid_training_summary(request):
         return render(request, 'first-aid-summary.html', variables)
 
 
-def eyfs_summary(request):
-    """
-    Method returning the template for the Early Years knowledge: summary page (for a given application)
-    displaying entered data for this task and navigating to the task list when successfully completed
-    :param request: a request object used to generate the HttpResponse
-    :return: an HttpResponse object with the rendered Early years knowledge: summary template
-    """
-    if request.method == 'GET':
-        application_id_local = request.GET["id"]
-        eyfs_record = Eyfs.objects.get(application_id=application_id_local)
-        eyfs_understand = eyfs_record.eyfs_understand
-        eyfs_training_declare = eyfs_record.eyfs_training_declare
-        eyfs_questions_declare = eyfs_record.eyfs_questions_declare
-        application = Application.objects.get(pk=application_id_local)
-        variables = {
-            'application_id': application_id_local,
-            'eyfs_understand': eyfs_understand,
-            'eyfs_training_declare': eyfs_training_declare,
-            'eyfs_questions_declare': eyfs_questions_declare,
-            'eyfs_training_status': application.eyfs_training_status,
-        }
-        return render(request, 'eyfs-summary.html', variables)
-
 
 def dbs_check_summary(request):
     """

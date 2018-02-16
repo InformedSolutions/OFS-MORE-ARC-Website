@@ -4,7 +4,7 @@ import os
 SERVER_LABEL = 'Test_1'
 
 ARC_GROUP = 'arc'
-APPLICATION_LIMIT = 1
+APPLICATION_LIMIT = 10
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
