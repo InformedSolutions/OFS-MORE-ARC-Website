@@ -8,7 +8,7 @@ from django.shortcuts import render
 
 from .models import ApplicantHomeAddress, ApplicantName, ApplicantPersonalDetails, Application, ChildcareType, \
     FirstAidTraining, UserDetails, Eyfs, CriminalRecordCheck, Reference, ChildInHome, AdultInHome, \
-    HealthDeclarationBooklet
+    HealthDeclarationBooklet, ArcStatus
 
 
 @login_required()
@@ -16,24 +16,21 @@ def task_list(request):
     if has_group(request.user, 'arc'):
         if request.method == 'GET':
             application_id = request.GET['id']
-            application = Application.objects.get(pk=application_id)
-            childcare_record = ChildcareType.objects.get(application_id=application_id)
+            application = ArcStatus.objects.get(application_id=application_id)
 
             application_status_context = dict({
                 'application_id': application_id,
-                'login_details_status': application.login_details_status,
-                'personal_details_status': application.personal_details_status,
-                'childcare_type_status': application.childcare_type_status,
-                'first_aid_training_status': application.first_aid_training_status,
-                'eyfs_training_status': application.eyfs_training_status,
-                'criminal_record_check_status': application.criminal_record_check_status,
-                'health_status': application.health_status,
-                'reference_status': application.references_status,
-                'people_in_home_status': application.people_in_home_status,
-                'declaration_status': application.declarations_status,
-                'all_complete': False,
-                'confirm_details': False,
+                'login_details_status': application.login_details_review,
+                'personal_details_status': application.personal_details_review,
+                'childcare_type_status': application.childcare_type_review,
+                'first_aid_training_status': application.first_aid_review,
+                'criminal_record_check_status': application.dbs_review,
+                'health_status': application.health_review,
+                'reference_status': application.references_review,
+                'people_in_home_status': application.people_in_home_review,
+                'declaration_status': application.declaration_review,
             })
+
             temp_context = application_status_context
             del temp_context['declaration_status']
             # Enable/disable Declarations and Confirm your details tasks depending on task completion

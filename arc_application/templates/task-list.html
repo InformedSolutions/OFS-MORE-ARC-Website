@@ -32,7 +32,7 @@
                             <span class="task-name">Your login details</span><strong class="task-finished task-to-do">To
                             do</strong>
                         </a>
-                        {% elif login_details_status == 'IN_PROGRESS' %}
+                        {% elif login_details_status == 'FLAGGED' %}
                         <a href="{{ URL_PREFIX }}/account/summary?id={{application_id}}">
                             <span class="task-name">Your login details</span><strong
                                 class="task-finished task-in-progress">Flagged</strong>
@@ -48,12 +48,12 @@
                 <tr id="children">
                     <td class="task" style="padding-right: 10px; word-wrap: break-word;">
                         {% if childcare_type_status == 'NOT_STARTED' %}
-                        <a href="{{ URL_PREFIX }}/childcare/guidance?id={{application_id}}">
+                        <a href="{{ URL_PREFIX }}/childcare/age-groups?id={{application_id}}">
                             <span class="task-name">Type of childcare</span><strong class="task-finished task-to-do">To
                             do</strong>
                         </a>
-                        {% elif childcare_type_status == 'IN_PROGRESS' %}
-                        <a href="{{ URL_PREFIX }}/childcare/guidance?id={{application_id}}">
+                        {% elif childcare_type_status == 'FLAGGED' %}
+                        <a href="{{ URL_PREFIX }}/childcare/age-groups?id={{application_id}}">
                             <span class="task-name">Type of childcare</span><strong
                                 class="task-finished task-in-progress" s>Flagged</strong>
                         </a>
@@ -68,12 +68,12 @@
                 <tr id="personal_details">
                     <td class="task" style="padding-right: 10px; word-wrap: break-word;">
                         {% if personal_details_status == 'NOT_STARTED' %}
-                        <a href="{{ URL_PREFIX }}/personal-details/guidance?id={{application_id}}">
+                        <a href="{{ URL_PREFIX }}/personal-details/summary?id={{application_id}}">
                             <span class="task-name">Your personal details</span><strong
                                 class="task-finished task-to-do">To do</strong>
                         </a>
-                        {% elif personal_details_status == 'IN_PROGRESS' %}
-                        <a href="{{ URL_PREFIX }}/personal-details/guidance?id={{application_id}}">
+                        {% elif personal_details_status == 'FLAGGED' %}
+                        <a href="{{ URL_PREFIX }}/personal-details/summary?id={{application_id}}">
                             <span class="task-name">Your personal details</span><strong
                                 class="task-finished task-in-progress">Flagged</strong>
                         </a>
@@ -88,12 +88,12 @@
                 <tr id="first_aid">
                     <td class="task" style="padding-right: 10px; word-wrap: break-word;">
                         {% if first_aid_training_status == 'NOT_STARTED' %}
-                        <a href="{{ URL_PREFIX }}/first-aid/guidance?id={{application_id}}">
+                        <a href="{{ URL_PREFIX }}/first-aid/summary?id={{application_id}}">
                             <span class="task-name">First aid training</span><strong class="task-finished task-to-do">To
                             do</strong>
                         </a>
-                        {% elif first_aid_training_status == 'IN_PROGRESS' %}
-                        <a href="{{ URL_PREFIX }}/first-aid/guidance?id={{application_id}}">
+                        {% elif first_aid_training_status == 'FLAGGED' %}
+                        <a href="{{ URL_PREFIX }}/first-aid/summary?id={{application_id}}">
                             <span class="task-name">First aid training</span><strong
                                 class="task-finished task-in-progress">Flagged</strong>
                         </a>
@@ -108,12 +108,12 @@
                 <tr id="dbs">
                     <td class="task" style="padding-right: 10px; word-wrap: break-word;">
                         {% if criminal_record_check_status == 'NOT_STARTED' %}
-                        <a href="{{ URL_PREFIX }}/dbs-check/guidance?id={{application_id}}">
+                        <a href="{{ URL_PREFIX }}/dbs-check/summary?id={{application_id}}">
                             <span class="task-name">Criminal record (DBS) check</span><strong
                                 class="task-finished task-to-do">To do</strong>
                         </a>
-                        {% elif criminal_record_check_status == 'IN_PROGRESS' %}
-                        <a href="{{ URL_PREFIX }}/dbs-check/guidance?id={{application_id}}">
+                        {% elif criminal_record_check_status == 'FLAGGED' %}
+                        <a href="{{ URL_PREFIX }}/dbs-check/summary?id={{application_id}}">
                             <span class="task-name">Criminal record (DBS) check</span><strong
                                 class="task-finished task-in-progress">Flagged</strong>
                         </a>
@@ -127,12 +127,12 @@
                 <tr id="health">
                     <td class="task" style="padding-right: 10px; word-wrap: break-word;">
                         {% if health_status == 'NOT_STARTED' %}
-                        <a href="{{ URL_PREFIX }}/health/intro?id={{application_id}}">
+                        <a href="{{ URL_PREFIX }}/health/check-answers?id={{application_id}}">
                             <span class="task-name">Health declaration booklet</span><strong
                                 class="task-finished task-to-do">To do</strong>
                         </a>
-                        {% elif health_status == 'IN_PROGRESS' %}
-                        <a href="{{ URL_PREFIX }}/health/intro?id={{application_id}}">
+                        {% elif health_status == 'FLAGGED' %}
+                        <a href="{{ URL_PREFIX }}/health/check-answers?id={{application_id}}">
                             <span class="task-name">Health declaration booklet</span><strong
                                 class="task-finished task-in-progress">Flagged</strong>
                         </a>
@@ -146,12 +146,12 @@
                 <tr id="references">
                     <td class="task" style="padding-right: 10px; word-wrap: break-word;">
                         {% if reference_status == 'NOT_STARTED' %}
-                        <a href="{{ URL_PREFIX }}/references/intro?id={{application_id}}">
+                        <a href="{{ URL_PREFIX }}/references/summary?id={{application_id}}">
                             <span class="task-name">References</span><strong class="task-finished task-to-do">To
                             do</strong>
                         </a>
-                        {% elif reference_status == 'IN_PROGRESS' %}
-                        <a href="{{ URL_PREFIX }}/references/intro?id={{application_id}}">
+                        {% elif reference_status == 'FLAGGED' %}
+                        <a href="{{ URL_PREFIX }}/references/summary?id={{application_id}}">
                             <span class="task-name">References</span><strong class="task-finished task-in-progress">Flagged</strong>
                         </a>
                         {% elif reference_status == 'COMPLETED' %}
@@ -164,12 +164,12 @@
                 <tr id="other_people">
                     <td class="task" style="padding-right: 10px; word-wrap: break-word;">
                         {% if people_in_home_status == 'NOT_STARTED' %}
-                        <a href="{{ URL_PREFIX }}/other-people/guidance?id={{application_id}}">
+                        <a href="{{ URL_PREFIX }}/other-people/summary?id={{application_id}}">
                             <span class="task-name">People in your home</span><strong class="task-finished task-to-do">To
                             do</strong>
                         </a>
-                        {% elif people_in_home_status == 'IN_PROGRESS' %}
-                        <a href="{{ URL_PREFIX }}/other-people/guidance?id={{application_id}}">
+                        {% elif people_in_home_status == 'FLAGGED' %}
+                        <a href="{{ URL_PREFIX }}/other-people/summary?id={{application_id}}">
                             <span class="task-name">People in your home</span><strong
                                 class="task-finished task-in-progress">Flagged</strong>
                         </a>
@@ -185,7 +185,7 @@
                 <tr id="reviewInactive">
                     <td class="task" style="padding-right: 10px; word-wrap: break-word;">
                         <span>
-                            <span style="color: #BFC1C3; float: left; width: 66.66667%;">Declaration and payment</span><strong
+                            <span style="color: #BFC1C3; float: left; width: 66.66667%;">Declaration</span><strong
                                 class="task-finished task-do-last" style="margin-left: 12.371%;">Do last</strong>
                         </span>
                     </td>
@@ -198,7 +198,7 @@
                             <span class="task-name">Declaration and payment</span><strong
                                 class="task-finished task-to-do">To do</strong>
                         </a>
-                        {% elif declaration_status == 'IN_PROGRESS' %}
+                        {% elif declaration_status == 'FLAGGED' %}
                         <a href="{{ URL_PREFIX }}/declaration?id={{application_id}}">
                             <span class="task-name">Declaration and payment</span><strong
                                 class="task-finished task-to-do">Flagged</strong>

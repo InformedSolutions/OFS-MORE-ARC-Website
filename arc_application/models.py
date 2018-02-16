@@ -6,36 +6,51 @@ from django.db import models
 
 from django.forms import DateTimeField, BooleanField
 
-
+TASK_STATUS = (
+        ('NOT_STARTED', 'NOT_STARTED'),
+        ('FLAGGED', 'FLAGGED'),
+        ('COMPLETE', 'COMPLETE')
+    )
 class ArcStatus(models.Model):
     application_id = models.UUIDField(primary_key=True, default=uuid4)
-    login_summary = BooleanField(initial=False)
-    login_email = BooleanField(initial=False)
-    login_mobile = BooleanField(initial=False)
-    login_alt_mobile = BooleanField(initial=False)
-    login_kb_question = BooleanField(initial=False)
-    login_kb_answer = BooleanField(initial=False)
+    login_details_review = models.CharField(choices=TASK_STATUS, max_length=50)
+    childcare_type_review = models.CharField(choices=TASK_STATUS, max_length=50)
+    personal_details_review = models.CharField(choices=TASK_STATUS, max_length=50)
+    first_aid_review = models.CharField(choices=TASK_STATUS, max_length=50)
+    dbs_review = models.CharField(choices=TASK_STATUS, max_length=50)
+    health_review = models.CharField(choices=TASK_STATUS, max_length=50)
+    references_review = models.CharField(choices=TASK_STATUS, max_length=50)
+    people_in_home_review = models.CharField(choices=TASK_STATUS, max_length=50)
+    declaration_review = models.CharField(choices=TASK_STATUS, max_length=50)
 
-    personal_summary = BooleanField(initial=False)
-    personal_first_name = BooleanField(initial=False)
-    personal_middle_name = BooleanField(initial=False)
-    personal_last_name = BooleanField(initial=False)
-    personal_first_name = BooleanField(initial=False)
-    personal_dob = BooleanField(initial=False)
-    personal_address = BooleanField(initial=False)
-    personal_location = BooleanField(initial=False)
-
-
-    fist_aid_organisation = BooleanField(initial=False)
-    fist_aid_course = BooleanField(initial=False)
-    fist_aid_date = BooleanField(initial=False)
-
-    dbs_cert = BooleanField(initial=False)
-    dbs_convictions = BooleanField(initial=False)
+    #
+    # login_email = BooleanField(initial=False)
+    # login_mobile = BooleanField(initial=False)
+    # login_alt_mobile = BooleanField(initial=False)
+    # login_kb_question = BooleanField(initial=False)
+    # login_kb_answer = BooleanField(initial=False)
+    #
+    # personal_summary = BooleanField(initial=False)
+    # personal_first_name = BooleanField(initial=False)
+    # personal_middle_name = BooleanField(initial=False)
+    # personal_last_name = BooleanField(initial=False)
+    # personal_first_name = BooleanField(initial=False)
+    # personal_dob = BooleanField(initial=False)
+    # personal_address = BooleanField(initial=False)
+    # personal_location = BooleanField(initial=False)
+    #
+    #
+    # fist_aid_organisation = BooleanField(initial=False)
+    # fist_aid_course = BooleanField(initial=False)
+    # fist_aid_date = BooleanField(initial=False)
+    #
+    # dbs_cert = BooleanField(initial=False)
+    # dbs_convictions = BooleanField(initial=False)
 
     # references and people in your home, how to do one to many in a single table?
 
-
+    class Meta:
+        db_table = 'ARC_STATUS'
 
 
 class ArcReview(models.Model):

@@ -10,7 +10,7 @@ from django.utils.http import urlsafe_base64_decode
 from django.utils.text import capfirst
 from govuk_forms.forms import GOVUKForm
 
-from .models import ApplicantName, ApplicantPersonalDetails, Application, ArcReview
+from .models import ApplicantName, ApplicantPersonalDetails, Application, ArcReview, ArcStatus
 
 
 @login_required()
@@ -82,6 +82,19 @@ def assign_new_application(request):
         arc_user.last_accessed = str(application.date_updated.strftime('%d/%m/%Y'))
         arc_user.user_id = request.user.id
         arc_user.app_type = 'Childminder'
+        if ArcStatus.objects.filter(pk=local_application_id).count !=1:
+            status = ArcStatus.objects.create(application_id=local_application_id)
+            status.login_details_review = "NOT_STARTED"
+            status.childcare_type_review = "NOT_STARTED"
+            status.personal_details_review = "NOT_STARTED"
+            status.first_aid_review = "NOT_STARTED"
+            status.dbs_review = "NOT_STARTED"
+            status.health_review = "NOT_STARTED"
+            status.references_review = "NOT_STARTED"
+            status.people_in_home_review ="NOT_STARTED"
+            status.declaration_review ="NOT_STARTED"
+            status.save()
+
         arc_user.save()
 
         return JsonResponse({'message': arc_user.application_id})
