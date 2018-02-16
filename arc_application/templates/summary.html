@@ -13,17 +13,13 @@
     <h2 class="heading-medium error-summary-heading" id="error-summary-heading-jGBv">   {{ error_title }}
     </h2>
     <ul class="error-summary-list">
-
         <li class="non-field-error">{{ error_text }}</li>
-
-
-
     </ul>
   </div>
 {% endif %}
 <div class="column-full">
     <!-- templates/registration/login.html -->
-        <br>
+        <h2 class="heading-large">Applications</h2>
         <p>Please choose to either continue reviewing an application or to start a new review</p>
         <br>
         <form action="" method="post">
@@ -32,6 +28,7 @@
         </form>
     <div>
         {% if empty != "true" %}
+        <p>Please select the application you wish to review from the table below</p>
         <table class="table table-hover" id="request-table">
             <thead>
             <tr>
