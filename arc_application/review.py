@@ -1,5 +1,6 @@
-import datetime
+import json
 
+import requests
 from django import forms
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
@@ -7,10 +8,11 @@ from django.contrib.auth.models import Group
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from govuk_forms.forms import GOVUKForm
+from govuk_forms.widgets import CheckboxSelectMultiple
 
-from .models import ApplicantHomeAddress, ApplicantName, ApplicantPersonalDetails, Application, ChildcareType, \
-    FirstAidTraining, UserDetails, CriminalRecordCheck, Reference, ChildInHome, AdultInHome, \
-    HealthDeclarationBooklet, ArcStatus, ArcReview
+from .models import AdultInHome, ApplicantHomeAddress, ApplicantName, ApplicantPersonalDetails, Application, ArcReview, \
+    ArcStatus, ChildInHome, ChildcareType, CriminalRecordCheck, FirstAidTraining, HealthDeclarationBooklet, Reference, \
+    UserDetails
 
 
 @login_required()
@@ -19,7 +21,7 @@ def task_list(request):
         if request.method == 'GET':
             application_id = request.GET['id']
             application = ArcStatus.objects.get(application_id=application_id)
-            print(all_complete(application_id))
+            # Load review status
             application_status_context = dict({
                 'application_id': application_id,
                 'login_details_status': application.login_details_review,
@@ -410,6 +412,9 @@ def health_check_answers(request):
 
 
 def declaration(request):
+    """
+    This page may change, but currently returns a full summary of the application
+    """
     if request.method == 'GET':
         application_id_local = request.GET["id"]
     elif request.method == 'POST':
@@ -560,35 +565,38 @@ def declaration(request):
 
 
 def comments(request):
-    application_id_local = request.GET["id"]
+    """"""
     if request.method == 'GET':
-        arc = ArcReview.objects.get(application_id=application_id_local)
-        form = CommentsForm(request.POST, id=application_id_local, initial={'comments': arc.comments})
-        radio = RadioButton()
-    else:
+        application_id_local = request.GET["id"]
         form = CommentsForm(request.POST, id=application_id_local)
-    if form.is_valid():
-        # Send login e-mail link if applicant has previously applied
-        comments = form.cleaned_data['comments']
-        if ArcReview.objects.filter(application_id=application_id_local):
-            arc = ArcReview.objects.get(application_id=application_id_local)
-            arc.comments = comments
-            arc.save()
+    if request.method == 'POST':
+        application_id_local = request.POST["id"]
+        form = CommentsForm(request.POST, id=application_id_local)
+        if form.is_valid():
+            # Send login e-mail link if applicant has previously applied
+            comments = form.cleaned_data['comments']
+            if ArcReview.objects.filter(application_id=application_id_local):
+                arc = ArcReview.objects.get(application_id=application_id_local)
+                arc.comments = comments
+                arc.save()
+        return review(request)
     variables = {
-        'radio': radio,
         'form': form,
         'application_id': application_id_local,
     }
-    if request.method == 'POST':
-        return render(request, 'review-confirmation.html', variables)
     return render(request, 'comments.html', variables)
 
 
 def review(request):
     application_id_local = request.GET["id"]
+    form = Checkbox(request.POST, id=application_id_local)
+
+
     variables = {
+        'checkbox': form,
         'application_id': application_id_local,
     }
+
     return render(request, 'review-confirmation.html', variables)
 
 
@@ -625,13 +633,6 @@ class CommentsForm(GOVUKForm):
         return comments
 
 
-class RadioButton(forms.Form):
-    CHOICES = [('select1', 'select 1'),
-               ('select2', 'select 2')]
-
-    YN = forms.ChoiceField(choices=CHOICES, widget=forms.RadioSelect())
-
-
 def all_complete(id):
     if ArcStatus.objects.filter(application_id=id):
         arc = ArcStatus.objects.get(application_id=id)
@@ -640,6 +641,78 @@ def all_complete(id):
                 arc.people_in_home_review, arc.declaration_review]
         for i in list:
             if i != 'COMPLETED':
-                print(list)
                 return False
         return True
+
+
+class Checkbox(GOVUKForm):
+    """
+    GOV.UK form for the Type of childcare task
+    """
+    field_label_classes = 'form-label-bold'
+    auto_replace_widgets = True
+    options = (
+        ('Flag', ''),
+    )
+    checkbox = forms.MultipleChoiceField(
+        required=True,
+        widget=CheckboxSelectMultiple,
+        choices=options,
+        label='What age groups will you be caring for?',
+        help_text='Tick all that apply'
+    )
+
+    def __init__(self, *args, **kwargs):
+        """
+        Method to configure the initialisation of the Type of childcare form
+        :param args: arguments passed to the form
+        :param kwargs: keyword arguments passed to the form, e.g. application ID
+        """
+        self.application_id_local = kwargs.pop('id')
+        super(Checkbox, self).__init__(*args, **kwargs)
+        # If information was previously entered, display it on the form
+
+# Add personalisation and create template
+def accepted_email(email):
+    """
+    Method to send a magic link email using the Notify Gateway API
+    :param email: string containing the e-mail address to send the e-mail to
+    :param link_id: string containing the magic link ID related to an application
+    :return: an email
+    """
+    email = 'matthew.styles@informed.com'
+    base_request_url = settings.NOTIFY_URL
+    header = {'content-type': 'application/json'}
+    notification_request = {
+        'email': email,
+        'personalisation': {},
+        'reference': 'string',
+        'templateId': 'ecd2a788-257b-4bb9-8784-5aed82bcbb92'
+    }
+    r = requests.post(base_request_url + '/api/v1/notifications/email/',
+                      json.dumps(notification_request),
+                      headers=header)
+    return r
+
+
+# Add personalisation and create template
+def returned_email(email):
+    """
+    Method to send a magic link email using the Notify Gateway API
+    :param email: string containing the e-mail address to send the e-mail to
+    :param link_id: string containing the magic link ID related to an application
+    :return: an email
+    """
+    email = 'matthew.styles@informed.com'
+    base_request_url = settings.NOTIFY_URL
+    header = {'content-type': 'application/json'}
+    notification_request = {
+        'email': email,
+        'personalisation': {},
+        'reference': 'string',
+        'templateId': 'ecd2a788-257b-4bb9-8784-5aed82bcbb92'
+    }
+    r = requests.post(base_request_url + '/api/v1/notifications/email/',
+                      json.dumps(notification_request),
+                      headers=header)
+    return r

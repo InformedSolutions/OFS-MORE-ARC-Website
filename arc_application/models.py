@@ -4,8 +4,6 @@ from uuid import uuid4
 
 from django.db import models
 
-from django.forms import DateTimeField, BooleanField
-
 TASK_STATUS = (
     ('NOT_STARTED', 'NOT_STARTED'),
     ('FLAGGED', 'FLAGGED'),
@@ -60,7 +58,7 @@ class ArcReview(models.Model):
     user_id = models.CharField(max_length=50)
     last_accessed = models.CharField(max_length=50)
     app_type = models.CharField(max_length=50)
-    comments = models.CharField(blank= True, max_length=500)
+    comments = models.CharField(blank=True, max_length=500)
 
     class Meta:
         db_table = 'ARC_REVIEW'

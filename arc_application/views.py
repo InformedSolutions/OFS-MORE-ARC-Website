@@ -15,25 +15,37 @@ from .models import ApplicantName, ApplicantPersonalDetails, Application, ArcRev
 
 @login_required()
 def summary_page(request):
+    """
+    Arc Summary page to view assigned applications and manage them
+    :param request: Http request, must be logged in with a user that has access
+    :return: render static template
+    """
+    # Check if user has access and initiate error messages
     if has_group(request.user, settings.ARC_GROUP):
         error_exist = 'false'
         error_title = ''
         error_text = ''
         empty = 'false'
         assign_response = True
+        # If the 'New Application' button has been clicked get new application
         if request.method == 'POST':
             assign_response = assign_new_application(request)
         entries = ArcReview.objects.filter(user_id=request.user.id)
         obj = []
+        # For each application assigned to the user
         for entry in entries:
+            # Get data to display in table
             response = get_table_data(entry)
             obj.append(response)
+        # If no applications are assigned hide the table
         if len(obj) == 0:
             empty = 'true'
+        # If you have reached the limit you will receive an error message
         if assign_response == 'LIMIT_REACHED':
             error_exist = 'true'
             error_title = 'You have reached the limit'
             error_text = 'You have already reached the maximum (' + str(settings.APPLICATION_LIMIT) + ') applications'
+        # No applications available for review
         if not assign_response:
             error_exist = 'true'
             error_title = 'No Available Applications'
@@ -52,6 +64,7 @@ def summary_page(request):
 
 
 def get_table_data(obj):
+    # Get data to display in summary table
     local_application_id = obj.application_id
     if Application.objects.filter(pk=local_application_id).count() > 0:
         obj.application = Application.objects.get(application_id=local_application_id)
@@ -67,6 +80,7 @@ def get_table_data(obj):
 
 
 def assign_new_application(request):
+    #
     if ArcReview.objects.filter(user_id=request.user.id).count() == settings.APPLICATION_LIMIT:
         return 'LIMIT_REACHED'
 
@@ -98,7 +112,6 @@ def assign_new_application(request):
         status.people_in_home_review = "NOT_STARTED"
         status.declaration_review = "NOT_STARTED"
         status.save()
-
 
     return JsonResponse({'message': arc_user.application_id})
 
