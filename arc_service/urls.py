@@ -6,7 +6,7 @@ OFS-MORE-CCN3: Apply to be a Childminder Beta
 """
 import re
 
-from arc_application.review import contact_summary, task_list, type_of_childcare_age_groups, personal_details_summary, first_aid_training_summary, dbs_check_summary, references_summary, other_people_summary, health_check_answers, declaration, review
+from arc_application.review import contact_summary, task_list, type_of_childcare_age_groups, personal_details_summary, first_aid_training_summary, dbs_check_summary, references_summary, other_people_summary, health_check_answers, declaration, review, comments
 from arc_application.views import assign_new_application, custom_login, delete_all, release_application, summary_page
 from django.conf import settings
 from django.conf.urls import url

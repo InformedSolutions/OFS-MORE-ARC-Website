@@ -1,14 +1,16 @@
 import datetime
 
+from django import forms
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
+from govuk_forms.forms import GOVUKForm
 
 from .models import ApplicantHomeAddress, ApplicantName, ApplicantPersonalDetails, Application, ChildcareType, \
-    FirstAidTraining, UserDetails, Eyfs, CriminalRecordCheck, Reference, ChildInHome, AdultInHome, \
-    HealthDeclarationBooklet, ArcStatus
+    FirstAidTraining, UserDetails, CriminalRecordCheck, Reference, ChildInHome, AdultInHome, \
+    HealthDeclarationBooklet, ArcStatus, ArcReview
 
 
 @login_required()
@@ -17,7 +19,7 @@ def task_list(request):
         if request.method == 'GET':
             application_id = request.GET['id']
             application = ArcStatus.objects.get(application_id=application_id)
-
+            print(all_complete(application_id))
             application_status_context = dict({
                 'application_id': application_id,
                 'login_details_status': application.login_details_review,
@@ -29,8 +31,7 @@ def task_list(request):
                 'reference_status': application.references_review,
                 'people_in_home_status': application.people_in_home_review,
                 'declaration_status': application.declaration_review,
-                'all_complete': True,
-
+                'all_complete': all_complete(application_id),
             })
 
             temp_context = application_status_context
@@ -416,7 +417,7 @@ def declaration(request):
         status = ArcStatus.objects.get(pk=application_id_local)
         status.declaration_review = 'COMPLETED'
         status.save()
-        return HttpResponseRedirect(settings.URL_PREFIX + '/comments?id=' + application_id_local)
+        return HttpResponseRedirect(settings.URL_PREFIX + '/review?id=' + application_id_local)
     # Retrieve all information related to the application from the database
     application = Application.objects.get(application_id=application_id_local)
     login_detail_id = application.login_id
@@ -560,9 +561,26 @@ def declaration(request):
 
 def comments(request):
     application_id_local = request.GET["id"]
+    if request.method == 'GET':
+        arc = ArcReview.objects.get(application_id=application_id_local)
+        form = CommentsForm(request.POST, id=application_id_local, initial={'comments': arc.comments})
+        radio = RadioButton()
+    else:
+        form = CommentsForm(request.POST, id=application_id_local)
+    if form.is_valid():
+        # Send login e-mail link if applicant has previously applied
+        comments = form.cleaned_data['comments']
+        if ArcReview.objects.filter(application_id=application_id_local):
+            arc = ArcReview.objects.get(application_id=application_id_local)
+            arc.comments = comments
+            arc.save()
     variables = {
+        'radio': radio,
+        'form': form,
         'application_id': application_id_local,
     }
+    if request.method == 'POST':
+        return render(request, 'review-confirmation.html', variables)
     return render(request, 'comments.html', variables)
 
 
@@ -573,6 +591,55 @@ def review(request):
     }
     return render(request, 'review-confirmation.html', variables)
 
+
 def has_group(user, group_name):
     group = Group.objects.get(name=group_name)
     return True if group in user.groups.all() else False
+
+
+class CommentsForm(GOVUKForm):
+    """
+    GOV.UK form for the Your login and contact details: email page
+    """
+    field_label_classes = 'form-label-bold'
+    auto_replace_widgets = True
+    comments = forms.CharField(label='Comments', required=False, widget=forms.TextInput(attrs={'size': 80}))
+
+    def __init__(self, *args, **kwargs):
+        """
+        Method to configure the initialisation of the Your login and contact details: email form
+        :param args: arguments passed to the form
+        :param kwargs: keyword arguments passed to the form, e.g. application ID
+        """
+        self.application_id_local = kwargs.pop('id')
+        super(CommentsForm, self).__init__(*args, **kwargs)
+        # If information was previously entered, display it on the form
+        if ArcReview.objects.filter(application_id=self.application_id_local).count() > 0:
+            rev = ArcReview.objects.get(application_id=self.application_id_local)
+            self.fields['comments'].initial = rev.comments
+
+    def clean_comments(self):
+        comments = self.cleaned_data['comments']
+        # RegEx for valid e-mail addresses
+
+        return comments
+
+
+class RadioButton(forms.Form):
+    CHOICES = [('select1', 'select 1'),
+               ('select2', 'select 2')]
+
+    YN = forms.ChoiceField(choices=CHOICES, widget=forms.RadioSelect())
+
+
+def all_complete(id):
+    if ArcStatus.objects.filter(application_id=id):
+        arc = ArcStatus.objects.get(application_id=id)
+        list = [arc.login_details_review, arc.childcare_type_review, arc.personal_details_review,
+                arc.first_aid_review, arc.dbs_review, arc.health_review, arc.references_review,
+                arc.people_in_home_review, arc.declaration_review]
+        for i in list:
+            if i != 'COMPLETED':
+                print(list)
+                return False
+        return True
