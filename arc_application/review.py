@@ -416,7 +416,7 @@ def declaration(request):
         status = ArcStatus.objects.get(pk=application_id_local)
         status.declaration_review = 'COMPLETED'
         status.save()
-        return HttpResponseRedirect(settings.URL_PREFIX + '/review?id=' + application_id_local)
+        return HttpResponseRedirect(settings.URL_PREFIX + '/comments?id=' + application_id_local)
     # Retrieve all information related to the application from the database
     application = Application.objects.get(application_id=application_id_local)
     login_detail_id = application.login_id
@@ -558,13 +558,20 @@ def declaration(request):
     return render(request, 'declaration-summary.html', variables)
 
 
+def comments(request):
+    application_id_local = request.GET["id"]
+    variables = {
+        'application_id': application_id_local,
+    }
+    return render(request, 'comments.html', variables)
+
+
 def review(request):
     application_id_local = request.GET["id"]
     variables = {
         'application_id': application_id_local,
     }
     return render(request, 'review-confirmation.html', variables)
-
 
 def has_group(user, group_name):
     group = Group.objects.get(name=group_name)

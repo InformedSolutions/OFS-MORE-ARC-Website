@@ -32,6 +32,7 @@ urlpatterns = [
     url(r'^health/check-answers/', health_check_answers),
     url(r'^declaration/', declaration),
     url(r'^confirmation/', review),
+    url(r'^comments/', comments),
 
 ]
 
