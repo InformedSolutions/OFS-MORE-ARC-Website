@@ -64,7 +64,11 @@ def summary_page(request):
 
 
 def get_table_data(obj):
-    # Get data to display in summary table
+    """
+    Get data to display in summary table
+    :param obj: ArcReview object
+    :return: Dict that essentially extends ArcReview and includes a few more fields
+    """
     local_application_id = obj.application_id
     if Application.objects.filter(pk=local_application_id).count() > 0:
         obj.application = Application.objects.get(application_id=local_application_id)
@@ -80,7 +84,11 @@ def get_table_data(obj):
 
 
 def assign_new_application(request):
-    #
+    """
+    Assign a new application and initiate ArcStatus row
+    :param request: HTTP request
+    :return: A Json with the Application Id, 'Limit Reached' if a user has too many already assigned, and False if none availible
+    """
     if ArcReview.objects.filter(user_id=request.user.id).count() == settings.APPLICATION_LIMIT:
         return 'LIMIT_REACHED'
 
@@ -118,6 +126,11 @@ def assign_new_application(request):
 
 @login_required()
 def delete_all(request):
+    """
+    Delete everything in ArcReview
+    :param request: Http Request
+    :return: Json Response
+    """
     try:
         ArcReview.objects.all().delete()
         JsonResponse({'message': 'ArcReview Table deleted'})
@@ -126,6 +139,11 @@ def delete_all(request):
 
 
 def get_assigned_apps(request):
+    """
+    Get applications currently supplied to the user
+    :param request: HTTP Request
+    :return: a list of Arc Review objects
+    """
     apps = ArcReview.objects.all()
     arr = []
     for i in apps:
@@ -133,13 +151,13 @@ def get_assigned_apps(request):
     return arr
 
 
-def get_name(application_id):
-    # lookup app id, traverse throught tables and return name
-    name = 'placeholder'
-    return name
 
 
 def get_oldest_application_id():
+    """
+    Get the oldest application (where payment is successful)
+    :return:
+    """
     application_list = Application.objects.exclude(date_submitted=None)
     for application in application_list:
         # If application is submitted and not already assigned to another ARC user
@@ -147,12 +165,14 @@ def get_oldest_application_id():
             return application.application_id
 
 
-def get_users():
-    users = User.objects.all()
-    return users
 
 
 def custom_login(request):
+    """
+    Overridden django login method
+    :param request: HTTP Request
+    :return: Login
+    """
     if has_group(request.user, settings.ARC_GROUP) and request.user.is_authenticated():
         return HttpResponseRedirect(settings.URL_PREFIX + '/summary')
     if request.method == 'POST':
@@ -174,7 +194,6 @@ def custom_login(request):
             print(ex)
             form.error_summary_title = 'There was a problem signing you in'
             form.get_invalid_login_error()
-
     else:
         form = AuthenticationForm()
     variables = {
@@ -208,8 +227,9 @@ def release_application(request, application_id):
 
 
 ######################################################################################################
+# Overwrited Django Authentication Methods
 
-# Overwrited Django Auth Form
+
 class AuthenticationForm(GOVUKForm):
     """
     Base class for authenticating users. Extend this to get a form that accepts

@@ -414,6 +414,8 @@ def health_check_answers(request):
 def declaration(request):
     """
     This page may change, but currently returns a full summary of the application
+    :param request: a request object used to generate the HttpResponse
+    :return: an HttpResponse object with the rendered declaration-summary template
     """
     if request.method == 'GET':
         application_id_local = request.GET["id"]
@@ -565,7 +567,11 @@ def declaration(request):
 
 
 def comments(request):
-    """"""
+    """
+    This is the arc comments page
+    :param request: a request object used to generate the HttpResponse
+    :return: an HttpResponse object with the rendered Your arc comments template
+    """
     if request.method == 'GET':
         application_id_local = request.GET["id"]
         form = CommentsForm(request.POST, id=application_id_local)
@@ -588,10 +594,15 @@ def comments(request):
 
 
 def review(request):
+    """
+    Confirmation Page
+    :param request: a request object used to generate the HttpResponse
+    :return: an HttpResponse object with the rendered Your App Review Confirmation template
+    """
     application_id_local = request.GET["id"]
     form = Checkbox(request.POST, id=application_id_local)
-
-
+    # call accepted/returned email
+    release_application(application_id_local)
     variables = {
         'checkbox': form,
         'application_id': application_id_local,
@@ -599,8 +610,27 @@ def review(request):
 
     return render(request, 'review-confirmation.html', variables)
 
+def release_application(app_id):
+    """
+    Release application and status
+    :param request: an application id
+    :return: either True or False, depending on whether an application was found
+    """
+    if ArcReview.objects.filter(application_id=app_id).count > 0:
+        app = ArcReview.objects.get(application_id=app_id)
+        app.delete()
+        if ArcStatus.objects.filter(application_id=app_id).count > 0:
+            status = ArcStatus.objects.get(application_id=app_id)
+            status.delete()
+        return True
+    else:
+        return False
 
 def has_group(user, group_name):
+    """
+    Check if user is in group
+    :return: True if user is in group, else false
+    """
     group = Group.objects.get(name=group_name)
     return True if group in user.groups.all() else False
 
@@ -634,6 +664,11 @@ class CommentsForm(GOVUKForm):
 
 
 def all_complete(id):
+    """
+    Check the status of all sections
+    :param id: Application Id
+    :return: True or False dependingo n whether all sections have been reviewed
+    """
     if ArcStatus.objects.filter(application_id=id):
         arc = ArcStatus.objects.get(application_id=id)
         list = [arc.login_details_review, arc.childcare_type_review, arc.personal_details_review,
@@ -675,10 +710,10 @@ class Checkbox(GOVUKForm):
 # Add personalisation and create template
 def accepted_email(email):
     """
-    Method to send a magic link email using the Notify Gateway API
+    Method to send an email using the Notify Gateway API
     :param email: string containing the e-mail address to send the e-mail to
-    :param link_id: string containing the magic link ID related to an application
-    :return: an email
+    :param email: string email address
+    :return: HTTP response
     """
     email = 'matthew.styles@informed.com'
     base_request_url = settings.NOTIFY_URL
@@ -700,8 +735,8 @@ def returned_email(email):
     """
     Method to send a magic link email using the Notify Gateway API
     :param email: string containing the e-mail address to send the e-mail to
-    :param link_id: string containing the magic link ID related to an application
-    :return: an email
+     :param email: string email address
+    :return: HTTP response
     """
     email = 'matthew.styles@informed.com'
     base_request_url = settings.NOTIFY_URL
