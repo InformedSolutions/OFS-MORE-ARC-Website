@@ -610,6 +610,7 @@ def review(request):
 
     return render(request, 'review-confirmation.html', variables)
 
+
 def release_application(app_id):
     """
     Release application and status
@@ -625,6 +626,7 @@ def release_application(app_id):
         return True
     else:
         return False
+
 
 def has_group(user, group_name):
     """
@@ -706,6 +708,7 @@ class Checkbox(GOVUKForm):
         self.application_id_local = kwargs.pop('id')
         super(Checkbox, self).__init__(*args, **kwargs)
         # If information was previously entered, display it on the form
+
 
 # Add personalisation and create template
 def accepted_email(email):
