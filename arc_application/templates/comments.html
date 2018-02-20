@@ -6,7 +6,7 @@
 {% block inner_content %}
 
 <div class="column-full">
-    <div class="grid-row">
+    <div class="form-group grid-row column-full">
         <a href="{{ URL_PREFIX }}/review?id={{application_id}}" class="link-back"
            style="margin-right: 10px; line-height: 28px" alt='Back to application list'>
             Back
@@ -14,18 +14,15 @@
         <h1 class="form-title heading-large">
             Additional Comments
         </h1>
-        {{ radio.as_div }}
         <form method="post">
-            <div class="form-group grid-row">
                 <p>Would you like to add any additional comments to send to the applicant?</p>
-            </div>
-            <div class="form-group grid-row">
+
                 {{form.as_div}}
                 {% csrf_token %}
                 <input type="hidden" id="id" value="{{application_id}}" name="id"/>
                 <input type="submit" class="button" value="Save and continue" alt='Continue to declaration'>
-            </div>
         </form>
+        <br>
         <a href="{{URL_PREFIX}}/review?id={{application_id}}">Return to applications</a>
     </div>
 </div>

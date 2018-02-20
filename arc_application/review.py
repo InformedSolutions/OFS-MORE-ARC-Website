@@ -6,7 +6,7 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group
 from django.http import HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from govuk_forms.forms import GOVUKForm
 from govuk_forms.widgets import CheckboxSelectMultiple
 from .forms import CheckBox, CommentsForm
