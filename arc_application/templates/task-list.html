@@ -15,8 +15,7 @@
             </a>
         </div>
         <header class="page-heading page-heading-with-context">
-            <h1 class="heading-xlarge">Application Overview</h1>
-
+            <h1 class="heading-xlarge">Application overview</h1>
         </header>
     </div>
 </div>
@@ -203,16 +202,81 @@
                 </tr>
                 </tbody>
             </table>
+            <br>
+            <br>
+            {% if all_complete == True %}
+            <a href="{{ URL_PREFIX }}/arc-summary/?id={{application_id}}" class="button">Complete review</a>
+            {% endif %}
         </div>
-        {% if all_complete == True %}
-        <div class="column-two-thirds">
-            <div class="form-group">
-                <a href="{{ URL_PREFIX }}/arc-summary/?id={{application_id}}" class="button"
-                   style="margin-left: 0px;">Complete Review</a>
-            </div>
-        </div>
+    </div>
+    <div class="column-third" style="background-color: #bfc1c3; margin-left: 15px; padding: 10px; margin-top: 15px; float: left; width: 30%;">
+        <b style="font-weight: bold;">Progress:</b>
+        <br>
+        {{review_count}} of 9 sections complete
+        <br>
+        <br>
+        {% if middle_names %}
+        <b style="font-weight: bold;">Name:</b> <b style="text-transform: capitalize;">{{first_name}} {{middle_names}} {{last_name}}</b>
+        {% elif not middle_names %}
+        <b style="font-weight: bold;">Name:</b> <b style="text-transform: capitalize;">{{first_name}} {{last_name}}</b>
         {% endif %}
+        <br>
+        {% if birth_day < 10 and birth_month < 10 %}
+        <b style="font-weight: bold;">D.O.B.:</b> 0{{birth_day}}/0{{birth_month}}/{{birth_year}}
+        {% elif birth_day < 10 and birth_month >= 10 %}
+        <b style="font-weight: bold;">D.O.B.:</b> 0{{birth_day}}/{{birth_month}}/{{birth_year}}
+        {% elif birth_day >= 10 and birth_month < 10 %}
+        <b style="font-weight: bold;">D.O.B.:</b> {{birth_day}}/0{{birth_month}}/{{birth_year}}
+        {% elif birth_day >= 10 and birth_month >= 10 %}
+        <b style="font-weight: bold;">D.O.B.:</b> {{birth_day}}/{{birth_month}}/{{birth_year}}
+        {% endif %}
+        <br>
+        <br>
+        <b style="font-weight: bold;">Ages:</b>
+        <br>
+        {% if zero_to_five is True %}
+        Birth up to 5 years old
+        <br>
+        {% endif %}
+        {% if five_to_eight is True %}
+        5 to 8 years old
+        <br>
+        {% endif %}
+        {% if eight_plus is True %}
+        8 years and older
+        <br>
+        {% endif %}
+        <br>
+        <b style="font-weight: bold;">Register type(s):</b>
+        <br>
+        {% if zero_to_five is True and five_to_eight is True and eight_plus is True %}
+        Early Years
+        <br>
+        Childcare (both parts)
+        {% elif zero_to_five is True and five_to_eight is True and eight_plus is False %}
+        Early Years
+        <br>
+        Childcare (compulsory part)
+        {% elif zero_to_five is True and five_to_eight is False and eight_plus is True %}
+        Early Years
+        <br>
+        Childcare (voluntary part)
+        {% elif zero_to_five is False and five_to_eight is True and eight_plus is True %}
+        Childcare (both parts)
+        {% elif zero_to_five is True and five_to_eight is False and eight_plus is False %}
+        Early Years
+        {% elif zero_to_five is False and five_to_eight is True and eight_plus is False %}
+        Childcare (compulsory part)
+        {% elif zero_to_five is False and five_to_eight is False and eight_plus is True %}
+        Childcare (voluntary part)
+        {% endif %}
+        <br>
+    </div>
+    <div class="column-third" style="background-color: #bfc1c3; margin-left: 15px; padding: 10px; margin-top: 15px; float: left; width: 30%;">
+        <b style="font-weight: bold;">Application history:</b>
+        <br>
+        <a href="">Audit log</a>
     </div>
 </div>
 
-    {% endblock %}
+{% endblock %}
