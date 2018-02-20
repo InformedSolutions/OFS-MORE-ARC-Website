@@ -782,33 +782,31 @@ def arc_summary(request):
 
     return render(request, 'arc-summary.html', variables)
 
-def comments(request):
+def review(request):
     """
-    This is the arc comments page
+    Confirmation Page
     :param request: a request object used to generate the HttpResponse
-    :return: an HttpResponse object with the rendered Your arc comments template
+    :return: an HttpResponse object with the rendered Your App Review Confirmation template
     """
-    if request.method == 'GET':
-        form = CheckBox()
-        application_id_local = request.GET["id"]
-        form = CommentsForm(request.POST, id=application_id_local)
-    if request.method == 'POST':
-        form = CheckBox()
-        application_id_local = request.POST["id"]
-        form = CommentsForm(request.POST, id=application_id_local)
-        if form.is_valid():
-            # Send login e-mail link if applicant has previously applied
-            comments = form.cleaned_data['comments']
-            if ArcReview.objects.filter(application_id=application_id_local):
-                arc = ArcReview.objects.get(application_id=application_id_local)
-                arc.comments = comments
-                arc.save()
-        return review(request)
+    application_id_local = request.GET["id"]
+    form = Checkbox(request.POST, id=application_id_local)
+    application = Application.objects.get(application_id=application_id_local)
+    login_id = application.login_id
+    if UserDetails.objects.filter(login_id=login_id).count() > 0:
+        user_details = UserDetails.objects.get(login_id=login_id)
+        email = UserDetails.email
+    if all_complete(application_id_local, True):
+        accepted_email(email)
+        release_application(application_id_local)
+    else:
+        returned_email(email)
+
     variables = {
-        'form': form,
+        'checkbox': form,
         'application_id': application_id_local,
     }
-    return render(request, 'comments.html', variables)
+
+    return render(request, 'review-confirmation.html', variables)
 
 
 def review(request):
