@@ -1,0 +1,19 @@
+{% extends 'govuk_template.html' %}
+{% load static %}
+{% load govuk_template_base %}
+{% block page_title %}Ofsted - Childminder Application Review{% endblock %}
+
+{% block inner_content %}
+<!-- Initialise error summary for page -->
+{{form.error_summary}}
+
+<!-- templates/registration/login.html -->
+<div class="column-full">
+    <h2 class="heading-large">Ofsted - Childminder Application Review</h2>
+    <form method="post">
+      {% csrf_token %}
+      {{form.as_div}}
+      <input type="submit" class="button" value="Log in" alt='Login'>
+    </form>
+</div>
+{% endblock %}

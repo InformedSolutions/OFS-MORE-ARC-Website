@@ -1,0 +1,63 @@
+{% extends 'govuk_template.html' %}
+{% block page_title %}Type of childcare{% endblock %}
+{% load static %}
+{% load govuk_template_base %}
+
+{% block inner_content %}
+
+<!-- Initialise error summary for page -->
+
+<div class="column-full">
+    <div class="form-group grid-row" style="padding-top: 30px;">
+        <!-- Back button -->
+        <a href="{{ URL_PREFIX }}/review?id={{application_id}}" class="link-back"
+           style="margin-right: 10px; line-height: 28px" alt='Back to application list'>
+            Back
+        </a>
+    </div>
+    <!-- Form -->
+
+        <!-- Content -->
+        <div class="form-group grid-row">
+
+            <thead>
+        <tr>
+            <th colspan="2">
+                <div class="heading-large">
+                    Ages of the children
+                </div>
+            </th>
+        </tr>
+        </thead>
+            <table class="check-your-answers form-group grid-row" style="table-layout: fixed; width: 100%; margin: 0">
+                <thead></thead>
+                <tbody>
+                <tr><td> </td><td> </td></tr>
+                <tr><td>0-5 Years Old </td><td> {{ zero }}</td></tr>
+                 <tr><td>5-8 Years Old </td><td> {{ five }}</td></tr>
+                 <tr><td>8+ Years Old </td><td> {{ eight }}</td></tr>
+                </tbody>
+            </table>
+
+
+
+        </div>
+        <div class="form-group grid-row">
+            <form method="post" novalidate>
+                <input type="submit" class="button" value="Save and continue" alt='Continue to declaration'>
+                <input type="hidden" id="id" name="id" value="{{application_id}}"/>
+                {% csrf_token %}
+            </form>
+        </div>
+        <br>
+
+
+        <!-- Return to task list -->
+        <div class="form-group grid-row">
+            {% if childcare_type_status == 'COMPLETED' %}
+            <a href="{{ URL_PREFIX }}/task-list?id={{application_id}}">Return to list</a>
+            {% endif %}
+        </div>
+</div>
+
+{% endblock %}

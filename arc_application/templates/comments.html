@@ -1,0 +1,30 @@
+{% extends 'govuk_template.html' %}
+{% block page_title %}Additional Comments{% endblock %}
+{% load static %}
+{% load govuk_template_base %}
+
+{% block inner_content %}
+
+<div class="column-full">
+    <div class="form-group grid-row column-full">
+        <a href="{{ URL_PREFIX }}/review?id={{application_id}}" class="link-back"
+           style="margin-right: 10px; line-height: 28px" alt='Back to application list'>
+            Back
+        </a>
+        <h1 class="form-title heading-large">
+            Additional Comments
+        </h1>
+        <form method="post">
+                <p>Would you like to add any additional comments to send to the applicant?</p>
+
+                {{form.as_div}}
+                {% csrf_token %}
+                <input type="hidden" id="id" value="{{application_id}}" name="id"/>
+                <input type="submit" class="button" value="Save and continue" alt='Continue to declaration'>
+        </form>
+        <br>
+        <a href="{{URL_PREFIX}}/review?id={{application_id}}">Return to applications</a>
+    </div>
+</div>
+
+{% endblock %}

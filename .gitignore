@@ -1,0 +1,11 @@
+xmlrunner/
+logs/
+arc_application/__pycache__
+### Python ###
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+db.sqlite3
+.coverage
+.idea/
+.settings/

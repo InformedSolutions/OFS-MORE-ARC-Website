@@ -1,0 +1,7 @@
+Django==1.11.6
+psycopg2
+unittest-xml-reporting
+django-govuk-template==0.4
+django-govuk-forms==0.4
+requests
+whitenoise
