@@ -1315,6 +1315,7 @@ table td {
   text-align: left;
   color: #0b0c0c;
   border-bottom: 1px solid #bfc1c3;
+  width: 33%
 }
 
 @media (min-width: 641px) {
@@ -1674,7 +1675,7 @@ textarea.form-control {
 
 .multiple-choice {
   display: block;
-  float: none;
+  float: right;
   clear: left;
   position: relative;
   padding: 8px 10px 9px 50px;
@@ -1686,7 +1687,7 @@ textarea.form-control {
 
 @media (min-width: 641px) {
   .multiple-choice {
-    float: left;
+    float: right;
     padding-top: 7px;
     padding-bottom: 7px;
   }
@@ -1707,7 +1708,9 @@ textarea.form-control {
 }
 
 .multiple-choice label {
-  cursor: pointer;
+  cursor: none;
+  visibility: hidden;
+  font-size: 0px;
 }
 
 .multiple-choice [type=radio] + label::before {
@@ -1749,6 +1752,7 @@ textarea.form-control {
   position: absolute;
   top: 0;
   left: 0;
+  visibility: visible !important;
 }
 
 .multiple-choice [type=checkbox] + label::after {
@@ -1769,6 +1773,7 @@ textarea.form-control {
   zoom: 1;
   filter: alpha(opacity=0);
   opacity: 0;
+  visibility: visible !important;
 }
 
 .multiple-choice [type=radio]:focus + label::before {
@@ -2164,6 +2169,7 @@ input[type=number] {
     line-height: 1.31579;
   }
 }
+
 
 .check-your-answers .change-answer {
   text-align: right;

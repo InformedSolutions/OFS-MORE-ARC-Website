@@ -41,9 +41,7 @@
             </td>
             {% endif %}
             <td class="change-answer">
-                <a href="{{ URL_PREFIX }}/other-people/adult-question?id={{application_id}}" alt='Change adults in your home'>
-                    Change <span class="visuallyhidden">adults in your home</span>
-                </a>
+                {{form}}
             </td>
         </tr>
         </tbody>
@@ -73,9 +71,7 @@
             </td>
             {% endif %}
             <td class="change-answer">
-                <a href="{{ URL_PREFIX }}/other-people/children-question?id={{application_id}}" alt='Change children in your home'>
-                    Change <span class="visuallyhidden">children in your home</span>
-                </a>
+                {{form}}
             </td>
         </tr>
         </tbody>
@@ -100,9 +96,7 @@
                 {{name}}
             </td>
             <td class="change-answer">
-                <a href="{{ URL_PREFIX }}/other-people/adult-details?id={{application_id}}&adults={{number_of_adults}}&remove=0" alt='Change adult name'>
-                    Change <span class="visuallyhidden">adult name</span>
-                </a>
+                {{form}}
             </td>
         </tr>
         <tr>
@@ -159,9 +153,7 @@
             </td>
             {% endif %}
             <td class="change-answer">
-                <a href="{{ URL_PREFIX }}/other-people/adult-details?id={{application_id}}&adults={{number_of_adults}}&remove=0" alt='Change adult date of birth'>
-                    Change <span class="visuallyhidden">date of birth</span>
-                </a>
+                {{form}}
             </td>
         </tr>
         <tr>
@@ -172,9 +164,7 @@
                 {{relationship}}
             </td>
             <td class="change-answer">
-                <a href="{{ URL_PREFIX }}/other-people/adult-details?id={{application_id}}&adults={{number_of_adults}}&remove=0" alt='Change adult relationship'>
-                    Change <span class="visuallyhidden">adult relationship</span>
-                </a>
+               {{form}}
             </td>
         </tr>
         <tr>
@@ -185,9 +175,7 @@
                 {{dbs_certificate_number}}
             </td>
             <td class="change-answer">
-                <a href="{{ URL_PREFIX }}/other-people/adult-dbs?id={{application_id}}&adults={{number_of_adults}}" alt='Change adult DBS certificate number'>
-                    Change <span class="visuallyhidden">adult DBS certificate number</span>
-                </a>
+                {{form}}
             </td>
         </tr>
         <tr>
@@ -204,9 +192,7 @@
             </td>
             {% endif %}
             <td class="change-answer">
-                <a href="{{ URL_PREFIX }}/other-people/adult-permission?id={{application_id}}&adults={{number_of_adults}}" alt='Change adult permission for checks'>
-                    Change <span class="visuallyhidden">adult permission for checks</span>
-                </a>
+                {{form}}
             </td>
         </tr>
         </tbody>
@@ -232,9 +218,7 @@
                 {{name}}
             </td>
             <td class="change-answer">
-                <a href="{{ URL_PREFIX }}/other-people/children-details?id={{application_id}}&children={{number_of_children}}&remove=0" alt='Change child name'>
-                    Change <span class="visuallyhidden">child name</span>
-                </a>
+                {{form}}
             </td>
         </tr>
         <tr>
@@ -291,9 +275,7 @@
             </td>
             {% endif %}
             <td class="change-answer">
-                <a href="{{ URL_PREFIX }}/other-people/children-details?id={{application_id}}&children={{number_of_children}}&remove=0" alt='Change child date of birth'>
-                    Change <span class="visuallyhidden">date of birth</span>
-                </a>
+                {{form}}
             </td>
         </tr>
         <tr>
@@ -304,9 +286,7 @@
                 {{relationship}}
             </td>
             <td class="change-answer">
-                <a href="{{ URL_PREFIX }}/other-people/children-details?id={{application_id}}&children={{number_of_children}}&remove=0" alt='Change child relationship'>
-                    Change <span class="visuallyhidden">child relationship</span>
-                </a>
+                {{form}}
             </td>
         </tr>
         </tbody>

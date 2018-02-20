@@ -35,10 +35,7 @@
                 {{dbs_certificate_number}}
             </td>
             <td class="change-answer">
-                <a href="{{ URL_PREFIX }}/dbs-check/dbs-details?id={{application_id}}#id_dbs_certificate_number-group"
-                   alt='Change DBS certificate number'>
-                    Change <span class="visuallyhidden">DBS certificate number</span>
-                </a>
+                {{ form }}
             </td>
         </tr>
         <tr>
@@ -55,10 +52,7 @@
             </td>
             {% endif %}
             <td class="change-answer">
-                <a href="{{ URL_PREFIX }}/dbs-check/dbs-details?id={{application_id}}#id_convictions-group"
-                   alt='Change do you have any cautions or convictions?'>
-                    Change <span class="visuallyhidden">do you have any cautions or convictions?</span>
-                </a>
+               {{ form }}
             </td>
         </tr>
         {% if cautions_convictions is True %}
@@ -76,10 +70,7 @@
             </td>
             {% endif %}
             <td class="change-answer">
-                <a href="{{ URL_PREFIX }}/dbs-check/upload-dbs?id={{application_id}}#id_declaration-group"
-                   alt='Change will you send your DBS certificate to Ofsted?'>
-                    Change <span class="visuallyhidden">will you send your DBS certificate to Ofsted?</span>
-                </a>
+                {{ form }}
             </td>
         </tr>
         {% endif %}

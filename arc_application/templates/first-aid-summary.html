@@ -35,10 +35,7 @@
                 {{training_organisation}}
             </td>
             <td class="change-answer">
-                <a href="{{ URL_PREFIX }}/first-aid/details?id={{application_id}}#id_first_aid_training_organisation"
-                   alt='Change training organisation'>
-                    Change <span class="visuallyhidden">training organisation</span>
-                </a>
+                {{ form }}
             </td>
         </tr>
         <tr>
@@ -49,10 +46,7 @@
                 {{training_course}}
             </td>
             <td class="change-answer">
-                <a href="{{ URL_PREFIX }}/first-aid/details?id={{application_id}}#id_title_of_training_course"
-                   alt='Change course title'>
-                    Change <span class="visuallyhidden">course title</span>
-                </a>
+                {{ form }}
             </td>
         </tr>
         <tr>
@@ -109,10 +103,7 @@
             </td>
             {% endif %}
             <td class="change-answer">
-                <a href="{{ URL_PREFIX }}/first-aid/details?id={{application_id}}#id_course_date-label"
-                   alt='Change date of certificate'>
-                    Change <span class="visuallyhidden">date of certificate</span>
-                </a>
+                {{ form }}
             </td>
         </tr>
         </tbody>

@@ -7,8 +7,10 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
+from django.forms import formset_factory
 from govuk_forms.forms import GOVUKForm
 from govuk_forms.widgets import CheckboxSelectMultiple
+from .forms import CheckBox
 
 from .models import AdultInHome, ApplicantHomeAddress, ApplicantName, ApplicantPersonalDetails, Application, ArcReview, \
     ArcStatus, ChildInHome, ChildcareType, CriminalRecordCheck, FirstAidTraining, HealthDeclarationBooklet, Reference, \
@@ -55,8 +57,10 @@ def contact_summary(request):
     :return: an HttpResponse object with the rendered Your login and contact details: summary template
     """
     if request.method == 'GET':
+        form = CheckBox()
         application_id_local = request.GET["id"]
     elif request.method == 'POST':
+        print(request.POST)
         application_id_local = request.POST["id"]
         status = ArcStatus.objects.get(pk=application_id_local)
         status.login_details_review = 'COMPLETED'
@@ -72,6 +76,7 @@ def contact_summary(request):
     security_question = user_details.security_question
     security_answer = user_details.security_answer
     variables = {
+        'form': form,
         'application_id': application_id_local,
         'email': email,
         'mobile_number': mobile_number,
@@ -94,7 +99,9 @@ def type_of_childcare_age_groups(request):
     """
     if request.method == 'GET':
         application_id_local = request.GET["id"]
+        form = CheckBox()
     elif request.method == 'POST':
+        form = CheckBox()
         application_id_local = request.POST["id"]
         status = ArcStatus.objects.get(pk=application_id_local)
         status.childcare_type_review = 'COMPLETED'
@@ -104,6 +111,7 @@ def type_of_childcare_age_groups(request):
     application = ChildcareType.objects.get(application_id=application_id_local)
 
     variables = {
+        'form': form,
         'application_id': str(application_id_local),
         'zero': application.zero_to_five,
         'five': application.five_to_eight,
@@ -120,8 +128,10 @@ def personal_details_summary(request):
     :return: an HttpResponse object with the rendered Your personal details: summary template
     """
     if request.method == 'GET':
+        form = CheckBox()
         application_id_local = request.GET["id"]
     elif request.method == 'POST':
+        form = CheckBox()
         application_id_local = request.POST["id"]
         status = ArcStatus.objects.get(pk=application_id_local)
         status.personal_details_review = 'COMPLETED'
@@ -153,6 +163,7 @@ def personal_details_summary(request):
     childcare_postcode = applicant_childcare_address_record.postcode
     application = Application.objects.get(pk=application_id_local)
     variables = {
+        'form': form,
         'application_id': application_id_local,
         'first_name': first_name,
         'middle_names': middle_names,
@@ -184,8 +195,10 @@ def first_aid_training_summary(request):
     :return: an HttpResponse object with the rendered First aid training: summary template
     """
     if request.method == 'GET':
+        form = CheckBox()
         application_id_local = request.GET["id"]
     elif request.method == 'POST':
+        form = CheckBox()
         application_id_local = request.POST["id"]
         status = ArcStatus.objects.get(pk=application_id_local)
         status.first_aid_review = 'COMPLETED'
@@ -198,6 +211,7 @@ def first_aid_training_summary(request):
     certificate_year = FirstAidTraining.objects.get(application_id=application_id_local).course_year
     application = Application.objects.get(pk=application_id_local)
     variables = {
+        'form': form,
         'application_id': application_id_local,
         'training_organisation': training_organisation,
         'training_course': training_course,
@@ -218,8 +232,10 @@ def dbs_check_summary(request):
     """
     if request.method == 'GET':
         application_id_local = request.GET["id"]
+        form = CheckBox()
     elif request.method == 'POST':
         application_id_local = request.POST["id"]
+        form = CheckBox()
         status = ArcStatus.objects.get(pk=application_id_local)
         status.dbs_review = 'COMPLETED'
         status.save()
@@ -230,6 +246,7 @@ def dbs_check_summary(request):
     send_certificate_declare = criminal_record_check.send_certificate_declare
     application = Application.objects.get(pk=application_id_local)
     variables = {
+        'form': form,
         'application_id': application_id_local,
         'dbs_certificate_number': dbs_certificate_number,
         'cautions_convictions': cautions_convictions,
@@ -247,8 +264,10 @@ def references_summary(request):
     :return: an HttpResponse object with the rendered 2 references: summary template
     """
     if request.method == 'GET':
+        form = CheckBox()
         application_id_local = request.GET["id"]
     elif request.method == 'POST':
+        form = CheckBox()
         application_id_local = request.POST["id"]
         status = ArcStatus.objects.get(pk=application_id_local)
         status.references_review = 'COMPLETED'
@@ -284,6 +303,7 @@ def references_summary(request):
     second_reference_email = second_reference_record.email
     application = Application.objects.get(pk=application_id_local)
     variables = {
+        'form': form,
         'application_id': application_id_local,
         'first_reference_first_name': first_reference_first_name,
         'first_reference_last_name': first_reference_last_name,
@@ -324,8 +344,10 @@ def other_people_summary(request):
     :return: an HttpResponse object with the rendered People in your home: summary template
     """
     if request.method == 'GET':
+        form = CheckBox()
         application_id_local = request.GET["id"]
     elif request.method == 'POST':
+        form = CheckBox()
         application_id_local = request.POST["id"]
         status = ArcStatus.objects.get(pk=application_id_local)
         status.people_in_home_review = 'COMPLETED'
@@ -373,6 +395,7 @@ def other_people_summary(request):
     child_lists = zip(child_name_list, child_birth_day_list, child_birth_month_list, child_birth_year_list,
                       child_relationship_list)
     variables = {
+        'form': form,
         'application_id': application_id_local,
         'adults_in_home': application.adults_in_home,
         'children_in_home': application.children_in_home,
@@ -394,8 +417,10 @@ def health_check_answers(request):
     :return: an HttpResponse object with the rendered Your health: answers template
     """
     if request.method == 'GET':
+        form = CheckBox()
         application_id_local = request.GET["id"]
     elif request.method == 'POST':
+        form = CheckBox()
         application_id_local = request.POST["id"]
         status = ArcStatus.objects.get(pk=application_id_local)
         status.health_review = 'COMPLETED'
@@ -404,6 +429,7 @@ def health_check_answers(request):
     send_hdb_declare = HealthDeclarationBooklet.objects.get(application_id=application_id_local).send_hdb_declare
     application = Application.objects.get(pk=application_id_local)
     variables = {
+        'form': form,
         'application_id': application_id_local,
         'send_hdb_declare': send_hdb_declare,
         'health_status': application.health_status,
@@ -418,8 +444,10 @@ def declaration(request):
     :return: an HttpResponse object with the rendered declaration-summary template
     """
     if request.method == 'GET':
+        form = CheckBox()
         application_id_local = request.GET["id"]
     elif request.method == 'POST':
+        form = CheckBox()
         application_id_local = request.POST["id"]
         status = ArcStatus.objects.get(pk=application_id_local)
         status.declaration_review = 'COMPLETED'
@@ -495,6 +523,7 @@ def declaration(request):
     child_lists = zip(child_name_list, child_birth_day_list, child_birth_month_list, child_birth_year_list,
                       child_relationship_list)
     variables = {
+        'form': form,
         'application_id': application_id_local,
         'login_details_email': login_record.email,
         'login_details_mobile_number': login_record.mobile_number,
@@ -727,9 +756,11 @@ def comments(request):
     :return: an HttpResponse object with the rendered Your arc comments template
     """
     if request.method == 'GET':
+        form = CheckBox()
         application_id_local = request.GET["id"]
         form = CommentsForm(request.POST, id=application_id_local)
     if request.method == 'POST':
+        form = CheckBox()
         application_id_local = request.POST["id"]
         form = CommentsForm(request.POST, id=application_id_local)
         if form.is_valid():
