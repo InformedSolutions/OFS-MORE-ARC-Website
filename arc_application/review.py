@@ -7,7 +7,6 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
-from django.forms import formset_factory
 from govuk_forms.forms import GOVUKForm
 from govuk_forms.widgets import CheckboxSelectMultiple
 from .forms import CheckBox
@@ -60,7 +59,6 @@ def contact_summary(request):
         form = CheckBox()
         application_id_local = request.GET["id"]
     elif request.method == 'POST':
-        print(request.POST)
         application_id_local = request.POST["id"]
         status = ArcStatus.objects.get(pk=application_id_local)
         status.login_details_review = 'COMPLETED'
