@@ -10,7 +10,7 @@ from django.shortcuts import render
 from django.forms import formset_factory
 from govuk_forms.forms import GOVUKForm
 from govuk_forms.widgets import CheckboxSelectMultiple
-from .forms import CheckBox
+from .forms import CheckBox, CommentsForm
 
 from .models import AdultInHome, ApplicantHomeAddress, ApplicantName, ApplicantPersonalDetails, Application, ArcReview, \
     ArcStatus, ChildInHome, ChildcareType, CriminalRecordCheck, FirstAidTraining, HealthDeclarationBooklet, Reference, \
@@ -678,7 +678,9 @@ def arc_summary(request):
     # Zip the appended lists together for the HTML to simultaneously parse
     child_lists = zip(child_name_list, child_birth_day_list, child_birth_month_list, child_birth_year_list,
                       child_relationship_list)
+    form = CheckBox()
     variables = {
+        'form': form,
         'application_id': application_id_local,
         'login_details_email': login_record.email,
         'login_details_mobile_number': login_record.mobile_number,
@@ -785,7 +787,7 @@ def review(request):
     :return: an HttpResponse object with the rendered Your App Review Confirmation template
     """
     application_id_local = request.GET["id"]
-    form = Checkbox(request.POST, id=application_id_local)
+    form = CheckBox
     # call accepted/returned email
     release_application(application_id_local)
     variables = {
@@ -822,32 +824,7 @@ def has_group(user, group_name):
     return True if group in user.groups.all() else False
 
 
-class CommentsForm(GOVUKForm):
-    """
-    GOV.UK form for the Your login and contact details: email page
-    """
-    field_label_classes = 'form-label-bold'
-    auto_replace_widgets = True
-    comments = forms.CharField(label='Comments', required=False, widget=forms.TextInput(attrs={'size': 80}))
 
-    def __init__(self, *args, **kwargs):
-        """
-        Method to configure the initialisation of the Your login and contact details: email form
-        :param args: arguments passed to the form
-        :param kwargs: keyword arguments passed to the form, e.g. application ID
-        """
-        self.application_id_local = kwargs.pop('id')
-        super(CommentsForm, self).__init__(*args, **kwargs)
-        # If information was previously entered, display it on the form
-        if ArcReview.objects.filter(application_id=self.application_id_local).count() > 0:
-            rev = ArcReview.objects.get(application_id=self.application_id_local)
-            self.fields['comments'].initial = rev.comments
-
-    def clean_comments(self):
-        comments = self.cleaned_data['comments']
-        # RegEx for valid e-mail addresses
-
-        return comments
 
 
 def all_complete(id):
@@ -866,33 +843,6 @@ def all_complete(id):
                 return False
         return True
 
-
-class Checkbox(GOVUKForm):
-    """
-    GOV.UK form for the Type of childcare task
-    """
-    field_label_classes = 'form-label-bold'
-    auto_replace_widgets = True
-    options = (
-        ('Flag', ''),
-    )
-    checkbox = forms.MultipleChoiceField(
-        required=True,
-        widget=CheckboxSelectMultiple,
-        choices=options,
-        label='What age groups will you be caring for?',
-        help_text='Tick all that apply'
-    )
-
-    def __init__(self, *args, **kwargs):
-        """
-        Method to configure the initialisation of the Type of childcare form
-        :param args: arguments passed to the form
-        :param kwargs: keyword arguments passed to the form, e.g. application ID
-        """
-        self.application_id_local = kwargs.pop('id')
-        super(Checkbox, self).__init__(*args, **kwargs)
-        # If information was previously entered, display it on the form
 
 
 # Add personalisation and create template

@@ -35,10 +35,8 @@
             <td>
                 {{login_details_email}}
             </td>
-            <td class="change-answer">
-                <a href="{{ URL_PREFIX }}/account/email?id={{application_id}}#id_email_address" alt="Update your email">
-                    Change <span class="visuallyhidden">email</span>
-                </a>
+            <td class="change-answer" style="text-align:right">
+                {{ form }}
             </td>
         </tr>
         <tr>
@@ -48,10 +46,8 @@
             <td>
                 {{login_details_mobile_number}}
             </td>
-            <td class="change-answer">
-                <a href="{{ URL_PREFIX }}/account/phone?id={{application_id}}#id_mobile_number" alt="Update your mobile phone number">
-                    Change <span class="visuallyhidden">mobile phone number</span>
-                </a>
+            <td class="change-answer" style="text-align:right">
+                {{ form }}
             </td>
         </tr>
         <tr>
@@ -61,10 +57,8 @@
             <td>
                 {{login_details_alternative_phone_number}}
             </td>
-            <td class="change-answer">
-                <a href="{{ URL_PREFIX }}/account/phone?id={{application_id}}#id_add_phone_number" alt="Update your alternative phone number">
-                    Change <span class="visuallyhidden">alternative phone number</span>
-                </a>
+            <td class="change-answer" style="text-align:right">
+                {{ form }}
             </td>
         </tr>
         </tbody>
@@ -93,10 +87,8 @@
                 No
             </td>
             {% endif %}
-            <td class="change-answer">
-                <a href="{{ URL_PREFIX }}/childcare/age-groups?id={{application_id}}#id_type_of_childcare_0" alt="Update whether you plan to look after 0 to 5 year olds">
-                    Change <span class="visuallyhidden">0 to 5</span>
-                </a>
+            <td class="change-answer" style="text-align:right">
+                {{ form }}
             </td>
         </tr>
         <tr>
@@ -112,10 +104,8 @@
                 No
             </td>
             {% endif %}
-            <td class="change-answer">
-                <a href="{{ URL_PREFIX }}/childcare/age-groups?id={{application_id}}#id_type_of_childcare_1" alt="Update whether you plan to look after 5 to 7 year olds">
-                    Change <span class="visuallyhidden">5 to 7</span>
-                </a>
+            <td class="change-answer" style="text-align:right">
+                {{ form }}
             </td>
         </tr>
         <tr>
@@ -131,10 +121,8 @@
                 No
             </td>
             {% endif %}
-            <td class="change-answer">
-                <a href="{{ URL_PREFIX }}/childcare/age-groups?id={{application_id}}#id_type_of_childcare_2" alt="Update whether you plan to look at children of 8 years and older">
-                    Change <span class="visuallyhidden">8 and older</span>
-                </a>
+            <td class="change-answer" style="text-align:right">
+                {{ form }}
             </td>
         </tr>
         <tr>
@@ -176,10 +164,8 @@
                 Childcare Register (voluntary part)
             </td>
             {% endif %}
-            <td class="change-answer">
-                <a href="{{ URL_PREFIX }}/childcare/age-groups?id={{application_id}}" alt="Update your registers">
-                    Change <span class="visuallyhidden">registers</span>
-                </a>
+            <td class="change-answer" style="text-align:right">
+                {{ form }}
             </td>
         </tr>
         </tbody>
@@ -208,10 +194,8 @@
                 {{personal_details_first_name}} {{personal_details_last_name}}
             </td>
             {% endif %}
-            <td class="change-answer">
-                <a href="{{ URL_PREFIX }}/personal-details/name?id={{application_id}}" alt="Update your name">
-                    Change <span class="visuallyhidden">your name</span>
-                </a>
+            <td class="change-answer" style="text-align:right">
+                {{ form }}
             </td>
         </tr>
         <tr>
@@ -267,10 +251,8 @@
                 {{personal_details_birth_day}} December {{personal_details_birth_year}}
             </td>
             {% endif %}
-            <td class="change-answer">
-                <a href="{{ URL_PREFIX }}/personal-details/dob?id={{application_id}}" alt="Update your date of birth">
-                    Change <span class="visuallyhidden">date of birth</span>
-                </a>
+            <td class="change-answer" style="text-align:right">
+                {{ form }}
             </td>
         <tr>
             <td>
@@ -317,11 +299,8 @@
                 {{home_address_postcode}}
             </td>
             {% endif %}
-            <td class="change-answer">
-                <a href="{{ URL_PREFIX }}/personal-details/home-address?id={{application_id}}&manual=True"
-                   alt='Update your home address'>
-                    Change <span class="visuallyhidden">home address</span>
-                </a>
+            <td class="change-answer" style="text-align:right">
+                {{ form }}
             </td>
         </tr>
         <tr>
@@ -332,11 +311,8 @@
             <td style="word-wrap: break-word">
                 Same as home address
             </td>
-            <td class="change-answer">
-                <a href="{{ URL_PREFIX }}/personal-details/location-of-care?id={{application_id}}"
-                   alt='Update your childcare address'>
-                    Change <span class="visuallyhidden">childcare address</span>
-                </a>
+            <td class="change-answer" style="text-align:right">
+                {{ form }}
             </td>
             {% elif location_of_childcare == False %}
             {% if childcare_street_line2 and childcare_county %}
@@ -380,11 +356,8 @@
                 {{childcare_postcode}}
             </td>
             {% endif %}
-            <td class="change-answer">
-                <a href="{{ URL_PREFIX }}/personal-details/childcare-address?id={{application_id}}&manual=True"
-                   alt='Update your childcare address'>
-                    Change <span class="visuallyhidden">childcare address</span>
-                </a>
+            <td class="change-answer" style="text-align:right">
+                {{ form }}
             </td>
             {% endif %}
         </tr>
@@ -408,11 +381,8 @@
             <td style="word-wrap: break-word">
                 {{first_aid_training_organisation}}
             </td>
-            <td class="change-answer">
-                <a href="{{ URL_PREFIX }}/first-aid/details?id={{application_id}}#id_first_aid_training_organisation"
-                   alt='Update your first aid training provider'>
-                    Change <span class="visuallyhidden">first aid training provider</span>
-                </a>
+            <td class="change-answer" style="text-align:right">
+                {{ form }}
             </td>
         </tr>
         <tr>
@@ -422,11 +392,8 @@
             <td style="word-wrap: break-word">
                 {{first_aid_training_course}}
             </td>
-            <td class="change-answer">
-                <a href="{{ URL_PREFIX }}/first-aid/details?id={{application_id}}#id_title_of_training_course"
-                   alt='Update your first aid training course title'>
-                    Change <span class="visuallyhidden">course title</span>
-                </a>
+            <td class="change-answer" style="text-align:right">
+                {{ form }}
             </td>
         </tr>
         <tr>
@@ -482,11 +449,8 @@
                 {{first_aid_certificate_day}} December {{first_aid_certificate_year}}
             </td>
             {% endif %}
-            <td class="change-answer">
-                <a href="{{ URL_PREFIX }}/first-aid/details?id={{application_id}}"
-                   alt='Update your first aid certificate date'>
-                    Change <span class="visuallyhidden">date of first aid certificate</span>
-                </a>
+            <td class="change-answer" style="text-align:right">
+                {{ form }}
             </td>
         </tr>
         </tbody>
@@ -509,11 +473,8 @@
             <td style="word-wrap: break-word">
                 {{dbs_certificate_number}}
             </td>
-            <td class="change-answer">
-                <a href="{{ URL_PREFIX }}/dbs-check/dbs-details?id={{application_id}}#id_dbs_certificate_number"
-                   alt='Update your DBS certificate number'>
-                    Change <span class="visuallyhidden">DBS certificate number</span>
-                </a>
+            <td class="change-answer" style="text-align:right">
+                {{ form }}
             </td>
         </tr>
         <tr>
@@ -529,11 +490,8 @@
                 No
             </td>
             {% endif %}
-            <td class="change-answer">
-                <a href="{{ URL_PREFIX }}/dbs-check/dbs-details?id={{application_id}}"
-                   alt='Update whether you have any cautions or convictions?'>
-                    Change <span class="visuallyhidden">do you have any cautions or convictions?</span>
-                </a>
+            <td class="change-answer" style="text-align:right">
+                {{ form }}
             </td>
         </tr>
         {% if cautions_convictions is True %}
@@ -550,11 +508,8 @@
                 No
             </td>
             {% endif %}
-            <td class="change-answer">
-                <a href="{{ URL_PREFIX }}/dbs-check/upload-dbs?id={{application_id}}#id_declaration"
-                   alt='Update whether you will send your DBS certificate to Ofsted?'>
-                    Change <span class="visuallyhidden">will you send your DBS certificate to Ofsted?</span>
-                </a>
+            <td class="change-answer" style="text-align:right">
+                {{ form }}
             </td>
         </tr>
         {% endif %}
@@ -584,10 +539,8 @@
                 No
             </td>
             {% endif %}
-            <td class="change-answer">
-                <a href="{{ URL_PREFIX }}/health/booklet?id={{application_id}}#id_send_hdb_declare" alt="Update your declaration to send a Health Declaration Booklet to Ofsted">
-                    Change <span class="visuallyhidden">your declaration to provide a Health Declaration Booklet</span>
-                </a>
+            <td class="change-answer" style="text-align:right">
+                {{ form }}
             </td>
         </tr>
         </tbody>
@@ -610,10 +563,8 @@
             <td style="word-wrap: break-word">
                 {{first_reference_first_name}} {{first_reference_last_name}}
             </td>
-            <td class="change-answer">
-                <a href="{{ URL_PREFIX }}/references/first-reference?id={{application_id}}" alt="Update your first reference's name">
-                    Change
-                </a>
+            <td class="change-answer" style="text-align:right">
+                {{ form }}
             </td>
         </tr>
         <tr>
@@ -623,10 +574,8 @@
             <td style="word-wrap: break-word">
                 {{first_reference_relationship}}
             </td>
-            <td class="change-answer">
-                <a href="{{ URL_PREFIX }}/references/first-reference?id={{application_id}}#id_relationship" alt="Update your first reference's relationship">
-                    Change
-                </a>
+            <td class="change-answer" style="text-align:right">
+                {{ form }}
             </td>
         </tr>
         <tr>
@@ -636,10 +585,8 @@
             <td style="word-wrap: break-word">
                 {{first_reference_years_known}} years, {{first_reference_months_known}} months
             </td>
-            <td class="change-answer">
-                <a href="{{ URL_PREFIX }}/references/first-reference?id={{application_id}}" alt="Update your first reference's time known">
-                    Change
-                </a>
+            <td class="change-answer" style="text-align:right">
+                {{ form }}
             </td>
         </tr>
         <tr>
@@ -695,10 +642,8 @@
                 {{first_reference_country}}
             </td>
             {% endif %}
-            <td class="change-answer">
-                <a href="{{ URL_PREFIX }}/references/first-reference-address?id={{application_id}}&manual=True" alt="Update your first reference's address">
-                    Change
-                </a>
+            <td class="change-answer" style="text-align:right">
+                {{ form }}
             </td>
         </tr>
         <tr>
@@ -708,10 +653,8 @@
             <td style="word-wrap: break-word">
                 {{first_reference_phone_number}}
             </td>
-            <td class="change-answer">
-                <a href="{{ URL_PREFIX }}/references/first-reference-contact-details?id={{application_id}}#id_phone_number" alt="Update your first reference's phone number">
-                    Change
-                </a>
+            <td class="change-answer" style="text-align:right">
+                {{ form }}
             </td>
         </tr>
         <tr>
@@ -721,10 +664,8 @@
             <td style="word-wrap: break-word">
                 {{first_reference_email}}
             </td>
-            <td class="change-answer">
-                <a href="{{ URL_PREFIX }}/references/first-reference-contact-details?id={{application_id}}#id_email_address" alt="Update your first reference's email">
-                    Change
-                </a>
+            <td class="change-answer" style="text-align:right">
+                {{ form }}
             </td>
         </tr>
         </tbody>
@@ -747,10 +688,8 @@
             <td style="word-wrap: break-word">
                 {{second_reference_first_name}} {{second_reference_last_name}}
             </td>
-            <td class="change-answer">
-                <a href="{{ URL_PREFIX }}/references/second-reference?id={{application_id}}" alt="Update your second reference's name">
-                    Change
-                </a>
+            <td class="change-answer" style="text-align:right">
+                {{ form }}
             </td>
         </tr>
         <tr>
@@ -760,10 +699,8 @@
             <td style="word-wrap: break-word">
                 {{second_reference_relationship}}
             </td>
-            <td class="change-answer">
-                <a href="{{ URL_PREFIX }}/references/second-reference?id={{application_id}}#id_relationship" alt="Update your second reference's relationship">
-                    Change
-                </a>
+            <td class="change-answer" style="text-align:right">
+                {{ form }}
             </td>
         </tr>
         <tr>
@@ -773,10 +710,8 @@
             <td style="word-wrap: break-word">
                 {{second_reference_years_known}} years, {{second_reference_months_known}} months
             </td>
-            <td class="change-answer">
-                <a href="{{ URL_PREFIX }}/references/second-reference?id={{application_id}}" alt="Update your second reference's time known">
-                    Change
-                </a>
+            <td class="change-answer" style="text-align:right">
+                {{ form }}
             </td>
         </tr>
         <tr>
@@ -832,10 +767,8 @@
                 {{second_reference_country}}
             </td>
             {% endif %}
-            <td class="change-answer">
-                <a href="{{ URL_PREFIX }}/references/second-reference-address?id={{application_id}}&manual=True" alt="Update your second reference's address">
-                    Change
-                </a>
+            <td class="change-answer" style="text-align:right">
+                {{ form }}
             </td>
         </tr>
         <tr>
@@ -845,10 +778,8 @@
             <td style="word-wrap: break-word">
                 {{second_reference_phone_number}}
             </td>
-            <td class="change-answer">
-                <a href="{{ URL_PREFIX }}/references/second-reference-contact-details?id={{application_id}}#id_phone_number" alt="Update your second reference's phone number">
-                    Change
-                </a>
+            <td class="change-answer" style="text-align:right">
+                {{ form }}
             </td>
         </tr>
         <tr>
@@ -858,10 +789,8 @@
             <td style="word-wrap: break-word">
                 {{second_reference_email}}
             </td>
-            <td class="change-answer">
-                <a href="{{ URL_PREFIX }}/references/second-reference-contact-details?id={{application_id}}#id_email_address" alt="Update your second reference's email">
-                    Change
-                </a>
+            <td class="change-answer" style="text-align:right">
+                {{ form }}
             </td>
         </tr>
         </tbody>
@@ -890,11 +819,8 @@
                 No
             </td>
             {% endif %}
-            <td class="change-answer">
-                <a href="{{ URL_PREFIX }}/other-people/adult-question?id={{application_id}}"
-                   alt='Update the adults in your home'>
-                    Change <span class="visuallyhidden">adults in your home</span>
-                </a>
+            <td class="change-answer" style="text-align:right">
+                {{ form }}
             </td>
         </tr>
         </tbody>
@@ -923,11 +849,8 @@
                 No
             </td>
             {% endif %}
-            <td class="change-answer">
-                <a href="{{ URL_PREFIX }}/other-people/children-question?id={{application_id}}"
-                   alt='Update the children in your home'>
-                    Change <span class="visuallyhidden">children in your home</span>
-                </a>
+            <td class="change-answer" style="text-align:right">
+                {{ form }}
             </td>
         </tr>
         </tbody>
@@ -951,11 +874,8 @@
             <td style="word-wrap: break-word">
                 {{name}}
             </td>
-            <td class="change-answer">
-                <a href="{{ URL_PREFIX }}/other-people/adult-details?id={{application_id}}&adults={{number_of_adults}}&remove=0"
-                   alt="Update the adult's name">
-                    Change <span class="visuallyhidden">adult name</span>
-                </a>
+            <td class="change-answer" style="text-align:right">
+                {{ form }}
             </td>
         </tr>
         <tr>
@@ -1011,11 +931,8 @@
                 {{day}} December {{year}}
             </td>
             {% endif %}
-            <td class="change-answer">
-                <a href="{{ URL_PREFIX }}/other-people/adult-details?id={{application_id}}&adults={{number_of_adults}}&remove=0"
-                   alt="Update the adult's date of birth">
-                    Change <span class="visuallyhidden">date of birth</span>
-                </a>
+            <td class="change-answer" style="text-align:right">
+                {{ form }}
             </td>
         </tr>
         <tr>
@@ -1025,11 +942,8 @@
             <td style="word-wrap: break-word">
                 {{relationship}}
             </td>
-            <td class="change-answer">
-                <a href="{{ URL_PREFIX }}/other-people/adult-details?id={{application_id}}&adults={{number_of_adults}}&remove=0"
-                   alt="Update the adult's relationship">
-                    Change <span class="visuallyhidden">adult relationship</span>
-                </a>
+            <td class="change-answer" style="text-align:right">
+                {{ form }}
             </td>
         </tr>
         <tr>
@@ -1039,11 +953,8 @@
             <td style="word-wrap: break-word">
                 {{dbs_certificate_number}}
             </td>
-            <td class="change-answer">
-                <a href="{{ URL_PREFIX }}/other-people/adult-dbs?id={{application_id}}&adults={{number_of_adults}}"
-                   alt="Update the adult's DBS certificate number">
-                    Change <span class="visuallyhidden">adult DBS certificate number</span>
-                </a>
+            <td class="change-answer" style="text-align:right">
+                {{ form }}
             </td>
         </tr>
         <tr>
@@ -1059,11 +970,8 @@
                 No
             </td>
             {% endif %}
-            <td class="change-answer">
-                <a href="{{ URL_PREFIX }}/other-people/adult-permission?id={{application_id}}&adults={{number_of_adults}}"
-                   alt="Update the adult's permission for checks">
-                    Change <span class="visuallyhidden">adult permission for checks</span>
-                </a>
+            <td class="change-answer" style="text-align:right">
+                {{ form }}
             </td>
         </tr>
         </tbody>
@@ -1088,11 +996,8 @@
             <td style="word-wrap: break-word">
                 {{name}}
             </td>
-            <td class="change-answer">
-                <a href="{{ URL_PREFIX }}/other-people/children-details?id={{application_id}}&children={{number_of_children}}&remove=0"
-                   alt="Update the child's name">
-                    Change <span class="visuallyhidden">child name</span>
-                </a>
+            <td class="change-answer" style="text-align:right">
+                {{ form }}
             </td>
         </tr>
         <tr>
@@ -1148,11 +1053,8 @@
                 {{day}} December {{year}}
             </td>
             {% endif %}
-            <td class="change-answer">
-                <a href="{{ URL_PREFIX }}/other-people/children-details?id={{application_id}}&children={{number_of_children}}&remove=0"
-                   alt="Update the child's date of birth">
-                    Change <span class="visuallyhidden">date of birth</span>
-                </a>
+            <td class="change-answer" style="text-align:right">
+                {{ form }}
             </td>
         </tr>
         <tr>
@@ -1162,11 +1064,8 @@
             <td style="word-wrap: break-word">
                 {{relationship}}
             </td>
-            <td class="change-answer">
-                <a href="{{ URL_PREFIX }}/other-people/children-details?id={{application_id}}&children={{number_of_children}}&remove=0"
-                   alt="Update the child's relationship">
-                    Change <span class="visuallyhidden">child relationship</span>
-                </a>
+            <td class="change-answer" style="text-align:right">
+                {{ form }}
             </td>
         </tr>
         </tbody>
@@ -1181,7 +1080,6 @@
         </form>
     </div>
     <br>
-    <!-- Return to task list -->
     <div class="form-group grid-row">
         <a href="{{ URL_PREFIX }}/review?id={{application_id}}">Return to list</a>
     </div>
