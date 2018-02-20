@@ -782,6 +782,33 @@ def arc_summary(request):
 
     return render(request, 'arc-summary.html', variables)
 
+def comments(request):
+    """
+    This is the arc comments page
+    :param request: a request object used to generate the HttpResponse
+    :return: an HttpResponse object with the rendered Your arc comments template
+    """
+    if request.method == 'GET':
+        application_id_local = request.GET["id"]
+        form = CommentsForm(request.POST, id=application_id_local)
+    if request.method == 'POST':
+        application_id_local = request.POST["id"]
+        form = CommentsForm(request.POST, id=application_id_local)
+        if form.is_valid():
+            # Send login e-mail link if applicant has previously applied
+            comments = form.cleaned_data['comments']
+            if ArcReview.objects.filter(application_id=application_id_local):
+                arc = ArcReview.objects.get(application_id=application_id_local)
+                arc.comments = comments
+                arc.save()
+        return review(request)
+    variables = {
+        'form': form,
+        'application_id': application_id_local,
+    }
+    return render(request, 'comments.html', variables)
+
+
 def review(request):
     """
     Confirmation Page
@@ -789,7 +816,6 @@ def review(request):
     :return: an HttpResponse object with the rendered Your App Review Confirmation template
     """
     application_id_local = request.GET["id"]
-    form = Checkbox(request.POST, id=application_id_local)
     application = Application.objects.get(application_id=application_id_local)
     login_id = application.login_id
     if UserDetails.objects.filter(login_id=login_id).count() > 0:
@@ -802,30 +828,10 @@ def review(request):
         returned_email(email)
 
     variables = {
-        'checkbox': form,
         'application_id': application_id_local,
     }
 
     return render(request, 'review-confirmation.html', variables)
-
-
-def review(request):
-    """
-    Confirmation Page
-    :param request: a request object used to generate the HttpResponse
-    :return: an HttpResponse object with the rendered Your App Review Confirmation template
-    """
-    application_id_local = request.GET["id"]
-    form = CheckBox
-    # call accepted/returned email
-    release_application(application_id_local)
-    variables = {
-        'checkbox': form,
-        'application_id': application_id_local,
-    }
-
-    return render(request, 'review-confirmation.html', variables)
-
 
 def release_application(app_id):
     """
@@ -899,7 +905,7 @@ def accepted_email(email):
 
 
 # Add personalisation and create template
-def accepted_email(email):
+def returned_email(email):
     """
     Method to send an email using the Notify Gateway API
     :param email: string containing the e-mail address to send the e-mail to
