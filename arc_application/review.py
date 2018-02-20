@@ -56,7 +56,6 @@ def task_list(request):
                 'reference_status': application.references_review,
                 'people_in_home_status': application.people_in_home_review,
                 'declaration_status': application.declaration_review,
-                'all_complete': all_complete(application_id),
                 'birth_day': personal_details_record.birth_day,
                 'birth_month': personal_details_record.birth_month,
                 'birth_year': personal_details_record.birth_year,
@@ -66,7 +65,8 @@ def task_list(request):
                 'zero_to_five': childcare_type_record.zero_to_five,
                 'five_to_eight': childcare_type_record.five_to_eight,
                 'eight_plus': childcare_type_record.eight_plus,
-                'review_count': review_count
+                'review_count': review_count,
+                'all_complete': all_complete(application_id, False)
             })
 
             temp_context = application_status_context
@@ -789,8 +789,17 @@ def review(request):
     """
     application_id_local = request.GET["id"]
     form = Checkbox(request.POST, id=application_id_local)
-    # call accepted/returned email
-    release_application(application_id_local)
+    application = Application.objects.get(application_id=application_id_local)
+    login_id = application.login_id
+    if UserDetails.objects.filter(login_id=login_id).count() > 0:
+        user_details = UserDetails.objects.get(login_id=login_id)
+        email = UserDetails.email
+    if all_complete(application_id_local, True):
+        accepted_email(email)
+        release_application(application_id_local)
+    else:
+        returned_email(email)
+
     variables = {
         'checkbox': form,
         'application_id': application_id_local,
@@ -808,9 +817,6 @@ def release_application(app_id):
     if ArcReview.objects.filter(application_id=app_id).count() > 0:
         app = ArcReview.objects.get(application_id=app_id)
         app.delete()
-        if ArcStatus.objects.filter(application_id=app_id).count() > 0:
-            status = ArcStatus.objects.get(application_id=app_id)
-            status.delete()
         return True
     else:
         return False
@@ -853,7 +859,7 @@ class CommentsForm(GOVUKForm):
         return comments
 
 
-def all_complete(id):
+def all_complete(id, flag):
     """
     Check the status of all sections
     :param id: Application Id
@@ -865,7 +871,7 @@ def all_complete(id):
                 arc.first_aid_review, arc.dbs_review, arc.health_review, arc.references_review,
                 arc.people_in_home_review, arc.declaration_review]
         for i in list:
-            if i == 'NOT_STARTED':
+            if (i == 'NOT_STARTED' and not flag) or (i!= 'COMPLETED' and flag):
                 return False
         return True
 
@@ -906,17 +912,17 @@ def accepted_email(email):
     :param email: string email address
     :return: HTTP response
     """
-    email = 'matthew.styles@informed.com'
+    email = email
     base_request_url = settings.NOTIFY_URL
     header = {'content-type': 'application/json'}
-    notification_request = {
+    request = {
         'email': email,
         'personalisation': {},
         'reference': 'string',
         'templateId': 'b973c5a2-cadd-46a5-baf7-beae65ab11dc'
     }
     r = requests.post(base_request_url + '/api/v1/notifications/email/',
-                      json.dumps(notification_request),
+                      json.dumps(request),
                       headers=header)
     return r
 
@@ -929,16 +935,16 @@ def returned_email(email):
      :param email: string email address
     :return: HTTP response
     """
-    email = 'matthew.styles@informed.com'
+    email = email
     base_request_url = settings.NOTIFY_URL
     header = {'content-type': 'application/json'}
-    notification_request = {
+    request = {
         'email': email,
         'personalisation': {},
         'reference': 'string',
         'templateId': 'c9157aaa-02cd-4294-8094-df2184c12930'
     }
     r = requests.post(base_request_url + '/api/v1/notifications/email/',
-                      json.dumps(notification_request),
+                      json.dumps(request),
                       headers=header)
     return r
