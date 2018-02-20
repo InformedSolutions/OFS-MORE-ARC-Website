@@ -870,7 +870,7 @@ def all_complete(id, flag):
                 arc.first_aid_review, arc.dbs_review, arc.health_review, arc.references_review,
                 arc.people_in_home_review, arc.declaration_review]
         for i in list:
-            if i == 'NOT_STARTED':
+            if (i == 'NOT_STARTED' and not flag) or (i != 'COMPLETED' and flag):
                 return False
         return True
 
@@ -884,39 +884,41 @@ def accepted_email(email):
     :param email: string email address
     :return: HTTP response
     """
-    email = 'matthew.styles@informed.com'
-    base_request_url = settings.NOTIFY_URL
-    header = {'content-type': 'application/json'}
-    notification_request = {
-        'email': email,
-        'personalisation': {},
-        'reference': 'string',
-        'templateId': 'b973c5a2-cadd-46a5-baf7-beae65ab11dc'
-    }
-    r = requests.post(base_request_url + '/api/v1/notifications/email/',
-                      json.dumps(notification_request),
-                      headers=header)
-    return r
+    if hasattr(settings, 'NOTIFY_URL'):
+        email = str(email)
+        base_request_url = settings.NOTIFY_URL
+        header = {'content-type': 'application/json'}
+        request = {
+            'email': email,
+            'reference': 'string',
+            'templateId': 'b973c5a2-cadd-46a5-baf7-beae65ab11dc'
+        }
+        data = json.dumps(request)
+        r = requests.post(base_request_url + '/api/v1/notifications/email/',
+                          data,
+                          headers=header)
+        return r
 
 
 # Add personalisation and create template
-def returned_email(email):
+def accepted_email(email):
     """
-    Method to send a magic link email using the Notify Gateway API
+    Method to send an email using the Notify Gateway API
     :param email: string containing the e-mail address to send the e-mail to
-     :param email: string email address
+    :param email: string email address
     :return: HTTP response
     """
-    email = 'matthew.styles@informed.com'
-    base_request_url = settings.NOTIFY_URL
-    header = {'content-type': 'application/json'}
-    notification_request = {
-        'email': email,
-        'personalisation': {},
-        'reference': 'string',
-        'templateId': 'c9157aaa-02cd-4294-8094-df2184c12930'
-    }
-    r = requests.post(base_request_url + '/api/v1/notifications/email/',
-                      json.dumps(notification_request),
-                      headers=header)
-    return r
+    if hasattr(settings, 'NOTIFY_URL'):
+        email = str(email)
+        base_request_url = settings.NOTIFY_URL
+        header = {'content-type': 'application/json'}
+        request = {
+            'email': email,
+            'reference': 'string',
+            'templateId': 'c9157aaa-02cd-4294-8094-df2184c12930'
+        }
+        data = json.dumps(request)
+        r = requests.post(base_request_url + '/api/v1/notifications/email/',
+                          data,
+                          headers=header)
+        return r
