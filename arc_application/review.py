@@ -21,6 +21,29 @@ def task_list(request):
         if request.method == 'GET':
             application_id = request.GET['id']
             application = ArcStatus.objects.get(application_id=application_id)
+            personal_details_record = ApplicantPersonalDetails.objects.get(application_id=application_id)
+            name_record = ApplicantName.objects.get(personal_detail_id=personal_details_record.personal_detail_id)
+            childcare_type_record = ChildcareType.objects.get(application_id=application_id)
+            reviewed = []
+            if application.login_details_review == 'COMPLETED' or application.login_details_review == 'FLAGGED':
+                reviewed.append('login_details')
+            if application.personal_details_review == 'COMPLETED' or application.personal_details_review == 'FLAGGED':
+                reviewed.append('personal_details')
+            if application.childcare_type_review == 'COMPLETED' or application.childcare_type_review == 'FLAGGED':
+                reviewed.append('childcare_type')
+            if application.first_aid_review == 'COMPLETED' or application.first_aid_review == 'FLAGGED':
+                reviewed.append('first_aid')
+            if application.dbs_review == 'COMPLETED' or application.dbs_review == 'FLAGGED':
+                reviewed.append('dbs_check')
+            if application.health_review == 'COMPLETED' or application.health_review == 'FLAGGED':
+                reviewed.append('health')
+            if application.references_review == 'COMPLETED' or application.references_review == 'FLAGGED':
+                reviewed.append('references')
+            if application.people_in_home_review == 'COMPLETED' or application.people_in_home_review == 'FLAGGED':
+                reviewed.append('people_in_home')
+            if application.declaration_review == 'COMPLETED' or application.declaration_review == 'FLAGGED':
+                reviewed.append('declaration')
+            review_count = len(reviewed)
             # Load review status
             application_status_context = dict({
                 'application_id': application_id,
@@ -34,6 +57,16 @@ def task_list(request):
                 'people_in_home_status': application.people_in_home_review,
                 'declaration_status': application.declaration_review,
                 'all_complete': all_complete(application_id),
+                'birth_day': personal_details_record.birth_day,
+                'birth_month': personal_details_record.birth_month,
+                'birth_year': personal_details_record.birth_year,
+                'first_name': name_record.first_name,
+                'middle_names': name_record.middle_names,
+                'last_name': name_record.last_name,
+                'zero_to_five': childcare_type_record.zero_to_five,
+                'five_to_eight': childcare_type_record.five_to_eight,
+                'eight_plus': childcare_type_record.eight_plus,
+                'review_count': review_count
             })
 
             temp_context = application_status_context
@@ -719,6 +752,7 @@ def arc_summary(request):
     }
 
     return render(request, 'arc-summary.html', variables)
+
 
 def comments(request):
     """
