@@ -879,19 +879,20 @@ def accepted_email(email):
     :param email: string email address
     :return: HTTP response
     """
-    email = str(email)
-    base_request_url = settings.NOTIFY_URL
-    header = {'content-type': 'application/json'}
-    request = {
-        'email': email,
-        'reference': 'string',
-        'templateId': 'b973c5a2-cadd-46a5-baf7-beae65ab11dc'
-    }
-    data = json.dumps(request)
-    r = requests.post(base_request_url + '/api/v1/notifications/email/',
-                      data,
-                      headers=header)
-    return r
+    if hasattr(settings, 'NOTIFY_URL'):
+        email = str(email)
+        base_request_url = settings.NOTIFY_URL
+        header = {'content-type': 'application/json'}
+        request = {
+            'email': email,
+            'reference': 'string',
+            'templateId': 'b973c5a2-cadd-46a5-baf7-beae65ab11dc'
+        }
+        data = json.dumps(request)
+        r = requests.post(base_request_url + '/api/v1/notifications/email/',
+                          data,
+                          headers=header)
+        return r
 
 
 # Add personalisation and create template
@@ -902,16 +903,17 @@ def accepted_email(email):
     :param email: string email address
     :return: HTTP response
     """
-    email = str(email)
-    base_request_url = settings.NOTIFY_URL
-    header = {'content-type': 'application/json'}
-    request = {
-        'email': email,
-        'reference': 'string',
-        'templateId': 'c9157aaa-02cd-4294-8094-df2184c12930'
-    }
-    data = json.dumps(request)
-    r = requests.post(base_request_url + '/api/v1/notifications/email/',
-                      data,
-                      headers=header)
-    return r
+    if hasattr(settings, 'NOTIFY_URL'):
+        email = str(email)
+        base_request_url = settings.NOTIFY_URL
+        header = {'content-type': 'application/json'}
+        request = {
+            'email': email,
+            'reference': 'string',
+            'templateId': 'c9157aaa-02cd-4294-8094-df2184c12930'
+        }
+        data = json.dumps(request)
+        r = requests.post(base_request_url + '/api/v1/notifications/email/',
+                          data,
+                          headers=header)
+        return r
