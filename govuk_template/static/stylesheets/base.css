@@ -1704,7 +1704,6 @@ textarea.form-control {
   margin: 0;
   zoom: 1;
   /*filter: alpha(opacity=0);*/
-  opacity: 0;
 }
 
 .multiple-choice label {
