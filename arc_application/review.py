@@ -5,6 +5,7 @@ from django import forms
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group
+from django.core import serializers
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from govuk_forms.forms import GOVUKForm
@@ -878,39 +879,39 @@ def accepted_email(email):
     :param email: string email address
     :return: HTTP response
     """
-    email = email
+    email = str(email)
     base_request_url = settings.NOTIFY_URL
     header = {'content-type': 'application/json'}
     request = {
         'email': email,
-        'personalisation': {},
         'reference': 'string',
         'templateId': 'b973c5a2-cadd-46a5-baf7-beae65ab11dc'
     }
+    data = json.dumps(request)
     r = requests.post(base_request_url + '/api/v1/notifications/email/',
-                      json.dumps(request),
+                      data,
                       headers=header)
     return r
 
 
 # Add personalisation and create template
-def returned_email(email):
+def accepted_email(email):
     """
-    Method to send a magic link email using the Notify Gateway API
+    Method to send an email using the Notify Gateway API
     :param email: string containing the e-mail address to send the e-mail to
-     :param email: string email address
+    :param email: string email address
     :return: HTTP response
     """
-    email = email
+    email = str(email)
     base_request_url = settings.NOTIFY_URL
     header = {'content-type': 'application/json'}
     request = {
         'email': email,
-        'personalisation': {},
         'reference': 'string',
         'templateId': 'c9157aaa-02cd-4294-8094-df2184c12930'
     }
+    data = json.dumps(request)
     r = requests.post(base_request_url + '/api/v1/notifications/email/',
-                      json.dumps(request),
+                      data,
                       headers=header)
     return r
