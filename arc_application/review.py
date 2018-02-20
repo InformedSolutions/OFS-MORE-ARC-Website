@@ -820,7 +820,7 @@ def review(request):
     login_id = application.login_id
     if UserDetails.objects.filter(login_id=login_id).count() > 0:
         user_details = UserDetails.objects.get(login_id=login_id)
-        email = UserDetails.email
+        email = user_details.email
     if all_complete(application_id_local, True):
         accepted_email(email)
         release_application(application_id_local)
