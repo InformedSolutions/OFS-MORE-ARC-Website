@@ -6,7 +6,6 @@
 {% block inner_content %}
 
 <!-- Initialise error summary for page -->
-{{form.error_summary}}
 
 <div class="column-full">
     <div class="form-group grid-row" style="padding-top: 30px;">
@@ -17,7 +16,7 @@
         </a>
     </div>
     <!-- Form -->
-    <form method="post">
+    <form method="post" novalidate>
         <!-- Content -->
         <div class="form-group grid-row">
 
@@ -30,13 +29,13 @@
             </th>
         </tr>
         </thead>
-            <table class="check-your-answers form-group grid-row" style="table-layout: fixed; width: 100%">
+            <table class="check-your-answers form-group grid-row" style="table-layout: fixed; width: 100%; margin: 0">
                 <thead></thead>
                 <tbody>
-                <tr><td> </td><td> </td></tr>
-                <tr><td>0-5 Years Old </td><td> {{ zero }}</td></tr>
-                 <tr><td>5-8 Years Old </td><td> {{ five }}</td></tr>
-                 <tr><td>8+ Years Old </td><td> {{ eight }}</td></tr>
+                <tr><td> </td><td> </td><td> </td></tr>
+                <tr><td>0-5 Years Old </td><td> {{ zero }}</td><td class="change-answer">{{ form }}</td></tr>
+                 <tr><td>5-8 Years Old </td><td> {{ five }}</td><td class="change-answer">{{ form }}</td></tr>
+                 <tr><td>8+ Years Old </td><td> {{ eight }}</td><td class="change-answer">{{ form }}</td></tr>
                 </tbody>
             </table>
             {% csrf_token %}
