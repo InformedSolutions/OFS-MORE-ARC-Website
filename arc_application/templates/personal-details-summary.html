@@ -111,7 +111,19 @@
             </td>
             {% endif %}
             <td class="change-answer">
-                <!--{{ form }}-->
+                {{ form.dateofbirth_correct_declare }}
+            </td>
+        </tr>
+        <tr class="js-hidden" id="dateofbirth" >
+            <td colspan="1"style="width:100%">
+                <div >
+                    {{ form.dateofbirth_correct_comments.label}}
+                </div>
+            </td>
+            <td colspan="2"style="width:100%">
+                <div >
+                    {{ form.dateofbirth_correct_comments}}
+                </div>
             </td>
         </tr>
         </tbody>
@@ -173,7 +185,19 @@
             </td>
             {% endif %}
             <td class="change-answer">
-                <!-- {{ form }} -->
+                {{ form.homeaddress_correct_declare }}
+            </td>
+        </tr>
+        <tr class="js-hidden" id="homeaddress" >
+            <td colspan="1"style="width:100%">
+                <div >
+                    {{ form.homeaddess_correct_comments.label}}
+                </div>
+            </td>
+            <td colspan="2"style="width:100%">
+                <div >
+                    {{ form.homeaddress_correct_comments}}
+                </div>
             </td>
         </tr>
         <tr>
@@ -228,7 +252,19 @@
             {% endif %}
             {% endif %}
             <td class="change-answer">
-                <!-- {{ form }} -->
+                {{ form.childcarelocation_correct_declare }}
+            </td>
+        </tr>
+        <tr class="js-hidden" id="childcarelocation" >
+            <td colspan="1"style="width:100%">
+                <div >
+                    {{ form.childcarelocation_correct_comments.label}}
+                </div>
+            </td>
+            <td colspan="2"style="width:100%">
+                <div >
+                    {{ form.childcarelocation_correct_comments}}
+                </div>
             </td>
         </tr>
         </tbody>

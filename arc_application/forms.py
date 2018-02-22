@@ -35,16 +35,21 @@ class PersonalDetailsForm(GOVUKForm):
     field_label_classes = 'form-label-bold'
     name_correct_declare = forms.BooleanField(label='This information is correct', widget=custom_field_widgets.CustomCheckboxInput)
     name_correct_comments = forms.CharField(label='Enter your reasoning here', widget=forms.Textarea)
-    dateofbirth_correct_declare = forms.BooleanField(label='This information is correct')
-    dateofbirth_correct_comments = forms.CharField(label='Enter your reasoning here')
-    homeaddress_correct_declare = forms.BooleanField(label='This information is correct')
-    homeaddress_correct_comments = forms.CharField(label='Enter your reasoning here')
-    childcarelocation_correct_declare = forms.BooleanField(label='This information is correct')
-    childcarelocation_correct_comments = forms.CharField(label='Enter your reasoning here')
+    dateofbirth_correct_declare = forms.BooleanField(label='This information is correct', widget=custom_field_widgets.CustomCheckboxInput)
+    dateofbirth_correct_comments = forms.CharField(label='Enter your reasoning here', widget=forms.Textarea)
+    homeaddress_correct_declare = forms.BooleanField(label='This information is correct', widget=custom_field_widgets.CustomCheckboxInput)
+    homeaddress_correct_comments = forms.CharField(label='Enter your reasoning here', widget=forms.Textarea)
+    childcarelocation_correct_declare = forms.BooleanField(label='This information is correct', widget=custom_field_widgets.CustomCheckboxInput)
+    childcarelocation_correct_comments = forms.CharField(label='Enter your reasoning here', widget=forms.Textarea)
 
-    name_correct_declare.widget.attrs.update({'data-target': 'name',
-                                              'aria-controls': 'name',
-                                              'aria-expanded': 'false'},)
+    checkboxes = [(name_correct_declare,'name'), (dateofbirth_correct_declare,'dateofbirth'),
+                  (homeaddress_correct_declare,'homeaddress'),(childcarelocation_correct_declare,'childcarelocation')]
+
+    for box in checkboxes:
+        box[0].widget.attrs.update({'data_target': box[1],
+                                                'aria-controls': box[1],
+                                                'aria-expanded': 'false'},)
+
 
 class CommentsForm(GOVUKForm):
     """
