@@ -1,6 +1,6 @@
 xmlrunner/
 logs/
-__pycache__/
+
 ### Python ###
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -9,3 +9,4 @@ db.sqlite3
 .coverage
 .idea/
 .settings/
+.venv/
