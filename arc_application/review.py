@@ -9,7 +9,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect
 from govuk_forms.forms import GOVUKForm
 from govuk_forms.widgets import CheckboxSelectMultiple
-from .forms import CheckBox, CommentsForm
+from .forms import CheckBox, CommentsForm, PersonalDetailsForm
 
 from .models import AdultInHome, ApplicantHomeAddress, ApplicantName, ApplicantPersonalDetails, Application, ArcReview, \
     ArcStatus, ChildInHome, ChildcareType, CriminalRecordCheck, FirstAidTraining, HealthDeclarationBooklet, Reference, \
@@ -159,10 +159,10 @@ def personal_details_summary(request):
     :return: an HttpResponse object with the rendered Your personal details: summary template
     """
     if request.method == 'GET':
-        form = CheckBox()
+        form = PersonalDetailsForm()
         application_id_local = request.GET["id"]
     elif request.method == 'POST':
-        form = CheckBox()
+        form = PersonalDetailsForm()
         application_id_local = request.POST["id"]
         status = ArcStatus.objects.get(pk=application_id_local)
         status.personal_details_review = 'COMPLETED'
