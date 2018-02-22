@@ -284,10 +284,6 @@ class ChildInYourHomeForm(GOVUKForm):
                                     'aria-controls': box[1],
                                     'aria-expanded': 'false'}, )
 
-
-
-
-
 class CommentsForm(GOVUKForm):
     """
     GOV.UK form for the Your login and contact details: email page
