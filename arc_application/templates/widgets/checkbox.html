@@ -1,4 +1,4 @@
-<div class="multiple-choice" data-target="{{ widget.target }}">
+<div class="multiple-choice" data-target="{{ widget.attrs.data_target }}">
   {% include 'django/forms/widgets/input.html' %}
   <label id="{{ widget.attrs.id }}-label" for="{{ widget.attrs.id }}">{{ widget.label }}</label>
 </div>
