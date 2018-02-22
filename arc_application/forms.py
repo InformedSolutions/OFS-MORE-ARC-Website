@@ -10,6 +10,8 @@ from django.conf import settings
 from django.contrib.auth.forms import UserModel
 from govuk_forms.forms import GOVUKForm
 
+from . import custom_field_widgets
+
 from .models import ArcReview
 from .views import has_group, authenticate, capfirst
 
@@ -31,7 +33,7 @@ class PersonalDetailsForm(GOVUKForm):
     }
 
     field_label_classes = 'form-label-bold'
-    name_correct_declare = forms.BooleanField(label='This information is correct')
+    name_correct_declare = forms.BooleanField(label='This information is correct', widget=custom_field_widgets.CustomCheckboxInput)
     name_correct_comments = forms.CharField(label='Enter your reasoning here', widget=forms.Textarea)
     dateofbirth_correct_declare = forms.BooleanField(label='This information is correct')
     dateofbirth_correct_comments = forms.CharField(label='Enter your reasoning here')
