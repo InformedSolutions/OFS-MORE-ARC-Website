@@ -40,8 +40,8 @@ class PersonalDetailsForm(GOVUKForm):
     childcarelocation_correct_declare = forms.BooleanField(label='This information is correct')
     childcarelocation_correct_comments = forms.CharField(label='Enter your reasoning here')
 
-    name_correct_declare.widget.attrs.update({'data-target': 'contact-by-email',
-                                              'aria-controls': 'contact-by-email',
+    name_correct_declare.widget.attrs.update({'data-target': 'name',
+                                              'aria-controls': 'name',
                                               'aria-expanded': 'false'},)
 
 class CommentsForm(GOVUKForm):
