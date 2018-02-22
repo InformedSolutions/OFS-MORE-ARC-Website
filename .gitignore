@@ -1,6 +1,6 @@
 xmlrunner/
 logs/
-arc_application/__pycache__
+__pycache__/
 ### Python ###
 # Byte-compiled / optimized / DLL files
 __pycache__/
