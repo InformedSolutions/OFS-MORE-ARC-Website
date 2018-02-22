@@ -19,6 +19,31 @@ class CheckBox(GOVUKForm):
     auto_replace_widgets = True
     information_correct_declare = forms.BooleanField(label='This information is correct')
 
+
+class PersonalDetailsForm(GOVUKForm):
+    # customisations:
+    auto_replace_widgets = True
+    reveal_conditionally = {
+        'name_correct_declare': {True: 'name_correct_comments'},
+        'dateofbirth_correct_declare': {True: 'dateofbirth_correct_comments'},
+        'homeaddress_correct_declare': {True: 'homeaddress_correct_comments'},
+        'childcarelocation_correct_declare': {True: 'childcarelocation_correct_comments'},
+    }
+
+    field_label_classes = 'form-label-bold'
+    name_correct_declare = forms.BooleanField(label='This information is correct')
+    name_correct_comments = forms.CharField(label='Enter your reasoning here', widget=forms.Textarea)
+    dateofbirth_correct_declare = forms.BooleanField(label='This information is correct')
+    dateofbirth_correct_comments = forms.CharField(label='Enter your reasoning here')
+    homeaddress_correct_declare = forms.BooleanField(label='This information is correct')
+    homeaddress_correct_comments = forms.CharField(label='Enter your reasoning here')
+    childcarelocation_correct_declare = forms.BooleanField(label='This information is correct')
+    childcarelocation_correct_comments = forms.CharField(label='Enter your reasoning here')
+
+    name_correct_declare.widget.attrs.update({'data-target': 'contact-by-email',
+                                              'aria-controls': 'contact-by-email',
+                                              'aria-expanded': 'false'},)
+
 class CommentsForm(GOVUKForm):
     """
     GOV.UK form for the Your login and contact details: email page

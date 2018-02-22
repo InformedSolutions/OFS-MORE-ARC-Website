@@ -1800,7 +1800,7 @@ textarea.form-control {
 }
 
 .multiple-choice:last-child, .multiple-choice:last-of-type {
-  margin-bottom: 0;
+  margin-bottom: 30px;
 }
 
 .inline .multiple-choice {
