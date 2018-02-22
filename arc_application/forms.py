@@ -314,3 +314,4 @@ class CommentsForm(GOVUKForm):
         # RegEx for valid e-mail addresses
 
         return comments
+
