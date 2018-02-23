@@ -298,11 +298,11 @@ def references_summary(request):
     """
     if request.method == 'GET':
         form = ReferencesForm()
-        form2 = ReferencesForm2()
+        form2 = ReferencesForm()
         application_id_local = request.GET["id"]
     elif request.method == 'POST':
         form = ReferencesForm()
-        form2 = ReferencesForm2()
+        form2 = ReferencesForm()
         application_id_local = request.POST["id"]
         status = ArcStatus.objects.get(pk=application_id_local)
         status.references_review = 'COMPLETED'
@@ -430,7 +430,6 @@ def other_people_summary(request):
         child_relationship_list.append(child.relationship)
     child_lists = zip(child_name_list, child_birth_day_list, child_birth_month_list, child_birth_year_list,
                       child_relationship_list)
-    #child_formset_dictionary =
     variables = {
         'form': form,
         'application_id': application_id_local,

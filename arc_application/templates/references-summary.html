@@ -195,7 +195,7 @@
                 {{first_reference_email}}
             </td>
             <td class="change-answer">
-                {{ form.email_address_declare }}
+                {{ form.phone_number_declare }}
             </td>
         </tr>
         <tr class="js-hidden" id="email_address" >
@@ -231,6 +231,19 @@
                 {{second_reference_first_name}} {{second_reference_last_name}}
             </td>
             <td class="change-answer">
+                {{ form.full_name_declare }}
+            </td>
+        </tr>
+        <tr class="js-hidden" id="full_name" >
+            <td colspan="1"style="width:100%">
+                <div >
+                    {{ form.full_name_comments.label}}
+                </div>
+            </td>
+            <td colspan="2"style="width:100%">
+                <div >
+                    {{ form.full_name_comments}}
+                </div>
                 {{ form2.full_name_declare }}
             </td>
         </tr>
@@ -254,6 +267,19 @@
                 {{second_reference_relationship}}
             </td>
             <td class="change-answer">
+                {{ form.how_they_know_you_declare }}
+            </td>
+        </tr>
+        <tr class="js-hidden" id="name" >
+            <td colspan="1"style="width:100%">
+                <div >
+                    {{ form.how_they_know_you_comments.label}}
+                </div>
+            </td>
+            <td colspan="2"style="width:100%">
+                <div >
+                    {{ form.how_they_know_you_comments}}
+                </div>
                 {{ form2.how_they_know_you_declare }}
             </td>
         </tr>
@@ -277,18 +303,18 @@
                 {{second_reference_years_known}} years, {{second_reference_months_known}} months
             </td>
             <td class="change-answer">
-                {{ form2.known_for_declare }}
+                {{ form.known_for_declare }}
             </td>
         </tr>
-        <tr class="js-hidden" id="known_for2" >
+        <tr class="js-hidden" id="known_for" >
             <td colspan="1"style="width:100%">
                 <div >
-                    {{ form2.known_for_comments.label}}
+                    {{ form.known_for_comments.label}}
                 </div>
             </td>
             <td colspan="2"style="width:100%">
                 <div >
-                    {{ form2.known_for_comments}}
+                    {{ form.known_for_comments}}
                 </div>
             </td>
         </tr>
@@ -346,6 +372,19 @@
             </td>
             {% endif %}
             <td class="change-answer">
+                {{ form.name_declare }}
+            </td>
+        </tr>
+        <tr class="js-hidden" id="name" >
+            <td colspan="1"style="width:100%">
+                <div >
+                    {{ form.name_comments.label}}
+                </div>
+            </td>
+            <td colspan="2"style="width:100%">
+                <div >
+                    {{ form.name_comments}}
+                </div>
                 {{ form2.address_declare }}
             </td>
         </tr>
@@ -369,18 +408,18 @@
                 {{second_reference_phone_number}}
             </td>
             <td class="change-answer">
-                {{ form2.phone_number_declare }}
+                {{ form.name_declare }}
             </td>
         </tr>
-        <tr class="js-hidden" id="phone_number2" >
+        <tr class="js-hidden" id="name" >
             <td colspan="1"style="width:100%">
                 <div >
-                    {{ form2.phone_number_comments.label}}
+                    {{ form.name_comments.label}}
                 </div>
             </td>
             <td colspan="2"style="width:100%">
                 <div >
-                    {{ form2.phone_number_comments}}
+                    {{ form.name_comments}}
                 </div>
             </td>
         </tr>
@@ -392,18 +431,18 @@
                 {{second_reference_email}}
             </td>
             <td class="change-answer">
-                {{ form2.email_address_declare }}
+                {{ form.name_declare }}
             </td>
         </tr>
-        <tr class="js-hidden" id="email_address2" >
+        <tr class="js-hidden" id="name" >
             <td colspan="1"style="width:100%">
                 <div >
-                    {{ form2.email_address_comments.label}}
+                    {{ form.name_comments.label}}
                 </div>
             </td>
             <td colspan="2"style="width:100%">
                 <div >
-                    {{ form2.email_address_comments}}
+                    {{ form.name_comments}}
                 </div>
             </td>
         </tr>
