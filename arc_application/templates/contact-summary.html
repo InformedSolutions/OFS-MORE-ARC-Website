@@ -36,7 +36,19 @@
                 {{email}}
             </td>
             <td class="change-answer">
-                {{form}}
+                {{ form.email_declare }}
+            </td>
+        </tr>
+        <tr class="js-hidden" id="email" >
+            <td colspan="1"style="width:100%">
+                <div >
+                    {{ form.email_comments.label}}
+                </div>
+            </td>
+            <td colspan="2"style="width:100%">
+                <div >
+                    {{ form.email_comments}}
+                </div>
             </td>
         </tr>
         <tr>
@@ -47,7 +59,19 @@
                 {{mobile_number}}
             </td>
             <td class="change-answer">
-                {{form}}
+                {{ form.mobile_phone_number_declare }}
+            </td>
+        </tr>
+        <tr class="js-hidden" id="mobile_phone_number" >
+            <td colspan="1"style="width:100%">
+                <div >
+                    {{ form.mobile_phone_number_comments.label}}
+                </div>
+            </td>
+            <td colspan="2"style="width:100%">
+                <div >
+                    {{ form.mobile_phone_number_comments}}
+                </div>
             </td>
         </tr>
         <tr>
@@ -58,7 +82,19 @@
                 {{add_phone_number}}
             </td>
             <td class="change-answer">
-                {{form}}
+                {{ form.alternative_phone_number_declare }}
+            </td>
+        </tr>
+        <tr class="js-hidden" id="alternative_phone_number" >
+            <td colspan="1"style="width:100%">
+                <div >
+                    {{ form.alternative_phone_number_comments.label}}
+                </div>
+            </td>
+            <td colspan="2"style="width:100%">
+                <div >
+                    {{ form.alternative_phone_number_comments}}
+                </div>
             </td>
         </tr>
         <tr>
@@ -69,7 +105,19 @@
                 {{security_question}}
             </td>
             <td class="change-answer">
-                {{form}}
+                {{ form.knowledge_based_question_declare }}
+            </td>
+        </tr>
+        <tr class="js-hidden" id="knowledge_based_question" >
+            <td colspan="1"style="width:100%">
+                <div >
+                    {{ form.knowledge_based_question_comments.label}}
+                </div>
+            </td>
+            <td colspan="2"style="width:100%">
+                <div >
+                    {{ form.knowledge_based_question_comments}}
+                </div>
             </td>
         </tr>
         <tr>
@@ -80,8 +128,21 @@
                 {{security_answer}}
             </td>
             <td class="change-answer">
-                {{form}}
+                {{ form.knowledge_based_answer_declare }}
             </td>
+        </tr>
+        <tr class="js-hidden" id="knowledge_based_answer" >
+            <td colspan="1"style="width:100%">
+                <div >
+                    {{ form.knowledge_based_answer_comments.label}}
+                </div>
+            </td>
+            <td colspan="2"style="width:100%">
+                <div >
+                    {{ form.knowledge_based_answer_comments}}
+                </div>
+            </td>
+        </tr>
         </tr>
         </tbody>
     </table>

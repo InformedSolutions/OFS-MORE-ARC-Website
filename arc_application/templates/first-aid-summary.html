@@ -35,7 +35,19 @@
                 {{training_organisation}}
             </td>
             <td class="change-answer">
-                {{ form }}
+                {{ form.training_organisation_declare }}
+            </td>
+        </tr>
+        <tr class="js-hidden" id="training_organisation" >
+            <td colspan="1"style="width:100%">
+                <div >
+                    {{ form.training_organisation_comments.label}}
+                </div>
+            </td>
+            <td colspan="2"style="width:100%">
+                <div >
+                    {{ form.training_organisation_comments}}
+                </div>
             </td>
         </tr>
         <tr>
@@ -46,7 +58,19 @@
                 {{training_course}}
             </td>
             <td class="change-answer">
-                {{ form }}
+                {{ form.title_of_first_aid_course_declare }}
+            </td>
+        </tr>
+        <tr class="js-hidden" id="title_of_first_aid_course" >
+            <td colspan="1"style="width:100%">
+                <div >
+                    {{ form.title_of_first_aid_course_comments.label}}
+                </div>
+            </td>
+            <td colspan="2"style="width:100%">
+                <div >
+                    {{ form.title_of_first_aid_course_comments}}
+                </div>
             </td>
         </tr>
         <tr>
@@ -103,9 +127,22 @@
             </td>
             {% endif %}
             <td class="change-answer">
-                {{ form }}
+                {{ form.date_of_certificate_declare }}
             </td>
         </tr>
+        <tr class="js-hidden" id="date_of_certificate" >
+            <td colspan="1"style="width:100%">
+                <div >
+                    {{ form.date_of_certificate_comments.label}}
+                </div>
+            </td>
+            <td colspan="2"style="width:100%">
+                <div >
+                    {{ form.date_of_certificate_comments}}
+                </div>
+            </td>
+        </tr>
+
         </tbody>
     </table>
     <br>

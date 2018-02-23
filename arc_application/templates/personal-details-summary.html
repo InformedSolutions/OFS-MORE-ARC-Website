@@ -41,18 +41,18 @@
             </td>
             {% endif %}
             <td class="change-answer">
-                {{ form.name_correct_declare }}
+                {{ form.name_declare }}
             </td>
         </tr>
         <tr class="js-hidden" id="name" >
             <td colspan="1"style="width:100%">
                 <div >
-                    {{ form.name_correct_comments.label}}
+                    {{ form.name_comments.label}}
                 </div>
             </td>
             <td colspan="2"style="width:100%">
                 <div >
-                    {{ form.name_correct_comments}}
+                    {{ form.name_comments}}
                 </div>
             </td>
         </tr>
@@ -100,7 +100,7 @@
             {% elif birth_month == 10 %}
             <td>
                 {{birth_day}} October {{birth_year}}
-            </td style="word-wrap: break-word">
+            </td>
             {% elif birth_month == 11 %}
             <td style="word-wrap: break-word">
                 {{birth_day}} November {{birth_year}}
@@ -111,18 +111,18 @@
             </td>
             {% endif %}
             <td class="change-answer">
-                {{ form.dateofbirth_correct_declare }}
+                {{ form.date_of_birth_declare }}
             </td>
         </tr>
-        <tr class="js-hidden" id="dateofbirth" >
+        <tr class="js-hidden" id="date_of_birth" >
             <td colspan="1"style="width:100%">
                 <div >
-                    {{ form.dateofbirth_correct_comments.label}}
+                    {{ form.date_of_birth_comments.label}}
                 </div>
             </td>
             <td colspan="2"style="width:100%">
                 <div >
-                    {{ form.dateofbirth_correct_comments}}
+                    {{ form.date_of_birth_comments}}
                 </div>
             </td>
         </tr>
@@ -185,18 +185,18 @@
             </td>
             {% endif %}
             <td class="change-answer">
-                {{ form.homeaddress_correct_declare }}
+                {{ form.home_address_declare }}
             </td>
         </tr>
-        <tr class="js-hidden" id="homeaddress" >
+        <tr class="js-hidden" id="home_address" >
             <td colspan="1"style="width:100%">
                 <div >
-                    {{ form.homeaddess_correct_comments.label}}
+                    {{ form.home_addess_comments.label}}
                 </div>
             </td>
             <td colspan="2"style="width:100%">
                 <div >
-                    {{ form.homeaddress_correct_comments}}
+                    {{ form.home_address_comments}}
                 </div>
             </td>
         </tr>
@@ -252,18 +252,18 @@
             {% endif %}
             {% endif %}
             <td class="change-answer">
-                {{ form.childcarelocation_correct_declare }}
+                {{ form.childcare_location_declare }}
             </td>
         </tr>
-        <tr class="js-hidden" id="childcarelocation" >
+        <tr class="js-hidden" id="childcare_location" >
             <td colspan="1"style="width:100%">
                 <div >
-                    {{ form.childcarelocation_correct_comments.label}}
+                    {{ form.childcare_location_comments.label}}
                 </div>
             </td>
             <td colspan="2"style="width:100%">
                 <div >
-                    {{ form.childcarelocation_correct_comments}}
+                    {{ form.childcare_location_comments}}
                 </div>
             </td>
         </tr>
