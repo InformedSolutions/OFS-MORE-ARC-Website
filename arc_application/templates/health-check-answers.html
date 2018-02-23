@@ -41,7 +41,19 @@
             </td>
             {% endif %}
             <td class="change-answer">
-                {{ form }}
+                {{ form.health_submission_consent_declare }}
+            </td>
+        </tr>
+        <tr class="js-hidden" id="health_submission_consent" >
+            <td colspan="1"style="width:100%">
+                <div >
+                    {{ form.health_submission_consent_comments.label}}
+                </div>
+            </td>
+            <td colspan="2"style="width:100%">
+                <div >
+                    {{ form.health_submission_consent_comments}}
+                </div>
             </td>
         </tr>
         </tbody>
