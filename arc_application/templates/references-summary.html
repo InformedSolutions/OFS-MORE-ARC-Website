@@ -34,7 +34,19 @@
                 {{first_reference_first_name}} {{first_reference_last_name}}
             </td>
             <td class="change-answer">
-                {{ form }}
+                {{ form.full_name_declare }}
+            </td>
+        </tr>
+        <tr class="js-hidden" id="full_name" >
+            <td colspan="1"style="width:100%">
+                <div >
+                    {{ form.full_name_comments.label}}
+                </div>
+            </td>
+            <td colspan="2"style="width:100%">
+                <div >
+                    {{ form.full_name_comments}}
+                </div>
             </td>
         </tr>
         <tr>
@@ -45,7 +57,19 @@
                 {{first_reference_relationship}}
             </td>
             <td class="change-answer">
-                {{ form }}
+                {{ form.how_they_know_you_declare }}
+            </td>
+        </tr>
+        <tr class="js-hidden" id="how_they_know_you" >
+            <td colspan="1"style="width:100%">
+                <div >
+                    {{ form.how_they_know_you_comments.label}}
+                </div>
+            </td>
+            <td colspan="2"style="width:100%">
+                <div >
+                    {{ form.how_they_know_you_comments}}
+                </div>
             </td>
         </tr>
         <tr>
@@ -56,7 +80,19 @@
                 {{first_reference_years_known}} years, {{first_reference_months_known}} months
             </td>
             <td class="change-answer">
-                {{ form }}
+                {{ form.known_for_declare }}
+            </td>
+        </tr>
+        <tr class="js-hidden" id="known_for" >
+            <td colspan="1"style="width:100%">
+                <div >
+                    {{ form.known_for_comments.label}}
+                </div>
+            </td>
+            <td colspan="2"style="width:100%">
+                <div >
+                    {{ form.known_for_comments}}
+                </div>
             </td>
         </tr>
         <tr>
@@ -113,7 +149,19 @@
             </td>
             {% endif %}
             <td class="change-answer">
-                {{ form }}
+                {{ form.address_declare }}
+            </td>
+        </tr>
+        <tr class="js-hidden" id="address" >
+            <td colspan="1"style="width:100%">
+                <div >
+                    {{ form.address_comments.label}}
+                </div>
+            </td>
+            <td colspan="2"style="width:100%">
+                <div >
+                    {{ form.address_comments}}
+                </div>
             </td>
         </tr>
         <tr>
@@ -124,7 +172,19 @@
                 {{first_reference_phone_number}}
             </td>
             <td class="change-answer">
-                {{ form }}
+                {{ form.phone_number_declare }}
+            </td>
+        </tr>
+        <tr class="js-hidden" id="phone_number" >
+            <td colspan="1"style="width:100%">
+                <div >
+                    {{ form.phone_number_comments.label}}
+                </div>
+            </td>
+            <td colspan="2"style="width:100%">
+                <div >
+                    {{ form.phone_number_comments}}
+                </div>
             </td>
         </tr>
         <tr>
@@ -135,7 +195,19 @@
                 {{first_reference_email}}
             </td>
             <td class="change-answer">
-                {{ form }}
+                {{ form.phone_number_declare }}
+            </td>
+        </tr>
+        <tr class="js-hidden" id="email_address" >
+            <td colspan="1"style="width:100%">
+                <div >
+                    {{ form.email_address_comments.label}}
+                </div>
+            </td>
+            <td colspan="2"style="width:100%">
+                <div >
+                    {{ form.email_address_comments}}
+                </div>
             </td>
         </tr>
         </tbody>
@@ -159,7 +231,19 @@
                 {{second_reference_first_name}} {{second_reference_last_name}}
             </td>
             <td class="change-answer">
-                {{ form }}
+                {{ form.full_name_declare }}
+            </td>
+        </tr>
+        <tr class="js-hidden" id="full_name" >
+            <td colspan="1"style="width:100%">
+                <div >
+                    {{ form.full_name_comments.label}}
+                </div>
+            </td>
+            <td colspan="2"style="width:100%">
+                <div >
+                    {{ form.full_name_comments}}
+                </div>
             </td>
         </tr>
         <tr>
@@ -170,7 +254,19 @@
                 {{second_reference_relationship}}
             </td>
             <td class="change-answer">
-                {{ form }}
+                {{ form.how_they_know_you_declare }}
+            </td>
+        </tr>
+        <tr class="js-hidden" id="name" >
+            <td colspan="1"style="width:100%">
+                <div >
+                    {{ form.how_they_know_you_comments.label}}
+                </div>
+            </td>
+            <td colspan="2"style="width:100%">
+                <div >
+                    {{ form.how_they_know_you_comments}}
+                </div>
             </td>
         </tr>
         <tr>
@@ -181,7 +277,19 @@
                 {{second_reference_years_known}} years, {{second_reference_months_known}} months
             </td>
             <td class="change-answer">
-                {{ form }}
+                {{ form.known_for_declare }}
+            </td>
+        </tr>
+        <tr class="js-hidden" id="known_for" >
+            <td colspan="1"style="width:100%">
+                <div >
+                    {{ form.known_for_comments.label}}
+                </div>
+            </td>
+            <td colspan="2"style="width:100%">
+                <div >
+                    {{ form.known_for_comments}}
+                </div>
             </td>
         </tr>
         <tr>
@@ -238,7 +346,19 @@
             </td>
             {% endif %}
             <td class="change-answer">
-                {{ form }}
+                {{ form.name_declare }}
+            </td>
+        </tr>
+        <tr class="js-hidden" id="name" >
+            <td colspan="1"style="width:100%">
+                <div >
+                    {{ form.name_comments.label}}
+                </div>
+            </td>
+            <td colspan="2"style="width:100%">
+                <div >
+                    {{ form.name_comments}}
+                </div>
             </td>
         </tr>
         <tr>
@@ -249,7 +369,19 @@
                 {{second_reference_phone_number}}
             </td>
             <td class="change-answer">
-                {{ form }}
+                {{ form.name_declare }}
+            </td>
+        </tr>
+        <tr class="js-hidden" id="name" >
+            <td colspan="1"style="width:100%">
+                <div >
+                    {{ form.name_comments.label}}
+                </div>
+            </td>
+            <td colspan="2"style="width:100%">
+                <div >
+                    {{ form.name_comments}}
+                </div>
             </td>
         </tr>
         <tr>
@@ -260,7 +392,19 @@
                 {{second_reference_email}}
             </td>
             <td class="change-answer">
-                {{ form }}
+                {{ form.name_declare }}
+            </td>
+        </tr>
+        <tr class="js-hidden" id="name" >
+            <td colspan="1"style="width:100%">
+                <div >
+                    {{ form.name_comments.label}}
+                </div>
+            </td>
+            <td colspan="2"style="width:100%">
+                <div >
+                    {{ form.name_comments}}
+                </div>
             </td>
         </tr>
         </tbody>

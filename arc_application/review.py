@@ -9,7 +9,9 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect
 from govuk_forms.forms import GOVUKForm
 from govuk_forms.widgets import CheckboxSelectMultiple
-from .forms import CheckBox, CommentsForm, PersonalDetailsForm
+from .forms import CheckBox, CommentsForm, PersonalDetailsForm, LogInDetailsForm, FirstAidTrainingForm, DBSCheckForm,\
+    HealthForm, ReferencesForm
+
 
 from .models import AdultInHome, ApplicantHomeAddress, ApplicantName, ApplicantPersonalDetails, Application, ArcReview, \
     ArcStatus, ChildInHome, ChildcareType, CriminalRecordCheck, FirstAidTraining, HealthDeclarationBooklet, Reference, \
@@ -89,7 +91,7 @@ def contact_summary(request):
     :return: an HttpResponse object with the rendered Your login and contact details: summary template
     """
     if request.method == 'GET':
-        form = CheckBox()
+        form = LogInDetailsForm()
         application_id_local = request.GET["id"]
     elif request.method == 'POST':
         application_id_local = request.POST["id"]
@@ -226,10 +228,10 @@ def first_aid_training_summary(request):
     :return: an HttpResponse object with the rendered First aid training: summary template
     """
     if request.method == 'GET':
-        form = CheckBox()
+        form = FirstAidTrainingForm()
         application_id_local = request.GET["id"]
     elif request.method == 'POST':
-        form = CheckBox()
+        form = FirstAidTrainingForm()
         application_id_local = request.POST["id"]
         status = ArcStatus.objects.get(pk=application_id_local)
         status.first_aid_review = 'COMPLETED'
@@ -263,10 +265,10 @@ def dbs_check_summary(request):
     """
     if request.method == 'GET':
         application_id_local = request.GET["id"]
-        form = CheckBox()
+        form = DBSCheckForm()
     elif request.method == 'POST':
         application_id_local = request.POST["id"]
-        form = CheckBox()
+        form = DBSCheckForm()
         status = ArcStatus.objects.get(pk=application_id_local)
         status.dbs_review = 'COMPLETED'
         status.save()
@@ -295,10 +297,12 @@ def references_summary(request):
     :return: an HttpResponse object with the rendered 2 references: summary template
     """
     if request.method == 'GET':
-        form = CheckBox()
+        form = ReferencesForm()
+        form2 = ReferencesForm()
         application_id_local = request.GET["id"]
     elif request.method == 'POST':
-        form = CheckBox()
+        form = ReferencesForm()
+        form2 = ReferencesForm()
         application_id_local = request.POST["id"]
         status = ArcStatus.objects.get(pk=application_id_local)
         status.references_review = 'COMPLETED'
@@ -335,6 +339,7 @@ def references_summary(request):
     application = Application.objects.get(pk=application_id_local)
     variables = {
         'form': form,
+        'form2': form2,
         'application_id': application_id_local,
         'first_reference_first_name': first_reference_first_name,
         'first_reference_last_name': first_reference_last_name,
@@ -448,10 +453,10 @@ def health_check_answers(request):
     :return: an HttpResponse object with the rendered Your health: answers template
     """
     if request.method == 'GET':
-        form = CheckBox()
+        form = HealthForm()
         application_id_local = request.GET["id"]
     elif request.method == 'POST':
-        form = CheckBox()
+        form = HealthForm()
         application_id_local = request.POST["id"]
         status = ArcStatus.objects.get(pk=application_id_local)
         status.health_review = 'COMPLETED'

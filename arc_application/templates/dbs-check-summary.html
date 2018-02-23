@@ -35,7 +35,19 @@
                 {{dbs_certificate_number}}
             </td>
             <td class="change-answer">
-                {{ form }}
+                {{ form.dbs_certificate_number_declare }}
+            </td>
+        </tr>
+        <tr class="js-hidden" id="dbs_certificate_number" >
+            <td colspan="1"style="width:100%">
+                <div >
+                    {{ form.dbs_certificate_number_comments.label}}
+                </div>
+            </td>
+            <td colspan="2"style="width:100%">
+                <div >
+                    {{ form.dbs_certificate_number_comments}}
+                </div>
             </td>
         </tr>
         <tr>
@@ -52,7 +64,19 @@
             </td>
             {% endif %}
             <td class="change-answer">
-               {{ form }}
+                {{ form.dbs_submission_consent_declare }}
+            </td>
+        </tr>
+        <tr class="js-hidden" id="dbs_submission_consent" >
+            <td colspan="1"style="width:100%">
+                <div >
+                    {{ form.dbs_submission_consent_comments.label}}
+                </div>
+            </td>
+            <td colspan="2"style="width:100%">
+                <div >
+                    {{ form.dbs_submission_consent_comments}}
+                </div>
             </td>
         </tr>
         {% if cautions_convictions is True %}
@@ -70,7 +94,19 @@
             </td>
             {% endif %}
             <td class="change-answer">
-                {{ form }}
+                {{ form.cautions_or_convictions_declare }}
+            </td>
+        </tr>
+        <tr class="js-hidden" id="cautions_or_convictions" >
+            <td colspan="1"style="width:100%">
+                <div >
+                    {{ form.cautions_or_convictions_comments.label}}
+                </div>
+            </td>
+            <td colspan="2"style="width:100%">
+                <div >
+                    {{ form.cautions_or_convictions_comments}}
+                </div>
             </td>
         </tr>
         {% endif %}
