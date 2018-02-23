@@ -11,7 +11,7 @@ from arc_application.review import contact_summary, task_list, type_of_childcare
     declaration, review, comments, arc_summary
 from arc_application.views import assign_new_application, custom_login, delete_all, release_application, summary_page
 from django.conf import settings
-from django.conf.urls import url
+from django.conf.urls import url, include
 from django.contrib import admin
 from django.contrib.auth.views import logout
 
@@ -45,3 +45,9 @@ if settings.URL_PREFIX:
         pat.regex = re.compile(r"^%s/%s" % (settings.URL_PREFIX[1:], pat.regex.pattern[1:]))
         prefixed_url_pattern.append(pat)
     urlpatterns = prefixed_url_pattern
+
+if settings.DEBUG:
+    import debug_toolbar
+    urlpatterns = [
+        url(r'^__debug__/', include(debug_toolbar.urls)),
+    ] + urlpatterns
