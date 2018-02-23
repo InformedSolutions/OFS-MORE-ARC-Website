@@ -21,6 +21,8 @@ class CheckBox(GOVUKForm):
     auto_replace_widgets = True
     information_correct_declare = forms.BooleanField(label='This information is correct')
 
+class LogInDetailsForm(GOVUKForm):
+    pass
 
 class LogInDetailsForm(GOVUKForm):
     # customisations:
@@ -283,6 +285,30 @@ class ChildInYourHomeForm(GOVUKForm):
         box[0].widget.attrs.update({'data_target': box[1],
                                     'aria-controls': box[1],
                                     'aria-expanded': 'false'}, )
+
+class FirstAidTrainingForm(GOVUKForm):
+    pass
+
+
+class DBSCheckForm(GOVUKForm):
+    pass
+
+
+class HealthDeclarationBookletForm(GOVUKForm):
+    pass
+
+
+class ReferencesForm(GOVUKForm):
+    pass
+
+
+class PeopleInYourHomeForm(GOVUKForm):
+    pass
+
+
+class DeclarationForm(GOVUKForm):
+    pass
+
 
 class CommentsForm(GOVUKForm):
     """
