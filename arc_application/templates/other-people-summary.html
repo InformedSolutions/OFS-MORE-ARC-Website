@@ -76,7 +76,8 @@
         </tr>
         </tbody>
     </table>
-    {% for name, day, month, year, relationship, dbs_certificate_number, permission in adult_lists %}
+    {% for name, day, month, year, relationship, dbs_certificate_number, permission, formsetadult in adult_lists %}
+
     <table class="check-your-answers form-group grid-row">
         <thead>
         <tr>
@@ -96,7 +97,19 @@
                 {{name}}
             </td>
             <td class="change-answer">
-                {{form}}
+                {{ formsetadult.full_name_declare }}
+            </td>
+        </tr>
+        <tr class="js-hidden" id="full_name" >
+            <td colspan="1"style="width:100%">
+                <div >
+                    {{ formsetadult.full_name_comments.label}}
+                </div>
+            </td>
+            <td colspan="2"style="width:100%">
+                <div >
+                    {{ formsetadult.full_name_comments}}
+                </div>
             </td>
         </tr>
         <tr>
@@ -153,7 +166,19 @@
             </td>
             {% endif %}
             <td class="change-answer">
-                {{form}}
+                {{ formsetadult.date_of_birth_declare }}
+            </td>
+        </tr>
+        <tr class="js-hidden" id="date_of_birth" >
+            <td colspan="1"style="width:100%">
+                <div >
+                    {{ formsetadult.date_of_birth_comments.label}}
+                </div>
+            </td>
+            <td colspan="2"style="width:100%">
+                <div >
+                    {{ formsetadult.date_of_birth_comments}}
+                </div>
             </td>
         </tr>
         <tr>
@@ -164,7 +189,19 @@
                 {{relationship}}
             </td>
             <td class="change-answer">
-               {{form}}
+                {{ formsetadult.relationship_declare }}
+            </td>
+        </tr>
+        <tr class="js-hidden" id="relationship" >
+            <td colspan="1"style="width:100%">
+                <div >
+                    {{ formsetadult.relationship_comments.label}}
+                </div>
+            </td>
+            <td colspan="2"style="width:100%">
+                <div >
+                    {{ formsetadult.relationship_comments}}
+                </div>
             </td>
         </tr>
         <tr>
@@ -175,9 +212,22 @@
                 {{dbs_certificate_number}}
             </td>
             <td class="change-answer">
-                {{form}}
+                {{ formsetadult.dbs_certificate_declare }}
             </td>
         </tr>
+        <tr class="js-hidden" id="dbs_certificate" >
+            <td colspan="1"style="width:100%">
+                <div >
+                    {{ formsetadult.dbs_certificate_comments.label}}
+                </div>
+            </td>
+            <td colspan="2"style="width:100%">
+                <div >
+                    {{ formsetadult.dbs_certificate_comments}}
+                </div>
+            </td>
+        </tr>
+        <tr>
         <tr>
             <td style="word-wrap: break-word">
                 Permission for checks
@@ -192,7 +242,19 @@
             </td>
             {% endif %}
             <td class="change-answer">
-                {{form}}
+                {{ formsetadult.permission_for_checks_declare }}
+            </td>
+        </tr>
+        <tr class="js-hidden" id="permission_for_checks" >
+            <td colspan="1"style="width:100%">
+                <div >
+                    {{ formsetadult.permission_for_checks_comments.label}}
+                </div>
+            </td>
+            <td colspan="2"style="width:100%">
+                <div >
+                    {{ formsetadult.permission_for_checks_comments}}
+                </div>
             </td>
         </tr>
         </tbody>

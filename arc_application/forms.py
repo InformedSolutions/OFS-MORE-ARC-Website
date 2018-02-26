@@ -252,7 +252,7 @@ class AdultInYourHomeForm(GOVUKForm):
 
     checkboxes = [(full_name_declare, 'full_name'),
                   (date_of_birth_declare, 'date_of_birth'),
-                  (relationship_declare, 'relationship_declare'),
+                  (relationship_declare, 'relationship'),
                   (dbs_certificate_declare, 'dbs_certificate'),
                   (permission_for_checks_declare, 'permission_for_checks')]
 

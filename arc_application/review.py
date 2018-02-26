@@ -7,10 +7,11 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect
+from django.forms import formset_factory
 from govuk_forms.forms import GOVUKForm
 from govuk_forms.widgets import CheckboxSelectMultiple
 from .forms import CheckBox, CommentsForm, PersonalDetailsForm, LogInDetailsForm, FirstAidTrainingForm, DBSCheckForm,\
-    HealthForm, ReferencesForm, ReferencesForm2
+    HealthForm, ReferencesForm, ReferencesForm2, AdultInYourHomeForm, ChildInYourHomeForm
 
 
 from .models import AdultInHome, ApplicantHomeAddress, ApplicantName, ApplicantPersonalDetails, Application, ArcReview, \
@@ -416,8 +417,22 @@ def other_people_summary(request):
         adult_relationship_list.append(adult.relationship)
         adult_dbs_list.append(adult.dbs_certificate_number)
         adult_permission_list.append(adult.permission_declare)
+    amount_of_people = str(len(adult_name_list))
+    data = {
+    'form-TOTAL_FORMS': '2',
+    'form-INITIAL_FORMS': amount_of_people,
+    'form-MAX_NUM_FORMS': '',
+    }
+    AdultFormSet = formset_factory(AdultInYourHomeForm)
+
+    formset = AdultFormSet(data)
+
     adult_lists = zip(adult_name_list, adult_birth_day_list, adult_birth_month_list, adult_birth_year_list,
-                      adult_relationship_list, adult_dbs_list, adult_permission_list)
+                      adult_relationship_list, adult_dbs_list, adult_permission_list, formset)
+
+    adult_lists = list(adult_lists)
+    print(adult_lists)
+
     for child in children_list:
         if child.middle_names != '':
             name = child.first_name + ' ' + child.middle_names + ' ' + child.last_name
@@ -430,9 +445,10 @@ def other_people_summary(request):
         child_relationship_list.append(child.relationship)
     child_lists = zip(child_name_list, child_birth_day_list, child_birth_month_list, child_birth_year_list,
                       child_relationship_list)
-    #child_formset_dictionary =
+
     variables = {
         'form': form,
+        'formset': formset,
         'application_id': application_id_local,
         'adults_in_home': application.adults_in_home,
         'children_in_home': application.children_in_home,
@@ -535,8 +551,11 @@ def declaration(request):
         adult_dbs_list.append(adult.dbs_certificate_number)
         adult_permission_list.append(adult.permission_declare)
     # Zip the appended lists together for the HTML to simultaneously parse
+    AdultFormSet = formset_factory(AdultInYourHomeForm)
+    adult_form_set = AdultFormSet()
     adult_lists = zip(adult_name_list, adult_birth_day_list, adult_birth_month_list, adult_birth_year_list,
-                      adult_relationship_list, adult_dbs_list, adult_permission_list)
+                      adult_relationship_list, adult_dbs_list, adult_permission_list, adult_form_set)
+
     # Generate lists of data for adults in your home, to be iteratively displayed on the summary page
     # The HTML will then parse through each list simultaneously, to display the correct data for each adult
     child_name_list = []
@@ -556,9 +575,11 @@ def declaration(request):
         child_birth_month_list.append(child.birth_month)
         child_birth_year_list.append(child.birth_year)
         child_relationship_list.append(child.relationship)
+    ChildFormSet = formset_factory(ChildInYourHomeForm)
+    formset = ChildFormSet()
     # Zip the appended lists together for the HTML to simultaneously parse
     child_lists = zip(child_name_list, child_birth_day_list, child_birth_month_list, child_birth_year_list,
-                      child_relationship_list)
+                      child_relationship_list, formset)
     variables = {
         'form': form,
         'application_id': application_id_local,
@@ -700,6 +721,7 @@ def arc_summary(request):
     child_birth_month_list = []
     child_birth_year_list = []
     child_relationship_list = []
+
     for child in children_list:
         # For each child, append the correct attribute (e.g. name, relationship) to the relevant list
         # Concatenate the child's name for display, displaying any middle names if present
@@ -714,7 +736,7 @@ def arc_summary(request):
         child_relationship_list.append(child.relationship)
     # Zip the appended lists together for the HTML to simultaneously parse
     child_lists = zip(child_name_list, child_birth_day_list, child_birth_month_list, child_birth_year_list,
-                      child_relationship_list)
+                          child_relationship_list)
     form = CheckBox()
     variables = {
         'form': form,
