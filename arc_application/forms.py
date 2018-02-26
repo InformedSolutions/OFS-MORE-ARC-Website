@@ -118,7 +118,7 @@ class DBSCheckForm(GOVUKForm):
                                                         widget=custom_field_widgets.CustomCheckboxInput)
     dbs_certificate_number_comments = forms.CharField(label='Enter your reasoning here', widget=forms.Textarea)
     dbs_submission_consent_declare = forms.BooleanField(label='This information is correct',
-                                                         widget=custom_field_widgets.CustomCheckboxInput)
+                                                        widget=custom_field_widgets.CustomCheckboxInput)
     dbs_submission_consent_comments = forms.CharField(label='Enter your reasoning here', widget=forms.Textarea)
     cautions_or_convictions_declare = forms.BooleanField(label='This information is correct',
                                                          widget=custom_field_widgets.CustomCheckboxInput)
@@ -150,8 +150,6 @@ class HealthForm(GOVUKForm):
                                     'aria-expanded': 'false'},)
 
 
-
-
 class ReferencesForm(GOVUKForm):
     # customisations:
     auto_replace_widgets = True
@@ -181,8 +179,8 @@ class ReferencesForm(GOVUKForm):
     email_address_comments = forms.CharField(label='Enter your reasoning here', widget=forms.Textarea)
 
     checkboxes = [(full_name_declare, 'full_name'), (how_they_know_you_declare, 'how_they_know_you'),
-                  (known_for_declare, 'known_for'), (address_declare, 'address_declare'),
-                  (phone_number_declare, 'phone_number'), (email_address_declare, 'email_declare')]
+                  (known_for_declare, 'known_for'), (address_declare, 'address'),
+                  (phone_number_declare, 'phone_number'), (email_address_declare, 'email_address')]
 
     for box in checkboxes:
         box[0].widget.attrs.update({'data_target': box[1],
@@ -190,14 +188,104 @@ class ReferencesForm(GOVUKForm):
                                     'aria-expanded': 'false'},)
 
 
-class PeopleInYourHomeForm(GOVUKForm):
-    # TODO: Plan formset implementation for this form
-    pass
+class ReferencesForm2(GOVUKForm):
+    # customisations:
+    auto_replace_widgets = True
+
+    full_name_declare = forms.BooleanField(label='This information is correct',
+                                           widget=custom_field_widgets.CustomCheckboxInput)
+    full_name_comments = forms.CharField(label='Enter your reasoning here', widget=forms.Textarea)
+
+    how_they_know_you_declare = forms.BooleanField(label='This information is correct',
+                                                   widget=custom_field_widgets.CustomCheckboxInput)
+    how_they_know_you_comments = forms.CharField(label='Enter your reasoning here', widget=forms.Textarea)
+
+    known_for_declare = forms.BooleanField(label='This information is correct',
+                                           widget=custom_field_widgets.CustomCheckboxInput)
+    known_for_comments = forms.CharField(label='Enter your reasoning here', widget=forms.Textarea)
+
+    address_declare = forms.BooleanField(label='This information is correct',
+                                         widget=custom_field_widgets.CustomCheckboxInput)
+    address_comments = forms.CharField(label='Enter your reasoning here', widget=forms.Textarea)
+
+    phone_number_declare = forms.BooleanField(label='This information is correct',
+                                              widget=custom_field_widgets.CustomCheckboxInput)
+    phone_number_comments = forms.CharField(label='Enter your reasoning here', widget=forms.Textarea)
+
+    email_address_declare = forms.BooleanField(label='This information is correct',
+                                               widget=custom_field_widgets.CustomCheckboxInput)
+    email_address_comments = forms.CharField(label='Enter your reasoning here', widget=forms.Textarea)
+
+    checkboxes = [(full_name_declare, 'full_name2'),
+                  (how_they_know_you_declare, 'how_they_know_you2'),
+                  (known_for_declare, 'known_for2'), (address_declare, 'address2'),
+                  (phone_number_declare, 'phone_number2'),
+                  (email_address_declare, 'email_address2')]
+
+    for box in checkboxes:
+        box[0].widget.attrs.update({'data_target': box[1],
+                                    'aria-controls': box[1],
+                                    'aria-expanded': 'false'}, )
 
 
-class DeclarationForm(GOVUKForm):
-    # TODO: Await confirmation as to workflow for this [page
-    pass
+class AdultInYourHomeForm(GOVUKForm):
+
+    full_name_declare = forms.BooleanField(label='This information is correct',
+                                           widget=custom_field_widgets.CustomCheckboxInput)
+    full_name_comments = forms.CharField(label='Enter your reasoning here', widget=forms.Textarea)
+
+    date_of_birth_declare = forms.BooleanField(label='This information is correct',
+                                               widget=custom_field_widgets.CustomCheckboxInput)
+    date_of_birth_comments = forms.CharField(label='Enter your reasoning here', widget=forms.Textarea)
+
+    relationship_declare = forms.BooleanField(label='This information is correct',
+                                              widget=custom_field_widgets.CustomCheckboxInput)
+    relationship_comments = forms.CharField(label='Enter your reasoning here', widget=forms.Textarea)
+
+    dbs_certificate_declare = forms.BooleanField(label='This information is correct',
+                                                 widget=custom_field_widgets.CustomCheckboxInput)
+    dbs_certificate_comments = forms.CharField(label='Enter your reasoning here', widget=forms.Textarea)
+
+    permission_for_checks_declare = forms.BooleanField(label='This information is correct',
+                                                       widget=custom_field_widgets.CustomCheckboxInput)
+    permission_for_checks_comments = forms.CharField(label='Enter your reasoning here', widget=forms.Textarea)
+
+    checkboxes = [(full_name_declare, 'full_name'),
+                  (date_of_birth_declare, 'date_of_birth'),
+                  (relationship_declare, 'relationship_declare'),
+                  (dbs_certificate_declare, 'dbs_certificate'),
+                  (permission_for_checks_declare, 'permission_for_checks')]
+
+    for box in checkboxes:
+        box[0].widget.attrs.update({'data_target': box[1],
+                                    'aria-controls': box[1],
+                                    'aria-expanded': 'false'}, )
+
+
+class ChildInYourHomeForm(GOVUKForm):
+    full_name_declare = forms.BooleanField(label='This information is correct',
+                                           widget=custom_field_widgets.CustomCheckboxInput)
+    full_name_comments = forms.CharField(label='Enter your reasoning here', widget=forms.Textarea)
+
+    date_of_birth_declare = forms.BooleanField(label='This information is correct',
+                                               widget=custom_field_widgets.CustomCheckboxInput)
+    date_of_birth_comments = forms.CharField(label='Enter your reasoning here', widget=forms.Textarea)
+
+    relationship_declare = forms.BooleanField(label='This information is correct',
+                                              widget=custom_field_widgets.CustomCheckboxInput)
+    relationship_comments = forms.CharField(label='Enter your reasoning here', widget=forms.Textarea)
+
+    checkboxes = [(full_name_declare, 'full_name'),
+                  (date_of_birth_declare, 'date_of_birth'),
+                  (relationship_declare, 'relationship_declare')]
+
+    for box in checkboxes:
+        box[0].widget.attrs.update({'data_target': box[1],
+                                    'aria-controls': box[1],
+                                    'aria-expanded': 'false'}, )
+
+
+
 
 
 class CommentsForm(GOVUKForm):
