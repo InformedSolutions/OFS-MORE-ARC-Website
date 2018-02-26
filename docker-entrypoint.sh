@@ -7,8 +7,8 @@ python manage.py makemigrations arc_application
 
 # Apply database migrations
 echo "Apply database migrations"
-python manage.py migrate
-python manage.py migrate arc_application
+python manage.py migrate --settings=$PROJECT_SETTINGS
+python manage.py migrate arc_application --settings=$PROJECT_SETTINGS
 
 #Collect static resources
 echo "Collecting static assets"
