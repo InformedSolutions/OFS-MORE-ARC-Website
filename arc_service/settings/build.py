@@ -13,6 +13,7 @@ MIDDLEWARE_DEV = [
 ]
 
 INSTALLED_APPS = BUILTIN_APPS + THIRD_PARTY_APPS + DEV_APPS + PROJECT_APPS
+MIDDLEWARE = MIDDLEWARE + MIDDLEWARE_DEV
 
 # Database
 # https://docs.djangoproject.com/en/1.11/ref/settings/#databases
