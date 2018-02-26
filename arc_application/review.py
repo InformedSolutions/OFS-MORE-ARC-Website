@@ -417,21 +417,21 @@ def other_people_summary(request):
         adult_relationship_list.append(adult.relationship)
         adult_dbs_list.append(adult.dbs_certificate_number)
         adult_permission_list.append(adult.permission_declare)
-    amount_of_people = str(len(adult_name_list))
+    amount_of_adults = str(len(adult_name_list))
     data = {
-    'form-TOTAL_FORMS': '2',
-    'form-INITIAL_FORMS': amount_of_people,
+    'form-TOTAL_FORMS': amount_of_adults,
+    'form-INITIAL_FORMS': amount_of_adults,
     'form-MAX_NUM_FORMS': '',
     }
     AdultFormSet = formset_factory(AdultInYourHomeForm)
 
-    formset = AdultFormSet(data)
+    formset_adult = AdultFormSet(data)
 
     adult_lists = zip(adult_name_list, adult_birth_day_list, adult_birth_month_list, adult_birth_year_list,
-                      adult_relationship_list, adult_dbs_list, adult_permission_list, formset)
+                      adult_relationship_list, adult_dbs_list, adult_permission_list, formset_adult)
 
     adult_lists = list(adult_lists)
-    print(adult_lists)
+
 
     for child in children_list:
         if child.middle_names != '':
@@ -443,11 +443,21 @@ def other_people_summary(request):
         child_birth_month_list.append(child.birth_month)
         child_birth_year_list.append(child.birth_year)
         child_relationship_list.append(child.relationship)
+    amount_of_children = str(len(child_name_list))
+    data = {
+        'form-TOTAL_FORMS': amount_of_children,
+        'form-INITIAL_FORMS': amount_of_children,
+        'form-MAX_NUM_FORMS': '',
+    }
+    ChildFormSet = formset_factory(ChildInYourHomeForm)
+
+    formset_child = ChildFormSet(data)
+
     child_lists = zip(child_name_list, child_birth_day_list, child_birth_month_list, child_birth_year_list,
-                      child_relationship_list)
+                      child_relationship_list, formset_child)
+
     variables = {
         'form': form,
-        'formset': formset,
         'application_id': application_id_local,
         'adults_in_home': application.adults_in_home,
         'children_in_home': application.children_in_home,

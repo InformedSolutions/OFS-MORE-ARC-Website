@@ -98,9 +98,10 @@
             </td>
             <td class="change-answer">
                 {{ formsetadult.full_name_declare }}
+                {{formsetadult.initial.instance_id}}
             </td>
         </tr>
-        <tr class="js-hidden" id="full_name" >
+        <tr class="js-hidden" id="full_name{{formsetadult.instance_id.initial}}" >
             <td colspan="1"style="width:100%">
                 <div >
                     {{ formsetadult.full_name_comments.label}}
@@ -169,7 +170,7 @@
                 {{ formsetadult.date_of_birth_declare }}
             </td>
         </tr>
-        <tr class="js-hidden" id="date_of_birth" >
+        <tr class="js-hidden" id="date_of_birth{{formsetadult.instance_id.initial}}" >
             <td colspan="1"style="width:100%">
                 <div >
                     {{ formsetadult.date_of_birth_comments.label}}
@@ -192,7 +193,7 @@
                 {{ formsetadult.relationship_declare }}
             </td>
         </tr>
-        <tr class="js-hidden" id="relationship" >
+        <tr class="js-hidden" id="relationship{{formsetadult.instance_id.initial}}" >
             <td colspan="1"style="width:100%">
                 <div >
                     {{ formsetadult.relationship_comments.label}}
@@ -215,7 +216,7 @@
                 {{ formsetadult.dbs_certificate_declare }}
             </td>
         </tr>
-        <tr class="js-hidden" id="dbs_certificate" >
+        <tr class="js-hidden" id="dbs_certificate{{formsetadult.instance_id.initial}}" >
             <td colspan="1"style="width:100%">
                 <div >
                     {{ formsetadult.dbs_certificate_comments.label}}
@@ -245,7 +246,7 @@
                 {{ formsetadult.permission_for_checks_declare }}
             </td>
         </tr>
-        <tr class="js-hidden" id="permission_for_checks" >
+        <tr class="js-hidden" id="permission_for_checks{{formsetadult.instance_id.initial}}" >
             <td colspan="1"style="width:100%">
                 <div >
                     {{ formsetadult.permission_for_checks_comments.label}}
@@ -260,7 +261,7 @@
         </tbody>
     </table>
     {% endfor %}
-    {% for name, day, month, year, relationship in child_lists %}
+    {% for name, day, month, year, relationship, formsetchild in child_lists %}
     <table class="check-your-answers form-group grid-row">
         <thead>
         <tr>
@@ -280,7 +281,19 @@
                 {{name}}
             </td>
             <td class="change-answer">
-                {{form}}
+                {{ formsetchild.full_name_declare }}
+            </td>
+        </tr>
+        <tr class="js-hidden" id="full_name{{formsetchild.instance_id.initial}}" >
+            <td colspan="1"style="width:100%">
+                <div >
+                    {{ formsetchild.full_name_comments.label}}
+                </div>
+            </td>
+            <td colspan="2"style="width:100%">
+                <div >
+                    {{ formsetchild.full_name_comments}}
+                </div>
             </td>
         </tr>
         <tr>
@@ -337,7 +350,19 @@
             </td>
             {% endif %}
             <td class="change-answer">
-                {{form}}
+                {{ formsetchild.date_of_birth_declare }}
+            </td>
+        </tr>
+        <tr class="js-hidden" id="date_of_birth{{formsetchild.instance_id.initial}}" >
+            <td colspan="1"style="width:100%">
+                <div >
+                    {{ formsetchild.date_of_birth_comments.label}}
+                </div>
+            </td>
+            <td colspan="2"style="width:100%">
+                <div >
+                    {{ formsetchild.date_of_birth_comments}}
+                </div>
             </td>
         </tr>
         <tr>
@@ -348,7 +373,19 @@
                 {{relationship}}
             </td>
             <td class="change-answer">
-                {{form}}
+                {{ formsetchild.relationship_declare }}
+            </td>
+        </tr>
+        <tr class="js-hidden" id="relationship{{formsetchild.instance_id.initial}}" >
+            <td colspan="1"style="width:100%">
+                <div >
+                    {{ formsetchild.relationship_comments.label}}
+                </div>
+            </td>
+            <td colspan="2"style="width:100%">
+                <div >
+                    {{ formsetchild.relationship_comments}}
+                </div>
             </td>
         </tr>
         </tbody>
