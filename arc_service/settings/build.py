@@ -2,6 +2,8 @@ from .base import *
 
 DEBUG = True
 
+ALLOWED_HOSTS = ['*']
+
 DEV_APPS = [
 ]
 
