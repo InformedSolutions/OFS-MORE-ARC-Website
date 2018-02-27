@@ -180,25 +180,7 @@
                         {% endif %}
                     </td>
                 </tr>
-                <tr id="review">
-                    <td class="task" style="padding-right: 10px; word-wrap: break-word;">
-                        {% if declaration_status == 'NOT_STARTED' %}
-                        <a href="{{ URL_PREFIX }}/declaration?id={{application_id}}">
-                            <span class="task-name">Declaration</span><strong
-                                class="task-finished task-to-do">To do</strong>
-                        </a>
-                        {% elif declaration_status == 'FLAGGED' %}
-                        <a href="{{ URL_PREFIX }}/declaration?id={{application_id}}">
-                            <span class="task-name">Declaration</span><strong
-                                class="task-finished task-to-do">Flagged</strong>
-                        </a>
-                        {% elif declaration_status == 'COMPLETED' %}
-                        <a href="{{ URL_PREFIX }}/declaration?id={{application_id}}">
-                            <span class="task-name">Declaration</span><strong
-                                class="task-finished">Reviewed</strong>
-                        </a>
-                        {% endif %}
-                    </td>
+
                 </tr>
                 </tbody>
             </table>
@@ -212,7 +194,7 @@
     <div class="column-third" style="background-color: #bfc1c3; margin-left: 15px; padding: 10px; margin-top: 15px; float: left; width: 30%;">
         <b style="font-weight: bold;">Progress:</b>
         <br>
-        {{review_count}} of 9 sections complete
+        {{review_count}} of 8 sections complete
         <br>
         <br>
         {% if middle_names %}

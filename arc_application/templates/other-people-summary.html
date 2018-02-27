@@ -41,7 +41,19 @@
             </td>
             {% endif %}
             <td class="change-answer">
-                {{form}}
+                {{ form.adults_in_home_declare }}
+            </td>
+        </tr>
+        <tr class="js-hidden" id="adults_in_home" >
+            <td colspan="1"style="width:100%">
+                <div >
+                    {{ form.adults_in_home_comments.label}}
+                </div>
+            </td>
+            <td colspan="2"style="width:100%">
+                <div >
+                    {{ form.adults_in_home_comments}}
+                </div>
             </td>
         </tr>
         </tbody>
@@ -71,7 +83,19 @@
             </td>
             {% endif %}
             <td class="change-answer">
-                {{form}}
+                {{ form.children_in_home_declare }}
+            </td>
+        </tr>
+        <tr class="js-hidden" id="children_in_home" >
+            <td colspan="1"style="width:100%">
+                <div >
+                    {{ form.children_in_home_comments.label}}
+                </div>
+            </td>
+            <td colspan="2"style="width:100%">
+                <div >
+                    {{ form.children_in_home_comments}}
+                </div>
             </td>
         </tr>
         </tbody>
@@ -98,7 +122,6 @@
             </td>
             <td class="change-answer">
                 {{ formsetadult.full_name_declare }}
-                {{formsetadult.initial.instance_id}}
             </td>
         </tr>
         <tr class="js-hidden" id="full_name{{formsetadult.instance_id.initial}}" >

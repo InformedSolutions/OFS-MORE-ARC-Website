@@ -3,14 +3,14 @@ from django.conf import settings
 from django.contrib.auth import authenticate, login as auth_login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserModel
-from django.contrib.auth.models import Group, User
+from django.contrib.auth.models import Group
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.utils.http import urlsafe_base64_decode
 from django.utils.text import capfirst
 from govuk_forms.forms import GOVUKForm
 
-from .models import ApplicantName, ApplicantPersonalDetails, Application, ArcReview, ArcStatus
+from .models import ApplicantName, ApplicantPersonalDetails, Application, Arc
 
 
 @login_required()
@@ -30,7 +30,7 @@ def summary_page(request):
         # If the 'New Application' button has been clicked get new application
         if request.method == 'POST':
             assign_response = assign_new_application(request)
-        entries = ArcReview.objects.filter(user_id=request.user.id)
+        entries = Arc.objects.filter(user_id=request.user.id)
         obj = []
         # For each application assigned to the user
         for entry in entries:
@@ -66,13 +66,13 @@ def summary_page(request):
 def get_table_data(obj):
     """
     Get data to display in summary table
-    :param obj: ArcReview object
-    :return: Dict that essentially extends ArcReview and includes a few more fields
+    :param obj: Arc object
+    :return: Dict that essentially extends Arc and includes a few more fields
     """
     local_application_id = obj.application_id
     if Application.objects.filter(pk=local_application_id).count() > 0:
         obj.application = Application.objects.get(application_id=local_application_id)
-        arc_user = ArcReview.objects.get(application_id=local_application_id)
+        arc_user = Arc.objects.get(application_id=local_application_id)
         obj.date_submitted = obj.application.date_submitted
         obj.last_accessed = arc_user.last_accessed
         obj.app_type = 'Childminder'
@@ -89,7 +89,7 @@ def assign_new_application(request):
     :param request: HTTP request
     :return: A Json with the Application Id, 'Limit Reached' if a user has too many already assigned, and False if none availible
     """
-    if ArcReview.objects.filter(user_id=request.user.id).count() == settings.APPLICATION_LIMIT:
+    if Arc.objects.filter(user_id=request.user.id).count() == settings.APPLICATION_LIMIT:
         return 'LIMIT_REACHED'
 
     local_application_id = get_oldest_application_id()
@@ -100,16 +100,16 @@ def assign_new_application(request):
     if Application.objects.filter(pk=local_application_id).count() > 0:
         application = Application.objects.get(application_id=local_application_id)
 
-        arc_user = ArcReview.objects.create(application_id=local_application_id)
+        arc_user = Arc.objects.create(application_id=local_application_id)
         arc_user.last_accessed = str(application.date_updated.strftime('%d/%m/%Y'))
         arc_user.user_id = request.user.id
         arc_user.app_type = 'Childminder'
         arc_user.save()
         try:
-            status = ArcStatus.objects.get(application_id=local_application_id)
+            status = Arc.objects.get(application_id=local_application_id)
         except Exception as ex:
             print(ex)
-            status = ArcStatus.objects.create(application_id=local_application_id)
+            status = Arc.objects.create(application_id=local_application_id)
         status.login_details_review = "NOT_STARTED"
         status.childcare_type_review = "NOT_STARTED"
         status.personal_details_review = "NOT_STARTED"
@@ -127,13 +127,13 @@ def assign_new_application(request):
 @login_required()
 def delete_all(request):
     """
-    Delete everything in ArcReview
+    Delete everything in Arc
     :param request: Http Request
     :return: Json Response
     """
     try:
-        ArcReview.objects.all().delete()
-        JsonResponse({'message': 'ArcReview Table deleted'})
+        Arc.objects.all().delete()
+        JsonResponse({'message': 'Arc Table deleted'})
     except Exception as ex:
         HttpResponse(ex)
 
@@ -144,27 +144,24 @@ def get_assigned_apps(request):
     :param request: HTTP Request
     :return: a list of Arc Review objects
     """
-    apps = ArcReview.objects.all()
+    apps = Arc.objects.all()
     arr = []
     for i in apps:
         arr.append(i)
     return arr
 
 
-
-
 def get_oldest_application_id():
     """
     Get the oldest application (where payment is successful)
-    :return:
+    :return: Application ID
     """
     application_list = Application.objects.exclude(date_submitted=None)
     for application in application_list:
         # If application is submitted and not already assigned to another ARC user
-        if application.date_submitted is not None and len(ArcReview.objects.filter(pk=application.application_id)) == 0:
+        if application.date_submitted is not None and len(Arc.objects.filter(
+                pk=application.application_id)) == 0 and application.application_status == 'COMPLETE':
             return application.application_id
-
-
 
 
 def custom_login(request):
@@ -218,8 +215,8 @@ def has_group(user, group_name):
 
 
 def release_application(request, application_id):
-    if len(ArcReview.objects.filter(application_id=application_id)) == 1:
-        row = ArcReview.objects.get(application_id=application_id)
+    if len(Arc.objects.filter(application_id=application_id)) == 1:
+        row = Arc.objects.get(application_id=application_id)
         row.delete()
         return HttpResponseRedirect('/arc/summary')
     else:

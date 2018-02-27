@@ -13,17 +13,16 @@ from govuk_forms.forms import GOVUKForm
 
 from . import custom_field_widgets
 
-from .models import ArcReview
+from .models import Arc as ArcReview
 from .views import has_group, authenticate, capfirst
 
-
 class CheckBox(GOVUKForm):
-    field_label_classes = 'form-label-bold'
-    auto_replace_widgets = True
-    information_correct_declare = forms.BooleanField(label='This information is correct')
-
+    pass
 
 class LogInDetailsForm(GOVUKForm):
+    """
+    GOV.UK form for the Your login and contact details: email page
+    """
     # customisations:
     auto_replace_widgets = True
     field_label_classes = 'form-label-bold'
@@ -44,11 +43,15 @@ class LogInDetailsForm(GOVUKForm):
                                                         widget=custom_field_widgets.CustomCheckboxInput)
     knowledge_based_answer_comments = forms.CharField(label='Enter your reasoning here', widget=forms.Textarea)
 
+    # As this will only happen once per page, we can do this in the form itself rather than __init
+    # Each checkbox must be assigned a name for the html injection
     checkboxes = [(email_declare, 'email'), (mobile_phone_number_declare, 'mobile_phone_number'),
                   (alternative_phone_number_declare, 'alternative_phone_number'),
                   (knowledge_based_question_declare, 'knowledge_based_question'),
                   (knowledge_based_answer_declare, 'knowledge_based_answer')]
 
+    # This is where the html is added that assigns each checkbox with the correct name, so the javascript knows where
+    # act
     for box in checkboxes:
         box[0].widget.attrs.update({'data_target': box[1],
                                     'aria-controls': box[1],
@@ -56,6 +59,9 @@ class LogInDetailsForm(GOVUKForm):
 
 
 class PersonalDetailsForm(GOVUKForm):
+    """
+    GOV.UK form for the Personal details page
+    """
     # customisations:
     auto_replace_widgets = True
 
@@ -86,6 +92,9 @@ class PersonalDetailsForm(GOVUKForm):
 
 
 class FirstAidTrainingForm(GOVUKForm):
+    """
+    GOV.UK form for the First Aid Training Form
+    """
     # customisations:
     auto_replace_widgets = True
 
@@ -112,6 +121,9 @@ class FirstAidTrainingForm(GOVUKForm):
 
 
 class DBSCheckForm(GOVUKForm):
+    """
+    GOV.UK form for the Your login and contact details: email page
+    """
     # customisations:
     auto_replace_widgets = True
 
@@ -136,6 +148,9 @@ class DBSCheckForm(GOVUKForm):
 
 
 class HealthForm(GOVUKForm):
+    """
+    GOV.UK form for the Health Page
+    """
     # customisations:
     auto_replace_widgets = True
 
@@ -152,6 +167,9 @@ class HealthForm(GOVUKForm):
 
 
 class ReferencesForm(GOVUKForm):
+    """
+    GOV.UK form for the first reference
+    """
     # customisations:
     auto_replace_widgets = True
 
@@ -190,6 +208,9 @@ class ReferencesForm(GOVUKForm):
 
 
 class ReferencesForm2(GOVUKForm):
+    """
+    GOV.UK form for the second reference, this can be deleted later if these are done dynamically
+    """
     # customisations:
     auto_replace_widgets = True
 
@@ -229,7 +250,33 @@ class ReferencesForm2(GOVUKForm):
                                     'aria-expanded': 'false'}, )
 
 
+class OtherPeopleInYourHomeForm(GOVUKForm):
+    """
+    GOV.UK form for the top part ot the other people form, that isnt rendered manually
+    """
+
+    auto_replace_widgets = True
+
+    adults_in_home_declare = forms.BooleanField(label='This information is correct',
+                                                widget=custom_field_widgets.CustomCheckboxInput)
+    adults_in_home_comments = forms.CharField(label='Enter your reasoning here', widget=forms.Textarea)
+    children_in_home_declare = forms.BooleanField(label='This information is correct',
+                                                  widget=custom_field_widgets.CustomCheckboxInput)
+    children_in_home_comments = forms.CharField(label='Enter your reasoning here', widget=forms.Textarea)
+
+    checkboxes = [(adults_in_home_declare, 'adults_in_home'),
+                  (children_in_home_declare, 'children_in_home')]
+
+    for box in checkboxes:
+        box[0].widget.attrs.update({'data_target': box[1],
+                                    'aria-controls': box[1],
+                                    'aria-expanded': 'false'}, )
+
+
 class AdultInYourHomeForm(GOVUKForm):
+    """
+    GOV.UK form for each adult other person in an application
+    """
 
     full_name_declare = forms.BooleanField(label='This information is correct',
                                            widget=custom_field_widgets.CustomCheckboxInput)
@@ -251,25 +298,33 @@ class AdultInYourHomeForm(GOVUKForm):
                                                        widget=custom_field_widgets.CustomCheckboxInput)
     permission_for_checks_comments = forms.CharField(label='Enter your reasoning here', widget=forms.Textarea)
 
+    # This is the id appended to all htmls names ot make the individual form instance unique, this is given a alue in
+    # the init
     instance_id = forms.CharField(widget=forms.HiddenInput)
 
     def __init__(self, *args, **kwargs):
         super(AdultInYourHomeForm, self).__init__(*args, **kwargs)
+        # Create unique id value and populate the instance_id field with it
         id_value = str(uuid.uuid4())
         self.fields['instance_id'].initial = id_value
-        print(self.fields['instance_id'].initial)
+        #print(self.fields['instance_id'].initial)
+        # Make all checkbox names refer the the name with the correct instance id, making each conditional reveal unique
         checkboxes = [((self.fields['full_name_declare']), 'full_name' + id_value),
                       ((self.fields['date_of_birth_declare']), 'date_of_birth' + id_value),
                       ((self.fields['relationship_declare']), 'relationship' + id_value),
                       ((self.fields['dbs_certificate_declare']), 'dbs_certificate' + id_value),
                       ((self.fields['permission_for_checks_declare']), 'permission_for_checks' + id_value)]
+
         for box in checkboxes:
-                      box[0].widget.attrs.update({'data_target': box[1],
-                      'aria-controls': box[1],
-                      'aria-expanded': 'false'},)
+                        box[0].widget.attrs.update({'data_target': box[1],
+                        'aria-controls': box[1],
+                        'aria-expanded': 'false'},)
 
 
 class ChildInYourHomeForm(GOVUKForm):
+    """
+    GOV.UK form for each child other person in an application, see adult form for comment explanation
+    """
     full_name_declare = forms.BooleanField(label='This information is correct',
                                            widget=custom_field_widgets.CustomCheckboxInput)
     full_name_comments = forms.CharField(label='Enter your reasoning here', widget=forms.Textarea)
@@ -282,6 +337,7 @@ class ChildInYourHomeForm(GOVUKForm):
                                               widget=custom_field_widgets.CustomCheckboxInput)
     relationship_comments = forms.CharField(label='Enter your reasoning here', widget=forms.Textarea)
 
+    instance_id = forms.CharField(widget=forms.HiddenInput)
 
     def __init__(self, *args, **kwargs):
         super(ChildInYourHomeForm, self).__init__(*args, **kwargs)

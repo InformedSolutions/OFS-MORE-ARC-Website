@@ -13,6 +13,8 @@
             Back
         </a>
     </div>
+    <form method="post" novalidate>
+            {% csrf_token %}
     <div class="grid-row">
         <h1 class="form-title heading-large">Review - Login Details</h1>
     </div>
@@ -149,8 +151,7 @@
     <br>
     <div class="form-group grid-row">
 
-        <form method="post">
-            {% csrf_token %}
+
             <input type="submit" class="button" value="Confirm and continue"/>
             <input type="hidden" value="{{application_id}}" name="id"/>
         </form>

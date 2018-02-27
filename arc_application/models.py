@@ -11,8 +11,25 @@ TASK_STATUS = (
 )
 
 
-class ArcStatus(models.Model):
+class ArcComments(models.Model):
+    review_id = models.UUIDField(primary_key=True, default=uuid4),
+    table_pk = models.UUIDField(default=uuid4),
+    table_name = models.CharField(max_length=30, blank=True)
+    field_name = models.CharField(max_length=30, blank=True)
+    comment = models.CharField(max_length=100, blank=True)
+    flagged = models.BooleanField
+
+    class Meta:
+        db_table = 'ARC_COMMENTS'
+
+
+class Arc(models.Model):
     application_id = models.UUIDField(primary_key=True, default=uuid4)
+    user_id = models.CharField(max_length=50)
+    last_accessed = models.CharField(max_length=50)
+    app_type = models.CharField(max_length=50)
+    comments = models.CharField(blank=True, max_length=400)
+    # What was previously ArcStatus is below
     login_details_review = models.CharField(choices=TASK_STATUS, max_length=50)
     childcare_type_review = models.CharField(choices=TASK_STATUS, max_length=50)
     personal_details_review = models.CharField(choices=TASK_STATUS, max_length=50)
@@ -23,45 +40,8 @@ class ArcStatus(models.Model):
     people_in_home_review = models.CharField(choices=TASK_STATUS, max_length=50)
     declaration_review = models.CharField(choices=TASK_STATUS, max_length=50)
 
-    #
-    # login_email = BooleanField(initial=False)
-    # login_mobile = BooleanField(initial=False)
-    # login_alt_mobile = BooleanField(initial=False)
-    # login_kb_question = BooleanField(initial=False)
-    # login_kb_answer = BooleanField(initial=False)
-    #
-    # personal_summary = BooleanField(initial=False)
-    # personal_first_name = BooleanField(initial=False)
-    # personal_middle_name = BooleanField(initial=False)
-    # personal_last_name = BooleanField(initial=False)
-    # personal_first_name = BooleanField(initial=False)
-    # personal_dob = BooleanField(initial=False)
-    # personal_address = BooleanField(initial=False)
-    # personal_location = BooleanField(initial=False)
-    #
-    #
-    # fist_aid_organisation = BooleanField(initial=False)
-    # fist_aid_course = BooleanField(initial=False)
-    # fist_aid_date = BooleanField(initial=False)
-    #
-    # dbs_cert = BooleanField(initial=False)
-    # dbs_convictions = BooleanField(initial=False)
-
-    # references and people in your home, how to do one to many in a single table?
-
     class Meta:
-        db_table = 'ARC_STATUS'
-
-
-class ArcReview(models.Model):
-    application_id = models.UUIDField(primary_key=True, default=uuid4)
-    user_id = models.CharField(max_length=50)
-    last_accessed = models.CharField(max_length=50)
-    app_type = models.CharField(max_length=50)
-    comments = models.CharField(blank=True, max_length=500)
-
-    class Meta:
-        db_table = 'ARC_REVIEW'
+        db_table = 'ARC'
 
 
 class AdultInHome(models.Model):
