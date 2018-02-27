@@ -8,7 +8,7 @@ import re
 
 from arc_application.review import contact_summary, task_list, type_of_childcare_age_groups, personal_details_summary, \
     first_aid_training_summary, dbs_check_summary, references_summary, other_people_summary, health_check_answers, \
-    declaration, review, comments, arc_summary
+    review, comments, arc_summary
 from arc_application.views import assign_new_application, custom_login, delete_all, release_application, summary_page
 from django.conf import settings
 from django.conf.urls import url, include
@@ -32,7 +32,6 @@ urlpatterns = [
     url(r'^references/summary/', references_summary),
     url(r'^other-people/summary/', other_people_summary),
     url(r'^health/check-answers/', health_check_answers),
-    url(r'^declaration/', declaration),
     url(r'^confirmation/', review),
     url(r'^comments/', comments),
     url(r'^arc-summary/', arc_summary),

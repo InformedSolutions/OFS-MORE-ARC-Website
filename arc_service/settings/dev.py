@@ -2,20 +2,10 @@ from .base import *
 
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
-
-INTERNAL_IPS = "127.0.0.1"
-
 DEV_APPS = [
-    'debug_toolbar'
-]
-
-MIDDLEWARE_DEV = [
-    'debug_toolbar.middleware.DebugToolbarMiddleware'
 ]
 
 INSTALLED_APPS = BUILTIN_APPS + THIRD_PARTY_APPS + DEV_APPS + PROJECT_APPS
-MIDDLEWARE = MIDDLEWARE + MIDDLEWARE_DEV
 
 # Database
 # https://docs.djangoproject.com/en/1.11/ref/settings/#databases
