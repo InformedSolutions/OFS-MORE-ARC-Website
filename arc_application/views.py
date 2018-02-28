@@ -99,6 +99,8 @@ def assign_new_application(request):
 
     if Application.objects.filter(pk=local_application_id).count() > 0:
         application = Application.objects.get(application_id=local_application_id)
+        application.application_status='ARC_REVIEW'
+        application.save()
         if Arc.objects.filter(pk=local_application_id).count() == 0:
             arc_user = Arc.objects.create(application_id=local_application_id)
             arc_user.login_details_review = "NOT_STARTED"
@@ -119,6 +121,7 @@ def assign_new_application(request):
             arc_user.last_accessed = str(application.date_updated.strftime('%d/%m/%Y'))
             arc_user.user_id = request.user.id
             arc_user.save()
+
         return JsonResponse({'message': arc_user.application_id})
 
 
@@ -158,7 +161,7 @@ def get_oldest_application_id():
     for application in application_list:
         # If application is submitted and not already assigned to another ARC user
         if application.date_submitted is not None:
-            if application.application_status != 'ARC_REVIEW':
+            if application.application_status != 'ARC_REVIEW' :
                 return application.application_id
 
 

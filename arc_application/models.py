@@ -38,7 +38,6 @@ class Arc(models.Model):
     health_review = models.CharField(choices=TASK_STATUS, max_length=50)
     references_review = models.CharField(choices=TASK_STATUS, max_length=50)
     people_in_home_review = models.CharField(choices=TASK_STATUS, max_length=50)
-    declaration_review = models.CharField(choices=TASK_STATUS, max_length=50)
 
     class Meta:
         db_table = 'ARC'

@@ -7,14 +7,14 @@ from django.contrib.auth.models import Group
 from django.forms import formset_factory
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
-from .review_util import request_to_comment
-from .views import release_application
-from .forms import AdultInYourHomeForm, CheckBox, CommentsForm, DBSCheckForm, FirstAidTrainingForm, HealthForm, \
-    LogInDetailsForm, PersonalDetailsForm, ReferencesForm, ReferencesForm2, AdultInYourHomeForm, ChildInYourHomeForm, \
-    OtherPeopleInYourHomeForm
+
+from .forms import AdultInYourHomeForm, CheckBox, ChildInYourHomeForm, CommentsForm, DBSCheckForm, FirstAidTrainingForm, \
+    HealthForm, LogInDetailsForm, OtherPeopleInYourHomeForm, PersonalDetailsForm, ReferencesForm, ReferencesForm2
 from .models import AdultInHome, ApplicantHomeAddress, ApplicantName, ApplicantPersonalDetails, Application, Arc, \
     ChildInHome, ChildcareType, CriminalRecordCheck, FirstAidTraining, HealthDeclarationBooklet, Reference, \
     UserDetails
+from .review_util import request_to_comment
+from .views import release_application
 
 
 @login_required()
@@ -69,7 +69,6 @@ def task_list(request):
             })
 
             temp_context = application_status_context
-
 
     return render(request, 'task-list.html', application_status_context)
 
@@ -380,7 +379,7 @@ def other_people_summary(request):
     :return: an HttpResponse object with the rendered People in your home: summary template
     """
     if request.method == 'GET':
-        #Defines tat static form at the top of the page
+        # Defines tat static form at the top of the page
         form = OtherPeopleInYourHomeForm()
         application_id_local = request.GET["id"]
     elif request.method == 'POST':
@@ -420,9 +419,9 @@ def other_people_summary(request):
     # Defines the data required for rendering the amount of forms in the below formset
     amount_of_adults = str(len(adult_name_list))
     data = {
-    'form-TOTAL_FORMS': amount_of_adults,
-    'form-INITIAL_FORMS': amount_of_adults,
-    'form-MAX_NUM_FORMS': '',
+        'form-TOTAL_FORMS': amount_of_adults,
+        'form-INITIAL_FORMS': amount_of_adults,
+        'form-MAX_NUM_FORMS': '',
     }
     # Defines the formset using formset factory
     AdultFormSet = formset_factory(AdultInYourHomeForm)
@@ -436,7 +435,6 @@ def other_people_summary(request):
 
     # Converts it to a list, there was trouble parsing the form objects when it was in a zip object
     adult_lists = list(adult_lists)
-
 
     for child in children_list:
         if child.middle_names != '':
@@ -502,6 +500,7 @@ def health_check_answers(request):
         'health_status': application.health_status,
     }
     return render(request, 'health-check-answers.html', variables)
+
 
 def arc_summary(request):
     """
@@ -587,7 +586,7 @@ def arc_summary(request):
         child_relationship_list.append(child.relationship)
     # Zip the appended lists together for the HTML to simultaneously parse
     child_lists = zip(child_name_list, child_birth_day_list, child_birth_month_list, child_birth_year_list,
-                          child_relationship_list)
+                      child_relationship_list)
     form = CheckBox()
     variables = {
         'form': form,
@@ -661,6 +660,7 @@ def arc_summary(request):
 
     return render(request, 'arc-summary.html', variables)
 
+
 def comments(request):
     """
     This is the arc comments page
@@ -674,7 +674,6 @@ def comments(request):
         application_id_local = request.POST["id"]
         form = CommentsForm(request.POST, id=application_id_local)
         if form.is_valid():
-            # Send login e-mail link if applicant has previously applied
             comments = form.cleaned_data['comments']
             if Arc.objects.filter(application_id=application_id_local):
                 arc = Arc.objects.get(application_id=application_id_local)
@@ -704,7 +703,7 @@ def review(request):
         accepted_email(email)
         release_application(request, application_id_local, 'SUBMITTED')
     else:
-        release_application(request, application_id_local, 'REJECTED')
+        release_application(request, application_id_local, 'FURTHER_INFORMATION')
         returned_email(email)
 
     variables = {
@@ -714,7 +713,6 @@ def review(request):
     return render(request, 'review-confirmation.html', variables)
 
 
-
 def has_group(user, group_name):
     """
     Check if user is in group
@@ -722,9 +720,6 @@ def has_group(user, group_name):
     """
     group = Group.objects.get(name=group_name)
     return True if group in user.groups.all() else False
-
-
-
 
 
 def all_complete(id, flag):
@@ -742,7 +737,6 @@ def all_complete(id, flag):
             if (i == 'NOT_STARTED' and not flag) or (i != 'COMPLETED' and flag):
                 return False
         return True
-
 
 
 # Add personalisation and create template
