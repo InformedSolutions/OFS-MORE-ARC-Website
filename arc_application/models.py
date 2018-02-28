@@ -28,7 +28,6 @@ class Arc(models.Model):
     user_id = models.CharField(max_length=50, blank=True)
     last_accessed = models.CharField(max_length=50)
     app_type = models.CharField(max_length=50)
-    # This is just
     comments = models.CharField(blank=True, max_length=400)
     # What was previously ArcStatus is below
     login_details_review = models.CharField(choices=TASK_STATUS, max_length=50)
