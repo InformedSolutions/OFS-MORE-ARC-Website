@@ -1,7 +1,6 @@
 xmlrunner/
 logs/
-
-staticfiles/
+addressing_service/settings.py
 
 ### Python ###
 # Byte-compiled / optimized / DLL files
@@ -9,9 +8,16 @@ __pycache__/
 *.py[cod]
 db.sqlite3
 .coverage
+staticfiles/
 
 ### Dev files ###
-.settings/
 .idea/
-.makerc
 .venv/
+.makerc
+.settings/
+
+
+### Vim file ###
+*~
+*.swp
+*.swo
