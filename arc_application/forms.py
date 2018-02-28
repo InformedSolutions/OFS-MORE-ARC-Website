@@ -14,10 +14,14 @@ from govuk_forms.forms import GOVUKForm
 from . import custom_field_widgets
 
 from .models import Arc as ArcReview
+from .models import ArcComments
 from .views import has_group, authenticate, capfirst
+from .review_util import populate_initial_values
+
 
 class CheckBox(GOVUKForm):
     pass
+
 
 class LogInDetailsForm(GOVUKForm):
     """
@@ -57,6 +61,11 @@ class LogInDetailsForm(GOVUKForm):
                                     'aria-controls': box[1],
                                     'aria-expanded': 'false'},)
 
+    def __init__(self, *args, **kwargs):
+
+        self.table_key = kwargs.pop('table_key')
+        super(LogInDetailsForm, self).__init__(*args, **kwargs)
+        populate_initial_values(self)
 
 class PersonalDetailsForm(GOVUKForm):
     """
@@ -343,7 +352,7 @@ class ChildInYourHomeForm(GOVUKForm):
         super(ChildInYourHomeForm, self).__init__(*args, **kwargs)
         id_value = str(uuid.uuid4())
         self.fields['instance_id'].initial = id_value
-        print(self.fields['instance_id'].initial)
+
         checkboxes = [((self.fields['full_name_declare']), 'full_name' + id_value),
                       ((self.fields['date_of_birth_declare']), 'date_of_birth' + id_value),
                       ((self.fields['relationship_declare']), 'relationship' + id_value)]

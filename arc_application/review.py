@@ -84,14 +84,17 @@ def contact_summary(request):
     TABLE_NAME = 'USER_DETAILS'
 
     if request.method == 'GET':
-        form = LogInDetailsForm()
+        application_id_local = request.GET["id"]
+        application = Application.objects.get(pk=application_id_local)
+        form = LogInDetailsForm(table_key=application.login_id)
         application_id_local = request.GET["id"]
     elif request.method == 'POST':
         # .Populate the form with the recieved data
-        form = LogInDetailsForm(request.POST)
         application_id_local = request.POST["id"]
         application = Application.objects.get(pk=application_id_local)
         login_id = application.login_id
+        form = LogInDetailsForm(request.POST, table_key=login_id)
+
         comment_list = request_to_comment(login_id, TABLE_NAME, request.POST)
         print(comment_list)
         for single_comment in comment_list:
