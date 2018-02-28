@@ -7,7 +7,7 @@ from django.contrib.auth.models import Group
 from django.forms import formset_factory
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
-from .review_util import request_to_comment
+from .review_util import request_to_comment, save_comments
 
 from .forms import AdultInYourHomeForm, CheckBox, CommentsForm, DBSCheckForm, FirstAidTrainingForm, HealthForm, \
     LogInDetailsForm, PersonalDetailsForm, ReferencesForm, ReferencesForm2, AdultInYourHomeForm, ChildInYourHomeForm, \
@@ -85,32 +85,25 @@ def contact_summary(request):
     if request.method == 'GET':
         application_id_local = request.GET["id"]
         application = Application.objects.get(pk=application_id_local)
-        form = LogInDetailsForm(table_key=application.login_id)
+        form = LogInDetailsForm(table_keys=[application.login_id])
         application_id_local = request.GET["id"]
     elif request.method == 'POST':
         # .Populate the form with the recieved data
         application_id_local = request.POST["id"]
         application = Application.objects.get(pk=application_id_local)
         login_id = application.login_id
-        form = LogInDetailsForm(request.POST, table_key=login_id)
+        form = LogInDetailsForm(request.POST, table_keys=[login_id])
 
         comment_list = request_to_comment(login_id, TABLE_NAME, request.POST)
-        print(comment_list)
-        for single_comment in comment_list:
-            defaults = {"table_pk": single_comment[0], "table_name": single_comment[1],
-                        "field_name": single_comment[2], "comment":single_comment[3],
-                        "flagged": single_comment[4]
-                        }
-            comment_record, created = ArcComments.objects.update_or_create(table_pk=single_comment[0],
-                                                                  field_name=single_comment[2],
-                                                                  defaults=defaults)
+        save_successful = save_comments(comment_list)
 
-            print(created)
-
-        status = Arc.objects.get(pk=application_id_local)
-        status.login_details_review = 'COMPLETED'
-        status.save()
-        return HttpResponseRedirect(settings.URL_PREFIX + '/childcare/age-groups?id=' + application_id_local)
+        if save_successful:
+            status = Arc.objects.get(pk=application_id_local)
+            status.login_details_review = 'COMPLETED'
+            status.save()
+            return HttpResponseRedirect(settings.URL_PREFIX + '/childcare/age-groups?id=' + application_id_local)
+        else:
+            return(ChildProcessError)
 
     application = Application.objects.get(pk=application_id_local)
     login_id = application.login_id
@@ -142,6 +135,7 @@ def type_of_childcare_age_groups(request):
     :param request: a request object used to generate the HttpResponse
     :return: an HttpResponse object with the rendered Type of childcare: age groups template
     """
+
     if request.method == 'GET':
         application_id_local = request.GET["id"]
         form = CheckBox()
@@ -172,12 +166,51 @@ def personal_details_summary(request):
     :param request: a request object used to generate the HttpResponse
     :return: an HttpResponse object with the rendered Your personal details: summary template
     """
+    application_id_local = request.GET["id"]
+    personal_detail_id = (ApplicantPersonalDetails.objects.get(application_id=application_id_local)).personal_detail_id
+    applicant_name_id = (ApplicantName.objects.get(personal_detail_id=personal_detail_id)).name_id
+    applicant_home_address_id = (ApplicantHomeAddress.objects.get(personal_detail_id=personal_detail_id,
+                                                                  current_address=True)).home_address_id
+    TABLE_NAMES = ['APPLICANT_PERSONAL_DETAILS', 'APPLICANT_NAME', 'APPLICANT_HOME_ADDRESS' ]
+    PERSONAL_DETAIL_FIELDS = ['date_of_birth_declare', 'date_of_birth_comments']
+    NAME_FIELDS = ['name_declare', 'name_comments']
+    HOME_ADDRESS_FIELDS = ['home_address_declare', 'home_address_comments',
+                           'childcare_location_declare', 'childcare_location_comments']
     if request.method == 'GET':
-        form = PersonalDetailsForm()
+        # Collect required ids
         application_id_local = request.GET["id"]
+        personal_detail_id = (ApplicantPersonalDetails.objects.get(application_id=application_id_local)).personal_detail_id
+        applicant_name_id = (ApplicantName.objects.get(personal_detail_id=personal_detail_id)).name_id
+        applicant_home_address_id = (ApplicantHomeAddress.objects.get(personal_detail_id=personal_detail_id,
+                                                                         current_address=True)).home_address_id
+
+        form = PersonalDetailsForm(table_keys=[personal_detail_id, applicant_name_id, applicant_home_address_id])
+
     elif request.method == 'POST':
-        form = PersonalDetailsForm()
+        birthdate_dict = {}
+        name_dict = {}
+        address_dict = {}
+
+        form = PersonalDetailsForm(request.POST, table_keys=[personal_detail_id, applicant_name_id, applicant_home_address_id])
         application_id_local = request.POST["id"]
+        personal_detail_id = (ApplicantPersonalDetails.objects.get(application_id=application_id_local)).personal_detail_id
+        applicant_name_id = (ApplicantName.objects.get(personal_detail_id=personal_detail_id)).name_id
+        applicant_home_address_id = (ApplicantHomeAddress.objects.get(personal_detail_id=personal_detail_id,
+                                                                      current_address=True)).home_address_id
+
+        for field in request.POST:
+            if field in PERSONAL_DETAIL_FIELDS:
+                birthdate_dict[field] = request.POST[field]
+            if field in NAME_FIELDS:
+                name_dict[field] = request.POST[field]
+            if field in HOME_ADDRESS_FIELDS:
+                address_dict[field] = request.POST[field]
+
+        request_to_comment(personal_detail_id)
+
+        #comment_list = request_to_comment(login_id, TABLE_NAME, request.POST)
+        #save_successful = save_comments(comment_list)
+
         status = Arc.objects.get(pk=application_id_local)
         status.personal_details_review = 'COMPLETED'
         status.save()
