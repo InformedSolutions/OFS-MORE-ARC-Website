@@ -14,7 +14,7 @@ from .forms import AdultInYourHomeForm, CheckBox, CommentsForm, DBSCheckForm, Fi
     OtherPeopleInYourHomeForm
 from .models import AdultInHome, ApplicantHomeAddress, ApplicantName, ApplicantPersonalDetails, Application, Arc, \
     ChildInHome, ChildcareType, CriminalRecordCheck, FirstAidTraining, HealthDeclarationBooklet, Reference, \
-    UserDetails
+    UserDetails, ArcComments
 
 
 @login_required()
@@ -94,6 +94,16 @@ def contact_summary(request):
         login_id = application.login_id
         comment_list = request_to_comment(login_id, TABLE_NAME, request.POST)
         print(comment_list)
+        for single_comment in comment_list:
+            defaults = {"table_pk": single_comment[0], "table_name": single_comment[1],
+                        "field_name": single_comment[2], "comment":single_comment[3],
+                        "flagged": single_comment[4]
+                        }
+            comment_record, created = ArcComments.objects.update_or_create(table_pk=single_comment[0],
+                                                                  field_name=single_comment[2],
+                                                                  defaults=defaults)
+
+            print(created)
 
         status = Arc.objects.get(pk=application_id_local)
         status.login_details_review = 'COMPLETED'

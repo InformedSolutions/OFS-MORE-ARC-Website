@@ -13,7 +13,7 @@ TASK_STATUS = (
 
 class ArcComments(models.Model):
     review_id = models.UUIDField(primary_key=True, default=uuid4, unique=True),
-    table_pk = models.UUIDField(unique=True, blank=True)
+    table_pk = models.UUIDField(blank=True)
     table_name = models.CharField(max_length=30, blank=True)
     field_name = models.CharField(max_length=30, blank=True)
     comment = models.CharField(max_length=100, blank=True)
@@ -25,7 +25,7 @@ class ArcComments(models.Model):
 
 class Arc(models.Model):
     application_id = models.UUIDField(primary_key=True, default=uuid4)
-    user_id = models.CharField(max_length=50)
+    user_id = models.CharField(max_length=50, blank=True)
     last_accessed = models.CharField(max_length=50)
     app_type = models.CharField(max_length=50)
     comments = models.CharField(blank=True, max_length=400)
@@ -38,7 +38,6 @@ class Arc(models.Model):
     health_review = models.CharField(choices=TASK_STATUS, max_length=50)
     references_review = models.CharField(choices=TASK_STATUS, max_length=50)
     people_in_home_review = models.CharField(choices=TASK_STATUS, max_length=50)
-    declaration_review = models.CharField(choices=TASK_STATUS, max_length=50)
 
     class Meta:
         db_table = 'ARC'
