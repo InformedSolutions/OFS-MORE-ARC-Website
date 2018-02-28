@@ -7,14 +7,14 @@ from django.contrib.auth.models import Group
 from django.forms import formset_factory
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
+from .review_util import request_to_comment
 
-from .forms import AdultInYourHomeForm, CheckBox, ChildInYourHomeForm, CommentsForm, DBSCheckForm, FirstAidTrainingForm, \
-    HealthForm, LogInDetailsForm, OtherPeopleInYourHomeForm, PersonalDetailsForm, ReferencesForm, ReferencesForm2
+from .forms import AdultInYourHomeForm, CheckBox, CommentsForm, DBSCheckForm, FirstAidTrainingForm, HealthForm, \
+    LogInDetailsForm, PersonalDetailsForm, ReferencesForm, ReferencesForm2, AdultInYourHomeForm, ChildInYourHomeForm, \
+    OtherPeopleInYourHomeForm
 from .models import AdultInHome, ApplicantHomeAddress, ApplicantName, ApplicantPersonalDetails, Application, Arc, \
     ChildInHome, ChildcareType, CriminalRecordCheck, FirstAidTraining, HealthDeclarationBooklet, Reference, \
-    UserDetails
-from .review_util import request_to_comment
-from .views import release_application
+    UserDetails, ArcComments
 
 
 @login_required()
@@ -93,6 +93,16 @@ def contact_summary(request):
         login_id = application.login_id
         comment_list = request_to_comment(login_id, TABLE_NAME, request.POST)
         print(comment_list)
+        for single_comment in comment_list:
+            defaults = {"table_pk": single_comment[0], "table_name": single_comment[1],
+                        "field_name": single_comment[2], "comment":single_comment[3],
+                        "flagged": single_comment[4]
+                        }
+            comment_record, created = ArcComments.objects.update_or_create(table_pk=single_comment[0],
+                                                                  field_name=single_comment[2],
+                                                                  defaults=defaults)
+
+            print(created)
 
         status = Arc.objects.get(pk=application_id_local)
         status.login_details_review = 'COMPLETED'
@@ -713,6 +723,22 @@ def review(request):
 
     return render(request, 'review-confirmation.html', variables)
 
+def release_application(app_id):
+    """
+    Release application and status
+    :param request: an application id
+    :return: either True or False, depending on whether an application was found
+    """
+    if Arc.objects.filter(application_id=app_id).count() > 0:
+        app = Arc.objects.get(application_id=app_id)
+        app.delete()
+        if Arc.objects.filter(application_id=app_id).count() > 0:
+            status = Arc.objects.get(application_id=app_id)
+            status.delete()
+        return True
+    else:
+        return False
+
 
 def has_group(user, group_name):
     """
@@ -721,6 +747,9 @@ def has_group(user, group_name):
     """
     group = Group.objects.get(name=group_name)
     return True if group in user.groups.all() else False
+
+
+
 
 
 def all_complete(id, flag):
