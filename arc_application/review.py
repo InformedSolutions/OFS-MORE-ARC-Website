@@ -7,6 +7,7 @@ from django.contrib.auth.models import Group
 from django.forms import formset_factory
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
+from .review_util import request_to_comment
 
 from .forms import AdultInYourHomeForm, CheckBox, CommentsForm, DBSCheckForm, FirstAidTrainingForm, HealthForm, \
     LogInDetailsForm, PersonalDetailsForm, ReferencesForm, ReferencesForm2, AdultInYourHomeForm, ChildInYourHomeForm, \
@@ -80,6 +81,8 @@ def contact_summary(request):
     :param request: a request object used to generate the HttpResponse
     :return: an HttpResponse object with the rendered Your login and contact details: summary template
     """
+    TABLE_NAME = 'USER_DETAILS'
+
     if request.method == 'GET':
         form = LogInDetailsForm()
         application_id_local = request.GET["id"]
@@ -87,6 +90,10 @@ def contact_summary(request):
         # .Populate the form with the recieved data
         form = LogInDetailsForm(request.POST)
         application_id_local = request.POST["id"]
+        application = Application.objects.get(pk=application_id_local)
+        login_id = application.login_id
+        comment_list = request_to_comment(login_id, TABLE_NAME, request.POST)
+        print(comment_list)
 
         status = Arc.objects.get(pk=application_id_local)
         status.login_details_review = 'COMPLETED'
@@ -420,7 +427,7 @@ def other_people_summary(request):
     # Defines the formset using formset factory
     AdultFormSet = formset_factory(AdultInYourHomeForm)
 
-    # Instantiates the formset with the management data defined avove, forcing a set amount of forms
+    # Instantiates the formset with the management data defined abbove, forcing a set amount of forms
     formset_adult = AdultFormSet(data)
 
     # Zips the formset into the list of adults

@@ -12,12 +12,12 @@ TASK_STATUS = (
 
 
 class ArcComments(models.Model):
-    review_id = models.UUIDField(primary_key=True, default=uuid4)
-    table_pk = models.UUIDField(unique=True, blank=True)
+    review_id = models.UUIDField(primary_key=True, default=uuid4),
+    table_pk = models.UUIDField(default=uuid4),
     table_name = models.CharField(max_length=30, blank=True)
     field_name = models.CharField(max_length=30, blank=True)
     comment = models.CharField(max_length=100, blank=True)
-    flagged = models.BooleanField()
+    flagged = models.BooleanField
 
     class Meta:
         db_table = 'ARC_COMMENTS'
