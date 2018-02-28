@@ -8,7 +8,7 @@ from django.forms import formset_factory
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from .review_util import request_to_comment
-
+from .views import release_application
 from .forms import AdultInYourHomeForm, CheckBox, CommentsForm, DBSCheckForm, FirstAidTrainingForm, HealthForm, \
     LogInDetailsForm, PersonalDetailsForm, ReferencesForm, ReferencesForm2, AdultInYourHomeForm, ChildInYourHomeForm, \
     OtherPeopleInYourHomeForm
@@ -702,8 +702,9 @@ def review(request):
         email = user_details.email
     if all_complete(application_id_local, True):
         accepted_email(email)
-        release_application(application_id_local)
+        release_application(request, application_id_local, 'SUBMITTED')
     else:
+        release_application(request, application_id_local, 'REJECTED')
         returned_email(email)
 
     variables = {
@@ -712,21 +713,6 @@ def review(request):
 
     return render(request, 'review-confirmation.html', variables)
 
-def release_application(app_id):
-    """
-    Release application and status
-    :param request: an application id
-    :return: either True or False, depending on whether an application was found
-    """
-    if Arc.objects.filter(application_id=app_id).count() > 0:
-        app = Arc.objects.get(application_id=app_id)
-        app.delete()
-        if Arc.objects.filter(application_id=app_id).count() > 0:
-            status = Arc.objects.get(application_id=app_id)
-            status.delete()
-        return True
-    else:
-        return False
 
 
 def has_group(user, group_name):

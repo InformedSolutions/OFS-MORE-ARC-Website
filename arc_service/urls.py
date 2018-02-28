@@ -9,7 +9,7 @@ import re
 from arc_application.review import contact_summary, task_list, type_of_childcare_age_groups, personal_details_summary, \
     first_aid_training_summary, dbs_check_summary, references_summary, other_people_summary, health_check_answers, \
     review, comments, arc_summary
-from arc_application.views import assign_new_application, custom_login, delete_all, release_application, summary_page
+from arc_application.views import assign_new_application, custom_login, delete_all, release, summary_page
 from django.conf import settings
 from django.conf.urls import url, include
 from django.contrib import admin
@@ -17,7 +17,7 @@ from django.contrib.auth.views import logout
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'^release/(?P<application_id>[\w\- ]+)', release_application),
+    url(r'^release/(?P<application_id>[\w\- ]+)', release),
     url(r'^accounts/profile/', assign_new_application),
     url(r'^login/', custom_login),
     url(r'^logout/', logout, {'next_page': settings.URL_PREFIX + '/login/'}),
