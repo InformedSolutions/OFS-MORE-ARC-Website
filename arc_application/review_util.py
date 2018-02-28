@@ -17,7 +17,10 @@ def request_to_comment(table_key, table_name, user_request):
         # Finds all checkboxes sent in the request
         if param[-7:] == 'declare':
             # Grabs the existing comment if it exists, returns None otherwise
-            existing_comment = ArcComments.objects.get(table_pk=table_key, field_name=param[:-7])
+            try:
+                existing_comment = ArcComments.objects.get(table_pk=table_key, field_name=param[:-7])
+            except ArcComments.DoesNotExist:
+                existing_comment = None
             # Checkboxes set to on when they are ticked, param will always be the name of a field
             if user_request[param] == 'on':
                 field_name = param[:-7]
