@@ -6,17 +6,21 @@ OFS-MORE-CCN3: Apply to be a Childminder Beta
 """
 
 import uuid
-
 from django import forms
+from django.conf import settings
+from django.contrib.auth.forms import UserModel
 from govuk_forms.forms import GOVUKForm
 
 from . import custom_field_widgets
+
 from .models import Arc as ArcReview
+from .models import ArcComments
+from .views import has_group, authenticate, capfirst
+from .review_util import populate_initial_values
 
 
 class CheckBox(GOVUKForm):
     pass
-
 
 class LogInDetailsForm(GOVUKForm):
     """
@@ -56,6 +60,11 @@ class LogInDetailsForm(GOVUKForm):
                                     'aria-controls': box[1],
                                     'aria-expanded': 'false'}, )
 
+    def __init__(self, *args, **kwargs):
+
+        self.table_key = kwargs.pop('table_key')
+        super(LogInDetailsForm, self).__init__(*args, **kwargs)
+        populate_initial_values(self)
 
 class PersonalDetailsForm(GOVUKForm):
     """
@@ -87,7 +96,7 @@ class PersonalDetailsForm(GOVUKForm):
     for box in checkboxes:
         box[0].widget.attrs.update({'data_target': box[1],
                                     'aria-controls': box[1],
-                                    'aria-expanded': 'false'}, )
+                                    'aria-expanded': 'false'},)
 
 
 class FirstAidTrainingForm(GOVUKForm):
@@ -116,7 +125,7 @@ class FirstAidTrainingForm(GOVUKForm):
     for box in checkboxes:
         box[0].widget.attrs.update({'data_target': box[1],
                                     'aria-controls': box[1],
-                                    'aria-expanded': 'false'}, )
+                                    'aria-expanded': 'false'},)
 
 
 class DBSCheckForm(GOVUKForm):
@@ -143,7 +152,7 @@ class DBSCheckForm(GOVUKForm):
     for box in checkboxes:
         box[0].widget.attrs.update({'data_target': box[1],
                                     'aria-controls': box[1],
-                                    'aria-expanded': 'false'}, )
+                                    'aria-expanded': 'false'},)
 
 
 class HealthForm(GOVUKForm):
@@ -162,7 +171,7 @@ class HealthForm(GOVUKForm):
     for box in checkboxes:
         box[0].widget.attrs.update({'data_target': box[1],
                                     'aria-controls': box[1],
-                                    'aria-expanded': 'false'}, )
+                                    'aria-expanded': 'false'},)
 
 
 class ReferencesForm(GOVUKForm):
@@ -203,7 +212,7 @@ class ReferencesForm(GOVUKForm):
     for box in checkboxes:
         box[0].widget.attrs.update({'data_target': box[1],
                                     'aria-controls': box[1],
-                                    'aria-expanded': 'false'}, )
+                                    'aria-expanded': 'false'},)
 
 
 class ReferencesForm2(GOVUKForm):
@@ -342,7 +351,7 @@ class ChildInYourHomeForm(GOVUKForm):
         super(ChildInYourHomeForm, self).__init__(*args, **kwargs)
         id_value = str(uuid.uuid4())
         self.fields['instance_id'].initial = id_value
-        print(self.fields['instance_id'].initial)
+
         checkboxes = [((self.fields['full_name_declare']), 'full_name' + id_value),
                       ((self.fields['date_of_birth_declare']), 'date_of_birth' + id_value),
                       ((self.fields['relationship_declare']), 'relationship' + id_value)]
