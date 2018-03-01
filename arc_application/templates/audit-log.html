@@ -1,0 +1,50 @@
+{% extends 'govuk_template.html' %}
+{% block page_title %}Audit Log{% endblock %}
+{% load static %}
+{% load govuk_template_base %}
+
+{% block inner_content %}
+<main>
+    <a href="{{ URL_PREFIX }}/review?id={{application_id}}" class="link-back"
+       style="margin-right: 10px; line-height: 28px" alt='Back to application list'>
+        Back
+    </a>
+    <header><h1 class="form-title heading-large">Audit Log</h1></header>
+    <table>
+        <thead>
+        <tr>
+            <td>
+                Date
+            </td>
+            <td>
+                User
+            </td>
+            <td>
+                Action
+            </td>
+        </tr>
+        </thead>
+        <tbody>
+        {% for app in app %}
+        <tr>
+            <td class="col-xs-1">
+                <b>
+                    {{ app.date|date:'d-m-Y H:i:s' }}
+                </b>
+            </td>
+            <td class="col-xs-1">{{ app.user }}</td>
+            <td style="col-xs-1">
+                <code> {{ app.action }} </code>
+            </td>
+        </tr>
+        {% endfor %}
+
+        </tbody>
+    </table>
+    <br>
+    <!-- Return to task list -->
+    <div class="form-group grid-row">
+        <a href="{{ URL_PREFIX }}/review?id={{application_id}}">Return to list</a>
+    </div>
+</main>
+{% endblock %}

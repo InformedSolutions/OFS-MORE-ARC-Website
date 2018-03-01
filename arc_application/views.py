@@ -97,6 +97,11 @@ def assign_new_application(request):
     if local_application_id is None:
         return False
 
+    # TRIGGER
+    # This is where all applications are assigned to the arc users
+    # This is BDD scenario 2
+    # According to the mockup it should say 'Assigned to USERNAME'
+
     if Application.objects.filter(pk=local_application_id).count() > 0:
         application = Application.objects.get(application_id=local_application_id)
         # Update app status to Arc review when assigned to an arc user
@@ -227,6 +232,11 @@ def release(request, application_id):
     return release_application(request, application_id, 'SUBMITTED')
 
 
+# TRIGGER
+# This is where all applications are released (3 different messages)
+# 1. If status == 'COMPLETE' it has been released by Arc User (not mentioned in BDD)
+# 2. If status == 'FURTHER_INFORMATION' it needs to be returned to the applicant (BDD #3)
+# 3. If status == 'ACCEPTED' it has been submitted to Cygnum (BDD #8)
 def release_application(request, application_id, status):
     """
     Release application- essentiall remove the user_id field so that it's not assigned to anyone but the review status
@@ -236,6 +246,7 @@ def release_application(request, application_id, status):
     :param status: what status to update the application with on release
     :return: Either redirect on success, or return error page (TBC)
     """
+
     if len(Application.objects.filter(application_id=application_id)) == 1:
         app = Application.objects.get(application_id=application_id)
         app.application_status = status
@@ -248,6 +259,21 @@ def release_application(request, application_id, status):
     else:
         # Swap this with legitimate error page
         return JsonResponse({"message": "fail"})
+
+
+def audit_log(request):
+    user_id = request.user.id
+    if request.method == 'GET':
+        application_id_local = request.GET["id"]
+
+        # Change this to Audit Log table (field name in templates are date, user and action)
+        app = Application.objects.all().order_by('-application_id')
+        variables = {
+            "application_id": application_id_local,
+            "app": app,
+        }
+
+        return render(request, './audit-log.html', variables)
 
 
 ######################################################################################################
