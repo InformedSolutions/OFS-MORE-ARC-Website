@@ -224,7 +224,7 @@ def release(request, application_id):
     :param application_id: Childminder app id (PK)
     :return: release_application request
     """
-    return release_application(request, application_id, 'COMPLETE')
+    return release_application(request, application_id, 'SUBMITTED')
 
 
 def release_application(request, application_id, status):
