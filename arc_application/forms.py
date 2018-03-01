@@ -6,18 +6,17 @@ OFS-MORE-CCN3: Apply to be a Childminder Beta
 """
 
 import uuid
+
 from django import forms
-from django.conf import settings
-from django.contrib.auth.forms import UserModel
 from govuk_forms.forms import GOVUKForm
 
 from . import custom_field_widgets
-
 from .models import Arc as ArcReview
-from .views import has_group, authenticate, capfirst
+
 
 class CheckBox(GOVUKForm):
     pass
+
 
 class LogInDetailsForm(GOVUKForm):
     """
@@ -55,7 +54,7 @@ class LogInDetailsForm(GOVUKForm):
     for box in checkboxes:
         box[0].widget.attrs.update({'data_target': box[1],
                                     'aria-controls': box[1],
-                                    'aria-expanded': 'false'},)
+                                    'aria-expanded': 'false'}, )
 
 
 class PersonalDetailsForm(GOVUKForm):
@@ -88,7 +87,7 @@ class PersonalDetailsForm(GOVUKForm):
     for box in checkboxes:
         box[0].widget.attrs.update({'data_target': box[1],
                                     'aria-controls': box[1],
-                                    'aria-expanded': 'false'},)
+                                    'aria-expanded': 'false'}, )
 
 
 class FirstAidTrainingForm(GOVUKForm):
@@ -117,7 +116,7 @@ class FirstAidTrainingForm(GOVUKForm):
     for box in checkboxes:
         box[0].widget.attrs.update({'data_target': box[1],
                                     'aria-controls': box[1],
-                                    'aria-expanded': 'false'},)
+                                    'aria-expanded': 'false'}, )
 
 
 class DBSCheckForm(GOVUKForm):
@@ -144,7 +143,7 @@ class DBSCheckForm(GOVUKForm):
     for box in checkboxes:
         box[0].widget.attrs.update({'data_target': box[1],
                                     'aria-controls': box[1],
-                                    'aria-expanded': 'false'},)
+                                    'aria-expanded': 'false'}, )
 
 
 class HealthForm(GOVUKForm):
@@ -163,7 +162,7 @@ class HealthForm(GOVUKForm):
     for box in checkboxes:
         box[0].widget.attrs.update({'data_target': box[1],
                                     'aria-controls': box[1],
-                                    'aria-expanded': 'false'},)
+                                    'aria-expanded': 'false'}, )
 
 
 class ReferencesForm(GOVUKForm):
@@ -204,7 +203,7 @@ class ReferencesForm(GOVUKForm):
     for box in checkboxes:
         box[0].widget.attrs.update({'data_target': box[1],
                                     'aria-controls': box[1],
-                                    'aria-expanded': 'false'},)
+                                    'aria-expanded': 'false'}, )
 
 
 class ReferencesForm2(GOVUKForm):
@@ -307,7 +306,7 @@ class AdultInYourHomeForm(GOVUKForm):
         # Create unique id value and populate the instance_id field with it
         id_value = str(uuid.uuid4())
         self.fields['instance_id'].initial = id_value
-        #print(self.fields['instance_id'].initial)
+        # print(self.fields['instance_id'].initial)
         # Make all checkbox names refer the the name with the correct instance id, making each conditional reveal unique
         checkboxes = [((self.fields['full_name_declare']), 'full_name' + id_value),
                       ((self.fields['date_of_birth_declare']), 'date_of_birth' + id_value),
@@ -316,9 +315,9 @@ class AdultInYourHomeForm(GOVUKForm):
                       ((self.fields['permission_for_checks_declare']), 'permission_for_checks' + id_value)]
 
         for box in checkboxes:
-                        box[0].widget.attrs.update({'data_target': box[1],
-                        'aria-controls': box[1],
-                        'aria-expanded': 'false'},)
+            box[0].widget.attrs.update({'data_target': box[1],
+                                        'aria-controls': box[1],
+                                        'aria-expanded': 'false'}, )
 
 
 class ChildInYourHomeForm(GOVUKForm):
@@ -349,10 +348,9 @@ class ChildInYourHomeForm(GOVUKForm):
                       ((self.fields['relationship_declare']), 'relationship' + id_value)]
 
         for box in checkboxes:
-                      box[0].widget.attrs.update({'data_target': box[1],
-                      'aria-controls': box[1],
-                      'aria-expanded': 'false'},)
-
+            box[0].widget.attrs.update({'data_target': box[1],
+                                        'aria-controls': box[1],
+                                        'aria-expanded': 'false'}, )
 
 
 class CommentsForm(GOVUKForm):

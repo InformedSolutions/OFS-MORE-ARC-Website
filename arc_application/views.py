@@ -99,29 +99,33 @@ def assign_new_application(request):
 
     if Application.objects.filter(pk=local_application_id).count() > 0:
         application = Application.objects.get(application_id=local_application_id)
+        # Update app status to Arc review when assigned to an arc user
+        application.application_status = 'ARC_REVIEW'
+        application.save()
+        if Arc.objects.filter(pk=local_application_id).count() == 0:
+            arc_user = Arc.objects.create(application_id=local_application_id)
+            arc_user.login_details_review = "NOT_STARTED"
+            arc_user.childcare_type_review = "NOT_STARTED"
+            arc_user.personal_details_review = "NOT_STARTED"
+            arc_user.first_aid_review = "NOT_STARTED"
+            arc_user.dbs_review = "NOT_STARTED"
+            arc_user.health_review = "NOT_STARTED"
+            arc_user.references_review = "NOT_STARTED"
+            arc_user.people_in_home_review = "NOT_STARTED"
+            arc_user.declaration_review = "NOT_STARTED"
+            arc_user.app_type = 'Childminder'
+            arc_user.last_accessed = str(application.date_updated.strftime('%d/%m/%Y'))
+            arc_user.user_id = request.user.id
+            arc_user.save()
+        elif Arc.objects.filter(pk=local_application_id).count() > 0:
+            # If an Arc review has already started (but the application was released or resubmitted) then add user_id,
+            # and update last_accessed
+            arc_user = Arc.objects.get(pk=local_application_id)
+            arc_user.last_accessed = str(application.date_updated.strftime('%d/%m/%Y'))
+            arc_user.user_id = request.user.id
+            arc_user.save()
 
-        arc_user = Arc.objects.create(application_id=local_application_id)
-        arc_user.last_accessed = str(application.date_updated.strftime('%d/%m/%Y'))
-        arc_user.user_id = request.user.id
-        arc_user.app_type = 'Childminder'
-        arc_user.save()
-        try:
-            status = Arc.objects.get(application_id=local_application_id)
-        except Exception as ex:
-            print(ex)
-            status = Arc.objects.create(application_id=local_application_id)
-        status.login_details_review = "NOT_STARTED"
-        status.childcare_type_review = "NOT_STARTED"
-        status.personal_details_review = "NOT_STARTED"
-        status.first_aid_review = "NOT_STARTED"
-        status.dbs_review = "NOT_STARTED"
-        status.health_review = "NOT_STARTED"
-        status.references_review = "NOT_STARTED"
-        status.people_in_home_review = "NOT_STARTED"
-        status.declaration_review = "NOT_STARTED"
-        status.save()
-
-    return JsonResponse({'message': arc_user.application_id})
+        return JsonResponse({'message': arc_user.application_id})
 
 
 @login_required()
@@ -158,9 +162,8 @@ def get_oldest_application_id():
     """
     application_list = Application.objects.exclude(date_submitted=None)
     for application in application_list:
-        # If application is submitted and not already assigned to another ARC user
-        if application.date_submitted is not None and len(Arc.objects.filter(
-                pk=application.application_id)) == 0 and application.application_status == 'COMPLETE':
+        # Only return applications that have been submitted successfully by childminder (or released by arc)
+        if application.application_status == 'SUBMITTED':
             return application.application_id
 
 
@@ -214,13 +217,60 @@ def has_group(user, group_name):
     return True if group in user.groups.all() else False
 
 
-def release_application(request, application_id):
+def release(request, application_id):
+    """
+    This is purely to handle the /release url on the arc summary page
+    :param request: HTTP Request
+    :param application_id: Childminder app id (PK)
+    :return: release_application request
+    """
+    return release_application(request, application_id, 'COMPLETE')
+
+
+def release_application(request, application_id, status):
+    """
+    Release application- essentiall remove the user_id field so that it's not assigned to anyone but the review status
+    should remain
+    :param request: HTTP Request
+    :param application_id: Childminder app id (PK)
+    :param status: what status to update the application with on release
+    :return: Either redirect on success, or return error page (TBC)
+    """
+    if len(Application.objects.filter(application_id=application_id)) == 1:
+        app = Application.objects.get(application_id=application_id)
+        app.application_status = status
+        app.save()
     if len(Arc.objects.filter(application_id=application_id)) == 1:
-        row = Arc.objects.get(application_id=application_id)
-        row.delete()
+        arc = Arc.objects.get(pk=application_id)
+        arc.user_id = ''
+        arc.save()
         return HttpResponseRedirect('/arc/summary')
     else:
+        # Swap this with legitimate error page
         return JsonResponse({"message": "fail"})
+
+
+######################################################################################################
+# Error Pages copied from Childminder
+
+def error_404(request):
+    """
+    Method returning the 404 error template
+    :param request: a request object used to generate the HttpResponse
+    :return: an HttpResponse object with the rendered 404 error template
+    """
+    data = {}
+    return render(request, '404.html', data)
+
+
+def error_500(request):
+    """
+    Method returning the 500 error template
+    :param request: a request object used to generate the HttpResponse
+    :return: an HttpResponse object with the rendered 500 error template
+    """
+    data = {}
+    return render(request, '500.html', data)
 
 
 ######################################################################################################
