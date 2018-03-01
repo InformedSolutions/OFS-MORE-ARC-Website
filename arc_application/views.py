@@ -162,11 +162,9 @@ def get_oldest_application_id():
     """
     application_list = Application.objects.exclude(date_submitted=None)
     for application in application_list:
-        # If application is submitted and not already assigned to another ARC user
-        if application.date_submitted is not None:
-            # Only return applications that have been submitted successfully by childminder (or released by arc)
-            if application.application_status == 'COMPLETE':
-                return application.application_id
+        # Only return applications that have been submitted successfully by childminder (or released by arc)
+        if application.application_status == 'SUBMITTED':
+            return application.application_id
 
 
 def custom_login(request):

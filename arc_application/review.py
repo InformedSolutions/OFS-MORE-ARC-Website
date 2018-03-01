@@ -701,8 +701,8 @@ def review(request):
         email = user_details.email
     if all_complete(application_id_local, True):
         accepted_email(email)
-        # On successful
-        release_application(request, application_id_local, 'SUBMITTED')
+        # If successful
+        release_application(request, application_id_local, 'ACCEPTED')
     else:
         release_application(request, application_id_local, 'FURTHER_INFORMATION')
         returned_email(email)
