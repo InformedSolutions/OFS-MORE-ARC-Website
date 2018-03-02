@@ -12,6 +12,13 @@ RUN mkdir /source
 RUN mkdir /source/logs
 WORKDIR /source
 ADD . /source/
+
+# If dev env install additional packages
+RUN  if [ "`echo $PROJECT_SETTINGS | rev | cut -c -3 | rev`" = "dev" ]; then \
+       apt-get update; \
+       apt-get install -y build-essential graphviz; \
+     fi
+
 RUN pip install -r requirements.txt
 RUN chmod +x /source/docker-entrypoint.sh
 EXPOSE 8000
