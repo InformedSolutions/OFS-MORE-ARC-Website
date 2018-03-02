@@ -29,7 +29,7 @@ def request_to_comment(table_key, table_name, user_request):
                 flagged = False
                 try:
                     existing_comment = ArcComments.objects.get(table_pk=table_key, field_name=param[:-8])
-                    comment_list.append([table_key, table_name, field_name, existing_comment.comment, flagged])
+                    existing_comment.delete()
                 except ArcComments.DoesNotExist:
                     pass
     return comment_list
