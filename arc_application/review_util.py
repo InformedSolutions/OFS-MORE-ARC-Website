@@ -12,32 +12,56 @@ def request_to_comment(table_key, table_name, user_request):
     :return: Returns a list of what comment should be added for each field, blank signifies to do nothing
     """
     comment_list = []
-
     for param in user_request:
         # Finds all checkboxes sent in the request
-        if param[-7:] == 'declare':
+        if 'declare' in param:
             # Grabs the existing comment if it exists, returns None otherwise
-            try:
-                existing_comment = ArcComments.objects.get(table_pk=table_key, field_name=param[:-7])
-            except ArcComments.DoesNotExist:
-                existing_comment = None
             # Checkboxes set to on when they are ticked, param will always be the name of a field
-            if user_request[param] == 'on':
-                field_name = param[:-7]
-                comment = user_request.POST[param.replace("declare", "comments")]
+
+            if user_request[param] == True:
+                field_name = param[:-8]
+                comment = user_request[param.replace("declare", "comments")]
                 flagged = True
+                comment_list.append([table_key, table_name, field_name, comment, flagged])
 
-            # For the case where a result has been previously flagged but now unflagged
-            elif user_request[param] != 'on' and existing_comment:
-                field_name = existing_comment.field_name
-                comment = existing_comment.comment
+            if user_request[param] == False:
+                field_name = param[:-8]
                 flagged = False
-
-            else:
-                field_name = param[:-7]
-                comment = None
-                flagged = False
-
-            comment_list.append([table_key, table_name, field_name, comment, flagged])
-
+                try:
+                    existing_comment = ArcComments.objects.get(table_pk=table_key, field_name=param[:-8])
+                    comment_list.append([table_key, table_name, field_name, existing_comment.comment, flagged])
+                except ArcComments.DoesNotExist:
+                    pass
     return comment_list
+
+
+def populate_initial_values(self):
+    for field_string in self.fields:
+        if field_string[-7:] == 'declare':
+            try:
+                comment_object = ArcComments.objects.get(table_pk__in=self.table_keys, field_name=field_string[:-8])
+                self.fields[field_string].initial = comment_object.flagged
+
+            except ArcComments.DoesNotExist:
+                pass
+        elif field_string[-8:] == 'comments':
+            try:
+                comment_object = ArcComments.objects.get(table_pk__in=self.table_keys, field_name=field_string[:-9])
+                self.fields[field_string].initial = comment_object.comment
+            except ArcComments.DoesNotExist:
+                pass
+
+
+def save_comments(comment_list):
+    try:
+        for single_comment in comment_list:
+            defaults = {"table_pk": single_comment[0], "table_name": single_comment[1],
+                        "field_name": single_comment[2], "comment": single_comment[3],
+                        "flagged": single_comment[4]
+                        }
+            comment_record, created = ArcComments.objects.update_or_create(table_pk=single_comment[0],
+                                                                           field_name=single_comment[2],
+                                                                           defaults=defaults)
+        return True
+    except:
+        return False
