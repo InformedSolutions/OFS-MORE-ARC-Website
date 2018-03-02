@@ -18,7 +18,8 @@
     </div>
     <form method="post" novalidate>
             {% csrf_token %}
-
+            {{ formset_adult.management_form }}
+            {{ formset_child.management_form }}
     <table class="check-your-answers form-group grid-row" style="table-layout: fixed; width: 100%">
         <thead>
         <tr>
