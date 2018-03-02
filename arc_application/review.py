@@ -223,7 +223,7 @@ def personal_details_summary(request):
                 status.save()
                 return HttpResponseRedirect(settings.URL_PREFIX + '/first-aid/summary?id=' + application_id_local)
             else:
-                return ChildProcessError
+                return render(request, '500.html')
 
     application_id_local = request.GET["id"]
     personal_detail_id = ApplicantPersonalDetails.objects.get(application_id=application_id_local)
@@ -304,7 +304,7 @@ def first_aid_training_summary(request):
                 status.save()
                 return HttpResponseRedirect(settings.URL_PREFIX + '/dbs-check/summary?id=' + application_id_local)
             else:
-                return ChildProcessError
+                return render(request, '500.html')
 
     training_organisation = FirstAidTraining.objects.get(application_id=application_id_local).training_organisation
     training_course = FirstAidTraining.objects.get(application_id=application_id_local).course_title
@@ -354,7 +354,7 @@ def dbs_check_summary(request):
                 status.save()
                 return HttpResponseRedirect(settings.URL_PREFIX + '/health/check-answers?id=' + application_id_local)
             else:
-                return ChildProcessError
+                return render(request, '500.html')
 
     criminal_record_check = CriminalRecordCheck.objects.get(application_id=application_id_local)
     dbs_certificate_number = criminal_record_check.dbs_certificate_number
@@ -421,7 +421,7 @@ def references_summary(request):
                 status.save()
                 return HttpResponseRedirect(settings.URL_PREFIX + '/other-people/summary?id=' + application_id_local)
             else:
-                return ChildProcessError
+                return render(request, '500.html')
 
     first_reference_record = Reference.objects.get(application_id=application_id_local, reference=1)
     second_reference_record = Reference.objects.get(application_id=application_id_local, reference=2)
@@ -538,12 +538,12 @@ def other_people_summary(request):
                     person_comments = request_to_comment(person_id, TABLE_NAMES[object_index], person)
                     successful = save_comments(person_comments)
                     if not successful:
-                        return ChildProcessError
+                        return render(request, '500.html')
 
             static_form_comments = request_to_comment(application_id_local, 'APPLICATION', form.cleaned_data)
             successful = save_comments(static_form_comments)
             if not successful:
-                raise ChildProcessError
+                return render(request, '500.html')
 
             status = Arc.objects.get(pk=application_id_local)
             status.people_in_home_review = 'COMPLETED'
@@ -611,7 +611,7 @@ def other_people_summary(request):
         child_birth_month_list.append(child.birth_month)
         child_birth_year_list.append(child.birth_year)
         child_relationship_list.append(child.relationship)
-    amount_of_children = str(len(child_name_list))
+
     initial_child_data = other_people_initial_population(False, children_list)
 
     formset_child = ChildFormSet(initial=initial_child_data, prefix='child')
@@ -665,7 +665,7 @@ def health_check_answers(request):
                 status.save()
                 return HttpResponseRedirect(settings.URL_PREFIX + '/references/summary?id=' + application_id_local)
             else:
-                return(ChildProcessError)
+                return render(request, '500.html')
 
     send_hdb_declare = HealthDeclarationBooklet.objects.get(application_id=application_id_local).send_hdb_declare
     application = Application.objects.get(pk=application_id_local)

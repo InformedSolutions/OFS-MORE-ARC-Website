@@ -28,8 +28,8 @@ def request_to_comment(table_key, table_name, user_request):
                 field_name = param[:-8]
                 flagged = False
                 try:
-                    existing_comment = ArcComments.objects.get(table_pk=table_key, field_name=param[:-9])
-                    comment_list.append([table_key, table_name, field_name, existing_comment, flagged])
+                    existing_comment = ArcComments.objects.get(table_pk=table_key, field_name=param[:-8])
+                    comment_list.append([table_key, table_name, field_name, existing_comment.comment, flagged])
                 except ArcComments.DoesNotExist:
                     pass
     return comment_list
