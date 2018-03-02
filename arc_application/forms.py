@@ -14,8 +14,6 @@ from govuk_forms.forms import GOVUKForm
 from . import custom_field_widgets
 
 from .models import Arc as ArcReview
-from .models import ArcComments
-from .views import has_group, authenticate, capfirst
 from .review_util import populate_initial_values
 
 
@@ -62,9 +60,10 @@ class LogInDetailsForm(GOVUKForm):
 
     def __init__(self, *args, **kwargs):
 
-        self.table_key = kwargs.pop('table_key')
+        self.table_keys = kwargs.pop('table_keys')
         super(LogInDetailsForm, self).__init__(*args, **kwargs)
         populate_initial_values(self)
+
 
 class PersonalDetailsForm(GOVUKForm):
     """
@@ -98,6 +97,12 @@ class PersonalDetailsForm(GOVUKForm):
                                     'aria-controls': box[1],
                                     'aria-expanded': 'false'},)
 
+    def __init__(self, *args, **kwargs):
+
+        self.table_keys = kwargs.pop('table_keys')
+        super(PersonalDetailsForm, self).__init__(*args, **kwargs)
+        populate_initial_values(self)
+
 
 class FirstAidTrainingForm(GOVUKForm):
     """
@@ -127,6 +132,12 @@ class FirstAidTrainingForm(GOVUKForm):
                                     'aria-controls': box[1],
                                     'aria-expanded': 'false'},)
 
+    def __init__(self, *args, **kwargs):
+
+        self.table_keys = kwargs.pop('table_keys')
+        super(FirstAidTrainingForm, self).__init__(*args, **kwargs)
+        populate_initial_values(self)
+
 
 class DBSCheckForm(GOVUKForm):
     """
@@ -154,6 +165,12 @@ class DBSCheckForm(GOVUKForm):
                                     'aria-controls': box[1],
                                     'aria-expanded': 'false'},)
 
+    def __init__(self, *args, **kwargs):
+
+        self.table_keys = kwargs.pop('table_keys')
+        super(DBSCheckForm, self).__init__(*args, **kwargs)
+        populate_initial_values(self)
+
 
 class HealthForm(GOVUKForm):
     """
@@ -172,6 +189,13 @@ class HealthForm(GOVUKForm):
         box[0].widget.attrs.update({'data_target': box[1],
                                     'aria-controls': box[1],
                                     'aria-expanded': 'false'},)
+
+    def __init__(self, *args, **kwargs):
+        self.table_keys = kwargs.pop('table_keys')
+        super(HealthForm, self).__init__(*args, **kwargs)
+        populate_initial_values(self)
+
+
 
 
 class ReferencesForm(GOVUKForm):
@@ -213,6 +237,11 @@ class ReferencesForm(GOVUKForm):
         box[0].widget.attrs.update({'data_target': box[1],
                                     'aria-controls': box[1],
                                     'aria-expanded': 'false'},)
+
+    def __init__(self, *args, **kwargs):
+        self.table_keys = kwargs.pop('table_keys')
+        super(ReferencesForm, self).__init__(*args, **kwargs)
+        populate_initial_values(self)
 
 
 class ReferencesForm2(GOVUKForm):
@@ -256,6 +285,12 @@ class ReferencesForm2(GOVUKForm):
         box[0].widget.attrs.update({'data_target': box[1],
                                     'aria-controls': box[1],
                                     'aria-expanded': 'false'}, )
+
+    def __init__(self, *args, **kwargs):
+        self.table_keys = kwargs.pop('table_keys')
+        super(ReferencesForm2, self).__init__(*args, **kwargs)
+        populate_initial_values(self)
+
 
 
 class OtherPeopleInYourHomeForm(GOVUKForm):
@@ -388,3 +423,4 @@ class CommentsForm(GOVUKForm):
         # RegEx for valid e-mail addresses
 
         return comments
+

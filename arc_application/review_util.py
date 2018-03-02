@@ -45,13 +45,29 @@ def populate_initial_values(self):
     for field_string in self.fields:
         if field_string[-7:] == 'declare':
             try:
-                comment_object = ArcComments.objects.get(table_pk=self.table_key, field_name=field_string[:-8])
+                comment_object = ArcComments.objects.get(table_pk__in=self.table_keys, field_name=field_string[:-8])
                 self.fields[field_string].initial = comment_object.flagged
+
             except ArcComments.DoesNotExist:
                 pass
         elif field_string[-8:] == 'comments':
             try:
-                comment_object = ArcComments.objects.get(table_pk=self.table_key, field_name=field_string[:-9])
+                comment_object = ArcComments.objects.get(table_pk__in=self.table_keys, field_name=field_string[:-9])
                 self.fields[field_string].initial = comment_object.comment
             except ArcComments.DoesNotExist:
                 pass
+
+
+def save_comments(comment_list):
+    try:
+        for single_comment in comment_list:
+            defaults = {"table_pk": single_comment[0], "table_name": single_comment[1],
+                        "field_name": single_comment[2], "comment": single_comment[3],
+                        "flagged": single_comment[4]
+                        }
+            comment_record, created = ArcComments.objects.update_or_create(table_pk=single_comment[0],
+                                                                           field_name=single_comment[2],
+                                                                           defaults=defaults)
+        return True
+    except:
+        return False

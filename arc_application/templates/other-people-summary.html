@@ -16,6 +16,9 @@
     <div class="grid-row">
         <h1 class="form-title heading-large">Check your answers: people in your home</h1>
     </div>
+    <form method="post" novalidate>
+            {% csrf_token %}
+
     <table class="check-your-answers form-group grid-row" style="table-layout: fixed; width: 100%">
         <thead>
         <tr>
@@ -416,12 +419,12 @@
     {% endfor %}
     <br>
     <div class="form-group grid-row">
-        <form method="post">
-            {% csrf_token %}
+
             <input type="submit" class="button" value="Confirm and continue"/>
             <input type="hidden" value="{{application_id}}" name="id"/>
-        </form>
+
     </div>
+        </form>
     <br>
 </div>
 
