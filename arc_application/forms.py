@@ -20,6 +20,7 @@ from .review_util import populate_initial_values
 class CheckBox(GOVUKForm):
     pass
 
+
 class LogInDetailsForm(GOVUKForm):
     """
     GOV.UK form for the Your login and contact details: email page
@@ -57,6 +58,12 @@ class LogInDetailsForm(GOVUKForm):
         box[0].widget.attrs.update({'data_target': box[1],
                                     'aria-controls': box[1],
                                     'aria-expanded': 'false'}, )
+
+    def __init__(self, *args, **kwargs):
+
+        self.table_keys = kwargs.pop('table_keys')
+        super(LogInDetailsForm, self).__init__(*args, **kwargs)
+        populate_initial_values(self)
 
     def __init__(self, *args, **kwargs):
 
