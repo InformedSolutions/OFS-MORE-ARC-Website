@@ -302,11 +302,11 @@ class OtherPeopleInYourHomeForm(GOVUKForm):
     auto_replace_widgets = True
 
     adults_in_home_declare = forms.BooleanField(label='This information is correct',
-                                                widget=custom_field_widgets.CustomCheckboxInput)
-    adults_in_home_comments = forms.CharField(label='Enter your reasoning here', widget=forms.Textarea)
+                                                widget=custom_field_widgets.CustomCheckboxInput, required=False)
+    adults_in_home_comments = forms.CharField(label='Enter your reasoning here', widget=forms.Textarea, required=False)
     children_in_home_declare = forms.BooleanField(label='This information is correct',
-                                                  widget=custom_field_widgets.CustomCheckboxInput)
-    children_in_home_comments = forms.CharField(label='Enter your reasoning here', widget=forms.Textarea)
+                                                  widget=custom_field_widgets.CustomCheckboxInput, required=False)
+    children_in_home_comments = forms.CharField(label='Enter your reasoning here', widget=forms.Textarea, required=False)
 
     checkboxes = [(adults_in_home_declare, 'adults_in_home'),
                   (children_in_home_declare, 'children_in_home')]
@@ -316,6 +316,11 @@ class OtherPeopleInYourHomeForm(GOVUKForm):
                                     'aria-controls': box[1],
                                     'aria-expanded': 'false'}, )
 
+    def __init__(self, *args, **kwargs):
+        self.table_keys = kwargs.pop('table_keys')
+        super(OtherPeopleInYourHomeForm, self).__init__(*args, **kwargs)
+        populate_initial_values(self)
+
 
 class AdultInYourHomeForm(GOVUKForm):
     """
@@ -323,28 +328,28 @@ class AdultInYourHomeForm(GOVUKForm):
     """
 
     full_name_declare = forms.BooleanField(label='This information is correct',
-                                           widget=custom_field_widgets.CustomCheckboxInput)
-    full_name_comments = forms.CharField(label='Enter your reasoning here', widget=forms.Textarea)
+                                           widget=custom_field_widgets.CustomCheckboxInput, required=False)
+    full_name_comments = forms.CharField(label='Enter your reasoning here', widget=forms.Textarea, required=False)
 
     date_of_birth_declare = forms.BooleanField(label='This information is correct',
-                                               widget=custom_field_widgets.CustomCheckboxInput)
-    date_of_birth_comments = forms.CharField(label='Enter your reasoning here', widget=forms.Textarea)
+                                               widget=custom_field_widgets.CustomCheckboxInput, required=False)
+    date_of_birth_comments = forms.CharField(label='Enter your reasoning here', widget=forms.Textarea, required=False)
 
     relationship_declare = forms.BooleanField(label='This information is correct',
-                                              widget=custom_field_widgets.CustomCheckboxInput)
-    relationship_comments = forms.CharField(label='Enter your reasoning here', widget=forms.Textarea)
+                                              widget=custom_field_widgets.CustomCheckboxInput, required=False)
+    relationship_comments = forms.CharField(label='Enter your reasoning here', widget=forms.Textarea, required=False)
 
     dbs_certificate_declare = forms.BooleanField(label='This information is correct',
-                                                 widget=custom_field_widgets.CustomCheckboxInput)
-    dbs_certificate_comments = forms.CharField(label='Enter your reasoning here', widget=forms.Textarea)
+                                                 widget=custom_field_widgets.CustomCheckboxInput, required=False)
+    dbs_certificate_comments = forms.CharField(label='Enter your reasoning here', widget=forms.Textarea, required=False)
 
     permission_for_checks_declare = forms.BooleanField(label='This information is correct',
-                                                       widget=custom_field_widgets.CustomCheckboxInput)
-    permission_for_checks_comments = forms.CharField(label='Enter your reasoning here', widget=forms.Textarea)
+                                                       widget=custom_field_widgets.CustomCheckboxInput, required=False)
+    permission_for_checks_comments = forms.CharField(label='Enter your reasoning here', widget=forms.Textarea, required=False)
 
     # This is the id appended to all htmls names ot make the individual form instance unique, this is given a alue in
     # the init
-    instance_id = forms.CharField(widget=forms.HiddenInput)
+    instance_id = forms.CharField(widget=forms.HiddenInput, required=False)
 
     def __init__(self, *args, **kwargs):
         super(AdultInYourHomeForm, self).__init__(*args, **kwargs)
@@ -370,18 +375,18 @@ class ChildInYourHomeForm(GOVUKForm):
     GOV.UK form for each child other person in an application, see adult form for comment explanation
     """
     full_name_declare = forms.BooleanField(label='This information is correct',
-                                           widget=custom_field_widgets.CustomCheckboxInput)
-    full_name_comments = forms.CharField(label='Enter your reasoning here', widget=forms.Textarea)
+                                           widget=custom_field_widgets.CustomCheckboxInput, required=False)
+    full_name_comments = forms.CharField(label='Enter your reasoning here', widget=forms.Textarea, required=False)
 
     date_of_birth_declare = forms.BooleanField(label='This information is correct',
-                                               widget=custom_field_widgets.CustomCheckboxInput)
-    date_of_birth_comments = forms.CharField(label='Enter your reasoning here', widget=forms.Textarea)
+                                               widget=custom_field_widgets.CustomCheckboxInput, required=False)
+    date_of_birth_comments = forms.CharField(label='Enter your reasoning here', widget=forms.Textarea, required=False)
 
     relationship_declare = forms.BooleanField(label='This information is correct',
-                                              widget=custom_field_widgets.CustomCheckboxInput)
-    relationship_comments = forms.CharField(label='Enter your reasoning here', widget=forms.Textarea)
+                                              widget=custom_field_widgets.CustomCheckboxInput, required=False)
+    relationship_comments = forms.CharField(label='Enter your reasoning here', widget=forms.Textarea, required=False)
 
-    instance_id = forms.CharField(widget=forms.HiddenInput)
+    instance_id = forms.CharField(widget=forms.HiddenInput, required=False)
 
     def __init__(self, *args, **kwargs):
         super(ChildInYourHomeForm, self).__init__(*args, **kwargs)
