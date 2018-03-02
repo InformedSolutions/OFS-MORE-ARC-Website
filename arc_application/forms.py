@@ -29,20 +29,20 @@ class LogInDetailsForm(GOVUKForm):
     field_label_classes = 'form-label-bold'
 
     email_declare = forms.BooleanField(label='This information is correct',
-                                       widget=custom_field_widgets.CustomCheckboxInput)
-    email_comments = forms.CharField(label='Enter your reasoning here', widget=forms.Textarea)
+                                       widget=custom_field_widgets.CustomCheckboxInput, required=False)
+    email_comments = forms.CharField(label='Enter your reasoning here', widget=forms.Textarea, required=False)
     mobile_phone_number_declare = forms.BooleanField(label='This information is correct',
-                                                     widget=custom_field_widgets.CustomCheckboxInput)
-    mobile_phone_number_comments = forms.CharField(label='Enter your reasoning here', widget=forms.Textarea)
+                                                     widget=custom_field_widgets.CustomCheckboxInput, required=False)
+    mobile_phone_number_comments = forms.CharField(label='Enter your reasoning here', widget=forms.Textarea, required=False)
     alternative_phone_number_declare = forms.BooleanField(label='This information is correct',
-                                                          widget=custom_field_widgets.CustomCheckboxInput)
-    alternative_phone_number_comments = forms.CharField(label='Enter your reasoning here', widget=forms.Textarea)
+                                                          widget=custom_field_widgets.CustomCheckboxInput, required=False)
+    alternative_phone_number_comments = forms.CharField(label='Enter your reasoning here', widget=forms.Textarea, required=False)
     knowledge_based_question_declare = forms.BooleanField(label='This information is correct',
-                                                          widget=custom_field_widgets.CustomCheckboxInput)
-    knowledge_based_question_comments = forms.CharField(label='Enter your reasoning here', widget=forms.Textarea)
+                                                          widget=custom_field_widgets.CustomCheckboxInput, required=False)
+    knowledge_based_question_comments = forms.CharField(label='Enter your reasoning here', widget=forms.Textarea, required=False)
     knowledge_based_answer_declare = forms.BooleanField(label='This information is correct',
-                                                        widget=custom_field_widgets.CustomCheckboxInput)
-    knowledge_based_answer_comments = forms.CharField(label='Enter your reasoning here', widget=forms.Textarea)
+                                                        widget=custom_field_widgets.CustomCheckboxInput, required=False)
+    knowledge_based_answer_comments = forms.CharField(label='Enter your reasoning here', widget=forms.Textarea, required=False)
 
     # As this will only happen once per page, we can do this in the form itself rather than __init
     # Each checkbox must be assigned a name for the html injection
@@ -74,20 +74,20 @@ class PersonalDetailsForm(GOVUKForm):
 
     field_label_classes = 'form-label-bold'
     name_declare = forms.BooleanField(label='This information is correct',
-                                      widget=custom_field_widgets.CustomCheckboxInput)
-    name_comments = forms.CharField(label='Enter your reasoning here', widget=forms.Textarea)
+                                      widget=custom_field_widgets.CustomCheckboxInput, required=False)
+    name_comments = forms.CharField(label='Enter your reasoning here', widget=forms.Textarea, required=False)
 
     date_of_birth_declare = forms.BooleanField(label='This information is correct',
-                                               widget=custom_field_widgets.CustomCheckboxInput)
-    date_of_birth_comments = forms.CharField(label='Enter your reasoning here', widget=forms.Textarea)
+                                               widget=custom_field_widgets.CustomCheckboxInput, required=False)
+    date_of_birth_comments = forms.CharField(label='Enter your reasoning here', widget=forms.Textarea, required=False)
 
     home_address_declare = forms.BooleanField(label='This information is correct',
-                                              widget=custom_field_widgets.CustomCheckboxInput)
-    home_address_comments = forms.CharField(label='Enter your reasoning here', widget=forms.Textarea)
+                                              widget=custom_field_widgets.CustomCheckboxInput, required=False)
+    home_address_comments = forms.CharField(label='Enter your reasoning here', widget=forms.Textarea, required=False)
 
     childcare_location_declare = forms.BooleanField(label='This information is correct',
-                                                    widget=custom_field_widgets.CustomCheckboxInput)
-    childcare_location_comments = forms.CharField(label='Enter your reasoning here', widget=forms.Textarea)
+                                                    widget=custom_field_widgets.CustomCheckboxInput, required=False)
+    childcare_location_comments = forms.CharField(label='Enter your reasoning here', widget=forms.Textarea, required=False)
 
     checkboxes = [(name_declare, 'name'), (date_of_birth_declare, 'date_of_birth'),
                   (home_address_declare, 'home_address'), (childcare_location_declare, 'childcare_location')]
@@ -112,16 +112,16 @@ class FirstAidTrainingForm(GOVUKForm):
     auto_replace_widgets = True
 
     training_organisation_declare = forms.BooleanField(label='This information is correct',
-                                                       widget=custom_field_widgets.CustomCheckboxInput)
-    training_organisation_comments = forms.CharField(label='Enter your reasoning here', widget=forms.Textarea)
+                                                       widget=custom_field_widgets.CustomCheckboxInput, required=False)
+    training_organisation_comments = forms.CharField(label='Enter your reasoning here', widget=forms.Textarea, required=False)
 
     title_of_first_aid_course_declare = forms.BooleanField(label='This information is correct',
-                                                           widget=custom_field_widgets.CustomCheckboxInput)
-    title_of_first_aid_course_comments = forms.CharField(label='Enter your reasoning here', widget=forms.Textarea)
+                                                           widget=custom_field_widgets.CustomCheckboxInput, required=False)
+    title_of_first_aid_course_comments = forms.CharField(label='Enter your reasoning here', widget=forms.Textarea, required=False)
 
     date_of_certificate_declare = forms.BooleanField(label='This information is correct',
-                                                     widget=custom_field_widgets.CustomCheckboxInput)
-    date_of_certificate_comments = forms.CharField(label='Enter your reasoning here', widget=forms.Textarea)
+                                                     widget=custom_field_widgets.CustomCheckboxInput, required=False)
+    date_of_certificate_comments = forms.CharField(label='Enter your reasoning here', widget=forms.Textarea, required=False)
 
     checkboxes = [(training_organisation_declare, 'training_organisation'),
                   (title_of_first_aid_course_declare, 'title_of_first_aid_course'),
@@ -147,14 +147,14 @@ class DBSCheckForm(GOVUKForm):
     auto_replace_widgets = True
 
     dbs_certificate_number_declare = forms.BooleanField(label='This information is correct',
-                                                        widget=custom_field_widgets.CustomCheckboxInput)
-    dbs_certificate_number_comments = forms.CharField(label='Enter your reasoning here', widget=forms.Textarea)
+                                                        widget=custom_field_widgets.CustomCheckboxInput, required=False)
+    dbs_certificate_number_comments = forms.CharField(label='Enter your reasoning here', widget=forms.Textarea, required=False)
     dbs_submission_consent_declare = forms.BooleanField(label='This information is correct',
-                                                        widget=custom_field_widgets.CustomCheckboxInput)
-    dbs_submission_consent_comments = forms.CharField(label='Enter your reasoning here', widget=forms.Textarea)
+                                                        widget=custom_field_widgets.CustomCheckboxInput, required=False)
+    dbs_submission_consent_comments = forms.CharField(label='Enter your reasoning here', widget=forms.Textarea, required=False)
     cautions_or_convictions_declare = forms.BooleanField(label='This information is correct',
-                                                         widget=custom_field_widgets.CustomCheckboxInput)
-    cautions_or_convictions_comments = forms.CharField(label='Enter your reasoning here', widget=forms.Textarea)
+                                                         widget=custom_field_widgets.CustomCheckboxInput, required=False)
+    cautions_or_convictions_comments = forms.CharField(label='Enter your reasoning here', widget=forms.Textarea, required=False)
 
     checkboxes = [(dbs_certificate_number_declare, 'dbs_certificate_number'),
                   (dbs_submission_consent_declare, 'dbs_submission_consent'),
@@ -180,8 +180,8 @@ class HealthForm(GOVUKForm):
     auto_replace_widgets = True
 
     health_submission_consent_declare = forms.BooleanField(label='This information is correct',
-                                                           widget=custom_field_widgets.CustomCheckboxInput)
-    health_submission_consent_comments = forms.CharField(label='Enter your reasoning here', widget=forms.Textarea)
+                                                           widget=custom_field_widgets.CustomCheckboxInput, required=False)
+    health_submission_consent_comments = forms.CharField(label='Enter your reasoning here', widget=forms.Textarea, required=False)
 
     checkboxes = [(health_submission_consent_declare, 'health_submission_consent')]
 
@@ -206,28 +206,28 @@ class ReferencesForm(GOVUKForm):
     auto_replace_widgets = True
 
     full_name_declare = forms.BooleanField(label='This information is correct',
-                                           widget=custom_field_widgets.CustomCheckboxInput)
-    full_name_comments = forms.CharField(label='Enter your reasoning here', widget=forms.Textarea)
+                                           widget=custom_field_widgets.CustomCheckboxInput, required=False)
+    full_name_comments = forms.CharField(label='Enter your reasoning here', widget=forms.Textarea, required=False)
 
     how_they_know_you_declare = forms.BooleanField(label='This information is correct',
-                                                   widget=custom_field_widgets.CustomCheckboxInput)
-    how_they_know_you_comments = forms.CharField(label='Enter your reasoning here', widget=forms.Textarea)
+                                                   widget=custom_field_widgets.CustomCheckboxInput, required=False)
+    how_they_know_you_comments = forms.CharField(label='Enter your reasoning here', widget=forms.Textarea, required=False)
 
     known_for_declare = forms.BooleanField(label='This information is correct',
-                                           widget=custom_field_widgets.CustomCheckboxInput)
-    known_for_comments = forms.CharField(label='Enter your reasoning here', widget=forms.Textarea)
+                                           widget=custom_field_widgets.CustomCheckboxInput, required=False)
+    known_for_comments = forms.CharField(label='Enter your reasoning here', widget=forms.Textarea, required=False)
 
     address_declare = forms.BooleanField(label='This information is correct',
-                                         widget=custom_field_widgets.CustomCheckboxInput)
-    address_comments = forms.CharField(label='Enter your reasoning here', widget=forms.Textarea)
+                                         widget=custom_field_widgets.CustomCheckboxInput, required=False)
+    address_comments = forms.CharField(label='Enter your reasoning here', widget=forms.Textarea, required=False)
 
     phone_number_declare = forms.BooleanField(label='This information is correct',
-                                              widget=custom_field_widgets.CustomCheckboxInput)
-    phone_number_comments = forms.CharField(label='Enter your reasoning here', widget=forms.Textarea)
+                                              widget=custom_field_widgets.CustomCheckboxInput, required=False)
+    phone_number_comments = forms.CharField(label='Enter your reasoning here', widget=forms.Textarea, required=False)
 
     email_address_declare = forms.BooleanField(label='This information is correct',
-                                               widget=custom_field_widgets.CustomCheckboxInput)
-    email_address_comments = forms.CharField(label='Enter your reasoning here', widget=forms.Textarea)
+                                               widget=custom_field_widgets.CustomCheckboxInput, required=False)
+    email_address_comments = forms.CharField(label='Enter your reasoning here', widget=forms.Textarea, required=False)
 
     checkboxes = [(full_name_declare, 'full_name'), (how_they_know_you_declare, 'how_they_know_you'),
                   (known_for_declare, 'known_for'), (address_declare, 'address'),
@@ -252,28 +252,28 @@ class ReferencesForm2(GOVUKForm):
     auto_replace_widgets = True
 
     full_name_declare = forms.BooleanField(label='This information is correct',
-                                           widget=custom_field_widgets.CustomCheckboxInput)
-    full_name_comments = forms.CharField(label='Enter your reasoning here', widget=forms.Textarea)
+                                           widget=custom_field_widgets.CustomCheckboxInput, required=False)
+    full_name_comments = forms.CharField(label='Enter your reasoning here', widget=forms.Textarea, required=False)
 
     how_they_know_you_declare = forms.BooleanField(label='This information is correct',
-                                                   widget=custom_field_widgets.CustomCheckboxInput)
-    how_they_know_you_comments = forms.CharField(label='Enter your reasoning here', widget=forms.Textarea)
+                                                   widget=custom_field_widgets.CustomCheckboxInput, required=False)
+    how_they_know_you_comments = forms.CharField(label='Enter your reasoning here', widget=forms.Textarea, required=False)
 
     known_for_declare = forms.BooleanField(label='This information is correct',
-                                           widget=custom_field_widgets.CustomCheckboxInput)
-    known_for_comments = forms.CharField(label='Enter your reasoning here', widget=forms.Textarea)
+                                           widget=custom_field_widgets.CustomCheckboxInput, required=False)
+    known_for_comments = forms.CharField(label='Enter your reasoning here', widget=forms.Textarea, required=False)
 
     address_declare = forms.BooleanField(label='This information is correct',
-                                         widget=custom_field_widgets.CustomCheckboxInput)
-    address_comments = forms.CharField(label='Enter your reasoning here', widget=forms.Textarea)
+                                         widget=custom_field_widgets.CustomCheckboxInput, required=False)
+    address_comments = forms.CharField(label='Enter your reasoning here', widget=forms.Textarea, required=False)
 
     phone_number_declare = forms.BooleanField(label='This information is correct',
-                                              widget=custom_field_widgets.CustomCheckboxInput)
-    phone_number_comments = forms.CharField(label='Enter your reasoning here', widget=forms.Textarea)
+                                              widget=custom_field_widgets.CustomCheckboxInput, required=False)
+    phone_number_comments = forms.CharField(label='Enter your reasoning here', widget=forms.Textarea, required=False)
 
     email_address_declare = forms.BooleanField(label='This information is correct',
-                                               widget=custom_field_widgets.CustomCheckboxInput)
-    email_address_comments = forms.CharField(label='Enter your reasoning here', widget=forms.Textarea)
+                                               widget=custom_field_widgets.CustomCheckboxInput, required=False)
+    email_address_comments = forms.CharField(label='Enter your reasoning here', widget=forms.Textarea, required=False)
 
     checkboxes = [(full_name_declare, 'full_name2'),
                   (how_they_know_you_declare, 'how_they_know_you2'),

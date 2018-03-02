@@ -85,6 +85,7 @@ def contact_summary(request):
     if request.method == 'GET':
         application_id_local = request.GET["id"]
         application = Application.objects.get(pk=application_id_local)
+        # Table keys are supplied in a list format for use in init
         form = LogInDetailsForm(table_keys=[application.login_id])
         application_id_local = request.GET["id"]
     elif request.method == 'POST':
@@ -94,7 +95,7 @@ def contact_summary(request):
         login_id = application.login_id
         form = LogInDetailsForm(request.POST, table_keys=[login_id])
 
-        if form.isvalid():
+        if form.is_valid():
             comment_list = request_to_comment(login_id, TABLE_NAME, form.cleaned_data)
             save_successful = save_comments(comment_list)
 
@@ -196,8 +197,9 @@ def personal_details_summary(request):
         applicant_name_id = (ApplicantName.objects.get(personal_detail_id=personal_detail_id)).name_id
         applicant_home_address_id = (ApplicantHomeAddress.objects.get(personal_detail_id=personal_detail_id,
                                                                       current_address=True)).home_address_id
-        if form.is_valid()
-            #Populate field dictionaries for use in request to comment funciton
+        if form.is_valid():
+            # Populate field dictionaries for use in request to comment funciton
+            # As the data required on this form is stored in three different tables, these must be sorted by table
             for field in form.cleaned_data:
                 if field in PERSONAL_DETAIL_FIELDS:
                     birthdate_dict[field] = form.cleaned_data[field]
@@ -206,7 +208,7 @@ def personal_details_summary(request):
                 if field in HOME_ADDRESS_FIELDS:
                     address_dict[field] = form.cleaned_data[field]
 
-            #Populate below lists with comments by table
+            # Populate below lists with comments by table
             birthdate_comments = request_to_comment(personal_detail_id, TABLE_NAMES[0], birthdate_dict)
             name_comments = request_to_comment(applicant_name_id, TABLE_NAMES[1], name_dict)
             address_comments = request_to_comment(applicant_home_address_id, TABLE_NAMES[2], address_dict)
@@ -292,16 +294,17 @@ def first_aid_training_summary(request):
         first_aid_id = FirstAidTraining.objects.get(application_id=application_id_local).first_aid_id
         form = FirstAidTrainingForm(request.POST, table_keys=[application_id_local])
 
-        comment_list = request_to_comment(first_aid_id, TABLE_NAME, request.POST)
-        save_successful = save_comments(comment_list)
+        if form.is_valid():
+            comment_list = request_to_comment(first_aid_id, TABLE_NAME, form.cleaned_data)
+            save_successful = save_comments(comment_list)
 
-        if save_successful:
-            status = Arc.objects.get(pk=application_id_local)
-            status.first_aid_review = 'COMPLETED'
-            status.save()
-            return HttpResponseRedirect(settings.URL_PREFIX + '/dbs-check/summary?id=' + application_id_local)
-        else:
-            return ChildProcessError
+            if save_successful:
+                status = Arc.objects.get(pk=application_id_local)
+                status.first_aid_review = 'COMPLETED'
+                status.save()
+                return HttpResponseRedirect(settings.URL_PREFIX + '/dbs-check/summary?id=' + application_id_local)
+            else:
+                return ChildProcessError
 
     training_organisation = FirstAidTraining.objects.get(application_id=application_id_local).training_organisation
     training_course = FirstAidTraining.objects.get(application_id=application_id_local).course_title
@@ -341,16 +344,17 @@ def dbs_check_summary(request):
         criminal_record_id = CriminalRecordCheck.objects.get(application_id=application_id_local).criminal_record_id
         form = DBSCheckForm(request.POST, table_keys=[criminal_record_id])
 
-        comment_list = request_to_comment(criminal_record_id, TABLE_NAME, request.POST)
-        save_successful = save_comments(comment_list)
+        if form.is_valid():
+            comment_list = request_to_comment(criminal_record_id, TABLE_NAME, form.cleaned_data)
+            save_successful = save_comments(comment_list)
 
-        if save_successful:
-            status = Arc.objects.get(pk=application_id_local)
-            status.dbs_review = 'COMPLETED'
-            status.save()
-            return HttpResponseRedirect(settings.URL_PREFIX + '/health/check-answers?id=' + application_id_local)
-        else:
-            return(ChildProcessError)
+            if save_successful:
+                status = Arc.objects.get(pk=application_id_local)
+                status.dbs_review = 'COMPLETED'
+                status.save()
+                return HttpResponseRedirect(settings.URL_PREFIX + '/health/check-answers?id=' + application_id_local)
+            else:
+                return ChildProcessError
 
     criminal_record_check = CriminalRecordCheck.objects.get(application_id=application_id_local)
     dbs_certificate_number = criminal_record_check.dbs_certificate_number
@@ -400,31 +404,24 @@ def references_summary(request):
 
         # As form data prefixed in above lines to separate the two forms, this prefix must be removed before
         # storage, this is to allow for easier retrieval form the database
-        for data_entry in form.data:
-            #Find the prefix
-            if data_entry[:5] == 'form2':
-                #Mimic the usual post request dictionary with just data from the specific form
-                form2_dict[data_entry[6:]] = form.data[data_entry]
-            elif data_entry[:4] == 'form':
-                form1_dict[data_entry[5:]] = form.data[data_entry]
+
+        if form.is_valid() and form2.is_valid():
+
+            # Get comments to be saved
+            form_comments = request_to_comment(reference_id_1, TABLE_NAME, form.cleaned_data)
+            form2_comments = request_to_comment(reference_id_2, TABLE_NAME, form2.cleaned_data)
+
+            # Save the comments
+            reference1_saved = save_comments(form_comments)
+            reference2_saved = save_comments(form2_comments)
+
+            if reference1_saved and reference2_saved:
+                status = Arc.objects.get(pk=application_id_local)
+                status.references_review = 'COMPLETED'
+                status.save()
+                return HttpResponseRedirect(settings.URL_PREFIX + '/other-people/summary?id=' + application_id_local)
             else:
-                pass
-
-        # Get comments to be saved
-        form_comments = request_to_comment(reference_id_1, TABLE_NAME, form1_dict)
-        form2_comments = request_to_comment(reference_id_2, TABLE_NAME, form2_dict)
-
-        # Save the comments
-        reference1_saved = save_comments(form_comments)
-        reference2_saved = save_comments(form2_comments)
-
-        if reference1_saved and reference2_saved:
-            status = Arc.objects.get(pk=application_id_local)
-            status.references_review = 'COMPLETED'
-            status.save()
-            return HttpResponseRedirect(settings.URL_PREFIX + '/other-people/summary?id=' + application_id_local)
-        else:
-            return(ChildProcessError)
+                return ChildProcessError
 
     first_reference_record = Reference.objects.get(application_id=application_id_local, reference=1)
     second_reference_record = Reference.objects.get(application_id=application_id_local, reference=2)
@@ -552,6 +549,7 @@ def other_people_summary(request):
             status.people_in_home_review = 'COMPLETED'
             status.save()
             return HttpResponseRedirect(settings.URL_PREFIX + '/review?id=' + application_id_local)
+
     adults_list = AdultInHome.objects.filter(application_id=application_id_local).order_by('adult')
     adult_name_list = []
     adult_birth_day_list = []
@@ -657,16 +655,17 @@ def health_check_answers(request):
         hdb_id = HealthDeclarationBooklet.objects.get(application_id=application_id_local).hdb_id
         form = HealthForm(request.POST, table_keys=[hdb_id])
 
-        comment_list = request_to_comment(hdb_id, TABLE_NAME, request.POST)
-        save_successful = save_comments(comment_list)
+        if form.is_valid():
+            comment_list = request_to_comment(hdb_id, TABLE_NAME, form.cleaned_data)
+            save_successful = save_comments(comment_list)
 
-        if save_successful:
-            status = Arc.objects.get(pk=application_id_local)
-            status.health_review = 'COMPLETED'
-            status.save()
-            return HttpResponseRedirect(settings.URL_PREFIX + '/references/summary?id=' + application_id_local)
-        else:
-            return(ChildProcessError)
+            if save_successful:
+                status = Arc.objects.get(pk=application_id_local)
+                status.health_review = 'COMPLETED'
+                status.save()
+                return HttpResponseRedirect(settings.URL_PREFIX + '/references/summary?id=' + application_id_local)
+            else:
+                return(ChildProcessError)
 
     send_hdb_declare = HealthDeclarationBooklet.objects.get(application_id=application_id_local).send_hdb_declare
     application = Application.objects.get(pk=application_id_local)

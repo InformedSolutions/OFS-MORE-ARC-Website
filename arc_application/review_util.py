@@ -12,7 +12,6 @@ def request_to_comment(table_key, table_name, user_request):
     :return: Returns a list of what comment should be added for each field, blank signifies to do nothing
     """
     comment_list = []
-    print(user_request)
     for param in user_request:
         # Finds all checkboxes sent in the request
         if 'declare' in param:
@@ -33,8 +32,7 @@ def request_to_comment(table_key, table_name, user_request):
                     comment_list.append([table_key, table_name, field_name, existing_comment, flagged])
                 except ArcComments.DoesNotExist:
                     pass
-    r
-    eturn comment_list
+    return comment_list
 
 
 def populate_initial_values(self):
