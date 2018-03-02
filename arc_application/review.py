@@ -177,6 +177,7 @@ def personal_details_summary(request):
     NAME_FIELDS = ['name_declare', 'name_comments']
     HOME_ADDRESS_FIELDS = ['home_address_declare', 'home_address_comments',
                            'childcare_location_declare', 'childcare_location_comments']
+
     if request.method == 'GET':
         # Collect required ids
         application_id_local = request.GET["id"]
@@ -199,6 +200,7 @@ def personal_details_summary(request):
         applicant_home_address_id = (ApplicantHomeAddress.objects.get(personal_detail_id=personal_detail_id,
                                                                       current_address=True)).home_address_id
 
+        #Populate field dictionaries for use in request to comment funciton
         for field in request.POST:
             if field in PERSONAL_DETAIL_FIELDS:
                 birthdate_dict[field] = request.POST[field]
@@ -207,15 +209,23 @@ def personal_details_summary(request):
             if field in HOME_ADDRESS_FIELDS:
                 address_dict[field] = request.POST[field]
 
-        request_to_comment(personal_detail_id)
+        #Populate below lists with comments by table
+        birthdate_comments = request_to_comment(personal_detail_id, TABLE_NAMES[0], birthdate_dict)
+        name_comments = request_to_comment(applicant_name_id, TABLE_NAMES[1], name_dict)
+        address_comments = request_to_comment(applicant_home_address_id, TABLE_NAMES[2], address_dict)
 
-        #comment_list = request_to_comment(login_id, TABLE_NAME, request.POST)
-        #save_successful = save_comments(comment_list)
+        birthdate_save_successful = save_comments(birthdate_comments)
+        name_save_successful = save_comments(name_comments)
+        address_save_successful = save_comments(address_comments)
 
-        status = Arc.objects.get(pk=application_id_local)
-        status.personal_details_review = 'COMPLETED'
-        status.save()
-        return HttpResponseRedirect(settings.URL_PREFIX + '/first-aid/summary?id=' + application_id_local)
+        if birthdate_save_successful and name_save_successful and address_save_successful:
+            status = Arc.objects.get(pk=application_id_local)
+            status.personal_details_review = 'COMPLETED'
+            status.save()
+            return HttpResponseRedirect(settings.URL_PREFIX + '/first-aid/summary?id=' + application_id_local)
+        else:
+            return(ChildProcessError)
+
     application_id_local = request.GET["id"]
     personal_detail_id = ApplicantPersonalDetails.objects.get(application_id=application_id_local)
     birth_day = personal_detail_id.birth_day
@@ -273,16 +283,29 @@ def first_aid_training_summary(request):
     :param request: a request object used to generate the HttpResponse
     :return: an HttpResponse object with the rendered First aid training: summary template
     """
+    TABLE_NAME = 'FIRST_AID_TRAINING'
+
     if request.method == 'GET':
-        form = FirstAidTrainingForm()
         application_id_local = request.GET["id"]
+        first_aid_id = FirstAidTraining.objects.get(application_id=application_id_local).first_aid_id
+        form = FirstAidTrainingForm(table_keys=[first_aid_id])
+
     elif request.method == 'POST':
-        form = FirstAidTrainingForm()
         application_id_local = request.POST["id"]
-        status = Arc.objects.get(pk=application_id_local)
-        status.first_aid_review = 'COMPLETED'
-        status.save()
-        return HttpResponseRedirect(settings.URL_PREFIX + '/dbs-check/summary?id=' + application_id_local)
+        first_aid_id = FirstAidTraining.objects.get(application_id=application_id_local).first_aid_id
+        form = FirstAidTrainingForm(request.POST, table_keys=[application_id_local])
+
+        comment_list = request_to_comment(first_aid_id, TABLE_NAME, request.POST)
+        save_successful = save_comments(comment_list)
+
+        if save_successful:
+            status = Arc.objects.get(pk=application_id_local)
+            status.first_aid_review = 'COMPLETED'
+            status.save()
+            return HttpResponseRedirect(settings.URL_PREFIX + '/dbs-check/summary?id=' + application_id_local)
+        else:
+            return ChildProcessError
+
     training_organisation = FirstAidTraining.objects.get(application_id=application_id_local).training_organisation
     training_course = FirstAidTraining.objects.get(application_id=application_id_local).course_title
     certificate_day = FirstAidTraining.objects.get(application_id=application_id_local).course_day
@@ -309,16 +332,29 @@ def dbs_check_summary(request):
     :param request: a request object used to generate the HttpResponse
     :return: an HttpResponse object with the rendered Your criminal record (DBS) check: summary template
     """
+    TABLE_NAME = 'CRIMINAL_RECORD_CHECK'
+
     if request.method == 'GET':
         application_id_local = request.GET["id"]
-        form = DBSCheckForm()
+        criminal_record_id = CriminalRecordCheck.objects.get(application_id=application_id_local).criminal_record_id
+
+        form = DBSCheckForm(table_keys=[criminal_record_id])
     elif request.method == 'POST':
         application_id_local = request.POST["id"]
-        form = DBSCheckForm()
-        status = Arc.objects.get(pk=application_id_local)
-        status.dbs_review = 'COMPLETED'
-        status.save()
-        return HttpResponseRedirect(settings.URL_PREFIX + '/health/check-answers?id=' + application_id_local)
+        criminal_record_id = CriminalRecordCheck.objects.get(application_id=application_id_local).criminal_record_id
+        form = DBSCheckForm(request.POST, table_keys=[criminal_record_id])
+
+        comment_list = request_to_comment(criminal_record_id, TABLE_NAME, request.POST)
+        save_successful = save_comments(comment_list)
+
+        if save_successful:
+            status = Arc.objects.get(pk=application_id_local)
+            status.dbs_review = 'COMPLETED'
+            status.save()
+            return HttpResponseRedirect(settings.URL_PREFIX + '/health/check-answers?id=' + application_id_local)
+        else:
+            return(ChildProcessError)
+
     criminal_record_check = CriminalRecordCheck.objects.get(application_id=application_id_local)
     dbs_certificate_number = criminal_record_check.dbs_certificate_number
     cautions_convictions = criminal_record_check.cautions_convictions
@@ -342,18 +378,57 @@ def references_summary(request):
     :param request: a request object used to generate the HttpResponse
     :return: an HttpResponse object with the rendered 2 references: summary template
     """
+    TABLE_NAME = 'REFERENCE'
+
     if request.method == 'GET':
-        form = ReferencesForm()
-        form2 = ReferencesForm2()
         application_id_local = request.GET["id"]
+
+        reference_id_1 = Reference.objects.get(application_id=application_id_local, reference=1).reference_id
+        reference_id_2 = Reference.objects.get(application_id=application_id_local, reference=2).reference_id
+
+        form = ReferencesForm(table_keys=[reference_id_1], prefix="form")
+        form2 = ReferencesForm2(table_keys=[reference_id_2], prefix="form2")
     elif request.method == 'POST':
-        form = ReferencesForm()
-        form2 = ReferencesForm2()
+        form1_dict = {}
+        form2_dict = {}
+
+        # Grab necessary IDs
         application_id_local = request.POST["id"]
-        status = Arc.objects.get(pk=application_id_local)
-        status.references_review = 'COMPLETED'
-        status.save()
-        return HttpResponseRedirect(settings.URL_PREFIX + '/other-people/summary?id=' + application_id_local)
+        reference_id_1 = Reference.objects.get(application_id=application_id_local, reference=1).reference_id
+        reference_id_2 = Reference.objects.get(application_id=application_id_local, reference=2).reference_id
+
+        #Grab form data from post
+        form = ReferencesForm(request.POST, table_keys=[reference_id_1], prefix="form")
+        form2 = ReferencesForm2(request.POST, table_keys=[reference_id_2], prefix="form2")
+
+        # As form data prefixed in above lines to separate the two forms, this prefix must be removed before
+        # storage, this is to allow for easier retrieval form the database
+        for data_entry in form.data:
+            #Find the prefix
+            if data_entry[:5] == 'form2':
+                #Mimic the usual post request dictionary with just data from the specific form
+                form2_dict[data_entry[6:]] = form.data[data_entry]
+            elif data_entry[:4] == 'form':
+                form1_dict[data_entry[5:]] = form.data[data_entry]
+            else:
+                pass
+
+        # Get comments to be saved
+        form_comments = request_to_comment(reference_id_1, TABLE_NAME, form1_dict)
+        form2_comments = request_to_comment(reference_id_2, TABLE_NAME, form2_dict)
+
+        # Save the comments
+        reference1_saved = save_comments(form_comments)
+        reference2_saved = save_comments(form2_comments)
+
+        if reference1_saved and reference2_saved:
+            status = Arc.objects.get(pk=application_id_local)
+            status.references_review = 'COMPLETED'
+            status.save()
+            return HttpResponseRedirect(settings.URL_PREFIX + '/other-people/summary?id=' + application_id_local)
+        else:
+            return(ChildProcessError)
+
     first_reference_record = Reference.objects.get(application_id=application_id_local, reference=1)
     second_reference_record = Reference.objects.get(application_id=application_id_local, reference=2)
     first_reference_first_name = first_reference_record.first_name
@@ -425,13 +500,42 @@ def other_people_summary(request):
     :param request: a request object used to generate the HttpResponse
     :return: an HttpResponse object with the rendered People in your home: summary template
     """
+    # Defines the formset using formset factory
+    AdultFormSet = formset_factory(AdultInYourHomeForm)
+    ChildFormSet = formset_factory(ChildInYourHomeForm)
+    TABLE_NAMES = ['ADULT_IN_HOME', 'CHILD_IN_HOME']
+
+
     if request.method == 'GET':
         #Defines tat static form at the top of the page
         form = OtherPeopleInYourHomeForm()
         application_id_local = request.GET["id"]
     elif request.method == 'POST':
-        form = OtherPeopleInYourHomeForm()
+        child_formset = ChildFormSet(request.POST, prefix='child')
+        adult_formset = AdultFormSet(request.POST, prefix='adult')
+
+        #for field in request.POST:
+        #    if field[:5] == 'adult':
         application_id_local = request.POST["id"]
+        child_objects = ChildInHome.objects.filter(application_id=application_id_local).order_by('child')
+        adult_objects = AdultInHome.objects.filter(application_id=application_id_local).order_by('adult')
+
+        request_list = other_people_parsing(request.POST)
+        object_list = [adult_objects, child_objects]
+        attr_list = ['adult_id', 'child_id']
+
+        for dictionary in request_list:
+            object_index = request_list.index(dictionary)
+            for person in dictionary:
+                request_index = dictionary.index(person)
+                person_object_list = object_list[object_index]
+                person_object = person_object_list[request_index]
+                person_id = getattr(person_object, attr_list[object_index])
+                person_comments = request_to_comment(person_id, TABLE_NAMES[object_index], person)
+                successful = save_comments(person_comments)
+                if not successful:
+                    return ChildProcessError
+
         status = Arc.objects.get(pk=application_id_local)
         status.people_in_home_review = 'COMPLETED'
         status.save()
@@ -466,15 +570,17 @@ def other_people_summary(request):
     # Defines the data required for rendering the amount of forms in the below formset
     amount_of_adults = str(len(adult_name_list))
     data = {
-    'form-TOTAL_FORMS': amount_of_adults,
-    'form-INITIAL_FORMS': amount_of_adults,
-    'form-MAX_NUM_FORMS': '',
+    'adult-TOTAL_FORMS': amount_of_adults,
+    'adult-INITIAL_FORMS': amount_of_adults,
+    'adult-MAX_NUM_FORMS': '',
     }
-    # Defines the formset using formset factory
-    AdultFormSet = formset_factory(AdultInYourHomeForm)
+
+    initial_adult_data = other_people_initial_population(True, adults_list)
+
+
 
     # Instantiates the formset with the management data defined abbove, forcing a set amount of forms
-    formset_adult = AdultFormSet(data)
+    formset_adult = AdultFormSet(data, prefix='adult', initial=initial_adult_data)
 
     # Zips the formset into the list of adults
     adult_lists = zip(adult_name_list, adult_birth_day_list, adult_birth_month_list, adult_birth_year_list,
@@ -496,19 +602,23 @@ def other_people_summary(request):
         child_relationship_list.append(child.relationship)
     amount_of_children = str(len(child_name_list))
     data = {
-        'form-TOTAL_FORMS': amount_of_children,
-        'form-INITIAL_FORMS': amount_of_children,
-        'form-MAX_NUM_FORMS': '',
+        'child-TOTAL_FORMS': amount_of_children,
+        'child-INITIAL_FORMS': amount_of_children,
+        'child-MAX_NUM_FORMS': '',
     }
-    ChildFormSet = formset_factory(ChildInYourHomeForm)
+    initial_data = []
 
-    formset_child = ChildFormSet(data)
+    initial_child_data = other_people_initial_population(False, children_list)
+
+    formset_child = ChildFormSet(data, prefix='child', initial=initial_child_data)
 
     child_lists = zip(child_name_list, child_birth_day_list, child_birth_month_list, child_birth_year_list,
                       child_relationship_list, formset_child)
 
     variables = {
         'form': form,
+        'formset_adult': formset_adult,
+        'formset_child': formset_child,
         'application_id': application_id_local,
         'adults_in_home': application.adults_in_home,
         'children_in_home': application.children_in_home,
@@ -529,16 +639,29 @@ def health_check_answers(request):
     :param request: a request object used to generate the HttpResponse
     :return: an HttpResponse object with the rendered Your health: answers template
     """
+    TABLE_NAME = 'HDB'
+
     if request.method == 'GET':
-        form = HealthForm()
         application_id_local = request.GET["id"]
+        hdb_id = HealthDeclarationBooklet.objects.get(application_id=application_id_local).hdb_id
+        form = HealthForm(table_keys=[hdb_id])
+
     elif request.method == 'POST':
-        form = HealthForm()
         application_id_local = request.POST["id"]
-        status = Arc.objects.get(pk=application_id_local)
-        status.health_review = 'COMPLETED'
-        status.save()
-        return HttpResponseRedirect(settings.URL_PREFIX + '/references/summary?id=' + application_id_local)
+        hdb_id = HealthDeclarationBooklet.objects.get(application_id=application_id_local).hdb_id
+        form = HealthForm(request.POST, table_keys=[hdb_id])
+
+        comment_list = request_to_comment(hdb_id, TABLE_NAME, request.POST)
+        save_successful = save_comments(comment_list)
+
+        if save_successful:
+            status = Arc.objects.get(pk=application_id_local)
+            status.health_review = 'COMPLETED'
+            status.save()
+            return HttpResponseRedirect(settings.URL_PREFIX + '/references/summary?id=' + application_id_local)
+        else:
+            return(ChildProcessError)
+
     send_hdb_declare = HealthDeclarationBooklet.objects.get(application_id=application_id_local).send_hdb_declare
     application = Application.objects.get(pk=application_id_local)
     variables = {
@@ -851,3 +974,67 @@ def returned_email(email):
                           data,
                           headers=header)
         return r
+
+# Including the below file elsewhere caused cyclical import error, keeping here till this can be debugged
+
+
+def other_people_initial_population(adult, person_list):
+    initial_data = []
+
+    for person in person_list:
+        temp_dict = {}
+        if not adult:
+            table_id = person.child_id
+            form_instance = ChildInYourHomeForm()
+        else:
+            table_id = person.adult_id
+            form_instance = AdultInYourHomeForm()
+
+        for field in form_instance.fields:
+            try:
+                if field[-8:] == 'comments':
+                    field_name_local = field[:-9]
+                    comment = (ArcComments.objects.filter(table_pk=table_id).get(field_name=field_name_local)).comment
+                    temp_dict[field] = comment
+
+                if field[-7:] == 'declare':
+                    field_name_local = field[:-8]
+                    checkbox = (ArcComments.objects.filter(table_pk=table_id).get(field_name=field_name_local)).flagged
+                    temp_dict[field] = checkbox
+
+            except ArcComments.DoesNotExist:
+                pass
+        initial_data.append(temp_dict)
+    return initial_data
+
+
+def other_people_parsing(request_post):
+
+    other_person_list = []
+    adult_dict = {}
+    child_dict = {}
+    output_list = []
+
+    for field in request_post:
+        if 'child-' in field:
+            child_dict[field[6:]] = request_post[field]
+        if 'adult-' in field:
+            adult_dict[field[6:]] = request_post[field]
+
+    other_person_list.append(child_dict)
+    other_person_list.append(adult_dict)
+
+    for dictionary in other_person_list:
+        seen_before = []
+        temp_list = []
+        for key, value in dictionary.items():
+            num = key[0]
+            key = key[2:]
+            if num in seen_before:
+                temp_list[seen_before.index(num)][key] = value
+            else:
+                seen_before.append(num)
+                temp_list.append({key: value})
+        output_list.append(temp_list)
+
+    return output_list
