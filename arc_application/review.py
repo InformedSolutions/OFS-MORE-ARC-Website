@@ -15,6 +15,7 @@ from .forms import AdultInYourHomeForm, CheckBox, CommentsForm, DBSCheckForm, Fi
 from .models import AdultInHome, ApplicantHomeAddress, ApplicantName, ApplicantPersonalDetails, Application, Arc, \
     ChildInHome, ChildcareType, CriminalRecordCheck, FirstAidTraining, HealthDeclarationBooklet, Reference, \
     UserDetails, ArcComments
+from .views import release_application
 
 
 @login_required()
@@ -926,22 +927,6 @@ def review(request):
     }
 
     return render(request, 'review-confirmation.html', variables)
-
-def release_application(app_id):
-    """
-    Release application and status
-    :param request: an application id
-    :return: either True or False, depending on whether an application was found
-    """
-    if Arc.objects.filter(application_id=app_id).count() > 0:
-        app = Arc.objects.get(application_id=app_id)
-        app.delete()
-        if Arc.objects.filter(application_id=app_id).count() > 0:
-            status = Arc.objects.get(application_id=app_id)
-            status.delete()
-        return True
-    else:
-        return False
 
 
 def has_group(user, group_name):
