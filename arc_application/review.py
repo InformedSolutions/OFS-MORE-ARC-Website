@@ -99,9 +99,14 @@ def contact_summary(request):
             comment_list = request_to_comment(login_id, TABLE_NAME, form.cleaned_data)
             save_successful = save_comments(comment_list)
 
+            if not comment_list:
+                section_status = 'COMPLETED'
+            else:
+                section_status = 'FLAGGED'
+
             if save_successful:
                 status = Arc.objects.get(pk=application_id_local)
-                status.login_details_review = 'COMPLETED'
+                status.login_details_review = section_status
                 status.save()
                 return HttpResponseRedirect(settings.URL_PREFIX + '/childcare/age-groups?id=' + application_id_local)
             else:
@@ -217,9 +222,15 @@ def personal_details_summary(request):
             name_save_successful = save_comments(name_comments)
             address_save_successful = save_comments(address_comments)
 
+            if not birthdate_comments and not name_comments and not address_comments:
+                section_status = 'COMPLETED'
+            else:
+                section_status = 'FLAGGED'
+
             if birthdate_save_successful and name_save_successful and address_save_successful:
+
                 status = Arc.objects.get(pk=application_id_local)
-                status.personal_details_review = 'COMPLETED'
+                status.personal_details_review = section_status
                 status.save()
                 return HttpResponseRedirect(settings.URL_PREFIX + '/first-aid/summary?id=' + application_id_local)
             else:
@@ -298,9 +309,14 @@ def first_aid_training_summary(request):
             comment_list = request_to_comment(first_aid_id, TABLE_NAME, form.cleaned_data)
             save_successful = save_comments(comment_list)
 
+            if not comment_list:
+                section_status = 'COMPLETED'
+            else:
+                section_status = 'FLAGGED'
+
             if save_successful:
                 status = Arc.objects.get(pk=application_id_local)
-                status.first_aid_review = 'COMPLETED'
+                status.first_aid_review = section_status
                 status.save()
                 return HttpResponseRedirect(settings.URL_PREFIX + '/dbs-check/summary?id=' + application_id_local)
             else:
@@ -348,9 +364,15 @@ def dbs_check_summary(request):
             comment_list = request_to_comment(criminal_record_id, TABLE_NAME, form.cleaned_data)
             save_successful = save_comments(comment_list)
 
+            if not comment_list:
+                section_status = 'COMPLETED'
+            else:
+                section_status = 'FLAGGED'
+
+
             if save_successful:
                 status = Arc.objects.get(pk=application_id_local)
-                status.dbs_review = 'COMPLETED'
+                status.dbs_review = section_status
                 status.save()
                 return HttpResponseRedirect(settings.URL_PREFIX + '/health/check-answers?id=' + application_id_local)
             else:
@@ -415,9 +437,15 @@ def references_summary(request):
             reference1_saved = save_comments(form_comments)
             reference2_saved = save_comments(form2_comments)
 
+            if not form_comments and not form2_comments:
+                section_status = 'COMPLETED'
+            else:
+                section_status = 'FLAGGED'
+
+
             if reference1_saved and reference2_saved:
                 status = Arc.objects.get(pk=application_id_local)
-                status.references_review = 'COMPLETED'
+                status.references_review = section_status
                 status.save()
                 return HttpResponseRedirect(settings.URL_PREFIX + '/other-people/summary?id=' + application_id_local)
             else:
@@ -528,6 +556,8 @@ def other_people_summary(request):
             object_list = [adult_objects, child_objects]
             attr_list = ['adult_id', 'child_id']
 
+            section_status = 'COMPLETED'
+
             for dictionary in request_list:
                 object_index = request_list.index(dictionary)
                 for person in dictionary:
@@ -536,9 +566,12 @@ def other_people_summary(request):
                     person_object = person_object_list[request_index]
                     person_id = getattr(person_object, attr_list[object_index])
                     person_comments = request_to_comment(person_id, TABLE_NAMES[object_index], person)
+                    if person_comments:
+                        section_status = 'FLAGGED'
                     successful = save_comments(person_comments)
                     if not successful:
                         return render(request, '500.html')
+
 
             static_form_comments = request_to_comment(application_id_local, 'APPLICATION', form.cleaned_data)
             successful = save_comments(static_form_comments)
@@ -546,7 +579,7 @@ def other_people_summary(request):
                 return render(request, '500.html')
 
             status = Arc.objects.get(pk=application_id_local)
-            status.people_in_home_review = 'COMPLETED'
+            status.people_in_home_review = section_status
             status.save()
             return HttpResponseRedirect(settings.URL_PREFIX + '/review?id=' + application_id_local)
 
@@ -659,9 +692,14 @@ def health_check_answers(request):
             comment_list = request_to_comment(hdb_id, TABLE_NAME, form.cleaned_data)
             save_successful = save_comments(comment_list)
 
+            if not comment_list:
+                section_status = 'COMPLETED'
+            else:
+                section_status = 'FLAGGED'
+
             if save_successful:
                 status = Arc.objects.get(pk=application_id_local)
-                status.health_review = 'COMPLETED'
+                status.health_review = section_status
                 status.save()
                 return HttpResponseRedirect(settings.URL_PREFIX + '/references/summary?id=' + application_id_local)
             else:
