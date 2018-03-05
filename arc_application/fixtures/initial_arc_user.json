@@ -1,0 +1,33 @@
+[  
+    {  
+        "model":"arc_application.authgroup",
+        "pk":1,
+        "fields":{  
+            "name":"arc"
+        }
+    },
+                {  
+        "model":"arc_application.authuser",
+        "pk":2,
+        "fields":{  
+            "password":"pbkdf2_sha256$36000$jUzrXnboK71X$tGfIhB2l8VhkWEP5VeoUmOJdZirIIZ0bM1XgWdx2OQ8=",
+            "last_login":"2018-03-05T09:01:10.474Z",
+            "is_superuser":false,
+            "username":"arc1",
+            "first_name":"",
+            "last_name":"",
+            "email":"",
+            "is_staff":false,
+            "is_active":true,
+            "date_joined":"2018-03-01T10:16:32Z"
+        }
+    },
+                {  
+        "model":"arc_application.authusergroups",
+        "pk":1,
+        "fields":{  
+            "user":2,
+            "group":1
+        }
+    }
+]
