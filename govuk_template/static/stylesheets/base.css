@@ -1607,10 +1607,15 @@ textarea {
   }
 }
 
-input.form-control,
+input.form-control {
+  -webkit-appearance: none;
+  border-radius: 0;
+}
+
 textarea.form-control {
   -webkit-appearance: none;
   border-radius: 0;
+  width: 100%
 }
 
 .form-control-3-4 {
@@ -2495,6 +2500,10 @@ div.error-summary ul.error-summary-list {
 
 .task-in-progress {
   background-color: #6F777B;
+}
+
+.task-flagged {
+  background-color: #B10E1E;
 }
 
 .task-to-do {

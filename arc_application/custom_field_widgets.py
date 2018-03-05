@@ -28,3 +28,10 @@ class CustomCheckboxInput(widgets.CheckboxInput, Widget):
             context['widget']['label'] = self.label
         context['conditionally_revealed'] = self.conditionally_revealed.get(True)
         return context
+
+class Textarea(widgets.Textarea, Widget):
+    def __init__(self, attrs=None):
+        default_attrs = {'cols': '40', 'rows': '3'}
+        if attrs:
+            default_attrs.update(attrs)
+        super().__init__()

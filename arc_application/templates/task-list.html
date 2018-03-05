@@ -34,7 +34,7 @@
                         {% elif login_details_status == 'FLAGGED' %}
                         <a href="{{ URL_PREFIX }}/account/summary?id={{application_id}}">
                             <span class="task-name">Your login details</span><strong
-                                class="task-finished task-in-progress">Flagged</strong>
+                                class="task-finished task-flagged">Flagged</strong>
                         </a>
                         {% elif login_details_status == 'COMPLETED' %}
                         <a href="{{ URL_PREFIX }}/account/summary?id={{application_id}}">
@@ -54,7 +54,7 @@
                         {% elif childcare_type_status == 'FLAGGED' %}
                         <a href="{{ URL_PREFIX }}/childcare/age-groups?id={{application_id}}">
                             <span class="task-name">Type of childcare</span><strong
-                                class="task-finished task-in-progress" s>Flagged</strong>
+                                class="task-finished task-flagged" s>Flagged</strong>
                         </a>
                         {% elif childcare_type_status == 'COMPLETED' %}
                         <a href="{{ URL_PREFIX }}/childcare/age-groups?id={{application_id}}">
@@ -74,7 +74,7 @@
                         {% elif personal_details_status == 'FLAGGED' %}
                         <a href="{{ URL_PREFIX }}/personal-details/summary?id={{application_id}}">
                             <span class="task-name">Your personal details</span><strong
-                                class="task-finished task-in-progress">Flagged</strong>
+                                class="task-finished task-flagged">Flagged</strong>
                         </a>
                         {% elif personal_details_status == 'COMPLETED' %}
                         <a href="{{ URL_PREFIX }}/personal-details/summary?id={{application_id}}">
@@ -94,7 +94,7 @@
                         {% elif first_aid_training_status == 'FLAGGED' %}
                         <a href="{{ URL_PREFIX }}/first-aid/summary?id={{application_id}}">
                             <span class="task-name">First aid training</span><strong
-                                class="task-finished task-in-progress">Flagged</strong>
+                                class="task-finished task-flagged">Flagged</strong>
                         </a>
                         {% elif first_aid_training_status == 'COMPLETED' %}
                         <a href="{{ URL_PREFIX }}/first-aid/summary?id={{application_id}}">
@@ -114,7 +114,7 @@
                         {% elif criminal_record_check_status == 'FLAGGED' %}
                         <a href="{{ URL_PREFIX }}/dbs-check/summary?id={{application_id}}">
                             <span class="task-name">Criminal record (DBS) check</span><strong
-                                class="task-finished task-in-progress">Flagged</strong>
+                                class="task-finished task-flagged">Flagged</strong>
                         </a>
                         {% elif criminal_record_check_status == 'COMPLETED' %}
                         <a href="{{ URL_PREFIX }}/dbs-check/summary?id={{application_id}}">
@@ -133,7 +133,7 @@
                         {% elif health_status == 'FLAGGED' %}
                         <a href="{{ URL_PREFIX }}/health/check-answers?id={{application_id}}">
                             <span class="task-name">Health declaration booklet</span><strong
-                                class="task-finished task-in-progress">Flagged</strong>
+                                class="task-finished task-flagged">Flagged</strong>
                         </a>
                         {% elif health_status == 'COMPLETED' %}
                         <a href="{{ URL_PREFIX }}/health/check-answers?id={{application_id}}">
@@ -151,7 +151,7 @@
                         </a>
                         {% elif reference_status == 'FLAGGED' %}
                         <a href="{{ URL_PREFIX }}/references/summary?id={{application_id}}">
-                            <span class="task-name">References</span><strong class="task-finished task-in-progress">Flagged</strong>
+                            <span class="task-name">References</span><strong class="task-finished task-flagged">Flagged</strong>
                         </a>
                         {% elif reference_status == 'COMPLETED' %}
                         <a href="{{ URL_PREFIX }}/references/summary?id={{application_id}}">
@@ -170,7 +170,7 @@
                         {% elif people_in_home_status == 'FLAGGED' %}
                         <a href="{{ URL_PREFIX }}/other-people/summary?id={{application_id}}">
                             <span class="task-name">People in your home</span><strong
-                                class="task-finished task-in-progress">Flagged</strong>
+                                class="task-finished task-flagged">Flagged</strong>
                         </a>
                         {% elif people_in_home_status == 'COMPLETED' %}
                         <a href="{{ URL_PREFIX }}/other-people/summary?id={{application_id}}">
