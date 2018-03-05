@@ -9,7 +9,7 @@
                 {  
         "model":"arc_application.authuser",
         "pk":2,
-        "fields":{  
+        "fields":{
             "password":"pbkdf2_sha256$36000$0LmFEZxDRGCu$lAZrw1t7xlrEw+bwkv43Npyx7eGYGDVMFg6qHeptuMo=",
             "last_login":"2018-03-05T09:01:10.474Z",
             "is_superuser":false,
