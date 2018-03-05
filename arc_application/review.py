@@ -918,15 +918,24 @@ def review(request):
         accepted_email(email)
         # If successful
         release_application(request, application_id_local, 'ACCEPTED')
+        variables = {
+            'application_id': application_id_local,
+        }
+        return render(request, 'review-confirmation.html')
+
     else:
         release_application(request, application_id_local, 'FURTHER_INFORMATION')
         returned_email(email)
+        variables = {
+            'application_id': application_id_local,
+        }
+        return render(request, 'review-sent-back.html', variables)
 
     variables = {
         'application_id': application_id_local,
     }
 
-    return render(request, 'review-confirmation.html', variables)
+    return render(request, 'review-sent-back.html', variables)
 
 
 def has_group(user, group_name):
