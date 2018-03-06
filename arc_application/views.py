@@ -238,18 +238,24 @@ def release(request, application_id):
 
 def trigger_audit_log(application_id, status, user):
     message = ''
-    if status == 'FURTHER_INFORMATION':
-        message = 'The arc reviewer has flagged some fields that have been returned to the applicant'
-    elif status == 'ACCEPTED':
-        message = 'The reviewer has accepted your applicant'
-    elif status == 'SUBMITTED':
-        message = 'The reviewer has released your application, its still pending review'
-    elif status == 'ASSIGN':
-        message = 'The arc reviewer has been assigned this application'
     mydata = {}
-    mydata['message'] = message
     mydata['user'] = str(user)
-    mydata['date'] =  str(datetime.today().strftime("%H:%M | %d %B %Y"))
+    mydata['date'] =  str(datetime.today().strftime("%d/%m/%Y"))
+    if status == 'FURTHER_INFORMATION':
+        message = 'Returned - multiple tasks failed'
+        mydata['user'] = 'Reviewer'
+    elif status == 'ACCEPTED':
+        message = 'Accepted'
+        mydata['user'] = 'Reviewer'
+    elif status == 'SUBMITTED':
+        message = 'Released'
+        mydata['user'] = 'Reviewer'
+    elif status == 'ASSIGN':
+        message = 'Assigned to ' +str(user)
+        mydata['user'] = 'Reviewer'
+
+    mydata['message'] = message
+
     if AuditLog.objects.filter(application_id=application_id).count() == 1:
         log = AuditLog.objects.get(application_id=application_id)
         log.audit_message = log.audit_message[:-1] + ',' + json.dumps(mydata) + ']'
