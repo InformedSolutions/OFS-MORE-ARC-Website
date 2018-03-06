@@ -9,7 +9,7 @@ import re
 from arc_application.review import contact_summary, task_list, type_of_childcare_age_groups, personal_details_summary, \
     first_aid_training_summary, dbs_check_summary, references_summary, other_people_summary, health_check_answers, \
     review, comments, arc_summary
-from arc_application.views import assign_new_application, custom_login, delete_all, release, summary_page, error_404, error_500
+from arc_application.views import assign_new_application, custom_login, delete_all, release, summary_page, error_404, error_500, audit_log
 from django.conf import settings
 from django.conf.urls import url, include
 from django.contrib import admin
