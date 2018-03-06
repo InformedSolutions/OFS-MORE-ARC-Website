@@ -1,0 +1,4 @@
+{% load i18n %}
+{% blocktrans trimmed with timestamp=log.timestamp user=log.user|default:_('Reviewer') object=log.content_object extra=log.exta_data|safe %}
+   {{ timestamp }} - {{ user }} changed status to "{{ extra.application_status }}".
+{% endblocktrans %}

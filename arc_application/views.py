@@ -1,3 +1,6 @@
+import json
+from datetime import datetime
+
 from django import forms
 from django.conf import settings
 from django.contrib.auth import authenticate, login as auth_login
@@ -9,8 +12,9 @@ from django.shortcuts import render
 from django.utils.http import urlsafe_base64_decode
 from django.utils.text import capfirst
 from govuk_forms.forms import GOVUKForm
+from timeline_logger.models import TimelineLog
 
-from .models import ApplicantName, ApplicantPersonalDetails, Application, Arc
+from .models import ApplicantName, ApplicantPersonalDetails, Application, Arc, AuditLog
 
 
 @login_required()
@@ -129,7 +133,7 @@ def assign_new_application(request):
             arc_user.last_accessed = str(application.date_updated.strftime('%d/%m/%Y'))
             arc_user.user_id = request.user.id
             arc_user.save()
-
+        trigger_audit_log(local_application_id, 'ASSIGN', request.user)
         return JsonResponse({'message': arc_user.application_id})
 
 
@@ -232,6 +236,28 @@ def release(request, application_id):
     return release_application(request, application_id, 'SUBMITTED')
 
 
+def trigger_audit_log(application_id, status, user):
+    message = ''
+    if status == 'FURTHER_INFORMATION':
+        message = 'The arc reviewer has flagged some fields that have been returned to the applicant'
+    elif status == 'ACCEPTED':
+        message = 'The reviewer has accepted your applicant'
+    elif status == 'SUBMITTED':
+        message = 'The reviewer has released your application, its still pending review'
+    elif status == 'ASSIGN':
+        message = 'The arc reviewer has been assigned this application'
+    mydata = {}
+    mydata['message'] = message
+    mydata['user'] = str(user)
+    mydata['date'] =  str(datetime.today().strftime("%H:%M | %d %B %Y"))
+    if AuditLog.objects.filter(application_id=application_id).count() == 1:
+        log = AuditLog.objects.get(application_id=application_id)
+        log.audit_message = log.audit_message[:-1] + ',' + json.dumps(mydata) + ']'
+        log.save()
+    else:
+        log = AuditLog.objects.create(application_id=application_id, audit_message='[' + json.dumps(mydata) + ']')
+
+
 # TRIGGER
 # This is where all applications are released (3 different messages)
 # 1. If status == 'COMPLETE' it has been released by Arc User (not mentioned in BDD)
@@ -246,19 +272,31 @@ def release_application(request, application_id, status):
     :param status: what status to update the application with on release
     :return: Either redirect on success, or return error page (TBC)
     """
+    # Logging
+    """
+    if ApplicantPersonalDetails.objects.filter(application_id=local_application_id).count() > 0:
+                personal_details = ApplicantPersonalDetails.objects.get(
+                    application_id=local_application_id
+                )
+                applicant_name = ApplicantName.objects.get(
+                    personal_detail_id=personal_details.personal_detail_id
+                )
+                obj.applicant_name = applicant_name.first_name + ' ' + applicant_name.last_name
+    """
+
+
 
     if len(Application.objects.filter(application_id=application_id)) == 1:
         app = Application.objects.get(application_id=application_id)
         app.application_status = status
         app.save()
+
     if len(Arc.objects.filter(application_id=application_id)) == 1:
         arc = Arc.objects.get(pk=application_id)
         arc.user_id = ''
         arc.save()
+        trigger_audit_log(application_id, status, request.user)
         return HttpResponseRedirect('/arc/summary')
-    else:
-        # Swap this with legitimate error page
-        return JsonResponse({"message": "fail"})
 
 
 def audit_log(request):
@@ -266,14 +304,15 @@ def audit_log(request):
     if request.method == 'GET':
         application_id_local = request.GET["id"]
 
-        # Change this to Audit Log table (field name in templates are date, user and action)
-        app = Application.objects.all().order_by('-application_id')
-        variables = {
-            "application_id": application_id_local,
-            "app": app,
-        }
+        if AuditLog.objects.filter(application_id = application_id_local):
+            app = AuditLog.objects.get(application_id = application_id_local)
 
-        return render(request, './audit-log.html', variables)
+            variables = {
+                "application_id": application_id_local,
+                "app": json.loads(app.audit_message),
+            }
+
+            return render(request, './audit-log.html', variables)
 
 
 ######################################################################################################

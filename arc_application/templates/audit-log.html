@@ -29,12 +29,12 @@
         <tr>
             <td class="col-xs-1">
                 <b>
-                    {{ app.date|date:'d-m-Y H:i:s' }}
+                    {{ app.date }}
                 </b>
             </td>
             <td class="col-xs-1">{{ app.user }}</td>
             <td style="col-xs-1">
-                <code> {{ app.action }} </code>
+                <code> {{ app.message }} </code>
             </td>
         </tr>
         {% endfor %}
