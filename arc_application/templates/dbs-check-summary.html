@@ -6,17 +6,17 @@
 {% block inner_content %}
 
 <div class="column-full">
+    <form method="post" novalidate>
     <div class="form-group grid-row" style="padding-top: 30px;">
         <!-- Back button -->
-        <a href="{{ URL_PREFIX }}/review?id={{application_id}}" class="link-back"
-           style="margin-right: 10px; line-height: 28px" alt='Back to application list'>
-            Back
+        <a class="link-back">
+            <button type="submit" name="back" class="hidden-button" value="/first-aid/summary">Back</button>
         </a>
     </div>
     <div class="grid-row">
         <h1 class="form-title heading-large">Check your answers: your criminal record check</h1>
     </div>
-    <form method="post" novalidate>
+
             {% csrf_token %}
     <table class="check-your-answers form-group grid-row" style="table-layout: fixed; width: 100%">
         <thead>
@@ -121,8 +121,14 @@
             <input type="hidden" value="{{application_id}}" name="id"/>
 
     </div>
-    </form>
     <br>
+        <div class="form-group grid-row" style="padding-top: 30px;">
+        <a class="link-back">
+            <button type="submit" name="return_to_list" class="hidden-button" value="/review/">Return to List</button>
+        </a>
+        </div>
+
+    </form>
 </div>
 
 {% endblock %}

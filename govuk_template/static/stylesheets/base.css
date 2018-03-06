@@ -2510,6 +2510,17 @@ div.error-summary ul.error-summary-list {
   background-color: #BFC1C3;
 }
 
+.hidden-button {
+  font-size: 16px;
+  margin-right: 10px;
+  line-height: 28px;
+  background-color: transparent;
+  border: 0px;
+  margin: unset;
+  padding-left: unset;
+  cursor: pointer
+}
+
 .task-do-last {
   background-color: #FFFFFF;
   border: medium;

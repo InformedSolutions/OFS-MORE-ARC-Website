@@ -6,14 +6,15 @@
 {% block inner_content %}
 
 <div class="column-full">
+    <form method="post" novalidate>
     <div class="form-group grid-row" style="padding-top: 30px;">
         <!-- Back button -->
-        <a href="{{ URL_PREFIX }}/review?id={{application_id}}" class="link-back"
-           style="margin-right: 10px; line-height: 28px" alt='Back to application list'>
-            Back
+
+        <a class="link-back">
+            <button type="submit" name="back" class="hidden-button" value="/review/">Back</button>
         </a>
     </div>
-    <form method="post" novalidate>
+
             {% csrf_token %}
     <div class="grid-row">
         <h1 class="form-title heading-large">Review - Login Details</h1>
@@ -149,12 +150,18 @@
     <br>
     <div class="form-group grid-row">
 
-
             <input type="submit" class="button" value="Confirm and continue"/>
             <input type="hidden" value="{{application_id}}" name="id"/>
-        </form>
+
     </div>
     <br>
+    <div class="form-group grid-row" style="padding-top: 30px;">
+        <a class="link-back">
+            <button type="submit" name="return_to_list" class="hidden-button" value="/review/">Return to List </button>
+        </a>
+    </div>
+
+    </form>
 </div>
 
 {% endblock %}

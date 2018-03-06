@@ -7,7 +7,7 @@ from django.contrib.auth.models import Group
 from django.forms import formset_factory
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
-from .review_util import request_to_comment, save_comments
+from .review_util import request_to_comment, save_comments, redirect_selection
 
 from .forms import AdultInYourHomeForm, CheckBox, CommentsForm, DBSCheckForm, FirstAidTrainingForm, HealthForm, \
     LogInDetailsForm, PersonalDetailsForm, ReferencesForm, ReferencesForm2, AdultInYourHomeForm, ChildInYourHomeForm, \
@@ -109,7 +109,10 @@ def contact_summary(request):
                 status = Arc.objects.get(pk=application_id_local)
                 status.login_details_review = section_status
                 status.save()
-                return HttpResponseRedirect(settings.URL_PREFIX + '/childcare/age-groups?id=' + application_id_local)
+                default = '/childcare/age-groups'
+                redirect_link = redirect_selection(request,default)
+
+                return HttpResponseRedirect(settings.URL_PREFIX + redirect_link +'?id=' + application_id_local)
             else:
                 return ChildProcessError
 
@@ -151,7 +154,10 @@ def type_of_childcare_age_groups(request):
         status = Arc.objects.get(pk=application_id_local)
         status.childcare_type_review = 'COMPLETED'
         status.save()
-        return HttpResponseRedirect(settings.URL_PREFIX + '/personal-details/summary?id=' + application_id_local)
+        default = '/personal-details/summary'
+        redirect_link = redirect_selection(request, default)
+
+        return HttpResponseRedirect(settings.URL_PREFIX + redirect_link + '?id=' + application_id_local)
     application_id_local = request.GET["id"]
     application = ChildcareType.objects.get(application_id=application_id_local)
 
@@ -233,7 +239,11 @@ def personal_details_summary(request):
                 status = Arc.objects.get(pk=application_id_local)
                 status.personal_details_review = section_status
                 status.save()
-                return HttpResponseRedirect(settings.URL_PREFIX + '/first-aid/summary?id=' + application_id_local)
+                default = '/first-aid/summary'
+                redirect_link = redirect_selection(request, default)
+
+                return HttpResponseRedirect(settings.URL_PREFIX + redirect_link + '?id=' + application_id_local)
+
             else:
                 return render(request, '500.html')
 
@@ -319,7 +329,10 @@ def first_aid_training_summary(request):
                 status = Arc.objects.get(pk=application_id_local)
                 status.first_aid_review = section_status
                 status.save()
-                return HttpResponseRedirect(settings.URL_PREFIX + '/dbs-check/summary?id=' + application_id_local)
+                default = '/dbs-check/summary'
+                redirect_link = redirect_selection(request, default)
+
+                return HttpResponseRedirect(settings.URL_PREFIX + redirect_link + '?id=' + application_id_local)
             else:
                 return render(request, '500.html')
 
@@ -375,7 +388,10 @@ def dbs_check_summary(request):
                 status = Arc.objects.get(pk=application_id_local)
                 status.dbs_review = section_status
                 status.save()
-                return HttpResponseRedirect(settings.URL_PREFIX + '/health/check-answers?id=' + application_id_local)
+                default = '/health/check-answers'
+                redirect_link = redirect_selection(request, default)
+
+                return HttpResponseRedirect(settings.URL_PREFIX + redirect_link + '?id=' + application_id_local)
             else:
                 return render(request, '500.html')
 
@@ -448,7 +464,10 @@ def references_summary(request):
                 status = Arc.objects.get(pk=application_id_local)
                 status.references_review = section_status
                 status.save()
-                return HttpResponseRedirect(settings.URL_PREFIX + '/other-people/summary?id=' + application_id_local)
+                default = '/other-people/summary'
+                redirect_link = redirect_selection(request, default)
+
+                return HttpResponseRedirect(settings.URL_PREFIX + redirect_link + '?id=' + application_id_local)
             else:
                 return render(request, '500.html')
 
@@ -575,6 +594,8 @@ def other_people_summary(request):
 
 
             static_form_comments = request_to_comment(application_id_local, 'APPLICATION', form.cleaned_data)
+            if static_form_comments:
+                section_status = 'FLAGGED'
             successful = save_comments(static_form_comments)
             if not successful:
                 return render(request, '500.html')
@@ -582,7 +603,10 @@ def other_people_summary(request):
             status = Arc.objects.get(pk=application_id_local)
             status.people_in_home_review = section_status
             status.save()
-            return HttpResponseRedirect(settings.URL_PREFIX + '/review?id=' + application_id_local)
+            default = '/review'
+            redirect_link = redirect_selection(request, default)
+
+            return HttpResponseRedirect(settings.URL_PREFIX + redirect_link + '?id=' + application_id_local)
 
     adults_list = AdultInHome.objects.filter(application_id=application_id_local).order_by('adult')
     adult_name_list = []
@@ -621,11 +645,8 @@ def other_people_summary(request):
 
     initial_adult_data = other_people_initial_population(True, adults_list)
 
-
-
     # Instantiates the formset with the management data defined abbove, forcing a set amount of forms
     formset_adult = AdultFormSet(initial=initial_adult_data, prefix='adult')
-
 
     # Zips the formset into the list of adults
     adult_lists = zip(adult_name_list, adult_birth_day_list, adult_birth_month_list, adult_birth_year_list,
@@ -702,7 +723,11 @@ def health_check_answers(request):
                 status = Arc.objects.get(pk=application_id_local)
                 status.health_review = section_status
                 status.save()
-                return HttpResponseRedirect(settings.URL_PREFIX + '/references/summary?id=' + application_id_local)
+                default = '/references/summary'
+                redirect_link = redirect_selection(request, default)
+
+                return HttpResponseRedirect(settings.URL_PREFIX + redirect_link + '?id=' + application_id_local)
+
             else:
                 return render(request, '500.html')
 
@@ -1045,3 +1070,4 @@ def other_people_initial_population(adult, person_list):
                 pass
         initial_data.append(temp_dict)
     return initial_data
+

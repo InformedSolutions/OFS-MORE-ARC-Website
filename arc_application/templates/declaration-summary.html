@@ -1079,7 +1079,11 @@
             <input type="hidden" value="{{application_id}}" name="id"/>
         </form>
     </div>
-    <br>
+
+    <a href="{{ URL_PREFIX }}/review?id={{application_id}}" class="link-back"
+           style="margin-right: 10px; line-height: 28px">
+            Return to list
+    </a>
 </div>
 
 {% endblock %}

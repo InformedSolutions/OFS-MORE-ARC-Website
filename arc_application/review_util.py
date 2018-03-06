@@ -65,3 +65,12 @@ def save_comments(comment_list):
         return True
     except:
         return False
+
+
+def redirect_selection(request, default):
+    redirect_link = default
+    if 'return_to_list' in request.POST.keys():
+        redirect_link = request.POST['return_to_list']
+    if 'back' in request.POST.keys():
+        redirect_link = request.POST['back']
+    return redirect_link
