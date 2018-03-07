@@ -34,17 +34,14 @@
             </td>
             <td class="col-xs-1">{{ app.user }}</td>
             <td style="col-xs-1">
-                <code> {{ app.message }} </code>
+                {{ app.message }}
             </td>
         </tr>
         {% endfor %}
-
         </tbody>
     </table>
     <br>
     <!-- Return to task list -->
-    <div class="form-group grid-row">
-        <a href="{{ URL_PREFIX }}/review?id={{application_id}}">Return to list</a>
-    </div>
+    <a href="{{ URL_PREFIX }}/review?id={{application_id}}" class="link-back">Return to list</a>
 </main>
 {% endblock %}
