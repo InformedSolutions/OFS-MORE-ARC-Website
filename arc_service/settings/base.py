@@ -4,6 +4,7 @@ import os
 SERVER_LABEL = 'Test_1'
 
 ARC_GROUP = 'arc'
+CONTACT_CENTRE= 'contact-centre'
 APPLICATION_LIMIT = 5
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)

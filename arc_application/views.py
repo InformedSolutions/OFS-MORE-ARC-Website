@@ -137,18 +137,7 @@ def assign_new_application(request):
         return JsonResponse({'message': arc_user.application_id})
 
 
-@login_required()
-def delete_all(request):
-    """
-    Delete everything in Arc
-    :param request: Http Request
-    :return: Json Response
-    """
-    try:
-        Arc.objects.all().delete()
-        JsonResponse({'message': 'Arc Table deleted'})
-    except Exception as ex:
-        HttpResponse(ex)
+
 
 
 def get_assigned_apps(request):
@@ -184,6 +173,8 @@ def custom_login(request):
     """
     if has_group(request.user, settings.ARC_GROUP) and request.user.is_authenticated():
         return HttpResponseRedirect(settings.URL_PREFIX + '/summary')
+    elif has_group(request.user, settings.CONTACT_CENTRE) and request.user.is_authenticated():
+        return HttpResponseRedirect(settings.URL_PREFIX + '/search')
     if request.method == 'POST':
         form = AuthenticationForm(data=request.POST)
         variables = {
@@ -197,6 +188,9 @@ def custom_login(request):
             if user is not None and has_group(user, settings.ARC_GROUP):
                 auth_login(request, user)
                 return HttpResponseRedirect(settings.URL_PREFIX + '/summary')
+            elif has_group(user, settings.CONTACT_CENTRE):
+                auth_login(request, user)
+                return HttpResponseRedirect(settings.URL_PREFIX + '/search')
             else:
                 form.error_summary_title = 'There was a problem signing you in'
         except Exception as ex:
@@ -378,7 +372,7 @@ class AuthenticationForm(GOVUKForm):
         password = self.cleaned_data.get('password')
         if username is not None and password:
             self.user_cache = authenticate(self.request, username=username, password=password)
-            if self.user_cache is None or not has_group(self.user_cache, settings.ARC_GROUP):
+            if self.user_cache is None or (not has_group(self.user_cache, settings.ARC_GROUP) and not has_group(self.user_cache, settings.CONTACT_CENTRE)):
                 raise forms.ValidationError(
                     'Username and password combination not recognised. Please try signing in again below')
             else:
