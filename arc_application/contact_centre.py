@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.forms import Form
 from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from oscar.core.application import Application
@@ -11,7 +12,13 @@ from .models import AdultInHome, ApplicantHomeAddress, ApplicantName, ApplicantP
 def search(request):
     # On post search
     # Return search template
-    return JsonResponse({"message": "Hi"})
+    form = Form()
+    variables = {
+        'form': form,
+
+
+    }
+    return render(request, 'search.html', variables)
 
 
 def search_summary(request):

@@ -1,0 +1,80 @@
+{% extends 'govuk_template.html' %}
+{% block page_title %}Additional Comments{% endblock %}
+{% load static %}
+{% load govuk_template_base %}
+
+{% block inner_content %}
+
+<div class="column-full">
+    <div class="form-group grid-row column-full">
+        <h1 class="form-title heading-large">
+            Applications
+        </h1>
+        <form method="post">
+            <p>Please search for the application you wish to view below</p>
+
+            <br>
+            <p>This will search through all applicant names, date of birth's, and application references</p>
+            {{form.as_div}}
+            {% csrf_token %}
+            <input type="hidden" id="id" value="{{application_id}}" name="id"/>
+            <input type="submit" class="button" value="Search" alt='Continue to declaration'>
+        </form>
+        <br>
+        <br>
+        <div>
+            <p> Please select the application you wish to view from the table below</p>
+            <table>
+                <thead>
+                <tr>
+                    <td>
+                        App Type
+                    </td>
+                    <td>
+                        Applicant Name
+                    </td>
+                    <td>
+                        Date Submitted
+                    </td>
+                    <td>
+                        Date Accessed
+                    </td>
+                    <td>
+                        Submission Type
+                    </td>
+                    <td></td>
+                </tr>
+                </thead>
+                <tbody>
+                {% for app in app %}
+                <tr>
+                    <td class="col-xs-1">
+                        <b>
+                            {{ app.type }}
+                        </b>
+                    </td>
+                    <td class="col-xs-1">{{ app.name }}</td>
+                    <td style="col-xs-1">
+                        {{ app.submitted }}
+                    </td>
+                    <td style="col-xs-1">
+                        {{ app.accessed }}
+                    </td>
+                    <td style="col-xs-1">
+                        {{ app.sub_type }}
+                    </td>
+                    <td style="col-xs-1">
+                        {{ app.link }}
+                    </td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            <br>
+            <br>
+            <input type="submit" class="button" value="Clear" alt='Continue to declaration' id="clear">
+        </div>
+    </div>
+</div>
+
+{% endblock %}
