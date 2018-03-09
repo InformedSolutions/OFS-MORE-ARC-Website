@@ -6,15 +6,20 @@
 {% block inner_content %}
 
 <div class="column-full">
+    <div class="column-third" style="background-color: #bfc1c3; margin-left: 15px; padding: 10px; margin-top: 15px; float: right; width: 30%;">
+        <b style="font-weight: bold;">Application history:</b>
+        <br>
+        <a href="/arc/audit-log/?id={{application_id}}">Audit log</a>
+    </div>
     <div class="form-group grid-row" style="padding-top: 30px;">
-        <a href="{{ URL_PREFIX }}/review?id={{application_id}}" class="link-back"
+        <a href="{{ URL_PREFIX }}/search" class="link-back"
            style="margin-right: 10px; line-height: 28px">
             Back
         </a>
     </div>
     <div class="grid-row">
         <h1 class="form-title heading-large">
-            Check and confirm all your details
+             Application Summary
         </h1>
     </div>
     <table class="check-your-answers form-group grid-row">
@@ -1072,18 +1077,12 @@
     </table>
     {% endfor %}
     <br>
+
     <div class="form-group grid-row">
-        <form method="post">
-            {% csrf_token %}
-            <input type="submit" class="button" value="Confirm and continue"/>
-            <input type="hidden" value="{{application_id}}" name="id"/>
+        <form method="get" action="/arc/search">
+            <input type="submit" class="button" value="Continue"/>
         </form>
     </div>
-    <a href="{{ URL_PREFIX }}/review?id={{application_id}}" class="link-back"
-           style="margin-right: 10px; line-height: 28px">
-            Return to list
-        </a>
-    <br>
 </div>
 
 {% endblock %}

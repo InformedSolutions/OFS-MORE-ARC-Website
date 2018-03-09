@@ -1,9 +1,9 @@
 from django.conf import settings
-from django.forms import Form
-from django.http import HttpResponseRedirect, JsonResponse
+from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from oscar.core.application import Application
 
+from .forms import SearchForm
 from .models import AdultInHome, ApplicantHomeAddress, ApplicantName, ApplicantPersonalDetails, Application, Arc, \
     ChildInHome, ChildcareType, CriminalRecordCheck, FirstAidTraining, HealthDeclarationBooklet, Reference, \
     UserDetails
@@ -12,13 +12,85 @@ from .models import AdultInHome, ApplicantHomeAddress, ApplicantName, ApplicantP
 def search(request):
     # On post search
     # Return search template
-    form = Form()
+
+    form = SearchForm(request.POST)
+    if request.method == 'POST':
+        if form.is_valid():
+            query = form.cleaned_data['query']
+            results = search_query(query)
+            if results is not None and len(results) > 0:
+                data = format_data(results)
+                variables = {
+                    'empty': False,
+                    'form': form,
+                    'app': data,
+                }
+                return render(request, 'search.html', variables)
+
     variables = {
+        'empty': True,
         'form': form,
-
-
     }
     return render(request, 'search.html', variables)
+
+
+def format_data(results):
+    arr = list(results)
+    for i in arr:
+        if hasattr(i, 'application_id'):
+            if hasattr(i, 'personal_detail_id'):
+                # DoB was searched for
+                app = Application.objects.get(application_id=i.application_id)
+                name = ApplicantName.objects.get(personal_detail_id=i.personal_detail_id)
+                i.name = name.first_name + " " + name.last_name
+            else:
+                # This means an application id was searched for
+                app = Application.objects.get(application_id=i.application_id)
+                det = ApplicantPersonalDetails.objects.get(application_id=i.application_id)
+                name = ApplicantName.objects.get(personal_detail_id=det.personal_detail_id)
+                i.name = name.first_name + " " + name.last_name
+        if hasattr(i, 'first_name'):
+            det = ApplicantPersonalDetails.objects.get(personal_detail_id=i.personal_detail_id)
+            i.application_id = det.application_id
+            app = Application.objects.get(application_id=i.application_id)
+            i.name = i.first_name + " " + i.last_name
+        i.submitted = app.date_submitted
+        i.accessed = app.date_updated
+        i.type = 'Childminder'
+        i.sub_type = 'New'
+        i.link = '/arc/search-summary?id=' + str(i.application_id)
+        i.audit_link = '/arc/audit-log?id=' + str(i.application_id)
+    return results
+
+
+def search_query(query):
+    if len(query) == 36 and Application.objects.filter(pk=query).count() > 0:
+        return Application.objects.filter(pk=query)
+    elif ApplicantName.objects.filter(first_name=query).count() > 0:
+        return ApplicantName.objects.filter(first_name=query)
+    elif ApplicantName.objects.filter(last_name=query).count() > 0:
+        return ApplicantName.objects.filter(last_name=query)
+    elif ApplicantName.objects.filter(first_name=query.split(' ')[0], last_name=query.split(' ')[1]).count() > 0:
+        return ApplicantName.objects.filter(first_name=query.split(' ')[0], last_name=query.split(' ')[1])
+    elif query.count('.') == 2:
+        arr = query.split('.')
+        if len(arr[2]) == 2:
+            arr[2] = str(19) + arr[2]
+        return ApplicantPersonalDetails.objects.filter(birth_day=int(arr[0]), birth_month=int(arr[1]),
+                                                       birth_year=int(arr[2]))
+    elif query.count('/') == 2:
+        arr = query.split('/')
+        if len(arr[2]) == 2:
+            arr[2] = str(19) + arr[2]
+        return ApplicantPersonalDetails.objects.filter(birth_day=int(arr[0]), birth_month=int(arr[1]),
+                                                       birth_year=int(arr[2]))
+    elif query.count('-') == 2:
+        arr = query.split('-')
+        if len(arr[2]) == 2:
+            arr[2] = str(19) + arr[2]
+        return ApplicantPersonalDetails.objects.filter(birth_day=int(arr[0]), birth_month=int(arr[1]),
+                                                       birth_year=int(arr[2]))
+    return None
 
 
 def search_summary(request):
@@ -106,9 +178,7 @@ def search_summary(request):
     # Zip the appended lists together for the HTML to simultaneously parse
     child_lists = zip(child_name_list, child_birth_day_list, child_birth_month_list, child_birth_year_list,
                       child_relationship_list)
-    form = CheckBox()
     variables = {
-        'form': form,
         'application_id': application_id_local,
         'login_details_email': login_record.email,
         'login_details_mobile_number': login_record.mobile_number,

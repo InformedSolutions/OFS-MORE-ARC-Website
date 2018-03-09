@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib.auth.models import Group, User
 from django.test import Client, RequestFactory, TestCase
 
@@ -12,16 +13,16 @@ class ArcSummaryTest(TestCase):
         self.request_factory = RequestFactory()
         self.user = User.objects.create_user(
             username='arc_test', email='test@test.com', password='my_secret')
-        g = Group.objects.create(name='arc')
+        g = Group.objects.create(name=settings.ARC_GROUP)
         g.user_set.add(self.user)
         self.user = User.objects.create_user(
             username='cc_test', email='testing@test.com', password='my_secret')
-        g2 = Group.objects.create(name='contact-centre')
+        g2 = Group.objects.create(name=settings.CONTACT_CENTRE)
         g2.user_set.add(self.user)
 
     def test_user_group(self):
-        self.assertEqual(Group.objects.filter(name='contact-centre').count(), 1)
-        self.assertEqual(Group.objects.filter(name='arc').count(), 1)
+        self.assertEqual(Group.objects.filter(name=settings.CONTACT_CENTRE).count(), 1)
+        self.assertEqual(Group.objects.filter(name=settings.ARC_GROUP).count(), 1)
 
     def test_user(self):
         self.assertEqual(User.objects.filter(username='arc_test').count(), 1)
@@ -36,7 +37,7 @@ class ArcSummaryTest(TestCase):
         resp = self.client.get('/arc/summary/')
         self.assertEqual(resp.status_code, 200)
 
-    def test_summary_page(self):
+    def test_search_page(self):
         self.client.login(username='cc_test', password='my_secret')
         resp = self.client.get('/arc/search/')
         self.assertEqual(resp.status_code, 200)

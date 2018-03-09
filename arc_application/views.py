@@ -7,12 +7,11 @@ from django.contrib.auth import authenticate, login as auth_login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserModel
 from django.contrib.auth.models import Group
-from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
+from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.utils.http import urlsafe_base64_decode
 from django.utils.text import capfirst
 from govuk_forms.forms import GOVUKForm
-from timeline_logger.models import TimelineLog
 
 from .models import ApplicantName, ApplicantPersonalDetails, Application, Arc, AuditLog
 
@@ -137,9 +136,6 @@ def assign_new_application(request):
         return JsonResponse({'message': arc_user.application_id})
 
 
-
-
-
 def get_assigned_apps(request):
     """
     Get applications currently supplied to the user
@@ -234,7 +230,7 @@ def trigger_audit_log(application_id, status, user):
     message = ''
     mydata = {}
     mydata['user'] = str(user)
-    mydata['date'] =  str(datetime.today().strftime("%d/%m/%Y"))
+    mydata['date'] = str(datetime.today().strftime("%d/%m/%Y"))
     if status == 'FURTHER_INFORMATION':
         message = 'Returned - multiple tasks failed'
         mydata['user'] = 'Reviewer'
@@ -245,7 +241,7 @@ def trigger_audit_log(application_id, status, user):
         message = 'Released'
         mydata['user'] = 'Reviewer'
     elif status == 'ASSIGN':
-        message = 'Assigned to ' +str(user)
+        message = 'Assigned to ' + str(user)
         mydata['user'] = 'Reviewer'
 
     mydata['message'] = message
@@ -284,8 +280,6 @@ def release_application(request, application_id, status):
                 obj.applicant_name = applicant_name.first_name + ' ' + applicant_name.last_name
     """
 
-
-
     if len(Application.objects.filter(application_id=application_id)) == 1:
         app = Application.objects.get(application_id=application_id)
         app.application_status = status
@@ -304,8 +298,8 @@ def audit_log(request):
     if request.method == 'GET':
         application_id_local = request.GET["id"]
 
-        if AuditLog.objects.filter(application_id = application_id_local):
-            app = AuditLog.objects.get(application_id = application_id_local)
+        if AuditLog.objects.filter(application_id=application_id_local):
+            app = AuditLog.objects.get(application_id=application_id_local)
 
             variables = {
                 "application_id": application_id_local,
@@ -313,6 +307,9 @@ def audit_log(request):
             }
 
             return render(request, './audit-log.html', variables)
+        else:
+            # Currently if no Arc entries are found it simply sends you back to where you came.
+            return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 
 ######################################################################################################
@@ -372,7 +369,9 @@ class AuthenticationForm(GOVUKForm):
         password = self.cleaned_data.get('password')
         if username is not None and password:
             self.user_cache = authenticate(self.request, username=username, password=password)
-            if self.user_cache is None or (not has_group(self.user_cache, settings.ARC_GROUP) and not has_group(self.user_cache, settings.CONTACT_CENTRE)):
+            if self.user_cache is None or (
+                    not has_group(self.user_cache, settings.ARC_GROUP) and not has_group(self.user_cache,
+                                                                                         settings.CONTACT_CENTRE)):
                 raise forms.ValidationError(
                     'Username and password combination not recognised. Please try signing in again below')
             else:

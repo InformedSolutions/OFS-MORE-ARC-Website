@@ -12,7 +12,6 @@
         </h1>
         <form method="post">
             <p>Please search for the application you wish to view below</p>
-
             <br>
             <p>This will search through all applicant names, date of birth's, and application references</p>
             {{form.as_div}}
@@ -22,7 +21,10 @@
         </form>
         <br>
         <br>
+
+
         <div>
+            {% if not empty %}
             <p> Please select the application you wish to view from the table below</p>
             <table>
                 <thead>
@@ -42,29 +44,37 @@
                     <td>
                         Submission Type
                     </td>
+                    <td>
+
+                    </td>
+                    <td>
+                    </td>
                     <td></td>
                 </tr>
                 </thead>
                 <tbody>
                 {% for app in app %}
                 <tr>
-                    <td class="col-xs-1">
+                    <td>
                         <b>
                             {{ app.type }}
                         </b>
                     </td>
-                    <td class="col-xs-1">{{ app.name }}</td>
-                    <td style="col-xs-1">
+                    <td>{{ app.name }}</td>
+                    <td>
                         {{ app.submitted }}
                     </td>
-                    <td style="col-xs-1">
+                    <td>
                         {{ app.accessed }}
                     </td>
-                    <td style="col-xs-1">
+                    <td>
                         {{ app.sub_type }}
                     </td>
-                    <td style="col-xs-1">
-                        {{ app.link }}
+                    <td>
+                        <a href="{{ app.link }}">Application Summary</a>
+                    </td>
+                    <td>
+                        <a href="{{ app.audit_link }}">Audit Log</a>
                     </td>
                 </tr>
                 {% endfor %}
@@ -72,8 +82,12 @@
             </table>
             <br>
             <br>
-            <input type="submit" class="button" value="Clear" alt='Continue to declaration' id="clear">
+            <form method="get" action="/arc/search">
+                <input type="submit" class="button" value="Clear" alt='Continue to declaration' id="clear">
+            </form>
+            {% endif %}
         </div>
+
     </div>
 </div>
 
