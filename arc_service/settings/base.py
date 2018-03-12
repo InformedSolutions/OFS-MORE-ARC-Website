@@ -4,6 +4,7 @@ import os
 SERVER_LABEL = 'Test_1'
 
 ARC_GROUP = 'arc'
+CONTACT_CENTRE= 'contact-centre'
 APPLICATION_LIMIT = 5
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -27,7 +28,6 @@ THIRD_PARTY_APPS = [
     'govuk_forms',
     'govuk_template',
     'govuk_template_base',
-    'timeline_logger'
 ]
 
 PROJECT_APPS = [

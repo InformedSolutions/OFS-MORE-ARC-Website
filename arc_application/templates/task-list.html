@@ -151,7 +151,8 @@
                         </a>
                         {% elif reference_status == 'FLAGGED' %}
                         <a href="{{ URL_PREFIX }}/references/summary?id={{application_id}}">
-                            <span class="task-name">References</span><strong class="task-finished task-flagged">Flagged</strong>
+                            <span class="task-name">References</span><strong
+                                class="task-finished task-flagged">Flagged</strong>
                         </a>
                         {% elif reference_status == 'COMPLETED' %}
                         <a href="{{ URL_PREFIX }}/references/summary?id={{application_id}}">
@@ -191,14 +192,16 @@
             {% endif %}
         </div>
     </div>
-    <div class="column-third" style="background-color: #bfc1c3; margin-left: 15px; padding: 10px; margin-top: 15px; float: left; width: 30%;">
+    <div class="column-third"
+         style="background-color: #bfc1c3; margin-left: 15px; padding: 10px; margin-top: 15px; float: left; width: 30%;">
         <b style="font-weight: bold;">Progress:</b>
         <br>
         {{review_count}} of 8 sections complete
         <br>
         <br>
         {% if middle_names %}
-        <b style="font-weight: bold;">Name:</b> <b style="text-transform: capitalize;">{{first_name}} {{middle_names}} {{last_name}}</b>
+        <b style="font-weight: bold;">Name:</b> <b style="text-transform: capitalize;">{{first_name}} {{middle_names}}
+        {{last_name}}</b>
         {% elif not middle_names %}
         <b style="font-weight: bold;">Name:</b> <b style="text-transform: capitalize;">{{first_name}} {{last_name}}</b>
         {% endif %}
@@ -254,7 +257,8 @@
         {% endif %}
         <br>
     </div>
-    <div class="column-third" style="background-color: #bfc1c3; margin-left: 15px; padding: 10px; margin-top: 15px; float: left; width: 30%;">
+    <div class="column-third"
+         style="background-color: #bfc1c3; margin-left: 15px; padding: 10px; margin-top: 15px; float: left; width: 30%;">
         <b style="font-weight: bold;">Application history:</b>
         <br>
         <a href="{{ URL_PREFIX }}/audit-log/?id={{application_id}}">Audit log</a>

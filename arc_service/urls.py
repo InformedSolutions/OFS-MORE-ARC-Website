@@ -6,12 +6,14 @@ OFS-MORE-CCN3: Apply to be a Childminder Beta
 """
 import re
 
-from arc_application.review import contact_summary, task_list, type_of_childcare_age_groups, personal_details_summary, \
-    first_aid_training_summary, dbs_check_summary, references_summary, other_people_summary, health_check_answers, \
-    review, comments, arc_summary
-from arc_application.views import assign_new_application, custom_login, delete_all, release, summary_page, error_404, error_500, audit_log
+from arc_application.review import arc_summary, comments, contact_summary, dbs_check_summary, \
+    first_aid_training_summary, health_check_answers, other_people_summary, personal_details_summary, \
+    references_summary, review, task_list, type_of_childcare_age_groups
+from arc_application.views import assign_new_application, audit_log, custom_login, error_404, error_500, \
+    release, summary_page
+from arc_application.contact_centre import search, search_summary
 from django.conf import settings
-from django.conf.urls import url, include
+from django.conf.urls import include, url
 from django.contrib import admin
 from django.contrib.auth.views import logout
 
@@ -22,7 +24,6 @@ urlpatterns = [
     url(r'^login/', custom_login, name='login'),
     url(r'^logout/', logout, {'next_page': settings.URL_PREFIX + '/login/'}),
     url(r'^summary/', summary_page, name='summary'),
-    url(r'^delete/', delete_all, name='delete'),
     url(r'^review/', task_list, name='task_list'),
     url(r'^account/summary/', contact_summary, name='contact_summary'),
     url(r'^childcare/age-groups/', type_of_childcare_age_groups, name='ype_of_childcare_age_groups'),
@@ -35,7 +36,9 @@ urlpatterns = [
     url(r'^confirmation/', review, name='review'),
     url(r'^comments/', comments, name='comments'),
     url(r'^arc-summary/', arc_summary, name='arc-summary'),
-url(r'^audit-log/', audit_log),
+    url(r'^audit-log/', audit_log),
+    url(r'^search/', search),
+    url(r'^search-summary/', search_summary, name = 'search_summary'),
 ]
 
 if settings.URL_PREFIX:
@@ -47,10 +50,10 @@ if settings.URL_PREFIX:
 
 if settings.DEBUG:
     import debug_toolbar
-    urlpatterns = [
-        url(r'^__debug__/', include(debug_toolbar.urls)),
-    ] + urlpatterns
 
+    urlpatterns = [
+                      url(r'^__debug__/', include(debug_toolbar.urls)),
+                  ] + urlpatterns
 
 handler404 = error_404
 handler500 = error_500

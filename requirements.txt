@@ -6,4 +6,3 @@ django-govuk-forms==0.4
 requests
 whitenoise
 django-debug-toolbar
-django-timeline-logger

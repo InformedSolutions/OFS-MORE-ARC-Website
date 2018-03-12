@@ -22,4 +22,4 @@ DATABASES = {
         'HOST': os.environ.get('POSTGRES_HOST', 'ofsted-postgres'),
         'PORT': os.environ.get('POSTGRES_PORT', '5432')
     }
-}}
+}

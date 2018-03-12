@@ -1,0 +1,94 @@
+{% extends 'govuk_template.html' %}
+{% block page_title %}Additional Comments{% endblock %}
+{% load static %}
+{% load govuk_template_base %}
+
+{% block inner_content %}
+
+<div class="column-full">
+    <div class="form-group grid-row column-full">
+        <h1 class="form-title heading-large">
+            Applications
+        </h1>
+        <form method="post">
+            <p>Please search for the application you wish to view below</p>
+            <br>
+            <p>This will search through all applicant names, date of birth's, and application references</p>
+            {{form.as_div}}
+            {% csrf_token %}
+            <input type="hidden" id="id" value="{{application_id}}" name="id"/>
+            <input type="submit" class="button" value="Search" alt='Continue to declaration'>
+        </form>
+        <br>
+        <br>
+
+
+        <div>
+            {% if not empty %}
+            <p> Please select the application you wish to view from the table below</p>
+            <table>
+                <thead>
+                <tr>
+                    <td>
+                        App Type
+                    </td>
+                    <td>
+                        Applicant Name
+                    </td>
+                    <td>
+                        Date Submitted
+                    </td>
+                    <td>
+                        Date Accessed
+                    </td>
+                    <td>
+                        Submission Type
+                    </td>
+                    <td>
+
+                    </td>
+                    <td>
+                    </td>
+                    <td></td>
+                </tr>
+                </thead>
+                <tbody>
+                {% for app in app %}
+                <tr>
+                    <td>
+                        <b>
+                            {{ app.type }}
+                        </b>
+                    </td>
+                    <td>{{ app.name }}</td>
+                    <td>
+                        {{ app.submitted }}
+                    </td>
+                    <td>
+                        {{ app.accessed }}
+                    </td>
+                    <td>
+                        {{ app.sub_type }}
+                    </td>
+                    <td>
+                        <a href="{{ app.link }}">Application Summary</a>
+                    </td>
+                    <td>
+                        <a href="{{ app.audit_link }}">Audit Log</a>
+                    </td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            <br>
+            <br>
+            <form method="get" action="/arc/search">
+                <input type="submit" class="button" value="Clear" alt='Continue to declaration' id="clear">
+            </form>
+            {% endif %}
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}
