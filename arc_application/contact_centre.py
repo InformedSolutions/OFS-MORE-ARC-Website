@@ -98,16 +98,17 @@ def search_query(query):
     :param query: Either a search for DoB, Name, or Application Id
     :return: A querystring of results
     """
+    query = str(query).lower()
     if len(query) == 36 and Application.objects.filter(pk=query).count() > 0:
         return Application.objects.filter(pk=query)
-    elif ApplicantName.objects.filter(first_name=query).count() > 0:
-        return ApplicantName.objects.filter(first_name=query)
-    elif ApplicantName.objects.filter(last_name=query).count() > 0:
-        return ApplicantName.objects.filter(last_name=query)
+    elif ApplicantName.objects.filter(first_name__iexact=query).count() > 0:
+        return ApplicantName.objects.filter(first_name__iexact=query)
+    elif ApplicantName.objects.filter(last_nam__iexacte=query).count() > 0:
+        return ApplicantName.objects.filter(last_name__iexact=query)
     else:
         try:
-            if ApplicantName.objects.filter(first_name=query.split(' ')[0], last_name=query.split(' ')[1]).count() > 0:
-                return ApplicantName.objects.filter(first_name=query.split(' ')[0], last_name=query.split(' ')[1])
+            if ApplicantName.objects.filter(first_name__iexact=query.split(' ')[0], last_name__iexact=query.split(' ')[1]).count() > 0:
+                return ApplicantName.objects.filter(first_name__iexact=query.split(' ')[0], last_name__iexact=query.split(' ')[1])
             elif query.count('.') == 2:
                 arr = query.split('.')
                 if len(arr[2]) == 2:
