@@ -181,10 +181,10 @@ def custom_login(request):
             username = form.cleaned_data.get('username')
             password = form.cleaned_data.get('password')
             user = authenticate(username=username, password=password)
-            if user is not None and has_group(user, settings.ARC_GROUP):
+            if user is not None and has_group(user, settings.ARC_GROUP) and not has_group(user, settings.CONTACT_CENTRE):
                 auth_login(request, user)
                 return HttpResponseRedirect(settings.URL_PREFIX + '/summary')
-            elif has_group(user, settings.CONTACT_CENTRE):
+            elif has_group(user, settings.CONTACT_CENTRE) and not has_group(user, settings.ARC_GROUP):
                 auth_login(request, user)
                 return HttpResponseRedirect(settings.URL_PREFIX + '/search')
             else:
@@ -371,6 +371,7 @@ class AuthenticationForm(GOVUKForm):
             self.user_cache = authenticate(self.request, username=username, password=password)
             if self.user_cache is None or (
                     not has_group(self.user_cache, settings.ARC_GROUP) and not has_group(self.user_cache,
+                                                                                         settings.CONTACT_CENTRE)) or (has_group(self.user_cache, settings.ARC_GROUP) and has_group(self.user_cache,
                                                                                          settings.CONTACT_CENTRE)):
                 raise forms.ValidationError(
                     'Username and password combination not recognised. Please try signing in again below')
