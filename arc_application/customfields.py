@@ -5,10 +5,10 @@ OFS-MORE-CCN3: Apply to be a Childminder Beta
 """
 
 import datetime
+
 from django import forms
 from django.forms import widgets
 from django.utils.timezone import now
-from django.utils.dates import MONTHS
 from django.utils.translation import gettext, gettext_lazy as _
 from govuk_forms.widgets import SplitHiddenDateWidget
 
@@ -330,7 +330,7 @@ class SelectDateWidget(MultiWidget):
     def __init__(self, attrs=None, years=None, months=None, empty_label=None):
         this_year = datetime.date.today().year
         self.years = [(i, i) for i in years or range(this_year, this_year + 10)]
-        self.months = [(i , i) for i in months or range(1, 13)]
+        self.months = [(i, i) for i in months or range(1, 13)]
 
         if isinstance(empty_label, (list, tuple)):
             self.year_none_value = (0, empty_label[0])

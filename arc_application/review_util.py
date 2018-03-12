@@ -1,6 +1,4 @@
-from .models import AdultInHome, ApplicantHomeAddress, ApplicantName, ApplicantPersonalDetails, Application, Arc, \
-    ChildInHome, ChildcareType, CriminalRecordCheck, FirstAidTraining, HealthDeclarationBooklet, Reference, \
-    UserDetails, ArcComments
+from .models import ArcComments
 
 
 def request_to_comment(table_key, table_name, user_request):

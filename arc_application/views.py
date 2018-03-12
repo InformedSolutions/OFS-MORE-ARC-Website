@@ -181,7 +181,8 @@ def custom_login(request):
             username = form.cleaned_data.get('username')
             password = form.cleaned_data.get('password')
             user = authenticate(username=username, password=password)
-            if user is not None and has_group(user, settings.ARC_GROUP) and not has_group(user, settings.CONTACT_CENTRE):
+            if user is not None and has_group(user, settings.ARC_GROUP) and not has_group(user,
+                                                                                          settings.CONTACT_CENTRE):
                 auth_login(request, user)
                 return HttpResponseRedirect(settings.URL_PREFIX + '/summary')
             elif has_group(user, settings.CONTACT_CENTRE) and not has_group(user, settings.ARC_GROUP):
@@ -214,6 +215,7 @@ def get_user(self, uidb64):
 def has_group(user, group_name):
     group = Group.objects.get(name=group_name)
     return True if group in user.groups.all() else False
+
 
 @login_required()
 def release(request, application_id):
@@ -291,6 +293,7 @@ def release_application(request, application_id, status):
         arc.save()
         trigger_audit_log(application_id, status, request.user)
         return HttpResponseRedirect('/arc/summary')
+
 
 @login_required()
 def audit_log(request):
@@ -380,8 +383,9 @@ class AuthenticationForm(GOVUKForm):
             self.user_cache = authenticate(self.request, username=username, password=password)
             if self.user_cache is None or (
                     not has_group(self.user_cache, settings.ARC_GROUP) and not has_group(self.user_cache,
-                                                                                         settings.CONTACT_CENTRE)) or (has_group(self.user_cache, settings.ARC_GROUP) and has_group(self.user_cache,
-                                                                                         settings.CONTACT_CENTRE)):
+                                                                                         settings.CONTACT_CENTRE)) or (
+                    has_group(self.user_cache, settings.ARC_GROUP) and has_group(self.user_cache,
+                                                                                 settings.CONTACT_CENTRE)):
                 raise forms.ValidationError(
                     'Username and password combination not recognised. Please try signing in again below')
             else:

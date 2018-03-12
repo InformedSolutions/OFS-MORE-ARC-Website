@@ -3,11 +3,12 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 
-from .views import has_group
 from .forms import SearchForm
 from .models import AdultInHome, ApplicantHomeAddress, ApplicantName, ApplicantPersonalDetails, Application, Arc, \
     ChildInHome, ChildcareType, CriminalRecordCheck, FirstAidTraining, HealthDeclarationBooklet, Reference, \
     UserDetails
+from .views import has_group
+
 
 @login_required()
 def search(request):
@@ -107,6 +108,7 @@ def search_query(query):
         return ApplicantPersonalDetails.objects.filter(birth_day=int(arr[0]), birth_month=int(arr[1]),
                                                        birth_year=int(arr[2]))
     return None
+
 
 @login_required()
 def search_summary(request):

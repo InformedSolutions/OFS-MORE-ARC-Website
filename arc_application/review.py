@@ -7,14 +7,13 @@ from django.contrib.auth.models import Group
 from django.forms import formset_factory
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
-from .review_util import request_to_comment, save_comments, redirect_selection
 
-from .forms import AdultInYourHomeForm, CheckBox, CommentsForm, DBSCheckForm, FirstAidTrainingForm, HealthForm, \
-    LogInDetailsForm, PersonalDetailsForm, ReferencesForm, ReferencesForm2, AdultInYourHomeForm, ChildInYourHomeForm, \
-    OtherPeopleInYourHomeForm
+from .forms import AdultInYourHomeForm, CheckBox, ChildInYourHomeForm, CommentsForm, DBSCheckForm, FirstAidTrainingForm, \
+    HealthForm, LogInDetailsForm, OtherPeopleInYourHomeForm, PersonalDetailsForm, ReferencesForm, ReferencesForm2
 from .models import AdultInHome, ApplicantHomeAddress, ApplicantName, ApplicantPersonalDetails, Application, Arc, \
-    ChildInHome, ChildcareType, CriminalRecordCheck, FirstAidTraining, HealthDeclarationBooklet, Reference, \
-    UserDetails, ArcComments
+    ArcComments, ChildInHome, ChildcareType, CriminalRecordCheck, FirstAidTraining, HealthDeclarationBooklet, Reference, \
+    UserDetails
+from .review_util import redirect_selection, request_to_comment, save_comments
 from .views import release_application
 
 
@@ -110,9 +109,9 @@ def contact_summary(request):
                 status.login_details_review = section_status
                 status.save()
                 default = '/childcare/age-groups'
-                redirect_link = redirect_selection(request,default)
+                redirect_link = redirect_selection(request, default)
 
-                return HttpResponseRedirect(settings.URL_PREFIX + redirect_link +'?id=' + application_id_local)
+                return HttpResponseRedirect(settings.URL_PREFIX + redirect_link + '?id=' + application_id_local)
             else:
                 return ChildProcessError
 
@@ -182,7 +181,7 @@ def personal_details_summary(request):
     applicant_name_id = (ApplicantName.objects.get(personal_detail_id=personal_detail_id)).name_id
     applicant_home_address_id = (ApplicantHomeAddress.objects.get(personal_detail_id=personal_detail_id,
                                                                   current_address=True)).home_address_id
-    TABLE_NAMES = ['APPLICANT_PERSONAL_DETAILS', 'APPLICANT_NAME', 'APPLICANT_HOME_ADDRESS' ]
+    TABLE_NAMES = ['APPLICANT_PERSONAL_DETAILS', 'APPLICANT_NAME', 'APPLICANT_HOME_ADDRESS']
     PERSONAL_DETAIL_FIELDS = ['date_of_birth_declare', 'date_of_birth_comments']
     NAME_FIELDS = ['name_declare', 'name_comments']
     HOME_ADDRESS_FIELDS = ['home_address_declare', 'home_address_comments',
@@ -191,10 +190,11 @@ def personal_details_summary(request):
     if request.method == 'GET':
         # Collect required ids
         application_id_local = request.GET["id"]
-        personal_detail_id = (ApplicantPersonalDetails.objects.get(application_id=application_id_local)).personal_detail_id
+        personal_detail_id = (
+        ApplicantPersonalDetails.objects.get(application_id=application_id_local)).personal_detail_id
         applicant_name_id = (ApplicantName.objects.get(personal_detail_id=personal_detail_id)).name_id
         applicant_home_address_id = (ApplicantHomeAddress.objects.get(personal_detail_id=personal_detail_id,
-                                                                         current_address=True)).home_address_id
+                                                                      current_address=True)).home_address_id
 
         form = PersonalDetailsForm(table_keys=[personal_detail_id, applicant_name_id, applicant_home_address_id])
 
@@ -203,9 +203,11 @@ def personal_details_summary(request):
         name_dict = {}
         address_dict = {}
 
-        form = PersonalDetailsForm(request.POST, table_keys=[personal_detail_id, applicant_name_id, applicant_home_address_id])
+        form = PersonalDetailsForm(request.POST,
+                                   table_keys=[personal_detail_id, applicant_name_id, applicant_home_address_id])
         application_id_local = request.POST["id"]
-        personal_detail_id = (ApplicantPersonalDetails.objects.get(application_id=application_id_local)).personal_detail_id
+        personal_detail_id = (
+        ApplicantPersonalDetails.objects.get(application_id=application_id_local)).personal_detail_id
         applicant_name_id = (ApplicantName.objects.get(personal_detail_id=personal_detail_id)).name_id
         applicant_home_address_id = (ApplicantHomeAddress.objects.get(personal_detail_id=personal_detail_id,
                                                                       current_address=True)).home_address_id
@@ -383,7 +385,6 @@ def dbs_check_summary(request):
             else:
                 section_status = 'FLAGGED'
 
-
             if save_successful:
                 status = Arc.objects.get(pk=application_id_local)
                 status.dbs_review = section_status
@@ -437,7 +438,7 @@ def references_summary(request):
         reference_id_1 = Reference.objects.get(application_id=application_id_local, reference=1).reference_id
         reference_id_2 = Reference.objects.get(application_id=application_id_local, reference=2).reference_id
 
-        #Grab form data from post
+        # Grab form data from post
         form = ReferencesForm(request.POST, table_keys=[reference_id_1], prefix="form")
         form2 = ReferencesForm2(request.POST, table_keys=[reference_id_2], prefix="form2")
 
@@ -458,7 +459,6 @@ def references_summary(request):
                 section_status = 'COMPLETED'
             else:
                 section_status = 'FLAGGED'
-
 
             if reference1_saved and reference2_saved:
                 status = Arc.objects.get(pk=application_id_local)
@@ -547,9 +547,8 @@ def other_people_summary(request):
     ChildFormSet = formset_factory(ChildInYourHomeForm)
     TABLE_NAMES = ['ADULT_IN_HOME', 'CHILD_IN_HOME']
 
-
     if request.method == 'GET':
-        #Defines the static form at the top of the page
+        # Defines the static form at the top of the page
 
         application_id_local = request.GET["id"]
         form = OtherPeopleInYourHomeForm(table_keys=[application_id_local], prefix='static')
@@ -591,7 +590,6 @@ def other_people_summary(request):
                     successful = save_comments(person_comments)
                     if not successful:
                         return render(request, '500.html')
-
 
             static_form_comments = request_to_comment(application_id_local, 'APPLICATION', form.cleaned_data)
             if static_form_comments:
@@ -638,9 +636,9 @@ def other_people_summary(request):
     # Defines the data required for rendering the amount of forms in the below formset
     amount_of_adults = str(len(adult_name_list))
     data = {
-    'adult-TOTAL_FORMS': amount_of_adults,
-    'adult-INITIAL_FORMS': amount_of_adults,
-    'adult-MAX_NUM_FORMS': '',
+        'adult-TOTAL_FORMS': amount_of_adults,
+        'adult-INITIAL_FORMS': amount_of_adults,
+        'adult-MAX_NUM_FORMS': '',
     }
 
     initial_adult_data = other_people_initial_population(True, adults_list)
@@ -654,7 +652,6 @@ def other_people_summary(request):
 
     # Converts it to a list, there was trouble parsing the form objects when it was in a zip object
     adult_lists = list(adult_lists)
-
 
     for child in children_list:
         if child.middle_names != '':
@@ -972,9 +969,6 @@ def has_group(user, group_name):
     return True if group in user.groups.all() else False
 
 
-
-
-
 def all_complete(id, flag):
     """
     Check the status of all sections
@@ -1039,6 +1033,7 @@ def returned_email(email):
                           headers=header)
         return r
 
+
 # Including the below file elsewhere caused cyclical import error, keeping here till this can be debugged
 
 
@@ -1070,4 +1065,3 @@ def other_people_initial_population(adult, person_list):
                 pass
         initial_data.append(temp_dict)
     return initial_data
-

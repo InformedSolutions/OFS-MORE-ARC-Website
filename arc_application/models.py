@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 from uuid import uuid4
+
 from django.contrib.postgres.fields import JSONField
 from django.db import models
 
@@ -14,6 +15,7 @@ TASK_STATUS = (
 class AuditLog(models.Model):
     application_id = models.UUIDField(primary_key=True, default=uuid4)
     audit_message = JSONField(blank=True)
+
     class Meta:
         db_table = 'AUDIT_LOG'
 

@@ -21,13 +21,13 @@ class CustomCheckboxInput(widgets.CheckboxInput, Widget):
         super().__init__(*args, **kwargs)
         self.conditionally_revealed = {}
 
-
     def get_context(self, name, value, attrs):
         context = super().get_context(name, value, attrs)
         if self.label:
             context['widget']['label'] = self.label
         context['conditionally_revealed'] = self.conditionally_revealed.get(True)
         return context
+
 
 class Textarea(widgets.Textarea, Widget):
     def __init__(self, attrs=None):

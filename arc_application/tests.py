@@ -1,8 +1,6 @@
 from django.conf import settings
 from django.contrib.auth.models import Group, User
-from django.test import Client, RequestFactory, TestCase
-
-from .models import Arc
+from django.test import RequestFactory, TestCase
 
 
 class ArcSummaryTest(TestCase):
@@ -41,6 +39,8 @@ class ArcSummaryTest(TestCase):
         self.client.login(username='cc_test', password='my_secret')
         resp = self.client.get('/arc/search/')
         self.assertEqual(resp.status_code, 200)
+
+
 """
     def test_assign_application(self):
         # This test is currently incomplete, and not that different than 'test_summary_page'
