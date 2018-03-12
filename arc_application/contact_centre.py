@@ -103,7 +103,7 @@ def search_query(query):
         return Application.objects.filter(pk=query)
     elif ApplicantName.objects.filter(first_name__iexact=query).count() > 0:
         return ApplicantName.objects.filter(first_name__iexact=query)
-    elif ApplicantName.objects.filter(last_name__iexacte=query).count() > 0:
+    elif ApplicantName.objects.filter(last_name__iexact=query).count() > 0:
         return ApplicantName.objects.filter(last_name__iexact=query)
     else:
         try:
