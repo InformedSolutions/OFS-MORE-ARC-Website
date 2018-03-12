@@ -1,7 +1,6 @@
 from django.conf import settings
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
-from oscar.core.application import Application
 
 from .forms import SearchForm
 from .models import AdultInHome, ApplicantHomeAddress, ApplicantName, ApplicantPersonalDetails, Application, Arc, \
@@ -10,9 +9,11 @@ from .models import AdultInHome, ApplicantHomeAddress, ApplicantName, ApplicantP
 
 
 def search(request):
-    # On post search
-    # Return search template
-
+    """
+    This is the contact centre search applications page
+    :param request: An Http request- you must be logged in.
+    :return: The search template on GET request, or submit it and return the search results on POST
+    """
     form = SearchForm(request.POST)
     if request.method == 'POST':
         if form.is_valid():
@@ -35,6 +36,11 @@ def search(request):
 
 
 def format_data(results):
+    """
+    This adds the missing data from the objects returned from the search
+    :param results: An Http request- you must be logged in.
+    :return: a querystring of results that match the search
+    """
     arr = list(results)
     for i in arr:
         if hasattr(i, 'application_id'):
@@ -64,6 +70,11 @@ def format_data(results):
 
 
 def search_query(query):
+    """
+    This method actually searches the database for results matching the query
+    :param query: Either a search for DoB, Name, or Application Id
+    :return: A querystring of results
+    """
     if len(query) == 36 and Application.objects.filter(pk=query).count() > 0:
         return Application.objects.filter(pk=query)
     elif ApplicantName.objects.filter(first_name=query).count() > 0:
