@@ -215,7 +215,7 @@ def has_group(user, group_name):
     group = Group.objects.get(name=group_name)
     return True if group in user.groups.all() else False
 
-
+@login_required()
 def release(request, application_id):
     """
     This is purely to handle the /release url on the arc summary page
@@ -292,19 +292,28 @@ def release_application(request, application_id, status):
         trigger_audit_log(application_id, status, request.user)
         return HttpResponseRedirect('/arc/summary')
 
-
+@login_required()
 def audit_log(request):
-    user_id = request.user.id
+    user = request.user
+
     if request.method == 'GET':
         application_id_local = request.GET["id"]
 
         if AuditLog.objects.filter(application_id=application_id_local):
             app = AuditLog.objects.get(application_id=application_id_local)
+            if has_group(user, settings.CONTACT_CENTRE):
 
-            variables = {
-                "application_id": application_id_local,
-                "app": json.loads(app.audit_message),
-            }
+                variables = {
+                    "application_id": application_id_local,
+                    "app": json.loads(app.audit_message),
+                    "back": 'search'
+                }
+            elif has_group(user, settings.ARC_GROUP):
+                variables = {
+                    "application_id": application_id_local,
+                    "app": json.loads(app.audit_message),
+                    "back": 'review?id=' + application_id_local
+                }
 
             return render(request, './audit-log.html', variables)
         else:

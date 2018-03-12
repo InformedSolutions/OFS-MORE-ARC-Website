@@ -5,7 +5,7 @@
 
 {% block inner_content %}
 <main>
-    <a href="{{ URL_PREFIX }}/review?id={{application_id}}" class="link-back"
+    <a href="{{ URL_PREFIX }}/{{ back }}" class="link-back"
        style="margin-right: 10px; line-height: 28px" alt='Back to application list'>
         Back
     </a>
@@ -42,6 +42,6 @@
     </table>
     <br>
     <!-- Return to task list -->
-    <a href="{{ URL_PREFIX }}/review?id={{application_id}}" class="link-back">Return to list</a>
+    <a href="{{ URL_PREFIX }}/{{ back }}" class="link-back">Return to list</a>
 </main>
 {% endblock %}

@@ -1,38 +1,43 @@
 from django.conf import settings
+from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 
+from .views import has_group
 from .forms import SearchForm
 from .models import AdultInHome, ApplicantHomeAddress, ApplicantName, ApplicantPersonalDetails, Application, Arc, \
     ChildInHome, ChildcareType, CriminalRecordCheck, FirstAidTraining, HealthDeclarationBooklet, Reference, \
     UserDetails
 
-
+@login_required()
 def search(request):
     """
     This is the contact centre search applications page
     :param request: An Http request- you must be logged in.
     :return: The search template on GET request, or submit it and return the search results on POST
     """
-    form = SearchForm(request.POST)
-    if request.method == 'POST':
-        if form.is_valid():
-            query = form.cleaned_data['query']
-            results = search_query(query)
-            if results is not None and len(results) > 0:
-                data = format_data(results)
-                variables = {
-                    'empty': False,
-                    'form': form,
-                    'app': data,
-                }
-                return render(request, 'search.html', variables)
+    if has_group(request.user, settings.CONTACT_CENTRE) and request.user.is_authenticated():
+        form = SearchForm(request.POST)
+        if request.method == 'POST':
+            if form.is_valid():
+                query = form.cleaned_data['query']
+                results = search_query(query)
+                if results is not None and len(results) > 0:
+                    data = format_data(results)
+                    variables = {
+                        'empty': False,
+                        'form': form,
+                        'app': data,
+                    }
+                    return render(request, 'search.html', variables)
 
-    variables = {
-        'empty': True,
-        'form': form,
-    }
-    return render(request, 'search.html', variables)
+        variables = {
+            'empty': True,
+            'form': form,
+        }
+        return render(request, 'search.html', variables)
+    else:
+        return HttpResponseRedirect(settings.URL_PREFIX + '/login/')
 
 
 def format_data(results):
@@ -103,7 +108,7 @@ def search_query(query):
                                                        birth_year=int(arr[2]))
     return None
 
-
+@login_required()
 def search_summary(request):
     """
     This page may change, but currently returns a full summary of the application, this doenst have dynamic boxes as it
