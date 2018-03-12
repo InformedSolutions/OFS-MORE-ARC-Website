@@ -21,7 +21,7 @@
         </h1>
         <form method="post">
             <p>Please search for the application you wish to view below</p>
-            <br>
+
             <p>This will search through all applicant names, date of birth's, and application references</p>
             {{form.as_div}}
             {% csrf_token %}
@@ -71,13 +71,17 @@
                     </td>
                     <td>{{ app.name }}</td>
                     <td>
+                        <b>
                         {{ app.submitted }}
+                        </b>
                     </td>
                     <td>
                         {{ app.accessed }}
                     </td>
                     <td>
+                        <b>
                         {{ app.sub_type }}
+                        </b>
                     </td>
                     <td>
                         <a href="{{ app.link }}">Application Summary</a>

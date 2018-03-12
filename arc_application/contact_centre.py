@@ -36,8 +36,7 @@ def search(request):
                     return render(request, 'search.html', variables)
                 else:
                     error_exist = 'true'
-                    error_title = 'Your search \'' +query +'\' has returned no results'
-
+                    error_title = 'Your search \'' + query + '\' has returned no results'
 
         variables = {
             'empty': True,
@@ -76,8 +75,16 @@ def format_data(results):
             i.application_id = det.application_id
             app = Application.objects.get(application_id=i.application_id)
             i.name = i.first_name + " " + i.last_name
-        i.submitted = app.date_submitted
-        i.accessed = app.date_updated
+
+        if not app.date_submitted == None:
+            i.submitted = app.date_submitted.strftime('%d/%m/%Y')
+        else:
+            i.submitted = None
+        if not app.date_updated == None:
+            i.accessed = app.date_updated.strftime('%d/%m/%Y')
+        else:
+            i.accessed = None
+
         i.type = 'Childminder'
         i.sub_type = 'New'
         i.link = '/arc/search-summary?id=' + str(i.application_id)
