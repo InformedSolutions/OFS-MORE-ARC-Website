@@ -18,6 +18,9 @@ def search(request):
     :return: The search template on GET request, or submit it and return the search results on POST
     """
     if has_group(request.user, settings.CONTACT_CENTRE) and request.user.is_authenticated():
+        error_exist = 'false'
+        error_title = ''
+        error_text = ''
         form = SearchForm(request.POST)
         if request.method == 'POST':
             if form.is_valid():
@@ -31,10 +34,17 @@ def search(request):
                         'app': data,
                     }
                     return render(request, 'search.html', variables)
+                else:
+                    error_exist = 'true'
+                    error_title = 'Your search \'' +query +'\' has returned no results'
+
 
         variables = {
             'empty': True,
             'form': form,
+            'error_exist': error_exist,
+            'error_title': error_title,
+            'error_text': error_text
         }
         return render(request, 'search.html', variables)
     else:
@@ -87,26 +97,30 @@ def search_query(query):
         return ApplicantName.objects.filter(first_name=query)
     elif ApplicantName.objects.filter(last_name=query).count() > 0:
         return ApplicantName.objects.filter(last_name=query)
-    elif ApplicantName.objects.filter(first_name=query.split(' ')[0], last_name=query.split(' ')[1]).count() > 0:
-        return ApplicantName.objects.filter(first_name=query.split(' ')[0], last_name=query.split(' ')[1])
-    elif query.count('.') == 2:
-        arr = query.split('.')
-        if len(arr[2]) == 2:
-            arr[2] = str(19) + arr[2]
-        return ApplicantPersonalDetails.objects.filter(birth_day=int(arr[0]), birth_month=int(arr[1]),
-                                                       birth_year=int(arr[2]))
-    elif query.count('/') == 2:
-        arr = query.split('/')
-        if len(arr[2]) == 2:
-            arr[2] = str(19) + arr[2]
-        return ApplicantPersonalDetails.objects.filter(birth_day=int(arr[0]), birth_month=int(arr[1]),
-                                                       birth_year=int(arr[2]))
-    elif query.count('-') == 2:
-        arr = query.split('-')
-        if len(arr[2]) == 2:
-            arr[2] = str(19) + arr[2]
-        return ApplicantPersonalDetails.objects.filter(birth_day=int(arr[0]), birth_month=int(arr[1]),
-                                                       birth_year=int(arr[2]))
+    else:
+        try:
+            if ApplicantName.objects.filter(first_name=query.split(' ')[0], last_name=query.split(' ')[1]).count() > 0:
+                return ApplicantName.objects.filter(first_name=query.split(' ')[0], last_name=query.split(' ')[1])
+            elif query.count('.') == 2:
+                arr = query.split('.')
+                if len(arr[2]) == 2:
+                    arr[2] = str(19) + arr[2]
+                return ApplicantPersonalDetails.objects.filter(birth_day=int(arr[0]), birth_month=int(arr[1]),
+                                                               birth_year=int(arr[2]))
+            elif query.count('/') == 2:
+                arr = query.split('/')
+                if len(arr[2]) == 2:
+                    arr[2] = str(19) + arr[2]
+                return ApplicantPersonalDetails.objects.filter(birth_day=int(arr[0]), birth_month=int(arr[1]),
+                                                               birth_year=int(arr[2]))
+            elif query.count('-') == 2:
+                arr = query.split('-')
+                if len(arr[2]) == 2:
+                    arr[2] = str(19) + arr[2]
+                return ApplicantPersonalDetails.objects.filter(birth_day=int(arr[0]), birth_month=int(arr[1]),
+                                                               birth_year=int(arr[2]))
+        except Exception as ex:
+            print(ex)
     return None
 
 
