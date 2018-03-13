@@ -24,18 +24,23 @@ def search(request):
         if request.method == 'POST':
             if form.is_valid():
                 query = form.cleaned_data['query']
-                results = search_query(query)
-                if results is not None and len(results) > 0:
-                    data = format_data(results)
-                    variables = {
-                        'empty': False,
-                        'form': form,
-                        'app': data,
-                    }
-                    return render(request, 'search.html', variables)
+                if len(query) != 0:
+
+                    results = search_query(query)
+                    if results is not None and len(results) > 0:
+                        data = format_data(results)
+                        variables = {
+                            'empty': False,
+                            'form': form,
+                            'app': data,
+                        }
+                        return render(request, 'search.html', variables)
+                    else:
+                        error_exist = 'true'
+                        error_title = 'Your search \'' + query + '\' has returned no results'
                 else:
                     error_exist = 'true'
-                    error_title = 'Your search \'' + query + '\' has returned no results'
+                    error_title = 'This field is required'
 
         variables = {
             'empty': True,
@@ -106,10 +111,11 @@ def search_query(query):
         return ApplicantName.objects.filter(last_name__iexact=query)
     else:
         try:
-            if ApplicantName.objects.filter(first_name__iexact=query.split(' ')[0],
-                                            last_name__iexact=query.split(' ')[1]).count() > 0:
-                return ApplicantName.objects.filter(first_name__iexact=query.split(' ')[0],
-                                                    last_name__iexact=query.split(' ')[1])
+            if ' ' in query:
+                if ApplicantName.objects.filter(first_name__iexact=query.split(' ')[0],
+                                                last_name__iexact=query.split(' ')[1]).count() > 0:
+                    return ApplicantName.objects.filter(first_name__iexact=query.split(' ')[0],
+                                                        last_name__iexact=query.split(' ')[1])
             elif query.count('.') == 2:
                 arr = query.split('.')
                 if len(arr[2]) == 2:
