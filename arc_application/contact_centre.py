@@ -9,7 +9,6 @@ from .models import AdultInHome, ApplicantHomeAddress, ApplicantName, ApplicantP
     UserDetails
 from .views import has_group
 
-
 @login_required()
 def search(request):
     """
@@ -107,8 +106,10 @@ def search_query(query):
         return ApplicantName.objects.filter(last_name__iexact=query)
     else:
         try:
-            if ApplicantName.objects.filter(first_name__iexact=query.split(' ')[0], last_name__iexact=query.split(' ')[1]).count() > 0:
-                return ApplicantName.objects.filter(first_name__iexact=query.split(' ')[0], last_name__iexact=query.split(' ')[1])
+            if ApplicantName.objects.filter(first_name__iexact=query.split(' ')[0],
+                                            last_name__iexact=query.split(' ')[1]).count() > 0:
+                return ApplicantName.objects.filter(first_name__iexact=query.split(' ')[0],
+                                                    last_name__iexact=query.split(' ')[1])
             elif query.count('.') == 2:
                 arr = query.split('.')
                 if len(arr[2]) == 2:
