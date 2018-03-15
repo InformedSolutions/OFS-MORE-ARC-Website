@@ -15,7 +15,6 @@ echo "Collecting static assets"
 mkdir -p static
 python manage.py collectstatic --noinput --settings=$PROJECT_SETTINGS
 
-echo "from django.contrib.auth.models import User; User.objects.filter(username='root').delete(); User.objects.create_superuser('root', 'root@admin.com', 'default-password')" | python manage.py shell --settings=$PROJECT_SETTINGS
 python manage.py loaddata initial_arc_user --settings=$PROJECT_SETTINGS
 
 # Start server
