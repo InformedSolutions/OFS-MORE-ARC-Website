@@ -36,8 +36,8 @@ urlpatterns = [
     url(r'^confirmation/', review, name='review'),
     url(r'^comments/', comments, name='comments'),
     url(r'^arc-summary/', arc_summary, name='arc-summary'),
-    url(r'^audit-log/', audit_log),
-    url(r'^search/', search),
+    url(r'^audit-log/', audit_log, name = 'audit_log'),
+    url(r'^search/', search, name = 'search'),
     url(r'^search-summary/', search_summary, name = 'search_summary'),
 ]
 

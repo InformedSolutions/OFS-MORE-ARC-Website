@@ -245,6 +245,9 @@ def trigger_audit_log(application_id, status, user):
     elif status == 'ASSIGN':
         message = 'Assigned to ' + str(user)
         mydata['user'] = 'Reviewer'
+    elif status == 'CONTACT_CENTRE':
+        message = 'Application viewed'
+        mydata['user'] = user
 
     mydata['message'] = message
 

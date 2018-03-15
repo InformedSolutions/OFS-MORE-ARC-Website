@@ -7,7 +7,7 @@ from .forms import SearchForm
 from .models import AdultInHome, ApplicantHomeAddress, ApplicantName, ApplicantPersonalDetails, Application, Arc, \
     ChildInHome, ChildcareType, CriminalRecordCheck, FirstAidTraining, HealthDeclarationBooklet, Reference, \
     UserDetails
-from .views import has_group
+from .views import has_group, trigger_audit_log
 
 
 @login_required()
@@ -18,32 +18,25 @@ def search(request):
     :return: The search template on GET request, or submit it and return the search results on POST
     """
     if has_group(request.user, settings.CONTACT_CENTRE) and request.user.is_authenticated():
-        error_exist = 'false'
-        error_title = ''
-        error_text = ''
         form = SearchForm(request.POST)
         if request.method == 'POST':
             if form.is_valid():
                 query = form.cleaned_data['query']
-                results = search_query(query)
-                if results is not None and len(results) > 0:
-                    data = format_data(results)
-                    variables = {
-                        'empty': False,
-                        'form': form,
-                        'app': data,
-                    }
-                    return render(request, 'search.html', variables)
-                else:
-                    error_exist = 'true'
-                    error_title = 'Your search \'' + query + '\' has returned no results'
+                if len(query) > 2:
+
+                    results = search_query(query)
+                    if results is not None and len(results) > 0:
+                        data = format_data(results)
+                        variables = {
+                            'empty': False,
+                            'form': form,
+                            'app': data,
+                        }
+                        return render(request, 'search.html', variables)
 
         variables = {
             'empty': True,
             'form': form,
-            'error_exist': error_exist,
-            'error_title': error_title,
-            'error_text': error_text
         }
         return render(request, 'search.html', variables)
     else:
@@ -101,14 +94,17 @@ def search_query(query):
     query = str(query).lower()
     if len(query) == 36 and Application.objects.filter(pk=query).count() > 0:
         return Application.objects.filter(pk=query)
-    elif ApplicantName.objects.filter(first_name__iexact=query).count() > 0:
-        return ApplicantName.objects.filter(first_name__iexact=query)
-    elif ApplicantName.objects.filter(last_name__iexact=query).count() > 0:
-        return ApplicantName.objects.filter(last_name__iexact=query)
+    elif ApplicantName.objects.filter(first_name__icontains=query).count() > 0:
+        return ApplicantName.objects.filter(first_name__icontains=query)
+    elif ApplicantName.objects.filter(last_name__icontains=query).count() > 0:
+        return ApplicantName.objects.filter(last_name__icontains=query)
     else:
         try:
-            if ApplicantName.objects.filter(first_name__iexact=query.split(' ')[0], last_name__iexact=query.split(' ')[1]).count() > 0:
-                return ApplicantName.objects.filter(first_name__iexact=query.split(' ')[0], last_name__iexact=query.split(' ')[1])
+            if ' ' in query:
+                if ApplicantName.objects.filter(first_name__icontains=query.split(' ')[0],
+                                                last_name__icontains=query.split(' ')[1]).count() > 0:
+                    return ApplicantName.objects.filter(first_name__icontains=query.split(' ')[0],
+                                                        last_name__icontains=query.split(' ')[1])
             elif query.count('.') == 2:
                 arr = query.split('.')
                 if len(arr[2]) == 2:
@@ -140,8 +136,10 @@ def search_summary(request):
     :param request: a request object used to generate the HttpResponse
     :return: an HttpResponse object with the rendered declaration-summary template
     """
+
     if request.method == 'GET':
         application_id_local = request.GET["id"]
+        trigger_audit_log(application_id_local, 'CONTACT_CENTRE', 'Contact Centre')
     elif request.method == 'POST':
         application_id_local = request.POST["id"]
         status = Arc.objects.get(pk=application_id_local)

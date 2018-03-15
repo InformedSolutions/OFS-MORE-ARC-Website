@@ -478,7 +478,7 @@ class SearchForm(GOVUKForm):
     """
     field_label_classes = 'form-label-bold'
     auto_replace_widgets = True
-    query = forms.CharField(label='Search all fields', required=False)
+    query = forms.CharField(label='Search all fields', required=True)
 
     def __init__(self, *args, **kwargs):
         """
@@ -490,5 +490,7 @@ class SearchForm(GOVUKForm):
 
     def clean_query(self):
         query = self.cleaned_data['query']
+        if len(query) < 3:
+            raise forms.ValidationError('Please enter a keyword that is greater than 2 characters')
 
         return query

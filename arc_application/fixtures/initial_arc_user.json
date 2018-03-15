@@ -13,6 +13,7 @@
       "name": "contact-centre"
     }
   },
+
   {
     "model": "arc_application.authuser",
     "pk": 2,
@@ -45,6 +46,16 @@
       "date_joined": "2018-03-01T10:16:32Z"
     }
   },
+  { "model": "auth.user",
+        "pk": 4,
+        "fields": {
+            "username": "root",
+            "password": "default-password",
+            "is_superuser": true,
+            "is_staff": true,
+            "is_active": true
+        }
+    },
   {
     "model": "arc_application.authusergroups",
     "pk": 1,
