@@ -18,12 +18,19 @@ def search(request):
     :return: The search template on GET request, or submit it and return the search results on POST
     """
     if has_group(request.user, settings.CONTACT_CENTRE) and request.user.is_authenticated():
-        form = SearchForm(request.POST)
-        if request.method == 'POST':
+
+        if request.method == 'GET':
+            form = SearchForm()
+            variables = {
+                'empty': True,
+                'form': form,
+            }
+            return render(request, 'search.html', variables)
+        elif request.method == 'POST':
+            form = SearchForm(request.POST)
             if form.is_valid():
                 query = form.cleaned_data['query']
                 if len(query) > 2:
-
                     results = search_query(query)
                     if results is not None and len(results) > 0:
                         data = format_data(results)
@@ -33,12 +40,11 @@ def search(request):
                             'app': data,
                         }
                         return render(request, 'search.html', variables)
-
-        variables = {
-            'empty': True,
-            'form': form,
-        }
-        return render(request, 'search.html', variables)
+            variables = {
+                'empty': True,
+                'form': form,
+            }
+            return render(request, 'search.html', variables)
     else:
         return HttpResponseRedirect(settings.URL_PREFIX + '/login/')
 

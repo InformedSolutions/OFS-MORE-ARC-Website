@@ -487,5 +487,6 @@ class SearchForm(GOVUKForm):
         query = self.cleaned_data['query']
         if len(query) < 3:
             raise forms.ValidationError('Please enter a keyword that is greater than 2 characters')
-
+        if len(query) == 0:
+            raise forms.ValidationError('This field is required')
         return query
