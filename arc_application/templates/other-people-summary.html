@@ -240,18 +240,18 @@
                 {{dbs_certificate_number}}
             </td>
             <td class="change-answer">
-                {{ formsetadult.dbs_certificate_declare }}
+                {{ formsetadult.dbs_certificate_number_declare }}
             </td>
         </tr>
-        <tr class="js-hidden" id="dbs_certificate{{formsetadult.instance_id.initial}}" >
+        <tr class="js-hidden" id="dbs_certificate_number{{formsetadult.instance_id.initial}}" >
             <td colspan="1">
                 <div >
-                    {{ formsetadult.dbs_certificate_comments.label}}
+                    {{ formsetadult.dbs_certificate_number_comments.label}}
                 </div>
             </td>
             <td colspan="2"style="width:100%">
                 <div >
-                    {{ formsetadult.dbs_certificate_comments}}
+                    {{ formsetadult.dbs_certificate_number_comments}}
                 </div>
             </td>
         </tr>
@@ -270,18 +270,18 @@
             </td>
             {% endif %}
             <td class="change-answer">
-                {{ formsetadult.permission_for_checks_declare }}
+                {{ formsetadult.permission_declare }}
             </td>
         </tr>
-        <tr class="js-hidden" id="permission_for_checks{{formsetadult.instance_id.initial}}" >
+        <tr class="js-hidden" id="permission{{formsetadult.instance_id.initial}}" >
             <td colspan="1">
                 <div >
-                    {{ formsetadult.permission_for_checks_comments.label}}
+                    {{ formsetadult.permission_comments.label}}
                 </div>
             </td>
             <td colspan="2"style="width:100%">
                 <div >
-                    {{ formsetadult.permission_for_checks_comments}}
+                    {{ formsetadult.permission_comments}}
                 </div>
             </td>
         </tr>

@@ -98,7 +98,7 @@ class ContactCentreTest(TestCase):
 
         self.assertEqual(r.status_code, 200)
 
-    def test_audit_log(self)
+    def test_audit_log(self):
         self.client.login(username='cc_test', password='my_secret')
         r = self.client.get("%s?application_id=da2265c2-2d65-4214-bfef-abcfe59b75aa" +reverse('audit_log'))
         self.assertEqual(r.status_code, 200)

@@ -13,7 +13,7 @@ class StandardFormValidationTests(TestCase):
     def test_log_in_details(self):
         """Login form with correct test data"""
         test_key = uuid4()
-        initial_data = {'email_declare': True, 'email_comments': 'Test'}
+        initial_data = {'email_address_declare': True, 'email_address_comments': 'Test'}
         form = LogInDetailsForm(data=initial_data, table_keys=[test_key])
         self.assertTrue(form.is_valid())
 
@@ -27,7 +27,7 @@ class StandardFormValidationTests(TestCase):
     def test_first_aid_training(self):
         """First aid training form with correct test data"""
         test_key = uuid4()
-        initial_data = {'training_organisation_declare': True, 'training_organisation_comments': 'Test'}
+        initial_data = {'first_aid_training_organisation_declare': True, 'first_aid_training_organisation_comments': 'Test'}
         form = FirstAidTrainingForm(data=initial_data, table_keys=[test_key])
         self.assertTrue(form.is_valid())
 
@@ -80,8 +80,8 @@ class StandardFormPopulationTests(TestCase):
     def test_log_in_details_population(self):
         """Log In Details form with initial data to populate from USER_DETAILS"""
         form = LogInDetailsForm(table_keys=[self.key_dict['USER_DETAILS'][0]])
-        form.email_comments = 'Test'
-        form.email_declare = True
+        form.email_address_comments = 'Test'
+        form.email_address_declare = True
 
     def test_personal_details_population(self):
         """Personal Details form with initial data to populate from APPLICANT_PERSONAL_DETAILS, APPLICANT_NAME, and APPLICANT_HOME_ADDRESS"""
@@ -98,8 +98,8 @@ class StandardFormPopulationTests(TestCase):
     def test_first_aid_training_population(self):
         """First Aid Training with initial data to populate from FIRST_AID_TRAINING"""
         form = FirstAidTrainingForm(table_keys=[self.key_dict['FIRST_AID_TRAINING'][0]])
-        form.training_organisation_comments = 'Test'
-        form.training_organisation_declare = True
+        form.first_aid_training_organisation_comments = 'Test'
+        form.first_aid_training_organisation_declare = True
 
     def test_DBS_check_population(self):
         """DBS form with initial data to populate from CRIMINAL_RECORD_CHECK"""

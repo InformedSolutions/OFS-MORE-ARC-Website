@@ -139,7 +139,7 @@ class Application(models.Model):
     children_in_home = models.NullBooleanField()
     children_turning_16 = models.NullBooleanField()
     background_check_declare = models.NullBooleanField()
-    eyfs_questions_declare = models.NullBooleanField()
+    share_info_declare = models.NullBooleanField()
     inspect_home_declare = models.NullBooleanField()
     interview_declare = models.NullBooleanField()
     information_correct_declare = models.NullBooleanField()
@@ -195,7 +195,7 @@ class Eyfs(models.Model):
     eyfs_id = models.UUIDField(primary_key=True)
     eyfs_understand = models.NullBooleanField()
     eyfs_training_declare = models.NullBooleanField()
-    eyfs_questions_declare = models.NullBooleanField()
+    share_info_declare = models.NullBooleanField()
     application = models.ForeignKey(Application, models.DO_NOTHING)
 
     class Meta:
