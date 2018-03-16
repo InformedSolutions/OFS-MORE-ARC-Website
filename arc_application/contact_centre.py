@@ -1,3 +1,5 @@
+from itertools import chain
+
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
@@ -52,24 +54,26 @@ def search(request):
 def format_data(results):
     """
     This adds the missing data from the objects returned from the search
-    :param results: An Http request- you must be logged in.
+    :param results: Querystring of objects that match query.
     :return: a querystring of results that match the search
     """
     arr = list(results)
     for i in arr:
+        # these if statements are not obvious, essentiall we need to get name, date submitted, updated and application id for each result found
         if hasattr(i, 'application_id'):
             if hasattr(i, 'personal_detail_id'):
-                # DoB was searched for
+                # DoB was searched for (has both personal_details_id and application_id columns)
                 app = Application.objects.get(application_id=i.application_id)
                 name = ApplicantName.objects.get(personal_detail_id=i.personal_detail_id)
                 i.name = name.first_name + " " + name.last_name
             else:
-                # This means an application id was searched for
+                # This means an application id was searched for (has only application_id, and not
                 app = Application.objects.get(application_id=i.application_id)
                 det = ApplicantPersonalDetails.objects.get(application_id=i.application_id)
                 name = ApplicantName.objects.get(personal_detail_id=det.personal_detail_id)
                 i.name = name.first_name + " " + name.last_name
         if hasattr(i, 'first_name'):
+            # This if statement is for if they searched a name
             det = ApplicantPersonalDetails.objects.get(personal_detail_id=i.personal_detail_id)
             i.application_id = det.application_id
             app = Application.objects.get(application_id=i.application_id)
@@ -98,6 +102,7 @@ def search_query(query):
     :return: A querystring of results
     """
     query = str(query).lower()
+    # Check for Application Id (36 Chars)
     if len(query) == 36 and Application.objects.filter(pk=query).count() > 0:
         return Application.objects.filter(pk=query)
     elif ApplicantName.objects.filter(first_name__icontains=query).count() > 0:
@@ -114,21 +119,33 @@ def search_query(query):
             elif query.count('.') == 2:
                 arr = query.split('.')
                 if len(arr[2]) == 2:
+                    temp_year = str(20) + arr[2]
                     arr[2] = str(19) + arr[2]
-                return ApplicantPersonalDetails.objects.filter(birth_day=int(arr[0]), birth_month=int(arr[1]),
-                                                               birth_year=int(arr[2]))
+                return list(
+                    chain(ApplicantPersonalDetails.objects.filter(birth_day=int(arr[0]), birth_month=int(arr[1]),
+                                                                  birth_year=int(arr[2])),
+                          ApplicantPersonalDetails.objects.filter(birth_day=int(arr[0]), birth_month=int(arr[1]),
+                                                                  birth_year=int(temp_year))))
             elif query.count('/') == 2:
                 arr = query.split('/')
                 if len(arr[2]) == 2:
+                    temp_year = str(20) + arr[2]
                     arr[2] = str(19) + arr[2]
-                return ApplicantPersonalDetails.objects.filter(birth_day=int(arr[0]), birth_month=int(arr[1]),
-                                                               birth_year=int(arr[2]))
+                return list(
+                    chain(ApplicantPersonalDetails.objects.filter(birth_day=int(arr[0]), birth_month=int(arr[1]),
+                                                                  birth_year=int(arr[2])),
+                          ApplicantPersonalDetails.objects.filter(birth_day=int(arr[0]), birth_month=int(arr[1]),
+                                                                  birth_year=int(temp_year))))
             elif query.count('-') == 2:
                 arr = query.split('-')
                 if len(arr[2]) == 2:
+                    temp_year = str(20) + arr[2]
                     arr[2] = str(19) + arr[2]
-                return ApplicantPersonalDetails.objects.filter(birth_day=int(arr[0]), birth_month=int(arr[1]),
-                                                               birth_year=int(arr[2]))
+                return list(
+                    chain(ApplicantPersonalDetails.objects.filter(birth_day=int(arr[0]), birth_month=int(arr[1]),
+                                                                  birth_year=int(arr[2])),
+                          ApplicantPersonalDetails.objects.filter(birth_day=int(arr[0]), birth_month=int(arr[1]),
+                                                                  birth_year=int(temp_year))))
         except Exception as ex:
             print(ex)
     return None
