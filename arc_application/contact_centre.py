@@ -118,6 +118,7 @@ def search_query(query):
                                                         last_name__icontains=query.split(' ')[1])
             elif query.count('.') == 2:
                 arr = query.split('.')
+                temp_year = arr[2]
                 if len(arr[2]) == 2:
                     temp_year = str(20) + arr[2]
                     arr[2] = str(19) + arr[2]
@@ -128,6 +129,7 @@ def search_query(query):
                                                                   birth_year=int(temp_year))))
             elif query.count('/') == 2:
                 arr = query.split('/')
+                temp_year = arr[2]
                 if len(arr[2]) == 2:
                     temp_year = str(20) + arr[2]
                     arr[2] = str(19) + arr[2]
@@ -138,6 +140,7 @@ def search_query(query):
                                                                   birth_year=int(temp_year))))
             elif query.count('-') == 2:
                 arr = query.split('-')
+                temp_year = arr[2]
                 if len(arr[2]) == 2:
                     temp_year = str(20) + arr[2]
                     arr[2] = str(19) + arr[2]
