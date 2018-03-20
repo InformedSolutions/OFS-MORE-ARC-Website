@@ -4,6 +4,7 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
+from django.db.models import Q
 
 from .forms import SearchForm
 from .models import AdultInHome, ApplicantHomeAddress, ApplicantName, ApplicantPersonalDetails, Application, Arc, \
@@ -123,10 +124,11 @@ def search_query(query):
                     temp_year = str(20) + arr[2]
                     arr[2] = str(19) + arr[2]
                 return list(
-                    chain(ApplicantPersonalDetails.objects.filter(birth_day=int(arr[0]), birth_month=int(arr[1]),
-                                                                  birth_year=int(arr[2])),
-                          ApplicantPersonalDetails.objects.filter(birth_day=int(arr[0]), birth_month=int(arr[1]),
-                                                                  birth_year=int(temp_year))))
+                    ApplicantPersonalDetails.objects.filter(
+                        Q(birth_day=int(arr[0]), birth_month=int(arr[1]), birth_year=int(arr[2])) |
+                        Q(birth_day=int(arr[0]), birth_month=int(arr[1]), birth_year=int(temp_year))
+                    )
+                )
             elif query.count('/') == 2:
                 arr = query.split('/')
                 temp_year = arr[2]
@@ -134,10 +136,11 @@ def search_query(query):
                     temp_year = str(20) + arr[2]
                     arr[2] = str(19) + arr[2]
                 return list(
-                    chain(ApplicantPersonalDetails.objects.filter(birth_day=int(arr[0]), birth_month=int(arr[1]),
-                                                                  birth_year=int(arr[2])),
-                          ApplicantPersonalDetails.objects.filter(birth_day=int(arr[0]), birth_month=int(arr[1]),
-                                                                  birth_year=int(temp_year))))
+                    ApplicantPersonalDetails.objects.filter(
+                        Q(birth_day=int(arr[0]), birth_month=int(arr[1]), birth_year=int(arr[2])) |
+                        Q(birth_day=int(arr[0]), birth_month=int(arr[1]), birth_year=int(temp_year))
+                    )
+                )
             elif query.count('-') == 2:
                 arr = query.split('-')
                 temp_year = arr[2]
@@ -145,10 +148,11 @@ def search_query(query):
                     temp_year = str(20) + arr[2]
                     arr[2] = str(19) + arr[2]
                 return list(
-                    chain(ApplicantPersonalDetails.objects.filter(birth_day=int(arr[0]), birth_month=int(arr[1]),
-                                                                  birth_year=int(arr[2])),
-                          ApplicantPersonalDetails.objects.filter(birth_day=int(arr[0]), birth_month=int(arr[1]),
-                                                                  birth_year=int(temp_year))))
+                    ApplicantPersonalDetails.objects.filter(
+                        Q(birth_day=int(arr[0]), birth_month=int(arr[1]), birth_year=int(arr[2])) |
+                        Q(birth_day=int(arr[0]), birth_month=int(arr[1]), birth_year=int(temp_year))
+                    )
+                )
         except Exception as ex:
             print(ex)
     return None
@@ -157,7 +161,7 @@ def search_query(query):
 @login_required()
 def search_summary(request):
     """
-    This page may change, but currently returns a full summary of the application, this doenst have dynamic boxes as it
+    This page may change, but currently returns a full summary of the application, this doesn't have dynamic boxes as it
     needs data first
     :param request: a request object used to generate the HttpResponse
     :return: an HttpResponse object with the rendered declaration-summary template
