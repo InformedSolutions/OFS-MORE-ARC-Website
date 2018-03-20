@@ -28,6 +28,7 @@ THIRD_PARTY_APPS = [
     'govuk_forms',
     'govuk_template',
     'govuk_template_base',
+    'timeline_logger',
 ]
 
 PROJECT_APPS = [
