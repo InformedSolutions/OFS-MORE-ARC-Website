@@ -947,7 +947,7 @@ def review(request):
 
     else:
         release_application(request, application_id_local, 'FURTHER_INFORMATION')
-        #returned_email(email)
+        returned_email(email)
         # Copy Arc status' to Chilminder App
         if Arc.objects.filter(pk=application_id_local):
             arc = Arc.objects.get(pk=application_id_local)
