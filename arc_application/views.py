@@ -13,7 +13,8 @@ from django.utils.http import urlsafe_base64_decode
 from django.utils.text import capfirst
 from govuk_forms.forms import GOVUKForm
 
-from .models import ApplicantName, ApplicantPersonalDetails, Application, Arc, AuditLog
+from .models import ApplicantName, ApplicantPersonalDetails, Application, Arc, AuditLog, ArcComments, \
+    ApplicantHomeAddress, AdultInHome, CriminalRecordCheck, FirstAidTraining, Reference
 
 
 @login_required()
@@ -289,6 +290,7 @@ def release_application(request, application_id, status):
         app = Application.objects.get(application_id=application_id)
         app.application_status = status
         app.save()
+
 
     if len(Arc.objects.filter(application_id=application_id)) == 1:
         arc = Arc.objects.get(pk=application_id)
