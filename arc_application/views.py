@@ -133,7 +133,7 @@ def assign_new_application(request):
             arc_user.last_accessed = str(application.date_updated.strftime('%d/%m/%Y'))
             arc_user.user_id = request.user.id
             arc_user.save()
-        trigger_audit_log(local_application_id, 'ASSIGN', request.user)
+        # trigger_audit_log(local_application_id, 'ASSIGN', request.user)
         return JsonResponse({'message': arc_user.application_id})
 
 
@@ -262,7 +262,7 @@ def trigger_audit_log(application_id, status, user):
 
 # TRIGGER
 # This is where all applications are released (3 different messages)
-# 1. If status == 'COMPLETE' it has been released by Arc User (not mentioned in BDD)
+# 1. If status == 'COMPLETED' it has been released by Arc User (not mentioned in BDD)
 # 2. If status == 'FURTHER_INFORMATION' it needs to be returned to the applicant (BDD #3)
 # 3. If status == 'ACCEPTED' it has been submitted to Cygnum (BDD #8)
 def release_application(request, application_id, status):
@@ -296,7 +296,7 @@ def release_application(request, application_id, status):
         arc = Arc.objects.get(pk=application_id)
         arc.user_id = ''
         arc.save()
-        trigger_audit_log(application_id, status, request.user)
+        # trigger_audit_log(application_id, status, request.user)
         return HttpResponseRedirect('/arc/summary')
 
 

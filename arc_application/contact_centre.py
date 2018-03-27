@@ -169,13 +169,16 @@ def search_summary(request):
 
     if request.method == 'GET':
         application_id_local = request.GET["id"]
-        trigger_audit_log(application_id_local, 'CONTACT_CENTRE', 'Contact Centre')
+        #trigger_audit_log(application_id_local, 'CONTACT_CENTRE', 'Contact Centre')
+
     elif request.method == 'POST':
+
         application_id_local = request.POST["id"]
         status = Arc.objects.get(pk=application_id_local)
         status.declaration_review = 'COMPLETED'
         status.save()
         return HttpResponseRedirect(settings.URL_PREFIX + '/search' + application_id_local)
+
     # Retrieve all information related to the application from the database
     application = Application.objects.get(application_id=application_id_local)
     login_detail_id = application.login_id
