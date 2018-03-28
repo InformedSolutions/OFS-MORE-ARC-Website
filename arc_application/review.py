@@ -8,6 +8,7 @@ from django.forms import formset_factory
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 
+from .magic_link import generate_magic_link
 from .forms import AdultInYourHomeForm, CheckBox, ChildInYourHomeForm, CommentsForm, DBSCheckForm, FirstAidTrainingForm, \
     HealthForm, LogInDetailsForm, OtherPeopleInYourHomeForm, PersonalDetailsForm, ReferencesForm, ReferencesForm2
 from .models import AdultInHome, ApplicantHomeAddress, ApplicantName, ApplicantPersonalDetails, Application, Arc, \
@@ -191,7 +192,7 @@ def personal_details_summary(request):
         # Collect required ids
         application_id_local = request.GET["id"]
         personal_detail_id = (
-        ApplicantPersonalDetails.objects.get(application_id=application_id_local)).personal_detail_id
+            ApplicantPersonalDetails.objects.get(application_id=application_id_local)).personal_detail_id
         applicant_name_id = (ApplicantName.objects.get(personal_detail_id=personal_detail_id)).name_id
         applicant_home_address_id = (ApplicantHomeAddress.objects.get(personal_detail_id=personal_detail_id,
                                                                       current_address=True)).home_address_id
@@ -207,7 +208,7 @@ def personal_details_summary(request):
                                    table_keys=[personal_detail_id, applicant_name_id, applicant_home_address_id])
         application_id_local = request.POST["id"]
         personal_detail_id = (
-        ApplicantPersonalDetails.objects.get(application_id=application_id_local)).personal_detail_id
+            ApplicantPersonalDetails.objects.get(application_id=application_id_local)).personal_detail_id
         applicant_name_id = (ApplicantName.objects.get(personal_detail_id=personal_detail_id)).name_id
         applicant_home_address_id = (ApplicantHomeAddress.objects.get(personal_detail_id=personal_detail_id,
                                                                       current_address=True)).home_address_id
@@ -933,11 +934,13 @@ def review(request):
     application_id_local = request.GET["id"]
     application = Application.objects.get(application_id=application_id_local)
     login_id = application.login_id
-    if UserDetails.objects.filter(login_id=login_id).count() > 0:
+    first_name = ''
+    if UserDetails.objects.filter(login_id=login_id).exists():
         user_details = UserDetails.objects.get(login_id=login_id)
         email = user_details.email
+        first_name = user_details.first_name
     if all_complete(application_id_local, True):
-        accepted_email(email)
+        accepted_email(email, first_name, application_id_local, '')
         # If successful
         release_application(request, application_id_local, 'ACCEPTED')
         variables = {
@@ -947,7 +950,12 @@ def review(request):
 
     else:
         release_application(request, application_id_local, 'FURTHER_INFORMATION')
-        returned_email(email)
+        magic_link = generate_magic_link
+        if hasattr(user_details, 'email'):
+            user_details.email_expiry_date = magic_link.expiry
+            user_details.magic_link_email = magic_link.link
+            user_details.save()
+
         # Copy Arc status' to Chilminder App
         if Arc.objects.filter(pk=application_id_local):
             arc = Arc.objects.get(pk=application_id_local)
@@ -1000,7 +1008,7 @@ def all_complete(id, flag):
 
 
 # Add personalisation and create template
-def accepted_email(email):
+def accepted_email(email, first_name, ref):
     """
     Method to send an email using the Notify Gateway API
     :param email: string containing the e-mail address to send the e-mail to
@@ -1014,7 +1022,11 @@ def accepted_email(email):
         request = {
             'email': email,
             'reference': 'string',
-            'templateId': 'b973c5a2-cadd-46a5-baf7-beae65ab11dc'
+            'templateId': 'b973c5a2-cadd-46a5-baf7-beae65ab11dc',
+            'personalisation': {
+                'first_name': first_name,
+                'ref': ref
+            }
         }
         data = json.dumps(request)
         r = requests.post(base_request_url + '/api/v1/notifications/email/',
@@ -1024,13 +1036,14 @@ def accepted_email(email):
 
 
 # Add personalisation and create template
-def returned_email(email):
+def returned_email(email, first_name, ref, link):
     """
     Method to send an email using the Notify Gateway API
     :param email: string containing the e-mail address to send the e-mail to
     :param email: string email address
     :return: HTTP response
     """
+
     if hasattr(settings, 'NOTIFY_URL'):
         email = str(email)
         base_request_url = settings.NOTIFY_URL
@@ -1038,7 +1051,12 @@ def returned_email(email):
         request = {
             'email': email,
             'reference': 'string',
-            'templateId': 'c9157aaa-02cd-4294-8094-df2184c12930'
+            'templateId': 'c9157aaa-02cd-4294-8094-df2184c12930',
+            'personalisation': {
+                'first_name': first_name,
+                'ref': ref,
+                'link': link,
+            }
         }
         data = json.dumps(request)
         r = requests.post(base_request_url + '/api/v1/notifications/email/',
