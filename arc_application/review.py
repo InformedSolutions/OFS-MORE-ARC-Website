@@ -1,4 +1,5 @@
 import json
+import time
 
 import requests
 from django.conf import settings
@@ -10,6 +11,7 @@ from django.shortcuts import render
 
 from .forms import AdultInYourHomeForm, CheckBox, ChildInYourHomeForm, CommentsForm, DBSCheckForm, FirstAidTrainingForm, \
     HealthForm, LogInDetailsForm, OtherPeopleInYourHomeForm, PersonalDetailsForm, ReferencesForm, ReferencesForm2
+from .magic_link import generate_magic_link
 from .models import AdultInHome, ApplicantHomeAddress, ApplicantName, ApplicantPersonalDetails, Application, Arc, \
     ArcComments, ChildInHome, ChildcareType, CriminalRecordCheck, FirstAidTraining, HealthDeclarationBooklet, Reference, \
     UserDetails
@@ -191,7 +193,7 @@ def personal_details_summary(request):
         # Collect required ids
         application_id_local = request.GET["id"]
         personal_detail_id = (
-        ApplicantPersonalDetails.objects.get(application_id=application_id_local)).personal_detail_id
+            ApplicantPersonalDetails.objects.get(application_id=application_id_local)).personal_detail_id
         applicant_name_id = (ApplicantName.objects.get(personal_detail_id=personal_detail_id)).name_id
         applicant_home_address_id = (ApplicantHomeAddress.objects.get(personal_detail_id=personal_detail_id,
                                                                       current_address=True)).home_address_id
@@ -207,7 +209,7 @@ def personal_details_summary(request):
                                    table_keys=[personal_detail_id, applicant_name_id, applicant_home_address_id])
         application_id_local = request.POST["id"]
         personal_detail_id = (
-        ApplicantPersonalDetails.objects.get(application_id=application_id_local)).personal_detail_id
+            ApplicantPersonalDetails.objects.get(application_id=application_id_local)).personal_detail_id
         applicant_name_id = (ApplicantName.objects.get(personal_detail_id=personal_detail_id)).name_id
         applicant_home_address_id = (ApplicantHomeAddress.objects.get(personal_detail_id=personal_detail_id,
                                                                       current_address=True)).home_address_id
@@ -933,11 +935,17 @@ def review(request):
     application_id_local = request.GET["id"]
     application = Application.objects.get(application_id=application_id_local)
     login_id = application.login_id
-    if UserDetails.objects.filter(login_id=login_id).count() > 0:
+    first_name = ''
+    if UserDetails.objects.filter(login_id=login_id).exists():
         user_details = UserDetails.objects.get(login_id=login_id)
         email = user_details.email
+        if ApplicantPersonalDetails.objects.filter(application_id=application_id_local).exists():
+            personal_details = ApplicantPersonalDetails.objects.get(application_id=application_id_local)
+            applicant_name = ApplicantName.objects.get(personal_detail_id=personal_details.personal_detail_id)
+            first_name = applicant_name.first_name
+
     if all_complete(application_id_local, True):
-        accepted_email(email)
+        accepted_email(email, first_name, application_id_local)
         # If successful
         release_application(request, application_id_local, 'ACCEPTED')
         variables = {
@@ -947,7 +955,15 @@ def review(request):
 
     else:
         release_application(request, application_id_local, 'FURTHER_INFORMATION')
-        returned_email(email)
+        magic_link = generate_magic_link()
+        expiry = int(time.time())
+        user_details.email_expiry_date = expiry
+        user_details.magic_link_email = magic_link
+        user_details.save()
+        returned_email(email, first_name, application_id_local, 'validate/' +magic_link)
+
+
+
         # Copy Arc status' to Chilminder App
         if Arc.objects.filter(pk=application_id_local):
             arc = Arc.objects.get(pk=application_id_local)
@@ -956,8 +972,8 @@ def review(request):
             app.personal_details_status = arc.personal_details_review
             app.childcare_type_status = arc.childcare_type_review
             app.first_aid_training_status = arc.first_aid_review
-            app.criminal_record_check_status = arc.dbs_review
             app.health_status = arc.health_review
+            app.criminal_record_check_status = arc.dbs_review
             app.references_status = arc.references_review
             app.people_in_home_status = arc.people_in_home_review
             app.save()
@@ -1000,13 +1016,14 @@ def all_complete(id, flag):
 
 
 # Add personalisation and create template
-def accepted_email(email):
+def accepted_email(email, first_name, ref):
     """
     Method to send an email using the Notify Gateway API
     :param email: string containing the e-mail address to send the e-mail to
     :param email: string email address
     :return: HTTP response
     """
+    print('accepted email')
     if hasattr(settings, 'NOTIFY_URL'):
         email = str(email)
         base_request_url = settings.NOTIFY_URL
@@ -1014,7 +1031,11 @@ def accepted_email(email):
         request = {
             'email': email,
             'reference': 'string',
-            'templateId': 'b973c5a2-cadd-46a5-baf7-beae65ab11dc'
+            'templateId': 'b973c5a2-cadd-46a5-baf7-beae65ab11dc',
+            'personalisation': {
+                'first_name': first_name,
+                'ref': ref
+            }
         }
         data = json.dumps(request)
         r = requests.post(base_request_url + '/api/v1/notifications/email/',
@@ -1024,13 +1045,14 @@ def accepted_email(email):
 
 
 # Add personalisation and create template
-def returned_email(email):
+def returned_email(email, first_name, ref, link):
     """
     Method to send an email using the Notify Gateway API
     :param email: string containing the e-mail address to send the e-mail to
     :param email: string email address
     :return: HTTP response
     """
+    print('returned email')
     if hasattr(settings, 'NOTIFY_URL'):
         email = str(email)
         base_request_url = settings.NOTIFY_URL
@@ -1038,7 +1060,12 @@ def returned_email(email):
         request = {
             'email': email,
             'reference': 'string',
-            'templateId': 'c9157aaa-02cd-4294-8094-df2184c12930'
+            'templateId': 'c9157aaa-02cd-4294-8094-df2184c12930',
+            'personalisation': {
+                'first_name': first_name,
+                'ref': ref,
+                'link': link,
+            }
         }
         data = json.dumps(request)
         r = requests.post(base_request_url + '/api/v1/notifications/email/',
