@@ -8,7 +8,7 @@ from django.db import models
 TASK_STATUS = (
     ('NOT_STARTED', 'NOT_STARTED'),
     ('FLAGGED', 'FLAGGED'),
-    ('COMPLETE', 'COMPLETE')
+    ('COMPLETED', 'COMPLETED')
 )
 
 

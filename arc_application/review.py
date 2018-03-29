@@ -1,4 +1,5 @@
 import json
+import time
 
 import requests
 from django.conf import settings
@@ -8,9 +9,9 @@ from django.forms import formset_factory
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 
-from .magic_link import generate_magic_link
 from .forms import AdultInYourHomeForm, CheckBox, ChildInYourHomeForm, CommentsForm, DBSCheckForm, FirstAidTrainingForm, \
     HealthForm, LogInDetailsForm, OtherPeopleInYourHomeForm, PersonalDetailsForm, ReferencesForm, ReferencesForm2
+from .magic_link import generate_magic_link
 from .models import AdultInHome, ApplicantHomeAddress, ApplicantName, ApplicantPersonalDetails, Application, Arc, \
     ArcComments, ChildInHome, ChildcareType, CriminalRecordCheck, FirstAidTraining, HealthDeclarationBooklet, Reference, \
     UserDetails
@@ -938,7 +939,11 @@ def review(request):
     if UserDetails.objects.filter(login_id=login_id).exists():
         user_details = UserDetails.objects.get(login_id=login_id)
         email = user_details.email
-        first_name = user_details.first_name
+        if ApplicantPersonalDetails.objects.filter(application_id=application_id_local).exists():
+            personal_details = ApplicantPersonalDetails.objects.get(application_id=application_id_local)
+            applicant_name = ApplicantName.objects.get(personal_detail_id=personal_details.personal_detail_id)
+            first_name = applicant_name.first_name
+
     if all_complete(application_id_local, True):
         accepted_email(email, first_name, application_id_local, '')
         # If successful
@@ -950,11 +955,13 @@ def review(request):
 
     else:
         release_application(request, application_id_local, 'FURTHER_INFORMATION')
-        magic_link = generate_magic_link
-        if hasattr(user_details, 'email'):
-            user_details.email_expiry_date = magic_link.expiry
-            user_details.magic_link_email = magic_link.link
-            user_details.save()
+        magic_link = generate_magic_link()
+        expiry = int(time.time())
+        user_details.email_expiry_date = expiry
+        user_details.magic_link_email = magic_link
+        user_details.save()
+        returned_email
+
 
         # Copy Arc status' to Chilminder App
         if Arc.objects.filter(pk=application_id_local):
@@ -964,8 +971,8 @@ def review(request):
             app.personal_details_status = arc.personal_details_review
             app.childcare_type_status = arc.childcare_type_review
             app.first_aid_training_status = arc.first_aid_review
-            app.criminal_record_check_status = arc.dbs_review
             app.health_status = arc.health_review
+            app.criminal_record_check_status = arc.dbs_review
             app.references_status = arc.references_review
             app.people_in_home_status = arc.people_in_home_review
             app.save()
