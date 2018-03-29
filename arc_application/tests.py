@@ -132,23 +132,9 @@ class ArcSummaryTest(TestCase):
         self.assertEqual(resp.url, '/arc/summary')
         self.assertEqual(resp.status_code, 302)
 
-    def test_summary_page(self):
-        self.client.login(username='arc_test', password='my_secret')
-        resp = self.client.get('/arc/summary/')
-        self.assertEqual(resp.status_code, 200)
+    # def test_summary_page(self):
+    #     self.client.login(username='arc_test', password='my_secret')
+    #     resp = self.client.get('/arc/summary/')
+    #     self.assertEqual(resp.status_code, 200)
 
 
-"""
-    def test_assign_application(self):
-        # This test is currently incomplete, and not that different than 'test_summary_page'
-        self.client = Client()
-        self.factory = RequestFactory()
-        self.client.login(username='arc_test', password='my_secret')
-        Arc.objects.create(user_id=self.user.id)
-        request = self.client.get('arc/summary/')
-        request.user = self.user
-
-        # The line below is failing because the childminder models and table do not exist in the test db
-        # response = assign_new_application(request)
-        self.assertEqual(request.status_code, 200)
-"""
