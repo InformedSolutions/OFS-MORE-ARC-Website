@@ -945,7 +945,7 @@ def review(request):
             first_name = applicant_name.first_name
 
     if all_complete(application_id_local, True):
-        accepted_email(email, first_name, application_id_local, '')
+        accepted_email(email, first_name, application_id_local)
         # If successful
         release_application(request, application_id_local, 'ACCEPTED')
         variables = {
@@ -960,7 +960,8 @@ def review(request):
         user_details.email_expiry_date = expiry
         user_details.magic_link_email = magic_link
         user_details.save()
-        returned_email
+        returned_email(email, first_name, application_id_local, 'validate/' +magic_link)
+
 
 
         # Copy Arc status' to Chilminder App
@@ -1022,6 +1023,7 @@ def accepted_email(email, first_name, ref):
     :param email: string email address
     :return: HTTP response
     """
+    print('accepted email')
     if hasattr(settings, 'NOTIFY_URL'):
         email = str(email)
         base_request_url = settings.NOTIFY_URL
@@ -1050,7 +1052,7 @@ def returned_email(email, first_name, ref, link):
     :param email: string email address
     :return: HTTP response
     """
-
+    print('returned email')
     if hasattr(settings, 'NOTIFY_URL'):
         email = str(email)
         base_request_url = settings.NOTIFY_URL
