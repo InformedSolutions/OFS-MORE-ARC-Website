@@ -1,0 +1,33 @@
+<table class="check-your-answers form-group grid-row">
+    {% for row in section %}
+    {% if row.title %}
+    <thead>
+    <tr>
+        <th colspan="4">
+            <div class="heading-medium">
+                {{row.title}}
+            </div>
+        </th>
+    </tr>
+    </thead>
+    {% endif %}
+    {% if row.name %}
+    <tbody>
+    <tr>
+        <td>
+            {{row.name}}
+        </td>
+        <td>
+            {{row.value}}
+        </td>
+        <td>
+            {{row.comment}}
+        </td>
+        <td class="change-answer" style="text-align:right">
+            <a href="{{row.link}}"> change</a>
+        </td>
+    </tr>
+    </tbody>
+    {% endif %}
+    {% endfor %}
+</table>

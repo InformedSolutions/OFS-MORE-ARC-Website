@@ -6,11 +6,10 @@ OFS-MORE-CCN3: Apply to be a Childminder Beta
 """
 import re
 
-from arc_application.review import arc_summary, comments, contact_summary, dbs_check_summary, \
-    first_aid_training_summary, health_check_answers, other_people_summary, personal_details_summary, \
-    references_summary, review, task_list, type_of_childcare_age_groups
-from arc_application.views import assign_new_application, audit_log, custom_login, error_404, error_500, \
-    release, summary_page
+from arc_application.view import assign_new_application, audit_log, custom_login, error_404, error_500, release, \
+    summary_page, arc_summary, comments, contact_summary, dbs_check_summary, first_aid_training_summary, \
+    health_check_answers, other_people_summary, personal_details_summary, references_summary, review, task_list, \
+    type_of_childcare_age_groups
 from arc_application.contact_centre import search, search_summary
 from django.conf import settings
 from django.conf.urls import include, url
@@ -26,7 +25,7 @@ urlpatterns = [
     url(r'^summary/', summary_page, name='summary'),
     url(r'^review/', task_list, name='task_list'),
     url(r'^account/summary/', contact_summary, name='contact_summary'),
-    url(r'^childcare/age-groups/', type_of_childcare_age_groups, name='ype_of_childcare_age_groups'),
+    url(r'^childcare/age-groups/', type_of_childcare_age_groups, name='type_of_childcare_age_groups'),
     url(r'^personal-details/summary/', personal_details_summary, name='personal_details_summary'),
     url(r'^first-aid/summary/', first_aid_training_summary, name='first_aid_training_summary'),
     url(r'^dbs-check/summary/', dbs_check_summary, name='dbs_check_summary'),
@@ -36,9 +35,9 @@ urlpatterns = [
     url(r'^confirmation/', review, name='review'),
     url(r'^comments/', comments, name='comments'),
     url(r'^arc-summary/', arc_summary, name='arc-summary'),
-    url(r'^audit-log/', audit_log, name = 'audit_log'),
-    url(r'^search/', search, name = 'search'),
-    url(r'^search-summary/', search_summary, name = 'search_summary'),
+    url(r'^audit-log/', audit_log, name='audit_log'),
+    url(r'^search/', search, name='search'),
+    url(r'^search-summary/', search_summary, name='search_summary'),
 ]
 
 if settings.URL_PREFIX:
@@ -57,3 +56,7 @@ if settings.DEBUG:
 
 handler404 = error_404
 handler500 = error_500
+
+
+
+
