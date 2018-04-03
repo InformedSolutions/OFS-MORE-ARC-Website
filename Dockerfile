@@ -5,7 +5,7 @@ ARG PROJECT_SETTINGS
 # If dev env install additional packages
 RUN  if [ "`echo $PROJECT_SETTINGS | rev | cut -c -3 | rev`" = "dev" ]; then \
        apt-get update; \
-       apt-get install -y build-essential graphviz; \
+       apt-get install -y build-essential graphviz vim tree git tig; \
      fi
 
 RUN mkdir /source
@@ -13,6 +13,12 @@ RUN mkdir /source/logs
 WORKDIR /source
 ADD . /source/
 RUN pip install -r requirements.txt
+
+# If dev env install python depedencies specifically for dev
+RUN  if [ "`echo $PROJECT_SETTINGS | rev | cut -c -3 | rev`" = "dev" ]; then \
+        pip install -r requirements.dev.txt; \
+     fi
+
 RUN chmod +x /source/docker-entrypoint.sh
 EXPOSE 8000
 CMD ["/source/docker-entrypoint.sh"]

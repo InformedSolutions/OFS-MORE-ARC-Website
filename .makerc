@@ -1,2 +1,3 @@
 PYTHON_CMD=python
 PIP_CMD=pip
+APP=app-arc
