@@ -68,15 +68,12 @@ def name_converter(name):
                  'Do you live with any children?',
                  'Full name', 'How they know you', 'Known for', 'Address', 'Phone number', 'Email address'
                  ]
-    print("HERE: " +str(len(field_list)) +' ' +str(len(name_list)))
     for i in range(len(name_list)):
         if name in name_list[i]:
-            print(name +' | ' +field_list[i])
             return field_list[i]
 
 
 def get_comment(pk, field):
-    print(field)
     if ArcComments.objects.filter(table_pk=pk, field_name=field):
         arc = ArcComments.objects.get(table_pk=pk, field_name=field)
         if arc.flagged:

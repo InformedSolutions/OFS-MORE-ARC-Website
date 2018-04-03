@@ -13,8 +13,7 @@ from django.utils.http import urlsafe_base64_decode
 from django.utils.text import capfirst
 from govuk_forms.forms import GOVUKForm
 
-from arc_application.models import ApplicantName, ApplicantPersonalDetails, Application, Arc, ArcComments, \
-    ApplicantHomeAddress, AdultInHome, CriminalRecordCheck, FirstAidTraining, Reference, AuditLog
+from ..models import ApplicantName, ApplicantPersonalDetails, Application, Arc, AuditLog
 
 
 @login_required()

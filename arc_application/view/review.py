@@ -9,14 +9,14 @@ from django.forms import formset_factory
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 
-from arc_application.forms import AdultInYourHomeForm, CheckBox, ChildInYourHomeForm, CommentsForm, DBSCheckForm, FirstAidTrainingForm, \
+from ..forms import AdultInYourHomeForm, CheckBox, ChildInYourHomeForm, CommentsForm, DBSCheckForm, FirstAidTrainingForm, \
     HealthForm, LogInDetailsForm, OtherPeopleInYourHomeForm, PersonalDetailsForm, ReferencesForm, ReferencesForm2
-from arc_application.magic_link import generate_magic_link
-from arc_application.models import AdultInHome, ApplicantHomeAddress, ApplicantName, ApplicantPersonalDetails, Application, Arc, \
+from ..magic_link import generate_magic_link
+from ..models import AdultInHome, ApplicantHomeAddress, ApplicantName, ApplicantPersonalDetails, Application, Arc, \
     ArcComments, ChildInHome, ChildcareType, CriminalRecordCheck, FirstAidTraining, HealthDeclarationBooklet, Reference, \
     UserDetails
-from arc_application.review_util import redirect_selection, request_to_comment, save_comments
-from arc_application.view.views import release_application
+from ..review_util import redirect_selection, request_to_comment, save_comments
+from .views import release_application
 
 
 @login_required()
