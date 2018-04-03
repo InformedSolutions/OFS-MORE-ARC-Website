@@ -1,5 +1,3 @@
-from itertools import chain
-
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
@@ -10,7 +8,7 @@ from .forms import SearchForm
 from .models import AdultInHome, ApplicantHomeAddress, ApplicantName, ApplicantPersonalDetails, Application, Arc, \
     ChildInHome, ChildcareType, CriminalRecordCheck, FirstAidTraining, HealthDeclarationBooklet, Reference, \
     UserDetails
-from .views import has_group, trigger_audit_log
+from arc_application.view.views import has_group
 
 
 @login_required()
