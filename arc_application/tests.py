@@ -57,9 +57,6 @@ class ContactCentreTest(TestCase):
             birth_year='2001'
         )
 
-    def create_audit_log(self):
-        AuditLog.objects.create(application_id='da2265c2-2d65-4214-bfef-abcfe59b75aa', audit_message='{}')
-
     def test_user_group(self):
         self.assertEqual(Group.objects.filter(name=settings.CONTACT_CENTRE).count(), 1)
 
@@ -96,11 +93,6 @@ class ContactCentreTest(TestCase):
         self.client.login(username='cc_test', password='my_secret')
         r = self.client.get("%s?application_id=da2265c2-2d65-4214-bfef-abcfe59b75aa" +reverse('search_summary'))
 
-        self.assertEqual(r.status_code, 200)
-
-    def test_audit_log(self):
-        self.client.login(username='cc_test', password='my_secret')
-        r = self.client.get("%s?application_id=da2265c2-2d65-4214-bfef-abcfe59b75aa" +reverse('audit_log'))
         self.assertEqual(r.status_code, 200)
 
 
