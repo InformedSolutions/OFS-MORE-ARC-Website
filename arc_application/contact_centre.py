@@ -174,7 +174,7 @@ def search_summary(request):
             content_object=Application.object.get(pk=app_id),
             user=request.user,
             template='timeline_logger/application_action_contact_center.txt',
-            extra_data={'user_type': 'contact center', 'action': "application viewed by"}
+            extra_data={'user_type': 'contact center', 'entity': 'application', 'action': "is viewed"}
         )
 
     elif request.method == 'POST':
