@@ -16,7 +16,7 @@ from ..models import AdultInHome, ApplicantHomeAddress, ApplicantName, Applicant
     ArcComments, ChildInHome, ChildcareType, CriminalRecordCheck, FirstAidTraining, HealthDeclarationBooklet, Reference, \
     UserDetails
 from ..review_util import redirect_selection, request_to_comment, save_comments
-from .views import release_application
+from .base import release_application
 
 
 @login_required()

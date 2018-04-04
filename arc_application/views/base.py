@@ -17,7 +17,7 @@ from govuk_forms.forms import GOVUKForm
 from timeline_logger.models import TimelineLog
 
 
-from .models import ApplicantName, ApplicantPersonalDetails, Application, Arc, ArcComments, \
+from ..models import ApplicantName, ApplicantPersonalDetails, Application, Arc, ArcComments, \
     ApplicantHomeAddress, AdultInHome, CriminalRecordCheck, FirstAidTraining, Reference
 
 
@@ -339,35 +339,6 @@ class AuditlogListView(ListView):
             context['back'] =  reverse('task_list') + '?id=' + self.request.GET.get('id')
 
         return context
-
-
-@login_required()
-def audit_log(request):
-    user = request.user
-
-    if request.method == 'GET':
-        app_id = request.GET["id"]
-
-        if AuditLog.objects.filter(application_id=app_id):
-            app = AuditLog.objects.get(application_id=app_id)
-            if has_group(user, settings.CONTACT_CENTRE):
-
-                variables = {
-                    "application_id": app_id,
-                    "app": json.loads(app.audit_message),
-                    "back": 'search'
-                }
-            if has_group(user, settings.ARC_GROUP):
-                variables = {
-                    "application_id": app_id,
-                    "app": json.loads(app.audit_message),
-                    "back": 'review?id=' + app_id
-                }
-
-            return render(request, './audit-log.html', variables)
-        else:
-            # Currently if no Arc entries are found it simply sends you back to where you came.
-            return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 
 ######################################################################################################
