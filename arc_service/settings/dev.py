@@ -8,6 +8,7 @@ NOTIFY_URL = 'http://130.130.52.132:8095/notify-gateway'
 ALLOWED_HOSTS = ['*']
 
 DEV_APPS = [
+  'django_extensions',
 ]
 
 INSTALLED_APPS = BUILTIN_APPS + THIRD_PARTY_APPS + DEV_APPS + PROJECT_APPS
