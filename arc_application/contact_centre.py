@@ -1,3 +1,5 @@
+from itertools import chain
+
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
@@ -8,7 +10,7 @@ from .forms import SearchForm
 from .models import AdultInHome, ApplicantHomeAddress, ApplicantName, ApplicantPersonalDetails, Application, Arc, \
     ChildInHome, ChildcareType, CriminalRecordCheck, FirstAidTraining, HealthDeclarationBooklet, Reference, \
     UserDetails
-from arc_application.view.views import has_group
+from .views import has_group
 
 
 @login_required()
@@ -166,37 +168,43 @@ def search_summary(request):
     """
 
     if request.method == 'GET':
-        application_id_local = request.GET["id"]
-        #trigger_audit_log(application_id_local, 'CONTACT_CENTRE', 'Contact Centre')
+        app_id = request.GET["id"]
+
+        TimelineLog.objects.create(
+            content_object=Application.object.get(pk=app_id),
+            user=request.user,
+            template='timeline_logger/application_action_contact_center.txt',
+            extra_data={'user_type': 'contact center', 'action': "application viewed by"}
+        )
 
     elif request.method == 'POST':
 
-        application_id_local = request.POST["id"]
-        status = Arc.objects.get(pk=application_id_local)
+        app_id = request.POST["id"]
+        status = Arc.objects.get(pk=app_id)
         status.declaration_review = 'COMPLETED'
         status.save()
-        return HttpResponseRedirect(settings.URL_PREFIX + '/search' + application_id_local)
+        return HttpResponseRedirect(settings.URL_PREFIX + '/search' + app_id)
 
     # Retrieve all information related to the application from the database
-    application = Application.objects.get(application_id=application_id_local)
+    application = Application.objects.get(application_id=app_id)
     login_detail_id = application.login_id
     login_record = UserDetails.objects.get(login_id=login_detail_id)
-    childcare_record = ChildcareType.objects.get(application_id=application_id_local)
-    applicant_record = ApplicantPersonalDetails.objects.get(application_id=application_id_local)
+    childcare_record = ChildcareType.objects.get(application_id=app_id)
+    applicant_record = ApplicantPersonalDetails.objects.get(application_id=app_id)
     personal_detail_id = applicant_record.personal_detail_id
     applicant_name_record = ApplicantName.objects.get(personal_detail_id=personal_detail_id)
     applicant_home_address_record = ApplicantHomeAddress.objects.get(personal_detail_id=personal_detail_id,
                                                                      current_address=True)
     applicant_childcare_address_record = ApplicantHomeAddress.objects.get(personal_detail_id=personal_detail_id,
                                                                           childcare_address=True)
-    first_aid_record = FirstAidTraining.objects.get(application_id=application_id_local)
-    dbs_record = CriminalRecordCheck.objects.get(application_id=application_id_local)
-    hdb_record = HealthDeclarationBooklet.objects.get(application_id=application_id_local)
-    first_reference_record = Reference.objects.get(application_id=application_id_local, reference=1)
-    second_reference_record = Reference.objects.get(application_id=application_id_local, reference=2)
+    first_aid_record = FirstAidTraining.objects.get(application_id=app_id)
+    dbs_record = CriminalRecordCheck.objects.get(application_id=app_id)
+    hdb_record = HealthDeclarationBooklet.objects.get(application_id=app_id)
+    first_reference_record = Reference.objects.get(application_id=app_id, reference=1)
+    second_reference_record = Reference.objects.get(application_id=app_id, reference=2)
     # Retrieve lists of adults and children, ordered by adult/child number for iteration by the HTML
-    adults_list = AdultInHome.objects.filter(application_id=application_id_local).order_by('adult')
-    children_list = ChildInHome.objects.filter(application_id=application_id_local).order_by('child')
+    adults_list = AdultInHome.objects.filter(application_id=app_id).order_by('adult')
+    children_list = ChildInHome.objects.filter(application_id=app_id).order_by('child')
     # Generate lists of data for adults in your home, to be iteratively displayed on the summary page
     # The HTML will then parse through each list simultaneously, to display the correct data for each adult
     adult_name_list = []
@@ -206,7 +214,7 @@ def search_summary(request):
     adult_relationship_list = []
     adult_dbs_list = []
     adult_permission_list = []
-    application = Application.objects.get(pk=application_id_local)
+    application = Application.objects.get(pk=app_id)
     for adult in adults_list:
         # For each adult, append the correct attribute (e.g. name, relationship) to the relevant list
         # Concatenate the adult's name for display, displaying any middle names if present
@@ -248,7 +256,7 @@ def search_summary(request):
     child_lists = zip(child_name_list, child_birth_day_list, child_birth_month_list, child_birth_year_list,
                       child_relationship_list)
     variables = {
-        'application_id': application_id_local,
+        'application_id': app_id,
         'login_details_email': login_record.email,
         'login_details_mobile_number': login_record.mobile_number,
         'login_details_alternative_phone_number': login_record.add_phone_number,

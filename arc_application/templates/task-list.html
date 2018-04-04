@@ -261,7 +261,7 @@
          style="background-color: #bfc1c3; margin-left: 15px; padding: 10px; margin-top: 15px; float: left; width: 30%;">
         <b style="font-weight: bold;">Application history:</b>
         <br>
-        <a href="{{ URL_PREFIX }}/audit-log/?id={{application_id}}">Audit log</a>
+        <a href="{% url 'auditlog' %}?id={{application_id}}">Audit log</a>
     </div>
 </div>
 
