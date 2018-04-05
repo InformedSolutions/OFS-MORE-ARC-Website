@@ -88,8 +88,8 @@ def get_comment(pk, field):
 
 def load_json(application_id_local):
     application = Application.objects.get(application_id=application_id_local)
-    login_detail_id = application.login_id
-    login_record = UserDetails.objects.get(login_id=login_detail_id)
+    login_record = UserDetails.objects.get(application_id=application)
+    login_detail_id = login_record.pk
     childcare_record = ChildcareType.objects.get(application_id=application_id_local)
     applicant_record = ApplicantPersonalDetails.objects.get(application_id=application_id_local)
     personal_detail_id = applicant_record.personal_detail_id

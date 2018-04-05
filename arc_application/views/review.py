@@ -87,14 +87,17 @@ def contact_summary(request):
     if request.method == 'GET':
         application_id_local = request.GET["id"]
         application = Application.objects.get(pk=application_id_local)
+        account = UserDetails.objects.get(application_id=application)
+        login_id = account.login_id
         # Table keys are supplied in a list format for use in init
-        form = LogInDetailsForm(table_keys=[application.login_id])
+        form = LogInDetailsForm(table_keys=[login_id])
         application_id_local = request.GET["id"]
     elif request.method == 'POST':
         # .Populate the form with the recieved data
         application_id_local = request.POST["id"]
         application = Application.objects.get(pk=application_id_local)
-        login_id = application.login_id
+        account = UserDetails.objects.get(application_id=application)
+        login_id = account.login_id
         form = LogInDetailsForm(request.POST, table_keys=[login_id])
 
         if form.is_valid():
@@ -118,8 +121,7 @@ def contact_summary(request):
                 return ChildProcessError
 
     application = Application.objects.get(pk=application_id_local)
-    login_id = application.login_id
-    user_details = UserDetails.objects.get(login_id=login_id)
+    user_details = UserDetails.objects.get(application_id=application)
     email = user_details.email
     mobile_number = user_details.mobile_number
     add_phone_number = user_details.add_phone_number
@@ -776,7 +778,8 @@ def review(request):
     """
     application_id_local = request.GET["id"]
     application = Application.objects.get(application_id=application_id_local)
-    login_id = application.login_id
+    account = UserDetails.objects.get(application_id=application)
+    login_id = account.pk
     first_name = ''
     if UserDetails.objects.filter(login_id=login_id).exists():
         user_details = UserDetails.objects.get(login_id=login_id)
