@@ -31,10 +31,13 @@ def search(request):
                 'form': form,
             }
             return render(request, 'search.html', variables)
+
         elif request.method == 'POST':
             form = SearchForm(request.POST)
+
             if form.is_valid():
                 query = form.cleaned_data['query']
+
                 if len(query) > 2:
                     results = search_query(query)
                     if results is not None and len(results) > 0:
@@ -45,10 +48,12 @@ def search(request):
                             'app': data,
                         }
                         return render(request, 'search.html', variables)
+
             variables = {
                 'empty': True,
                 'form': form,
             }
+
             return render(request, 'search.html', variables)
     else:
         return HttpResponseRedirect(settings.URL_PREFIX + '/login/')
@@ -105,12 +110,13 @@ def search_query(query):
     :return: A querystring of results
     """
     query = str(query).lower()
+
     # Check for Application Id (36 Chars)
-    if len(query) == 36 and Application.objects.filter(pk=query).count() > 0:
+    if len(query) == 36 and Application.objects.filter(pk=query).exists():
         return Application.objects.filter(pk=query)
-    elif ApplicantName.objects.filter(first_name__icontains=query).count() > 0:
+    elif ApplicantName.objects.filter(first_name__icontains=query).exists():
         return ApplicantName.objects.filter(first_name__icontains=query)
-    elif ApplicantName.objects.filter(last_name__icontains=query).count() > 0:
+    elif ApplicantName.objects.filter(last_name__icontains=query).exists():
         return ApplicantName.objects.filter(last_name__icontains=query)
     else:
         try:
@@ -173,7 +179,7 @@ def search_summary(request):
         app_id = request.GET["id"]
 
         TimelineLog.objects.create(
-            content_object=Application.object.get(pk=app_id),
+            content_object=Application.objects.get(pk=app_id),
             user=request.user,
             template='timeline_logger/application_action_contact_center.txt',
             extra_data={'user_type': 'contact center', 'entity': 'application', 'action': "is viewed"}
