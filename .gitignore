@@ -21,3 +21,6 @@ staticfiles/
 *~
 *.swp
 *.swo
+
+### Ignore migrations ###
+arc_application/migrations/*
