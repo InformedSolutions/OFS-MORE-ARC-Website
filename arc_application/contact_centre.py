@@ -195,8 +195,7 @@ def search_summary(request):
 
     # Retrieve all information related to the application from the database
     application = Application.objects.get(application_id=app_id)
-    login_detail_id = application.login_id
-    login_record = UserDetails.objects.get(login_id=login_detail_id)
+    login_record = UserDetails.objects.get(application_id=application)
     childcare_record = ChildcareType.objects.get(application_id=app_id)
     applicant_record = ApplicantPersonalDetails.objects.get(application_id=app_id)
     personal_detail_id = applicant_record.personal_detail_id

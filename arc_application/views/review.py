@@ -93,7 +93,7 @@ def contact_summary(request):
         form = LogInDetailsForm(table_keys=[login_id])
         application_id_local = request.GET["id"]
     elif request.method == 'POST':
-        # .Populate the form with the recieved data
+        # .Populate the form with the received data
         application_id_local = request.POST["id"]
         application = Application.objects.get(pk=application_id_local)
         account = UserDetails.objects.get(application_id=application)
