@@ -48,7 +48,14 @@ def search(request):
                             'app': data,
                         }
                         return render(request, 'search.html', variables)
-
+                    else:
+                        variables = {
+                            'empty': 'error',
+                            'error_title': 'No Results Found',
+                            'error_text': '',
+                            'form': form,
+                        }
+                        return render(request, 'search.html', variables)
             variables = {
                 'empty': True,
                 'form': form,
@@ -71,20 +78,22 @@ def format_data(results):
         if hasattr(i, 'application_id'):
             if hasattr(i, 'personal_detail_id'):
                 # DoB was searched for (has both personal_details_id and application_id columns)
-                app = Application.objects.get(application_id=i.application_id)
-                name = ApplicantName.objects.get(personal_detail_id=i.personal_detail_id)
+                app = Application.objects.get(application_id=i.application_id.pk)
+                name = ApplicantName.objects.get(personal_detail_id=i.personal_detail_id.pk)
                 i.name = name.first_name + " " + name.last_name
             else:
                 # This means an application id was searched for (has only application_id, and not
                 app = Application.objects.get(application_id=i.application_id)
-                det = ApplicantPersonalDetails.objects.get(application_id=i.application_id)
-                name = ApplicantName.objects.get(personal_detail_id=det.personal_detail_id)
-                i.name = name.first_name + " " + name.last_name
+
+                if ApplicantName.objects.filter(application_id=app.pk).exists():
+                    name = ApplicantName.objects.get(application_id=app.pk)
+                    i.name = name.first_name + " " + name.last_name
+
         if hasattr(i, 'first_name'):
             # This if statement is for if they searched a name
-            det = ApplicantPersonalDetails.objects.get(personal_detail_id=i.personal_detail_id)
+            det = ApplicantPersonalDetails.objects.get(personal_detail_id=i.personal_detail_id.pk)
             i.application_id = det.application_id
-            app = Application.objects.get(application_id=i.application_id)
+            app = Application.objects.get(application_id=i.application_id.pk)
             i.name = i.first_name + " " + i.last_name
 
         if not app.date_submitted == None:
@@ -98,8 +107,8 @@ def format_data(results):
 
         i.type = 'Childminder'
         i.sub_type = 'New'
-        i.link = '/arc/search-summary?id=' + str(i.application_id)
-        i.audit_link = '/arc/auditlog?id=' + str(i.application_id)
+        i.link = '/arc/search-summary?id=' + str(i.application_id.pk)
+        i.audit_link = '/arc/auditlog?id=' + str(i.application_id.pk)
     return results
 
 
