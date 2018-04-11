@@ -128,7 +128,7 @@ class FirstAidTrainingForm(GOVUKForm):
     title_of_training_course_declare = forms.BooleanField(label='This information is correct',
                                                            widget=custom_field_widgets.CustomCheckboxInput,
                                                            required=False)
-    title_of_first_aid_course_comments = forms.CharField(label='Enter your reasoning here',
+    title_of_training_course_comments = forms.CharField(label='Enter your reasoning here',
                                                          widget=custom_field_widgets.Textarea, required=False)
 
     course_date_declare = forms.BooleanField(label='This information is correct',

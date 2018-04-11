@@ -10,7 +10,7 @@ from arc_application.views import assign_new_application, custom_login, error_40
     summary_page, arc_summary, comments, contact_summary, dbs_check_summary, first_aid_training_summary, \
     health_check_answers, other_people_summary, personal_details_summary, references_summary, review, task_list, \
     type_of_childcare_age_groups, AuditlogListView, cc_summary
-from arc_application.contact_centre import search, search_summary
+from arc_application.contact_centre import search
 from django.conf import settings
 from django.conf.urls import include, url
 from django.contrib import admin
