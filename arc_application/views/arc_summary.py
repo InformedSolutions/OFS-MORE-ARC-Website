@@ -2,6 +2,7 @@ from django.conf import settings
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
+from timeline_logger.models import TimelineLog
 
 from ..summary_page_data import link_dict
 from ..models import *
@@ -29,6 +30,13 @@ def cc_summary(request):
     if request.method == 'GET':
         application_id_local = request.GET["id"]
         json = load_json(application_id_local)
+        TimelineLog.objects.create(
+            content_object=Application.objects.get(pk=application_id_local),
+            user=request.user,
+            template='timeline_logger/application_action_contact_center.txt',
+            extra_data={'user_type': 'contact center', 'entity': 'application', 'action': "is viewed"}
+        )
+
         variables = {
             'json': json,
             'application_id': application_id_local

@@ -6,10 +6,7 @@
 {% block inner_content %}
 
 <main>
-    <a href="{{ back }}" class="link-back"
-       style="margin-right: 10px; line-height: 28px" alt='Back to application list'>
-        Back
-    </a>
+{% include 'back-button.html' %}
     <header><h1 class="form-title heading-large">Audit Log</h1></header>
     <table>
         <thead>
