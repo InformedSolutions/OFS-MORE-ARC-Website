@@ -15,6 +15,7 @@ echo "Collecting static assets"
 mkdir -p static
 python manage.py collectstatic --noinput --settings=$PROJECT_SETTINGS
 
+python manage.py loaddata initial_root_user --settings=$PROJECT_SETTINGS
 python manage.py loaddata initial_arc_user --settings=$PROJECT_SETTINGS
 
 # Start server
