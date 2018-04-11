@@ -6,16 +6,10 @@
 {% block inner_content %}
 
 <!-- Initialise error summary for page -->
-
+{% include 'back-button.html' %}
 <div class="column-full">
+
     <form method="post" novalidate>
-    <div class="form-group grid-row" style="padding-top: 30px;">
-        <!-- Back button -->
-        <a class="link-back">
-            <button type="submit" name="back" class="hidden-button" value="/account/summary">Back</button>
-        </a>
-    </div>
-    <!-- Form -->
 
         <!-- Content -->
         <div class="form-group grid-row">

@@ -163,19 +163,19 @@ def load_login_details(app):
 def load_childcare_type(app):
     if ChildcareType.objects.filter(application_id=app).exists():
         childcare_record = ChildcareType.objects.get(application_id=app)
-        z = childcare_record.zero_to_five
-        f = childcare_record.five_to_eight
-        e = childcare_record.eight_plus
+        zero_to_five = childcare_record.zero_to_five
+        five_to_eight = childcare_record.five_to_eight
+        eight_plus = childcare_record.eight_plus
         register = ''
-        if z and f or z and not f and e:
+        if zero_to_five and five_to_eight or zero_to_five and not five_to_eight and eight_plus:
             register = 'Early Years Register, Childcare Register'
-        if not z and f and e:
+        if not zero_to_five and five_to_eight and eight_plus:
             register = 'Childcare Register (compulsory & voluntary parts)'
-        if z and not f and not e:
+        if zero_to_five and not five_to_eight and not eight_plus:
             register = 'Early Years Register'
-        if not z and f and not e:
+        if not zero_to_five and five_to_eight and not eight_plus:
             register = 'Childcare Register (compulsory part)'
-        if not z and not f and e:
+        if not zero_to_five and not five_to_eight and eight_plus:
             register = 'Childcare Register (voluntary part)'
 
         table = [
@@ -262,9 +262,12 @@ def load_reference(app, num):
     if Reference.objects.filter(application_id=app, reference=num).exists():
         first_reference_record = Reference.objects.get(application_id=app, reference=num)
         ref1_address = first_reference_record.street_line1 + ', ' + first_reference_record.street_line2 + ', ' + first_reference_record.town + ', ' + first_reference_record.postcode
-
+        if num == 1:
+            ref_num = 'First'
+        if num == 2:
+            ref_num = 'Second'
         table = [
-        {"title": "First reference", "id": first_reference_record.pk},
+        {"title": ref_num +" reference", "id": first_reference_record.pk},
         {"name": "Full name", "value": first_reference_record.first_name + ' ' + first_reference_record.last_name},
         {"name": "How they know you", "value": first_reference_record.relationship},
         {"name": "Known for", "value": str(first_reference_record.months_known) + ' months, ' + str(
@@ -279,7 +282,7 @@ def load_reference(app, num):
 
 
 def load_adult_home(app):
-    if Application.objects.filter(application_id=app.pk).exists():
+    if UserDetails.objects.filter(application_id=app).exists():
         login_record = UserDetails.objects.get(application_id=app)
 
         table = [
@@ -291,7 +294,7 @@ def load_adult_home(app):
 
 
 def load_child_home(app):
-    if Application.objects.filter(application_id=app.pk).exists():
+    if UserDetails.objects.filter(application_id=app).exists():
         login_record = UserDetails.objects.get(application_id=app)
 
         table = [

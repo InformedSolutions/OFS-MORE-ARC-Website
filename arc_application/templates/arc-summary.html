@@ -4,22 +4,19 @@
 {% load govuk_template_base %}
 
 {% block inner_content %}
-
+{% include 'back-button.html' %}
 <div class="column-full">
-    <div class="form-group grid-row" style="padding-top: 30px;">
-        <a href="{{ URL_PREFIX }}/review?id={{application_id}}" class="link-back"
-           style="margin-right: 10px; line-height: 28px">
-            Back
-        </a>
-    </div>
+
     <div class="grid-row">
         <h1 class="form-title heading-large">
             Check and confirm all your details
         </h1>
     </div>
+    {% with "4" as col %}
     {% for section in json %}
     {% include 'summary_tables.html' %}
     {% endfor %}
+    {% endwith %}
 
 <div class="form-group grid-row">
         <form method="post">

@@ -4,15 +4,10 @@
 {% load govuk_template_base %}
 
 {% block inner_content %}
-
+{% include 'back-button.html' %}
 <div class="column-full">
     <form method="post" novalidate>
-    <div class="form-group grid-row" style="padding-top: 30px;">
-        <!-- Back button -->
-        <a class="link-back">
-            <button type="submit" name="back" class="hidden-button" value="/childcare/age-groups">Back</button>
-        </a>
-    </div>
+
     <div class="grid-row">
         <h1 class="form-title heading-large">Check your answers: your personal details</h1>
     </div>

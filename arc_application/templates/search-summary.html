@@ -5,12 +5,8 @@
 
 {% block inner_content %}
 
-    <a href="{{ URL_PREFIX }}/search" class="link-back"
-       style="margin-right: 10px; line-height: 28px" alt='Back to application list'>
-        Back
-    </a>
 <div class="column-full">
-
+{% include 'back-button.html' %}
         <div class="column-third" style="background-color: #bfc1c3; margin-left: 15px; padding: 10px; margin-top: 15px; float: right; width: 30%;">
         <b style="font-weight: bold; position:absolute;">Application history:</b>
         <br>
