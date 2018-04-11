@@ -1,13 +1,13 @@
 [
   {
-    "model": "arc_application.authgroup",
+    "model": "auth.group",
     "pk": 1,
     "fields": {
       "name": "arc"
     }
   },
   {
-    "model": "arc_application.authgroup",
+    "model": "auth.group",
     "pk": 2,
     "fields": {
       "name": "contact-centre"
@@ -15,7 +15,7 @@
   },
 
   {
-    "model": "arc_application.authuser",
+    "model": "auth.user",
     "pk": 2,
     "fields": {
       "password": "pbkdf2_sha256$36000$0LmFEZxDRGCu$lAZrw1t7xlrEw+bwkv43Npyx7eGYGDVMFg6qHeptuMo=",
@@ -31,7 +31,7 @@
     }
   },
   {
-    "model": "arc_application.authuser",
+    "model": "auth.user",
     "pk": 3,
     "fields": {
       "password": "pbkdf2_sha256$36000$0LmFEZxDRGCu$lAZrw1t7xlrEw+bwkv43Npyx7eGYGDVMFg6qHeptuMo=",
@@ -46,8 +46,18 @@
       "date_joined": "2018-03-01T10:16:32Z"
     }
   },
-  {
-    "model": "arc_application.authusergroups",
+  { "model": "auth.user",
+        "pk": 1,
+        "fields": {
+            "username": "root",
+            "password": "default-password",
+            "is_superuser": true,
+            "is_staff": true,
+            "is_active": true
+        }
+    },
+    {
+    "model": "auth.user_groups",
     "pk": 1,
     "fields": {
       "user": 2,
@@ -55,7 +65,7 @@
     }
   },
   {
-    "model": "arc_application.authusergroups",
+    "model": "auth.user_groups",
     "pk": 2,
     "fields": {
       "user": 3,
