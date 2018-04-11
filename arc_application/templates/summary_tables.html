@@ -3,7 +3,7 @@
     {% if row.title %}
     <thead>
     <tr>
-        <th colspan="{{ col }}">
+        <th colspan="4">
             <div class="heading-medium">
                 {{row.title}}
             </div>
@@ -20,16 +20,12 @@
         <td>
             {{row.value}}
         </td>
-        {% if row.link %}
         <td>
             {{row.comment}}
         </td>
-        {% endif %}
-        {% if row.link %}
         <td class="change-answer" style="text-align:right">
             <a href="{{row.link}}"> change</a>
         </td>
-        {% endif %}
     </tr>
     </tbody>
     {% endif %}
