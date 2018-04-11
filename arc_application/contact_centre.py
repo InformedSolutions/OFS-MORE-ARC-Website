@@ -107,8 +107,8 @@ def format_data(results):
 
         i.type = 'Childminder'
         i.sub_type = 'New'
-        i.link = '/arc/search-summary?id=' + str(i.application_id.pk)
-        i.audit_link = '/arc/auditlog?id=' + str(i.application_id.pk)
+        i.link = '/arc/search-summary?id=' + str(i.application_id)
+        i.audit_link = '/arc/auditlog?id=' + str(i.application_id)
     return results
 
 
