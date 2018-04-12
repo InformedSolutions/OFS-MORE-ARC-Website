@@ -5,7 +5,7 @@ from django.contrib.auth.models import Group, User
 from django.test import RequestFactory, TestCase, Client
 from django.urls import reverse
 
-from .models import ApplicantName, ApplicantPersonalDetails, Application
+from arc_application.models import ApplicantName, ApplicantPersonalDetails, Application
 
 
 class ContactCentreTest(TestCase):
