@@ -15,6 +15,7 @@ staticfiles/
 .venv/
 .makerc
 .settings/
+geckodriver.log
 
 
 ### Vim file ###
