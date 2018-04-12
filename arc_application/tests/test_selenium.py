@@ -24,7 +24,11 @@ selenium_task_executor = None
 @override_settings(ALLOWED_HOSTS=['*'])
 class TestArcFunctions(LiveServerTestCase):
     port = 8000
-    host = '127.0.0.1'
+
+    if os.environ.get('LOCAL_SELENIUM_DRIVER') == 'True':
+        host = '127.0.0.1'
+    else:
+        host = '0.0.0.0'
 
     def setUp(self):
         global selenium_task_executor
