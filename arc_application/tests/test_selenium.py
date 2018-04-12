@@ -6,6 +6,7 @@ import os
 import random
 from datetime import datetime
 
+from django.core.management import call_command
 from django.test import LiveServerTestCase, override_settings, tag
 from selenium import webdriver
 
@@ -33,6 +34,9 @@ class TestArcFunctions(LiveServerTestCase):
     def setUp(self):
         global selenium_task_executor
         global selenium_driver
+
+        # Load fixtures to populate test users
+        call_command("loaddata", "initial_arc_user.json", verbosity=0)
 
         base_url = os.environ.get('DJANGO_LIVE_TEST_SERVER_ADDRESS')
 
