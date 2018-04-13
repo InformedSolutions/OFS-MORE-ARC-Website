@@ -34,7 +34,7 @@ def cc_summary(request):
             content_object=Application.objects.get(pk=application_id_local),
             user=request.user,
             template='timeline_logger/application_action_contact_center.txt',
-            extra_data={'user_type': 'contact center', 'entity': 'application', 'action': "is viewed"}
+            extra_data={'user_type': 'contact center', 'entity': 'application', 'action': "viewed"}
         )
 
         variables = {

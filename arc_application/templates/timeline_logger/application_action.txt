@@ -9,6 +9,6 @@
         {{ log.extra_data.user_type|capfirst }}
     </td>
     <td class="col-xs-1">
-       {{ log.extra_data.action|capfirst }} {{ log.extra_data.entity }} {{ log.user|default:_('') }}
+        {{ log.extra_data.entity|capfirst }} {{ log.extra_data.action }} {{ log.user|default:_('') }}
     </td>
 </tr>

@@ -159,7 +159,7 @@ def assign_new_application(request):
             content_object=arc_user,
             user=request.user,
             template='timeline_logger/application_action.txt',
-            extra_data={'user_type': 'reviewer', 'action': 'assigned', 'entity': 'application'}
+            extra_data={'user_type': 'reviewer', 'action': 'assigned to', 'entity': 'application'}
         )
 
         return JsonResponse({'message': arc_user.application_id})
