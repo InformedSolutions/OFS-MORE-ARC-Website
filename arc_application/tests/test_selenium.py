@@ -207,6 +207,124 @@ class TestArcFunctions(LiveServerTestCase):
             self.capture_screenshot()
             raise e
 
+    def test_arc_user_can_flag_responses(self):
+        self.assert_arc_user_can_flag_responses()
+
+    def assert_arc_user_can_flag_responses(self):
+        """
+        Tests that an ARC user can flag question responses
+        """
+        global selenium_task_executor
+        title_change_wait = 15
+
+        try:
+            self.login_as_arc_user()
+
+            selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='New Application']").click()
+            selenium_task_executor.get_driver().find_element_by_link_text("Review").click()
+            selenium_task_executor.get_driver().find_element_by_xpath("//main[@id='content']/div[2]/div").click()
+            selenium_task_executor.get_driver().find_element_by_xpath("//tr[@id='account_details']/td/a/span").click()
+            WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("Your account"))
+
+            selenium_task_executor.get_driver().find_element_by_id("id_mobile_number_declare").click()
+            selenium_task_executor.get_driver().find_element_by_id("id_mobile_number_comments").clear()
+            selenium_task_executor.get_driver().find_element_by_id("id_mobile_number_comments").send_keys("Test")
+            selenium_task_executor.get_driver().find_element_by_id("id_add_phone_number_declare").click()
+            selenium_task_executor.get_driver().find_element_by_id("id_add_phone_number_comments").clear()
+            selenium_task_executor.get_driver().find_element_by_id("id_add_phone_number_comments").send_keys("Test")
+            selenium_task_executor.get_driver().find_element_by_id("id_security_question_declare").click()
+            selenium_task_executor.get_driver().find_element_by_id("id_security_question_comments").clear()
+            selenium_task_executor.get_driver().find_element_by_id("id_security_question_comments").send_keys("Test")
+            selenium_task_executor.get_driver().find_element_by_id("id_security_answer_declare").click()
+            selenium_task_executor.get_driver().find_element_by_id("id_security_answer_comments").clear()
+            selenium_task_executor.get_driver().find_element_by_id("id_security_answer_comments").send_keys("Test")
+            selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Confirm and continue']").click()
+            WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("Type of childcare"))
+
+            selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Confirm and continue']").click()
+            WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("Personal details"))
+
+            selenium_task_executor.get_driver().find_element_by_id("id_name_declare").click()
+            selenium_task_executor.get_driver().find_element_by_id("id_name_comments").send_keys("Test")
+            selenium_task_executor.get_driver().find_element_by_id("id_date_of_birth_declare").click()
+            selenium_task_executor.get_driver().find_element_by_id("id_date_of_birth_comments").send_keys("Test")
+            selenium_task_executor.get_driver().find_element_by_id("id_home_address_declare").click()
+            selenium_task_executor.get_driver().find_element_by_id("id_home_address_comments").send_keys("Test")
+            selenium_task_executor.get_driver().find_element_by_id("id_childcare_location_declare").click()
+            selenium_task_executor.get_driver().find_element_by_id("id_childcare_location_comments").send_keys("Test")
+            selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Confirm and continue']").click()
+            WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("First aid training"))
+
+            selenium_task_executor.get_driver().find_element_by_id("id_first_aid_training_organisation_declare").click()
+            selenium_task_executor.get_driver().find_element_by_id("id_first_aid_training_organisation_comments").send_keys("Test")
+            selenium_task_executor.get_driver().find_element_by_id("id_title_of_training_course_declare").click()
+            selenium_task_executor.get_driver().find_element_by_id("id_title_of_training_course_comments").send_keys("Test")
+            selenium_task_executor.get_driver().find_element_by_id("id_course_date_declare").click()
+            selenium_task_executor.get_driver().find_element_by_id("id_course_date_comments").send_keys("Test")
+            selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Confirm and continue']").click()
+            WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("DBS check"))
+
+            selenium_task_executor.get_driver().find_element_by_id("id_dbs_certificate_number_declare").click()
+            selenium_task_executor.get_driver().find_element_by_id("id_dbs_certificate_number_comments").send_keys("Test")
+            selenium_task_executor.get_driver().find_element_by_id("id_dbs_submission_consent_declare").click()
+            selenium_task_executor.get_driver().find_element_by_id("id_dbs_submission_consent_comments").send_keys("Test")
+            selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Confirm and continue']").click()
+            WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("Check your answers: health declaration booklet"))
+
+            selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Confirm and continue']").click()
+            WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("References"))
+
+            selenium_task_executor.get_driver().find_element_by_id("id_form-full_name_declare").click()
+            selenium_task_executor.get_driver().find_element_by_id("id_form-full_name_comments").send_keys("Test")
+            selenium_task_executor.get_driver().find_element_by_id("id_form-relationship_declare").click()
+            selenium_task_executor.get_driver().find_element_by_id("id_form-relationship_comments").send_keys("Test")
+            selenium_task_executor.get_driver().find_element_by_id("id_form-time_known_declare").click()
+            selenium_task_executor.get_driver().find_element_by_id("id_form-time_known_comments").send_keys("Test")
+            selenium_task_executor.get_driver().find_element_by_id("id_form-address_declare").click()
+            selenium_task_executor.get_driver().find_element_by_id("id_form-address_comments").send_keys("Test")
+            selenium_task_executor.get_driver().find_element_by_id("id_form-phone_number_declare").click()
+            selenium_task_executor.get_driver().find_element_by_id("id_form-phone_number_comments").send_keys("Test")
+            selenium_task_executor.get_driver().find_element_by_id("id_form-email_address_declare").click()
+            selenium_task_executor.get_driver().find_element_by_id("id_form-email_address_comments").send_keys("Test")
+            selenium_task_executor.get_driver().find_element_by_id("id_form2-full_name_declare").click()
+            selenium_task_executor.get_driver().find_element_by_id("id_form2-full_name_comments").send_keys("Test")
+            selenium_task_executor.get_driver().find_element_by_id("id_form2-relationship_declare").click()
+            selenium_task_executor.get_driver().find_element_by_id("id_form2-relationship_comments").send_keys("Test")
+            selenium_task_executor.get_driver().find_element_by_id("id_form2-time_known_declare").click()
+            selenium_task_executor.get_driver().find_element_by_id("id_form2-time_known_comments").send_keys("Test")
+            selenium_task_executor.get_driver().find_element_by_id("id_form2-address_declare").click()
+            selenium_task_executor.get_driver().find_element_by_id("id_form2-address_comments").send_keys("Test")
+            selenium_task_executor.get_driver().find_element_by_id("id_form2-phone_number_declare").click()
+            selenium_task_executor.get_driver().find_element_by_id("id_form2-phone_number_comments").send_keys("Test")
+            selenium_task_executor.get_driver().find_element_by_id("id_form2-email_address_declare").click()
+            selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Confirm and continue']").click()
+            WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("People in your home"))
+
+            selenium_task_executor.get_driver().find_element_by_id("id_static-adults_in_home_declare").click()
+            selenium_task_executor.get_driver().find_element_by_id("id_static-adults_in_home_comments").clear()
+            selenium_task_executor.get_driver().find_element_by_id("id_static-adults_in_home_comments").send_keys(
+                "Test")
+            selenium_task_executor.get_driver().find_element_by_id("id_static-children_in_home_declare").click()
+            selenium_task_executor.get_driver().find_element_by_id("id_static-children_in_home_comments").clear()
+            selenium_task_executor.get_driver().find_element_by_id("id_static-children_in_home_comments").send_keys(
+                "Test")
+            selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Confirm and continue']").click()
+
+            WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("Register as a childminder"))
+
+            selenium_task_executor.get_driver().find_element_by_link_text("Complete review").click()
+            WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("Application Summary"))
+            selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Confirm and continue']").click()
+            WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("Additional Comments"))
+            selenium_task_executor.get_driver().find_element_by_id("id_comments").send_keys("Test")
+            selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Save and continue']").click()
+
+            self.assertEqual("Review Returned",
+                             selenium_task_executor.get_driver().find_element_by_xpath("//main[@id='content']/div[2]/div/h1").text)
+        except Exception as e:
+            self.capture_screenshot()
+            raise e
+
     def release_arc_application(self):
         """
         Helper method for releasing an application as an ARC user
@@ -217,6 +335,27 @@ class TestArcFunctions(LiveServerTestCase):
         try:
             selenium_task_executor.get_driver().find_element_by_id("proposition-name").click()
             selenium_task_executor.get_driver().find_element_by_link_text("Release").click()
+        except Exception as e:
+            self.capture_screenshot()
+            raise e
+
+    def test_contact_centre_user_can_view_audit_log(self):
+        self.assert_contact_centre_user_can_view_audit_log()
+
+    def assert_contact_centre_user_can_view_audit_log(self):
+        """
+        Tests that a Contact Centre user can search for an application and view its audit log
+        """
+        global selenium_task_executor
+
+        try:
+            self.login_as_contact_user()
+            selenium_task_executor.get_driver().find_element_by_id("id_query").send_keys("test")
+            selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Search']").click()
+            selenium_task_executor.get_driver().find_element_by_link_text("Application Summary").click()
+            self.assertEqual("Application Summary", selenium_task_executor.get_driver().title)
+            selenium_task_executor.get_driver().find_element_by_link_text("Audit log").click()
+            self.assertEqual("Audit Log", selenium_task_executor.get_driver().title)
         except Exception as e:
             self.capture_screenshot()
             raise e
@@ -250,15 +389,6 @@ class TestArcFunctions(LiveServerTestCase):
         except Exception as e:
             self.capture_screenshot()
             raise e
-
-    def wait_until_title_changes(self, current_title, wait_timeout):
-        """
-        Helper to wait a set time until the current page title changes
-        :param wait_timeout: the timeout in seconds to wait
-        :return:
-        """
-        WebDriverWait(selenium_task_executor.get_driver(), wait_timeout).until_not(
-            expected_conditions.title_is(selenium_task_executor.get_driver().title))
 
     def capture_screenshot(self):
         now = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
