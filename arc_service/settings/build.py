@@ -2,9 +2,6 @@ from .base import *
 
 DEBUG = True
 
-# Base URL of notify gateway
-NOTIFY_URL = 'http://notify-gateway:8000/notify-gateway'
-
 ALLOWED_HOSTS = ['*']
 
 DEV_APPS = [
