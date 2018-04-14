@@ -7,14 +7,17 @@
 
 <main>
 {% include 'back-button.html' %}
-    <header><h1 class="form-title heading-large">Audit Log</h1></header>
+    <h1 class="form-title heading-large">
+        Audit Log
+    </h1>
+
     <table>
         <thead>
-        <tr>
-            <td>Date</td>
-            <td>User type</td>
-            <td>Message</td>
-        </tr>
+            <tr>
+                <th scope="col">Date</th>
+                <th scope="col">User type</th>
+                <th scope="col">Message</th>
+            </tr>
         </thead>
         <tbody>
         {% for log in object_list %}

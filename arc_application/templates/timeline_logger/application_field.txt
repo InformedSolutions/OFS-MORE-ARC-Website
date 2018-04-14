@@ -8,7 +8,7 @@
     <td class="col-xs-1">
         {{ log.extra_data.user_type|capfirst }}
     </td>
-    <td class="col-xs-1">
-        {{ log.extra_data.entity|capfirst }} {{ log.extra_data.action }} {{ log.user|default:_('applicant') }}
+    <td class="col-xs-3">
+      Field '{{ log.extra_data.formatted_field|capfirst }}' {{ log.extra_data.action }}
     </td>
 </tr>

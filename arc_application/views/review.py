@@ -868,14 +868,12 @@ def accepted_email(email, first_name, ref):
     :param email: string email address
     :return: HTTP response
     """
-    print('accepted email')
     if hasattr(settings, 'NOTIFY_URL'):
         email = str(email)
         base_request_url = settings.NOTIFY_URL
         header = {'content-type': 'application/json'}
         request = {
             'email': email,
-            'reference': 'string',
             'templateId': 'b973c5a2-cadd-46a5-baf7-beae65ab11dc',
             'personalisation': {
                 'first_name': first_name,
@@ -897,14 +895,12 @@ def returned_email(email, first_name, ref, link):
     :param email: string email address
     :return: HTTP response
     """
-    print('returned email')
     if hasattr(settings, 'NOTIFY_URL'):
         email = str(email)
         base_request_url = settings.NOTIFY_URL
         header = {'content-type': 'application/json'}
         request = {
             'email': email,
-            'reference': 'string',
             'templateId': 'c9157aaa-02cd-4294-8094-df2184c12930',
             'personalisation': {
                 'first_name': first_name,
