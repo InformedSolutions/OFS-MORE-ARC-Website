@@ -3,14 +3,16 @@ Selenium test cases for the Childminder service
 """
 
 import os
-import random
 from datetime import datetime
 
 from django.core.management import call_command
 from django.test import LiveServerTestCase, override_settings, tag
 from selenium import webdriver
+from selenium.webdriver.support import expected_conditions
+from selenium.webdriver.support.wait import WebDriverWait
 
 from .selenium_task_executor import SeleniumTaskExecutor
+from arc_application.models import Application
 
 from faker import Faker
 
@@ -38,6 +40,9 @@ class TestArcFunctions(LiveServerTestCase):
         # Load fixtures to populate test users
         call_command("loaddata", "initial_arc_user.json", verbosity=0)
 
+        # Load fixtures to populate a test application
+        call_command("loaddata", "test_application.json", verbosity=0)
+
         base_url = os.environ.get('DJANGO_LIVE_TEST_SERVER_ADDRESS')
 
         if os.environ.get('LOCAL_SELENIUM_DRIVER') == 'True':
@@ -52,7 +57,7 @@ class TestArcFunctions(LiveServerTestCase):
             )
 
         selenium_driver.maximize_window()
-        selenium_driver.implicitly_wait(5)
+        selenium_driver.implicitly_wait(20)
 
         self.verification_errors = []
         self.accept_next_alert = True
@@ -73,10 +78,7 @@ class TestArcFunctions(LiveServerTestCase):
         global selenium_task_executor
 
         try:
-            selenium_task_executor.navigate_to_base_url()
-            selenium_task_executor.get_driver().find_element_by_id("id_username").send_keys("arc1")
-            selenium_task_executor.get_driver().find_element_by_id("id_password").send_keys("[jack-in]")
-            selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Log in']").click()
+            self.login_as_arc_user()
             self.assertEqual("Logout", selenium_task_executor.get_driver().find_element_by_link_text("Logout").text)
             selenium_task_executor.get_driver().find_element_by_link_text("Logout").click()
         except Exception as e:
@@ -88,7 +90,140 @@ class TestArcFunctions(LiveServerTestCase):
 
     def assert_can_login_as_contact_centre_user(self):
         """
-        Tests that an ARC user can login
+        Tests that a Contact Centre user can login
+        """
+        global selenium_task_executor
+
+        try:
+            self.login_as_contact_user()
+            self.assertEqual("Logout", selenium_task_executor.get_driver().find_element_by_link_text("Logout").text)
+            selenium_task_executor.get_driver().find_element_by_link_text("Logout").click()
+        except Exception as e:
+            self.capture_screenshot()
+            raise e
+
+    def test_message_shown_when_no_applications_to_assign_to_arc_user(self):
+        self.assert_message_shown_when_no_applications_to_assign_to_arc_user()
+
+    def assert_message_shown_when_no_applications_to_assign_to_arc_user(self):
+        """
+        Tests that an information message gets shown when an ARC user attempts to assign an application to themselves
+        but none are ready for review
+        """
+        global selenium_task_executor
+
+        try:
+            Application.objects.all().delete()
+            self.login_as_arc_user()
+            selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='New Application']").click()
+            self.assertTrue(
+                selenium_task_executor.get_driver().find_element_by_class_name('error-summary').is_displayed()
+            )
+        except Exception as e:
+            self.capture_screenshot()
+            raise e
+
+    def test_can_assign_application_to_arc_user(self):
+        self.assert_can_assign_and_release_an_application_as_arc_user()
+
+    def assert_can_assign_and_release_an_application_as_arc_user(self):
+        """
+        Tests that an ARC user can assign themselves an application
+        """
+        global selenium_task_executor
+
+        try:
+            self.login_as_arc_user()
+            selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='New Application']").click()
+            selenium_task_executor.get_driver().find_element_by_link_text("Review").click()
+            self.assertEqual("Application overview",
+                             selenium_task_executor.get_driver().find_element_by_xpath("//main[@id='content']/div[2]/div/header/h1").text)
+            self.release_arc_application()
+        except Exception as e:
+            self.capture_screenshot()
+            raise e
+
+    def test_arc_user_can_view_audit_log(self):
+        self.assert_arc_user_can_view_audit_log()
+
+    def assert_arc_user_can_view_audit_log(self):
+        """
+        Tests that an ARC user can access the audit log feature
+        """
+        global selenium_task_executor
+
+        try:
+            self.login_as_arc_user()
+            selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='New Application']").click()
+            selenium_task_executor.get_driver().find_element_by_link_text("Review").click()
+            selenium_task_executor.get_driver().find_element_by_link_text("Audit log").click()
+            self.assertEqual("Audit Log", selenium_task_executor.get_driver().title)
+        except Exception as e:
+            self.capture_screenshot()
+            raise e
+
+    def test_arc_user_can_complete_review_without_flagging_any_questions(self):
+        self.assert_arc_user_can_complete_review_without_flagging_any_questions()
+
+    def assert_arc_user_can_complete_review_without_flagging_any_questions(self):
+        """
+        Tests that an ARC user can complete a review without flagging any questions
+        """
+        global selenium_task_executor
+        title_change_wait = 15
+
+        try:
+            self.login_as_arc_user()
+            selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='New Application']").click()
+            selenium_task_executor.get_driver().find_element_by_link_text("Review").click()
+            selenium_task_executor.get_driver().find_element_by_xpath("//main[@id='content']/div[2]/div").click()
+            selenium_task_executor.get_driver().find_element_by_xpath("//tr[@id='account_details']/td/a/span").click()
+            WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("Your account"))
+            selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Confirm and continue']").click()
+            WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("Type of childcare"))
+            selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Confirm and continue']").click()
+            WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("Personal details"))
+            selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Confirm and continue']").click()
+            WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("First aid training"))
+            selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Confirm and continue']").click()
+            WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("DBS check"))
+            selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Confirm and continue']").click()
+            WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("Check your answers: health declaration booklet"))
+            selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Confirm and continue']").click()
+            WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("References"))
+            selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Confirm and continue']").click()
+            WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("People in your home"))
+            selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Confirm and continue']").click()
+            WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("Register as a childminder"))
+            selenium_task_executor.get_driver().find_element_by_link_text("Complete review").click()
+            WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("Application Summary"))
+            selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Confirm and continue']").click()
+            WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("Additional Comments"))
+            selenium_task_executor.get_driver().find_element_by_id("id_comments").send_keys("Test")
+            selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Save and continue']").click()
+            self.assertEqual("Review Approved",
+                             selenium_task_executor.get_driver().find_element_by_xpath("//main[@id='content']/div[2]/div/h1").text)
+        except Exception as e:
+            self.capture_screenshot()
+            raise e
+
+    def release_arc_application(self):
+        """
+        Helper method for releasing an application as an ARC user
+        :return:
+        """
+        global selenium_task_executor
+
+        try:
+            selenium_task_executor.get_driver().find_element_by_id("proposition-name").click()
+            selenium_task_executor.get_driver().find_element_by_link_text("Release").click()
+        except Exception as e:
+            self.capture_screenshot()
+            raise e
+
+    def login_as_contact_user(self):
+        """
+        Helper method for logging in as a contact centre user
         """
         global selenium_task_executor
 
@@ -97,11 +232,33 @@ class TestArcFunctions(LiveServerTestCase):
             selenium_task_executor.get_driver().find_element_by_id("id_username").send_keys("cc1")
             selenium_task_executor.get_driver().find_element_by_id("id_password").send_keys("[jack-in]")
             selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Log in']").click()
-            self.assertEqual("Logout", selenium_task_executor.get_driver().find_element_by_link_text("Logout").text)
-            selenium_task_executor.get_driver().find_element_by_link_text("Logout").click()
         except Exception as e:
             self.capture_screenshot()
             raise e
+
+    def login_as_arc_user(self):
+        """
+        Helper method for logging in as a contact centre user
+        """
+        global selenium_task_executor
+
+        try:
+            selenium_task_executor.navigate_to_base_url()
+            selenium_task_executor.get_driver().find_element_by_id("id_username").send_keys("arc1")
+            selenium_task_executor.get_driver().find_element_by_id("id_password").send_keys("[jack-in]")
+            selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Log in']").click()
+        except Exception as e:
+            self.capture_screenshot()
+            raise e
+
+    def wait_until_title_changes(self, current_title, wait_timeout):
+        """
+        Helper to wait a set time until the current page title changes
+        :param wait_timeout: the timeout in seconds to wait
+        :return:
+        """
+        WebDriverWait(selenium_task_executor.get_driver(), wait_timeout).until_not(
+            expected_conditions.title_is(selenium_task_executor.get_driver().title))
 
     def capture_screenshot(self):
         now = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
@@ -111,6 +268,8 @@ class TestArcFunctions(LiveServerTestCase):
     def tearDown(self):
         global selenium_driver
         selenium_driver.quit()
+        # Delete the test application after each test
+        Application.objects.all().delete()
         super(TestArcFunctions, self).tearDown()
         self.assertEqual([], self.verification_errors)
 
