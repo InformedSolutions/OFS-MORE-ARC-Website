@@ -325,20 +325,6 @@ class TestArcFunctions(LiveServerTestCase):
             self.capture_screenshot()
             raise e
 
-    def release_arc_application(self):
-        """
-        Helper method for releasing an application as an ARC user
-        :return:
-        """
-        global selenium_task_executor
-
-        try:
-            selenium_task_executor.get_driver().find_element_by_id("proposition-name").click()
-            selenium_task_executor.get_driver().find_element_by_link_text("Release").click()
-        except Exception as e:
-            self.capture_screenshot()
-            raise e
-
     def test_contact_centre_user_can_view_audit_log(self):
         self.assert_contact_centre_user_can_view_audit_log()
 
@@ -356,6 +342,43 @@ class TestArcFunctions(LiveServerTestCase):
             self.assertEqual("Application Summary", selenium_task_executor.get_driver().title)
             selenium_task_executor.get_driver().find_element_by_link_text("Audit log").click()
             self.assertEqual("Audit Log", selenium_task_executor.get_driver().title)
+        except Exception as e:
+            self.capture_screenshot()
+            raise e
+
+    def test_contact_centre_user_viewing_application_gets_logged_in_audit_log(self):
+        self.assert_contact_centre_user_viewing_application_gets_logged_in_audit_log()
+
+    def assert_contact_centre_user_viewing_application_gets_logged_in_audit_log(self):
+        """
+        Tests that a Contact Centre user can search for an application and view its audit log
+        """
+        global selenium_task_executor
+
+        try:
+            self.login_as_contact_user()
+            selenium_task_executor.get_driver().find_element_by_id("id_query").send_keys("test")
+            selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Search']").click()
+            selenium_task_executor.get_driver().find_element_by_link_text("Application Summary").click()
+            self.assertEqual("Application Summary", selenium_task_executor.get_driver().title)
+            selenium_task_executor.get_driver().find_element_by_link_text("Audit log").click()
+            self.assertEqual("Audit Log", selenium_task_executor.get_driver().title)
+            self.assertEqual("Application viewed by cc1",
+                             selenium_task_executor.get_driver().find_element_by_xpath("//main[@id='content']/main/table/tbody/tr/td[3]").text)
+        except Exception as e:
+            self.capture_screenshot()
+            raise e
+
+    def release_arc_application(self):
+        """
+        Helper method for releasing an application as an ARC user
+        :return:
+        """
+        global selenium_task_executor
+
+        try:
+            selenium_task_executor.get_driver().find_element_by_id("proposition-name").click()
+            selenium_task_executor.get_driver().find_element_by_link_text("Release").click()
         except Exception as e:
             self.capture_screenshot()
             raise e
