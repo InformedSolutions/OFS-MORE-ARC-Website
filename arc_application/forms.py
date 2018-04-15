@@ -473,20 +473,49 @@ class SearchForm(GOVUKForm):
     """
     field_label_classes = 'form-label-bold'
     auto_replace_widgets = True
-    query = forms.CharField(label='Search all fields', required=True)
+
+    reference_search_field = forms.CharField(label='Reference number', required=False)
+    name_search_field = forms.CharField(label='Name', required=False)
+    dob_search_field = forms.CharField(label='Date of birth', required=False)
+    home_postcode_search_field = forms.CharField(label='Home postcode', required=False)
+    care_location_postcode_search_field = forms.CharField(label='Location of care postcode', required=False)
 
     def __init__(self, *args, **kwargs):
         """
-        Method to configure the initialisation of the Your login and contact details: email form
+        Method to configure the initialisation of the Application Search form
         :param args: arguments passed to the form
         :param kwargs: keyword arguments passed to the form, e.g. application ID
         """
         super(SearchForm, self).__init__(*args, **kwargs)
 
-    def clean_query(self):
-        query = self.cleaned_data['query']
-        if len(query) < 3:
-            raise forms.ValidationError('Please enter a keyword that is greater than 2 characters')
-        if len(query) == 0:
-            raise forms.ValidationError('This field is required')
-        return query
+    def clean(self):
+        """
+        Custom form cleansing override
+        """
+        cleaned_data = super(SearchForm, self).clean()
+
+        name = self.cleaned_data['name_search_field']
+        dob = self.cleaned_data['dob_search_field']
+        home_postcode = self.cleaned_data['home_postcode_search_field']
+        care_location_postcode = self.cleaned_data['care_location_postcode_search_field']
+        reference = self.cleaned_data['reference_search_field']
+
+        length_error_text = 'To use this search filter you must enter more than 2 characters'
+
+        if len(reference) != 0 and len(reference) < 3:
+            self.add_error('reference_search_field', length_error_text)
+
+        if len(name) != 0 and len(name) < 3:
+            self.add_error('name_search_field', length_error_text)
+
+        if len(dob) != 0 and len(dob) < 3:
+            self.add_error('dob_search_field', length_error_text)
+
+        if len(home_postcode) != 0 and len(home_postcode) < 3:
+            self.add_error('home_postcode_search_field', length_error_text)
+
+        if len(care_location_postcode) != 0 and len(care_location_postcode) < 3:
+            self.add_error('care_location_postcode_search_field', length_error_text)
+
+        return cleaned_data
+

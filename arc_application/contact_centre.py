@@ -1,15 +1,13 @@
-from itertools import chain
+import re
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
+from django.db.models import Q
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
-from django.db.models import Q
 
 from .forms import SearchForm
-from .models import AdultInHome, ApplicantHomeAddress, ApplicantName, ApplicantPersonalDetails, Application, Arc, \
-    ChildInHome, ChildcareType, CriminalRecordCheck, FirstAidTraining, HealthDeclarationBooklet, Reference, \
-    UserDetails
+from .models import ApplicantName, ApplicantPersonalDetails, Application
 from .views import has_group
 
 
@@ -34,26 +32,40 @@ def search(request):
             form = SearchForm(request.POST)
 
             if form.is_valid():
-                query = form.cleaned_data['query']
+                name = form.cleaned_data['name_search_field']
+                dob = form.cleaned_data['dob_search_field']
+                home_postcode = form.cleaned_data['home_postcode_search_field']
+                care_location_postcode = form.cleaned_data['care_location_postcode_search_field']
+                reference = form.cleaned_data['reference_search_field']
 
-                if len(query) > 2:
-                    results = search_query(query)
-                    if results is not None and len(results) > 0:
-                        data = format_data(results)
-                        variables = {
-                            'empty': False,
-                            'form': form,
-                            'app': data,
-                        }
-                        return render(request, 'search.html', variables)
-                    else:
-                        variables = {
-                            'empty': 'error',
-                            'error_title': 'No Results Found',
-                            'error_text': '',
-                            'form': form,
-                        }
-                        return render(request, 'search.html', variables)
+                # If no search terms have been entered
+                if not name and not dob and not home_postcode and not care_location_postcode and not reference:
+                    variables = {
+                        'empty': 'error',
+                        'error_title': 'Please check the form',
+                        'error_text': 'You must enter at least one filter to search by',
+                        'form': form,
+                    }
+                    return render(request, 'search.html', variables)
+
+                results = search_query(name, dob, home_postcode, care_location_postcode, reference)
+
+                if results is not None and len(results) > 0:
+                    data = format_data(results)
+                    variables = {
+                        'empty': False,
+                        'form': form,
+                        'app': data,
+                    }
+                    return render(request, 'search.html', variables)
+                else:
+                    variables = {
+                        'empty': 'error',
+                        'error_title': 'No results found',
+                        'error_text': 'No results could be found based on your search',
+                        'form': form,
+                    }
+                    return render(request, 'search.html', variables)
             variables = {
                 'empty': True,
                 'form': form,
@@ -115,66 +127,122 @@ def format_data(results):
     return results
 
 
-def search_query(query):
+def search_query(name, dob, home_postcode, care_location_postcode, reference):
     """
     This method actually searches the database for results matching the query
     :param query: Either a search for DoB, Name, or Application Id
     :return: A querystring of results
     """
+    if len(dob) == 0:
+        return Application.objects.filter(
+            Q(order_code__icontains=reference),  # Contains reference AND
+            Q(
+                Q(applicantname__first_name__icontains=name) |
+                Q(applicantname__last_name__icontains=name)
+            ),  # Contains either first name OR last name matching query AND
+            Q(applicanthomeaddress__postcode__icontains=home_postcode),  # Matches postcode for home address AND
+            Q(
+                Q(applicanthomeaddress__childcare_address=True),  # Matches childcare address
+                Q(applicanthomeaddress__postcode__icontains=care_location_postcode)
+            )
+        ).distinct()
 
-    query = str(query).lower()
-    query_length = len(query)
+    # If a DOB has been supplied
+    if len(dob) > 0:
+        # Split DOB by non-alpha characters
+        split_dob = re.split(r"[^0-9]", dob)
 
-    # Check for Application Id (36 Chars)
-    if query_length == 36 and Application.objects.filter(pk=query).exists():
-        return Application.objects.filter(pk=query)
-    elif ApplicantName.objects.filter(first_name__icontains=query).exists():
-        return ApplicantName.objects.filter(first_name__icontains=query)
-    elif ApplicantName.objects.filter(last_name__icontains=query).exists():
-        return ApplicantName.objects.filter(last_name__icontains=query)
-    else:
-        try:
-            if ' ' in query:
-                if ApplicantName.objects.filter(first_name__icontains=query.split(' ')[0],
-                                                last_name__icontains=query.split(' ')[1]).count() > 0:
-                    return ApplicantName.objects.filter(first_name__icontains=query.split(' ')[0],
-                                                        last_name__icontains=query.split(' ')[1])
-            elif query.count('.') == 2:
-                arr = query.split('.')
-                temp_year = arr[2]
-                if len(arr[2]) == 2:
-                    temp_year = str(20) + arr[2]
-                    arr[2] = str(19) + arr[2]
-                return list(
-                    ApplicantPersonalDetails.objects.filter(
-                        Q(birth_day=int(arr[0]), birth_month=int(arr[1]), birth_year=int(arr[2])) |
-                        Q(birth_day=int(arr[0]), birth_month=int(arr[1]), birth_year=int(temp_year))
-                    )
-                )
-            elif query.count('/') == 2:
-                arr = query.split('/')
-                temp_year = arr[2]
-                if len(arr[2]) == 2:
-                    temp_year = str(20) + arr[2]
-                    arr[2] = str(19) + arr[2]
-                return list(
-                    ApplicantPersonalDetails.objects.filter(
-                        Q(birth_day=int(arr[0]), birth_month=int(arr[1]), birth_year=int(arr[2])) |
-                        Q(birth_day=int(arr[0]), birth_month=int(arr[1]), birth_year=int(temp_year))
-                    )
-                )
-            elif query.count('-') == 2:
-                arr = query.split('-')
-                temp_year = arr[2]
-                if len(arr[2]) == 2:
-                    temp_year = str(20) + arr[2]
-                    arr[2] = str(19) + arr[2]
-                return list(
-                    ApplicantPersonalDetails.objects.filter(
-                        Q(birth_day=int(arr[0]), birth_month=int(arr[1]), birth_year=int(arr[2])) |
-                        Q(birth_day=int(arr[0]), birth_month=int(arr[1]), birth_year=int(temp_year))
-                    )
-                )
-        except Exception as ex:
-            print(ex)
-    return None
+        if len(split_dob) == 1:
+            # If only one DOB part has been supplied assume it could be day month or year
+
+            # Create four digit year if 2 digit year supplied
+            if len(split_dob[0]) == 2:
+                previous_century_year = str(19) + split_dob[0]
+                current_century_year = str(20) + split_dob[0]
+            else:
+                # Otherwise allow longer values to be directly issued against query
+                previous_century_year = split_dob[0]
+                current_century_year = split_dob[0]
+
+            return Application.objects.filter(
+                Q(order_code__icontains=reference),  # Contains reference AND
+                Q(
+                    Q(applicantname__first_name__icontains=name) |
+                    Q(applicantname__last_name__icontains=name)
+                ),  # Contains either first name OR last name matching query AND
+                Q(applicanthomeaddress__postcode__icontains=home_postcode),  # Matches postcode for home address AND
+                Q(
+                    Q(applicanthomeaddress__childcare_address=True),  # Matches childcare address
+                    Q(applicanthomeaddress__postcode__icontains=care_location_postcode)
+                ),
+                Q(
+                    Q(applicantpersonaldetails__birth_day=int(split_dob[0])) |
+                    Q(applicantpersonaldetails__birth_month=int(split_dob[0])) |
+                    Q(applicantpersonaldetails__birth_year=int(previous_century_year)) |
+                    Q(applicantpersonaldetails__birth_year=int(current_century_year))
+                ),
+            ).distinct()
+
+        if len(split_dob) == 2:
+            # If two DOBs part have been supplied, again assume second part is either a month or a year
+
+            # Create four digit year if 2 digit year supplied
+            if len(split_dob[1]) == 2:
+                previous_century_year = str(19) + split_dob[1]
+                current_century_year = str(20) + split_dob[1]
+            else:
+                # Otherwise allow longer values to be directly issued against query
+                previous_century_year = split_dob[1]
+                current_century_year = split_dob[1]
+
+            return Application.objects.filter(
+                Q(order_code__icontains=reference),  # Contains reference AND
+                Q(
+                    Q(applicantname__first_name__icontains=name) |
+                    Q(applicantname__last_name__icontains=name)
+                ),  # Contains either first name OR last name matching query AND
+                Q(applicanthomeaddress__postcode__icontains=home_postcode),  # Matches postcode for home address AND
+                Q(
+                    Q(applicanthomeaddress__childcare_address=True),  # Matches childcare address
+                    Q(applicanthomeaddress__postcode__icontains=care_location_postcode)
+                ),
+                Q(
+                    Q(applicantpersonaldetails__birth_day=int(split_dob[0])),
+                    Q(applicantpersonaldetails__birth_month=int(split_dob[0])) |
+                    Q(applicantpersonaldetails__birth_month=int(split_dob[1])) |
+                    Q(applicantpersonaldetails__birth_year=int(previous_century_year)) |
+                    Q(applicantpersonaldetails__birth_year=int(current_century_year))
+                ),
+            ).distinct()
+
+        # If a full DOB parts have been provided, assume day month year ordering
+        if len(split_dob) == 3:
+
+            # Create four digit year if 2 digit year supplied
+            if len(split_dob[2]) == 2:
+                previous_century_year = str(19) + split_dob[2]
+                current_century_year = str(20) + split_dob[2]
+            else:
+                # Otherwise allow longer values to be directly issued against query
+                previous_century_year = split_dob[2]
+                current_century_year = split_dob[2]
+
+            return Application.objects.filter(
+                Q(order_code__icontains=reference),  # Contains reference AND
+                Q(
+                    Q(applicantname__first_name__icontains=name) |
+                    Q(applicantname__last_name__icontains=name)
+                ),  # Contains either first name OR last name matching query AND
+                Q(applicanthomeaddress__postcode__icontains=home_postcode),  # Matches postcode for home address AND
+                Q(
+                    Q(applicanthomeaddress__childcare_address=True),  # Matches childcare address
+                    Q(applicanthomeaddress__postcode__icontains=care_location_postcode)
+                ),
+                Q(
+                    Q(applicantpersonaldetails__birth_day=int(split_dob[0])),
+                    Q(applicantpersonaldetails__birth_month=int(split_dob[1])),
+                    Q(applicantpersonaldetails__birth_year=int(previous_century_year)) |
+                    Q(applicantpersonaldetails__birth_year=int(current_century_year))
+                ),
+            ).distinct()
+

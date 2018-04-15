@@ -30,8 +30,6 @@ class Application(models.Model):
         ('FURTHER_INFORMATION', 'FURTHER_INFORMATION')
     )
     application_id = models.UUIDField(primary_key=True, default=uuid4)
-    #login_id = models.ForeignKey(
-    #    UserDetails, on_delete=models.CASCADE, db_column='login_id', blank=True, null=True)
     application_type = models.CharField(choices=APP_TYPE, max_length=50, blank=True)
     application_status = models.CharField(choices=APP_STATUS, max_length=50, blank=True)
     cygnum_urn = models.CharField(max_length=50, blank=True)

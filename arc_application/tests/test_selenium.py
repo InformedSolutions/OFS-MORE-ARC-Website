@@ -336,7 +336,7 @@ class TestArcFunctions(LiveServerTestCase):
 
         try:
             self.login_as_contact_user()
-            selenium_task_executor.get_driver().find_element_by_id("id_query").send_keys("test")
+            selenium_task_executor.get_driver().find_element_by_id("id_name_search_field").send_keys("test")
             selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Search']").click()
             selenium_task_executor.get_driver().find_element_by_link_text("Application Summary").click()
             self.assertEqual("Application Summary", selenium_task_executor.get_driver().title)
@@ -357,7 +357,7 @@ class TestArcFunctions(LiveServerTestCase):
 
         try:
             self.login_as_contact_user()
-            selenium_task_executor.get_driver().find_element_by_id("id_query").send_keys("test")
+            selenium_task_executor.get_driver().find_element_by_id("id_name_search_field").send_keys("test")
             selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Search']").click()
             selenium_task_executor.get_driver().find_element_by_link_text("Application Summary").click()
             self.assertEqual("Application Summary", selenium_task_executor.get_driver().title)

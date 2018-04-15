@@ -18,94 +18,84 @@
   </div>
 {% endif %}
 
-<div class="column-full">
-    <div class="form-group grid-row column-full">
-        <h1 class="form-title heading-large">
-            Applications
-        </h1>
-        <form method="post" novalidate>
-            <p>Please search for the application you wish to view below</p>
+<h1 class="form-title heading-large">
+    Applications
+</h1>
 
-            <p>This will search through all applicant names, date of birth's, and application references</p>
-            {{form.as_div}}
-            {% csrf_token %}
-            <input type="hidden" id="id" value="{{application_id}}" name="id"/>
-            <input type="submit" class="button" value="Search" alt='Continue to declaration'>
-        </form>
-        <br>
-        <br>
-
-
-        <div>
-            {% if not empty %}
-            <p> Please select the application you wish to view from the table below</p>
-            <table>
-                <thead>
-                <tr>
-                    <td>
-                        App Type
-                    </td>
-                    <td>
-                        Applicant Name
-                    </td>
-                    <td>
-                        Date Submitted
-                    </td>
-                    <td>
-                        Date Accessed
-                    </td>
-                    <td>
-                        Submission Type
-                    </td>
-                    <td>
-
-                    </td>
-                    <td>
-                    </td>
-                    <td></td>
-                </tr>
-                </thead>
-                <tbody>
-                {% for app in app %}
-                <tr>
-                    <td>
-                        <b>
-                            {{ app.type }}
-                        </b>
-                    </td>
-                    <td>{{ app.name }}</td>
-                    <td>
-                        <b>
-                        {{ app.submitted }}
-                        </b>
-                    </td>
-                    <td>
-                        {{ app.accessed }}
-                    </td>
-                    <td>
-                        <b>
-                        {{ app.sub_type }}
-                        </b>
-                    </td>
-                    <td>
-                        <a href="{{ app.link }}">Application Summary</a>
-                    </td>
-                    <td>
-                        <a href="{{ app.audit_link }}">Audit Log</a>
-                    </td>
-                </tr>
-                {% endfor %}
-                </tbody>
-            </table>
-            <br>
-            <br>
-            <form method="get" action="/arc/search">
-                <input type="submit" class="button" value="Clear" alt='Continue to declaration' id="clear">
-            </form>
-            {% endif %}
+<form method="post" novalidate>
+    <div class="panel search-form">
+       {{form.as_div}}
+        <div class="search-actions">
+            <input type="submit" class="button" value="Search">
+            <a href="/arc/search" class="reset-filter-link">Reset filters</a>
         </div>
-
     </div>
+    {% csrf_token %}
+    <input type="hidden" id="id" value="{{application_id}}" name="id"/>
+</form>
+
+<div class="search-results">
+    {% if not empty %}
+        <p>Select the application you wish to view from the table below</p>
+        <table class="search-results-table">
+            <thead>
+            <tr>
+                <th scope="col">
+                    Application Type
+                </th>
+                <th scope="col">
+                    Applicant Name
+                </td>
+                <th scope="col">
+                    Date Submitted
+                </td>
+                <th scope="col">
+                    Date Accessed
+                </td>
+                <th scope="col">
+                    Submission Type
+                </td>
+                <td>
+
+                </td>
+                <td>
+                </td>
+                <td></td>
+            </tr>
+            </thead>
+            <tbody>
+            {% for app in app %}
+            <tr>
+                <td>
+                    <b>
+                        {{ app.type }}
+                    </b>
+                </td>
+                <td>{{ app.name }}</td>
+                <td>
+                    <b>
+                    {{ app.submitted }}
+                    </b>
+                </td>
+                <td>
+                    {{ app.accessed }}
+                </td>
+                <td>
+                    <b>
+                    {{ app.sub_type }}
+                    </b>
+                </td>
+                <td>
+                    <a href="{{ app.link }}">Application Summary</a>
+                </td>
+                <td>
+                    <a href="{{ app.audit_link }}">Audit Log</a>
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
 </div>
 
 {% endblock %}

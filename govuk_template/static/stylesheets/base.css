@@ -2648,3 +2648,56 @@ padding-bottom: 200px;
 #clear {
 float:right;
 }
+
+.search-form {
+    background: #DEE0E2 !important;
+    border-left: none;
+    padding: 1em;
+}
+
+@media (min-width: 641px) {
+
+    .search-form {
+      margin-bottom: 30px;
+    }
+
+    .search-form .form-group {
+      width: 33%;
+    }
+
+    .search-form .form-group .form-control {
+      width: 90%;
+    }
+
+    .search-form .error-message {
+       display: none !important;
+    }
+
+    .search-form .form-control-error {
+        margin: -4px !important;
+    }
+
+    .search-form .form-group-error input {
+        margin: 0px !important;
+    }
+
+    .search-actions {
+      display: block !important;
+      clear: left;
+    }
+
+    .reset-filter-link {
+        line-height: 2em;
+        margin-left: 15px;
+    }
+
+    .search-results-table {
+       margin-bottom: 15px;
+    }
+}
+
+.button-secondary {
+  display: block !important;
+  background-color: #eee;
+  color: #000;
+}
