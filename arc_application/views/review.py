@@ -743,7 +743,6 @@ def health_check_answers(request):
     return render(request, 'health-check-answers.html', variables)
 
 
-
 def comments(request):
     """
     This is the arc comments page
@@ -805,9 +804,8 @@ def review(request):
         user_details.email_expiry_date = expiry
         user_details.magic_link_email = magic_link
         user_details.save()
-        returned_email(email, first_name, application_id_local, 'validate/' +magic_link)
-
-
+        link = settings.CHILDMINDER_EMAIL_VALIDATION_URL + '/' + magic_link
+        returned_email(email, first_name, application_id_local, link)
 
         # Copy Arc status' to Chilminder App
         if Arc.objects.filter(pk=application_id_local):

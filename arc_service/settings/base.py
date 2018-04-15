@@ -7,7 +7,9 @@ ARC_GROUP = 'arc'
 CONTACT_CENTRE= 'contact-centre'
 APPLICATION_LIMIT = 5
 
-os.environ.get('APP_NOTIFY_URL')
+NOTIFY_URL = os.environ.get('APP_NOTIFY_URL')
+
+CHILDMINDER_EMAIL_VALIDATION_URL = os.environ.get('CHILDMINDER_EMAIL_VALIDATION_URL')
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
