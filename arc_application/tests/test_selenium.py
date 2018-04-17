@@ -363,7 +363,7 @@ class TestArcFunctions(LiveServerTestCase):
             self.assertEqual("Application Summary", selenium_task_executor.get_driver().title)
             selenium_task_executor.get_driver().find_element_by_link_text("Audit log").click()
             self.assertEqual("Audit Log", selenium_task_executor.get_driver().title)
-            self.assertEqual("Application viewed by cc1",
+            self.assertEqual("Application is viewed by cc1",
                              selenium_task_executor.get_driver().find_element_by_xpath("//main[@id='content']/main/table/tbody/tr/td[3]").text)
         except Exception as e:
             self.capture_screenshot()

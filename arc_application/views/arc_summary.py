@@ -30,11 +30,14 @@ def cc_summary(request):
     if request.method == 'GET':
         application_id_local = request.GET["id"]
         json = load_json(application_id_local)
+        json[0][1]['link'] = ('/arc/contact-centre/contact-details/email-address/?id=' + str(application_id_local))
+        json[0][2]['link'] = ('/arc/contact-centre/contact-details/phone-number/?id=' + str(application_id_local))
+        json[0][3]['link'] = ('/arc/contact-centre/contact-details/add-phone-number/?id=' + str(application_id_local))
         TimelineLog.objects.create(
             content_object=Application.objects.get(pk=application_id_local),
             user=request.user,
             template='timeline_logger/application_action_contact_center.txt',
-            extra_data={'user_type': 'contact center', 'entity': 'application', 'action': "viewed"}
+            extra_data={'user_type': 'contact center', 'entity': 'application', 'action': "is viewed"}
         )
 
         variables = {
@@ -150,11 +153,8 @@ def load_login_details(app):
         table = [
             {"title": "Your login details", "id": login_record.pk},
             {"name": "Your email", "value": login_record.email},
-            {"name": "Mobile phone number", "value": login_record.mobile_number},
-            {"name": "Alternative phone number", "value": login_record.add_phone_number},
-            {"name": "Knowledge based question", "value": login_record.security_question},
-            {"name": "Knowledge based answer", "value": login_record.security_question}
-
+            {"name": "Your mobile number", "value": login_record.mobile_number},
+            {"name": "Other phone number", "value": login_record.add_phone_number},
         ]
         return table
     return False

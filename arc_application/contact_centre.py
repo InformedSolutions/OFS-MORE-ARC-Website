@@ -6,7 +6,7 @@ from django.db.models import Q
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 
-from .forms import SearchForm
+from .forms.form import SearchForm
 from .models import ApplicantName, ApplicantPersonalDetails, Application
 from .views import has_group
 
