@@ -42,8 +42,8 @@ def search(request):
                 if not name and not dob and not home_postcode and not care_location_postcode and not reference:
                     variables = {
                         'empty': 'error',
-                        'error_title': 'Please check the form',
-                        'error_text': 'You must enter at least one filter to search by',
+                        'error_title': 'There was a problem with your search',
+                        'error_text': 'Please use at least one filter',
                         'form': form,
                     }
                     return render(request, 'search.html', variables)
@@ -245,4 +245,3 @@ def search_query(name, dob, home_postcode, care_location_postcode, reference):
                     Q(applicantpersonaldetails__birth_year=int(current_century_year))
                 ),
             ).distinct()
-

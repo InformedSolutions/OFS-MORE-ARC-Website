@@ -500,7 +500,7 @@ class SearchForm(GOVUKForm):
         care_location_postcode = self.cleaned_data['care_location_postcode_search_field']
         reference = self.cleaned_data['reference_search_field']
 
-        length_error_text = 'To use this search filter you must enter more than 2 characters'
+        length_error_text = 'Please enter more than 2 characters'
 
         if len(reference) != 0 and len(reference) < 3:
             self.add_error('reference_search_field', length_error_text)
@@ -517,5 +517,7 @@ class SearchForm(GOVUKForm):
         if len(care_location_postcode) != 0 and len(care_location_postcode) < 3:
             self.add_error('care_location_postcode_search_field', length_error_text)
 
-        return cleaned_data
+        if len(self.errors):
+            self.error_summary_title = 'There was a problem with your search'
 
+        return cleaned_data
