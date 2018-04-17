@@ -474,11 +474,11 @@ class SearchForm(GOVUKForm):
     field_label_classes = 'form-label-bold'
     auto_replace_widgets = True
 
-    reference_search_field = forms.CharField(label='Reference number', required=False)
+    reference_search_field = forms.CharField(label='URN', required=False)
     name_search_field = forms.CharField(label='Name', required=False)
     dob_search_field = forms.CharField(label='Date of birth', required=False)
     home_postcode_search_field = forms.CharField(label='Home postcode', required=False)
-    care_location_postcode_search_field = forms.CharField(label='Location of care postcode', required=False)
+    care_location_postcode_search_field = forms.CharField(label='Work postcode', required=False)
 
     def __init__(self, *args, **kwargs):
         """

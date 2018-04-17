@@ -19,7 +19,7 @@
 {% endif %}
 
 <h1 class="form-title heading-large">
-    Applications
+    Find an application
 </h1>
 
 <form method="post" novalidate>
@@ -27,7 +27,7 @@
        {{form.as_div}}
         <div class="search-actions">
             <input type="submit" class="button" value="Search">
-            <a href="/arc/search" class="reset-filter-link">Reset filters</a>
+            <a href="/arc/search" class="reset-filter-link">Clear filters</a>
         </div>
     </div>
     {% csrf_token %}
@@ -36,7 +36,7 @@
 
 <div class="search-results">
     {% if not empty %}
-        <p>Select the application you wish to view from the table below</p>
+        <p>Select an application:</p>
         <table class="search-results-table">
             <thead>
             <tr>
