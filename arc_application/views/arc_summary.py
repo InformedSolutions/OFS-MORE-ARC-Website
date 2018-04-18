@@ -152,9 +152,6 @@ def load_login_details(app):
             {"name": "Your email", "value": login_record.email},
             {"name": "Mobile phone number", "value": login_record.mobile_number},
             {"name": "Alternative phone number", "value": login_record.add_phone_number},
-            {"name": "Knowledge based question", "value": login_record.security_question},
-            {"name": "Knowledge based answer", "value": login_record.security_question}
-
         ]
         return table
     return False
