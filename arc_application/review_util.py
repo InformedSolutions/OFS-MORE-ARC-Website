@@ -78,8 +78,7 @@ def save_comments(comment_list):
 
 def redirect_selection(request, default):
     """
-    This function is now defunct. Previously selected the destination of the redirect,
-     dependant on which button submitted the post request
+    Selects redirect notifications for return to list links
     :param request: The incoming HTTP request
     :param default: The default link if no conditions have been met for extra logic
     :return:
@@ -87,6 +86,4 @@ def redirect_selection(request, default):
     redirect_link = default
     if 'return_to_list' in request.POST.keys():
         redirect_link = request.POST['return_to_list']
-    if 'back' in request.POST.keys():
-        redirect_link = request.POST['back']
     return redirect_link
