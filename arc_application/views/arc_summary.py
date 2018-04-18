@@ -196,8 +196,16 @@ def load_personal_detail_table(app):
         if ApplicantPersonalDetails.objects.filter(application_id=app).exists():
             applicant_record = ApplicantPersonalDetails.objects.get(application_id=app)
 
-            if ApplicantHomeAddress.objects.filter(application_id=app).exists():
-                applicant_home_address_record = ApplicantHomeAddress.objects.get(application_id=app)
+            if ApplicantHomeAddress.objects.filter(application_id=app, current_address=True).exists():
+                applicant_home_address_record = ApplicantHomeAddress.objects.get(application_id=app, current_address=True)
+
+                if ApplicantHomeAddress.objects.filter(application_id=app, childcare_address=True, current_address=False).exists():
+                    childcare_address_record = ApplicantHomeAddress.objects.get(application_id=app, childcare_address=True, current_address=False)
+                    childcare_address = childcare_address_record.street_line1 + ', ' + childcare_address_record.street_line2 \
+                                        + ', ' + childcare_address_record.town + ', ' + childcare_address_record.postcode
+                else:
+                    childcare_address = 'Same as home address'
+
                 home_address = applicant_home_address_record.street_line1 + ', ' + applicant_home_address_record.street_line2 \
                                + ', ' + applicant_home_address_record.town + ', ' + applicant_home_address_record.postcode
 
@@ -210,7 +218,7 @@ def load_personal_detail_table(app):
                      "value": str(applicant_record.birth_day) + '/' + str(applicant_record.birth_month) + '/' + str(
                          applicant_record.birth_year), 'pk': applicant_record.pk},
                     {"name": "Home address", "value": home_address, 'pk': applicant_home_address_record.pk},
-                    {"name": "Childcare location", "value": "Same as home address",
+                    {"name": "Childcare location", "value": childcare_address,
                      'pk': applicant_home_address_record.pk}
                 ]
                 return table
