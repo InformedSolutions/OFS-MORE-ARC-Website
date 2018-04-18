@@ -21,6 +21,13 @@ from .base import release_application
 
 @login_required()
 def task_list(request):
+    """
+    Generates the full task list for ARC users
+    :param request:  The Http request directed to the view
+    :return: The task list page with the associated context
+    """
+
+    # If the user has signed in and is a member of the ARC group
     if has_group(request.user, 'arc'):
         if request.method == 'GET':
             application_id = request.GET['id']
@@ -70,8 +77,6 @@ def task_list(request):
                 'all_complete': all_complete(application_id, False)
             })
 
-            temp_context = application_status_context
-
     return render(request, 'task-list.html', application_status_context)
 
 
@@ -93,7 +98,7 @@ def contact_summary(request):
         form = LogInDetailsForm(table_keys=[login_id])
         application_id_local = request.GET["id"]
     elif request.method == 'POST':
-        # .Populate the form with the received data
+        # Populate the form with the received data
         application_id_local = request.POST["id"]
         application = Application.objects.get(pk=application_id_local)
         account = UserDetails.objects.get(application_id=application)
@@ -101,19 +106,26 @@ def contact_summary(request):
         form = LogInDetailsForm(request.POST, table_keys=[login_id])
 
         if form.is_valid():
+            # Convert the data from the form into a series of comments with the
+            # table id to be stored in the ARC COMMENTS Table
             comment_list = request_to_comment(login_id, TABLE_NAME, form.cleaned_data)
             save_successful = save_comments(comment_list)
 
+            # If no comments have been made, the status has not been flagged
+            # Therefore it has been completed
             if not comment_list:
                 section_status = 'COMPLETED'
             else:
                 section_status = 'FLAGGED'
 
+            # If the save has been successful , save and redirect
             if save_successful:
                 status = Arc.objects.get(pk=application_id_local)
                 status.login_details_review = section_status
                 status.save()
                 default = '/childcare/age-groups'
+                # This is now redundant, as back buttons are managed by HTTP Referrer
+                # TODO: Remove redirect_selection
                 redirect_link = redirect_selection(request, default)
 
                 return HttpResponseRedirect(settings.URL_PREFIX + redirect_link + '?id=' + application_id_local)
@@ -153,6 +165,7 @@ def type_of_childcare_age_groups(request):
     if request.method == 'GET':
         application_id_local = request.GET["id"]
     elif request.method == 'POST':
+        # As there is no actual flagging to be done for this section, the status is just set to completed on POST
         application_id_local = request.POST["id"]
         status = Arc.objects.get(pk=application_id_local)
         status.childcare_type_review = 'COMPLETED'
@@ -185,6 +198,8 @@ def personal_details_summary(request):
     applicant_name_id = (ApplicantName.objects.get(personal_detail_id=personal_detail_id)).name_id
     applicant_home_address_id = (ApplicantHomeAddress.objects.get(personal_detail_id=personal_detail_id,
                                                                   current_address=True)).home_address_id
+
+
     TABLE_NAMES = ['APPLICANT_PERSONAL_DETAILS', 'APPLICANT_NAME', 'APPLICANT_HOME_ADDRESS']
     PERSONAL_DETAIL_FIELDS = ['date_of_birth_declare', 'date_of_birth_comments']
     NAME_FIELDS = ['name_declare', 'name_comments']
