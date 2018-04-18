@@ -124,8 +124,6 @@ def contact_summary(request):
                 status.login_details_review = section_status
                 status.save()
                 default = '/childcare/age-groups'
-                # This is now redundant, as back buttons are managed by HTTP Referrer
-                # TODO: Remove redirect_selection
                 redirect_link = redirect_selection(request, default)
 
                 return HttpResponseRedirect(settings.URL_PREFIX + redirect_link + '?id=' + application_id_local)
