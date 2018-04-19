@@ -11,10 +11,10 @@ class PreviousName(models.Model):
     """
     Model for PREVIOUS_NAME table, used to contain previous
     """
-    # Primary Key
+    # Primary key
     previous_name_id = models.UUIDField(primary_key=True, default=uuid4)
 
-    # Foreign key for both adult an child in home
+    # Foreign key for both adult and child in home
     adult_id = models.ForeignKey(AdultInHome, null=True, blank=True, on_delete=models.CASCADE)
     child_id = models.ForeignKey(ChildInHome, null=True, blank=True, on_delete=models.CASCADE)
 
@@ -25,8 +25,18 @@ class PreviousName(models.Model):
 
     @property
     def person(self):
-        if self.adult_id is not None:
+        """
+        Wrapper method so that fetching the foreign key is more generic
+        :return: Return the key that exists for the record, or an assertion error should neither key have been set
+        """
+        if self.adult_id is not None and self.child_id is not None:
+            raise AssertionError("Both 'adult_id' and 'child_id' have been set, this cannot occur")
+        elif self.adult_id is not None:
             return self.adult_id
-        if self.child_id is not None:
+        elif self.child_id is not None:
             return self.child_id
-        raise AssertionError("Neither 'adult_id' or 'child_id' is set")
+        else:
+            raise AssertionError("Neither 'adult_id' or 'child_id' is set")
+
+    class Meta:
+        db_table = 'PREVIOUS_NAME'
