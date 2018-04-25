@@ -98,7 +98,7 @@
             </tr>
             </tbody>
         </table>
-        {% for name, day, month, year, relationship, dbs_certificate_number, permission, formsetadult in adult_lists %}
+        {% for id ,name, day, month, year, relationship, dbs_certificate_number, permission, formsetadult in adult_lists %}
 
         <table class="check-your-answers form-group grid-row">
             <thead>
@@ -110,6 +110,7 @@
                 </th>
             </tr>
             </thead>
+
             <tbody>
             <tr>
                 <td style="word-wrap: break-word">
@@ -280,9 +281,16 @@
                 </td>
             </tr>
             </tbody>
+            <input type="hidden" value="{{ application_id }}" name="id" />
+
         </table>
+        <div class="form-group grid-row">
+            <a href="{% url 'other-people-previous-names' %}?id={{ application_id }}&person_id={{ id }}&type=ADULT" class="button-secondary button-save-and-exit">Save and exit</a>
+        </div>
+
+
         {% endfor %}
-        {% for name, day, month, year, relationship, formsetchild in child_lists %}
+        {% for id, name, day, month, year, relationship, formsetchild in child_lists %}
         <table class="check-your-answers form-group grid-row">
             <thead>
             <tr>
@@ -411,6 +419,9 @@
             </tr>
             </tbody>
         </table>
+        <div class="form-group grid-row">
+            <a href="{% url 'other-people-previous-names' %}?id={{ application_id }}&person_id={{ id }}&type=CHILD" class="button-secondary button-save-and-exit">Save and exit</a>
+        </div>
         {% endfor %}
         <br>
         <div class="form-group grid-row">
@@ -418,6 +429,7 @@
             <input type="hidden" value="{{application_id}}" name="id"/>
 
         </div>
+
 
         <br>
         <div class="form-group grid-row" style="padding-top: 30px;">
