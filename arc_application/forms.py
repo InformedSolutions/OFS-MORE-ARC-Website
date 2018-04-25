@@ -8,10 +8,12 @@ OFS-MORE-CCN3: Apply to be a Childminder Beta
 import uuid
 
 from django import forms
+from django.forms import ModelForm
 from govuk_forms.forms import GOVUKForm
 
+from arc_application.models.previous_name import PreviousName
 from . import custom_field_widgets
-from .models import Arc as ArcReview
+from .models import Arc as ArcReview, ApplicantName
 from .review_util import populate_initial_values
 
 
@@ -439,6 +441,7 @@ class ChildInYourHomeForm(GOVUKForm):
                                         'aria-expanded': 'false'}, )
 
 
+
 class CommentsForm(GOVUKForm):
     """
     GOV.UK form for the Your login and contact details: email page
@@ -521,3 +524,60 @@ class SearchForm(GOVUKForm):
             self.error_summary_title = 'There was a problem with your search'
 
         return cleaned_data
+
+
+# class OtherPersonPreviousNames(GOVUKForm):
+#
+#     field_label_classes = 'form-label-bold'
+#     auto_replace_widgets = True
+#
+#     first_name = forms.CharField(label='First name', error_messages={'required': 'Please enter your first name'})
+#     middle_names = forms.CharField(label='Middle names (if you have any)', required=False)
+#     last_name = forms.CharField(label='Last name', error_messages={'required': 'Please enter your last name'})
+#
+#     def __init__(self, *args, **kwargs):
+#         """
+#         Method to configure the initialisation of the Your personal details: name form
+#         :param args: arguments passed to the form
+#         :param kwargs: keyword arguments passed to the form, e.g. application ID
+#         """
+#         self.person_id = kwargs.pop('other_person_id')
+#         self.type = kwargs.pop('type')
+#
+#         super(OtherPersonPreviousNames, self).__init__(*args, **kwargs)
+#
+#         if self.type == 'ADULT':
+#             name_record_filter = PreviousName.objects.filter(adult_id=self.person_id, other_person_type=self.type)
+#         elif self.type == 'CHILD':
+#             name_record_filter = PreviousName.objects.filter(child_id=self.person_id, other_person_type=self.type)
+#
+#         # If information was previously entered, display it on the form
+#         # Logical XOR
+#         if name_record_filter.exists():
+#             name_record = name_record_filter[0]
+#             self.fields['first_name'].initial = name_record.first_name
+#             self.fields['middle_names'].initial = name_record.middle_names
+#             self.fields['last_name'].initial = name_record.last_name
+#             self.pk = name_record.name_id
+#             self.field_list = ['first_name', 'middle_names', 'last_name']
+
+class OtherPersonPreviousNames(GOVUKForm, ModelForm):
+    field_label_classes = 'form-label-bold'
+    auto_replace_widgets = True
+
+    def __init__(self, *args, **kwargs):
+        super(OtherPersonPreviousNames, self).__init__(*args, **kwargs)
+        self.fields['first_name'].required = True
+        self.fields['middle_names'].required = True
+        self.fields['last_name'].required = True
+
+    class Meta:
+        model = PreviousName
+        fields = ['first_name', 'middle_names', 'last_name',
+                  'previous_name_id', 'adult_id', 'child_id', 'other_person_type']
+        widgets = {
+            'previous_name_id': forms.HiddenInput(),
+            'adult_id': forms.HiddenInput(),
+            'child_id': forms.HiddenInput(),
+            'other_person_type': forms.HiddenInput()
+        }
