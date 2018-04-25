@@ -232,12 +232,6 @@ class TestArcFunctions(LiveServerTestCase):
             selenium_task_executor.get_driver().find_element_by_id("id_add_phone_number_declare").click()
             selenium_task_executor.get_driver().find_element_by_id("id_add_phone_number_comments").clear()
             selenium_task_executor.get_driver().find_element_by_id("id_add_phone_number_comments").send_keys("Test")
-            selenium_task_executor.get_driver().find_element_by_id("id_security_question_declare").click()
-            selenium_task_executor.get_driver().find_element_by_id("id_security_question_comments").clear()
-            selenium_task_executor.get_driver().find_element_by_id("id_security_question_comments").send_keys("Test")
-            selenium_task_executor.get_driver().find_element_by_id("id_security_answer_declare").click()
-            selenium_task_executor.get_driver().find_element_by_id("id_security_answer_comments").clear()
-            selenium_task_executor.get_driver().find_element_by_id("id_security_answer_comments").send_keys("Test")
             selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Confirm and continue']").click()
             WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("Type of childcare"))
 
@@ -363,7 +357,7 @@ class TestArcFunctions(LiveServerTestCase):
             self.assertEqual("Application Summary", selenium_task_executor.get_driver().title)
             selenium_task_executor.get_driver().find_element_by_link_text("Audit log").click()
             self.assertEqual("Audit Log", selenium_task_executor.get_driver().title)
-            self.assertEqual("Application is viewed by cc1",
+            self.assertEqual("Application viewed by cc1",
                              selenium_task_executor.get_driver().find_element_by_xpath("//main[@id='content']/main/table/tbody/tr/td[3]").text)
         except Exception as e:
             self.capture_screenshot()

@@ -37,7 +37,7 @@ def cc_summary(request):
             content_object=Application.objects.get(pk=application_id_local),
             user=request.user,
             template='timeline_logger/application_action_contact_center.txt',
-            extra_data={'user_type': 'contact center', 'entity': 'application', 'action': "is viewed"}
+            extra_data={'user_type': 'contact center', 'entity': 'application', 'action': "viewed"}
         )
 
         variables = {
@@ -153,8 +153,8 @@ def load_login_details(app):
         table = [
             {"title": "Your login details", "id": login_record.pk},
             {"name": "Your email", "value": login_record.email},
-            {"name": "Your mobile number", "value": login_record.mobile_number},
-            {"name": "Other phone number", "value": login_record.add_phone_number},
+            {"name": "Mobile phone number", "value": login_record.mobile_number},
+            {"name": "Alternative phone number", "value": login_record.add_phone_number},
         ]
         return table
     return False
