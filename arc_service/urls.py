@@ -8,8 +8,9 @@ import re
 
 from arc_application.views import assign_new_application, custom_login, error_404, error_500, release, \
     summary_page, arc_summary, comments, contact_summary, dbs_check_summary, first_aid_training_summary, \
-    health_check_answers, other_people_summary, personal_details_summary, references_summary, review, task_list, \
+    health_check_answers, personal_details_summary, references_summary, review, task_list, \
     type_of_childcare_age_groups, AuditlogListView, cc_summary
+from arc_application.views.other_people_in_home import other_people_summary, add_previous_name
 from arc_application.contact_centre import search
 from django.conf import settings
 from django.conf.urls import include, url
@@ -31,6 +32,7 @@ urlpatterns = [
     url(r'^dbs-check/summary/', dbs_check_summary, name='dbs_check_summary'),
     url(r'^references/summary/', references_summary, name='references_summary'),
     url(r'^other-people/summary/', other_people_summary, name='other_people_summary'),
+    url(r'^people-in-home/previous_names', add_previous_name, name='other-people-previous-names'),
     url(r'^health/check-answers/', health_check_answers, name='health_check_answers'),
     url(r'^confirmation/', review, name='review'),
     url(r'^comments/', comments, name='comments'),
