@@ -11,12 +11,21 @@ class PreviousName(models.Model):
     """
     Model for PREVIOUS_NAME table, used to contain previous
     """
+    # Options for type discriminator
+    previous_name_types = (
+        ('ADULT', 'ADULT'),
+        ('CHILD', 'CHILD')
+    )
+
     # Primary key
     previous_name_id = models.UUIDField(primary_key=True, default=uuid4)
 
     # Foreign key for both adult and child in home
     adult_id = models.ForeignKey(AdultInHome, null=True, blank=True, on_delete=models.CASCADE)
     child_id = models.ForeignKey(ChildInHome, null=True, blank=True, on_delete=models.CASCADE)
+
+    # Type discriminator
+    other_person_type = models.CharField(choices=previous_name_types, max_length=50, blank=True)
 
     # Actual name fields
     first_name = models.CharField(max_length=100, blank=True)
