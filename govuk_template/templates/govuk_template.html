@@ -24,9 +24,7 @@
   {% get_service_settings as service_settings %}
   <div class="header-proposition">
     <div class="content">
-      {% if service_settings.has_header_links %}
-        <a href="#proposition-links" class="js-header-toggle menu">{% trans 'Menu' %}</a>
-      {% endif %}
+      <a href="#proposition-links" class="js-header-toggle menu" aria-controls="navigation" aria-label="Show or hide Top Level Navigation">{% trans 'Menu' %}</a>
       <nav id="proposition-menu">
         <a href="{{ URL_PREFIX }}/login" id="proposition-name">
           {% block proposition %}Childminder Application Review{% endblock %}
