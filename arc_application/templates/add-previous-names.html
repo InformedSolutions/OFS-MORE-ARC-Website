@@ -1,5 +1,5 @@
 {% extends 'govuk_template.html' %}
-{% block page_title %}DBS check{% endblock %}
+{% block page_title %}Previous names of adults in your home{% endblock %}
 {% load static %}
 {% load govuk_template_base %}
 
@@ -18,7 +18,7 @@
         <input type="hidden" value="{{ extra }}" name="extra"/>
         {{ formset.management_form }}
         <div class="grid-row">
-            <h1 class="form-title heading-large">Previous names: {{ person_name }}</h1>
+            <h1 class="form-title heading-large">Previous names</h1>
         </div>
         {% csrf_token %}
         {% for form in formset %}
