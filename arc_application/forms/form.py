@@ -27,7 +27,7 @@ class LogInDetailsForm(GOVUKForm):
     field_label_classes = 'form-label-bold'
 
     email_address_declare = forms.BooleanField(label='This information is correct',
-                                       widget=custom_field_widgets.CustomCheckboxInput, required=False)
+                                       widget=custom_field_widgets.CustomCheckboxInput(), required=False)
     email_address_comments = forms.CharField(label='Enter your reasoning here',
                                      widget=custom_field_widgets.Textarea(attrs={'cols': '40', 'rows': '3'}),
                                      required=False)
