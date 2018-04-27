@@ -1,0 +1,75 @@
+{% extends 'govuk_template.html' %}
+{% block page_title %}Your home address{% endblock %}
+{% load static %}
+{% load govuk_template_base %}
+
+{% block inner_content %}
+
+{% include "back-button.html" %}
+
+<!-- Initialise error summary for page -->
+
+{{form.error_summary}}
+
+<!-- Form -->
+<form method="post" novalidate {% if form.is_multipart %}enctype="multipart/form-data" {% endif %}>
+    <!-- Content -->
+    <div class="form-group">
+        {% if previous_addresses|length > 0 %}
+            <h1 class="form-title heading-large">
+                Previous home address
+            </h1>
+        {% include 'previous-address-snippet.html' with queryset=previous_addresses %}
+        {% if not form.errors %}
+        <div id="id_postcode-group" class="form-group-required form-group">
+            <label id="id_postcode-label" class="form-label-bold" for="id_postcode">
+                {{form.postcode.label}}
+            </label>
+            {{form.postcode}}
+            <input type="submit" class="button button-search find-address-button" value="Find address"
+                   name="postcode-search">
+        </div>
+        {% elif form.errors %}
+        <div id="id_postcode-group" class="form-group-error form-group-required form-group">
+            <label id="id_postcode-label" class="form-label-bold" for="id_postcode">
+                {{form.postcode.label}}
+            </label>
+            <span class="error-message">
+                {% for error in form.postcode.errors %}
+                    {{error}}
+                {% endfor %}
+            </span>
+            {% if form.postcode.initial is not None %}
+            <input type="text" name="postcode" class="form-control-error form-control"
+                   value="{{form.postcode.initial}}" required="" id="id_postcode">
+            {% elif form.postcode.initial is None %}
+            <input type="text" name="postcode" class="form-control-error form-control"
+                   value="" required="" id="id_postcode">
+            {% endif %}
+                    <input type="hidden" name="state" value="entry"/>
+        <input type="hidden" name="person_id" value="{{ person_id }}"/>
+        <input type="hidden" name="person_type" value="{{ person_type }}"/>
+            <input type="submit" class="button button-search find-address-button" value="Find address"
+                   name="postcode-search">
+        </div>
+        {% endif %}
+        {% csrf_token %}
+        <a href="{{ URL_PREFIX }}/personal-details/enter-home-address?id={{id}}"
+           name="manual" id="manual">Enter address manually</a>
+        <br>
+        <br>
+        <input type="submit" class="button button-submit" value="Save and continue" name="submit"
+               alt='Continue to declaration'>
+        <input type="hidden" id="id" name="id" value="{{id}}"/>
+        <input type="hidden" name="state" value="entry"/>
+        <input type="hidden" name="person_id" value="{{ person_id }}"/>
+        <input type="hidden" name="person_type" value="{{ person_type }}"/>
+    </div>
+    <br>
+    <!-- Return to task list -->
+    <div class="form-group">
+        <a href="{{ URL_PREFIX }}/task-list?id={{id}}">Return to list</a>
+    </div>
+</form>
+
+{% endblock %}
