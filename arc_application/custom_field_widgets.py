@@ -37,6 +37,7 @@ class Textarea(widgets.Textarea, Widget):
     Custom textarea field to give better text area size
     """
     template_name = 'widgets/textarea.html'
+    
     def __init__(self, attrs=None):
         default_attrs = {'cols': '40', 'rows': '3'}
         if attrs:
