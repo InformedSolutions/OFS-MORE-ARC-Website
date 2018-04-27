@@ -220,14 +220,15 @@ def add_previous_name(request):
                 except ValueError:
                     pass
 
-
-
         if request.POST['action'] == "Confirm and continue":
             PreviousNamesFormset = modelformset_factory(PreviousName, form=OtherPersonPreviousNames)
             formset = PreviousNamesFormset(request.POST)
             if formset.is_valid():
                 formset.save()
-                return HttpResponseRedirect(build_url('other_people_summary', get={"id": app_id}))
+                return HttpResponseRedirect(build_url('other-people-previous-addresses', get={"id": app_id,
+                                                                                              "person_id": person_id,
+                                                                                              "person_type": person_type,
+                                                                                              "state": "entry"}))
             else:
                 extra = int(float(request.POST['extra']))
                 context = {
@@ -251,14 +252,14 @@ def add_previous_name(request):
 
     initial = []
     if person_type == 'ADULT':
-        key_dict = {"adult_id": person_id}
-        initial_data = PreviousName.objects.filter(other_person_type=person_type, adult_id=person_id)
+        key_dict = {"person_id": person_id}
+        initial_data = PreviousName.objects.filter(other_person_type=person_type, person_id=person_id)
     elif person_type == 'CHILD':
-        key_dict = {"child_id": person_id}
-        initial_data = PreviousName.objects.filter(other_person_type=person_type, child_id=person_id)
+        key_dict = {"person_id": person_id}
+        initial_data = PreviousName.objects.filter(other_person_type=person_type, person_id=person_id)
 
-    if request.method == "GET" and not initial_data:
-        extra = extra + 1
+    # if request.method == "GET" and not initial_data:
+    #     extra = extra + 1
 
     for extra_form in range(0, extra):
         temp_initial_dict = {
