@@ -7,6 +7,7 @@ OFS-MORE-CCN3: Apply to be a Childminder Beta
 
 import uuid
 
+import re
 from django import forms
 from django.forms import ModelForm
 from govuk_forms.forms import GOVUKForm
@@ -574,10 +575,48 @@ class OtherPersonPreviousNames(GOVUKForm, ModelForm):
     class Meta:
         model = PreviousName
         fields = ['first_name', 'middle_names', 'last_name',
-                  'previous_name_id', 'adult_id', 'child_id', 'other_person_type']
+                  'previous_name_id', 'person_id', 'other_person_type']
         widgets = {
             'previous_name_id': forms.HiddenInput(),
-            'adult_id': forms.HiddenInput(),
-            'child_id': forms.HiddenInput(),
+            'person_id': forms.HiddenInput(),
             'other_person_type': forms.HiddenInput()
         }
+
+
+class OtherPersonPreviousPostcodeEntry(GOVUKForm):
+
+    field_label_classes = 'form-label-bold'
+    auto_replace_widgets = True
+
+    postcode = forms.CharField(label='Postcode', error_messages={'required': 'Please enter your postcode'})
+
+    def clean_postcode(self):
+        """
+        Postcode validation
+        :return: string
+        """
+        postcode = self.cleaned_data['postcode']
+        postcode_no_space = postcode.replace(" ", "")
+        postcode_uppercase = postcode_no_space.upper()
+        if re.match("^[A-Z]{1,2}[0-9]{1,2}[A-Z]?[0-9][A-Z][A-Z]$", postcode_uppercase) is None:
+            raise forms.ValidationError('Please enter a valid postcode')
+        return postcode
+
+
+class OtherPeoplePreviousAddressLookupForm(GOVUKForm):
+
+    field_label_classes = 'form-label-bold'
+    auto_replace_widgets = True
+
+    address = forms.ChoiceField(label='Select address', required=True,
+                                error_messages={'required': 'Please select your address'})
+
+    def __init__(self, *args, **kwargs):
+        """
+        Method to configure the initialisation of the Your personal details: home address form for postcode search
+        :param args: arguments passed to the form
+        :param kwargs: keyword arguments passed to the form, e.g. application ID
+        """
+        self.choices = kwargs.pop('choices')
+        super(OtherPeoplePreviousAddressLookupForm, self).__init__(*args, **kwargs)
+        self.fields['address'].choices = self.choices
