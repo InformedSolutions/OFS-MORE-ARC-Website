@@ -21,8 +21,7 @@ class PreviousName(models.Model):
     previous_name_id = models.UUIDField(primary_key=True, default=uuid4)
 
     # Foreign key for both adult and child in home
-    adult_id = models.ForeignKey(AdultInHome, null=True, blank=True, on_delete=models.CASCADE)
-    child_id = models.ForeignKey(ChildInHome, null=True, blank=True, on_delete=models.CASCADE)
+    person_id = models.UUIDField(blank=True)
 
     # Type discriminator
     other_person_type = models.CharField(choices=previous_name_types, max_length=50, blank=True)
@@ -49,3 +48,4 @@ class PreviousName(models.Model):
 
     class Meta:
         db_table = 'PREVIOUS_NAME'
+

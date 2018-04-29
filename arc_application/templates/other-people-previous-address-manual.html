@@ -1,5 +1,5 @@
 {% extends 'govuk_template.html' %}
-{% block page_title %}Select your home address{% endblock %}
+{% block page_title %}Your home address{% endblock %}
 {% load static %}
 {% load govuk_template_base %}
 
@@ -10,33 +10,30 @@
 <!-- Initialise error summary for page -->
 {{form.error_summary}}
 
-
-
 <!-- Form -->
 <form method="post" novalidate {% if form.is_multipart %}enctype="multipart/form-data" {% endif %}>
     <!-- Content -->
     <div class="form-group">
         <h1 class="form-title heading-large">
-            Select your home address
+            Previous address {{previous_addresses|length|add:"1"}}
         </h1>
         {% include 'previous-address-snippet.html' with queryset=previous_addresses %}
 
-        <h2 class="form-title heading-small">Postcode</h2>
-        <p>{{postcode}} <a
-                href="{{ entry_url }}">Change</a></p>
         {{form.as_div}}
         {% csrf_token %}
-        <a href="{{ manual_url }}" name="manual"
-           id="manual">I
-            can't find my address in the list</a>
         <br>
         <br>
+        <a href="{{ entry_url }}" name="manual"
+           id="manual">Use postcode search</a>
+    </div>
+    <div class="form-group">
         <input type="hidden" id="id" name="id" value="{{id}}"/>
-        <input type="hidden" name="state" value="selection"/>
+        <input type="hidden" name="state" value="manual"/>
         <input type="hidden" name="person_id" value="{{ person_id }}"/>
         <input type="hidden" name="person_type" value="{{ person_type }}"/>
         <input type="hidden" name="postcode" value="{{ postcode }}"/>
-        <input type="submit" class="button-secondary button-save-and-exit" value="Save and continue">
+
+        <input type="submit" class="button-secondary button-save-and-exit" value="Add another address">
     </div>
 
     <a href="{{ list_url }}" class="button">Save and continue</a><br/>

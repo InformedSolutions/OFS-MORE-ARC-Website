@@ -15,7 +15,6 @@
 <form method="post" novalidate {% if form.is_multipart %}enctype="multipart/form-data" {% endif %}>
     <!-- Content -->
     <div class="form-group">
-        {% if previous_addresses|length > 0 %}
             <h1 class="form-title heading-large">
                 Previous home address
             </h1>
@@ -54,21 +53,23 @@
         </div>
         {% endif %}
         {% csrf_token %}
-        <a href="{{ URL_PREFIX }}/personal-details/enter-home-address?id={{id}}"
+        <a href="{{ manual_url }}"
            name="manual" id="manual">Enter address manually</a>
         <br>
         <br>
-        <input type="submit" class="button button-submit" value="Save and continue" name="submit"
-               alt='Continue to declaration'>
+        <input type="submit" class="button-secondary button-save-and-exit" value="Add another address">
         <input type="hidden" id="id" name="id" value="{{id}}"/>
         <input type="hidden" name="state" value="entry"/>
         <input type="hidden" name="person_id" value="{{ person_id }}"/>
         <input type="hidden" name="person_type" value="{{ person_type }}"/>
     </div>
+
+    <a href="{{ list_url }}" class="button">Save and continue</a><br/>
+
     <br>
     <!-- Return to task list -->
     <div class="form-group">
-        <a href="{{ URL_PREFIX }}/task-list?id={{id}}">Return to list</a>
+        <a href="{{ list_url }}">Return to list</a>
     </div>
 </form>
 

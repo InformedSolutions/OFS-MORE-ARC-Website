@@ -18,8 +18,6 @@ class ApplicantHomeAddress(models.Model):
                                            db_column='personal_detail_id')
     application_id = models.ForeignKey(Application, on_delete=models.CASCADE,
                                        db_column='application_id')
-    adult_id = models.ForeignKey(AdultInHome, null=True, blank=True, on_delete=models.CASCADE)
-    child_id = models.ForeignKey(ChildInHome, null=True, blank=True, on_delete=models.CASCADE)
 
     # Actual address fields
     street_line1 = models.CharField(max_length=100, blank=True)
