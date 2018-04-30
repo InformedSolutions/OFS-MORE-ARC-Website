@@ -2371,13 +2371,16 @@ input[type=number] {
   font-weight: 400;
 }
 
-a.button {
-    -webkit-appearance: button;
-    -moz-appearance: button;
-    appearance: button;
-
-    text-decoration: none;
-    color: initial;
+.hidden-link-2 {
+     background:none!important;
+     color:inherit;
+     border:none;
+     padding:0!important;
+     font: inherit;
+     /*border is optional*/
+     border-bottom:1px solid #005ea5;
+     cursor: pointer;
+     color: #005ea5;
 }
 
 @media only screen and (max-width: 768px) {
