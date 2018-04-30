@@ -34,7 +34,7 @@ class ApplicantHomeAddress(models.Model):
     @property
     def other_person(self):
         """
-        Wrapper method to get other person foriegn key should it exist
+        Wrapper method to get other person foreign key should it exist
         :return: Returns relevant foreign key if it has been set, otherwise returns false
         """
         if self.adult_id is not None and self.child_id is not None:
