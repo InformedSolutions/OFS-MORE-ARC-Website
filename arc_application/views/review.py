@@ -8,6 +8,7 @@ from django.contrib.auth.models import Group
 from django.forms import formset_factory
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
+from django.views import View
 
 from ..forms.form import AdultInYourHomeForm, CheckBox, ChildInYourHomeForm, CommentsForm, DBSCheckForm, FirstAidTrainingForm, \
     HealthForm, LogInDetailsForm, OtherPeopleInYourHomeForm, PersonalDetailsForm, ReferencesForm, ReferencesForm2
@@ -314,6 +315,11 @@ def personal_details_summary(request):
         'personal_details_status': application.personal_details_status
     }
     return render(request, 'personal-details-summary.html', variables)
+
+
+class AddPreviousRegistrationDetails(View):
+    def get(self, request):
+        return render(request, 'add-previous-registration.html')
 
 
 def first_aid_training_summary(request):
