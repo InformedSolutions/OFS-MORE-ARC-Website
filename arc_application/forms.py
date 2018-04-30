@@ -14,7 +14,7 @@ from govuk_forms.forms import GOVUKForm
 
 from arc_application.models.previous_name import PreviousName
 from . import custom_field_widgets
-from .models import Arc as ArcReview, ApplicantName
+from .models import Arc as ArcReview, ApplicantName, PreviousAddress
 from .review_util import populate_initial_values
 
 
@@ -527,50 +527,12 @@ class SearchForm(GOVUKForm):
         return cleaned_data
 
 
-# class OtherPersonPreviousNames(GOVUKForm):
-#
-#     field_label_classes = 'form-label-bold'
-#     auto_replace_widgets = True
-#
-#     first_name = forms.CharField(label='First name', error_messages={'required': 'Please enter your first name'})
-#     middle_names = forms.CharField(label='Middle names (if you have any)', required=False)
-#     last_name = forms.CharField(label='Last name', error_messages={'required': 'Please enter your last name'})
-#
-#     def __init__(self, *args, **kwargs):
-#         """
-#         Method to configure the initialisation of the Your personal details: name form
-#         :param args: arguments passed to the form
-#         :param kwargs: keyword arguments passed to the form, e.g. application ID
-#         """
-#         self.person_id = kwargs.pop('other_person_id')
-#         self.type = kwargs.pop('type')
-#
-#         super(OtherPersonPreviousNames, self).__init__(*args, **kwargs)
-#
-#         if self.type == 'ADULT':
-#             name_record_filter = PreviousName.objects.filter(adult_id=self.person_id, other_person_type=self.type)
-#         elif self.type == 'CHILD':
-#             name_record_filter = PreviousName.objects.filter(child_id=self.person_id, other_person_type=self.type)
-#
-#         # If information was previously entered, display it on the form
-#         # Logical XOR
-#         if name_record_filter.exists():
-#             name_record = name_record_filter[0]
-#             self.fields['first_name'].initial = name_record.first_name
-#             self.fields['middle_names'].initial = name_record.middle_names
-#             self.fields['last_name'].initial = name_record.last_name
-#             self.pk = name_record.name_id
-#             self.field_list = ['first_name', 'middle_names', 'last_name']
-
 class OtherPersonPreviousNames(GOVUKForm, ModelForm):
     field_label_classes = 'form-label-bold'
     auto_replace_widgets = True
 
     def __init__(self, *args, **kwargs):
         super(OtherPersonPreviousNames, self).__init__(*args, **kwargs)
-        self.fields['first_name'].required = True
-        self.fields['middle_names'].required = True
-        self.fields['last_name'].required = True
 
     class Meta:
         model = PreviousName
@@ -635,29 +597,31 @@ class OtherPeoplePreviousAddressManualForm(GOVUKForm):
     county = forms.CharField(label='County (optional)', required=False)
     postcode = forms.CharField(label='Postcode', required=False)
 
-    # def __init__(self, *args, **kwargs):
-    #     """
-    #     Method to configure the initialisation of the Your personal details: home address form for manual entry
-    #     :param args: arguments passed to the form
-    #     :param kwargs: keyword arguments passed to the form, e.g. application ID
-    #     """
-    #     self.application_id_local = kwargs.pop('id')
-    #     super(PersonalDetailsHomeAddressManualForm, self).__init__(*args, **kwargs)
-    #
-    #     # If information was previously entered, display it on the form
-    #     personal_detail_id = ApplicantPersonalDetails.objects.get(
-    #         application_id=self.application_id_local).personal_detail_id
-    #     if ApplicantHomeAddress.objects.filter(personal_detail_id=personal_detail_id,
-    #                                            current_address=True).count() > 0:
-    #         applicant_home_address = ApplicantHomeAddress.objects.get(personal_detail_id=personal_detail_id,
-    #                                                                   current_address=True)
-    #         self.fields['street_name_and_number'].initial = applicant_home_address.street_line1
-    #         self.fields['street_name_and_number2'].initial = applicant_home_address.street_line2
-    #         self.fields['town'].initial = applicant_home_address.town
-    #         self.fields['county'].initial = applicant_home_address.county
-    #         self.fields['postcode'].initial = applicant_home_address.postcode
-    #         self.pk = applicant_home_address.home_address_id
-    #         self.field_list = ['street_name_and_number', 'street_name_and_number2', 'town', 'county', 'postcode']
+    def __init__(self, *args, **kwargs):
+        """
+        Method to configure the initialisation of the Your personal details: home address form for manual entry
+        :param args: arguments passed to the form
+        :param kwargs: keyword arguments passed to the form, e.g. application ID
+        """
+        try:
+            self.address_id = kwargs.pop('id')
+        except:
+            self.address_id = None
+
+        super(OtherPeoplePreviousAddressManualForm, self).__init__(*args, **kwargs)
+        if PreviousAddress.objects.filter(previous_name_id=self.address_id).count() > 0:
+            previous_address = PreviousAddress.objects.get(previous_name_id=self.address_id)
+            self.fields['street_name_and_number'].initial = previous_address.street_line1
+            self.fields['street_name_and_number2'].initial = previous_address.street_line2
+            self.fields['town'].initial = previous_address.town
+            self.fields['county'].initial = previous_address.county
+            self.fields['postcode'].initial = previous_address.postcode
+            self.pk = previous_address.previous_name_id
+            self.field_list = ['street_name_and_number', 'street_name_and_number2', 'town', 'county', 'postcode']
+
+
+        # If information was previously entered, display it on the form
+
 
     def clean_street_name_and_number(self):
         """
