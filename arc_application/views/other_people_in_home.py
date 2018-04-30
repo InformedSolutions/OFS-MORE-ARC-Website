@@ -127,7 +127,8 @@ def other_people_summary(request):
     formset_adult = AdultFormSet(initial=initial_adult_data, prefix='adult')
 
     # Zips the formset into the list of adults
-    adult_lists = zip(adult_id_list, adult_name_list, adult_birth_day_list, adult_birth_month_list, adult_birth_year_list,
+    adult_lists = zip(adult_id_list, adult_name_list, adult_birth_day_list, adult_birth_month_list,
+                      adult_birth_year_list,
                       adult_relationship_list, adult_dbs_list, adult_permission_list, formset_adult)
 
     # Converts it to a list, there was trouble parsing the form objects when it was in a zip object
@@ -149,7 +150,8 @@ def other_people_summary(request):
 
     formset_child = ChildFormSet(initial=initial_child_data, prefix='child')
 
-    child_lists = zip(child_id_list, child_name_list, child_birth_day_list, child_birth_month_list, child_birth_year_list,
+    child_lists = zip(child_id_list, child_name_list, child_birth_day_list, child_birth_month_list,
+                      child_birth_year_list,
                       child_relationship_list, formset_child)
 
     adult_ids = []
@@ -158,7 +160,6 @@ def other_people_summary(request):
     address_querysets = []
 
     for adult_id, adult_name in zip(adult_id_list, adult_name_list):
-
         adult_ids.append(adult_id)
         adult_names.append(adult_name)
         name_querysets.append(PreviousName.objects.filter(person_id=adult_id, other_person_type='ADULT'))
@@ -252,7 +253,6 @@ def add_previous_name(request):
                 }
                 return render(request, 'add-previous-names.html', context)
 
-
         if request.POST['action'] == 'delete':
             # This scans the request poost dictionary for a key submitted by clicking remove person
             for key in request.POST.keys():
@@ -302,7 +302,6 @@ def add_previous_name(request):
 
                 return render(request, 'add-previous-names.html', context)
 
-
     if request.method == "GET":
 
         # General context defintion on get request
@@ -316,8 +315,6 @@ def add_previous_name(request):
             referrer = None
         extra = 0
 
-
-
     initial = []
     # Grab data already in table for the passed in person_id of the right person_type
     if person_type == 'ADULT':
@@ -328,7 +325,7 @@ def add_previous_name(request):
         initial_data = PreviousName.objects.filter(other_person_type=person_type, person_id=person_id)
 
     if request.method == "GET" and len(initial_data) == 0:
-         extra = extra + 1
+        extra = extra + 1
 
     # Extra forms need their primary key and person type, as these are hidden values (see form definition)
     for extra_form in range(0, extra):
@@ -343,8 +340,6 @@ def add_previous_name(request):
     PreviousNamesFormset = modelformset_factory(PreviousName, form=OtherPersonPreviousNames, extra=extra)
     formset = PreviousNamesFormset(initial=initial, queryset=initial_data)
 
-
-
     context = {
         'formset': formset,
         'application_id': app_id,
@@ -355,7 +350,3 @@ def add_previous_name(request):
     }
 
     return render(request, 'add-previous-names.html', context)
-
-
-
-

@@ -29,28 +29,28 @@ class LogInDetailsForm(GOVUKForm):
     field_label_classes = 'form-label-bold'
 
     email_address_declare = forms.BooleanField(label='This information is correct',
-                                       widget=custom_field_widgets.CustomCheckboxInput(), required=False)
+                                               widget=custom_field_widgets.CustomCheckboxInput(), required=False)
     email_address_comments = forms.CharField(label='Enter your reasoning here',
-                                     widget=custom_field_widgets.Textarea(attrs={'cols': '40', 'rows': '3'}),
-                                     required=False)
+                                             widget=custom_field_widgets.Textarea(attrs={'cols': '40', 'rows': '3'}),
+                                             required=False)
     mobile_number_declare = forms.BooleanField(label='This information is correct',
-                                                     widget=custom_field_widgets.CustomCheckboxInput, required=False)
+                                               widget=custom_field_widgets.CustomCheckboxInput, required=False)
     mobile_number_comments = forms.CharField(label='Enter your reasoning here',
-                                                   widget=custom_field_widgets.Textarea, required=False)
+                                             widget=custom_field_widgets.Textarea, required=False)
     add_phone_number_declare = forms.BooleanField(label='This information is correct',
-                                                          widget=custom_field_widgets.CustomCheckboxInput,
-                                                          required=False)
+                                                  widget=custom_field_widgets.CustomCheckboxInput,
+                                                  required=False)
     add_phone_number_comments = forms.CharField(label='Enter your reasoning here',
-                                                        widget=custom_field_widgets.Textarea, required=False)
+                                                widget=custom_field_widgets.Textarea, required=False)
     security_question_declare = forms.BooleanField(label='This information is correct',
-                                                          widget=custom_field_widgets.CustomCheckboxInput,
-                                                          required=False)
+                                                   widget=custom_field_widgets.CustomCheckboxInput,
+                                                   required=False)
     security_question_comments = forms.CharField(label='Enter your reasoning here',
-                                                        widget=custom_field_widgets.Textarea, required=False)
+                                                 widget=custom_field_widgets.Textarea, required=False)
     security_answer_declare = forms.BooleanField(label='This information is correct',
-                                                        widget=custom_field_widgets.CustomCheckboxInput, required=False)
+                                                 widget=custom_field_widgets.CustomCheckboxInput, required=False)
     security_answer_comments = forms.CharField(label='Enter your reasoning here',
-                                                      widget=custom_field_widgets.Textarea, required=False)
+                                               widget=custom_field_widgets.Textarea, required=False)
 
     # As this will only happen once per page, we can do this in the form itself rather than __init
     # Each checkbox must be assigned a name for the html injection
@@ -122,20 +122,21 @@ class FirstAidTrainingForm(GOVUKForm):
     auto_replace_widgets = True
 
     first_aid_training_organisation_declare = forms.BooleanField(label='This information is correct',
-                                                       widget=custom_field_widgets.CustomCheckboxInput, required=False)
+                                                                 widget=custom_field_widgets.CustomCheckboxInput,
+                                                                 required=False)
     first_aid_training_organisation_comments = forms.CharField(label='Enter your reasoning here',
-                                                     widget=custom_field_widgets.Textarea, required=False)
+                                                               widget=custom_field_widgets.Textarea, required=False)
 
     title_of_training_course_declare = forms.BooleanField(label='This information is correct',
-                                                           widget=custom_field_widgets.CustomCheckboxInput,
-                                                           required=False)
+                                                          widget=custom_field_widgets.CustomCheckboxInput,
+                                                          required=False)
     title_of_training_course_comments = forms.CharField(label='Enter your reasoning here',
-                                                         widget=custom_field_widgets.Textarea, required=False)
+                                                        widget=custom_field_widgets.Textarea, required=False)
 
     course_date_declare = forms.BooleanField(label='This information is correct',
-                                                     widget=custom_field_widgets.CustomCheckboxInput, required=False)
+                                             widget=custom_field_widgets.CustomCheckboxInput, required=False)
     course_date_comments = forms.CharField(label='Enter your reasoning here',
-                                                   widget=custom_field_widgets.Textarea, required=False)
+                                           widget=custom_field_widgets.Textarea, required=False)
 
     checkboxes = [(first_aid_training_organisation_declare, 'first_aid_training_organisation'),
                   (title_of_training_course_declare, 'title_of_training_course'),
@@ -227,14 +228,14 @@ class ReferencesForm(GOVUKForm):
                                          required=False)
 
     relationship_declare = forms.BooleanField(label='This information is correct',
-                                                   widget=custom_field_widgets.CustomCheckboxInput, required=False)
+                                              widget=custom_field_widgets.CustomCheckboxInput, required=False)
     relationship_comments = forms.CharField(label='Enter your reasoning here',
-                                                 widget=custom_field_widgets.Textarea, required=False)
+                                            widget=custom_field_widgets.Textarea, required=False)
 
     time_known_declare = forms.BooleanField(label='This information is correct',
-                                           widget=custom_field_widgets.CustomCheckboxInput, required=False)
+                                            widget=custom_field_widgets.CustomCheckboxInput, required=False)
     time_known_comments = forms.CharField(label='Enter your reasoning here', widget=custom_field_widgets.Textarea,
-                                         required=False)
+                                          required=False)
 
     address_declare = forms.BooleanField(label='This information is correct',
                                          widget=custom_field_widgets.CustomCheckboxInput, required=False)
@@ -279,14 +280,14 @@ class ReferencesForm2(GOVUKForm):
                                          required=False)
 
     relationship_declare = forms.BooleanField(label='This information is correct',
-                                                   widget=custom_field_widgets.CustomCheckboxInput, required=False)
+                                              widget=custom_field_widgets.CustomCheckboxInput, required=False)
     relationship_comments = forms.CharField(label='Enter your reasoning here',
-                                                 widget=custom_field_widgets.Textarea, required=False)
+                                            widget=custom_field_widgets.Textarea, required=False)
 
     time_known_declare = forms.BooleanField(label='This information is correct',
-                                           widget=custom_field_widgets.CustomCheckboxInput, required=False)
+                                            widget=custom_field_widgets.CustomCheckboxInput, required=False)
     time_known_comments = forms.CharField(label='Enter your reasoning here', widget=custom_field_widgets.Textarea,
-                                         required=False)
+                                          required=False)
 
     address_declare = forms.BooleanField(label='This information is correct',
                                          widget=custom_field_widgets.CustomCheckboxInput, required=False)
@@ -371,14 +372,15 @@ class AdultInYourHomeForm(GOVUKForm):
                                             required=False)
 
     dbs_certificate_number_declare = forms.BooleanField(label='This information is correct',
-                                                 widget=custom_field_widgets.CustomCheckboxInput, required=False)
-    dbs_certificate_number_comments = forms.CharField(label='Enter your reasoning here', widget=custom_field_widgets.Textarea,
-                                               required=False)
+                                                        widget=custom_field_widgets.CustomCheckboxInput, required=False)
+    dbs_certificate_number_comments = forms.CharField(label='Enter your reasoning here',
+                                                      widget=custom_field_widgets.Textarea,
+                                                      required=False)
 
     permission_declare = forms.BooleanField(label='This information is correct',
-                                                       widget=custom_field_widgets.CustomCheckboxInput, required=False)
+                                            widget=custom_field_widgets.CustomCheckboxInput, required=False)
     permission_comments = forms.CharField(label='Enter your reasoning here',
-                                                     widget=custom_field_widgets.Textarea, required=False)
+                                          widget=custom_field_widgets.Textarea, required=False)
 
     # This is the id appended to all htmls names ot make the individual form instance unique, this is given a alue in
     # the init
@@ -543,7 +545,6 @@ class OtherPersonPreviousNames(GOVUKForm, ModelForm):
 
 
 class OtherPersonPreviousPostcodeEntry(GOVUKForm):
-
     field_label_classes = 'form-label-bold'
     auto_replace_widgets = True
 
@@ -563,7 +564,6 @@ class OtherPersonPreviousPostcodeEntry(GOVUKForm):
 
 
 class OtherPeoplePreviousAddressLookupForm(GOVUKForm):
-
     field_label_classes = 'form-label-bold'
     auto_replace_widgets = True
 
@@ -616,9 +616,7 @@ class OtherPeoplePreviousAddressManualForm(GOVUKForm):
             self.pk = previous_address.previous_name_id
             self.field_list = ['street_name_and_number', 'street_name_and_number2', 'town', 'county', 'postcode']
 
-
         # If information was previously entered, display it on the form
-
 
     def clean_street_name_and_number(self):
         """
@@ -697,7 +695,6 @@ class PersonalDetailsPreviousNames(GOVUKForm, ModelForm):
 
 
 class PersonalDetailsPreviousPostcodeEntry(GOVUKForm):
-
     field_label_classes = 'form-label-bold'
     auto_replace_widgets = True
 
@@ -717,7 +714,6 @@ class PersonalDetailsPreviousPostcodeEntry(GOVUKForm):
 
 
 class PersonalDetailsPreviousAddressLookupForm(GOVUKForm):
-
     field_label_classes = 'form-label-bold'
     auto_replace_widgets = True
 
@@ -770,9 +766,7 @@ class PersonalDetailsPreviousAddressManualForm(GOVUKForm):
             self.pk = previous_address.previous_name_id
             self.field_list = ['street_name_and_number', 'street_name_and_number2', 'town', 'county', 'postcode']
 
-
         # If information was previously entered, display it on the form
-
 
     def clean_street_name_and_number(self):
         """

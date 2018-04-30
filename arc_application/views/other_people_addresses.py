@@ -71,7 +71,7 @@ def postcode_entry(request, context):
 
 def postcode_selection(request, context):
     """
-    Funciton to allow the user to select the postcode from the list, or redirect appropriately
+    Function to allow the user to select the postcode from the list, or redirect appropriately
     :param request: Standard Httprequest object
     :param context: See get_context declaration for definition
     :return:
@@ -80,7 +80,7 @@ def postcode_selection(request, context):
     if request.method == 'GET':
         context = get_urls(context)
 
-        # Call addressinng API with entered postcode
+        # Call addressing API with entered postcode
         addresses = address_helper.AddressHelper.create_address_lookup_list(context['postcode'])
 
         # Populate form for page with choices from this API call
@@ -127,10 +127,10 @@ def postcode_manual(request, context):
         if current_form.is_valid():
             # Store entered address as json to be sent to to the submission view to be saved
             context['address'] = json.dumps({'line1': current_form.cleaned_data['street_name_and_number'],
-                                  'line2': current_form.cleaned_data['street_name_and_number2'],
-                                  'townOrCity': current_form.cleaned_data['town'],
-                                  'county': current_form.cleaned_data['county'],
-                                  'postcode': current_form.cleaned_data['postcode']})
+                                             'line2': current_form.cleaned_data['street_name_and_number2'],
+                                             'townOrCity': current_form.cleaned_data['town'],
+                                             'county': current_form.cleaned_data['county'],
+                                             'postcode': current_form.cleaned_data['postcode']})
             context['state'] = 'submission'
 
             # As this is a manual entry rather than a postcode lookup, this is set to false
@@ -172,13 +172,13 @@ def postcode_submission(request, context):
 
         # Actual saving is the same regardless of lookup, so done beneath
         previous_address_record = PreviousAddress(person_id=context['person_id'],
-                                                   person_type=context['person_type'],
-                                                   street_line1=line1,
-                                                   street_line2=line2,
-                                                   town=town,
-                                                   county='',
-                                                   country='United Kingdom',
-                                                   postcode=postcode)
+                                                  person_type=context['person_type'],
+                                                  street_line1=line1,
+                                                  street_line2=line2,
+                                                  town=town,
+                                                  county='',
+                                                  country='United Kingdom',
+                                                  postcode=postcode)
         previous_address_record.save()
 
         # Next state is set to entry, so that they may enter a new address or continue
@@ -204,7 +204,6 @@ def address_update(request, context):
         context['form'] = current_form
         address_record = PreviousAddress.objects.get(previous_name_id=context['address_id'])
         if current_form.is_valid():
-
             # For ease of use, update saving is done here raather than in submission section, adding it would make it
             # harder to understand
             address_record.street_line1 = current_form.cleaned_data['street_name_and_number']
