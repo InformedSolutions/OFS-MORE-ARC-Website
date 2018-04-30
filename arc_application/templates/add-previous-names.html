@@ -29,7 +29,7 @@
             {{ form }}
             {% if formset|length > 1 %}
                 <input type="hidden" name="action" value="delete">
-                <input type="submit" class="link" name="{{ form.previous_name_id.value }}" value="Remove this person"/>
+                <input type="submit" class="hidden-link-2" name="{{ form.previous_name_id.value }}" value="Remove this person"/>
             {% endif %}
         </div>
 
@@ -46,6 +46,12 @@
         <div class="grid-row">
             <input type="hidden" name="referrer" value="{{ referrer }}">
             <input type="submit" name="action" class="button" value="Confirm and continue"/>
+        </div>
+
+        <br>
+
+        <div class="form-group grid-row">
+            <a href="{{ list_url }}" class="link-back">Return to list</a>
         </div>
     </form>
 
