@@ -435,97 +435,101 @@
         {% endfor %}
 
         {% for id, name, previous_names, previous_addresses in adult_ebulk_lists %}
-        <table class="check-your-answers form-group grid-row">
-            <thead>
-            <tr>
-                <th colspan="3">
-                    <div class="heading-medium">
-                        {{name}}'s eBulk details
-                    </div>
-                </th>
-            </tr>
-            </thead>
-            <tbody>
-            {% for name in previous_names %}
-            <tr>
-                <td>
-                    Previous name ({{ forloop.counter }})
-                </td>
-                <td>
-                    {{ name.first_name }} {{name.middle_names}} {{name.last_name}}
-                </td>
-                <td class="change-answer">
-                    <a href="{% url 'other-people-previous-names' %}?id={{ application_id }}&person_id={{ id }}&type=ADULT&referrer=list">Change</a>
-                </td>
-            </tr>
-            {% endfor %}
-            {% for address in previous_addresses%}
-            <tr>
-                <td>
-                    Previous addresss ({{ forloop.counter }})
-                </td>
-                <td>
-                    {{address.street_line1}}{% if address.street_line1 %}<br />{% endif %}
-                    {{address.street_line2}}{% if address.street_line2 %}<br />{% endif %}
-                    {{address.town}}{% if address.town %}<br />{% endif %}
-                    {{address.county}}{% if address.county %}<br />{% endif %}
-                    {{address.country}}{% if address.country %}<br />{% endif %}
-                    {{address.postcode}}{% if address.postcode %}<br />{% endif %}
-                </td>
-                <td class="change-answer">
-                    <a href="{% url 'other-people-previous-addresses' %}?id={{ application_id }}&state=update&person_id={{id}}&person_type=ADULT&address_id={{address.previous_name_id}}">Change</a>
-                </td>
-            </tr>
-            {% endfor %}
-            </tbody>
-        </table>
+            {% if previous_names %}
+                <table class="check-your-answers form-group grid-row">
+                    <thead>
+                    <tr>
+                        <th colspan="3">
+                            <div class="heading-medium">
+                                {{name}}'s eBulk details
+                            </div>
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for name in previous_names %}
+                    <tr>
+                        <td>
+                            Previous name ({{ forloop.counter }})
+                        </td>
+                        <td>
+                            {{ name.first_name }} {{name.middle_names}} {{name.last_name}}
+                        </td>
+                        <td class="change-answer">
+                            <a href="{% url 'other-people-previous-names' %}?id={{ application_id }}&person_id={{ id }}&type=ADULT&referrer=list">Change</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    {% for address in previous_addresses%}
+                    <tr>
+                        <td>
+                            Previous address ({{ forloop.counter }})
+                        </td>
+                        <td>
+                            {{address.street_line1}}{% if address.street_line1 %}<br />{% endif %}
+                            {{address.street_line2}}{% if address.street_line2 %}<br />{% endif %}
+                            {{address.town}}{% if address.town %}<br />{% endif %}
+                            {{address.county}}{% if address.county %}<br />{% endif %}
+                            {{address.country}}{% if address.country %}<br />{% endif %}
+                            {{address.postcode}}{% if address.postcode %}<br />{% endif %}
+                        </td>
+                        <td class="change-answer">
+                            <a href="{% url 'other-people-previous-addresses' %}?id={{ application_id }}&state=update&person_id={{id}}&person_type=ADULT&address_id={{address.previous_name_id}}">Change</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            {% endif %}
         {% endfor %}
 
         {% for id, name, previous_names, previous_addresses in child_ebulk_lists %}
-        <table class="check-your-answers form-group grid-row">
-            <thead>
-            <tr>
-                <th colspan="3">
-                    <div class="heading-medium">
-                        {{name}}'s eBulk details
-                    </div>
-                </th>
-            </tr>
-            </thead>
-            <tbody>
-            {% for name in previous_names %}
-            <tr>
-                <td>
-                    Previous name ({{ forloop.counter }})
-                </td>
-                <td>
-                    {{ name.first_name }} {{name.middle_names}} {{name.last_name}}
-                </td>
-                <td class="change-answer">
-                    <a href="{% url 'other-people-previous-names' %}?id={{ application_id }}&person_id={{ id }}&type=CHILD&referrer=list">Change</a>
-                </td>
-            </tr>
-            {% endfor %}
-            {% for address in previous_addresses%}
-            <tr>
-                <td>
-                    Previous addresss ({{ forloop.counter }})
-                </td>
-                <td>
-                    {{address.street_line1}}{% if address.street_line1 %}<br />{% endif %}
-                    {{address.street_line2}}{% if address.street_line2 %}<br />{% endif %}
-                    {{address.town}}{% if address.town %}<br />{% endif %}
-                    {{address.county}}{% if address.county %}<br />{% endif %}
-                    {{address.country}}{% if address.country %}<br />{% endif %}
-                    {{address.postcode}}{% if address.postcode %}<br />{% endif %}
-                </td>
-                <td class="change-answer">
-                    <a href="{% url 'other-people-previous-addresses' %}?id={{ application_id }}&state=update&person_id={{id}}&person_type=CHILD&address_id={{address.previous_name_id}}">Change</a>
-                </td>
-            </tr>
-            {% endfor %}
-            </tbody>
-        </table>
+            {% if previous_names %}
+                <table class="check-your-answers form-group grid-row">
+                    <thead>
+                    <tr>
+                        <th colspan="3">
+                            <div class="heading-medium">
+                                {{name}}'s eBulk details
+                            </div>
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for name in previous_names %}
+                    <tr>
+                        <td>
+                            Previous name ({{ forloop.counter }})
+                        </td>
+                        <td>
+                            {{ name.first_name }} {{name.middle_names}} {{name.last_name}}
+                        </td>
+                        <td class="change-answer">
+                            <a href="{% url 'other-people-previous-names' %}?id={{ application_id }}&person_id={{ id }}&type=CHILD&referrer=list">Change</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    {% for address in previous_addresses%}
+                    <tr>
+                        <td>
+                            Previous address ({{ forloop.counter }})
+                        </td>
+                        <td>
+                            {{address.street_line1}}{% if address.street_line1 %}<br />{% endif %}
+                            {{address.street_line2}}{% if address.street_line2 %}<br />{% endif %}
+                            {{address.town}}{% if address.town %}<br />{% endif %}
+                            {{address.county}}{% if address.county %}<br />{% endif %}
+                            {{address.country}}{% if address.country %}<br />{% endif %}
+                            {{address.postcode}}{% if address.postcode %}<br />{% endif %}
+                        </td>
+                        <td class="change-answer">
+                            <a href="{% url 'other-people-previous-addresses' %}?id={{ application_id }}&state=update&person_id={{id}}&person_type=CHILD&address_id={{address.previous_name_id}}">Change</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            {% endif %}
         {% endfor %}
 
         <br>
