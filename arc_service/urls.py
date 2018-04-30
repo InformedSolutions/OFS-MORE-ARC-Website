@@ -9,7 +9,7 @@ import re
 from arc_application.views import assign_new_application, custom_login, error_404, error_500, release, \
     summary_page, arc_summary, comments, contact_summary, dbs_check_summary, first_aid_training_summary, \
     health_check_answers, other_people_summary, personal_details_summary, references_summary, review, task_list, \
-    type_of_childcare_age_groups, AuditlogListView, cc_summary
+    type_of_childcare_age_groups, AuditlogListView, cc_summary, AddPreviousRegistrationDetails
 from arc_application.views.contact_centre.change_details import UpdateEmailView, UpdatePhoneNumberView, \
     UpdateAddPhoneNumberView
 from arc_application.contact_centre import search
@@ -43,6 +43,7 @@ urlpatterns = [
     url(r'^contact-centre/contact-details/email-address', UpdateEmailView.as_view(), name='update_email'),
     url(r'^contact-centre/contact-details/phone-number', UpdatePhoneNumberView.as_view(), name='update_phone_number'),
     url(r'^contact-centre/contact-details/add-phone-number', UpdateAddPhoneNumberView.as_view(), name='update_add_number'),
+    url(r'^personal-details/previous-registration', AddPreviousRegistrationDetails.as_view(), name='previous_registration_details'),
 ]
 
 if settings.URL_PREFIX:
