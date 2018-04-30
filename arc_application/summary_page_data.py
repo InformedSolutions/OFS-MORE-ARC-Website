@@ -1,3 +1,6 @@
+"""
+Link dict to associate tables with their corresponding view for change link reversal
+"""
 link_dict = {
     'Your login details':'contact_summary',
     'Childcare Type':'type_of_childcare_age_groups',

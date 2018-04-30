@@ -13,6 +13,9 @@ class Widget(widgets.Widget):
 
 
 class CustomCheckboxInput(widgets.CheckboxInput, Widget):
+    """
+    Custom checkbox field to import conditional revealing and set attributes associated with this
+    """
     template_name = 'widgets/checkbox.html'
     inherit_label_from_field = True
     label = None
@@ -30,6 +33,11 @@ class CustomCheckboxInput(widgets.CheckboxInput, Widget):
 
 
 class Textarea(widgets.Textarea, Widget):
+    """
+    Custom textarea field to give better text area size
+    """
+    template_name = 'widgets/textarea.html'
+    
     def __init__(self, attrs=None):
         default_attrs = {'cols': '40', 'rows': '3'}
         if attrs:

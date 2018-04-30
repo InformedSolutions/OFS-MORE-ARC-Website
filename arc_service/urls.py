@@ -12,6 +12,8 @@ from arc_application.views import assign_new_application, custom_login, error_40
     type_of_childcare_age_groups, AuditlogListView, cc_summary
 from arc_application.views.other_people_addresses import address_state_dispatcher
 from arc_application.views.other_people_in_home import other_people_summary, add_previous_name
+from arc_application.views.contact_centre.change_details import UpdateEmailView, UpdatePhoneNumberView, \
+    UpdateAddPhoneNumberView
 from arc_application.contact_centre import search
 from django.conf import settings
 from django.conf.urls import include, url
@@ -42,7 +44,9 @@ urlpatterns = [
     url(r'^auditlog/', AuditlogListView.as_view(), name='auditlog'),
     url(r'^search/', search, name='search'),
     url(r'^search-summary/', cc_summary, name='search_summary'),
-
+    url(r'^contact-centre/contact-details/email-address', UpdateEmailView.as_view(), name='update_email'),
+    url(r'^contact-centre/contact-details/phone-number', UpdatePhoneNumberView.as_view(), name='update_phone_number'),
+    url(r'^contact-centre/contact-details/add-phone-number', UpdateAddPhoneNumberView.as_view(), name='update_add_number'),
 ]
 
 if settings.URL_PREFIX:

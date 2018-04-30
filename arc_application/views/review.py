@@ -5,14 +5,15 @@ import requests
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group
+from django.forms import formset_factory
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 
-from ..forms import AdultInYourHomeForm, ChildInYourHomeForm, CommentsForm, DBSCheckForm, FirstAidTrainingForm, \
-    HealthForm, LogInDetailsForm, PersonalDetailsForm, ReferencesForm, ReferencesForm2
+from ..forms.form import AdultInYourHomeForm, CheckBox, ChildInYourHomeForm, CommentsForm, DBSCheckForm, FirstAidTrainingForm, \
+    HealthForm, LogInDetailsForm, OtherPeopleInYourHomeForm, PersonalDetailsForm, ReferencesForm, ReferencesForm2
 from ..magic_link import generate_magic_link
-from ..models import ApplicantHomeAddress, ApplicantName, ApplicantPersonalDetails, Application, Arc, \
-    ArcComments, ChildcareType, CriminalRecordCheck, FirstAidTraining, HealthDeclarationBooklet, Reference, \
+from ..models import AdultInHome, ApplicantHomeAddress, ApplicantName, ApplicantPersonalDetails, Application, Arc, \
+    ArcComments, ChildInHome, ChildcareType, CriminalRecordCheck, FirstAidTraining, HealthDeclarationBooklet, Reference, \
     UserDetails
 from ..review_util import redirect_selection, request_to_comment, save_comments
 from .base import release_application
@@ -20,6 +21,13 @@ from .base import release_application
 
 @login_required()
 def task_list(request):
+    """
+    Generates the full task list for ARC users
+    :param request:  The Http request directed to the view
+    :return: The task list page with the associated context
+    """
+
+    # If the user has signed in and is a member of the ARC group
     if has_group(request.user, 'arc'):
         if request.method == 'GET':
             application_id = request.GET['id']
@@ -69,8 +77,6 @@ def task_list(request):
                 'all_complete': all_complete(application_id, False)
             })
 
-            temp_context = application_status_context
-
     return render(request, 'task-list.html', application_status_context)
 
 
@@ -92,7 +98,7 @@ def contact_summary(request):
         form = LogInDetailsForm(table_keys=[login_id])
         application_id_local = request.GET["id"]
     elif request.method == 'POST':
-        # .Populate the form with the received data
+        # Populate the form with the received data
         application_id_local = request.POST["id"]
         application = Application.objects.get(pk=application_id_local)
         account = UserDetails.objects.get(application_id=application)
@@ -100,14 +106,19 @@ def contact_summary(request):
         form = LogInDetailsForm(request.POST, table_keys=[login_id])
 
         if form.is_valid():
+            # Convert the data from the form into a series of comments with the
+            # table id to be stored in the ARC COMMENTS Table
             comment_list = request_to_comment(login_id, TABLE_NAME, form.cleaned_data)
             save_successful = save_comments(comment_list)
 
+            # If no comments have been made, the status has not been flagged
+            # Therefore it has been completed
             if not comment_list:
                 section_status = 'COMPLETED'
             else:
                 section_status = 'FLAGGED'
 
+            # If the save has been successful , save and redirect
             if save_successful:
                 status = Arc.objects.get(pk=application_id_local)
                 status.login_details_review = section_status
@@ -152,6 +163,7 @@ def type_of_childcare_age_groups(request):
     if request.method == 'GET':
         application_id_local = request.GET["id"]
     elif request.method == 'POST':
+        # As there is no actual flagging to be done for this section, the status is just set to completed on POST
         application_id_local = request.POST["id"]
         status = Arc.objects.get(pk=application_id_local)
         status.childcare_type_review = 'COMPLETED'
@@ -184,6 +196,8 @@ def personal_details_summary(request):
     applicant_name_id = (ApplicantName.objects.get(personal_detail_id=personal_detail_id)).name_id
     applicant_home_address_id = (ApplicantHomeAddress.objects.get(personal_detail_id=personal_detail_id,
                                                                   current_address=True)).home_address_id
+
+
     TABLE_NAMES = ['APPLICANT_PERSONAL_DETAILS', 'APPLICANT_NAME', 'APPLICANT_HOME_ADDRESS']
     PERSONAL_DETAIL_FIELDS = ['date_of_birth_declare', 'date_of_birth_comments']
     NAME_FIELDS = ['name_declare', 'name_comments']
@@ -193,10 +207,11 @@ def personal_details_summary(request):
     if request.method == 'GET':
         # Collect required ids
         application_id_local = request.GET["id"]
-        personal_details = ApplicantPersonalDetails.objects.get(application_id=application_id_local)
-        personal_detail_id = personal_details.id
-        applicant_name_id = personal_details.name_id
-        applicant_home_address_id = personal_details.home_address_id
+        personal_detail_id = (
+            ApplicantPersonalDetails.objects.get(application_id=application_id_local)).personal_detail_id
+        applicant_name_id = (ApplicantName.objects.get(personal_detail_id=personal_detail_id)).name_id
+        applicant_home_address_id = (ApplicantHomeAddress.objects.get(personal_detail_id=personal_detail_id,
+                                                                      current_address=True)).home_address_id
 
         form = PersonalDetailsForm(table_keys=[personal_detail_id, applicant_name_id, applicant_home_address_id])
 
@@ -276,9 +291,6 @@ def personal_details_summary(request):
     childcare_county = applicant_childcare_address_record.county
     childcare_postcode = applicant_childcare_address_record.postcode
     application = Application.objects.get(pk=application_id_local)
-
-    # Code to
-
     variables = {
         'form': form,
         'application_id': application_id_local,

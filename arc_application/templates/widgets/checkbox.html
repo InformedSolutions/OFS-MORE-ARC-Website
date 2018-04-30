@@ -1,6 +1,6 @@
 <div class="multiple-choice" data-target="{{ widget.attrs.data_target }}">
+  <label id="{{ widget.attrs.id }}-label" for="{{ widget.attrs.id }}">{{ widget.attrs.data_target }}</label>
   {% include 'django/forms/widgets/input.html' %}
-  <label id="{{ widget.attrs.id }}-label" for="{{ widget.attrs.id }}">{{ widget.label }}</label>
 </div>
 {% if conditionally_revealed %}
   {{ conditionally_revealed.html }}
