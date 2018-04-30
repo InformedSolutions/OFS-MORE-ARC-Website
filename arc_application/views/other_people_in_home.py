@@ -175,7 +175,7 @@ def other_people_summary(request):
         child_ids.append(child_id)
         child_names.append(child_name)
         name_querysets.append(PreviousName.objects.filter(person_id=child_id, other_person_type='CHILD'))
-        address_querysets.append(PreviousAddress.objects.filter(person_id=child_id, other_person_type='CHILD'))
+        address_querysets.append(PreviousAddress.objects.filter(person_id=child_id, person_type='CHILD'))
 
     child_ebulk_lists = zip(child_ids, child_names, name_querysets, address_querysets)
 
@@ -317,6 +317,7 @@ def add_previous_name(request):
         extra = 0
 
 
+
     initial = []
     # Grab data already in table for the passed in person_id of the right person_type
     if person_type == 'ADULT':
@@ -326,8 +327,8 @@ def add_previous_name(request):
         key_dict = {"person_id": person_id}
         initial_data = PreviousName.objects.filter(other_person_type=person_type, person_id=person_id)
 
-    # if request.method == "GET" and not initial_data:
-    #     extra = extra + 1
+    if request.method == "GET" and len(initial_data) == 0:
+         extra = extra + 1
 
     # Extra forms need their primary key and person type, as these are hidden values (see form definition)
     for extra_form in range(0, extra):
