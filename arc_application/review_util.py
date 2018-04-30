@@ -1,5 +1,6 @@
 from .models import ArcComments
-
+from urllib.parse import urlencode
+from django.core.urlresolvers import reverse
 
 def request_to_comment(table_key, table_name, user_request):
     """
@@ -87,3 +88,11 @@ def redirect_selection(request, default):
     if 'return_to_list' in request.POST.keys():
         redirect_link = request.POST['return_to_list']
     return redirect_link
+
+
+def build_url(*args, **kwargs):
+    get = kwargs.pop('get', {})
+    url = reverse(*args, **kwargs)
+    if get:
+        url += '?' + urlencode(get)
+    return url
