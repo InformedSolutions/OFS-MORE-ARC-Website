@@ -34,11 +34,17 @@
         </div>
 
         {% endfor %}
+
+        <br>
+
         <div class="grid-row">
             <input type="submit" name="action" class="button-secondary button-save-and-exit button-formset" value="Add another name">
         </div>
 
+        <br>
+
         <div class="grid-row">
+            <input type="hidden" name="referrer" value="{{ referrer }}">
             <input type="submit" name="action" class="button" value="Confirm and continue"/>
         </div>
     </form>
