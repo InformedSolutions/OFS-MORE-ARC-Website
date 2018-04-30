@@ -86,4 +86,6 @@ def redirect_selection(request, default):
     redirect_link = default
     if 'return_to_list' in request.POST.keys():
         redirect_link = request.POST['return_to_list']
+    elif 'previous_registration_details' in request.POST.keys():
+        redirect_link = request.POST['previous_registration_details']
     return redirect_link
