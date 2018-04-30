@@ -7,7 +7,7 @@ from django.shortcuts import render
 
 from arc_application.models.previous_name import PreviousName
 from ..forms import AdultInYourHomeForm, ChildInYourHomeForm, OtherPeopleInYourHomeForm, OtherPersonPreviousNames
-from arc_application.models import ChildInHome, AdultInHome, Arc, Application
+from arc_application.models import ChildInHome, AdultInHome, Arc, Application, PreviousAddress
 from arc_application.review_util import request_to_comment, save_comments, redirect_selection, build_url
 from arc_application.views import other_people_initial_population
 
@@ -152,6 +152,33 @@ def other_people_summary(request):
     child_lists = zip(child_id_list, child_name_list, child_birth_day_list, child_birth_month_list, child_birth_year_list,
                       child_relationship_list, formset_child)
 
+    adult_ids = []
+    adult_names = []
+    name_querysets = []
+    address_querysets = []
+
+    for adult_id, adult_name in zip(adult_id_list, adult_name_list):
+
+        adult_ids.append(adult_id)
+        adult_names.append(adult_name)
+        name_querysets.append(PreviousName.objects.filter(person_id=adult_id, other_person_type='ADULT'))
+        address_querysets.append(PreviousAddress.objects.filter(person_id=adult_id, person_type='ADULT'))
+
+    adult_ebulk_lists = list(zip(adult_ids, adult_names, name_querysets, address_querysets))
+
+    child_ids = []
+    child_names = []
+    name_querysets = []
+    address_querysets = []
+
+    for child_id, child_name in zip(child_id_list, child_name_list):
+        child_ids.append(child_id)
+        child_names.append(child_name)
+        name_querysets.append(PreviousName.objects.filter(person_id=child_id, other_person_type='CHILD'))
+        address_querysets.append(PreviousAddress.objects.filter(person_id=child_id, other_person_type='CHILD'))
+
+    child_ebulk_lists = zip(child_ids, child_names, name_querysets, address_querysets)
+
     variables = {
         'form': form,
         'formset_adult': formset_adult,
@@ -163,6 +190,8 @@ def other_people_summary(request):
         'number_of_children': children_list.count(),
         'adult_lists': adult_lists,
         'child_lists': child_lists,
+        'adult_ebulk_lists': adult_ebulk_lists,
+        'child_ebulk_lists': child_ebulk_lists,
         'turning_16': application.children_turning_16,
         'people_in_home_status': application.people_in_home_status
     }
@@ -180,20 +209,39 @@ def add_previous_address(request):
 
 
 def add_previous_name(request):
+    """
+    View to handle previous name formset for the either adults or children in the home
+    :param request:
+    :return:
+    """
 
     if request.method == 'POST':
 
         app_id = request.POST["id"]
         person_id = request.POST["person_id"]
         person_type = request.POST["type"]
+        # If the user is updating from the summary page, referrer is set to let the update now to redirect back to summary
+        try:
+            referrer = request.POST["referrer"]
+        except:
+            # If it doesn't exist, just set it to none
+            referrer = None
 
+        # If the action (set in the submit buttons on previous names html) is add another name, do the following
         if request.POST['action'] == "Add another name":
+            # Create an empty model formset object
             PreviousNamesFormset = modelformset_factory(PreviousName, form=OtherPersonPreviousNames)
+
+            # Instantiate and populate it with post request details
             formset = PreviousNamesFormset(request.POST)
             if formset.is_valid():
+                # If its valid, save it
                 formset.save()
+
+                # Set extra to 1, so that an extra empty form appears when rendered (see bottom of function)
                 extra = 1
             else:
+                # If invalid, keep extra the same and return the same page
                 extra = int(float(request.POST['extra']))
                 context = {
                     'formset': formset,
@@ -202,34 +250,47 @@ def add_previous_name(request):
                     'person_type': person_type,
                     'extra': extra
                 }
-                extra = int(float(request.POST['extra']))
                 return render(request, 'add-previous-names.html', context)
 
 
         if request.POST['action'] == 'delete':
+            # This scans the request poost dictionary for a key submitted by clicking remove person
             for key in request.POST.keys():
                 try:
+                    # This trys to cast each key as a uuid, dismisses it if this fails
                     test_val = UUID(key, version=4)
                     if request.POST[key] == 'Remove this person':
-                        test = PreviousName.objects.filter(pk=key)
+                        # If the associated value in the POST dict is 'Remove this person'
+
+                        # If the key exists in the database, delete it
                         if len(PreviousName.objects.filter(pk=key)) == 1:
                             PreviousName.objects.filter(pk=key).delete()
                             extra = int(float(request.POST['extra']))
+
+                        # If it doesnt exist (clicked remove on an empty form)
                         elif not PreviousName.objects.filter(pk=key):
+                            # Reduce the extra value, in effect removing the extra form
                             extra = int(float(request.POST['extra'])) - 1
                 except ValueError:
                     pass
 
         if request.POST['action'] == "Confirm and continue":
+            # If we're saving, instantiate the formset with the POST data
             PreviousNamesFormset = modelformset_factory(PreviousName, form=OtherPersonPreviousNames)
             formset = PreviousNamesFormset(request.POST)
             if formset.is_valid():
                 formset.save()
-                return HttpResponseRedirect(build_url('other-people-previous-addresses', get={"id": app_id,
-                                                                                              "person_id": person_id,
-                                                                                              "person_type": person_type,
-                                                                                              "state": "entry"}))
+                if referrer == 'None':
+                    # If they've come from the 'add ebulk' button
+                    return HttpResponseRedirect(build_url('other-people-previous-addresses', get={"id": app_id,
+                                                                                                  "person_id": person_id,
+                                                                                                  "person_type": person_type,
+                                                                                                  "state": "entry"}))
+                else:
+                    # If they've come from the summary page (using a change link)
+                    return HttpResponseRedirect(build_url('other_people_summary', get={'id': app_id}))
             else:
+                # If errors, re render the page with them
                 extra = int(float(request.POST['extra']))
                 context = {
                     'formset': formset,
@@ -244,13 +305,20 @@ def add_previous_name(request):
 
     if request.method == "GET":
 
+        # General context defintion on get request
         app_id = request.GET["id"]
         person_id = request.GET["person_id"]
         person_type = request.GET["type"]
+        # Attempt to grab referrer, as explained in post request
+        try:
+            referrer = request.GET["referrer"]
+        except:
+            referrer = None
         extra = 0
 
 
     initial = []
+    # Grab data already in table for the passed in person_id of the right person_type
     if person_type == 'ADULT':
         key_dict = {"person_id": person_id}
         initial_data = PreviousName.objects.filter(other_person_type=person_type, person_id=person_id)
@@ -261,13 +329,16 @@ def add_previous_name(request):
     # if request.method == "GET" and not initial_data:
     #     extra = extra + 1
 
+    # Extra forms need their primary key and person type, as these are hidden values (see form definition)
     for extra_form in range(0, extra):
         temp_initial_dict = {
             "previous_name_id": uuid4(),
             "other_person_type": person_type,
         }
+        # Merge this blank initial form into the initial data dictionary
         initial.append({**temp_initial_dict, **key_dict})
 
+    # Instantiate and populate formset, queryset will find any data in the database
     PreviousNamesFormset = modelformset_factory(PreviousName, form=OtherPersonPreviousNames, extra=extra)
     formset = PreviousNamesFormset(initial=initial, queryset=initial_data)
 
@@ -278,7 +349,8 @@ def add_previous_name(request):
         'application_id': app_id,
         'person_id': person_id,
         'person_type': person_type,
-        'extra': extra
+        'extra': extra,
+        'referrer': referrer
     }
 
     return render(request, 'add-previous-names.html', context)
