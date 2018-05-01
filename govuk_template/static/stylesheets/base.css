@@ -1717,6 +1717,20 @@ textarea.form-control {
   font-size: 0px;
 }
 
+.multiple-choice-radio {
+  float: left !important;
+}
+
+.multiple-choice-radio input {
+  opacity: 0 !important;
+}
+
+.multiple-choice-radio label {
+  cursor: none;
+  visibility: visible !important;
+  font-size: 19px !important;
+}
+
 .multiple-choice [type=radio] + label::before {
   content: "";
   border: 2px solid;
