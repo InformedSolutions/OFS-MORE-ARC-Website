@@ -5,6 +5,7 @@ django-govuk-template==0.4
 django-govuk-forms==0.4
 requests
 whitenoise
+inflect
 django-debug-toolbar
 django-timeline-logger==1.0
 selenium==3.11.0
