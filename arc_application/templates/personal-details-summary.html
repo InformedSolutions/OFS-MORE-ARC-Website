@@ -265,6 +265,67 @@
         </tr>
         </tbody>
     </table>
+
+        {% block has_previously_applied %}
+            {% if has_previously_applied %}
+                <table class="check-your-answers form-group grid-row">
+                    <tr>
+                        <th colspan="3">
+                            <div class="heading-medium">
+                                Previous Registration
+                            </div>
+                        </th>
+                    </tr>
+                    <tbody>
+                    <tr>
+                        <td style="width: 85%">
+                            Has the applicant previously registered with Ofsted?
+                        </td>
+                        <td>
+                            {% if previous_registration %}
+                                Yes
+                            {% else %}
+                                No
+                            {% endif %}
+                        </td>
+                        <td class="change-answer">
+                            <a href="{{ URL_PREFIX }}/personal-details/previous-registration/?id={{application_id}}">Change</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Individual ID
+                        </td>
+                        <td>
+                            {% if individual_id %}
+                                {{ individual_id }}
+                            {% else %}
+                                None
+                            {% endif %}
+                        </td>
+                        <td class="change-answer">
+                            <a href="{{ URL_PREFIX }}/personal-details/previous-registration/?id={{application_id}}">Change</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Has the applicant lived in England for more than 5 years?
+                        </td>
+                        <td>
+                            {% if five_years_in_UK %}
+                                Yes
+                            {% else %}
+                                No
+                            {% endif %}
+                        </td>
+                        <td class="change-answer">
+                            <a href="{{ URL_PREFIX }}/personal-details/previous-registration/?id={{application_id}}">Change</a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            {% endif %}
+        {% endblock %}
     <br>
     <div class="form-group grid-row">
 
