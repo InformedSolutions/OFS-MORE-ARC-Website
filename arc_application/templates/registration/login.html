@@ -9,13 +9,11 @@
 
 <!-- templates/registration/login.html -->
 <body>
-<div class="column-full">
-    <h2 class="heading-large">Ofsted - Childminder Application Review</h2>
-    <form method="post">
-      {% csrf_token %}
-      {{form.as_div}}
-      <input type="submit" class="button" value="Log in" alt='Login'/>
-    </form>
-</div>
+<h2 class="heading-large">Ofsted - Childminder Application Review</h2>
+<form method="post">
+    {% csrf_token %}
+    {{form.as_div}}
+    <input type="submit" class="button" value="Log in" alt='Login'/>
+</form>
 </body>
 {% endblock %}

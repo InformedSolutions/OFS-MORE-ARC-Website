@@ -1,63 +1,53 @@
 {% extends 'govuk_template.html' %}
-{% block page_title %}Type of childcare{% endblock %}
+{% block page_title %}Review: type of childcare{% endblock %}
 {% load static %}
 {% load govuk_template_base %}
-
 {% block inner_content %}
-
-<!-- Initialise error summary for page -->
 {% include 'back-button.html' %}
+
 <div class="column-full">
-
     <form method="post" novalidate>
-
-        <!-- Content -->
-        <div class="form-group grid-row">
-
+        {% csrf_token %}
+        <div class="grid-row">
+            <h1 class="form-title heading-large">Review: type of childcare</h1>
+        </div>
+        <table class="check-your-answers form-group grid-row" style="table-layout: fixed; width: 100%">
             <thead>
-        <tr>
-            <th colspan="2">
-                <div class="heading-large">
-                    Ages of the children
-                </div>
-            </th>
-        </tr>
-        </thead>
-            <table class="check-your-answers form-group grid-row" style="table-layout: fixed; width: 100%; margin: 0">
-                <thead></thead>
-                <tbody>
-                <tr><td> </td><td> </td></tr>
-                <tr><td>0-5 Years Old </td><td> {{ zero }}</td></tr>
-                 <tr><td>5-8 Years Old </td><td> {{ five }}</td></tr>
-                 <tr><td>8+ Years Old </td><td> {{ eight }}</td></tr>
-                </tbody>
-            </table>
-
-
-
-        </div>
-        <div class="form-group grid-row">
-
-                <input type="submit" class="button" value="Confirm and continue" alt='Continue to declaration'>
-                <input type="hidden" id="id" name="id" value="{{application_id}}"/>
-                {% csrf_token %}
-
-        </div>
+            <tr>
+                <th colspan="3">
+                    <div class="heading-medium">
+                        Ages of the children
+                    </div>
+                </th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td colspan="1" style="width:100%">0-5 years old</td>
+                <td colspan="2" style="width:100%">{{ zero }}</td>
+            </tr>
+            <tr>
+                <td colspan="1" style="width:100%">5-8 years old</td>
+                <td colspan="2" style="width:100%">{{ five }}</td>
+            </tr>
+            <tr>
+                <td colspan="1" style="width:100%">8+ years old</td>
+                <td colspan="2" style="width:100%">{{ eight }}</td>
+            </tr>
+            </tbody>
+        </table>
         <br>
-
-
-        <!-- Return to task list -->
         <div class="form-group grid-row">
-            {% if childcare_type_status == 'COMPLETED' %}
-            <a href="{{ URL_PREFIX }}/task-list?id={{application_id}}">Return to list</a>
-            {% endif %}
+            <input type="submit" class="button" value="Confirm and continue" alt='Confirm and continue'>
+            <input type="hidden" id="id" name="id" value="{{application_id}}"/>
         </div>
         <div class="form-group grid-row" style="padding-top: 30px;">
-        <a class="link-back">
-            <button type="submit" name="return_to_list" class="hidden-button" value="/review/">Return to List</button>
-        </a>
+            <a class="link-back">
+                <button type="submit" name="return_to_list" class="hidden-button" value="/review/">
+                    Return to list
+                </button>
+            </a>
         </div>
-
     </form>
 </div>
 

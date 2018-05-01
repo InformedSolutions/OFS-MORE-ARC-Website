@@ -1,5 +1,5 @@
 {% extends 'govuk_template.html' %}
-{% block page_title %}Register as a childminder{% endblock %}
+{% block page_title %}Application overview{% endblock %}
 {% load static %}
 {% load govuk_template_base %}
 
@@ -9,7 +9,7 @@
     <div class="column-two-thirds">
         <div class="form-group grid-row" style="padding-top: 30px; padding-left:15px">
             <!-- Back button -->
-            <a href="{{ URL_PREFIX }}/summary" class="link-back"
+            <a href="{% url 'summary' %}" class="link-back"
                style="margin-right: 10px; line-height: 28px" alt='Back to application list'>
                 Back
             </a>
@@ -27,19 +27,19 @@
                 <tr id="account_details">
                     <td class="task" style="padding-right: 10px; word-wrap: break-word;">
                         {% if login_details_status == 'NOT_STARTED' %}
-                        <a href="{{ URL_PREFIX }}/account/summary?id={{application_id}}">
-                            <span class="task-name">Your login details</span><strong class="task-finished task-to-do">To
-                            do</strong>
+                        <a href="{% url 'contact_summary' %}?id={{application_id}}">
+                            <span class="task-name">Your login details</span>
+                            <strong class="task-finished task-to-do">To do</strong>
                         </a>
                         {% elif login_details_status == 'FLAGGED' %}
-                        <a href="{{ URL_PREFIX }}/account/summary?id={{application_id}}">
-                            <span class="task-name">Your login details</span><strong
-                                class="task-finished task-flagged">Flagged</strong>
+                        <a href="{% url 'contact_summary' %}?id={{application_id}}">
+                            <span class="task-name">Your login details</span>
+                            <strong class="task-finished task-flagged">Flagged</strong>
                         </a>
                         {% elif login_details_status == 'COMPLETED' %}
-                        <a href="{{ URL_PREFIX }}/account/summary?id={{application_id}}">
-                            <span class="task-name">Your login details</span><strong
-                                class="task-finished">Reviewed</strong>
+                        <a href="{% url 'contact_summary' %}?id={{application_id}}">
+                            <span class="task-name">Your login details</span>
+                            <strong class="task-finished">Reviewed</strong>
                         </a>
                         {% endif %}
                     </td>
@@ -47,19 +47,19 @@
                 <tr id="children">
                     <td class="task" style="padding-right: 10px; word-wrap: break-word;">
                         {% if childcare_type_status == 'NOT_STARTED' %}
-                        <a href="{{ URL_PREFIX }}/childcare/age-groups?id={{application_id}}">
-                            <span class="task-name">Type of childcare</span><strong class="task-finished task-to-do">To
-                            do</strong>
+                        <a href="{% url 'type_of_childcare_age_groups' %}?id={{application_id}}">
+                            <span class="task-name">Type of childcare</span>
+                            <strong class="task-finished task-to-do">To do</strong>
                         </a>
                         {% elif childcare_type_status == 'FLAGGED' %}
-                        <a href="{{ URL_PREFIX }}/childcare/age-groups?id={{application_id}}">
-                            <span class="task-name">Type of childcare</span><strong
-                                class="task-finished task-flagged" s>Flagged</strong>
+                        <a href="{% url 'type_of_childcare_age_groups' %}?id={{application_id}}">
+                            <span class="task-name">Type of childcare</span>
+                            <strong class="task-finished task-flagged">Flagged</strong>
                         </a>
                         {% elif childcare_type_status == 'COMPLETED' %}
-                        <a href="{{ URL_PREFIX }}/childcare/age-groups?id={{application_id}}">
-                            <span class="task-name">Type of childcare</span><strong
-                                class="task-finished">Reviewed</strong>
+                        <a href="{% url 'type_of_childcare_age_groups' %}?id={{application_id}}">
+                            <span class="task-name">Type of childcare</span>
+                            <strong class="task-finished">Reviewed</strong>
                         </a>
                         {% endif %}
                     </td>
@@ -67,19 +67,19 @@
                 <tr id="personal_details">
                     <td class="task" style="padding-right: 10px; word-wrap: break-word;">
                         {% if personal_details_status == 'NOT_STARTED' %}
-                        <a href="{{ URL_PREFIX }}/personal-details/summary?id={{application_id}}">
-                            <span class="task-name">Your personal details</span><strong
-                                class="task-finished task-to-do">To do</strong>
+                        <a href="{% url 'personal_details_summary' %}?id={{application_id}}">
+                            <span class="task-name">Your personal details</span>
+                            <strong class="task-finished task-to-do">To do</strong>
                         </a>
                         {% elif personal_details_status == 'FLAGGED' %}
-                        <a href="{{ URL_PREFIX }}/personal-details/summary?id={{application_id}}">
-                            <span class="task-name">Your personal details</span><strong
-                                class="task-finished task-flagged">Flagged</strong>
+                        <a href="{% url 'personal_details_summary' %}?id={{application_id}}">
+                            <span class="task-name">Your personal details</span>
+                            <strong class="task-finished task-flagged">Flagged</strong>
                         </a>
                         {% elif personal_details_status == 'COMPLETED' %}
-                        <a href="{{ URL_PREFIX }}/personal-details/summary?id={{application_id}}">
-                            <span class="task-name">Your personal details</span><strong
-                                class="task-finished">Reviewed</strong>
+                        <a href="{% url 'personal_details_summary' %}?id={{application_id}}">
+                            <span class="task-name">Your personal details</span>
+                            <strong class="task-finished">Reviewed</strong>
                         </a>
                         {% endif %}
                     </td>
@@ -87,19 +87,19 @@
                 <tr id="first_aid">
                     <td class="task" style="padding-right: 10px; word-wrap: break-word;">
                         {% if first_aid_training_status == 'NOT_STARTED' %}
-                        <a href="{{ URL_PREFIX }}/first-aid/summary?id={{application_id}}">
-                            <span class="task-name">First aid training</span><strong class="task-finished task-to-do">To
-                            do</strong>
+                        <a href="{% url 'first_aid_training_summary' %}?id={{application_id}}">
+                            <span class="task-name">First aid training</span>
+                            <strong class="task-finished task-to-do">To do</strong>
                         </a>
                         {% elif first_aid_training_status == 'FLAGGED' %}
-                        <a href="{{ URL_PREFIX }}/first-aid/summary?id={{application_id}}">
-                            <span class="task-name">First aid training</span><strong
-                                class="task-finished task-flagged">Flagged</strong>
+                        <a href="{% url 'first_aid_training_summary' %}?id={{application_id}}">
+                            <span class="task-name">First aid training</span>
+                            <strong class="task-finished task-flagged">Flagged</strong>
                         </a>
                         {% elif first_aid_training_status == 'COMPLETED' %}
-                        <a href="{{ URL_PREFIX }}/first-aid/summary?id={{application_id}}">
-                            <span class="task-name">First aid training</span><strong
-                                class="task-finished">Reviewed</strong>
+                        <a href="{% url 'first_aid_training_summary' %}?id={{application_id}}">
+                            <span class="task-name">First aid training</span>
+                            <strong class="task-finished">Reviewed</strong>
                         </a>
                         {% endif %}
                     </td>
@@ -107,18 +107,19 @@
                 <tr id="dbs">
                     <td class="task" style="padding-right: 10px; word-wrap: break-word;">
                         {% if criminal_record_check_status == 'NOT_STARTED' %}
-                        <a href="{{ URL_PREFIX }}/dbs-check/summary?id={{application_id}}">
-                            <span class="task-name">Criminal record (DBS) check</span><strong
-                                class="task-finished task-to-do">To do</strong>
+                        <a href="{% url 'dbs_check_summary' %}?id={{application_id}}">
+                            <span class="task-name">Criminal record (DBS) check</span>
+                            <strong class="task-finished task-to-do">To do</strong>
                         </a>
                         {% elif criminal_record_check_status == 'FLAGGED' %}
-                        <a href="{{ URL_PREFIX }}/dbs-check/summary?id={{application_id}}">
-                            <span class="task-name">Criminal record (DBS) check</span><strong
-                                class="task-finished task-flagged">Flagged</strong>
+                        <a href="{% url 'dbs_check_summary' %}?id={{application_id}}">
+                            <span class="task-name">Criminal record (DBS) check</span>
+                            <strong class="task-finished task-flagged">Flagged</strong>
                         </a>
                         {% elif criminal_record_check_status == 'COMPLETED' %}
-                        <a href="{{ URL_PREFIX }}/dbs-check/summary?id={{application_id}}">
-                            <span class="task-name">Criminal record (DBS) check</span><strong class="task-finished">Reviewed</strong>
+                        <a href="{% url 'dbs_check_summary' %}?id={{application_id}}">
+                            <span class="task-name">Criminal record (DBS) check</span>
+                            <strong class="task-finished">Reviewed</strong>
                         </a>
                         {% endif %}
                     </td>
@@ -126,18 +127,19 @@
                 <tr id="health">
                     <td class="task" style="padding-right: 10px; word-wrap: break-word;">
                         {% if health_status == 'NOT_STARTED' %}
-                        <a href="{{ URL_PREFIX }}/health/check-answers?id={{application_id}}">
-                            <span class="task-name">Health declaration booklet</span><strong
-                                class="task-finished task-to-do">To do</strong>
+                        <a href="{% url 'health_check_answers' %}?id={{application_id}}">
+                            <span class="task-name">Health declaration booklet</span>
+                            <strong class="task-finished task-to-do">To do</strong>
                         </a>
                         {% elif health_status == 'FLAGGED' %}
-                        <a href="{{ URL_PREFIX }}/health/check-answers?id={{application_id}}">
-                            <span class="task-name">Health declaration booklet</span><strong
-                                class="task-finished task-flagged">Flagged</strong>
+                        <a href="{% url 'health_check_answers' %}?id={{application_id}}">
+                            <span class="task-name">Health declaration booklet</span>
+                            <strong class="task-finished task-flagged">Flagged</strong>
                         </a>
                         {% elif health_status == 'COMPLETED' %}
-                        <a href="{{ URL_PREFIX }}/health/check-answers?id={{application_id}}">
-                            <span class="task-name">Health declaration booklet</span><strong class="task-finished">Reviewed</strong>
+                        <a href="{% url 'health_check_answers' %}?id={{application_id}}">
+                            <span class="task-name">Health declaration booklet</span>
+                            <strong class="task-finished">Reviewed</strong>
                         </a>
                         {% endif %}
                     </td>
@@ -145,18 +147,19 @@
                 <tr id="references">
                     <td class="task" style="padding-right: 10px; word-wrap: break-word;">
                         {% if reference_status == 'NOT_STARTED' %}
-                        <a href="{{ URL_PREFIX }}/references/summary?id={{application_id}}">
-                            <span class="task-name">References</span><strong class="task-finished task-to-do">To
-                            do</strong>
+                        <a href="{% url 'references_summary' %}?id={{application_id}}">
+                            <span class="task-name">References</span>
+                            <strong class="task-finished task-to-do">To do</strong>
                         </a>
                         {% elif reference_status == 'FLAGGED' %}
-                        <a href="{{ URL_PREFIX }}/references/summary?id={{application_id}}">
-                            <span class="task-name">References</span><strong
-                                class="task-finished task-flagged">Flagged</strong>
+                        <a href="{% url 'references_summary' %}?id={{application_id}}">
+                            <span class="task-name">References</span>
+                            <strong class="task-finished task-flagged">Flagged</strong>
                         </a>
                         {% elif reference_status == 'COMPLETED' %}
-                        <a href="{{ URL_PREFIX }}/references/summary?id={{application_id}}">
-                            <span class="task-name">References</span><strong class="task-finished">Reviewed</strong>
+                        <a href="{% url 'references_summary' %}?id={{application_id}}">
+                            <span class="task-name">References</span>
+                            <strong class="task-finished">Reviewed</strong>
                         </a>
                         {% endif %}
                     </td>
@@ -164,31 +167,30 @@
                 <tr id="other_people">
                     <td class="task" style="padding-right: 10px; word-wrap: break-word;">
                         {% if people_in_home_status == 'NOT_STARTED' %}
-                        <a href="{{ URL_PREFIX }}/other-people/summary?id={{application_id}}">
-                            <span class="task-name">People in your home</span><strong class="task-finished task-to-do">To
-                            do</strong>
+                        <a href="{% url 'other_people_summary' %}?id={{application_id}}">
+                            <span class="task-name">People in your home</span>
+                            <strong class="task-finished task-to-do">To do</strong>
                         </a>
                         {% elif people_in_home_status == 'FLAGGED' %}
-                        <a href="{{ URL_PREFIX }}/other-people/summary?id={{application_id}}">
-                            <span class="task-name">People in your home</span><strong
-                                class="task-finished task-flagged">Flagged</strong>
+                        <a href="{% url 'other_people_summary' %}?id={{application_id}}">
+                            <span class="task-name">People in your home</span>
+                            <strong class="task-finished task-flagged">Flagged</strong>
                         </a>
                         {% elif people_in_home_status == 'COMPLETED' %}
-                        <a href="{{ URL_PREFIX }}/other-people/summary?id={{application_id}}">
-                            <span class="task-name">People in your home</span><strong
-                                class="task-finished">Reviewed</strong>
+                        <a href="{% url 'other_people_summary' %}?id={{application_id}}">
+                            <span class="task-name">People in your home</span>
+                            <strong class="task-finished">Reviewed</strong>
                         </a>
                         {% endif %}
                     </td>
                 </tr>
-
                 </tr>
                 </tbody>
             </table>
             <br>
             <br>
             {% if all_complete == True %}
-            <a href="{{ URL_PREFIX }}/arc-summary/?id={{application_id}}" class="button">Complete review</a>
+            <a href="{% url 'arc-summary' %}?id={{application_id}}" class="button">Complete review</a>
             {% endif %}
         </div>
     </div>

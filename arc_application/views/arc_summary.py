@@ -30,9 +30,9 @@ def cc_summary(request):
     if request.method == 'GET':
         application_id_local = request.GET["id"]
         json = load_json(application_id_local)
-        json[0][1]['link'] = ('/arc/contact-centre/contact-details/email-address/?id=' + str(application_id_local))
-        json[0][2]['link'] = ('/arc/contact-centre/contact-details/phone-number/?id=' + str(application_id_local))
-        json[0][3]['link'] = ('/arc/contact-centre/contact-details/add-phone-number/?id=' + str(application_id_local))
+        json[0][1]['link'] = (reverse('update_email') + '?id=' + str(application_id_local))
+        json[0][2]['link'] = (reverse('update_phone_number') + '?id=' + str(application_id_local))
+        json[0][3]['link'] = (reverse('update_add_number') + '?id=' + str(application_id_local))
         TimelineLog.objects.create(
             content_object=Application.objects.get(pk=application_id_local),
             user=request.user,

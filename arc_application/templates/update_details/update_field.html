@@ -1,32 +1,24 @@
 {% extends 'govuk_template.html' %}
-{% block page_title %}Application Summary{% endblock %}
+{% block page_title %}Application summary{% endblock %}
 {% load static %}
 {% load govuk_template_base %}
-
 {% block inner_content %}
 {% include 'back-button.html' %}
+
 <div class="form-group">
-
     {{ form.error_summary }}
-
     <div class="form-group">
         <h1 class="form-title heading-large">
             {{ page_title }}
         </h1>
     </div>
-
     <form method="post" novalidate {% if form.is_multipart %}enctype="multipart/form-data" {% endif %}>
-
         {{ pre_text }}
         {{ form }}
         {{ post_text }}
-
         {% include 'submit_button.html' %}
-
     </form>
     <br>
     {% include 'return_to_list.html' with location='search' application_id=application_id %}
-
 </div>
-
 {% endblock %}

@@ -1,6 +1,4 @@
-import urllib
-
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.views import View
 from django.shortcuts import render
@@ -8,7 +6,7 @@ from django.utils.http import urlencode
 
 from arc_application.forms.form_helper import initial_data_filler, data_saver
 from ...forms.update_detail_forms.update_contact_details import UpdateEmail, UpdatePhoneNumber, UpdateAddPhoneNumber
-from ...models import UserDetails,  Application
+from ...models import UserDetails, Application
 
 
 class ChangeDetails(View):
@@ -17,7 +15,6 @@ class ChangeDetails(View):
     pre_text = ''
     post_text = ''
     alt_text = ''
-
 
     def get(self, request):
         context = {
@@ -44,7 +41,8 @@ class ChangeDetails(View):
         app_id = request.POST['id']
         application = Application.objects.get(application_id=app_id)
         contact_record = UserDetails.objects.get(application_id=application)
-        output_form = self.form(request.POST, contact_record.pk, id=UserDetails.objects.get(application_id=request.GET['id']))
+        output_form = self.form(request.POST, contact_record.pk,
+                                id=UserDetails.objects.get(application_id=request.GET['id']))
         context['application_id'] = app_id
         context['form'] = output_form
         initial_data_filler(output_form, UserDetails, contact_record.pk)
@@ -64,17 +62,17 @@ class ChangeDetails(View):
 
 class UpdateEmailView(ChangeDetails):
     form = UpdateEmail
-    page_title = 'Update the applicants email'
+    page_title = "Update the applicant's email"
 
 
 class UpdatePhoneNumberView(ChangeDetails):
     form = UpdatePhoneNumber
-    page_title = 'Update the applicants phone number'
+    page_title = "Update the applicant's mobile phone number"
 
 
 class UpdateAddPhoneNumberView(ChangeDetails):
     form = UpdateAddPhoneNumber
-    page_title = 'Update the applicants additional phone number'
+    page_title = "Update the applicant's alternative phone number"
 
 
 class UpdateSecurityQuestionView(ChangeDetails):

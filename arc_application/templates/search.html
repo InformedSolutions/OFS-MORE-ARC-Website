@@ -2,100 +2,97 @@
 {% block page_title %}Applications{% endblock %}
 {% load static %}
 {% load govuk_template_base %}
-
 {% block inner_content %}
-
 {{ form.error_summary }}
 
 {% if empty == "error" %}
 <!-- Initialise error summary for page -->
 <div class="error-summary" aria-labelledby="error-summary-heading-jGBv" role="alert" tabindex="-1">
-    <h2 class="heading-medium error-summary-heading" id="error-summary-heading-jGBv">   {{ error_title }}
+    <h2 class="heading-medium error-summary-heading" id="error-summary-heading-jGBv">
+        {{ error_title }}
     </h2>
     <ul class="error-summary-list">
         <li class="non-field-error">{{ error_text }}</li>
     </ul>
-  </div>
+</div>
 {% endif %}
 
 <h1 class="form-title heading-large">
     Find an application
 </h1>
-
 <form method="post" novalidate>
     <div class="panel search-form">
-       {{form.as_div}}
+        {{form.as_div}}
         <div class="search-actions">
-            <input type="submit" class="button" value="Search">
-            <a href="/arc/search" class="reset-filter-link">Clear filters</a>
+            <input type="submit" class="button" value="Search" style="margin-bottom: 15px;">
+            <a href="{% url 'search' %}" class="reset-filter-link">Clear filters</a>
         </div>
     </div>
     {% csrf_token %}
     <input type="hidden" id="id" value="{{application_id}}" name="id"/>
 </form>
-
 <div class="search-results">
     {% if not empty %}
-        <p>Select an application:</p>
-        <table class="search-results-table">
-            <thead>
-            <tr>
-                <th scope="col">
-                    Application Type
-                </th>
-                <th scope="col">
-                    Applicant Name
-                </td>
-                <th scope="col">
-                    Date Submitted
-                </th>
-                <th scope="col">
-                    Date Accessed
-                </th>
-                <th scope="col">
-                    Submission Type
-                </th>
-                <th scope="col">
-                    Application Summary
-                </th>
-                <th scope="col">
-                    Audit Log
-                </th>
-                <td></td>
-            </tr>
-            </thead>
-            <tbody>
-            {% for app in app %}
-            <tr>
-                <td>
-                    <b>
-                        {{ app.type }}
-                    </b>
-                </td>
-                <td>{{ app.name }}</td>
-                <td>
-                    <b>
+    <p>Select an application:</p>
+    <table class="search-results-table">
+        <thead>
+        <tr>
+            <th scope="col">
+                Application Type
+            </th>
+            <th scope="col">
+                Applicant Name
+            </td>
+            <th scope="col">
+                Date Submitted
+            </th>
+            <th scope="col">
+                Date Accessed
+            </th>
+            <th scope="col">
+                Submission Type
+            </th>
+            <th scope="col">
+                Application Summary
+            </th>
+            <th scope="col">
+                Audit Log
+            </th>
+            <td></td>
+        </tr>
+        </thead>
+        <tbody>
+        {% for app in app %}
+        <tr>
+            <td>
+                <b>
+                    {{ app.type }}
+                </b>
+            </td>
+            <td>{{ app.name }}</td>
+            <td>
+                <b>
                     {{ app.submitted }}
-                    </b>
-                </td>
-                <td>
-                    {{ app.accessed }}
-                </td>
-                <td>
-                    <b>
+                </b>
+            </td>
+            <td>
+                {{ app.accessed }}
+            </td>
+            <td>
+                <b>
                     {{ app.sub_type }}
-                    </b>
-                </td>
-                <td>
-                    <a href="{{ app.link }}">Application Summary</a>
-                </td>
-                <td>
-                    <a href="{{ app.audit_link }}">Audit Log</a>
-                </td>
-            </tr>
-            {% endfor %}
-            </tbody>
-        </table>
+                </b>
+            </td>
+            <td>
+                <a href="{{ app.link }}">Application Summary</a>
+            </td>
+            <td>
+                <a href="{{ app.audit_link }}">Audit Log</a>
+            </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
     {% endif %}
 </div>
 
