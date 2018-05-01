@@ -7,9 +7,10 @@ class PreviousRegistrationDetails(models.Model):
     """
     Model for PREVIOUS_REGISTRATION_DETAILS table
     """
-    personal_detail_id = models.UUIDField(primary_key=True, default=uuid4)
+    previous_registration_id = models.UUIDField(primary_key=True, default=uuid4)
     application_id = models.ForeignKey(Application, on_delete=models.CASCADE, db_column='application_id')
     previous_registration = models.BooleanField(default=False)
+    individual_id = models.IntegerField(default=0)
     five_years_in_UK = models.BooleanField(default=False)
 
     @classmethod
