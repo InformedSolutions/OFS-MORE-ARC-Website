@@ -7,8 +7,15 @@
 
 {% include "back-button.html" %}
 
-<p>
-    Hello, World!
-</p>
+<form method="post" novalidate>
+    <div class="form-group">
+        <h1 class="form-title heading-large">Previous registration</h1>
+
+        {{ form.as_div }}
+        {% csrf_token %}
+
+        <input type="submit" class="button" value="Save and continue">
+    </div>
+</form>
 
 {% endblock %}
