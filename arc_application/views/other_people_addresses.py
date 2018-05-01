@@ -191,7 +191,7 @@ def postcode_submission(request, context):
         if context['referrer'] == 'add-another':
             return HttpResponseRedirect(build_url('personal_details_previous_addresses', get=context))
         elif context['referrer'] == 'save-and-continue':
-            return HttpResponseRedirect(build_url('personal_details_summary', get=context))
+            return HttpResponseRedirect(build_url('other_people_summary', get=context))
         else:
             return HttpResponseRedirect(build_url('personal_details_previous_addresses', get=context))
 

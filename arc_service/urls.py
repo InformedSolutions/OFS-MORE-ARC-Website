@@ -8,8 +8,9 @@ import re
 
 from arc_application.views import assign_new_application, custom_login, error_404, error_500, release, \
     summary_page, arc_summary, comments, contact_summary, dbs_check_summary, first_aid_training_summary, \
-    health_check_answers, personal_details_summary, references_summary, review, task_list, \
+    health_check_answers, references_summary, review, task_list, \
     type_of_childcare_age_groups, AuditlogListView, cc_summary
+from arc_application.views.personal_details import personal_details_summary, add_applicant_previous_name
 from arc_application.views.other_people_addresses import address_state_dispatcher
 from arc_application.views.other_people_in_home import other_people_summary, add_previous_name
 from arc_application.views.contact_centre.change_details import UpdateEmailView, UpdatePhoneNumberView, \
@@ -19,6 +20,8 @@ from django.conf import settings
 from django.conf.urls import include, url
 from django.contrib import admin
 from django.contrib.auth.views import logout
+
+from arc_application.views.personal_details_addresses import personal_details_previous_address
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
@@ -31,6 +34,8 @@ urlpatterns = [
     url(r'^account/summary/', contact_summary, name='contact_summary'),
     url(r'^childcare/age-groups/', type_of_childcare_age_groups, name='type_of_childcare_age_groups'),
     url(r'^personal-details/summary/', personal_details_summary, name='personal_details_summary'),
+    url(r'^personal-details/previous-names/', add_applicant_previous_name, name='personal_details_previous_names'),
+    url(r'^personal-details/previous-addresses', personal_details_previous_address, name='personal_details_previous_addresses'),
     url(r'^first-aid/summary/', first_aid_training_summary, name='first_aid_training_summary'),
     url(r'^dbs-check/summary/', dbs_check_summary, name='dbs_check_summary'),
     url(r'^references/summary/', references_summary, name='references_summary'),
