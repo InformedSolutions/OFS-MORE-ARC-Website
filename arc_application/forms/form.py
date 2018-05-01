@@ -476,6 +476,7 @@ class SearchForm(GOVUKForm):
     """
     field_label_classes = 'form-label-bold'
     auto_replace_widgets = True
+    error_summary_title = "There was a problem on this page"
 
     reference_search_field = forms.CharField(label='Application number', required=False)
     name_search_field = forms.CharField(label='Name', required=False)
@@ -529,6 +530,7 @@ class SearchForm(GOVUKForm):
 class OtherPersonPreviousNames(GOVUKForm, ModelForm):
     field_label_classes = 'form-label-bold'
     auto_replace_widgets = True
+    error_summary_title = "There was a problem on this page"
 
     def __init__(self, *args, **kwargs):
         super(OtherPersonPreviousNames, self).__init__(*args, **kwargs)
@@ -547,6 +549,7 @@ class OtherPersonPreviousNames(GOVUKForm, ModelForm):
 class OtherPersonPreviousPostcodeEntry(GOVUKForm):
     field_label_classes = 'form-label-bold'
     auto_replace_widgets = True
+    error_summary_title = "There was a problem on this page"
 
     postcode = forms.CharField(label='Postcode', error_messages={'required': 'Please enter your postcode'})
 
@@ -566,6 +569,7 @@ class OtherPersonPreviousPostcodeEntry(GOVUKForm):
 class OtherPeoplePreviousAddressLookupForm(GOVUKForm):
     field_label_classes = 'form-label-bold'
     auto_replace_widgets = True
+    error_summary_title = "There was a problem on this page"
 
     address = forms.ChoiceField(label='Select address', required=True,
                                 error_messages={'required': 'Please select your address'})
@@ -587,6 +591,7 @@ class OtherPeoplePreviousAddressManualForm(GOVUKForm):
     """
     field_label_classes = 'form-label-bold'
     auto_replace_widgets = True
+    error_summary_title = "There was a problem on this page"
 
     street_name_and_number = forms.CharField(label='Address line 1', required=False)
     street_name_and_number2 = forms.CharField(label='Address line 2', required=False)
@@ -679,6 +684,7 @@ class OtherPeoplePreviousAddressManualForm(GOVUKForm):
 class PersonalDetailsPreviousNames(GOVUKForm, ModelForm):
     field_label_classes = 'form-label-bold'
     auto_replace_widgets = True
+    error_summary_title = "There was a problem on this page"
 
     def __init__(self, *args, **kwargs):
         super(PersonalDetailsPreviousNames, self).__init__(*args, **kwargs)
@@ -697,6 +703,7 @@ class PersonalDetailsPreviousNames(GOVUKForm, ModelForm):
 class PersonalDetailsPreviousPostcodeEntry(GOVUKForm):
     field_label_classes = 'form-label-bold'
     auto_replace_widgets = True
+    error_summary_title = "There was a problem on this page"
 
     postcode = forms.CharField(label='Postcode', error_messages={'required': 'Please enter your postcode'})
 
@@ -716,6 +723,7 @@ class PersonalDetailsPreviousPostcodeEntry(GOVUKForm):
 class PersonalDetailsPreviousAddressLookupForm(GOVUKForm):
     field_label_classes = 'form-label-bold'
     auto_replace_widgets = True
+    error_summary_title = "There was a problem on this page"
 
     address = forms.ChoiceField(label='Select address', required=True,
                                 error_messages={'required': 'Please select your address'})
@@ -737,6 +745,7 @@ class PersonalDetailsPreviousAddressManualForm(GOVUKForm):
     """
     field_label_classes = 'form-label-bold'
     auto_replace_widgets = True
+    error_summary_title = "There was a problem on this page"
 
     street_name_and_number = forms.CharField(label='Address line 1', required=False)
     street_name_and_number2 = forms.CharField(label='Address line 2', required=False)

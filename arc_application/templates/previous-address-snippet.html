@@ -1,6 +1,6 @@
 
 {% for address in queryset %}
-    Previous Address {{ forloop.counter }}: <br />
+    Previous address {{ forloop.counter }}: <br />
     <br>
     {{address.street_line1}}{% if address.street_line1 %}<br />{% endif %}
     {{address.street_line2}}{% if address.street_line2 %}<br />{% endif %}
@@ -11,5 +11,5 @@
     <br>
 
 {% endfor %}
-    Previous Address {{queryset|length|add:"1"}}:<br />
+    Previous address {{queryset|length|add:"1"}}:<br />
     <br>

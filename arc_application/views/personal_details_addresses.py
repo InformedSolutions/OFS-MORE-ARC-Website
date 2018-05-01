@@ -10,7 +10,7 @@ from arc_application.models import PreviousAddress
 from arc_application.review_util import build_url
 
 
-def address_state_dispatcher(request):
+def personal_details_previous_address(request):
     """
     Dispatcher function to handle the different pages to be rendered
     :param request: Standard Httprequest object
@@ -64,7 +64,7 @@ def postcode_entry(request, context):
 
             # Define next sate to perform get request on
             context['state'] = 'selection'
-            return HttpResponseRedirect(build_url('other-people-previous-addresses', get=context))
+            return HttpResponseRedirect(build_url('personal_details_previous_addresses', get=context))
 
         return render(request, 'previous-address-select.html', context)
 
@@ -97,17 +97,15 @@ def postcode_selection(request, context):
             address = current_form.cleaned_data['address']
             context['address'] = address
             context['state'] = 'submission'
-
             if 'save-and-continue' in request.POST.keys():
                 context['referrer'] = 'save-and-continue'
             elif "add-another" in request.POST.keys():
                 context['referrer'] = "add-another"
-
             # Different things must be done for submission if it is manual or a postcode lookup, this variable
             # differentiates the two functions
             context['lookup'] = True
 
-            return HttpResponseRedirect(build_url('other-people-previous-addresses', get=context))
+            return HttpResponseRedirect(build_url('personal_details_previous_addresses', get=context))
 
     return render(request, 'previous-address-lookup.html', context)
 
@@ -128,7 +126,12 @@ def postcode_manual(request, context):
 
     if request.method == 'POST':
         current_form = OtherPeoplePreviousAddressManualForm(request.POST)
+        context['postcode'] = request.POST['postcode2']
         context['form'] = current_form
+        if 'save-and-continue' in request.POST.keys():
+            context['referrer'] = 'save-and-continue'
+        elif "add-another" in request.POST.keys():
+            context['referrer'] = "add-another"
         if current_form.is_valid():
             # Store entered address as json to be sent to to the submission view to be saved
             context['address'] = json.dumps({'line1': current_form.cleaned_data['street_name_and_number'],
@@ -141,7 +144,7 @@ def postcode_manual(request, context):
             # As this is a manual entry rather than a postcode lookup, this is set to false
             context['lookup'] = False
 
-            return HttpResponseRedirect(build_url('other-people-previous-addresses', get=context))
+            return HttpResponseRedirect(build_url('personal_details_previous_addresses', get=context))
 
         return render(request, 'other-people-previous-address-manual.html', context)
 
@@ -191,10 +194,9 @@ def postcode_submission(request, context):
         if context['referrer'] == 'add-another':
             return HttpResponseRedirect(build_url('personal_details_previous_addresses', get=context))
         elif context['referrer'] == 'save-and-continue':
-            return HttpResponseRedirect(build_url('other_people_summary', get=context))
+            return HttpResponseRedirect(build_url('personal_details_summary', get=context))
         else:
             return HttpResponseRedirect(build_url('personal_details_previous_addresses', get=context))
-
 
 def address_update(request, context):
     """
@@ -224,7 +226,7 @@ def address_update(request, context):
             address_record.postcode = current_form.cleaned_data['postcode']
             address_record.save()
 
-            return HttpResponseRedirect(build_url('other_people_summary', get={'id': context['id']}))
+            return HttpResponseRedirect(build_url('personal_details_summary', get={'id': context['id']}))
 
         return render(request, 'previous-address-manual-update.html', context)
 
@@ -332,14 +334,14 @@ def get_urls(context):
 
     # These two urls need certain 'states' to be built, therefore state is saved then changed, and finally reset
     context['state'] = 'manual'
-    context['manual_url'] = build_url('other-people-previous-addresses', get=context)
+    context['manual_url'] = build_url('personal_details_previous_addresses', get=context)
     context['state'] = 'entry'
-    context['entry_url'] = build_url('other-people-previous-addresses', get=context)
+    context['entry_url'] = build_url('personal_details_previous_addresses', get=context)
 
     # Reset occurs here
     context['state'] = state
 
     # List url does not require a new state, so set after state changes, once it has been reset
-    context['list_url'] = build_url('other_people_summary', get={'id': context['id']})
+    context['list_url'] = build_url('personal_details_summary', get={'id': context['id']})
 
     return context
