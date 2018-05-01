@@ -8,6 +8,7 @@ import uuid
 
 from django import forms
 from govuk_forms.forms import GOVUKForm
+from govuk_forms.widgets import InlineRadioSelect, RadioSelect
 
 from .. import custom_field_widgets
 from ..models import Arc as ArcReview
@@ -210,6 +211,28 @@ class HealthForm(GOVUKForm):
         self.table_keys = kwargs.pop('table_keys')
         super(HealthForm, self).__init__(*args, **kwargs)
         populate_initial_values(self)
+
+
+class PreviousRegistrationDetailsForm(GOVUKForm):
+    """
+    GOV.UK form for adding details of previous registration.
+    """
+
+    field_label_classes = 'form-label-bold'
+    auto_replace_widgets = True
+
+    choices = (
+        ('Yes', 'Yes'),
+        ('No', 'No')
+    )
+
+    previous_registration = forms.ChoiceField(choices=choices, label='Has the applicant previously registered with Ofsted?',
+                                              widget=InlineRadioSelect, required=True)
+    five_years_in_UK = forms.ChoiceField(choices=choices, label='Has the applicant lived in England for more than 5 years?',
+                                         widget=InlineRadioSelect, required=True)
+
+    def __init__(self, *args, **kwargs):
+        super(PreviousRegistrationDetailsForm, self).__init__(*args, **kwargs)
 
 
 class ReferencesForm(GOVUKForm):
