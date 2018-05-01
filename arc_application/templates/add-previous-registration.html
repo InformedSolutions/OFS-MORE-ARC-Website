@@ -11,10 +11,17 @@
     <div class="form-group">
         <h1 class="form-title heading-large">Previous registration</h1>
 
-        {{ form.as_div }}
+        {% for field in form %}
+            <div class="inline form-group form-group-required">
+                <div class="form-label-bold">{{ field.label }}</div>
+                <div class="multiple-choice-radio form-label-bold"> {{ field }} </div>
+            </div>
+        {% endfor %}
+
         {% csrf_token %}
 
         <input type="submit" class="button" value="Save and continue">
+        <input type="hidden" value="{{application_id}}" name="id" />
     </div>
 </form>
 
