@@ -259,7 +259,7 @@ def add_previous_name(request):
                 try:
                     # This trys to cast each key as a uuid, dismisses it if this fails
                     test_val = UUID(key, version=4)
-                    if request.POST[key] == 'Remove this person':
+                    if request.POST[key] == 'Remove this name':
                         # If the associated value in the POST dict is 'Remove this person'
 
                         # If the key exists in the database, delete it

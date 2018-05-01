@@ -5,7 +5,7 @@ from django.forms import modelformset_factory
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 
-from arc_application.forms.form import PersonalDetailsForm, OtherPersonPreviousNames
+from arc_application.forms.form import PersonalDetailsForm, OtherPersonPreviousNames, PreviousRegistrationDetails
 from arc_application.models import ApplicantPersonalDetails, ApplicantName, ApplicantHomeAddress, Arc, Application, \
     PreviousName, uuid4
 from arc_application.review_util import request_to_comment, save_comments, redirect_selection, build_url
@@ -148,6 +148,16 @@ def personal_details_summary(request):
         'previous_names': previous_names,
         'previous_addresses': previous_addresses,
     }
+
+    try:
+        previous_reg_details = PreviousRegistrationDetails.objects.get(application_id=application_id_local)
+        variables['has_previously_applied'] = True
+        variables['previous_registration'] = previous_reg_details.previous_registration
+        variables['individual_id'] = str(previous_reg_details.individual_id)
+        variables['five_years_in_UK'] = previous_reg_details.five_years_in_UK
+    except:
+        pass
+
     return render(request, 'personal-details-summary.html', variables)
 
 
@@ -201,7 +211,7 @@ def add_applicant_previous_name(request):
                 try:
                     # This trys to cast each key as a uuid, dismisses it if this fails
                     test_val = UUID(key, version=4)
-                    if request.POST[key] == 'Remove this person':
+                    if request.POST[key] == 'Remove this name':
                         # If the associated value in the POST dict is 'Remove this person'
 
                         # If the key exists in the database, delete it
