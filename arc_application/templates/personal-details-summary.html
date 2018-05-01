@@ -2,269 +2,339 @@
 {% block page_title %}Personal details{% endblock %}
 {% load static %}
 {% load govuk_template_base %}
+{% load alt_text_extras %}
 
 {% block inner_content %}
 {% include 'back-button.html' %}
 <div class="column-full">
     <form method="post" novalidate>
 
-    <div class="grid-row">
-        <h1 class="form-title heading-large">Check your answers: your personal details</h1>
-    </div>
+        <div class="grid-row">
+            <h1 class="form-title heading-large">Check your answers: your personal details</h1>
+        </div>
 
-    <table class="check-your-answers form-group grid-row" style="table-layout: fixed; width: 100%">
-        <thead>
-        <tr>
-            <th colspan="3">
-                <div class="heading-medium">
-                    Your name and date of birth
-                </div>
-            </th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr>
-            <td>
-                Your name
-            </td>
-            {% if middle_names %}
-            <td style="word-wrap: break-word">
-                {{first_name}} {{middle_names}} {{last_name}}
-            </td>
-            {% elif not middle_names %}
-            <td style="word-wrap: break-word">
-                {{first_name}} {{last_name}}
-            </td>
-            {% endif %}
-            <td class="change-answer">
-                {{ form.name_declare }}
-            </td>
-        </tr>
-        <tr class="js-hidden" id="name" >
-            <td colspan="1"style="width:100%">
-                <div >
-                    {{ form.name_comments.label}}
-                </div>
-            </td>
-            <td colspan="2"style="width:100%">
-                <div >
-                    {{ form.name_comments}}
-                </div>
-            </td>
-        </tr>
+        <table class="check-your-answers form-group grid-row" style="table-layout: fixed; width: 100%">
+            <thead>
+            <tr>
+                <th colspan="3">
+                    <div class="heading-medium">
+                        Your name and date of birth
+                    </div>
+                </th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>
+                    Your name
+                </td>
+                {% if middle_names %}
+                <td style="word-wrap: break-word">
+                    {{first_name}} {{middle_names}} {{last_name}}
+                </td>
+                {% elif not middle_names %}
+                <td style="word-wrap: break-word">
+                    {{first_name}} {{last_name}}
+                </td>
+                {% endif %}
+                <td class="change-answer">
+                    {{ form.name_declare }}
+                </td>
+            </tr>
+            <tr class="js-hidden" id="name">
+                <td colspan="1" style="width:100%">
+                    <div>
+                        {{ form.name_comments.label}}
+                    </div>
+                </td>
+                <td colspan="2" style="width:100%">
+                    <div>
+                        {{ form.name_comments}}
+                    </div>
+                </td>
+            </tr>
 
-        <tr>
-            <td>
-                Your date of birth
-            </td>
-            {% if birth_month == 1 %}
-            <td style="word-wrap: break-word">
-                {{birth_day}} January {{birth_year}}
-            </td>
-            {% elif birth_month == 2 %}
-            <td style="word-wrap: break-word">
-                {{birth_day}} February {{birth_year}}
-            </td>
-            {% elif birth_month == 3 %}
-            <td style="word-wrap: break-word">
-                {{birth_day}} March {{birth_year}}
-            </td>
-            {% elif birth_month == 4 %}
-            <td style="word-wrap: break-word">
-                {{birth_day}} April {{birth_year}}
-            </td>
-            {% elif birth_month == 5 %}
-            <td style="word-wrap: break-word">
-                {{birth_day}} May {{birth_year}}
-            </td>
-            {% elif birth_month == 6 %}
-            <td style="word-wrap: break-word">
-                {{birth_day}} June {{birth_year}}
-            </td>
-            {% elif birth_month == 7 %}
-            <td style="word-wrap: break-word">
-                {{birth_day}} July {{birth_year}}
-            </td>
-            {% elif birth_month == 8 %}
-            <td style="word-wrap: break-word">
-                {{birth_day}} August {{birth_year}}
-            </td>
-            {% elif birth_month == 9 %}
-            <td>
-                {{birth_day}} September {{birth_year}}
-            </td>
-            {% elif birth_month == 10 %}
-            <td>
-                {{birth_day}} October {{birth_year}}
-            </td>
-            {% elif birth_month == 11 %}
-            <td style="word-wrap: break-word">
-                {{birth_day}} November {{birth_year}}
-            </td>
-            {% elif birth_month == 12 %}
-            <td style="word-wrap: break-word">
-                {{birth_day}} December {{birth_year}}
-            </td>
-            {% endif %}
-            <td class="change-answer">
-                {{ form.date_of_birth_declare }}
-            </td>
-        </tr>
-        <tr class="js-hidden" id="date_of_birth" >
-            <td colspan="1"style="width:100%">
-                <div >
-                    {{ form.date_of_birth_comments.label}}
-                </div>
-            </td>
-            <td colspan="2"style="width:100%">
-                <div >
-                    {{ form.date_of_birth_comments}}
-                </div>
-            </td>
-        </tr>
-        </tbody>
-    </table>
-    <table class="check-your-answers form-group grid-row">
-        <thead>
-        <tr>
-            <th colspan="3">
-                <div class="heading-medium">
-                    Your home address
-                </div>
-            </th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr>
-            <td>
-                Home address
-            </td>
-            {% if street_line2 and county %}
-            <td style="word-wrap: break-word">
-                {{street_line1}}
-                </br>
-                {{street_line2}}
-                </br>
-                {{town}}
-                </br>
-                {{county}}
-                </br>
-                {{postcode}}
-            </td>
-            {% elif street_line2 and not county %}
-            <td style="word-wrap: break-word">
-                {{street_line1}}
-                </br>
-                {{street_line2}}
-                </br>
-                {{town}}
-                </br>
-                {{postcode}}
-            </td>
-            {% elif not street_line2 and county %}
-            <td style="word-wrap: break-word">
-                {{street_line1}}
-                </br>
-                {{town}}
-                </br>
-                {{county}}
-                </br>
-                {{postcode}}
-            </td>
-            {% elif not street_line2 and not county %}
-            <td style="word-wrap: break-word">
-                {{street_line1}}
-                </br>
-                {{town}}
-                </br>
-                {{postcode}}
-            </td>
-            {% endif %}
-            <td class="change-answer">
-                {{ form.home_address_declare }}
-            </td>
-        </tr>
-        <tr class="js-hidden" id="home_address" >
-            <td colspan="1">
-                <div >
-                    {{ form.home_address_comments.label}}
-                </div>
-            </td>
-            <td colspan="2"style="width:100%">
-                <div >
-                    {{ form.home_address_comments}}
-                </div>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                Childcare location
-            </td>
-            {% if location_of_childcare == True %}
-            <td style="word-wrap: break-word">
-                Same as home address
-            </td>
-            {% elif location_of_childcare == False %}
-            {% if childcare_street_line2 and childcare_county %}
-            <td style="word-wrap: break-word">
-                {{childcare_street_line1}}
-                </br>
-                {{childcare_street_line2}}
-                </br>
-                {{childcare_town}}
-                </br>
-                {{childcare_county}}
-                </br>
-                {{childcare_postcode}}
-            </td>
-            {% elif childcare_street_line2 and not childcare_county %}
-            <td style="word-wrap: break-word">
-                {{childcare_street_line1}}
-                </br>
-                {{childcare_street_line2}}
-                </br>
-                {{childcare_town}}
-                </br>
-                {{childcare_postcode}}
-            </td>
-            {% elif not childcare_street_line2 and childcare_county %}
-            <td style="word-wrap: break-word">
-                {{childcare_street_line1}}
-                </br>
-                {{childcare_town}}
-                </br>
-                {{childcare_county}}
-                </br>
-                {{childcare_postcode}}
-            </td>
-            {% elif not childcare_street_line2 and not childcare_county %}
-            <td style="word-wrap: break-word">
-                {{childcare_street_line1}}
-                </br>
-                {{childcare_town}}
-                </br>
-                {{childcare_postcode}}
-            </td>
-            {% endif %}
-            {% endif %}
-            <td class="change-answer">
-                {{ form.childcare_location_declare }}
-            </td>
-        </tr>
-        <tr class="js-hidden" id="childcare_location" >
-            <td colspan="1">
-                <div >
-                    {{ form.childcare_location_comments.label}}
-                </div>
-            </td>
-            <td colspan="2"style="width:100%">
-                <div >
-                    {{ form.childcare_location_comments}}
-                </div>
-            </td>
-        </tr>
-        </tbody>
-    </table>
+            <tr>
+                <td>
+                    Your date of birth
+                </td>
+                {% if birth_month == 1 %}
+                <td style="word-wrap: break-word">
+                    {{birth_day}} January {{birth_year}}
+                </td>
+                {% elif birth_month == 2 %}
+                <td style="word-wrap: break-word">
+                    {{birth_day}} February {{birth_year}}
+                </td>
+                {% elif birth_month == 3 %}
+                <td style="word-wrap: break-word">
+                    {{birth_day}} March {{birth_year}}
+                </td>
+                {% elif birth_month == 4 %}
+                <td style="word-wrap: break-word">
+                    {{birth_day}} April {{birth_year}}
+                </td>
+                {% elif birth_month == 5 %}
+                <td style="word-wrap: break-word">
+                    {{birth_day}} May {{birth_year}}
+                </td>
+                {% elif birth_month == 6 %}
+                <td style="word-wrap: break-word">
+                    {{birth_day}} June {{birth_year}}
+                </td>
+                {% elif birth_month == 7 %}
+                <td style="word-wrap: break-word">
+                    {{birth_day}} July {{birth_year}}
+                </td>
+                {% elif birth_month == 8 %}
+                <td style="word-wrap: break-word">
+                    {{birth_day}} August {{birth_year}}
+                </td>
+                {% elif birth_month == 9 %}
+                <td>
+                    {{birth_day}} September {{birth_year}}
+                </td>
+                {% elif birth_month == 10 %}
+                <td>
+                    {{birth_day}} October {{birth_year}}
+                </td>
+                {% elif birth_month == 11 %}
+                <td style="word-wrap: break-word">
+                    {{birth_day}} November {{birth_year}}
+                </td>
+                {% elif birth_month == 12 %}
+                <td style="word-wrap: break-word">
+                    {{birth_day}} December {{birth_year}}
+                </td>
+                {% endif %}
+                <td class="change-answer">
+                    {{ form.date_of_birth_declare }}
+                </td>
+            </tr>
+            <tr class="js-hidden" id="date_of_birth">
+                <td colspan="1" style="width:100%">
+                    <div>
+                        {{ form.date_of_birth_comments.label}}
+                    </div>
+                </td>
+                <td colspan="2" style="width:100%">
+                    <div>
+                        {{ form.date_of_birth_comments}}
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+        <table class="check-your-answers form-group grid-row">
+            <thead>
+            <tr>
+                <th colspan="3">
+                    <div class="heading-medium">
+                        Your home address
+                    </div>
+                </th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>
+                    Home address
+                </td>
+                {% if street_line2 and county %}
+                <td style="word-wrap: break-word">
+                    {{street_line1}}
+                    </br>
+                    {{street_line2}}
+                    </br>
+                    {{town}}
+                    </br>
+                    {{county}}
+                    </br>
+                    {{postcode}}
+                </td>
+                {% elif street_line2 and not county %}
+                <td style="word-wrap: break-word">
+                    {{street_line1}}
+                    </br>
+                    {{street_line2}}
+                    </br>
+                    {{town}}
+                    </br>
+                    {{postcode}}
+                </td>
+                {% elif not street_line2 and county %}
+                <td style="word-wrap: break-word">
+                    {{street_line1}}
+                    </br>
+                    {{town}}
+                    </br>
+                    {{county}}
+                    </br>
+                    {{postcode}}
+                </td>
+                {% elif not street_line2 and not county %}
+                <td style="word-wrap: break-word">
+                    {{street_line1}}
+                    </br>
+                    {{town}}
+                    </br>
+                    {{postcode}}
+                </td>
+                {% endif %}
+                <td class="change-answer">
+                    {{ form.home_address_declare }}
+                </td>
+            </tr>
+            <tr class="js-hidden" id="home_address">
+                <td colspan="1">
+                    <div>
+                        {{ form.home_address_comments.label}}
+                    </div>
+                </td>
+                <td colspan="2" style="width:100%">
+                    <div>
+                        {{ form.home_address_comments}}
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Childcare location
+                </td>
+                {% if location_of_childcare == True %}
+                <td style="word-wrap: break-word">
+                    Same as home address
+                </td>
+                {% elif location_of_childcare == False %}
+                {% if childcare_street_line2 and childcare_county %}
+                <td style="word-wrap: break-word">
+                    {{childcare_street_line1}}
+                    </br>
+                    {{childcare_street_line2}}
+                    </br>
+                    {{childcare_town}}
+                    </br>
+                    {{childcare_county}}
+                    </br>
+                    {{childcare_postcode}}
+                </td>
+                {% elif childcare_street_line2 and not childcare_county %}
+                <td style="word-wrap: break-word">
+                    {{childcare_street_line1}}
+                    </br>
+                    {{childcare_street_line2}}
+                    </br>
+                    {{childcare_town}}
+                    </br>
+                    {{childcare_postcode}}
+                </td>
+                {% elif not childcare_street_line2 and childcare_county %}
+                <td style="word-wrap: break-word">
+                    {{childcare_street_line1}}
+                    </br>
+                    {{childcare_town}}
+                    </br>
+                    {{childcare_county}}
+                    </br>
+                    {{childcare_postcode}}
+                </td>
+                {% elif not childcare_street_line2 and not childcare_county %}
+                <td style="word-wrap: break-word">
+                    {{childcare_street_line1}}
+                    </br>
+                    {{childcare_town}}
+                    </br>
+                    {{childcare_postcode}}
+                </td>
+                {% endif %}
+                {% endif %}
+                <td class="change-answer">
+                    {{ form.childcare_location_declare }}
+                </td>
+            </tr>
+            <tr class="js-hidden" id="childcare_location">
+                <td colspan="1">
+                    <div>
+                        {{ form.childcare_location_comments.label}}
+                    </div>
+                </td>
+                <td colspan="2" style="width:100%">
+                    <div>
+                        {{ form.childcare_location_comments}}
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+        <br>
+
+        {% if previous_names %}
+        <table class="check-your-answers form-group grid-row" style="table-layout: fixed; width: 100%">
+            <thead>
+            <tr>
+                <th colspan="3">
+                    <div class="heading-medium">
+                        Previous names
+                    </div>
+                </th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for name in previous_names %}
+                <tr>
+                    <td>
+                        Your previous name {{ forloop.counter }}
+                    </td>
+                    <td>
+                        {{ name.first_name }}  {{ name.middle_names }} {{ name.last_name }}
+                    </td>
+                    <td class="change-answer">
+                        <a href="{% url 'personal_details_previous_names' %}?id={{ application_id }}&person_id={{ application_id }}&type=APPLICANT&referrer=list" alt="Change the {{ forloop.counter|inflect }} previous name">Change</a>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {% endif %}
+
+        {% if previous_addresses %}
+        <table class="check-your-answers form-group grid-row" style="table-layout: fixed; width: 100%">
+            <thead>
+            <tr>
+                <th colspan="3">
+                    <div class="heading-medium">
+                        Previous home addresses
+                    </div>
+                </th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for address in previous_addresses %}
+            <tr>
+                <td>
+                    Your previous home address {{ forloop.counter }}
+                </td>
+                <td>
+                    {{address.street_line1}}{% if address.street_line1 %}<br />{% endif %}
+                    {{address.street_line2}}{% if address.street_line2 %}<br />{% endif %}
+                    {{address.town}}{% if address.town %}<br />{% endif %}
+                    {{address.county}}{% if address.county %}<br />{% endif %}
+                    {{address.country}}{% if address.country %}<br />{% endif %}
+                    {{address.postcode}}{% if address.postcode %}<br />{% endif %}
+                </td>
+                <td class="change-answer">
+                    <a href="{% url 'personal_details_previous_addresses' %}?id={{ application_id }}&state=update&person_id={{ application_id }}&person_type=APPLICANT&address_id={{address.pk}}" alt="Change the {{ forloop.counter|inflect }} previous name">Change</a>
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {% endif %}
+
+
+
+
+
 
         {% block has_previously_applied %}
             {% if has_previously_applied %}
@@ -335,7 +405,21 @@
 
     </div>
 
-    <br>
+
+
+
+        <br>
+
+        <div class="grid-row">
+            <a href="{% url 'personal_details_previous_names' %}?id={{ application_id }}&person_id={{ application_id }}&type=APPLICANT"
+               class="button-secondary-inline button-save-and-exit">Add previous names and addresses</a>
+        </div>
+
+
+        <br>
+
+
+        <br>
         <div class="form-group grid-row">
             <a>
                 <button type="submit" name="previous_registration_details" class="button-secondary button-add-another" value="/personal-details/previous-registration/">
@@ -344,7 +428,6 @@
             </a>
         </div>
 
-    <br>
         <div class="form-group grid-row" style="padding-top: 30px;">
         <a class="link-back">
             <button type="submit" name="return_to_list" class="hidden-button" value="/review/">Return to List</button>

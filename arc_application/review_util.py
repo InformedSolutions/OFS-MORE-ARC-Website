@@ -1,5 +1,8 @@
-from .models import ArcComments
+import inflect as inflect
 
+from .models import ArcComments
+from urllib.parse import urlencode
+from django.core.urlresolvers import reverse
 
 def request_to_comment(table_key, table_name, user_request):
     """
@@ -89,3 +92,11 @@ def redirect_selection(request, default):
     elif 'previous_registration_details' in request.POST.keys():
         redirect_link = request.POST['previous_registration_details']
     return redirect_link
+
+
+def build_url(*args, **kwargs):
+    get = kwargs.pop('get', {})
+    url = reverse(*args, **kwargs)
+    if get:
+        url += '?' + urlencode(get)
+    return url

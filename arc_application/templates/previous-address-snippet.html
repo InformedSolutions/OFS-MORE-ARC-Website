@@ -1,0 +1,15 @@
+
+{% for address in queryset %}
+    Previous address {{ forloop.counter }}: <br />
+    <br>
+    {{address.street_line1}}{% if address.street_line1 %}<br />{% endif %}
+    {{address.street_line2}}{% if address.street_line2 %}<br />{% endif %}
+    {{address.town}}{% if address.town %}<br />{% endif %}
+    {{address.county}}{% if address.county %}<br />{% endif %}
+    {{address.country}}{% if address.country %}<br />{% endif %}
+    {{address.postcode}}{% if address.postcode %}<br />{% endif %}
+    <br>
+
+{% endfor %}
+    Previous address {{queryset|length|add:"1"}}:<br />
+    <br>

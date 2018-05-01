@@ -2379,10 +2379,6 @@ input[type=number] {
   vertical-align: top;
 }
 
-.button-save-and-exit {
-  margin-left: 50px;
-}
-
 .task-group {
   font-size: 30px;
   font-weight: 700;
@@ -2391,6 +2387,18 @@ input[type=number] {
 .task-title {
   font-size: 24px;
   font-weight: 400;
+}
+
+.hidden-link-2 {
+     background:none!important;
+     color:inherit;
+     border:none;
+     padding:0!important;
+     font: inherit;
+     /*border is optional*/
+     border-bottom:1px solid #005ea5;
+     cursor: pointer;
+     color: #005ea5;
 }
 
 @media only screen and (max-width: 768px) {
@@ -2716,6 +2724,11 @@ float:right;
 
 .button-secondary {
   display: block !important;
+  background-color: #eee;
+  color: #000;
+}
+
+.button-secondary-inline {
   background-color: #eee;
   color: #000;
 }

@@ -9,6 +9,9 @@ APPLICATION_LIMIT = 5
 
 NOTIFY_URL = os.environ.get('APP_NOTIFY_URL')
 
+# Base URL of addressing-service gateway
+ADDRESSING_URL = os.environ.get('APP_ADDRESSING_URL')
+
 CHILDMINDER_EMAIL_VALIDATION_URL = os.environ.get('CHILDMINDER_EMAIL_VALIDATION_URL')
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)

@@ -1,0 +1,60 @@
+{% extends 'govuk_template.html' %}
+{% block page_title %}Previous names {% if person_type != 'APPLICANT' %}of adults in your home{% endif %}{% endblock %}
+{% load static %}
+{% load govuk_template_base %}
+
+{% block inner_content %}
+{% include 'back-button.html' %}
+
+{% for form in form_set %}
+{{form.error_summary}}
+{% endfor %}
+
+<div class="column-full" xmlns="http://www.w3.org/1999/html">
+    <form method="post" novalidate>
+        <input type="hidden" value="{{ application_id }}" name="id"/>
+        <input type="hidden" value="{{ person_id }}" name="person_id"/>
+        <input type="hidden" value="{{ person_type }}" name="type"/>
+        <input type="hidden" value="{{ extra }}" name="extra"/>
+        {{ formset.management_form }}
+        <div class="grid-row">
+            <h1 class="form-title heading-large">Previous names</h1>
+        </div>
+        {% csrf_token %}
+        {% for form in formset %}
+
+        <h2 class="grid-row form-title heading-medium">Name {{ forloop.counter }}</h2>
+
+        <div class="grid-row">
+            {{ form }}
+            {% if formset|length > 1 %}
+                <input type="hidden" name="action" value="delete">
+                <input type="submit" class="hidden-link-2" name="{{ form.previous_name_id.value }}" value="Remove this name"/>
+            {% endif %}
+        </div>
+
+        {% endfor %}
+
+        <br>
+
+        <div class="grid-row">
+            <input type="submit" name="action" class="button-secondary button-save-and-exit button-formset" value="Add another name">
+        </div>
+
+        <br>
+
+        <div class="grid-row">
+            <input type="hidden" name="referrer" value="{{ referrer }}">
+            <input type="submit" name="action" class="button" value="Confirm and continue"/>
+        </div>
+
+        <br>
+
+        <div class="form-group grid-row">
+            <a href="{{ list_url }}" class="link-back">Return to list</a>
+        </div>
+    </form>
+
+</div>
+
+{% endblock %}
