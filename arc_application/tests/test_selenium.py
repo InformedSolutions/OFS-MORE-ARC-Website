@@ -115,7 +115,7 @@ class TestArcFunctions(LiveServerTestCase):
         try:
             Application.objects.all().delete()
             self.login_as_arc_user()
-            selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='New Application']").click()
+            selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='New application']").click()
             self.assertTrue(
                 selenium_task_executor.get_driver().find_element_by_class_name('error-summary').is_displayed()
             )
@@ -134,7 +134,7 @@ class TestArcFunctions(LiveServerTestCase):
 
         try:
             self.login_as_arc_user()
-            selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='New Application']").click()
+            selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='New application']").click()
             selenium_task_executor.get_driver().find_element_by_link_text("Review").click()
             self.assertEqual("Application overview",
                              selenium_task_executor.get_driver().find_element_by_xpath("//main[@id='content']/div[2]/div/header/h1").text)
@@ -154,10 +154,10 @@ class TestArcFunctions(LiveServerTestCase):
 
         try:
             self.login_as_arc_user()
-            selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='New Application']").click()
+            selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='New application']").click()
             selenium_task_executor.get_driver().find_element_by_link_text("Review").click()
             selenium_task_executor.get_driver().find_element_by_link_text("Audit log").click()
-            self.assertEqual("Audit Log", selenium_task_executor.get_driver().title)
+            self.assertEqual("Audit log", selenium_task_executor.get_driver().title)
         except Exception as e:
             self.capture_screenshot()
             raise e
@@ -174,31 +174,31 @@ class TestArcFunctions(LiveServerTestCase):
 
         try:
             self.login_as_arc_user()
-            selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='New Application']").click()
+            selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='New application']").click()
             selenium_task_executor.get_driver().find_element_by_link_text("Review").click()
             selenium_task_executor.get_driver().find_element_by_xpath("//main[@id='content']/div[2]/div").click()
             selenium_task_executor.get_driver().find_element_by_xpath("//tr[@id='account_details']/td/a/span").click()
-            WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("Your account"))
+            WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("Review: your login details"))
             selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Confirm and continue']").click()
-            WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("Type of childcare"))
+            WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("Review: type of childcare"))
             selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Confirm and continue']").click()
-            WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("Personal details"))
+            WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("Review: your personal details"))
             selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Confirm and continue']").click()
-            WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("First aid training"))
+            WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("Review: first aid training"))
             selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Confirm and continue']").click()
-            WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("DBS check"))
+            WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("Review: criminal record (DBS) check"))
             selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Confirm and continue']").click()
-            WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("Check your answers: health declaration booklet"))
+            WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("Review: health declaration booklet"))
             selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Confirm and continue']").click()
-            WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("References"))
+            WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("Review: references"))
             selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Confirm and continue']").click()
-            WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("People in your home"))
+            WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("Review: people in your home"))
             selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Confirm and continue']").click()
-            WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("Register as a childminder"))
+            WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("Application overview"))
             selenium_task_executor.get_driver().find_element_by_link_text("Complete review").click()
-            WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("Application Summary"))
+            WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("Application summary"))
             selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Confirm and continue']").click()
-            WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("Additional Comments"))
+            WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("Additional comments"))
             selenium_task_executor.get_driver().find_element_by_id("id_comments").send_keys("Test")
             selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Save and continue']").click()
             self.assertEqual("Review Approved",
@@ -220,11 +220,11 @@ class TestArcFunctions(LiveServerTestCase):
         try:
             self.login_as_arc_user()
 
-            selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='New Application']").click()
+            selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='New application']").click()
             selenium_task_executor.get_driver().find_element_by_link_text("Review").click()
             selenium_task_executor.get_driver().find_element_by_xpath("//main[@id='content']/div[2]/div").click()
             selenium_task_executor.get_driver().find_element_by_xpath("//tr[@id='account_details']/td/a/span").click()
-            WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("Your account"))
+            WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("Review: your login details"))
 
             selenium_task_executor.get_driver().find_element_by_id("id_mobile_number_declare").click()
             selenium_task_executor.get_driver().find_element_by_id("id_mobile_number_comments").clear()
@@ -233,10 +233,10 @@ class TestArcFunctions(LiveServerTestCase):
             selenium_task_executor.get_driver().find_element_by_id("id_add_phone_number_comments").clear()
             selenium_task_executor.get_driver().find_element_by_id("id_add_phone_number_comments").send_keys("Test")
             selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Confirm and continue']").click()
-            WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("Type of childcare"))
+            WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("Review: type of childcare"))
 
             selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Confirm and continue']").click()
-            WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("Personal details"))
+            WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("Review: your personal details"))
 
             selenium_task_executor.get_driver().find_element_by_id("id_name_declare").click()
             selenium_task_executor.get_driver().find_element_by_id("id_name_comments").send_keys("Test")
@@ -247,7 +247,7 @@ class TestArcFunctions(LiveServerTestCase):
             selenium_task_executor.get_driver().find_element_by_id("id_childcare_location_declare").click()
             selenium_task_executor.get_driver().find_element_by_id("id_childcare_location_comments").send_keys("Test")
             selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Confirm and continue']").click()
-            WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("First aid training"))
+            WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("Review: first aid training"))
 
             selenium_task_executor.get_driver().find_element_by_id("id_first_aid_training_organisation_declare").click()
             selenium_task_executor.get_driver().find_element_by_id("id_first_aid_training_organisation_comments").send_keys("Test")
@@ -256,17 +256,17 @@ class TestArcFunctions(LiveServerTestCase):
             selenium_task_executor.get_driver().find_element_by_id("id_course_date_declare").click()
             selenium_task_executor.get_driver().find_element_by_id("id_course_date_comments").send_keys("Test")
             selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Confirm and continue']").click()
-            WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("DBS check"))
+            WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("Review: criminal record (DBS) check"))
 
             selenium_task_executor.get_driver().find_element_by_id("id_dbs_certificate_number_declare").click()
             selenium_task_executor.get_driver().find_element_by_id("id_dbs_certificate_number_comments").send_keys("Test")
             selenium_task_executor.get_driver().find_element_by_id("id_dbs_submission_consent_declare").click()
             selenium_task_executor.get_driver().find_element_by_id("id_dbs_submission_consent_comments").send_keys("Test")
             selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Confirm and continue']").click()
-            WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("Check your answers: health declaration booklet"))
+            WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("Review: health declaration booklet"))
 
             selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Confirm and continue']").click()
-            WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("References"))
+            WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("Review: references"))
 
             selenium_task_executor.get_driver().find_element_by_id("id_form-full_name_declare").click()
             selenium_task_executor.get_driver().find_element_by_id("id_form-full_name_comments").send_keys("Test")
@@ -292,7 +292,7 @@ class TestArcFunctions(LiveServerTestCase):
             selenium_task_executor.get_driver().find_element_by_id("id_form2-phone_number_comments").send_keys("Test")
             selenium_task_executor.get_driver().find_element_by_id("id_form2-email_address_declare").click()
             selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Confirm and continue']").click()
-            WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("People in your home"))
+            WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("Review: people in your home"))
 
             selenium_task_executor.get_driver().find_element_by_id("id_static-adults_in_home_declare").click()
             selenium_task_executor.get_driver().find_element_by_id("id_static-adults_in_home_comments").clear()
@@ -304,16 +304,16 @@ class TestArcFunctions(LiveServerTestCase):
                 "Test")
             selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Confirm and continue']").click()
 
-            WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("Register as a childminder"))
+            WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("Application overview"))
 
             selenium_task_executor.get_driver().find_element_by_link_text("Complete review").click()
-            WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("Application Summary"))
+            WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("Application summary"))
             selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Confirm and continue']").click()
-            WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("Additional Comments"))
+            WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("Additional comments"))
             selenium_task_executor.get_driver().find_element_by_id("id_comments").send_keys("Test")
             selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Save and continue']").click()
 
-            self.assertEqual("Review Returned",
+            self.assertEqual("Review returned",
                              selenium_task_executor.get_driver().find_element_by_xpath("//main[@id='content']/div[2]/div/h1").text)
         except Exception as e:
             self.capture_screenshot()
@@ -333,9 +333,9 @@ class TestArcFunctions(LiveServerTestCase):
             selenium_task_executor.get_driver().find_element_by_id("id_name_search_field").send_keys("test")
             selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Search']").click()
             selenium_task_executor.get_driver().find_element_by_link_text("Application Summary").click()
-            self.assertEqual("Application Summary", selenium_task_executor.get_driver().title)
+            self.assertEqual("Application summary", selenium_task_executor.get_driver().title)
             selenium_task_executor.get_driver().find_element_by_link_text("Audit log").click()
-            self.assertEqual("Audit Log", selenium_task_executor.get_driver().title)
+            self.assertEqual("Audit log", selenium_task_executor.get_driver().title)
         except Exception as e:
             self.capture_screenshot()
             raise e
@@ -354,9 +354,9 @@ class TestArcFunctions(LiveServerTestCase):
             selenium_task_executor.get_driver().find_element_by_id("id_name_search_field").send_keys("test")
             selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Search']").click()
             selenium_task_executor.get_driver().find_element_by_link_text("Application Summary").click()
-            self.assertEqual("Application Summary", selenium_task_executor.get_driver().title)
+            self.assertEqual("Application summary", selenium_task_executor.get_driver().title)
             selenium_task_executor.get_driver().find_element_by_link_text("Audit log").click()
-            self.assertEqual("Audit Log", selenium_task_executor.get_driver().title)
+            self.assertEqual("Audit log", selenium_task_executor.get_driver().title)
             self.assertEqual("Application viewed by cc1",
                              selenium_task_executor.get_driver().find_element_by_xpath("//main[@id='content']/main/table/tbody/tr/td[3]").text)
         except Exception as e:

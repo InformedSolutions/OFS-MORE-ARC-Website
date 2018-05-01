@@ -1,5 +1,5 @@
 {% extends 'govuk_template.html' %}
-{% block page_title %}People in your home{% endblock %}
+{% block page_title %}Review: people in your home{% endblock %}
 {% load static %}
 {% load govuk_template_base %}
 
@@ -8,9 +8,8 @@
 <div class="column-full">
     <form method="post" novalidate>
         <div class="grid-row">
-            <h1 class="form-title heading-large">Check your answers: people in your home</h1>
+            <h1 class="form-title heading-large">Review: people in your home</h1>
         </div>
-
         {% csrf_token %}
         {{ formset_adult.management_form }}
         {{ formset_child.management_form }}
@@ -99,7 +98,6 @@
             </tbody>
         </table>
         {% for id ,name, day, month, year, relationship, dbs_certificate_number, permission, formsetadult in adult_lists %}
-
         <table class="check-your-answers form-group grid-row">
             <thead>
             <tr>
@@ -289,10 +287,6 @@
         <div class="grid-row">
             <a href="{% url 'other-people-previous-names' %}?id={{ application_id }}&person_id={{ id }}&type=ADULT" class="button">Add previous names and addresses</a>
         </div>
-
-
-
-
         {% endfor %}
         {% for id, name, day, month, year, relationship, formsetchild in child_lists %}
         <table class="check-your-answers form-group grid-row">
@@ -423,17 +417,10 @@
             </tr>
             </tbody>
         </table>
-
-
-
-
-
-
         <div class="grid-row">
         <a href="{% url 'other-people-previous-names' %}?id={{ application_id }}&person_id={{ id }}&type=CHILD" class="button">Add previous names and addresses</a>
         </div>
         {% endfor %}
-
         {% for id, name, previous_names, previous_addresses in adult_ebulk_lists %}
         <table class="check-your-answers form-group grid-row">
             <thead>
@@ -480,7 +467,6 @@
             </tbody>
         </table>
         {% endfor %}
-
         {% for id, name, previous_names, previous_addresses in child_ebulk_lists %}
             {% if previous_names %}
                 <table class="check-your-answers form-group grid-row">
@@ -529,25 +515,20 @@
                 </table>
             {% endif %}
         {% endfor %}
-
         <br>
         <div class="form-group grid-row">
             <input type="submit" class="button" value="Confirm and continue"/>
             <input type="hidden" value="{{application_id}}" name="id"/>
-
         </div>
-
-
         <br>
         <div class="form-group grid-row" style="padding-top: 30px;">
             <a class="link-back">
-                <button type="submit" name="return_to_list" class="hidden-button" value="/review/">Return to List
+                <button type="submit" name="return_to_list" class="hidden-button" value="/review/">
+                    Return to list
                 </button>
             </a>
         </div>
-
     </form>
-
 </div>
 
 {% endblock %}

@@ -1,15 +1,14 @@
 {% extends 'govuk_template.html' %}
-{% block page_title %}Application Summary{% endblock %}
+{% block page_title %}Application summary{% endblock %}
 {% load static %}
 {% load govuk_template_base %}
-
 {% block inner_content %}
 {% include 'back-button.html' %}
-<div class="column-full">
 
+<div class="column-full">
     <div class="grid-row">
         <h1 class="form-title heading-large">
-            Check and confirm all your details
+            Check and confirm all details
         </h1>
     </div>
     {% with "4" as col %}
@@ -17,18 +16,18 @@
     {% include 'summary_tables.html' %}
     {% endfor %}
     {% endwith %}
-
-<div class="form-group grid-row">
+    <div class="form-group grid-row">
         <form method="post">
             {% csrf_token %}
             <input type="submit" class="button" value="Confirm and continue"/>
             <input type="hidden" value="{{application_id}}" name="id"/>
         </form>
-    </div>
-    <a href="{{ URL_PREFIX }}/review?id={{application_id}}" class="link-back"
+        <br>
+        <a href="{% url 'task_list' %}?id={{application_id}}" class="link-back"
            style="margin-right: 10px; line-height: 28px">
             Return to list
         </a>
-    <br>
+        <br>
+    </div>
 </div>
 {% endblock %}

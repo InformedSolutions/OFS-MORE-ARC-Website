@@ -62,7 +62,7 @@ def summary_page(request):
         # No applications available for review
         if not assign_response:
             error_exist = 'true'
-            error_title = 'No Available Applications'
+            error_title = 'No available applications'
             error_text = 'There are currently no more applications ready for a review'
 
         variables = {
