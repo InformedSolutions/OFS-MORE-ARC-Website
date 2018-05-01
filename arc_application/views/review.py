@@ -11,11 +11,11 @@ from django.shortcuts import render
 from django.views import View
 
 from ..forms.form import AdultInYourHomeForm, CheckBox, ChildInYourHomeForm, CommentsForm, DBSCheckForm, FirstAidTrainingForm, \
-    HealthForm, LogInDetailsForm, OtherPeopleInYourHomeForm, PersonalDetailsForm, ReferencesForm, ReferencesForm2
+    HealthForm, LogInDetailsForm, OtherPeopleInYourHomeForm, PersonalDetailsForm, ReferencesForm, ReferencesForm2, PreviousRegistrationDetailsForm
 from ..magic_link import generate_magic_link
 from ..models import AdultInHome, ApplicantHomeAddress, ApplicantName, ApplicantPersonalDetails, Application, Arc, \
     ArcComments, ChildInHome, ChildcareType, CriminalRecordCheck, FirstAidTraining, HealthDeclarationBooklet, Reference, \
-    UserDetails
+    UserDetails, PreviousRegistrationDetails
 from ..review_util import redirect_selection, request_to_comment, save_comments
 from .base import release_application
 
@@ -317,9 +317,13 @@ def personal_details_summary(request):
     return render(request, 'personal-details-summary.html', variables)
 
 
-class AddPreviousRegistrationDetails(View):
+class PreviousRegistrationDetailsView(View):
     def get(self, request):
-        return render(request, 'add-previous-registration.html')
+        form = PreviousRegistrationDetailsForm()
+        variables = {
+            'form': form,
+        }
+        return render(request, 'add-previous-registration.html', context=variables)
 
 
 def first_aid_training_summary(request):
