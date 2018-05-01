@@ -1,5 +1,5 @@
 {% extends 'govuk_template.html' %}
-{% block page_title %}Your home address{% endblock %}
+{% block page_title %}Previous addresses {% if person_type != 'APPLICANT' %}of adults in your home{% endif %}{% endblock %}
 {% load static %}
 {% load govuk_template_base %}
 
@@ -23,18 +23,17 @@
         {% csrf_token %}
         <br>
         <br>
-        <a href="{{ entry_url }}" name="manual"
-           id="manual">Use postcode search</a>
+        <a href="{{ entry_url }}" name="manual" id="manual">Use postcode search</a>
     </div>
     <div class="form-group">
         <input type="hidden" id="id" name="id" value="{{id}}"/>
         <input type="hidden" name="state" value="manual"/>
         <input type="hidden" name="person_id" value="{{ person_id }}"/>
         <input type="hidden" name="person_type" value="{{ person_type }}"/>
-        <input type="hidden" name="postcode" value="{{ postcode }}"/>
+        <input type="hidden" name="postcode2" value="{{ postcode }}"/>
+        <input type="submit" class="button" name="save-and-continue" value = "Save and continue">
     </div>
 
-    <a href="{{ list_url }}" class="button">Save and continue</a><br/>
 
     <br>
     <!-- Return to task list -->

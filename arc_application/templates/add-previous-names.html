@@ -1,5 +1,5 @@
 {% extends 'govuk_template.html' %}
-{% block page_title %}Previous names of adults in your home{% endblock %}
+{% block page_title %}Previous names {% if person_type != 'APPLICANT' %}of adults in your home{% endif %}{% endblock %}
 {% load static %}
 {% load govuk_template_base %}
 

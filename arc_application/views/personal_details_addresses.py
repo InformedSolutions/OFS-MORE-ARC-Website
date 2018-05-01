@@ -126,7 +126,12 @@ def postcode_manual(request, context):
 
     if request.method == 'POST':
         current_form = OtherPeoplePreviousAddressManualForm(request.POST)
+        context['postcode'] = request.POST['postcode2']
         context['form'] = current_form
+        if 'save-and-continue' in request.POST.keys():
+            context['referrer'] = 'save-and-continue'
+        elif "add-another" in request.POST.keys():
+            context['referrer'] = "add-another"
         if current_form.is_valid():
             # Store entered address as json to be sent to to the submission view to be saved
             context['address'] = json.dumps({'line1': current_form.cleaned_data['street_name_and_number'],
@@ -222,6 +227,8 @@ def address_update(request, context):
             address_record.save()
 
             return HttpResponseRedirect(build_url('personal_details_summary', get={'id': context['id']}))
+
+        return render(request, 'previous-address-manual-update.html', context)
 
 
 def get_stored_addresses(person_id, person_type):

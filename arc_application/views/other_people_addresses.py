@@ -96,7 +96,7 @@ def postcode_selection(request, context):
             context = get_context(request)
             address = current_form.cleaned_data['address']
             context['address'] = address
-            context['state'] = 'submission'#
+            context['state'] = 'submission'
 
             if 'save-and-continue' in request.POST.keys():
                 context['referrer'] = 'save-and-continue'
@@ -225,6 +225,8 @@ def address_update(request, context):
             address_record.save()
 
             return HttpResponseRedirect(build_url('other_people_summary', get={'id': context['id']}))
+
+        return render(request, 'previous-address-manual-update.html', context)
 
 
 def get_stored_addresses(person_id, person_type):

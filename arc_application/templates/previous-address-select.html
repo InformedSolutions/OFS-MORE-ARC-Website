@@ -1,5 +1,5 @@
 {% extends 'govuk_template.html' %}
-{% block page_title %}Your home address{% endblock %}
+{% block page_title %}Previous addresses {% if person_type != 'APPLICANT' %}of adults in your home{% endif %}{% endblock %}
 {% load static %}
 {% load govuk_template_base %}
 
@@ -23,7 +23,7 @@
         {% if not form.errors %}
         <div id="id_postcode-group" class="form-group-required form-group">
             <label id="id_postcode-label" class="form-label-bold" for="id_postcode">
-                {{form.postcode.label}}
+                <b>{{form.postcode.label}}</b>
             </label>
             {{form.postcode}}
         </div>
@@ -51,22 +51,22 @@
         </div>
         {% endif %}
         {% csrf_token %}
-        <a href="{{ manual_url }}"
-           name="manual" id="manual">Enter address manually</a>
-        <br>
-        <br>
+
+
         <input type="submit" class="button" value="Find address"
                    name="postcode-search">
+        <br>
+        <br>
+        <a href="{{ manual_url }}"
+           name="manual" id="manual">Enter address manually</a>
         <input type="hidden" id="id" name="id" value="{{id}}"/>
         <input type="hidden" name="state" value="entry"/>
         <input type="hidden" name="person_id" value="{{ person_id }}"/>
         <input type="hidden" name="person_type" value="{{ person_type }}"/>
-    </div>
-
-    <br>
-    <!-- Return to task list -->
-    <div class="form-group">
+        <br>
+        <br>
         <a href="{{ list_url }}" class="link-back">Return to list</a>
+
     </div>
 </form>
 

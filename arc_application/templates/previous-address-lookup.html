@@ -1,5 +1,5 @@
 {% extends 'govuk_template.html' %}
-{% block page_title %}Select your home address{% endblock %}
+{% block page_title %}Previous addresses {% if person_type != 'APPLICANT' %}of adults in your home{% endif %}{% endblock %}
 {% load static %}
 {% load govuk_template_base %}
 
@@ -22,9 +22,10 @@
         {% include 'previous-address-snippet.html' with queryset=previous_addresses %}
 
         <h2 class="form-title heading-small">Postcode</h2>
-        <p>{{postcode}} <a
+        <p class="form-label-bold">{{postcode}} <a
                 href="{{ entry_url }}">Change</a></p>
-        {{form.as_div}}
+
+        {{form}}
         {% csrf_token %}
         <a href="{{ manual_url }}" name="manual"
            id="manual">I
@@ -38,6 +39,8 @@
         <input type="hidden" name="postcode" value="{{ postcode }}"/>
         <input type="submit" class="button-secondary button-save-and-exit" name="add-another" value="Add another address">
     </div>
+
+    <br>
 
     <input type="submit" class="button" name="save-and-continue" value = "Save and continue"><br/>
 
