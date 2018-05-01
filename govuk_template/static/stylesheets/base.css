@@ -1672,6 +1672,10 @@ textarea.form-control {
   width: 100%;
 }
 
+.form-control-prev-reg-id input {
+  width: 50% !important;
+}
+
 @media (min-width: 641px) {
   .form-control-1-8 {
     width: 12.5%;
