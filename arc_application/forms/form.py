@@ -10,9 +10,11 @@ import re
 from django import forms
 from django.forms import ModelForm
 from govuk_forms.forms import GOVUKForm
+from govuk_forms.widgets import InlineRadioSelect, NumberInput
 
 from .. import custom_field_widgets
 from ..models import Arc as ArcReview, PreviousAddress, PreviousName
+from ..models import Arc as ArcReview, PreviousRegistrationDetails
 from ..review_util import populate_initial_values
 
 
@@ -213,6 +215,48 @@ class HealthForm(GOVUKForm):
         self.table_keys = kwargs.pop('table_keys')
         super(HealthForm, self).__init__(*args, **kwargs)
         populate_initial_values(self)
+
+
+class PreviousRegistrationDetailsForm(GOVUKForm):
+    """
+    GOV.UK form for adding details of previous registration.
+    """
+    error_summary_template_name = 'standard-error-summary.html'
+    error_summary_title = 'There was a problem on this page'
+    field_label_classes = 'form-label-bold'
+    auto_replace_widgets = True
+
+    choices = (
+        (False, 'No'),
+        (True, 'Yes')
+    )
+
+    previous_registration = forms.ChoiceField(choices=choices, label='Has the applicant previously registered with Ofsted?',
+                                              widget=InlineRadioSelect, required=True, error_messages={'required': "Please select one"})
+    individual_id = forms.IntegerField(label='Individual ID:', widget=NumberInput(), required=False)
+    five_years_in_UK = forms.ChoiceField(choices=choices, label='Has the applicant lived in England for more than 5 years?',
+                                         widget=InlineRadioSelect, required=True, error_messages={'required': "Please select one"})
+
+    def __init__(self, *args, **kwargs):
+        self.application_id_local = kwargs.pop('id')
+        super(PreviousRegistrationDetailsForm, self).__init__(*args, **kwargs)
+        if PreviousRegistrationDetails.objects.filter(application_id=self.application_id_local).exists():
+            previous_reg_details = PreviousRegistrationDetails.objects.get(application_id=self.application_id_local)
+            self.fields['previous_registration'].initial = previous_reg_details.previous_registration
+            self.fields['individual_id'].initial = previous_reg_details.individual_id
+            self.fields['five_years_in_UK'].initial = previous_reg_details.five_years_in_UK
+
+    def clean_individual_id(self):
+        try:
+            previous_registration = self.cleaned_data['previous_registration']
+        except:
+            previous_registration = None
+        individual_id = self.cleaned_data['individual_id']
+        if previous_registration=='True':
+            if individual_id is None:
+                raise forms.ValidationError("Please select one")
+        # TODO Insert validation error when giving Inidividual ID w/o previously registering.
+        return individual_id
 
 
 class ReferencesForm(GOVUKForm):

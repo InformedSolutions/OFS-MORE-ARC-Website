@@ -18,3 +18,4 @@ from .user_details import *
 from .previous_name import *
 from .previous_address import *
 
+from .previous_registration_details import *

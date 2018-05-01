@@ -7,10 +7,16 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
+from django.views import View
 
+from ..forms.form import AdultInYourHomeForm, CheckBox, ChildInYourHomeForm, CommentsForm, DBSCheckForm, FirstAidTrainingForm, \
+    HealthForm, LogInDetailsForm, OtherPeopleInYourHomeForm, PersonalDetailsForm, ReferencesForm, ReferencesForm2, PreviousRegistrationDetailsForm
 from ..forms.form import AdultInYourHomeForm, ChildInYourHomeForm, CommentsForm, DBSCheckForm, FirstAidTrainingForm, \
     HealthForm, LogInDetailsForm, ReferencesForm, ReferencesForm2
 from ..magic_link import generate_magic_link
+from ..models import AdultInHome, ApplicantHomeAddress, ApplicantName, ApplicantPersonalDetails, Application, Arc, \
+    ArcComments, ChildInHome, ChildcareType, CriminalRecordCheck, FirstAidTraining, HealthDeclarationBooklet, Reference, \
+    UserDetails, PreviousRegistrationDetails
 from ..models import ApplicantName, ApplicantPersonalDetails, Application, Arc, \
     ArcComments, ChildcareType, CriminalRecordCheck, FirstAidTraining, HealthDeclarationBooklet, Reference, \
     UserDetails
@@ -671,3 +677,45 @@ def other_people_initial_population(adult, person_list):
                 pass
         initial_data.append(temp_dict)
     return initial_data
+
+
+class PreviousRegistrationDetailsView(View):
+
+    def get(self, request):
+        application_id_local = request.GET["id"]
+        form = PreviousRegistrationDetailsForm(id=application_id_local)
+        variables = {
+            'form': form,
+            'application_id': application_id_local,
+        }
+        return render(request, 'add-previous-registration.html', context=variables)
+
+    def post(self, request):
+        application_id_local = request.POST["id"]
+        form = PreviousRegistrationDetailsForm(request.POST, id=application_id_local)
+        if form.is_valid():
+
+            app = Application.objects.get(pk=application_id_local)
+            previous_registration = form.cleaned_data.get('previous_registration')
+            individual_id = form.cleaned_data.get('individual_id')
+            five_years_in_UK = form.cleaned_data.get('five_years_in_UK')
+
+            if PreviousRegistrationDetails.objects.filter(application_id=app).exists():
+                previous_reg_details = PreviousRegistrationDetails.objects.get(application_id=app)
+            else:
+                previous_reg_details = PreviousRegistrationDetails(application_id=app)
+
+            previous_reg_details.previous_registration = previous_registration
+            previous_reg_details.individual_id = individual_id
+            previous_reg_details.five_years_in_UK = five_years_in_UK
+            previous_reg_details.save()
+
+            redirect_link = '/personal-details/summary'
+            return HttpResponseRedirect(settings.URL_PREFIX + redirect_link + '?id=' + application_id_local)
+        else:
+            variables = {
+                'form': form,
+                'application_id': application_id_local,
+            }
+            return render(request, 'add-previous-registration.html', context=variables)
+

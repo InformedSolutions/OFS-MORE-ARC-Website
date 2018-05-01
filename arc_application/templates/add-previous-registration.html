@@ -1,0 +1,46 @@
+{% extends 'govuk_template.html' %}
+{% block page_title %}Previous registration{% endblock %}
+{% load static %}
+{% load govuk_template_base %}
+
+{% block inner_content %}
+
+{% include "back-button.html" %}
+
+{{form.error_summary}}
+
+<form method="post" novalidate>
+    <div class="form-group">
+        <h1 class="form-title heading-large">Previous registration</h1>
+
+        {% for field in form %}
+            {% if field.errors %}
+                <div class="inline form-group form-group-required error_div">
+                    <div class="form-label-bold">{{ field.label }}</div>
+                    <div class="error_message">{{ field.errors }}</div>
+                    {% if field.label == "Individual ID:" %}
+                        <div class="form-control-prev-reg-id"> {{ field }} </div>
+                    {% else %}
+                        <div class="multiple-choice-radio form-label-bold"> {{ field }} </div>
+                    {% endif %}
+                </div>
+            {% else %}
+                <div class="inline form-group form-group-required">
+                    <div class="form-label-bold">{{ field.label }}</div>
+                    {% if field.label == "Individual ID:" %}
+                        <div class="form-control-prev-reg-id"> {{ field }} </div>
+                    {% else %}
+                        <div class="multiple-choice-radio form-label-bold"> {{ field }} </div>
+                    {% endif %}
+                </div>
+            {% endif %}
+        {% endfor %}
+
+        {% csrf_token %}
+
+        <input type="submit" class="button" value="Save and continue">
+        <input type="hidden" value="{{application_id}}" name="id" />
+    </div>
+</form>
+
+{% endblock %}

@@ -1672,6 +1672,10 @@ textarea.form-control {
   width: 100%;
 }
 
+.form-control-prev-reg-id input {
+  width: 50% !important;
+}
+
 @media (min-width: 641px) {
   .form-control-1-8 {
     width: 12.5%;
@@ -1715,6 +1719,20 @@ textarea.form-control {
   cursor: none;
   visibility: hidden;
   font-size: 0px;
+}
+
+.multiple-choice-radio {
+  float: left !important;
+}
+
+.multiple-choice-radio input {
+  opacity: 0 !important;
+}
+
+.multiple-choice-radio label {
+  cursor: none;
+  visibility: visible !important;
+  font-size: 19px !important;
 }
 
 .multiple-choice [type=radio] + label::before {
