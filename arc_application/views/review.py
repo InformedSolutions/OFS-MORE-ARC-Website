@@ -319,11 +319,36 @@ def personal_details_summary(request):
 
 class PreviousRegistrationDetailsView(View):
     def get(self, request):
+        application_id_local = request.GET["id"]
         form = PreviousRegistrationDetailsForm()
         variables = {
             'form': form,
+            'application_id': application_id_local,
         }
         return render(request, 'add-previous-registration.html', context=variables)
+
+    def post(self, request):
+        application_id_local = request.POST["id"]
+        form = PreviousRegistrationDetailsForm(request.POST)
+        if form.is_valid():
+
+            app = Application.objects.get(pk=application_id_local)
+            previous_registration = form.cleaned_data.get('previous_registration')
+            five_years_in_UK = form.cleaned_data.get('five_years_in_UK')
+
+            previous_reg_details = PreviousRegistrationDetails(application_id=app,
+                                                               previous_registration=previous_registration,
+                                                               five_years_in_UK=five_years_in_UK)
+            previous_reg_details.save()
+
+            redirect_link = '/personal-details/summary'
+            return HttpResponseRedirect(settings.URL_PREFIX + redirect_link + '?id=' + application_id_local)
+        else:
+            variables = {
+                'form': form,
+                'application_id': application_id_local,
+            }
+            return render(request, 'add-previous-registration.html', context=variables)
 
 
 def first_aid_training_summary(request):
