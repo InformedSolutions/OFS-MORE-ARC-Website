@@ -5,15 +5,14 @@ import requests
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group
-from django.forms import formset_factory
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 
-from ..forms.form import AdultInYourHomeForm, CheckBox, ChildInYourHomeForm, CommentsForm, DBSCheckForm, FirstAidTrainingForm, \
-    HealthForm, LogInDetailsForm, OtherPeopleInYourHomeForm, PersonalDetailsForm, ReferencesForm, ReferencesForm2
+from ..forms.form import AdultInYourHomeForm, ChildInYourHomeForm, CommentsForm, DBSCheckForm, FirstAidTrainingForm, \
+    HealthForm, LogInDetailsForm, ReferencesForm, ReferencesForm2
 from ..magic_link import generate_magic_link
-from ..models import AdultInHome, ApplicantHomeAddress, ApplicantName, ApplicantPersonalDetails, Application, Arc, \
-    ArcComments, ChildInHome, ChildcareType, CriminalRecordCheck, FirstAidTraining, HealthDeclarationBooklet, Reference, \
+from ..models import ApplicantName, ApplicantPersonalDetails, Application, Arc, \
+    ArcComments, ChildcareType, CriminalRecordCheck, FirstAidTraining, HealthDeclarationBooklet, Reference, \
     UserDetails
 from ..review_util import redirect_selection, request_to_comment, save_comments
 from .base import release_application
@@ -182,138 +181,6 @@ def type_of_childcare_age_groups(request):
         'eight': application.eight_plus,
     }
     return render(request, 'childcare-age-groups.html', variables)
-
-
-def personal_details_summary(request):
-    """
-    Method returning the template for the Your personal details: summary page (for a given application)
-    displaying entered data for this task and navigating to the task list when successfully completed
-    :param request: a request object used to generate the HttpResponse
-    :return: an HttpResponse object with the rendered Your personal details: summary template
-    """
-    application_id_local = request.GET["id"]
-    personal_detail_id = (ApplicantPersonalDetails.objects.get(application_id=application_id_local)).personal_detail_id
-    applicant_name_id = (ApplicantName.objects.get(personal_detail_id=personal_detail_id)).name_id
-    applicant_home_address_id = (ApplicantHomeAddress.objects.get(personal_detail_id=personal_detail_id,
-                                                                  current_address=True)).home_address_id
-
-
-    TABLE_NAMES = ['APPLICANT_PERSONAL_DETAILS', 'APPLICANT_NAME', 'APPLICANT_HOME_ADDRESS']
-    PERSONAL_DETAIL_FIELDS = ['date_of_birth_declare', 'date_of_birth_comments']
-    NAME_FIELDS = ['name_declare', 'name_comments']
-    HOME_ADDRESS_FIELDS = ['home_address_declare', 'home_address_comments',
-                           'childcare_location_declare', 'childcare_location_comments']
-
-    if request.method == 'GET':
-        # Collect required ids
-        application_id_local = request.GET["id"]
-        personal_detail_id = (
-            ApplicantPersonalDetails.objects.get(application_id=application_id_local)).personal_detail_id
-        applicant_name_id = (ApplicantName.objects.get(personal_detail_id=personal_detail_id)).name_id
-        applicant_home_address_id = (ApplicantHomeAddress.objects.get(personal_detail_id=personal_detail_id,
-                                                                      current_address=True)).home_address_id
-
-        form = PersonalDetailsForm(table_keys=[personal_detail_id, applicant_name_id, applicant_home_address_id])
-
-    elif request.method == 'POST':
-        birthdate_dict = {}
-        name_dict = {}
-        address_dict = {}
-
-        form = PersonalDetailsForm(request.POST,
-                                   table_keys=[personal_detail_id, applicant_name_id, applicant_home_address_id])
-        application_id_local = request.POST["id"]
-        personal_detail_id = (
-            ApplicantPersonalDetails.objects.get(application_id=application_id_local)).personal_detail_id
-        applicant_name_id = (ApplicantName.objects.get(personal_detail_id=personal_detail_id)).name_id
-        applicant_home_address_id = (ApplicantHomeAddress.objects.get(personal_detail_id=personal_detail_id,
-                                                                      current_address=True)).home_address_id
-        if form.is_valid():
-            # Populate field dictionaries for use in request to comment funciton
-            # As the data required on this form is stored in three different tables, these must be sorted by table
-            for field in form.cleaned_data:
-                if field in PERSONAL_DETAIL_FIELDS:
-                    birthdate_dict[field] = form.cleaned_data[field]
-                if field in NAME_FIELDS:
-                    name_dict[field] = form.cleaned_data[field]
-                if field in HOME_ADDRESS_FIELDS:
-                    address_dict[field] = form.cleaned_data[field]
-
-            # Populate below lists with comments by table
-            birthdate_comments = request_to_comment(personal_detail_id, TABLE_NAMES[0], birthdate_dict)
-            name_comments = request_to_comment(applicant_name_id, TABLE_NAMES[1], name_dict)
-            address_comments = request_to_comment(applicant_home_address_id, TABLE_NAMES[2], address_dict)
-
-            birthdate_save_successful = save_comments(birthdate_comments)
-            name_save_successful = save_comments(name_comments)
-            address_save_successful = save_comments(address_comments)
-
-            if not birthdate_comments and not name_comments and not address_comments:
-                section_status = 'COMPLETED'
-            else:
-                section_status = 'FLAGGED'
-
-            if birthdate_save_successful and name_save_successful and address_save_successful:
-
-                status = Arc.objects.get(pk=application_id_local)
-                status.personal_details_review = section_status
-                status.save()
-                default = '/first-aid/summary'
-                redirect_link = redirect_selection(request, default)
-
-                return HttpResponseRedirect(settings.URL_PREFIX + redirect_link + '?id=' + application_id_local)
-
-            else:
-                return render(request, '500.html')
-
-    application_id_local = request.GET["id"]
-    personal_detail_id = ApplicantPersonalDetails.objects.get(application_id=application_id_local)
-    birth_day = personal_detail_id.birth_day
-    birth_month = personal_detail_id.birth_month
-    birth_year = personal_detail_id.birth_year
-    applicant_name_record = ApplicantName.objects.get(personal_detail_id=personal_detail_id)
-    first_name = applicant_name_record.first_name
-    middle_names = applicant_name_record.middle_names
-    last_name = applicant_name_record.last_name
-    applicant_home_address_record = ApplicantHomeAddress.objects.get(personal_detail_id=personal_detail_id,
-                                                                     current_address=True)
-    street_line1 = applicant_home_address_record.street_line1
-    street_line2 = applicant_home_address_record.street_line2
-    town = applicant_home_address_record.town
-    county = applicant_home_address_record.county
-    postcode = applicant_home_address_record.postcode
-    location_of_childcare = applicant_home_address_record.childcare_address
-    applicant_childcare_address_record = ApplicantHomeAddress.objects.get(personal_detail_id=personal_detail_id,
-                                                                          childcare_address=True)
-    childcare_street_line1 = applicant_childcare_address_record.street_line1
-    childcare_street_line2 = applicant_childcare_address_record.street_line2
-    childcare_town = applicant_childcare_address_record.town
-    childcare_county = applicant_childcare_address_record.county
-    childcare_postcode = applicant_childcare_address_record.postcode
-    application = Application.objects.get(pk=application_id_local)
-    variables = {
-        'form': form,
-        'application_id': application_id_local,
-        'first_name': first_name,
-        'middle_names': middle_names,
-        'last_name': last_name,
-        'birth_day': birth_day,
-        'birth_month': birth_month,
-        'birth_year': birth_year,
-        'street_line1': street_line1,
-        'street_line2': street_line2,
-        'town': town,
-        'county': county,
-        'postcode': postcode,
-        'location_of_childcare': location_of_childcare,
-        'childcare_street_line1': childcare_street_line1,
-        'childcare_street_line2': childcare_street_line2,
-        'childcare_town': childcare_town,
-        'childcare_county': childcare_county,
-        'childcare_postcode': childcare_postcode,
-        'personal_details_status': application.personal_details_status
-    }
-    return render(request, 'personal-details-summary.html', variables)
 
 
 def first_aid_training_summary(request):

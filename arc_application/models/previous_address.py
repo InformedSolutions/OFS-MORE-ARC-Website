@@ -14,7 +14,8 @@ class PreviousAddress(models.Model):
     # Options for type discriminator
     previous_name_types = (
         ('ADULT', 'ADULT'),
-        ('CHILD', 'CHILD')
+        ('CHILD', 'CHILD'),
+        ('APPLICANT', 'APPLICANT'),
     )
 
     # Primary key

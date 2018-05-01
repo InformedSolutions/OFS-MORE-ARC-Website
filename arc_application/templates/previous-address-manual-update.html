@@ -15,7 +15,7 @@
     <!-- Content -->
     <div class="form-group">
         <h1 class="form-title heading-large">
-            Previous address
+            Previous {% if person_type == 'APPLICANT' %}home {% endif %}address {{previous_addresses|length|add:"1"}}
         </h1>
 
         {{form.as_div}}
