@@ -225,6 +225,7 @@ class PreviousRegistrationDetailsForm(GOVUKForm):
     error_summary_title = 'There was a problem on this page'
     field_label_classes = 'form-label-bold'
     auto_replace_widgets = True
+    reveal_conditionally = {'previous_registration': {True: 'individual_id'}}
 
     choices = (
         (False, 'No'),
@@ -233,9 +234,12 @@ class PreviousRegistrationDetailsForm(GOVUKForm):
 
     previous_registration = forms.ChoiceField(choices=choices, label='Has the applicant previously registered with Ofsted?',
                                               widget=InlineRadioSelect, required=True, error_messages={'required': "Please select one"})
-    individual_id = forms.IntegerField(label='Individual ID:', widget=NumberInput(), required=False)
+    custom_number_input=NumberInput()
+    custom_number_input.input_classes = 'form-control form-control-1-4'
+    individual_id = forms.IntegerField(label='Individual ID:', widget=custom_number_input, required=False)
     five_years_in_UK = forms.ChoiceField(choices=choices, label='Has the applicant lived in England for more than 5 years?',
                                          widget=InlineRadioSelect, required=True, error_messages={'required': "Please select one"})
+
 
     def __init__(self, *args, **kwargs):
         self.application_id_local = kwargs.pop('id')
@@ -251,7 +255,10 @@ class PreviousRegistrationDetailsForm(GOVUKForm):
             previous_registration = self.cleaned_data['previous_registration']
         except:
             previous_registration = None
-        individual_id = self.cleaned_data['individual_id']
+        if previous_registration == 'True':
+            individual_id = self.cleaned_data['individual_id']
+        else:
+            individual_id = None
         if previous_registration=='True':
             if individual_id is None:
                 raise forms.ValidationError("Please select one")
