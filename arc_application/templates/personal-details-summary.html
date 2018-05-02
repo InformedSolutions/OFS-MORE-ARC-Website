@@ -363,6 +363,7 @@
                             <a href="{{ URL_PREFIX }}/personal-details/previous-registration/?id={{application_id}}">Change</a>
                         </td>
                     </tr>
+                    {% if individual_id != 'None' %}
                     <tr>
                         <td>
                             Individual ID
@@ -378,6 +379,7 @@
                             <a href="{{ URL_PREFIX }}/personal-details/previous-registration/?id={{application_id}}">Change</a>
                         </td>
                     </tr>
+                    {% endif %}
                     <tr>
                         <td>
                             Has the applicant lived in England for more than 5 years?
