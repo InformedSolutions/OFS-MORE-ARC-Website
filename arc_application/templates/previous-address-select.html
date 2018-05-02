@@ -23,7 +23,7 @@
         {% if not form.errors %}
         <div id="id_postcode-group" class="form-group-required form-group">
             <label id="id_postcode-label" class="form-label-bold" for="id_postcode">
-                <b>{{form.postcode.label}}</b>
+                {{form.postcode.label}}
             </label>
             {{form.postcode}}
         </div>
