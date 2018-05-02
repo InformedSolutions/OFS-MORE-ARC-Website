@@ -255,7 +255,10 @@ class PreviousRegistrationDetailsForm(GOVUKForm):
             previous_registration = self.cleaned_data['previous_registration']
         except:
             previous_registration = None
-        individual_id = self.cleaned_data['individual_id']
+        if previous_registration == 'True':
+            individual_id = self.cleaned_data['individual_id']
+        else:
+            individual_id = None
         if previous_registration=='True':
             if individual_id is None:
                 raise forms.ValidationError("Please select one")
