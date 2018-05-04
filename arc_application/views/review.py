@@ -476,32 +476,6 @@ def health_check_answers(request):
     return render(request, 'health-check-answers.html', variables)
 
 
-def comments(request):
-    """
-    This is the arc comments page
-    :param request: a request object used to generate the HttpResponse
-    :return: an HttpResponse object with the rendered Your arc comments template
-    """
-    if request.method == 'GET':
-        application_id_local = request.GET["id"]
-        form = CommentsForm(request.POST, id=application_id_local)
-    if request.method == 'POST':
-        application_id_local = request.POST["id"]
-        form = CommentsForm(request.POST, id=application_id_local)
-        if form.is_valid():
-            comments = form.cleaned_data['comments']
-            if Arc.objects.filter(application_id=application_id_local):
-                arc = Arc.objects.get(application_id=application_id_local)
-                arc.comments = comments
-                arc.save()
-        return review(request)
-    variables = {
-        'form': form,
-        'application_id': application_id_local,
-    }
-    return render(request, 'comments.html', variables)
-
-
 def review(request):
     """
     Confirmation Page
