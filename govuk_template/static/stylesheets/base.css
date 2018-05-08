@@ -2732,3 +2732,23 @@ float:right;
   background-color: #eee;
   color: #000;
 }
+
+.information-panel {
+    background-color: #bfc1c3;
+    margin-left: 15px;
+    padding: 10px;
+    margin-top: 15px;
+    float: left;
+    width: 30%;
+}
+
+.cross [type=checkbox] + label::after {
+    content: "X" !important;
+    font: icon;
+    font-weight: bold;
+    font-size: 30px;
+    border-width: 0;
+    transform: none !important;
+    left: 9px;
+    top: 3px;
+}

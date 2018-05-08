@@ -136,8 +136,7 @@ class TestArcFunctions(LiveServerTestCase):
             self.login_as_arc_user()
             selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='New application']").click()
             selenium_task_executor.get_driver().find_element_by_link_text("Review").click()
-            self.assertEqual("Application overview",
-                             selenium_task_executor.get_driver().find_element_by_xpath("//main[@id='content']/div[2]/div/header/h1").text)
+            self.assertEqual("Application overview", selenium_task_executor.get_driver().title)
             self.release_arc_application()
         except Exception as e:
             self.capture_screenshot()
@@ -176,7 +175,6 @@ class TestArcFunctions(LiveServerTestCase):
             self.login_as_arc_user()
             selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='New application']").click()
             selenium_task_executor.get_driver().find_element_by_link_text("Review").click()
-            selenium_task_executor.get_driver().find_element_by_xpath("//main[@id='content']/div[2]/div").click()
             selenium_task_executor.get_driver().find_element_by_xpath("//tr[@id='account_details']/td/a/span").click()
             WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("Review: your login details"))
             selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Confirm and continue']").click()
@@ -219,7 +217,6 @@ class TestArcFunctions(LiveServerTestCase):
 
             selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='New application']").click()
             selenium_task_executor.get_driver().find_element_by_link_text("Review").click()
-            selenium_task_executor.get_driver().find_element_by_xpath("//main[@id='content']/div[2]/div").click()
             selenium_task_executor.get_driver().find_element_by_xpath("//tr[@id='account_details']/td/a/span").click()
             WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("Review: your login details"))
 
