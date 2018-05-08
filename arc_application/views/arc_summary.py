@@ -136,8 +136,9 @@ def load_json(application_id_local):
 
     child_home_table = load_child_home(application)
 
-    table_list = [login_details_table, childcare_type_table, personal_detail_table, first_aid_table, criminal_record_table,
-            health_check_table, first_reference_table, second_reference_table, adult_home_table, child_home_table]
+    table_list = [login_details_table, childcare_type_table, personal_detail_table, first_aid_table,
+                  criminal_record_table,
+                  health_check_table, first_reference_table, second_reference_table, adult_home_table, child_home_table]
     l = []
     for i in table_list:
         if not i:
@@ -197,10 +198,14 @@ def load_personal_detail_table(app):
             applicant_record = ApplicantPersonalDetails.objects.get(application_id=app)
 
             if ApplicantHomeAddress.objects.filter(application_id=app, current_address=True).exists():
-                applicant_home_address_record = ApplicantHomeAddress.objects.get(application_id=app, current_address=True)
+                applicant_home_address_record = ApplicantHomeAddress.objects.get(application_id=app,
+                                                                                 current_address=True)
 
-                if ApplicantHomeAddress.objects.filter(application_id=app, childcare_address=True, current_address=False).exists():
-                    childcare_address_record = ApplicantHomeAddress.objects.get(application_id=app, childcare_address=True, current_address=False)
+                if ApplicantHomeAddress.objects.filter(application_id=app, childcare_address=True,
+                                                       current_address=False).exists():
+                    childcare_address_record = ApplicantHomeAddress.objects.get(application_id=app,
+                                                                                childcare_address=True,
+                                                                                current_address=False)
                     childcare_address = childcare_address_record.street_line1 + ', ' + childcare_address_record.street_line2 \
                                         + ', ' + childcare_address_record.town + ', ' + childcare_address_record.postcode
                 else:
@@ -259,9 +264,9 @@ def load_health_check(app):
         hdb_record = HealthDeclarationBooklet.objects.get(application_id=app)
 
         table = [
-        {"title": "Health checks", "id": hdb_record.pk},
-        {"name": "Provide a Health Declaration Booklet?", "value": hdb_record.send_hdb_declare}
-    ]
+            {"title": "Health checks", "id": hdb_record.pk},
+            {"name": "Provide a Health Declaration Booklet?", "value": hdb_record.send_hdb_declare}
+        ]
         return table
     return False
 
@@ -275,16 +280,16 @@ def load_reference(app, num):
         if num == 2:
             ref_num = 'Second'
         table = [
-        {"title": ref_num +" reference", "id": first_reference_record.pk},
-        {"name": "Full name", "value": first_reference_record.first_name + ' ' + first_reference_record.last_name},
-        {"name": "How they know you", "value": first_reference_record.relationship},
-        {"name": "Known for", "value": str(first_reference_record.months_known) + ' months, ' + str(
-            first_reference_record.years_known) + ' years'},
-        {"name": "Address", "value": ref1_address},
-        {"name": "Phone number", "value": first_reference_record.phone_number},
-        {"name": "Email address", "value": first_reference_record.email}
+            {"title": ref_num + " reference", "id": first_reference_record.pk},
+            {"name": "Full name", "value": first_reference_record.first_name + ' ' + first_reference_record.last_name},
+            {"name": "How they know you", "value": first_reference_record.relationship},
+            {"name": "Known for", "value": str(first_reference_record.months_known) + ' months, ' + str(
+                first_reference_record.years_known) + ' years'},
+            {"name": "Address", "value": ref1_address},
+            {"name": "Phone number", "value": first_reference_record.phone_number},
+            {"name": "Email address", "value": first_reference_record.email}
 
-    ]
+        ]
         return table
     return False
 
@@ -294,9 +299,9 @@ def load_adult_home(app):
         login_record = UserDetails.objects.get(application_id=app)
 
         table = [
-        {"title": "Adults in your home", "id": login_record.pk},
-        {"name": "Do you live with anyone who is 16 or over?", "value": app.adults_in_home}
-    ]
+            {"title": "Adults in your home", "id": login_record.pk},
+            {"name": "Do you live with anyone who is 16 or over?", "value": app.adults_in_home}
+        ]
         return table
     return False
 
@@ -306,11 +311,8 @@ def load_child_home(app):
         login_record = UserDetails.objects.get(application_id=app)
 
         table = [
-        {"title": "Children in your home", "id": login_record.pk},
-        {"name": "Do you live with any children?", "value": app.children_in_home}
-    ]
+            {"title": "Children in your home", "id": login_record.pk},
+            {"name": "Do you live with any children?", "value": app.children_in_home}
+        ]
         return table
     return False
-
-
-

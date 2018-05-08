@@ -1,6 +1,3 @@
-import json
-from datetime import datetime
-
 from django import forms
 from django.conf import settings
 from django.contrib.auth import authenticate, login as auth_login
@@ -16,9 +13,7 @@ from django.urls import reverse
 from govuk_forms.forms import GOVUKForm
 from timeline_logger.models import TimelineLog
 
-
-from ..models import ApplicantName, ApplicantPersonalDetails, Application, Arc, ArcComments, \
-    ApplicantHomeAddress, AdultInHome, CriminalRecordCheck, FirstAidTraining, Reference
+from ..models import ApplicantName, ApplicantPersonalDetails, Application, Arc
 
 
 @login_required()
@@ -261,6 +256,7 @@ def release(request, application_id):
     """
     return release_application(request, application_id, 'SUBMITTED')
 
+
 # TRIGGER
 # This is where all applications are released (3 different messages)
 # 1. If status == 'COMPLETED' it has been released by Arc User (not mentioned in BDD)
@@ -294,7 +290,6 @@ def release_application(request, application_id, status):
         app = Application.objects.get(application_id=application_id)
         app.application_status = status
         app.save()
-
 
     if Arc.objects.filter(application_id=application_id).exists():
         arc = Arc.objects.get(pk=application_id)
@@ -336,7 +331,7 @@ class AuditlogListView(ListView):
             context['back'] = reverse('search')
 
         if has_group(self.request.user, settings.ARC_GROUP):
-            context['back'] =  reverse('task_list') + '?id=' + self.request.GET.get('id')
+            context['back'] = reverse('task_list') + '?id=' + self.request.GET.get('id')
 
         return context
 

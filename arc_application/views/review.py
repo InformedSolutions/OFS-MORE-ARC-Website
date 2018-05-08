@@ -1,7 +1,7 @@
 import json
 import time
-
 import requests
+
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group
@@ -9,18 +9,11 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.views import View
 
-from ..forms.form import AdultInYourHomeForm, CheckBox, ChildInYourHomeForm, CommentsForm, DBSCheckForm, FirstAidTrainingForm, \
-    HealthForm, LogInDetailsForm, OtherPeopleInYourHomeForm, PersonalDetailsForm, ReferencesForm, ReferencesForm2, PreviousRegistrationDetailsForm
-from ..forms.form import AdultInYourHomeForm, ChildInYourHomeForm, CommentsForm, DBSCheckForm, FirstAidTrainingForm, \
-    HealthForm, LogInDetailsForm, ReferencesForm, ReferencesForm2
+from ..forms.form import PreviousRegistrationDetailsForm
+from ..forms.form import AdultInYourHomeForm, ChildInYourHomeForm, CommentsForm
 from ..magic_link import generate_magic_link
-from ..models import AdultInHome, ApplicantHomeAddress, ApplicantName, ApplicantPersonalDetails, Application, Arc, \
-    ArcComments, ChildInHome, ChildcareType, CriminalRecordCheck, FirstAidTraining, HealthDeclarationBooklet, Reference, \
-    UserDetails, PreviousRegistrationDetails
-from ..models import ApplicantName, ApplicantPersonalDetails, Application, Arc, \
-    ArcComments, ChildcareType, CriminalRecordCheck, FirstAidTraining, HealthDeclarationBooklet, Reference, \
-    UserDetails
-from ..review_util import redirect_selection, request_to_comment, save_comments
+from ..models import PreviousRegistrationDetails
+from ..models import ApplicantName, ApplicantPersonalDetails, Application, Arc, ArcComments, ChildcareType, UserDetails
 from .base import release_application
 
 
@@ -85,397 +78,6 @@ def task_list(request):
     return render(request, 'task-list.html', application_status_context)
 
 
-def contact_summary(request):
-    """
-    Method returning the template for the Your login and contact details: summary page (for a given application)
-    displaying entered data for this task and navigating to the Type of childcare page when successfully completed
-    :param request: a request object used to generate the HttpResponse
-    :return: an HttpResponse object with the rendered Your login and contact details: summary template
-    """
-    TABLE_NAME = 'USER_DETAILS'
-
-    if request.method == 'GET':
-        application_id_local = request.GET["id"]
-        application = Application.objects.get(pk=application_id_local)
-        account = UserDetails.objects.get(application_id=application)
-        login_id = account.login_id
-        # Table keys are supplied in a list format for use in init
-        form = LogInDetailsForm(table_keys=[login_id])
-        application_id_local = request.GET["id"]
-    elif request.method == 'POST':
-        # Populate the form with the received data
-        application_id_local = request.POST["id"]
-        application = Application.objects.get(pk=application_id_local)
-        account = UserDetails.objects.get(application_id=application)
-        login_id = account.login_id
-        form = LogInDetailsForm(request.POST, table_keys=[login_id])
-
-        if form.is_valid():
-            # Convert the data from the form into a series of comments with the
-            # table id to be stored in the ARC COMMENTS Table
-            comment_list = request_to_comment(login_id, TABLE_NAME, form.cleaned_data)
-            save_successful = save_comments(comment_list)
-
-            # If no comments have been made, the status has not been flagged
-            # Therefore it has been completed
-            if not comment_list:
-                section_status = 'COMPLETED'
-            else:
-                section_status = 'FLAGGED'
-
-            # If the save has been successful , save and redirect
-            if save_successful:
-                status = Arc.objects.get(pk=application_id_local)
-                status.login_details_review = section_status
-                status.save()
-                default = '/childcare/age-groups'
-                redirect_link = redirect_selection(request, default)
-
-                return HttpResponseRedirect(settings.URL_PREFIX + redirect_link + '?id=' + application_id_local)
-            else:
-                return ChildProcessError
-
-    application = Application.objects.get(pk=application_id_local)
-    user_details = UserDetails.objects.get(application_id=application)
-    email = user_details.email
-    mobile_number = user_details.mobile_number
-    add_phone_number = user_details.add_phone_number
-    security_question = user_details.security_question
-    security_answer = user_details.security_answer
-    variables = {
-        'form': form,
-        'application_id': application_id_local,
-        'email': email,
-        'mobile_number': mobile_number,
-        'add_phone_number': add_phone_number,
-        'security_question': security_question,
-        'security_answer': security_answer,
-        'login_details_status': application.login_details_status,
-        'childcare_type_status': application.childcare_type_status
-    }
-    return render(request, 'contact-summary.html', variables)
-
-
-def type_of_childcare_age_groups(request):
-    """
-    Method returning the template for the Type of childcare: age groups page (for a given application) and navigating
-    to the task list when successfully completed; business logic is applied to either create or update the
-    associated Childcare_Type record
-    :param request: a request object used to generate the HttpResponse
-    :return: an HttpResponse object with the rendered Type of childcare: age groups template
-    """
-
-    if request.method == 'GET':
-        application_id_local = request.GET["id"]
-    elif request.method == 'POST':
-        # As there is no actual flagging to be done for this section, the status is just set to completed on POST
-        application_id_local = request.POST["id"]
-        status = Arc.objects.get(pk=application_id_local)
-        status.childcare_type_review = 'COMPLETED'
-        status.save()
-        default = '/personal-details/summary'
-        redirect_link = redirect_selection(request, default)
-
-        return HttpResponseRedirect(settings.URL_PREFIX + redirect_link + '?id=' + application_id_local)
-    application_id_local = request.GET["id"]
-    application = ChildcareType.objects.get(application_id=application_id_local)
-
-    variables = {
-        'application_id': str(application_id_local),
-        'zero': application.zero_to_five,
-        'five': application.five_to_eight,
-        'eight': application.eight_plus,
-    }
-    return render(request, 'childcare-age-groups.html', variables)
-
-
-def first_aid_training_summary(request):
-    """
-    Method returning the template for the First aid training: summary page (for a given application)
-    displaying entered data for this task and navigating to the task list when successfully completed
-    :param request: a request object used to generate the HttpResponse
-    :return: an HttpResponse object with the rendered First aid training: summary template
-    """
-    TABLE_NAME = 'FIRST_AID_TRAINING'
-
-    if request.method == 'GET':
-        application_id_local = request.GET["id"]
-        first_aid_id = FirstAidTraining.objects.get(application_id=application_id_local).first_aid_id
-        form = FirstAidTrainingForm(table_keys=[first_aid_id])
-
-    elif request.method == 'POST':
-        application_id_local = request.POST["id"]
-        first_aid_id = FirstAidTraining.objects.get(application_id=application_id_local).first_aid_id
-        form = FirstAidTrainingForm(request.POST, table_keys=[application_id_local])
-
-        if form.is_valid():
-            comment_list = request_to_comment(first_aid_id, TABLE_NAME, form.cleaned_data)
-            save_successful = save_comments(comment_list)
-
-            if not comment_list:
-                section_status = 'COMPLETED'
-            else:
-                section_status = 'FLAGGED'
-
-            if save_successful:
-                status = Arc.objects.get(pk=application_id_local)
-                status.first_aid_review = section_status
-                status.save()
-                default = '/dbs-check/summary'
-                redirect_link = redirect_selection(request, default)
-
-                return HttpResponseRedirect(settings.URL_PREFIX + redirect_link + '?id=' + application_id_local)
-            else:
-                return render(request, '500.html')
-
-    training_organisation = FirstAidTraining.objects.get(application_id=application_id_local).training_organisation
-    training_course = FirstAidTraining.objects.get(application_id=application_id_local).course_title
-    certificate_day = FirstAidTraining.objects.get(application_id=application_id_local).course_day
-    certificate_month = FirstAidTraining.objects.get(application_id=application_id_local).course_month
-    certificate_year = FirstAidTraining.objects.get(application_id=application_id_local).course_year
-    application = Application.objects.get(pk=application_id_local)
-    variables = {
-        'form': form,
-        'application_id': application_id_local,
-        'training_organisation': training_organisation,
-        'training_course': training_course,
-        'certificate_day': certificate_day,
-        'certificate_month': certificate_month,
-        'certificate_year': certificate_year,
-        'first_aid_training_status': application.first_aid_training_status
-    }
-    return render(request, 'first-aid-summary.html', variables)
-
-
-def dbs_check_summary(request):
-    """
-    Method returning the template for the Your criminal record (DBS) check: summary page (for a given application)
-    displaying entered data for this task and navigating to the task list when successfully completed
-    :param request: a request object used to generate the HttpResponse
-    :return: an HttpResponse object with the rendered Your criminal record (DBS) check: summary template
-    """
-    TABLE_NAME = 'CRIMINAL_RECORD_CHECK'
-
-    if request.method == 'GET':
-        application_id_local = request.GET["id"]
-        criminal_record_id = CriminalRecordCheck.objects.get(application_id=application_id_local).criminal_record_id
-
-        form = DBSCheckForm(table_keys=[criminal_record_id])
-    elif request.method == 'POST':
-        application_id_local = request.POST["id"]
-        criminal_record_id = CriminalRecordCheck.objects.get(application_id=application_id_local).criminal_record_id
-        form = DBSCheckForm(request.POST, table_keys=[criminal_record_id])
-
-        if form.is_valid():
-            comment_list = request_to_comment(criminal_record_id, TABLE_NAME, form.cleaned_data)
-            save_successful = save_comments(comment_list)
-
-            if not comment_list:
-                section_status = 'COMPLETED'
-            else:
-                section_status = 'FLAGGED'
-
-            if save_successful:
-                status = Arc.objects.get(pk=application_id_local)
-                status.dbs_review = section_status
-                status.save()
-                default = '/health/check-answers'
-                redirect_link = redirect_selection(request, default)
-
-                return HttpResponseRedirect(settings.URL_PREFIX + redirect_link + '?id=' + application_id_local)
-            else:
-                return render(request, '500.html')
-
-    criminal_record_check = CriminalRecordCheck.objects.get(application_id=application_id_local)
-    dbs_certificate_number = criminal_record_check.dbs_certificate_number
-    cautions_convictions = criminal_record_check.cautions_convictions
-    send_certificate_declare = criminal_record_check.send_certificate_declare
-    application = Application.objects.get(pk=application_id_local)
-    variables = {
-        'form': form,
-        'application_id': application_id_local,
-        'dbs_certificate_number': dbs_certificate_number,
-        'cautions_convictions': cautions_convictions,
-        'criminal_record_check_status': application.criminal_record_check_status,
-        'declaration': send_certificate_declare
-    }
-    return render(request, 'dbs-check-summary.html', variables)
-
-
-def references_summary(request):
-    """
-    Method returning the template for the 2 references: summary page (for a given application)
-    displaying entered data for this task and navigating to the task list when successfully completed
-    :param request: a request object used to generate the HttpResponse
-    :return: an HttpResponse object with the rendered 2 references: summary template
-    """
-    TABLE_NAME = 'REFERENCE'
-
-    if request.method == 'GET':
-        application_id_local = request.GET["id"]
-
-        reference_id_1 = Reference.objects.get(application_id=application_id_local, reference=1).reference_id
-        reference_id_2 = Reference.objects.get(application_id=application_id_local, reference=2).reference_id
-
-        form = ReferencesForm(table_keys=[reference_id_1], prefix="form")
-        form2 = ReferencesForm2(table_keys=[reference_id_2], prefix="form2")
-    elif request.method == 'POST':
-        form1_dict = {}
-        form2_dict = {}
-
-        # Grab necessary IDs
-        application_id_local = request.POST["id"]
-        reference_id_1 = Reference.objects.get(application_id=application_id_local, reference=1).reference_id
-        reference_id_2 = Reference.objects.get(application_id=application_id_local, reference=2).reference_id
-
-        # Grab form data from post
-        form = ReferencesForm(request.POST, table_keys=[reference_id_1], prefix="form")
-        form2 = ReferencesForm2(request.POST, table_keys=[reference_id_2], prefix="form2")
-
-        # As form data prefixed in above lines to separate the two forms, this prefix must be removed before
-        # storage, this is to allow for easier retrieval form the database
-
-        if form.is_valid() and form2.is_valid():
-
-            # Get comments to be saved
-            form_comments = request_to_comment(reference_id_1, TABLE_NAME, form.cleaned_data)
-            form2_comments = request_to_comment(reference_id_2, TABLE_NAME, form2.cleaned_data)
-
-            # Save the comments
-            reference1_saved = save_comments(form_comments)
-            reference2_saved = save_comments(form2_comments)
-
-            if not form_comments and not form2_comments:
-                section_status = 'COMPLETED'
-            else:
-                section_status = 'FLAGGED'
-
-            if reference1_saved and reference2_saved:
-                status = Arc.objects.get(pk=application_id_local)
-                status.references_review = section_status
-                status.save()
-                default = '/other-people/summary'
-                redirect_link = redirect_selection(request, default)
-
-                return HttpResponseRedirect(settings.URL_PREFIX + redirect_link + '?id=' + application_id_local)
-            else:
-                return render(request, '500.html')
-
-    first_reference_record = Reference.objects.get(application_id=application_id_local, reference=1)
-    second_reference_record = Reference.objects.get(application_id=application_id_local, reference=2)
-    first_reference_first_name = first_reference_record.first_name
-    first_reference_last_name = first_reference_record.last_name
-    first_reference_relationship = first_reference_record.relationship
-    first_reference_years_known = first_reference_record.years_known
-    first_reference_months_known = first_reference_record.months_known
-    first_reference_street_line1 = first_reference_record.street_line1
-    first_reference_street_line2 = first_reference_record.street_line2
-    first_reference_town = first_reference_record.town
-    first_reference_county = first_reference_record.county
-    first_reference_country = first_reference_record.country
-    first_reference_postcode = first_reference_record.postcode
-    first_reference_phone_number = first_reference_record.phone_number
-    first_reference_email = first_reference_record.email
-    second_reference_first_name = second_reference_record.first_name
-    second_reference_last_name = second_reference_record.last_name
-    second_reference_relationship = second_reference_record.relationship
-    second_reference_years_known = second_reference_record.years_known
-    second_reference_months_known = second_reference_record.months_known
-    second_reference_street_line1 = second_reference_record.street_line1
-    second_reference_street_line2 = second_reference_record.street_line2
-    second_reference_town = second_reference_record.town
-    second_reference_county = second_reference_record.county
-    second_reference_country = second_reference_record.country
-    second_reference_postcode = second_reference_record.postcode
-    second_reference_phone_number = second_reference_record.phone_number
-    second_reference_email = second_reference_record.email
-    application = Application.objects.get(pk=application_id_local)
-    variables = {
-        'form': form,
-        'form2': form2,
-        'application_id': application_id_local,
-        'first_reference_first_name': first_reference_first_name,
-        'first_reference_last_name': first_reference_last_name,
-        'first_reference_relationship': first_reference_relationship,
-        'first_reference_years_known': first_reference_years_known,
-        'first_reference_months_known': first_reference_months_known,
-        'first_reference_street_line1': first_reference_street_line1,
-        'first_reference_street_line2': first_reference_street_line2,
-        'first_reference_town': first_reference_town,
-        'first_reference_county': first_reference_county,
-        'first_reference_country': first_reference_country,
-        'first_reference_postcode': first_reference_postcode,
-        'first_reference_phone_number': first_reference_phone_number,
-        'first_reference_email': first_reference_email,
-        'second_reference_first_name': second_reference_first_name,
-        'second_reference_last_name': second_reference_last_name,
-        'second_reference_relationship': second_reference_relationship,
-        'second_reference_years_known': second_reference_years_known,
-        'second_reference_months_known': second_reference_months_known,
-        'second_reference_street_line1': second_reference_street_line1,
-        'second_reference_street_line2': second_reference_street_line2,
-        'second_reference_town': second_reference_town,
-        'second_reference_county': second_reference_county,
-        'second_reference_country': second_reference_country,
-        'second_reference_postcode': second_reference_postcode,
-        'second_reference_phone_number': second_reference_phone_number,
-        'second_reference_email': second_reference_email,
-        'references_status': application.references_status
-    }
-    return render(request, 'references-summary.html', variables)
-
-
-def health_check_answers(request):
-    """
-    Method returning the template for the Your health: answers page (for a given application)
-    displaying entered data for this task and navigating to the task list when successfully completed
-    :param request: a request object used to generate the HttpResponse
-    :return: an HttpResponse object with the rendered Your health: answers template
-    """
-    TABLE_NAME = 'HDB'
-
-    if request.method == 'GET':
-        application_id_local = request.GET["id"]
-        hdb_id = HealthDeclarationBooklet.objects.get(application_id=application_id_local).hdb_id
-        form = HealthForm(table_keys=[hdb_id])
-
-    elif request.method == 'POST':
-        application_id_local = request.POST["id"]
-        hdb_id = HealthDeclarationBooklet.objects.get(application_id=application_id_local).hdb_id
-        form = HealthForm(request.POST, table_keys=[hdb_id])
-
-        if form.is_valid():
-            comment_list = request_to_comment(hdb_id, TABLE_NAME, form.cleaned_data)
-            save_successful = save_comments(comment_list)
-
-            if not comment_list:
-                section_status = 'COMPLETED'
-            else:
-                section_status = 'FLAGGED'
-
-            if save_successful:
-                status = Arc.objects.get(pk=application_id_local)
-                status.health_review = section_status
-                status.save()
-                default = '/references/summary'
-                redirect_link = redirect_selection(request, default)
-
-                return HttpResponseRedirect(settings.URL_PREFIX + redirect_link + '?id=' + application_id_local)
-
-            else:
-                return render(request, '500.html')
-
-    send_hdb_declare = HealthDeclarationBooklet.objects.get(application_id=application_id_local).send_hdb_declare
-    application = Application.objects.get(pk=application_id_local)
-    variables = {
-        'form': form,
-        'application_id': application_id_local,
-        'send_hdb_declare': send_hdb_declare,
-        'health_status': application.health_status,
-    }
-    return render(request, 'health-check-answers.html', variables)
-
-
 def comments(request):
     """
     This is the arc comments page
@@ -485,20 +87,26 @@ def comments(request):
     if request.method == 'GET':
         application_id_local = request.GET["id"]
         form = CommentsForm(request.POST, id=application_id_local)
+
     if request.method == 'POST':
         application_id_local = request.POST["id"]
         form = CommentsForm(request.POST, id=application_id_local)
+
         if form.is_valid():
             comments = form.cleaned_data['comments']
+
             if Arc.objects.filter(application_id=application_id_local):
                 arc = Arc.objects.get(application_id=application_id_local)
                 arc.comments = comments
                 arc.save()
+
         return review(request)
+
     variables = {
         'form': form,
         'application_id': application_id_local,
     }
+
     return render(request, 'comments.html', variables)
 
 
@@ -513,9 +121,11 @@ def review(request):
     account = UserDetails.objects.get(application_id=application)
     login_id = account.pk
     first_name = ''
+
     if UserDetails.objects.filter(login_id=login_id).exists():
         user_details = UserDetails.objects.get(login_id=login_id)
         email = user_details.email
+
         if ApplicantPersonalDetails.objects.filter(application_id=application_id_local).exists():
             personal_details = ApplicantPersonalDetails.objects.get(application_id=application_id_local)
             applicant_name = ApplicantName.objects.get(personal_detail_id=personal_details.personal_detail_id)
@@ -528,7 +138,8 @@ def review(request):
         variables = {
             'application_id': application_id_local,
         }
-        return render(request, 'review-confirmation.html')
+
+        return render(request, 'review-confirmation.html', variables)
 
     else:
         release_application(request, application_id_local, 'FURTHER_INFORMATION')
@@ -553,9 +164,11 @@ def review(request):
             app.references_status = arc.references_review
             app.people_in_home_status = arc.people_in_home_review
             app.save()
+
         variables = {
             'application_id': application_id_local,
         }
+
         return render(request, 'review-sent-back.html', variables)
 
     variables = {
@@ -571,6 +184,7 @@ def has_group(user, group_name):
     :return: True if user is in group, else false
     """
     group = Group.objects.get(name=group_name)
+
     return True if group in user.groups.all() else False
 
 
@@ -585,9 +199,12 @@ def all_complete(id, flag):
         list = [arc.login_details_review, arc.childcare_type_review, arc.personal_details_review,
                 arc.first_aid_review, arc.dbs_review, arc.health_review, arc.references_review,
                 arc.people_in_home_review]
+
         for i in list:
+
             if (i == 'NOT_STARTED' and not flag) or (i != 'COMPLETED' and flag):
                 return False
+
         return True
 
 
@@ -615,6 +232,7 @@ def accepted_email(email, first_name, ref):
         r = requests.post(base_request_url + '/api/v1/notifications/email/',
                           data,
                           headers=header)
+
         return r
 
 
@@ -643,17 +261,17 @@ def returned_email(email, first_name, ref, link):
         r = requests.post(base_request_url + '/api/v1/notifications/email/',
                           data,
                           headers=header)
+
         return r
 
 
 # Including the below file elsewhere caused cyclical import error, keeping here till this can be debugged
-
-
 def other_people_initial_population(adult, person_list):
     initial_data = []
 
     for person in person_list:
         temp_dict = {}
+
         if not adult:
             table_id = person.child_id
             form_instance = ChildInYourHomeForm()
@@ -663,6 +281,7 @@ def other_people_initial_population(adult, person_list):
 
         for field in form_instance.fields:
             try:
+
                 if field[-8:] == 'comments':
                     field_name_local = field[:-9]
                     comment = (ArcComments.objects.filter(table_pk=table_id).get(field_name=field_name_local)).comment
@@ -675,7 +294,9 @@ def other_people_initial_population(adult, person_list):
 
             except ArcComments.DoesNotExist:
                 pass
+
         initial_data.append(temp_dict)
+
     return initial_data
 
 
@@ -688,17 +309,18 @@ class PreviousRegistrationDetailsView(View):
             'form': form,
             'application_id': application_id_local,
         }
+
         return render(request, 'add-previous-registration.html', context=variables)
 
     def post(self, request):
         application_id_local = request.POST["id"]
         form = PreviousRegistrationDetailsForm(request.POST, id=application_id_local)
-        if form.is_valid():
 
+        if form.is_valid():
             app = Application.objects.get(pk=application_id_local)
             previous_registration = form.cleaned_data.get('previous_registration')
             individual_id = form.cleaned_data.get('individual_id')
-            five_years_in_UK = form.cleaned_data.get('five_years_in_UK')
+            five_years_in_uk = form.cleaned_data.get('five_years_in_UK')
 
             if PreviousRegistrationDetails.objects.filter(application_id=app).exists():
                 previous_reg_details = PreviousRegistrationDetails.objects.get(application_id=app)
@@ -707,15 +329,16 @@ class PreviousRegistrationDetailsView(View):
 
             previous_reg_details.previous_registration = previous_registration
             previous_reg_details.individual_id = individual_id
-            previous_reg_details.five_years_in_UK = five_years_in_UK
+            previous_reg_details.five_years_in_UK = five_years_in_uk
             previous_reg_details.save()
 
             redirect_link = '/personal-details/summary'
             return HttpResponseRedirect(settings.URL_PREFIX + redirect_link + '?id=' + application_id_local)
+
         else:
             variables = {
                 'form': form,
                 'application_id': application_id_local,
             }
-            return render(request, 'add-previous-registration.html', context=variables)
 
+            return render(request, 'add-previous-registration.html', context=variables)
