@@ -198,6 +198,7 @@ def postcode_submission(request, context):
         else:
             return HttpResponseRedirect(build_url('personal_details_previous_addresses', get=context))
 
+
 def address_update(request, context):
     """
     Function to allow the user to update an entry to the address table from the other people summary page

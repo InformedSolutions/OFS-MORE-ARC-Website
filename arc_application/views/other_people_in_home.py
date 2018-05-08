@@ -20,9 +20,9 @@ def other_people_summary(request):
     :return: an HttpResponse object with the rendered People in your home: summary template
     """
     # Defines the formset using formset factory
-    AdultFormSet = formset_factory(AdultInYourHomeForm)
-    ChildFormSet = formset_factory(ChildInYourHomeForm)
-    TABLE_NAMES = ['ADULT_IN_HOME', 'CHILD_IN_HOME']
+    adult_form_set = formset_factory(AdultInYourHomeForm)
+    child_form_set = formset_factory(ChildInYourHomeForm)
+    table_names = ['ADULT_IN_HOME', 'CHILD_IN_HOME']
 
     if request.method == 'GET':
         # Defines the static form at the top of the page
@@ -33,8 +33,8 @@ def other_people_summary(request):
     elif request.method == 'POST':
         application_id_local = request.POST["id"]
         form = OtherPeopleInYourHomeForm(request.POST, prefix='static', table_keys=[application_id_local])
-        child_formset = ChildFormSet(request.POST, prefix='child')
-        adult_formset = AdultFormSet(request.POST, prefix='adult')
+        child_formset = child_form_set(request.POST, prefix='child')
+        adult_formset = adult_form_set(request.POST, prefix='adult')
 
         application_id_local = request.POST["id"]
 
@@ -61,7 +61,7 @@ def other_people_summary(request):
                     person_object_list = object_list[object_index]
                     person_object = person_object_list[request_index]
                     person_id = getattr(person_object, attr_list[object_index])
-                    person_comments = request_to_comment(person_id, TABLE_NAMES[object_index], person)
+                    person_comments = request_to_comment(person_id, table_names[object_index], person)
                     if person_comments:
                         section_status = 'FLAGGED'
                     successful = save_comments(person_comments)
@@ -124,7 +124,7 @@ def other_people_summary(request):
     initial_adult_data = other_people_initial_population(True, adults_list)
 
     # Instantiates the formset with the management data defined above, forcing a set amount of forms
-    formset_adult = AdultFormSet(initial=initial_adult_data, prefix='adult')
+    formset_adult = adult_form_set(initial=initial_adult_data, prefix='adult')
 
     # Zips the formset into the list of adults
     adult_lists = zip(adult_id_list, adult_name_list, adult_birth_day_list, adult_birth_month_list,
@@ -148,7 +148,7 @@ def other_people_summary(request):
 
     initial_child_data = other_people_initial_population(False, children_list)
 
-    formset_child = ChildFormSet(initial=initial_child_data, prefix='child')
+    formset_child = child_form_set(initial=initial_child_data, prefix='child')
 
     child_lists = zip(child_id_list, child_name_list, child_birth_day_list, child_birth_month_list,
                       child_birth_year_list,
@@ -231,10 +231,10 @@ def add_previous_name(request):
         # If the action (set in the submit buttons on previous names html) is add another name, do the following
         if request.POST['action'] == "Add another name":
             # Create an empty model formset object
-            PreviousNamesFormset = modelformset_factory(PreviousName, form=OtherPersonPreviousNames)
+            previous_names_formset = modelformset_factory(PreviousName, form=OtherPersonPreviousNames)
 
             # Instantiate and populate it with post request details
-            formset = PreviousNamesFormset(request.POST)
+            formset = previous_names_formset(request.POST)
             if formset.is_valid():
                 # If its valid, save it
                 formset.save()
@@ -276,8 +276,8 @@ def add_previous_name(request):
 
         if request.POST['action'] == "Confirm and continue":
             # If we're saving, instantiate the formset with the POST data
-            PreviousNamesFormset = modelformset_factory(PreviousName, form=OtherPersonPreviousNames)
-            formset = PreviousNamesFormset(request.POST)
+            previous_names_formset = modelformset_factory(PreviousName, form=OtherPersonPreviousNames)
+            formset = previous_names_formset(request.POST)
             if formset.is_valid():
                 formset.save()
                 if referrer == 'None':
@@ -337,8 +337,8 @@ def add_previous_name(request):
         initial.append({**temp_initial_dict, **key_dict})
 
     # Instantiate and populate formset, queryset will find any data in the database
-    PreviousNamesFormset = modelformset_factory(PreviousName, form=OtherPersonPreviousNames, extra=extra)
-    formset = PreviousNamesFormset(initial=initial, queryset=initial_data)
+    previous_names_formset = modelformset_factory(PreviousName, form=OtherPersonPreviousNames, extra=extra)
+    formset = previous_names_formset(initial=initial, queryset=initial_data)
 
     context = {
         'formset': formset,

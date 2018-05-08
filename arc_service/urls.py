@@ -7,14 +7,17 @@ OFS-MORE-CCN3: Apply to be a Childminder Beta
 import re
 
 from arc_application.views import assign_new_application, custom_login, error_404, error_500, release, \
-    summary_page, arc_summary, contact_summary, dbs_check_summary, first_aid_training_summary, \
-    health_check_answers, references_summary, review, task_list, \
-    type_of_childcare_age_groups, AuditlogListView, cc_summary
-from arc_application.views.personal_details import personal_details_summary, add_applicant_previous_name
+    summary_page, arc_summary, review, task_list, AuditlogListView, cc_summary
+from arc_application.views.contact_details import contact_summary
+from arc_application.views.dbs_check import dbs_check_summary
+from arc_application.views.first_aid_training import first_aid_training_summary
+from arc_application.views.health_declaration_booklet import health_check_answers
 from arc_application.views.other_people_addresses import address_state_dispatcher
 from arc_application.views.other_people_in_home import other_people_summary, add_previous_name
-from arc_application.views.review import health_check_answers, references_summary, review, task_list, \
-    type_of_childcare_age_groups, PreviousRegistrationDetailsView
+from arc_application.views.personal_details import personal_details_summary, add_applicant_previous_name
+from arc_application.views.references import references_summary
+from arc_application.views.review import review, task_list, PreviousRegistrationDetailsView
+from arc_application.views.type_of_childcare import type_of_childcare_age_groups
 from arc_application.views.base import AuditlogListView
 from arc_application.views.arc_summary import cc_summary
 from arc_application.views.contact_centre.change_details import UpdateEmailView, UpdatePhoneNumberView, \
@@ -39,7 +42,8 @@ urlpatterns = [
     url(r'^childcare/age-groups/', type_of_childcare_age_groups, name='type_of_childcare_age_groups'),
     url(r'^personal-details/summary/', personal_details_summary, name='personal_details_summary'),
     url(r'^personal-details/previous-names/', add_applicant_previous_name, name='personal_details_previous_names'),
-    url(r'^personal-details/previous-addresses', personal_details_previous_address, name='personal_details_previous_addresses'),
+    url(r'^personal-details/previous-addresses', personal_details_previous_address,
+        name='personal_details_previous_addresses'),
     url(r'^first-aid/summary/', first_aid_training_summary, name='first_aid_training_summary'),
     url(r'^dbs-check/summary/', dbs_check_summary, name='dbs_check_summary'),
     url(r'^references/summary/', references_summary, name='references_summary'),
@@ -54,8 +58,10 @@ urlpatterns = [
     url(r'^search-summary/', cc_summary, name='search_summary'),
     url(r'^contact-centre/contact-details/email-address', UpdateEmailView.as_view(), name='update_email'),
     url(r'^contact-centre/contact-details/phone-number', UpdatePhoneNumberView.as_view(), name='update_phone_number'),
-    url(r'^contact-centre/contact-details/add-phone-number', UpdateAddPhoneNumberView.as_view(), name='update_add_number'),
-    url(r'^personal-details/previous-registration', PreviousRegistrationDetailsView.as_view(), name='previous_registration_details'),
+    url(r'^contact-centre/contact-details/add-phone-number', UpdateAddPhoneNumberView.as_view(),
+        name='update_add_number'),
+    url(r'^personal-details/previous-registration', PreviousRegistrationDetailsView.as_view(),
+        name='previous_registration_details'),
 ]
 
 if settings.URL_PREFIX:
