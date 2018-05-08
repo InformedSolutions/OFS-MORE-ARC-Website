@@ -7,7 +7,7 @@ OFS-MORE-CCN3: Apply to be a Childminder Beta
 import re
 
 from arc_application.views import assign_new_application, custom_login, error_404, error_500, release, \
-    summary_page, arc_summary, comments, review, task_list, AuditlogListView, cc_summary
+    summary_page, arc_summary, review, task_list, AuditlogListView, cc_summary
 from arc_application.views.contact_details import contact_summary
 from arc_application.views.dbs_check import dbs_check_summary
 from arc_application.views.first_aid_training import first_aid_training_summary
@@ -52,7 +52,6 @@ urlpatterns = [
     url(r'^people-in-home/previous_addresses', address_state_dispatcher, name='other-people-previous-addresses'),
     url(r'^health/check-answers/', health_check_answers, name='health_check_answers'),
     url(r'^confirmation/', review, name='review'),
-    url(r'^comments/', comments, name='comments'),
     url(r'^arc-summary/', arc_summary, name='arc-summary'),
     url(r'^auditlog/', AuditlogListView.as_view(), name='auditlog'),
     url(r'^search/', search, name='search'),

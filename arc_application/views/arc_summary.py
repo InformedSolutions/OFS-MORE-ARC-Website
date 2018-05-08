@@ -6,6 +6,7 @@ from timeline_logger.models import TimelineLog
 
 from ..summary_page_data import link_dict
 from ..models import *
+from .review import review
 
 
 def arc_summary(request):
@@ -23,7 +24,7 @@ def arc_summary(request):
         status = Arc.objects.get(pk=application_id_local)
         status.declaration_review = 'COMPLETED'
         status.save()
-        return HttpResponseRedirect(settings.URL_PREFIX + '/comments?id=' + application_id_local)
+        return review(request)
 
 
 def cc_summary(request):

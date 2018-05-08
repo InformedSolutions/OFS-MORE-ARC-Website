@@ -198,9 +198,6 @@ class TestArcFunctions(LiveServerTestCase):
             selenium_task_executor.get_driver().find_element_by_link_text("Complete review").click()
             WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("Application summary"))
             selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Confirm and continue']").click()
-            WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("Additional comments"))
-            selenium_task_executor.get_driver().find_element_by_id("id_comments").send_keys("Test")
-            selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Save and continue']").click()
             self.assertEqual("Review Approved",
                              selenium_task_executor.get_driver().find_element_by_xpath("//main[@id='content']/div[2]/div/h1").text)
         except Exception as e:
@@ -308,10 +305,8 @@ class TestArcFunctions(LiveServerTestCase):
 
             selenium_task_executor.get_driver().find_element_by_link_text("Complete review").click()
             WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("Application summary"))
+
             selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Confirm and continue']").click()
-            WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("Additional comments"))
-            selenium_task_executor.get_driver().find_element_by_id("id_comments").send_keys("Test")
-            selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Save and continue']").click()
 
             self.assertEqual("Review returned",
                              selenium_task_executor.get_driver().find_element_by_xpath("//main[@id='content']/div[2]/div/h1").text)
