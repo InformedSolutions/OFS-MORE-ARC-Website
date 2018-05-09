@@ -196,8 +196,7 @@ class TestArcFunctions(LiveServerTestCase):
             selenium_task_executor.get_driver().find_element_by_link_text("Complete review").click()
             WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("Application summary"))
             selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Confirm and continue']").click()
-            self.assertEqual("Review Approved",
-                             selenium_task_executor.get_driver().find_element_by_xpath("//main[@id='content']/div[2]/div/h1").text)
+            self.assertEqual("Review approved", selenium_task_executor.get_driver().title)
         except Exception as e:
             self.capture_screenshot()
             raise e
@@ -305,8 +304,7 @@ class TestArcFunctions(LiveServerTestCase):
 
             selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Confirm and continue']").click()
 
-            self.assertEqual("Review returned",
-                             selenium_task_executor.get_driver().find_element_by_xpath("//main[@id='content']/div[2]/div/h1").text)
+            self.assertEqual("Review returned", selenium_task_executor.get_driver().title)
         except Exception as e:
             self.capture_screenshot()
             raise e
