@@ -4,15 +4,14 @@
 {% load govuk_template_base %}
 {% block inner_content %}
 
-<div class="column-full">
-    <div class="form-group grid-row">
-        {% include 'back-button.html' %}
-        <h1 class="form-title heading-large">
-            Review returned
-        </h1>
-        <p>The application has been returned to the applicant.</p>
-        <a href="{{URL_PREFIX}}/summary">Return to applications</a>
-    </div>
-</div>
+{% include 'back-button.html' %}
+
+<h1 class="form-title heading-large">
+    Review returned
+</h1>
+
+<p>The application has been returned to the applicant.</p>
+
+<a href="{% url 'summary' %}">Return to applications</a>
 
 {% endblock %}
