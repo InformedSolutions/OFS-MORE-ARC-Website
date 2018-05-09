@@ -15,7 +15,7 @@ from ..magic_link import generate_magic_link
 from ..models import PreviousRegistrationDetails
 from ..models import ApplicantName, ApplicantPersonalDetails, Application, Arc, ArcComments, ChildcareType, UserDetails
 from .base import release_application
-
+from arc_application.notify import send_email, send_text
 
 @login_required()
 def task_list(request):
@@ -77,7 +77,7 @@ def task_list(request):
 
     return render(request, 'task-list.html', application_status_context)
 
-  
+
 def review(request):
     """
     Confirmation Page
@@ -181,27 +181,15 @@ def accepted_email(email, first_name, ref):
     """
     Method to send an email using the Notify Gateway API
     :param email: string containing the e-mail address to send the e-mail to
-    :param email: string email address
+    :param first_name: string first name
+    :param ref: string ref
     :return: HTTP response
     """
     if hasattr(settings, 'NOTIFY_URL'):
         email = str(email)
-        base_request_url = settings.NOTIFY_URL
-        header = {'content-type': 'application/json'}
-        request = {
-            'email': email,
-            'templateId': 'b973c5a2-cadd-46a5-baf7-beae65ab11dc',
-            'personalisation': {
-                'first_name': first_name,
-                'ref': ref
-            }
-        }
-        data = json.dumps(request)
-        r = requests.post(base_request_url + '/api/v1/notifications/email/',
-                          data,
-                          headers=header)
-
-        return r
+        template_id = 'b973c5a2-cadd-46a5-baf7-beae65ab11dc'
+        personalisation = {'first_name': first_name, 'ref': ref}
+        return send_email(email, personalisation, template_id)
 
 
 # Add personalisation and create template
@@ -209,28 +197,15 @@ def returned_email(email, first_name, ref, link):
     """
     Method to send an email using the Notify Gateway API
     :param email: string containing the e-mail address to send the e-mail to
-    :param email: string email address
+    :param first_name: string first name
+    :param ref: string ref
     :return: HTTP response
     """
     if hasattr(settings, 'NOTIFY_URL'):
         email = str(email)
-        base_request_url = settings.NOTIFY_URL
-        header = {'content-type': 'application/json'}
-        request = {
-            'email': email,
-            'templateId': 'c9157aaa-02cd-4294-8094-df2184c12930',
-            'personalisation': {
-                'first_name': first_name,
-                'ref': ref,
-                'link': link,
-            }
-        }
-        data = json.dumps(request)
-        r = requests.post(base_request_url + '/api/v1/notifications/email/',
-                          data,
-                          headers=header)
-
-        return r
+        template_id = 'c9157aaa-02cd-4294-8094-df2184c12930'
+        personalisation = {'first_name': first_name, 'ref': ref, 'link': link}
+        return send_email(email, personalisation, template_id)
 
 
 # Including the below file elsewhere caused cyclical import error, keeping here till this can be debugged
