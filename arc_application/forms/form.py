@@ -236,7 +236,7 @@ class PreviousRegistrationDetailsForm(GOVUKForm):
                                               widget=InlineRadioSelect, required=True, error_messages={'required': "Please select one"})
     custom_number_input=NumberInput()
     custom_number_input.input_classes = 'form-control form-control-1-4'
-    individual_id = forms.IntegerField(label='Individual ID:', widget=custom_number_input, required=False)
+    individual_id = forms.IntegerField(label='Individual ID', widget=custom_number_input, required=False)
     five_years_in_UK = forms.ChoiceField(choices=choices, label='Has the applicant lived in England for more than 5 years?',
                                          widget=InlineRadioSelect, required=True, error_messages={'required': "Please select one"})
 
