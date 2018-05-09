@@ -5,13 +5,12 @@
 {% block inner_content %}
 {% include 'back-button.html' %}
 
-<div class="column-full">
     <form method="post" novalidate>
         {% csrf_token %}
-        <div class="grid-row">
-            <h1 class="form-title heading-large">Review: type of childcare</h1>
-        </div>
-        <table class="check-your-answers form-group grid-row" style="table-layout: fixed; width: 100%">
+        <h1 class="form-title heading-large">
+            Review: type of childcare
+        </h1>
+        <table class="check-your-answers form-group">
             <thead>
             <tr>
                 <th colspan="3">
@@ -23,32 +22,24 @@
             </thead>
             <tbody>
             <tr>
-                <td colspan="1" style="width:100%">0-5 years old</td>
-                <td colspan="2" style="width:100%">{{ zero }}</td>
+                <td colspan="1">0-5 years old</td>
+                <td colspan="2">{{ zero }}</td>
             </tr>
             <tr>
-                <td colspan="1" style="width:100%">5-8 years old</td>
-                <td colspan="2" style="width:100%">{{ five }}</td>
+                <td colspan="1">5-8 years old</td>
+                <td colspan="2">{{ five }}</td>
             </tr>
             <tr>
-                <td colspan="1" style="width:100%">8+ years old</td>
-                <td colspan="2" style="width:100%">{{ eight }}</td>
+                <td colspan="1">8+ years old</td>
+                <td colspan="2">{{ eight }}</td>
             </tr>
             </tbody>
         </table>
-        <br>
-        <div class="form-group grid-row">
-            <input type="submit" class="button" value="Confirm and continue" alt='Confirm and continue'>
-            <input type="hidden" id="id" name="id" value="{{application_id}}"/>
-        </div>
-        <div class="form-group grid-row" style="padding-top: 30px;">
-            <a class="link-back">
-                <button type="submit" name="return_to_list" class="hidden-button" value="/review/">
-                    Return to list
-                </button>
-            </a>
-        </div>
+
+        <input type="submit" class="button" value="Confirm and continue" alt='Confirm and continue'>
+        <input type="hidden" id="id" name="id" value="{{application_id}}"/>
+
+        {% include 'return-to-list.html' %}
     </form>
-</div>
 
 {% endblock %}

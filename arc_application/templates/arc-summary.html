@@ -5,29 +5,19 @@
 {% block inner_content %}
 {% include 'back-button.html' %}
 
-<div class="column-full">
-    <div class="grid-row">
-        <h1 class="form-title heading-large">
-            Check and confirm all details
-        </h1>
-    </div>
-    {% with "4" as col %}
-    {% for section in json %}
-    {% include 'summary_tables.html' %}
-    {% endfor %}
-    {% endwith %}
-    <div class="form-group grid-row">
-        <form method="post">
-            {% csrf_token %}
-            <input type="submit" class="button" value="Confirm and continue"/>
-            <input type="hidden" value="{{application_id}}" name="id"/>
-        </form>
-        <br>
-        <a href="{% url 'task_list' %}?id={{application_id}}" class="link-back"
-           style="margin-right: 10px; line-height: 28px">
-            Return to list
-        </a>
-        <br>
-    </div>
-</div>
+<h1 class="form-title heading-large">
+    Check and confirm all details
+</h1>
+{% with "4" as col %}
+{% for section in json %}
+{% include 'summary_tables.html' %}
+{% endfor %}
+{% endwith %}
+<form method="post">
+    {% csrf_token %}
+    <input type="submit" class="button" value="Confirm and continue"/>
+    <input type="hidden" value="{{application_id}}" name="id"/>
+</form>
+{% include 'return-to-list.html' %}
+
 {% endblock %}

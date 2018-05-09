@@ -17,7 +17,7 @@ from govuk_forms.widgets import SplitHiddenDateWidget
 # Creating a widget class
 class Widget(widgets.Widget):
     """
-    Class to define the base widget from which any custom fields can inherit from, contains links to html and css from
+    Class to define the base widget from which any custom fields can inherit from, contains links to html and stylesheets from
     which to build thess widgets. This class shouldnt really be edited and has been taken from the govuk-template-forms
     library
     """
@@ -27,7 +27,7 @@ class Widget(widgets.Widget):
     def build_attrs(self, base_attrs, extra_attrs=None):
         """
         A method to define the attributes to build in the widget
-        :param base_attrs: The set of attributes is used to build the attrs object which contains the exact css classes
+        :param base_attrs: The set of attributes is used to build the attrs object which contains the exact stylesheets classes
         to use
         :param extra_attrs: Any extra attributes to be used
         :return: Returns the attributes object to be used in rendering of the form

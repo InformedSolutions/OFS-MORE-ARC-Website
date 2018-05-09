@@ -1,34 +1,21 @@
-<head>
-    <link rel="stylesheet" href="base_radio.css">
-</head>
-
 {% extends 'govuk_template.html' %}
 {% block page_title %}Previous registration{% endblock %}
 {% load static %}
-{% block head %}
-<link href="{% static 'stylesheets/base_radio.css' %}" media="screen" rel="stylesheet"/>
-{% endblock %}
 {% load govuk_template_base %}
-
 {% block inner_content %}
+{% include 'back-button.html' %}
 
-{% include "back-button.html" %}
+{{ form.error_summary }}
 
-
-{{form.error_summary}}
-
- <h1 class="form-title heading-large">Previous registration</h1>
-
+<h1 class="form-title heading-large">
+    Previous registration
+</h1>
 
 <form method="post" novalidate>
     {% csrf_token %}
-
-    {{ form }}
-
+    {{ form.as_div }}
     <input type="submit" class="button" value="Save and continue">
     <input type="hidden" value="{{application_id}}" name="id"/>
-    </div>
 </form>
 
 {% endblock %}
-ye

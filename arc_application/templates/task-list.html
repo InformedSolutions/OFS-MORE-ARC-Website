@@ -178,7 +178,9 @@
       </tbody>
    </table>
    {% if all_complete == True %}
-   <a href="{% url 'arc-summary' %}?id={{application_id}}" class="button">Complete review</a>
+      <div class="top-padded">
+         <a href="{% url 'arc-summary' %}?id={{application_id}}" class="button">Complete review</a>
+      </div>
    {% endif %}
 </div>
 

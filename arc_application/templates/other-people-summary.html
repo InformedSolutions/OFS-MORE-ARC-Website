@@ -5,15 +5,12 @@
 
 {% block inner_content %}
 {% include 'back-button.html' %}
-<div class="column-full">
     <form method="post" novalidate>
-        <div class="grid-row">
-            <h1 class="form-title heading-large">Review: people in your home</h1>
-        </div>
+        <h1 class="form-title heading-large">Review: people in your home</h1>
         {% csrf_token %}
         {{ formset_adult.management_form }}
         {{ formset_child.management_form }}
-        <table class="check-your-answers form-group grid-row" style="table-layout: fixed; width: 100%">
+        <table class="check-your-answers form-group">
             <thead>
             <tr>
                 <th colspan="3">
@@ -42,12 +39,12 @@
                 </td>
             </tr>
             <tr class="js-hidden" id="adults_in_home">
-                <td colspan="1" style="width:100%">
+                <td colspan="1">
                     <div>
                         {{ form.adults_in_home_comments.label}}
                     </div>
                 </td>
-                <td colspan="2" style="width:100%">
+                <td colspan="2">
                     <div>
                         {{ form.adults_in_home_comments}}
                     </div>
@@ -55,7 +52,7 @@
             </tr>
             </tbody>
         </table>
-        <table class="check-your-answers form-group grid-row" style="table-layout: fixed; width: 100%">
+        <table class="check-your-answers form-group">
             <thead>
             <tr>
                 <th colspan="3">
@@ -89,7 +86,7 @@
                         {{ form.children_in_home_comments.label}}
                     </div>
                 </td>
-                <td colspan="2" style="width:100%">
+                <td colspan="2">
                     <div>
                         {{ form.children_in_home_comments}}
                     </div>
@@ -98,7 +95,7 @@
             </tbody>
         </table>
         {% for id ,name, day, month, year, relationship, dbs_certificate_number, permission, formsetadult in adult_lists %}
-        <table class="check-your-answers form-group grid-row">
+        <table class="check-your-answers form-group">
             <thead>
             <tr>
                 <th colspan="3">
@@ -127,7 +124,7 @@
                         {{ formsetadult.full_name_comments.label}}
                     </div>
                 </td>
-                <td colspan="2" style="width:100%">
+                <td colspan="2">
                     <div>
                         {{ formsetadult.full_name_comments}}
                     </div>
@@ -196,7 +193,7 @@
                         {{ formsetadult.date_of_birth_comments.label}}
                     </div>
                 </td>
-                <td colspan="2" style="width:100%">
+                <td colspan="2">
                     <div>
                         {{ formsetadult.date_of_birth_comments}}
                     </div>
@@ -219,7 +216,7 @@
                         {{ formsetadult.relationship_comments.label}}
                     </div>
                 </td>
-                <td colspan="2" style="width:100%">
+                <td colspan="2">
                     <div>
                         {{ formsetadult.relationship_comments}}
                     </div>
@@ -242,7 +239,7 @@
                         {{ formsetadult.dbs_certificate_number_comments.label}}
                     </div>
                 </td>
-                <td colspan="2" style="width:100%">
+                <td colspan="2">
                     <div>
                         {{ formsetadult.dbs_certificate_number_comments}}
                     </div>
@@ -272,7 +269,7 @@
                         {{ formsetadult.permission_comments.label}}
                     </div>
                 </td>
-                <td colspan="2" style="width:100%">
+                <td colspan="2">
                     <div>
                         {{ formsetadult.permission_comments}}
                     </div>
@@ -282,14 +279,10 @@
             <input type="hidden" value="{{ application_id }}" name="id" />
 
         </table>
-        <br />
-        <br>
-        <div class="grid-row">
-            <a href="{% url 'other-people-previous-names' %}?id={{ application_id }}&person_id={{ id }}&type=ADULT" class="button">Add previous names and addresses</a>
-        </div>
+        <a href="{% url 'other-people-previous-names' %}?id={{ application_id }}&person_id={{ id }}&type=ADULT" class="button">Add previous names and addresses</a>
         {% endfor %}
         {% for id, name, day, month, year, relationship, formsetchild in child_lists %}
-        <table class="check-your-answers form-group grid-row">
+        <table class="check-your-answers form-group">
             <thead>
             <tr>
                 <th colspan="3">
@@ -317,7 +310,7 @@
                         {{ formsetchild.full_name_comments.label}}
                     </div>
                 </td>
-                <td colspan="2" style="width:100%">
+                <td colspan="2">
                     <div>
                         {{ formsetchild.full_name_comments}}
                     </div>
@@ -386,7 +379,7 @@
                         {{ formsetchild.date_of_birth_comments.label}}
                     </div>
                 </td>
-                <td colspan="2" style="width:100%">
+                <td colspan="2">
                     <div>
                         {{ formsetchild.date_of_birth_comments}}
                     </div>
@@ -409,7 +402,7 @@
                         {{ formsetchild.relationship_comments.label}}
                     </div>
                 </td>
-                <td colspan="2" style="width:100%">
+                <td colspan="2">
                     <div>
                         {{ formsetchild.relationship_comments}}
                     </div>
@@ -417,12 +410,12 @@
             </tr>
             </tbody>
         </table>
-        <div class="grid-row">
+
         <a href="{% url 'other-people-previous-names' %}?id={{ application_id }}&person_id={{ id }}&type=CHILD" class="button">Add previous names and addresses</a>
-        </div>
+
         {% endfor %}
         {% for id, name, previous_names, previous_addresses in adult_ebulk_lists %}
-        <table class="check-your-answers form-group grid-row">
+        <table class="check-your-answers form-group">
             <thead>
             <tr>
                 <th colspan="3">
@@ -469,7 +462,7 @@
         {% endfor %}
         {% for id, name, previous_names, previous_addresses in child_ebulk_lists %}
             {% if previous_names %}
-                <table class="check-your-answers form-group grid-row">
+                <table class="check-your-answers form-group">
                     <thead>
                     <tr>
                         <th colspan="3">
@@ -515,20 +508,10 @@
                 </table>
             {% endif %}
         {% endfor %}
-        <br>
-        <div class="form-group grid-row">
-            <input type="submit" class="button" value="Confirm and continue"/>
-            <input type="hidden" value="{{application_id}}" name="id"/>
-        </div>
-        <br>
-        <div class="form-group grid-row" style="padding-top: 30px;">
-            <a class="link-back">
-                <button type="submit" name="return_to_list" class="hidden-button" value="/review/">
-                    Return to list
-                </button>
-            </a>
-        </div>
+
+        <input type="submit" class="button" value="Confirm and continue"/>
+        <input type="hidden" value="{{application_id}}" name="id"/>
+        {% include 'return-to-list.html' %}
     </form>
-</div>
 
 {% endblock %}
