@@ -63,11 +63,9 @@
         <input type="hidden" name="state" value="entry"/>
         <input type="hidden" name="person_id" value="{{ person_id }}"/>
         <input type="hidden" name="person_type" value="{{ person_type }}"/>
-        <br>
-        <br>
-        <a href="{{ list_url }}" class="link-back">Return to list</a>
-
     </div>
 </form>
+
+{% include 'return-to-list.html' %}
 
 {% endblock %}
