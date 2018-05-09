@@ -20,6 +20,8 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__fil
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'm$9lif+zcnb5i5n21q9yecn8vs4h%(%7=!k%#6rlbhkfuq1mfq'
 
+EXECUTING_AS_TEST = os.environ.get('EXECUTING_AS_TEST')
+
 # Application definition
 
 BUILTIN_APPS = [
