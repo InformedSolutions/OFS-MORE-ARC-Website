@@ -188,9 +188,9 @@ class TestArcFunctions(LiveServerTestCase):
             selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Confirm and continue']").click()
             WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("Review: health declaration booklet"))
             selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Confirm and continue']").click()
-            WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("Review: references"))
-            selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Confirm and continue']").click()
             WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("Review: people in your home"))
+            selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Confirm and continue']").click()
+            WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("Review: references"))
             selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Confirm and continue']").click()
             WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("Application overview"))
             selenium_task_executor.get_driver().find_element_by_link_text("Complete review").click()
@@ -259,6 +259,17 @@ class TestArcFunctions(LiveServerTestCase):
             WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("Review: health declaration booklet"))
 
             selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Confirm and continue']").click()
+            WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("Review: people in your home"))
+
+            selenium_task_executor.get_driver().find_element_by_id("id_static-adults_in_home_declare").click()
+            selenium_task_executor.get_driver().find_element_by_id("id_static-adults_in_home_comments").clear()
+            selenium_task_executor.get_driver().find_element_by_id("id_static-adults_in_home_comments").send_keys(
+                "Test")
+            selenium_task_executor.get_driver().find_element_by_id("id_static-children_in_home_declare").click()
+            selenium_task_executor.get_driver().find_element_by_id("id_static-children_in_home_comments").clear()
+            selenium_task_executor.get_driver().find_element_by_id("id_static-children_in_home_comments").send_keys(
+                "Test")
+            selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Confirm and continue']").click()
             WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("Review: references"))
 
             selenium_task_executor.get_driver().find_element_by_id("id_form-full_name_declare").click()
@@ -284,17 +295,6 @@ class TestArcFunctions(LiveServerTestCase):
             selenium_task_executor.get_driver().find_element_by_id("id_form2-phone_number_declare").click()
             selenium_task_executor.get_driver().find_element_by_id("id_form2-phone_number_comments").send_keys("Test")
             selenium_task_executor.get_driver().find_element_by_id("id_form2-email_address_declare").click()
-            selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Confirm and continue']").click()
-            WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("Review: people in your home"))
-
-            selenium_task_executor.get_driver().find_element_by_id("id_static-adults_in_home_declare").click()
-            selenium_task_executor.get_driver().find_element_by_id("id_static-adults_in_home_comments").clear()
-            selenium_task_executor.get_driver().find_element_by_id("id_static-adults_in_home_comments").send_keys(
-                "Test")
-            selenium_task_executor.get_driver().find_element_by_id("id_static-children_in_home_declare").click()
-            selenium_task_executor.get_driver().find_element_by_id("id_static-children_in_home_comments").clear()
-            selenium_task_executor.get_driver().find_element_by_id("id_static-children_in_home_comments").send_keys(
-                "Test")
             selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Confirm and continue']").click()
 
             WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("Application overview"))

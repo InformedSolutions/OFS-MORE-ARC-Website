@@ -134,26 +134,6 @@
                {% endif %}
             </td>
          </tr>
-         <tr id="references">
-            <td class="task">
-               {% if reference_status == 'NOT_STARTED' %}
-               <a href="{% url 'references_summary' %}?id={{application_id}}">
-               <span class="task-name">References</span>
-               <strong class="task-finished task-to-do">To do</strong>
-               </a>
-               {% elif reference_status == 'FLAGGED' %}
-               <a href="{% url 'references_summary' %}?id={{application_id}}">
-               <span class="task-name">References</span>
-               <strong class="task-finished task-flagged">Flagged</strong>
-               </a>
-               {% elif reference_status == 'COMPLETED' %}
-               <a href="{% url 'references_summary' %}?id={{application_id}}">
-               <span class="task-name">References</span>
-               <strong class="task-finished">Reviewed</strong>
-               </a>
-               {% endif %}
-            </td>
-         </tr>
          <tr id="other_people">
             <td class="task">
                {% if people_in_home_status == 'NOT_STARTED' %}
@@ -169,6 +149,26 @@
                {% elif people_in_home_status == 'COMPLETED' %}
                <a href="{% url 'other_people_summary' %}?id={{application_id}}">
                <span class="task-name">People in your home</span>
+               <strong class="task-finished">Reviewed</strong>
+               </a>
+               {% endif %}
+            </td>
+         </tr>
+         <tr id="references">
+            <td class="task">
+               {% if reference_status == 'NOT_STARTED' %}
+               <a href="{% url 'references_summary' %}?id={{application_id}}">
+               <span class="task-name">References</span>
+               <strong class="task-finished task-to-do">To do</strong>
+               </a>
+               {% elif reference_status == 'FLAGGED' %}
+               <a href="{% url 'references_summary' %}?id={{application_id}}">
+               <span class="task-name">References</span>
+               <strong class="task-finished task-flagged">Flagged</strong>
+               </a>
+               {% elif reference_status == 'COMPLETED' %}
+               <a href="{% url 'references_summary' %}?id={{application_id}}">
+               <span class="task-name">References</span>
                <strong class="task-finished">Reviewed</strong>
                </a>
                {% endif %}

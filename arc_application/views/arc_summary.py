@@ -139,7 +139,7 @@ def load_json(application_id_local):
 
     table_list = [login_details_table, childcare_type_table, personal_detail_table, first_aid_table,
                   criminal_record_table,
-                  health_check_table, first_reference_table, second_reference_table, adult_home_table, child_home_table]
+                  health_check_table, adult_home_table, child_home_table, first_reference_table, second_reference_table]
     l = []
     for i in table_list:
         if not i:

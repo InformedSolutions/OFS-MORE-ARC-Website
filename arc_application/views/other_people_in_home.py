@@ -78,7 +78,7 @@ def other_people_summary(request):
             status = Arc.objects.get(pk=application_id_local)
             status.people_in_home_review = section_status
             status.save()
-            default = '/review'
+            default = '/references/summary'
             redirect_link = redirect_selection(request, default)
 
             return HttpResponseRedirect(settings.URL_PREFIX + redirect_link + '?id=' + application_id_local)
