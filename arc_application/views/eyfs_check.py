@@ -21,7 +21,7 @@ class EFYSCheckSummaryView(View):
     def post(self, request):
         application_id_local = request.POST["id"]
         eyfs_id = EYFS.objects.get(application_id=application_id_local).eyfs_id
-        form = EYFSCheckForm(table_keys=[eyfs_id])
+        form = EYFSCheckForm(request.POST, table_keys=[eyfs_id])
 
         if form.is_valid():
             comment_list = request_to_comment(eyfs_id, self.table_name, form.cleaned_data)
@@ -34,7 +34,7 @@ class EFYSCheckSummaryView(View):
 
             if save_successful:
                 status = Arc.objects.get(pk=application_id_local)
-                status.dbs_review = section_status
+                status.eyfs_review = section_status
                 status.save()
                 default = '/health/check-answers'
                 redirect_link = redirect_selection(request, default)
