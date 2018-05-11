@@ -94,6 +94,17 @@
   }
 },
 {
+  "model": "arc_application.eyfs",
+  "pk": "4c95433c-302a-4b6d-815f-f6ded72c07d8",
+  "fields": {
+    "application_id": "db0efe18-eec5-4ec9-887a-e93949f6b412",
+    "eyfs_course_name": "Example EYFS course ",
+    "eyfs_course_date_day": 22,
+    "eyfs_course_date_month": 1,
+    "eyfs_course_date_year": 2017
+  }
+},
+{
   "model": "arc_application.firstaidtraining",
   "pk": "9e9aee10-f7d1-4a54-99b4-69bd35c949a8",
   "fields": {
