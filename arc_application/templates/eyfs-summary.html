@@ -5,8 +5,6 @@
 {% block inner_content %}
 {% include 'back-button.html' %}
 
-{% csrf_token %}
-
 <form method="post" novalidate>
     <h1 class="form-title heading-large">Review: Early years training</h1>
     {% csrf_token %}
@@ -15,14 +13,113 @@
         <tr>
             <th colspan="3">
                 <div class="heading-medium">
-                    Early years training certificate
+                    Early years training course
                 </div>
             </th>
         </tr>
         </thead>
+        <tbody>
+        <tr>
+            <td>
+                Title of training course
+            </td>
+            <td style="word-wrap: break-word">
+                {{ eyfs_course_title }}
+            </td>
+            <td class="change-answer">
+                {{ form.title_of_course_declare }}
+            </td>
+        </tr>
+        <tr class="js-hidden" id="eyfs_course_title">
+            <td colspan="1">
+                <div>
+                    {{ form.title_of_course_comments.label }}
+                </div>
+            </td>
+            <td colspan="2">
+                <div>
+                    {{ form.title_of_course_comments }}
+                </div>
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                Date of training course
+            </td>
+            {% if eyfs_course_date_month == 1 %}
+            <td style="word-wrap: break-word">
+                {{eyfs_course_date_day}} January {{eyfs_course_date_year}}
+            </td>
+            {% elif eyfs_course_date_month == 2 %}
+            <td style="word-wrap: break-word">
+                {{eyfs_course_date_day}} February {{eyfs_course_date_year}}
+            </td>
+            {% elif eyfs_course_date_month == 3 %}
+            <td style="word-wrap: break-word">
+                {{eyfs_course_date_day}} March {{eyfs_course_date_year}}
+            </td>
+            {% elif eyfs_course_date_month == 4 %}
+            <td style="word-wrap: break-word">
+                {{eyfs_course_date_day}} April {{eyfs_course_date_year}}
+            </td>
+            {% elif eyfs_course_date_month == 5 %}
+            <td style="word-wrap: break-word">
+                {{eyfs_course_date_day}} May {{eyfs_course_date_year}}
+            </td>
+            {% elif eyfs_course_date_month == 6 %}
+            <td style="word-wrap: break-word">
+                {{eyfs_course_date_day}} June {{eyfs_course_date_year}}
+            </td>
+            {% elif eyfs_course_date_month == 7 %}
+            <td style="word-wrap: break-word">
+                {{eyfs_course_date_day}} July {{eyfs_course_date_year}}
+            </td>
+            {% elif eyfs_course_date_month == 8 %}
+            <td style="word-wrap: break-word">
+                {{eyfs_course_date_day}} August {{eyfs_course_date_year}}
+            </td>
+            {% elif eyfs_course_date_month == 9 %}
+            <td style="word-wrap: break-word">
+                {{eyfs_course_date_day}} September {{eyfs_course_date_year}}
+            </td>
+            {% elif eyfs_course_date_month == 10 %}
+            <td style="word-wrap: break-word">
+                {{eyfs_course_date_day}} October {{eyfs_course_date_year}}
+            </td>
+            {% elif eyfs_course_date_month == 11 %}
+            <td style="word-wrap: break-word">
+                {{eyfs_course_date_day}} November {{eyfs_course_date_year}}
+            </td>
+            {% elif eyfs_course_date_month == 12 %}
+            <td style="word-wrap: break-word">
+                {{eyfs_course_date_day}} December {{eyfs_course_date_year}}
+            </td>
+            {% endif %}
+            <td class="change-answer">
+                {{ form.date_of_course_declare }}
+            </td>
+        </tr>
+        <tr class="js-hidden" id="eyfs_course_date">
+            <td colspan="1">
+                <div>
+                    {{ form.date_of_course_comments.label }}
+                </div>
+            </td>
+            <td colspan="2">
+                <div>
+                    {{ form.date_of_course_comments }}
+                </div>
+            </td>
+        </tr>
+        </tbody>
     </table>
-</form>
+
+    <input type="submit" class="button" value="Confirm and continue"/>
+    <input type="hidden" value="{{application_id}}" name="id"/>
 
 {% include 'return-to-list.html' %}
+
+</form>
 
 {% endblock %}
