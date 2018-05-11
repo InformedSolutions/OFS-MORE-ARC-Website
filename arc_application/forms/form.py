@@ -161,6 +161,15 @@ class EYFSCheckForm(GOVUKForm):
     """
     auto_replace_widgets = True
 
+    title_of_course_comments = forms.CharField(label='Enter your reasoning here',
+                                                        widget=custom_field_widgets.Textarea, required=False)
+
+    date_of_course_comments = forms.CharField(label='Enter your reasoning here',
+                                           widget=custom_field_widgets.Textarea, required=False)
+
+    checkboxes = [(title_of_course_comments, 'title_of_course_comments'),
+                  (date_of_course_comments, 'date_of_course_comments')]
+
     def __init__(self, *args, **kwargs):
         self.table_keys = kwargs.pop('table_keys')
         super(EYFSCheckForm, self).__init__(*args, **kwargs)
