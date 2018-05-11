@@ -161,14 +161,24 @@ class EYFSCheckForm(GOVUKForm):
     """
     auto_replace_widgets = True
 
+    title_of_course_declare = forms.BooleanField(label='This information is correct',
+                                                  widget=custom_field_widgets.CustomCheckboxInput,
+                                                  required=False)
     title_of_course_comments = forms.CharField(label='Enter your reasoning here',
-                                                        widget=custom_field_widgets.Textarea, required=False)
+                                               widget=custom_field_widgets.Textarea, required=False)
 
+    date_of_course_declare = forms.BooleanField(label='This information is correct',
+                                                widget=custom_field_widgets.CustomCheckboxInput, required=False)
     date_of_course_comments = forms.CharField(label='Enter your reasoning here',
-                                           widget=custom_field_widgets.Textarea, required=False)
+                                              widget=custom_field_widgets.Textarea, required=False)
 
-    checkboxes = [(title_of_course_comments, 'title_of_course_comments'),
-                  (date_of_course_comments, 'date_of_course_comments')]
+    checkboxes = [(title_of_course_declare, 'title_of_course'),
+                  (date_of_course_declare, 'date_of_course')]
+
+    for box in checkboxes:
+        box[0].widget.attrs.update({'data_target': box[1],
+                                    'aria-controls': box[1],
+                                    'aria-expanded': 'false'},)
 
     def __init__(self, *args, **kwargs):
         self.table_keys = kwargs.pop('table_keys')
