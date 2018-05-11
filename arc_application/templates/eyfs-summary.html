@@ -1,0 +1,14 @@
+{% extends 'govuk_template.html' %}
+{% block page_title %}Review: Early years Training{% endblock %}
+{% load static %}
+{% load govuk_template_base %}
+{% block inner_content %}
+{% include 'back-button.html' %}
+
+{% csrf_token %}
+
+{{ form.as_div }}
+
+{% include 'return-to-list.html' %}
+
+{% endblock %}
