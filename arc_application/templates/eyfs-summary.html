@@ -7,7 +7,21 @@
 
 {% csrf_token %}
 
-{{ form.as_div }}
+<form method="post" novalidate>
+    <h1 class="form-title heading-large">Review: Early years training</h1>
+    {% csrf_token %}
+    <table class="check-your-answers form-group">
+        <thead>
+        <tr>
+            <th colspan="3">
+                <div class="heading-medium">
+                    Early years training certificate
+                </div>
+            </th>
+        </tr>
+        </thead>
+    </table>
+</form>
 
 {% include 'return-to-list.html' %}
 
