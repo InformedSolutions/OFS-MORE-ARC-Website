@@ -17,6 +17,7 @@ class Arc(models.Model):
     health_review = models.CharField(choices=TASK_STATUS, max_length=50)
     references_review = models.CharField(choices=TASK_STATUS, max_length=50)
     people_in_home_review = models.CharField(choices=TASK_STATUS, max_length=50)
+    eyfs_review = models.CharField(choices=TASK_STATUS, max_length=50)
 
     @classmethod
     def get_id(cls, app_id):
