@@ -155,6 +155,18 @@ class FirstAidTrainingForm(GOVUKForm):
         populate_initial_values(self)
 
 
+class EYFSCheckForm(GOVUKForm):
+    """
+    GOV.UK form for the Early years training page.
+    """
+    auto_replace_widgets = True
+
+    def __init__(self, *args, **kwargs):
+        self.table_keys = kwargs.pop('table_keys')
+        super(EYFSCheckForm, self).__init__(*args, **kwargs)
+        populate_initial_values(self)
+
+
 class DBSCheckForm(GOVUKForm):
     """
     GOV.UK form for the Your login and contact details: email page
