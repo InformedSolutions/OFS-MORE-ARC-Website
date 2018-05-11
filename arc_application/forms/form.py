@@ -262,7 +262,8 @@ class PreviousRegistrationDetailsForm(GOVUKForm):
         if previous_registration=='True':
             if individual_id is None:
                 raise forms.ValidationError("Please select one")
-        # TODO Insert validation error when giving Inidividual ID w/o previously registering.
+            if len(str(individual_id)) > 7:
+                raise forms.ValidationError("Individual ID must be fewer than 7 digits")
         return individual_id
 
 
