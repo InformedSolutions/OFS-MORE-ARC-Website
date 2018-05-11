@@ -114,6 +114,26 @@
                {% endif %}
             </td>
          </tr>
+         <tr id="efys">
+            <td class="task">
+               {% if eyfs_status == 'NOT_STARTED' %}
+               <a href="{% url 'eyfs_check_summary' %}?id={{application_id}}">  <!-- Build a view for the EYFS review -->
+               <span class="task-name">Early years training</span>
+               <strong class="task-finished task-to-do">To do</strong>
+               </a>
+               {% elif eyfs_status == 'FLAGGED' %}
+               <a href="{% url 'eyfs_check_summary' %}?id={{application_id}}">
+               <span class="task-name">Early years training</span>
+               <strong class="task-finished task-flagged">Flagged</strong>
+               </a>
+               {% elif eyfs_status == 'COMPLETED' %}
+               <a href="{% url 'eyfs_check_summary' %}?id={{application_id}}">
+               <span class="task-name">Early years training</span>
+               <strong class="task-finished">Reviewed</strong>
+               </a>
+               {% endif %}
+            </td>
+         </tr>
          <tr id="health">
             <td class="task">
                {% if health_status == 'NOT_STARTED' %}
