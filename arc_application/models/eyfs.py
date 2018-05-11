@@ -2,6 +2,7 @@ from uuid import uuid4
 from django.db import models
 from .application import Application
 
+
 class EYFS(models.Model):
     """
     Model for EYFS table
@@ -40,3 +41,4 @@ class EYFS(models.Model):
 
     class Meta:
         db_table = 'EYFS'
+        managed = False

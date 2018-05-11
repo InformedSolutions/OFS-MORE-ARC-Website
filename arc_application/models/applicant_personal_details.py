@@ -2,6 +2,7 @@ from uuid import uuid4
 from django.db import models
 from .application import Application
 
+
 class ApplicantPersonalDetails(models.Model):
     """
     Model for APPLICANT_PERSONAL_DETAILS table
@@ -33,3 +34,4 @@ class ApplicantPersonalDetails(models.Model):
 
     class Meta:
         db_table = 'APPLICANT_PERSONAL_DETAILS'
+        managed = False

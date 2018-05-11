@@ -3,6 +3,7 @@ from django.db import models
 from .applicant_personal_details import ApplicantPersonalDetails
 from .application import Application
 
+
 class ApplicantName(models.Model):
     """
     Model for APPLICANT_NAME table
@@ -40,3 +41,4 @@ class ApplicantName(models.Model):
 
     class Meta:
         db_table = 'APPLICANT_NAME'
+        managed = False

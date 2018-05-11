@@ -2,6 +2,7 @@ from uuid import uuid4
 from django.db import models
 from .application import Application
 
+
 class Reference(models.Model):
     """
     Model for REFERENCE table
@@ -59,3 +60,4 @@ class Reference(models.Model):
 
     class Meta:
         db_table = 'REFERENCE'
+        managed = False

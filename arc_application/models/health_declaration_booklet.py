@@ -2,6 +2,7 @@ from uuid import uuid4
 from django.db import models
 from .application import Application
 
+
 class HealthDeclarationBooklet(models.Model):
     """
     Model for HEALTH_DECLARATION_BOOKLET table
@@ -34,3 +35,4 @@ class HealthDeclarationBooklet(models.Model):
 
     class Meta:
         db_table = 'HDB'
+        managed = False

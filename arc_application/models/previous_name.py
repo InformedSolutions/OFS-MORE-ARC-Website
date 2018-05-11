@@ -1,10 +1,5 @@
 from uuid import uuid4
 from django.db import models
-from django.contrib.contenttypes.fields import GenericForeignKey
-from django.contrib.contenttypes.models import ContentType
-from .application import Application
-from .adult_in_home import AdultInHome
-from .child_in_home import ChildInHome
 
 
 class PreviousName(models.Model):
@@ -49,4 +44,4 @@ class PreviousName(models.Model):
 
     class Meta:
         db_table = 'PREVIOUS_NAME'
-
+        managed = False

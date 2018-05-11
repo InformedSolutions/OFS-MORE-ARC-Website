@@ -2,6 +2,7 @@ from uuid import uuid4
 from django.db import models
 from .application import Application
 
+
 class CriminalRecordCheck(models.Model):
     """
     Model for CRIMINAL_RECORD_CHECK table
@@ -38,3 +39,4 @@ class CriminalRecordCheck(models.Model):
 
     class Meta:
         db_table = 'CRIMINAL_RECORD_CHECK'
+        managed = False

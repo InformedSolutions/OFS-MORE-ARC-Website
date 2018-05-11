@@ -42,3 +42,4 @@ class UserDetails(models.Model):
 
     class Meta:
         db_table = 'USER_DETAILS'
+        managed = False
