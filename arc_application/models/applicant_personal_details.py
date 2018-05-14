@@ -34,4 +34,3 @@ class ApplicantPersonalDetails(models.Model):
 
     class Meta:
         db_table = 'APPLICANT_PERSONAL_DETAILS'
-        managed = False

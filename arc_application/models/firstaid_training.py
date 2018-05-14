@@ -47,4 +47,3 @@ class FirstAidTraining(models.Model):
 
     class Meta:
         db_table = 'FIRST_AID_TRAINING'
-        managed = False

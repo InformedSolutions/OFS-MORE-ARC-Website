@@ -72,4 +72,3 @@ class Application(models.Model):
 
     class Meta:
         db_table = 'APPLICATION'
-        managed = False

@@ -60,4 +60,3 @@ class Reference(models.Model):
 
     class Meta:
         db_table = 'REFERENCE'
-        managed = False

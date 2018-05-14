@@ -63,6 +63,7 @@ def create_application():
     name = ApplicantName.objects.create(
         name_id='da2265c2-2d65-4214-bfef-abcfe59b75aa',
         personal_detail_id=personal_details,
+        application_id=application,
         current_name='True',
         first_name='Erik',
         middle_names='Tolstrup',

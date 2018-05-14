@@ -41,4 +41,3 @@ class EYFS(models.Model):
 
     class Meta:
         db_table = 'EYFS'
-        managed = False

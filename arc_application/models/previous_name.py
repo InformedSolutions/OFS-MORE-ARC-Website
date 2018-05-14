@@ -44,4 +44,3 @@ class PreviousName(models.Model):
 
     class Meta:
         db_table = 'PREVIOUS_NAME'
-        managed = False

@@ -25,4 +25,3 @@ class Arc(models.Model):
 
     class Meta:
         db_table = 'ARC'
-        managed = False

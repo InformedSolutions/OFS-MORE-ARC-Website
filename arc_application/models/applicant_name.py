@@ -41,4 +41,3 @@ class ApplicantName(models.Model):
 
     class Meta:
         db_table = 'APPLICANT_NAME'
-        managed = False

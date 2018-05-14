@@ -39,4 +39,3 @@ class CriminalRecordCheck(models.Model):
 
     class Meta:
         db_table = 'CRIMINAL_RECORD_CHECK'
-        managed = False

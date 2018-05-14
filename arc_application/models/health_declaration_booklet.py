@@ -35,4 +35,3 @@ class HealthDeclarationBooklet(models.Model):
 
     class Meta:
         db_table = 'HDB'
-        managed = False
