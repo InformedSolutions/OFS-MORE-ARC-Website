@@ -44,6 +44,8 @@ def contact_summary(request):
                 section_status = 'COMPLETED'
             else:
                 section_status = 'FLAGGED'
+                application.login_details_arc_flagged = True
+                application.save()
 
             # If the save has been successful , save and redirect
             if save_successful:
