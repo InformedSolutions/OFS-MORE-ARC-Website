@@ -430,8 +430,8 @@ class ArcSummaryTest(TestCase):
         try:
             arc_comments = ArcComments.objects.get(
                 table_pk='da2265c2-2d65-4214-bfef-abcfe59b75aa',
-                table_name='PEOPLE_IN_HOME',
-                field_name='adults_in_home',
+                table_name='APPLICATION',
+                field_name='children_in_home',
                 comment='There was a test issue with this field',
                 flagged=True,
             )

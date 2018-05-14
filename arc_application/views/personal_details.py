@@ -81,6 +81,9 @@ def personal_details_summary(request):
                 section_status = 'COMPLETED'
             else:
                 section_status = 'FLAGGED'
+                application = Application.objects.get(pk=application_id_local)
+                application.personal_details_arc_flagged = True
+                application.save()
 
             if birthdate_save_successful and name_save_successful and address_save_successful:
 
