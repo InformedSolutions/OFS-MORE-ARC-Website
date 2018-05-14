@@ -2,7 +2,6 @@ from uuid import uuid4
 from django.db import models
 from .application import Application
 
-
 class AdultInHome(models.Model):
     """
     Model for ADULT_IN_HOME table
@@ -53,3 +52,4 @@ class AdultInHome(models.Model):
 
     class Meta:
         db_table = 'ADULT_IN_HOME'
+

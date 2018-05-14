@@ -45,6 +45,9 @@ def references_summary(request):
                 section_status = 'COMPLETED'
             else:
                 section_status = 'FLAGGED'
+                application = Application.objects.get(pk=application_id_local)
+                application.references_arc_flagged = True
+                application.save()
 
             if reference1_saved and reference2_saved:
                 status = Arc.objects.get(pk=application_id_local)

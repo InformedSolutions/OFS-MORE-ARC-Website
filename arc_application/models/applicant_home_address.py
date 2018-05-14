@@ -2,8 +2,6 @@ from uuid import uuid4
 from django.db import models
 from .applicant_personal_details import ApplicantPersonalDetails
 from .application import Application
-from .adult_in_home import AdultInHome
-from .child_in_home import ChildInHome
 
 
 class ApplicantHomeAddress(models.Model):

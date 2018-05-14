@@ -1,6 +1,7 @@
 from uuid import uuid4
 from django.db import models
 
+
 class ArcComments(models.Model):
     review_id = models.UUIDField(primary_key=True, default=uuid4, unique=True),
     table_pk = models.UUIDField(blank=True)

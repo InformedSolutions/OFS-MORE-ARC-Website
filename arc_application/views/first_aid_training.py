@@ -33,6 +33,9 @@ def first_aid_training_summary(request):
                 section_status = 'COMPLETED'
             else:
                 section_status = 'FLAGGED'
+                application = Application.objects.get(pk=application_id_local)
+                application.first_aid_training_arc_flagged = True
+                application.save()
 
             if save_successful:
                 status = Arc.objects.get(pk=application_id_local)

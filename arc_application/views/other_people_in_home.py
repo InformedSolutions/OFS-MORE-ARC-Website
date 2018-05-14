@@ -64,6 +64,9 @@ def other_people_summary(request):
                     person_comments = request_to_comment(person_id, table_names[object_index], person)
                     if person_comments:
                         section_status = 'FLAGGED'
+                        application = Application.objects.get(pk=application_id_local)
+                        application.people_in_home_arc_flagged = True
+                        application.save()
                     successful = save_comments(person_comments)
                     if not successful:
                         return render(request, '500.html')
@@ -71,6 +74,9 @@ def other_people_summary(request):
             static_form_comments = request_to_comment(application_id_local, 'APPLICATION', form.cleaned_data)
             if static_form_comments:
                 section_status = 'FLAGGED'
+                application = Application.objects.get(pk=application_id_local)
+                application.people_in_home_arc_flagged = True
+                application.save()
             successful = save_comments(static_form_comments)
             if not successful:
                 return render(request, '500.html')

@@ -2,6 +2,7 @@ from uuid import uuid4
 from django.db import models
 from .application import Application
 
+
 class HealthDeclarationBooklet(models.Model):
     """
     Model for HEALTH_DECLARATION_BOOKLET table

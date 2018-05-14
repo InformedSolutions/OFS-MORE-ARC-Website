@@ -2,6 +2,7 @@ from uuid import uuid4
 from django.db import models
 from .application import Application
 
+
 class FirstAidTraining(models.Model):
     """
     Model for FIRST_AID_TRAINING table

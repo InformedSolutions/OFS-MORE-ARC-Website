@@ -2,6 +2,7 @@ from uuid import uuid4
 from django.db import models
 from .application import Application
 
+
 class ChildInHome(models.Model):
     """
     Model for CHILD_IN_HOME table
