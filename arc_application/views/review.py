@@ -44,6 +44,8 @@ def task_list(request):
                 reviewed.append('first_aid')
             if application.dbs_review == 'COMPLETED' or application.dbs_review == 'FLAGGED':
                 reviewed.append('dbs_check')
+            if application.eyfs_review == 'COMPLETED' or application.eyfs_review == 'FLAGGED':
+                reviewed.append('eyfs_review')
             if application.health_review == 'COMPLETED' or application.health_review == 'FLAGGED':
                 reviewed.append('health')
             if application.references_review == 'COMPLETED' or application.references_review == 'FLAGGED':
@@ -52,13 +54,14 @@ def task_list(request):
                 reviewed.append('people_in_home')
             review_count = len(reviewed)
             # Load review status
-            application_status_context = dict({
+            application_status_context = {
                 'application_id': application_id,
                 'login_details_status': application.login_details_review,
                 'personal_details_status': application.personal_details_review,
                 'childcare_type_status': application.childcare_type_review,
                 'first_aid_training_status': application.first_aid_review,
                 'criminal_record_check_status': application.dbs_review,
+                'eyfs_status': application.eyfs_review,
                 'health_status': application.health_review,
                 'reference_status': application.references_review,
                 'people_in_home_status': application.people_in_home_review,
@@ -73,7 +76,7 @@ def task_list(request):
                 'eight_plus': childcare_type_record.eight_plus,
                 'review_count': review_count,
                 'all_complete': all_complete(application_id, False)
-            })
+            }
 
     return render(request, 'task-list.html', application_status_context)
 
@@ -128,6 +131,7 @@ def review(request):
             app.childcare_type_status = arc.childcare_type_review
             app.first_aid_training_status = arc.first_aid_review
             app.health_status = arc.health_review
+            app.eyfs_review = arc.eyfs_review
             app.criminal_record_check_status = arc.dbs_review
             app.references_status = arc.references_review
             app.people_in_home_status = arc.people_in_home_review

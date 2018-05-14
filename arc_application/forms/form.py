@@ -155,6 +155,37 @@ class FirstAidTrainingForm(GOVUKForm):
         populate_initial_values(self)
 
 
+class EYFSCheckForm(GOVUKForm):
+    """
+    GOV.UK form for the Early years training page.
+    """
+    auto_replace_widgets = True
+
+    title_of_course_declare = forms.BooleanField(label='This information is correct',
+                                                  widget=custom_field_widgets.CustomCheckboxInput,
+                                                  required=False)
+    title_of_course_comments = forms.CharField(label='Enter your reasoning here',
+                                               widget=custom_field_widgets.Textarea, required=False)
+
+    date_of_course_declare = forms.BooleanField(label='This information is correct',
+                                                widget=custom_field_widgets.CustomCheckboxInput, required=False)
+    date_of_course_comments = forms.CharField(label='Enter your reasoning here',
+                                              widget=custom_field_widgets.Textarea, required=False)
+
+    checkboxes = [(title_of_course_declare, 'title_of_course'),
+                  (date_of_course_declare, 'date_of_course')]
+
+    for box in checkboxes:
+        box[0].widget.attrs.update({'data_target': box[1],
+                                    'aria-controls': box[1],
+                                    'aria-expanded': 'false'},)
+
+    def __init__(self, *args, **kwargs):
+        self.table_keys = kwargs.pop('table_keys')
+        super(EYFSCheckForm, self).__init__(*args, **kwargs)
+        populate_initial_values(self)
+
+
 class DBSCheckForm(GOVUKForm):
     """
     GOV.UK form for the Your login and contact details: email page

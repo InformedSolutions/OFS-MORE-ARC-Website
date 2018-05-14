@@ -135,6 +135,8 @@ def assign_new_application(request):
             arc_user.references_review = "NOT_STARTED"
             arc_user.people_in_home_review = "NOT_STARTED"
             arc_user.declaration_review = "NOT_STARTED"
+            arc_user.eyfs_review = "NOT_STARTED"
+
             arc_user.app_type = 'Childminder'
             arc_user.last_accessed = str(application.date_updated.strftime('%d/%m/%Y'))
             arc_user.user_id = request.user.id
