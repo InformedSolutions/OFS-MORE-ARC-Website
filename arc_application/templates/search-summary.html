@@ -4,43 +4,43 @@
 {% load govuk_template_base %}
 
 {% block inner_content %}
-<div class="grid-row">
+
+<div>
+    {% include 'back-button.html' %}
+</div>
+
+<div>
     <div class="column-two-thirds">
-        <div class="form-group grid-row" style="padding-top: 30px; padding-left:15px">
-            <!-- Back button -->
-            <a href="{% url 'summary' %}" class="link-back"
-               style="margin-right: 10px; line-height: 28px" alt='Back to application list'>
-                Back
-            </a>
-        </div>
-        <header class="page-heading page-heading-with-context">
-            <h1 class="heading-large">Application summary</h1>
-        </header>
+
+        <h1 class="heading-large">Application summary</h1>
+
         <p>
             All application details will be listed below. They cannot be edited from this page
         </p>
+
         <p>
             To view the audit log, please click the link on the right hand side
         </p>
+
     </div>
-    <div class="column-third"
-         style="background-color: #bfc1c3; margin-left: 15px; padding: 10px; float: left; width: 30%; margin-top: 175px;">
-        <b style="font-weight: bold; position:absolute;">Application history:</b>
-        <br>
+
+    <div class="column-third information-panel">
+        <b class="bold">Application history:</b>
+        <br/>
         <a href="/arc/auditlog/?id={{application_id}}">Audit log</a>
     </div>
-    <div class="column-full" style="margin-left: 10px;">
-    {% with "4" as col %}
-    {% for section in json %}
-    {% include 'summary_tables.html' %}
-    {% endfor %}
-    {% endwith %}
-    </div>
-    <div class="form-group grid-row" style="margin-left: 10px; margin-top: 10px;">
-        <form method="get" action="/arc/search">
-            <input type="submit" class="button" value="Continue"/>
-        </form>
-    </div>
 </div>
+
+{% with "4" as col %}
+{% for section in json %}
+{% include 'summary_tables.html' %}
+{% endfor %}
+{% endwith %}
+
+
+ <form method="get" action="/arc/search">
+        <input type="submit" class="button" value="Continue"/>
+    </form>
+
 {% endblock %}
 

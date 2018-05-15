@@ -8,7 +8,7 @@
 }
 
 .task-to-do {
-  background-color: #BFC1C3;
+  background-color: #BFC1C3 !important;
 }
 
 .task-list-item:after {
@@ -338,13 +338,12 @@
 
 .cross [type=checkbox] + label::after {
     content: "X" !important;
-    font: icon;
     font-weight: bold;
     font-size: 30px;
     border-width: 0;
     transform: none !important;
-    left: 9px;
-    top: 3px;
+    left: 10px;
+    top: 2px;
 }
 
 .cross {
