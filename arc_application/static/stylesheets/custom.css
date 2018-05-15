@@ -288,7 +288,7 @@
 .button-secondary, .button-secondary:visited, .button-secondary:focus {
   display: table;
   background-color: #eee;
-  color: #000;
+  color: #000 !important;
   margin-top: 15px;
   margin-bottom: 15px;
 }
