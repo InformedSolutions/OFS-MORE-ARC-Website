@@ -72,7 +72,7 @@
                 Known for
             </td>
             <td style="word-wrap: break-word">
-                {{first_reference_years_known}} years, {{first_reference_months_known}} months
+                {{first_reference_years_known}} year{% if first_reference_years_known != 1 %}s{% endif %}, {{first_reference_months_known}} month{% if first_reference_months_known != 1 %}s{% endif %}
             </td>
             <td class="change-answer">
                 {{ form.time_known_declare }}
@@ -269,7 +269,7 @@
                 Known for
             </td>
             <td style="word-wrap: break-word">
-                {{second_reference_years_known}} years, {{second_reference_months_known}} months
+                {{second_reference_years_known}} year{% if second_reference_years_known != 1 %}s{% endif %}, {{second_reference_months_known}} month{% if second_reference_months_known != 1 %}s{% endif %}
             </td>
             <td class="change-answer">
                 {{ form2.time_known_declare }}

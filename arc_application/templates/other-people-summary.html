@@ -258,12 +258,16 @@
                 <td style="word-wrap: break-word">
                     No
                 </td>
+                {% else %}
+                <td style="word-wrap: break-word">
+
+                </td>
                 {% endif %}
                 <td class="change-answer">
                     {{ formsetadult.permission_declare }}
                 </td>
             </tr>
-            <tr class="js-hidden" id="permission{{formsetadult.instance_id.initial}}">
+            <tr class="js-hidden" id="permission_declare{{formsetadult.instance_id.initial}}">
                 <td colspan="1">
                     <div>
                         {{ formsetadult.permission_comments.label}}

@@ -52,15 +52,13 @@ def dbs_check_summary(request):
     criminal_record_check = CriminalRecordCheck.objects.get(application_id=application_id_local)
     dbs_certificate_number = criminal_record_check.dbs_certificate_number
     cautions_convictions = criminal_record_check.cautions_convictions
-    send_certificate_declare = criminal_record_check.send_certificate_declare
     application = Application.objects.get(pk=application_id_local)
     variables = {
         'form': form,
         'application_id': application_id_local,
         'dbs_certificate_number': dbs_certificate_number,
         'cautions_convictions': cautions_convictions,
-        'criminal_record_check_status': application.criminal_record_check_status,
-        'declaration': send_certificate_declare
+        'criminal_record_check_status': application.criminal_record_check_status
     }
 
     return render(request, 'dbs-check-summary.html', variables)

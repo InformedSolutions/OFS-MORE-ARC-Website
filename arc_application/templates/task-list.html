@@ -114,6 +114,7 @@
                {% endif %}
             </td>
          </tr>
+         {% if eyfs_status != '' %}
          <tr id="efys">
             <td class="task">
                {% if eyfs_status == 'NOT_STARTED' %}
@@ -134,6 +135,7 @@
                {% endif %}
             </td>
          </tr>
+         {% endif %}
          <tr id="health">
             <td class="task">
                {% if health_status == 'NOT_STARTED' %}

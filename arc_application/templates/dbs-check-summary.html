@@ -71,37 +71,6 @@
                 </div>
             </td>
         </tr>
-        {% if cautions_convictions is True %}
-        <tr>
-            <td style="word-wrap: break-word">
-                Will you send your DBS certificate to Ofsted?
-            </td>
-            {% if declaration is True %}
-            <td style="word-wrap: break-word">
-                Yes
-            </td>
-            {% elif declaration is False %}
-            <td style="word-wrap: break-word">
-                No
-            </td>
-            {% endif %}
-            <td class="change-answer">
-                {{ form.cautions_or_convictions_declare }}
-            </td>
-        </tr>
-        <tr class="js-hidden" id="cautions_or_convictions">
-            <td colspan="1">
-                <div>
-                    {{ form.cautions_or_convictions_comments.label}}
-                </div>
-            </td>
-            <td colspan="2">
-                <div>
-                    {{ form.cautions_or_convictions_comments}}
-                </div>
-            </td>
-        </tr>
-        {% endif %}
         </tbody>
     </table>
 

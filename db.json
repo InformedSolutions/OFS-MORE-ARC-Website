@@ -2007,8 +2007,7 @@
   "fields": {
     "application_id": "060162fe-c1a5-4b5f-b341-33991c51f1c0",
     "dbs_certificate_number": "121212121212",
-    "cautions_convictions": false,
-    "send_certificate_declare": null
+    "cautions_convictions": false
   }
 },
 {
@@ -2017,8 +2016,7 @@
   "fields": {
     "application_id": "aaa2e079-e179-40ee-8a89-a01ac8f46012",
     "dbs_certificate_number": "121212121212",
-    "cautions_convictions": false,
-    "send_certificate_declare": null
+    "cautions_convictions": false
   }
 },
 {
@@ -2027,8 +2025,7 @@
   "fields": {
     "application_id": "de96c5ab-e33f-4a2f-845e-20e7e89c474b",
     "dbs_certificate_number": "121212121212",
-    "cautions_convictions": false,
-    "send_certificate_declare": null
+    "cautions_convictions": false
   }
 },
 {

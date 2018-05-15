@@ -122,8 +122,7 @@ def create_application():
         criminal_record_id='da2265c2-2d65-4214-bfef-abcfe59b75aa',
         application_id=application,
         dbs_certificate_number='123456654321',
-        cautions_convictions=True,
-        send_certificate_declare=True
+        cautions_convictions=True
     )
 
     child_in_home = ChildInHome.objects.create(
