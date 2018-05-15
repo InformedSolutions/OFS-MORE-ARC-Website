@@ -71,7 +71,7 @@ def other_people_summary(request):
                     if not successful:
                         return render(request, '500.html')
 
-            static_form_comments = request_to_comment(application_id_local, 'APPLICATION', form.cleaned_data)
+            static_form_comments = request_to_comment(request, application_id_local, 'APPLICATION', form.cleaned_data)
             if static_form_comments:
                 section_status = 'FLAGGED'
                 application = Application.objects.get(pk=application_id_local)

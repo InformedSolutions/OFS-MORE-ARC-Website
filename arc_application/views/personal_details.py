@@ -5,11 +5,11 @@ from django.forms import modelformset_factory
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 
-from arc_application.forms.form import PersonalDetailsForm, OtherPersonPreviousNames, PreviousRegistrationDetails
-from arc_application.models import ApplicantPersonalDetails, ApplicantName, ApplicantHomeAddress, Arc, Application, \
+from ..forms.form import PersonalDetailsForm, OtherPersonPreviousNames, PreviousRegistrationDetails
+from ..models import ApplicantPersonalDetails, ApplicantName, ApplicantHomeAddress, Arc, Application, \
     PreviousName, uuid4
-from arc_application.review_util import request_to_comment, save_comments, redirect_selection, build_url
-from arc_application.views.personal_details_addresses import get_stored_addresses
+from ..review_util import request_to_comment, save_comments, redirect_selection, build_url
+from ..views.personal_details_addresses import get_stored_addresses
 
 
 def personal_details_summary(request):
@@ -24,7 +24,6 @@ def personal_details_summary(request):
     applicant_name_id = (ApplicantName.objects.get(personal_detail_id=personal_detail_id)).name_id
     applicant_home_address_id = (ApplicantHomeAddress.objects.get(personal_detail_id=personal_detail_id,
                                                                   current_address=True)).home_address_id
-
 
     TABLE_NAMES = ['APPLICANT_PERSONAL_DETAILS', 'APPLICANT_NAME', 'APPLICANT_HOME_ADDRESS']
     PERSONAL_DETAIL_FIELDS = ['date_of_birth_declare', 'date_of_birth_comments']
@@ -69,9 +68,9 @@ def personal_details_summary(request):
                     address_dict[field] = form.cleaned_data[field]
 
             # Populate below lists with comments by table
-            birthdate_comments = request_to_comment(personal_detail_id, TABLE_NAMES[0], birthdate_dict)
-            name_comments = request_to_comment(applicant_name_id, TABLE_NAMES[1], name_dict)
-            address_comments = request_to_comment(applicant_home_address_id, TABLE_NAMES[2], address_dict)
+            birthdate_comments = request_to_comment(request, personal_detail_id, TABLE_NAMES[0], birthdate_dict)
+            name_comments = request_to_comment(request, applicant_name_id, TABLE_NAMES[1], name_dict)
+            address_comments = request_to_comment(request, applicant_home_address_id, TABLE_NAMES[2], address_dict)
 
             birthdate_save_successful = save_comments(birthdate_comments)
             name_save_successful = save_comments(name_comments)

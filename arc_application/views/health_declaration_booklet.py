@@ -27,7 +27,7 @@ def health_check_answers(request):
         form = HealthForm(request.POST, table_keys=[hdb_id])
 
         if form.is_valid():
-            comment_list = request_to_comment(hdb_id, table_name, form.cleaned_data)
+            comment_list = request_to_comment(request, hdb_id, table_name, form.cleaned_data)
             save_successful = save_comments(comment_list)
 
             if not comment_list:

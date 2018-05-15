@@ -26,7 +26,7 @@ def first_aid_training_summary(request):
         form = FirstAidTrainingForm(request.POST, table_keys=[application_id_local])
 
         if form.is_valid():
-            comment_list = request_to_comment(first_aid_id, table_name, form.cleaned_data)
+            comment_list = request_to_comment(request, first_aid_id, table_name, form.cleaned_data)
             save_successful = save_comments(comment_list)
 
             if not comment_list:

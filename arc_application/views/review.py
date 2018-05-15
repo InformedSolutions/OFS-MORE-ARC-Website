@@ -15,7 +15,7 @@ from ..magic_link import generate_magic_link
 from ..models import PreviousRegistrationDetails
 from ..models import ApplicantName, ApplicantPersonalDetails, Application, Arc, ArcComments, ChildcareType, UserDetails
 from .base import release_application
-from arc_application.notify import send_email, send_text
+from ..notify import send_email
 
 @login_required()
 def task_list(request):

@@ -24,7 +24,7 @@ class EFYSCheckSummaryView(View):
         form = EYFSCheckForm(request.POST, table_keys=[eyfs_id])
 
         if form.is_valid():
-            comment_list = request_to_comment(eyfs_id, self.table_name, form.cleaned_data)
+            comment_list = request_to_comment(request, eyfs_id, self.table_name, form.cleaned_data)
             save_successful = save_comments(comment_list)
 
             if not comment_list:

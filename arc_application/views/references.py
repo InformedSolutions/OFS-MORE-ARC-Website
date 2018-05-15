@@ -35,8 +35,8 @@ def references_summary(request):
 
         if form.is_valid() and form2.is_valid():
             # Get comments to be saved
-            form_comments = request_to_comment(reference_id_1, table_name, form.cleaned_data)
-            form2_comments = request_to_comment(reference_id_2, table_name, form2.cleaned_data)
+            form_comments = request_to_comment(request, reference_id_1, table_name, form.cleaned_data)
+            form2_comments = request_to_comment(request, reference_id_2, table_name, form2.cleaned_data)
             # Save the comments
             reference1_saved = save_comments(form_comments)
             reference2_saved = save_comments(form2_comments)

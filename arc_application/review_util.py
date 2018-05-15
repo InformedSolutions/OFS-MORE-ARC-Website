@@ -1,12 +1,14 @@
-import inflect as inflect
+from timeline_logger.models import TimelineLog
 
-from .models import ArcComments
+from .models import ArcComments, Application
 from urllib.parse import urlencode
 from django.core.urlresolvers import reverse
 
-def request_to_comment(table_key, table_name, user_request):
-    """
 
+def request_to_comment(request, table_key, table_name, user_request):
+    """
+    Function for creating a ARC review comment from a page submission
+    :param request: The inbound HTTP request from which the user will be extracted
     :param table_key: The applicants unique id for the table which the reviewer is currently reviewing
     :param table_name: The name of the table the reviewer is currently reviewing
     :param user_request: The dictionary containing the list of fields as keys, mapped to the result
@@ -19,15 +21,29 @@ def request_to_comment(table_key, table_name, user_request):
             # Grabs the existing comment if it exists, returns None otherwise
             # Checkboxes set to on when they are ticked, param will always be the name of a field
 
-            if user_request[param] == True:
+            if user_request[param]:
                 field_name = param[:-8]
                 comment = user_request[param.replace("declare", "comments")]
                 flagged = True
                 comment_list.append([table_key, table_name, field_name, comment, flagged])
 
-            if user_request[param] == False:
-                field_name = param[:-8]
-                flagged = False
+                # Audit field level change
+                application_id = request.POST['id']
+                application = Application.objects.get(application_id=application_id)
+                TimelineLog.objects.create(
+                    content_object=application,
+                    user=request.user,
+                    template='timeline_logger/application_field_flagged.txt.txt',
+                    extra_data={
+                        'user_type': 'reviewer',
+                        'formatted_field': field_name.replace("_", " "),
+                        'action': 'flagged by',
+                        'entity': 'application',
+                        'task_name': get_task_name(table_name, field_name)
+                    }
+                )
+
+            if not user_request[param]:
                 try:
                     existing_comment = ArcComments.objects.get(table_pk=table_key, field_name=param[:-8])
                     existing_comment.delete()
@@ -71,7 +87,7 @@ def save_comments(comment_list):
                         "flagged": single_comment[4]
                         }
             # If a field already has a comment, this will update it, otherwise it will use the 'default' dictionary
-            comment_record, created = ArcComments.objects.update_or_create(table_pk=single_comment[0],
+            ArcComments.objects.update_or_create(table_pk=single_comment[0],
                                                                            field_name=single_comment[2],
                                                                            defaults=defaults)
         return True
@@ -100,3 +116,33 @@ def build_url(*args, **kwargs):
     if get:
         url += '?' + urlencode(get)
     return url
+
+
+def get_task_name(table_name, field_name):
+    """
+    Helper method to derive a task name from a table modification
+    :param table_name: the name of the table against which an update is being performed
+    :return: a task name based on the table adjusted
+    """
+    if table_name == "USER_DETAILS":
+        return 'Your login details'
+
+    if table_name == "APPLICANT_NAME" \
+            or table_name == "APPLICANT_PERSONAL_DETAILS" \
+            or table_name == "APPLICANT_HOME_ADDRESS":
+        return 'Your personal details'
+
+    if table_name == "FIRST_AID_TRAINING":
+        return 'First aid training'
+
+    if table_name == "CRIMINAL_RECORD_CHECK":
+        return 'Criminal record (DBS) check'
+
+    if field_name == "adults_in_home" or field_name == "children_in_home":
+        return 'People in your home'
+
+    if table_name == "REFERENCE":
+        return 'References'
+
+    return 'Test task name'
+
