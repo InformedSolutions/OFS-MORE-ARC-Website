@@ -307,6 +307,7 @@ def get_context(request):
 
     # Actual context definition after variable assignment
     context = {
+        'application_id': app_id,
         'id': app_id,
         'state': state,
         'person_id': person_id,
