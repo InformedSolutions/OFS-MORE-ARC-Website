@@ -286,8 +286,7 @@
 }
 
 .button-secondary, .button-secondary:visited, .button-secondary:focus {
-  display: block !important;
-  width: fit-content;
+  display: table;
   background-color: #eee;
   color: #000;
   margin-top: 15px;
