@@ -3,11 +3,11 @@ import json
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 
-from arc_application import address_helper
-from arc_application.forms.form import OtherPersonPreviousPostcodeEntry, OtherPeoplePreviousAddressLookupForm, \
+from .. import address_helper
+from ..forms.form import OtherPersonPreviousPostcodeEntry, OtherPeoplePreviousAddressLookupForm, \
     OtherPeoplePreviousAddressManualForm
-from arc_application.models import PreviousAddress
-from arc_application.review_util import build_url
+from ..models import PreviousAddress
+from ..review_util import build_url
 
 
 def personal_details_previous_address(request):
