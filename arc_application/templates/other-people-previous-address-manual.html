@@ -30,12 +30,9 @@
         <input type="submit" class="button" name="save-and-continue" value = "Save and continue">
     </div>
 
-
-    <br>
-    <!-- Return to task list -->
-    <div class="form-group">
-        <a href="{{ list_url }}" class="link-back">Return to list</a>
-    </div>
 </form>
+
+
+{% include 'return-to-list.html' %}
 
 {% endblock %}

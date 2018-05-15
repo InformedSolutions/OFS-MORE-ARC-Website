@@ -67,7 +67,7 @@ def other_people_summary(request):
                         application = Application.objects.get(pk=application_id_local)
                         application.people_in_home_arc_flagged = True
                         application.save()
-                    successful = save_comments(person_comments)
+                    successful = save_comments(request, person_comments)
                     if not successful:
                         return render(request, '500.html')
 
