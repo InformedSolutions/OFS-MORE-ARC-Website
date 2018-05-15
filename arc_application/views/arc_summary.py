@@ -234,7 +234,7 @@ def load_personal_detail_table(app):
 
 
 def load_first_aid(app):
-    if EYFS.objects.filter(application_id=app).exists():
+    if FirstAidTraining.objects.filter(application_id=app).exists():
         first_aid_record = FirstAidTraining.objects.get(application_id=app)
 
         table = [
