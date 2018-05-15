@@ -68,13 +68,13 @@ def personal_details_summary(request):
                     address_dict[field] = form.cleaned_data[field]
 
             # Populate below lists with comments by table
-            birthdate_comments = request_to_comment(request, personal_detail_id, TABLE_NAMES[0], birthdate_dict)
-            name_comments = request_to_comment(request, applicant_name_id, TABLE_NAMES[1], name_dict)
-            address_comments = request_to_comment(request, applicant_home_address_id, TABLE_NAMES[2], address_dict)
+            birthdate_comments = request_to_comment(personal_detail_id, TABLE_NAMES[0], birthdate_dict)
+            name_comments = request_to_comment(applicant_name_id, TABLE_NAMES[1], name_dict)
+            address_comments = request_to_comment(applicant_home_address_id, TABLE_NAMES[2], address_dict)
 
-            birthdate_save_successful = save_comments(birthdate_comments)
-            name_save_successful = save_comments(name_comments)
-            address_save_successful = save_comments(address_comments)
+            birthdate_save_successful = save_comments(request, birthdate_comments)
+            name_save_successful = save_comments(request, name_comments)
+            address_save_successful = save_comments(request, address_comments)
 
             if not birthdate_comments and not name_comments and not address_comments:
                 section_status = 'COMPLETED'

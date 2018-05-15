@@ -27,8 +27,8 @@ def dbs_check_summary(request):
         form = DBSCheckForm(request.POST, table_keys=[criminal_record_id])
 
         if form.is_valid():
-            comment_list = request_to_comment(request, criminal_record_id, table_name, form.cleaned_data)
-            save_successful = save_comments(comment_list)
+            comment_list = request_to_comment(criminal_record_id, table_name, form.cleaned_data)
+            save_successful = save_comments(request, comment_list)
 
             if not comment_list:
                 section_status = 'COMPLETED'

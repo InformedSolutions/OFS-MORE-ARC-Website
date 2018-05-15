@@ -35,8 +35,8 @@ def contact_summary(request):
         if form.is_valid():
             # Convert the data from the form into a series of comments with the
             # table id to be stored in the ARC COMMENTS Table
-            comment_list = request_to_comment(request, login_id, table_name, form.cleaned_data)
-            save_successful = save_comments(comment_list)
+            comment_list = request_to_comment(login_id, table_name, form.cleaned_data)
+            save_successful = save_comments(request, comment_list)
 
             # If no comments have been made, the status has not been flagged
             # Therefore it has been completed

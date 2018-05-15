@@ -10,9 +10,7 @@
 <!-- Initialise error summary for page -->
 {{form.error_summary}}
 
-<!-- Form -->
 <form method="post" novalidate {% if form.is_multipart %}enctype="multipart/form-data" {% endif %}>
-    <!-- Content -->
     <div class="form-group">
         <h1 class="form-title heading-large">
             Previous {% if person_type == 'APPLICANT' %}home {% endif %}address {{previous_addresses|length|add:"1"}}
@@ -21,8 +19,6 @@
 
         {{form.as_div}}
         {% csrf_token %}
-        <br>
-        <br>
         <a href="{{ entry_url }}" name="manual" id="manual">Use postcode search</a>
     </div>
     <div class="form-group">

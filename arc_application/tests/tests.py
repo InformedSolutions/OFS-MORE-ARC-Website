@@ -242,6 +242,7 @@ class ArcSummaryTest(TestCase):
         }
 
         # Act
+        self.client.login(username='arc_test', password='my_secret')
         response = self.client.post(reverse('contact_summary'), post_dictionary)
 
         # Assert
@@ -282,6 +283,7 @@ class ArcSummaryTest(TestCase):
         }
 
         # Act
+        self.client.login(username='arc_test', password='my_secret')
         response = self.client.post(reverse('personal_details_summary') + '?id=' + application.application_id,
                                     post_dictionary)
 
@@ -323,6 +325,7 @@ class ArcSummaryTest(TestCase):
         }
 
         # Act
+        self.client.login(username='arc_test', password='my_secret')
         response = self.client.post(reverse('first_aid_training_summary') + '?id=' + application.application_id,
                                     post_dictionary)
 
@@ -364,6 +367,7 @@ class ArcSummaryTest(TestCase):
         }
 
         # Act
+        self.client.login(username='arc_test', password='my_secret')
         response = self.client.post(reverse('dbs_check_summary') + '?id=' + application.application_id,
                                     post_dictionary)
 
@@ -413,6 +417,7 @@ class ArcSummaryTest(TestCase):
         }
 
         # Act
+        self.client.login(username='arc_test', password='my_secret')
         response = self.client.post(reverse('other_people_summary') + '?id=' + application.application_id,
                                     post_dictionary)
 
@@ -454,6 +459,7 @@ class ArcSummaryTest(TestCase):
         }
 
         # Act
+        self.client.login(username='arc_test', password='my_secret')
         response = self.client.post(reverse('references_summary') + '?id=' + application.application_id,
                                     post_dictionary)
 
