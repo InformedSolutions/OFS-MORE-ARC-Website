@@ -152,3 +152,6 @@ def get_task_name(table_name, field_name):
     if table_name == "REFERENCE":
         return 'References'
 
+    if table_name == "EYFS":
+        return 'Early years training'
+
