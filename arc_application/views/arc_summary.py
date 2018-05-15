@@ -125,9 +125,11 @@ def load_json(application_id_local):
 
     first_aid_table = load_first_aid(application)
 
-    criminal_record_table = load_criminal_record(application)
+    eyfs_table = load_eyfs_record(application)
 
     health_check_table = load_health_check(application)
+
+    criminal_record_table = load_criminal_record(application)
 
     first_reference_table = load_reference(application, 1)
 
@@ -137,9 +139,9 @@ def load_json(application_id_local):
 
     child_home_table = load_child_home(application)
 
-    table_list = [login_details_table, childcare_type_table, personal_detail_table, first_aid_table,
-                  criminal_record_table,
-                  health_check_table, adult_home_table, child_home_table, first_reference_table, second_reference_table]
+    table_list = [login_details_table, childcare_type_table, personal_detail_table, first_aid_table, eyfs_table,
+                  health_check_table,
+                  criminal_record_table, adult_home_table, child_home_table, first_reference_table, second_reference_table]
     l = []
     for i in table_list:
         if not i:
@@ -153,7 +155,7 @@ def load_login_details(app):
     if UserDetails.objects.filter(application_id=app).exists():
         login_record = UserDetails.objects.get(application_id=app)
         table = [
-            {"title": "Your login details", "id": login_record.pk},
+            {"title": "Your sign in details", "id": login_record.pk},
             {"name": "Your email", "value": login_record.email},
             {"name": "Mobile phone number", "value": login_record.mobile_number},
             {"name": "Alternative phone number", "value": login_record.add_phone_number},
@@ -181,7 +183,7 @@ def load_childcare_type(app):
             register = 'Childcare Register (voluntary part)'
 
         table = [
-            {"title": "Childcare Type", "id": childcare_record.pk},
+            {"title": "Type of childcare", "id": childcare_record.pk},
             {"name": "Looking after 0 to 5 year olds?", "value": childcare_record.zero_to_five},
             {"name": "Looking after 5 to 7 year olds? ", "value": childcare_record.five_to_eight},
             {"name": "Looking after 8 year olds and older? ", "value": childcare_record.eight_plus},
@@ -232,11 +234,11 @@ def load_personal_detail_table(app):
 
 
 def load_first_aid(app):
-    if FirstAidTraining.objects.filter(application_id=app).exists():
+    if EYFS.objects.filter(application_id=app).exists():
         first_aid_record = FirstAidTraining.objects.get(application_id=app)
 
         table = [
-            {"title": "Your first aid certificate", "id": first_aid_record.pk},
+            {"title": "First aid training", "id": first_aid_record.pk},
             {"name": "First aid training provider", "value": first_aid_record.training_organisation},
             {"name": "Title of first aid course", "value": first_aid_record.course_title},
             {"name": "Date of first aid certificate",
@@ -247,12 +249,27 @@ def load_first_aid(app):
     return False
 
 
+def load_eyfs_record(app):
+    if EYFS.objects.filter(application_id=app).exists():
+        eyfs_record = EYFS.objects.get(application_id=app)
+
+        table = [
+            {"title": "Early Years training", "id": eyfs_record.pk},
+            {"name": "Title of training course", "value": eyfs_record.eyfs_course_name},
+            {"name": "Date you completed course",
+             "value": str(eyfs_record.eyfs_course_date_day) + '/' + str(eyfs_record.eyfs_course_date_month) + '/' + str(
+                 eyfs_record.eyfs_course_date_year)}
+        ]
+        return table
+    return False
+
+
 def load_criminal_record(app):
     if CriminalRecordCheck.objects.filter(application_id=app).exists():
         dbs_record = CriminalRecordCheck.objects.get(application_id=app)
 
         table = [
-            {"title": "Criminal record checks", "id": dbs_record.pk},
+            {"title": "Criminal record (DBS) check", "id": dbs_record.pk},
             {"name": "DBS certificate number", "value": dbs_record.dbs_certificate_number},
             {"name": "Do you have any cautions or convictions?", "value": dbs_record.cautions_convictions}
         ]
@@ -265,7 +282,7 @@ def load_health_check(app):
         hdb_record = HealthDeclarationBooklet.objects.get(application_id=app)
 
         table = [
-            {"title": "Health checks", "id": hdb_record.pk},
+            {"title": "Health declaration booklet", "id": hdb_record.pk},
             {"name": "Provide a Health Declaration Booklet?", "value": hdb_record.send_hdb_declare}
         ]
         return table
@@ -280,12 +297,15 @@ def load_reference(app, num):
             ref_num = 'First'
         if num == 2:
             ref_num = 'Second'
+        months = first_reference_record.months_known
+        months_str = str(months) + ' months, ' if months != 1 else str(months) + ' month, '
+        years = first_reference_record.years_known
+        years_str = str(years) + ' years' if years != 1 else str(years) + ' year'
         table = [
             {"title": ref_num + " reference", "id": first_reference_record.pk},
             {"name": "Full name", "value": first_reference_record.first_name + ' ' + first_reference_record.last_name},
             {"name": "How they know you", "value": first_reference_record.relationship},
-            {"name": "Known for", "value": str(first_reference_record.months_known) + ' months, ' + str(
-                first_reference_record.years_known) + ' years'},
+            {"name": "Known for", "value": months_str + years_str},
             {"name": "Address", "value": ref1_address},
             {"name": "Phone number", "value": first_reference_record.phone_number},
             {"name": "Email address", "value": first_reference_record.email}
