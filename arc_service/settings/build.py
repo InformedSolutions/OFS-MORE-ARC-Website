@@ -23,10 +23,6 @@ DATABASES = {
     }
 }
 
-MIGRATION_MODULES = {
-    'arc_application': 'arc_application.tests.test_migrations',
-}
-
 # Automatic Django logging at the INFO level (i.e everything the comes to the console when ran locally)
 LOGGING = {
   'version': 1,
