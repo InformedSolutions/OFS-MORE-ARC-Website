@@ -33,9 +33,9 @@ def search(request):
 
         elif request.method == 'POST':
             form = SearchForm(request.POST)
+            context['form'] = form
 
             if form.is_valid():
-                context['form'] = form
                 name = form.cleaned_data['name_search_field']
                 dob = form.cleaned_data['dob_search_field']
                 home_postcode = form.cleaned_data['home_postcode_search_field']
