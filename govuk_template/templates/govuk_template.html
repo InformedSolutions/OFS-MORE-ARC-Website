@@ -34,6 +34,14 @@
           {% if user.is_authenticated %}
             <ul id="proposition-links">
                <li>
+                 <a href="{{ URL_PREFIX }}/search" class="{% if link.link_is_view_name and link.link == request.resolver_match.view_name %}active{% endif %}">Search</a>
+               </li>
+              {% if not cc_user %}
+               <li>
+                 <a href="{{ URL_PREFIX }}/summary" class="{% if link.link_is_view_name and link.link == request.resolver_match.view_name %}active{% endif %}">Review</a>
+               </li>
+              {% endif %}
+               <li>
                  <a href="{{ URL_PREFIX }}/logout" class="{% if link.link_is_view_name and link.link == request.resolver_match.view_name %}active{% endif %}">Logout</a>
                </li>
             </ul>

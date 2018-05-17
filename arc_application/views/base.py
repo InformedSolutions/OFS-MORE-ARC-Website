@@ -331,6 +331,7 @@ class AuditlogListView(ListView):
 
         if has_group(self.request.user, settings.CONTACT_CENTRE):
             context['back'] = reverse('search')
+            context['cc_user'] = True
 
         if has_group(self.request.user, settings.ARC_GROUP):
             context['back'] = reverse('task_list') + '?id=' + self.request.GET.get('id')
