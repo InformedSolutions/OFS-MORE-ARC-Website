@@ -360,4 +360,9 @@ class Migration(migrations.Migration):
             name='application_id',
             field=models.ForeignKey(db_column='application_id', on_delete=django.db.models.deletion.CASCADE, to='arc_application.Application'),
         ),
+        migrations.AddField(
+            model_name='application',
+            name='suitable_declare',
+            field=models.NullBooleanField(default=None),
+        ),
     ]
