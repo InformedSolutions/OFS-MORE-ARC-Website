@@ -18,20 +18,24 @@ def search(request):
     :param request: An Http request- you must be logged in.
     :return: The search template on GET request, or submit it and return the search results on POST
     """
-    if has_group(request.user, settings.CONTACT_CENTRE) and request.user.is_authenticated():
+    cc_user = has_group(request.user, settings.CONTACT_CENTRE)
+    arc_user = has_group(request.user, settings.ARC_GROUP)
+    context = {
+                'cc_user': cc_user,
+                'empty': True
+            }
+
+    if (cc_user or arc_user) and request.user.is_authenticated():
 
         if request.method == 'GET':
-            form = SearchForm()
-            variables = {
-                'empty': True,
-                'form': form,
-            }
-            return render(request, 'search.html', variables)
+            context['form'] = SearchForm()
+            return render(request, 'search.html', context)
 
         elif request.method == 'POST':
             form = SearchForm(request.POST)
 
             if form.is_valid():
+                context['form'] = form
                 name = form.cleaned_data['name_search_field']
                 dob = form.cleaned_data['dob_search_field']
                 home_postcode = form.cleaned_data['home_postcode_search_field']
@@ -40,38 +44,25 @@ def search(request):
 
                 # If no search terms have been entered
                 if not name and not dob and not home_postcode and not care_location_postcode and not reference:
-                    variables = {
-                        'empty': 'error',
-                        'error_title': 'There was a problem with your search',
-                        'error_text': 'Please use at least one filter',
-                        'form': form,
-                    }
-                    return render(request, 'search.html', variables)
+                    context['empty'] = 'error'
+                    context['error_title'] = 'There was a problem with your search'
+                    context['error_text'] = 'Please use at least one filter'
+                    return render(request, 'search.html', context)
 
                 results = search_query(name, dob, home_postcode, care_location_postcode, reference)
 
                 if results is not None and len(results) > 0:
                     data = format_data(results)
-                    variables = {
-                        'empty': False,
-                        'form': form,
-                        'app': data,
-                    }
-                    return render(request, 'search.html', variables)
+                    context['empty'] = False
+                    context['app'] = data
+                    return render(request, 'search.html', context)
                 else:
-                    variables = {
-                        'empty': 'error',
-                        'error_title': 'No results found',
-                        'error_text': 'No results could be found based on your search',
-                        'form': form,
-                    }
-                    return render(request, 'search.html', variables)
-            variables = {
-                'empty': True,
-                'form': form,
-            }
+                    context['empty'] = 'error'
+                    context['error_title'] = 'No results found'
+                    context['error_text'] = 'No results could be found based on your search'
+                    return render(request, 'search.html', context)
 
-            return render(request, 'search.html', variables)
+            return render(request, 'search.html', context)
     else:
         return HttpResponseRedirect(settings.URL_PREFIX + '/login/')
 

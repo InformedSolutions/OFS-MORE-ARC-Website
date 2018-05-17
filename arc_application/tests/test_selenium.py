@@ -135,17 +135,17 @@ class TestArcFunctions(LiveServerTestCase):
         try:
             self.login_as_arc_user()
             selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='New application']").click()
-            selenium_task_executor.get_driver().find_element_by_link_text("Review").click()
+            selenium_task_executor.get_driver().find_element_by_xpath("//*[@id='request-table']/tbody/tr[1]/td[5]/a").click()
             self.assertEqual("Application overview", selenium_task_executor.get_driver().title)
             self.release_arc_application()
         except Exception as e:
             self.capture_screenshot()
             raise e
 
-    def test_arc_user_can_view_audit_log(self):
-        self.assert_arc_user_can_view_audit_log()
+    def test_arc_user_can_view_audit_log_via_task_list(self):
+        self.assert_arc_user_can_view_audit_log_via_task_list()
 
-    def assert_arc_user_can_view_audit_log(self):
+    def assert_arc_user_can_view_audit_log_via_task_list(self):
         """
         Tests that an ARC user can access the audit log feature
         """
@@ -154,7 +154,70 @@ class TestArcFunctions(LiveServerTestCase):
         try:
             self.login_as_arc_user()
             selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='New application']").click()
-            selenium_task_executor.get_driver().find_element_by_link_text("Review").click()
+            selenium_task_executor.get_driver().find_element_by_xpath("//*[@id='request-table']/tbody/tr[1]/td[5]/a").click()
+            selenium_task_executor.get_driver().find_element_by_link_text("Audit log").click()
+            self.assertEqual("Audit log", selenium_task_executor.get_driver().title)
+        except Exception as e:
+            self.capture_screenshot()
+            raise e
+
+    def test_arc_user_can_view_audit_log_via_task_list(self):
+        self.assert_arc_user_can_view_audit_log_via_task_list()
+
+    def assert_arc_user_can_view_audit_log_via_task_list(self):
+        """
+        Tests that an ARC user can access the audit log feature
+        """
+        global selenium_task_executor
+
+        try:
+            self.login_as_arc_user()
+            selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='New application']").click()
+            selenium_task_executor.get_driver().find_element_by_xpath("//*[@id='request-table']/tbody/tr[1]/td[5]/a").click()
+            selenium_task_executor.get_driver().find_element_by_link_text("Audit log").click()
+            self.assertEqual("Audit log", selenium_task_executor.get_driver().title)
+        except Exception as e:
+            self.capture_screenshot()
+            raise e
+
+    def test_arc_user_can_search_and_view_applications(self):
+        self.assert_arc_user_can_search_and_view_applications()
+
+    def assert_arc_user_can_search_and_view_applications(self):
+        """
+        Tests that an Arc user can perform a search on applications
+        """
+        global selenium_task_executor
+        title_change_wait = 15
+        try:
+            self.login_as_arc_user()
+            selenium_task_executor.get_driver().find_element_by_xpath("//*[@id='proposition-links']/li[1]/a").click()
+            selenium_task_executor.get_driver().find_element_by_id("id_name_search_field").send_keys("test")
+            selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Search']").click()
+            selenium_task_executor.get_driver().find_element_by_link_text("Application Summary").click()
+            WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(
+                expected_conditions.title_contains("Application summary"))
+        except Exception as e:
+            self.capture_screenshot()
+            raise e
+
+    def test_arc_user_can_view_audit_log_via_search_page(self):
+        self.assert_arc_user_can_view_audit_log_via_search_page()
+
+    def assert_arc_user_can_view_audit_log_via_search_page(self):
+        """
+                Tests that an Arc user can access an application audit log via searching
+                """
+        global selenium_task_executor
+        title_change_wait = 15
+        try:
+            self.login_as_arc_user()
+            selenium_task_executor.get_driver().find_element_by_xpath("//*[@id='proposition-links']/li[1]/a").click()
+            selenium_task_executor.get_driver().find_element_by_id("id_name_search_field").send_keys("test")
+            selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Search']").click()
+            selenium_task_executor.get_driver().find_element_by_link_text("Application Summary").click()
+            WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(
+                expected_conditions.title_contains("Application summary"))
             selenium_task_executor.get_driver().find_element_by_link_text("Audit log").click()
             self.assertEqual("Audit log", selenium_task_executor.get_driver().title)
         except Exception as e:
@@ -174,7 +237,7 @@ class TestArcFunctions(LiveServerTestCase):
         try:
             self.login_as_arc_user()
             selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='New application']").click()
-            selenium_task_executor.get_driver().find_element_by_link_text("Review").click()
+            selenium_task_executor.get_driver().find_element_by_xpath("//*[@id='request-table']/tbody/tr[1]/td[5]/a").click()
             selenium_task_executor.get_driver().find_element_by_xpath("//tr[@id='account_details']/td/a/span").click()
             WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("Review: your login details"))
             selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Confirm and continue']").click()
@@ -217,7 +280,7 @@ class TestArcFunctions(LiveServerTestCase):
             self.login_as_arc_user()
 
             selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='New application']").click()
-            selenium_task_executor.get_driver().find_element_by_link_text("Review").click()
+            selenium_task_executor.get_driver().find_element_by_xpath("//*[@id='request-table']/tbody/tr[1]/td[5]/a").click()
             selenium_task_executor.get_driver().find_element_by_xpath("//tr[@id='account_details']/td/a/span").click()
             WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("Review: your login details"))
 
