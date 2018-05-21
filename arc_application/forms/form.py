@@ -563,7 +563,7 @@ class SearchForm(GOVUKForm):
 
     reference_search_field = forms.CharField(label='Application number', required=False)
     name_search_field = forms.CharField(label='Name', required=False)
-    dob_search_field = forms.CharField(label='Date of birth', required=False)
+    dob_search_field = forms.CharField(label='Date of birth', required=False, help_text='For example, 31 03 1980')
     home_postcode_search_field = forms.CharField(label='Home postcode', required=False)
     care_location_postcode_search_field = forms.CharField(label='Work postcode', required=False)
 

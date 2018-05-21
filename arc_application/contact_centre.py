@@ -59,7 +59,7 @@ def search(request):
                 else:
                     context['empty'] = 'error'
                     context['error_title'] = 'No results found'
-                    context['error_text'] = 'No results could be found based on your search'
+                    context['error_text'] = 'Check that you have the correct details and spelling.'
                     return render(request, 'search.html', context)
 
             return render(request, 'search.html', context)
