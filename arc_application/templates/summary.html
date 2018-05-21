@@ -20,14 +20,14 @@
 
 <!-- templates/registration/login.html -->
 <h2 class="heading-large">Applications</h2>
-<p>Please choose to either continue reviewing an application or to start a new review</p>
+<p>Review a new application:</p>
 <form action="" method="post">
     {% csrf_token %}
-    <input type="submit" class="button" value="New application" alt='New application'>
+    <input type="submit" class="button" value="Add from queue" alt='Add from queue'>
 </form>
 <div class="top-padded">
     {% if empty != "true" %}
-    <p>Please select the application you wish to review from the table below</p>
+    <p>Continue reviewing an application:</p>
     <table class="table table-hover" id="request-table">
         <thead>
         <tr>
@@ -36,7 +36,7 @@
             <th>Date Submitted</th>
             <th>Date Accessed</th>
             <th>Review</th>
-            <th>Release</th>
+            <th>Release to queue</th>
         </tr>
         </thead>
         <tbody>
@@ -47,7 +47,7 @@
             <td class="col-xs-1">{{ entry.date_submitted}}</td>
             <td class="col-xs-1">{{ entry.last_accessed}}</td>
             <td class="col-xs-4"><a href="{% url 'task_list' %}?id={{entry.application_id}}">Review</a></td>
-            <td class="col-xs-4"><a href="/arc/release/{{entry.application_id}}">Release</a></td>
+            <td class="col-xs-4"><a href="/arc/release/{{entry.application_id}}">Release to queue</a></td>
         </tr>
         {% endfor %}
         </tbody>

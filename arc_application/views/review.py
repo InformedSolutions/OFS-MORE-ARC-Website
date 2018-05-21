@@ -41,7 +41,7 @@ def task_list(request):
             resubmitted = False
             for log in queryset:
                 log_message = log.get_message()
-                if "Application re-submitted" in log_message:
+                if "Application resubmitted" in log_message:
                     resubmitted = True
                     break
 

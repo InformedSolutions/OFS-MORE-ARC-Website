@@ -7,6 +7,9 @@
 
 <form method="post" novalidate>
     <h1 class="form-title heading-large">Review: references</h1>
+    <p>
+        Please check the boxes if there are errors.
+    </p>
     {% csrf_token %}
     {{ formset_adult.management_form }}
     {{ formset_child.management_form }}
@@ -37,6 +40,9 @@
                 <div>
                     {{ form.full_name_comments.label}}
                 </div>
+                <div>
+                    {{ form.full_name_comments.help_text}}
+                </div>
             </td>
             <td colspan="2">
                 <div>
@@ -60,6 +66,9 @@
                 <div>
                     {{ form.relationship_comments.label}}
                 </div>
+                <div>
+                    {{ form.relationship_comments.help_text}}
+                </div>
             </td>
             <td colspan="2">
                 <div>
@@ -82,6 +91,9 @@
             <td colspan="1">
                 <div>
                     {{ form.time_known_comments.label}}
+                </div>
+                <div>
+                    {{ form.time_known_comments.help_text}}
                 </div>
             </td>
             <td colspan="2">
@@ -152,6 +164,9 @@
                 <div>
                     {{ form.address_comments.label}}
                 </div>
+                <div>
+                    {{ form.address_comments.help_text}}
+                </div>
             </td>
             <td colspan="2">
                 <div>
@@ -175,6 +190,9 @@
                 <div>
                     {{ form.phone_number_comments.label}}
                 </div>
+                <div>
+                    {{ form.phone_number_comments.help_text}}
+                </div>
             </td>
             <td colspan="2">
                 <div>
@@ -197,6 +215,9 @@
             <td colspan="1">
                 <div>
                     {{ form.email_address_comments.label}}
+                </div>
+                <div>
+                    {{ form.email_address_comments.help_text}}
                 </div>
             </td>
             <td colspan="2">
@@ -234,6 +255,9 @@
                 <div>
                     {{ form2.full_name_comments.label}}
                 </div>
+                <div>
+                    {{ form2.full_name_comments.help_text}}
+                </div>
             </td>
             <td colspan="2">
                 <div>
@@ -257,6 +281,9 @@
                 <div>
                     {{ form2.relationship_comments.label}}
                 </div>
+                <div>
+                    {{ form2.relationship_comments.help_text}}
+                </div>
             </td>
             <td colspan="2">
                 <div>
@@ -279,6 +306,9 @@
             <td colspan="1">
                 <div>
                     {{ form2.time_known_comments.label}}
+                </div>
+                <div>
+                    {{ form2.time_known_comments.help_text}}
                 </div>
             </td>
             <td colspan="2">
@@ -349,6 +379,9 @@
                 <div>
                     {{ form2.address_comments.label}}
                 </div>
+                <div>
+                    {{ form2.address_comments.help_text}}
+                </div>
             </td>
             <td colspan="2">
                 <div>
@@ -372,6 +405,9 @@
                 <div>
                     {{ form2.phone_number_comments.label}}
                 </div>
+                <div>
+                    {{ form2.phone_number_comments.help_text}}
+                </div>
             </td>
             <td colspan="2">
                 <div>
@@ -394,6 +430,9 @@
             <td colspan="1">
                 <div>
                     {{ form2.email_address_comments.label}}
+                </div>
+                <div>
+                    {{ form2.email_address_comments.help_text}}
                 </div>
             </td>
             <td colspan="2">

@@ -18,17 +18,17 @@
             <td class="task">
                {% if login_details_status == 'NOT_STARTED' %}
                <a href="{% url 'contact_summary' %}?id={{application_id}}">
-               <span class="task-name">Your login details</span>
+               <span class="task-name">Your sign in details</span>
                <strong class="task-finished task-to-do">To do</strong>
                </a>
                {% elif login_details_status == 'FLAGGED' %}
                <a href="{% url 'contact_summary' %}?id={{application_id}}">
-               <span class="task-name">Your login details</span>
+               <span class="task-name">Your sign in details</span>
                <strong class="task-finished task-flagged">Flagged</strong>
                </a>
                {% elif login_details_status == 'COMPLETED' %}
                <a href="{% url 'contact_summary' %}?id={{application_id}}">
-               <span class="task-name">Your login details</span>
+               <span class="task-name">Your sign in details</span>
                <strong class="task-finished">Reviewed</strong>
                </a>
                {% endif %}
@@ -94,26 +94,6 @@
                {% endif %}
             </td>
          </tr>
-         <tr id="dbs">
-            <td class="task">
-               {% if criminal_record_check_status == 'NOT_STARTED' %}
-               <a href="{% url 'dbs_check_summary' %}?id={{application_id}}">
-               <span class="task-name">Criminal record (DBS) check</span>
-               <strong class="task-finished task-to-do">To do</strong>
-               </a>
-               {% elif criminal_record_check_status == 'FLAGGED' %}
-               <a href="{% url 'dbs_check_summary' %}?id={{application_id}}">
-               <span class="task-name">Criminal record (DBS) check</span>
-               <strong class="task-finished task-flagged">Flagged</strong>
-               </a>
-               {% elif criminal_record_check_status == 'COMPLETED' %}
-               <a href="{% url 'dbs_check_summary' %}?id={{application_id}}">
-               <span class="task-name">Criminal record (DBS) check</span>
-               <strong class="task-finished">Reviewed</strong>
-               </a>
-               {% endif %}
-            </td>
-         </tr>
          {% if eyfs_status != '' %}
          <tr id="efys">
             <td class="task">
@@ -151,6 +131,26 @@
                {% elif health_status == 'COMPLETED' %}
                <a href="{% url 'health_check_answers' %}?id={{application_id}}">
                <span class="task-name">Health declaration booklet</span>
+               <strong class="task-finished">Reviewed</strong>
+               </a>
+               {% endif %}
+            </td>
+         </tr>
+         <tr id="dbs">
+            <td class="task">
+               {% if criminal_record_check_status == 'NOT_STARTED' %}
+               <a href="{% url 'dbs_check_summary' %}?id={{application_id}}">
+               <span class="task-name">Criminal record (DBS) check</span>
+               <strong class="task-finished task-to-do">To do</strong>
+               </a>
+               {% elif criminal_record_check_status == 'FLAGGED' %}
+               <a href="{% url 'dbs_check_summary' %}?id={{application_id}}">
+               <span class="task-name">Criminal record (DBS) check</span>
+               <strong class="task-finished task-flagged">Flagged</strong>
+               </a>
+               {% elif criminal_record_check_status == 'COMPLETED' %}
+               <a href="{% url 'dbs_check_summary' %}?id={{application_id}}">
+               <span class="task-name">Criminal record (DBS) check</span>
                <strong class="task-finished">Reviewed</strong>
                </a>
                {% endif %}
