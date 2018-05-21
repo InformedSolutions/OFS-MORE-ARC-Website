@@ -64,16 +64,12 @@ def contact_summary(request):
     email = user_details.email
     mobile_number = user_details.mobile_number
     add_phone_number = user_details.add_phone_number
-    security_question = user_details.security_question
-    security_answer = user_details.security_answer
     variables = {
         'form': form,
         'application_id': application_id_local,
         'email': email,
         'mobile_number': mobile_number,
         'add_phone_number': add_phone_number,
-        'security_question': security_question,
-        'security_answer': security_answer,
         'login_details_status': application.login_details_status,
         'childcare_type_status': application.childcare_type_status
     }
