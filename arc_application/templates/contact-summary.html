@@ -1,5 +1,5 @@
 {% extends 'govuk_template.html' %}
-{% block page_title %}Review: your login details{% endblock %}
+{% block page_title %}Review: your sign in details{% endblock %}
 {% load static %}
 {% load govuk_template_base %}
 {% block inner_content %}
@@ -9,20 +9,13 @@
     {% csrf_token %}
 
     <h1 class="form-title heading-large">
-        Review: your login details
+        Review: your sign in details
     </h1>
-
+    <p>
+        Please check the boxes if there are errors.
+    </p>
     <!-- Login details -->
     <table class="check-your-answers form-group">
-        <thead>
-        <tr>
-            <th colspan="3">
-                <div class="heading-medium">
-                    Login details
-                </div>
-            </th>
-        </tr>
-        </thead>
         <tbody>
         <tr>
             <td>
@@ -39,6 +32,9 @@
             <td colspan="1">
                 <div>
                     {{ form.email_address_comments.label}}
+                </div>
+                <div>
+                    {{ form.email_address_comments.help_text}}
                 </div>
             </td>
             <td colspan="2">
@@ -61,6 +57,9 @@
                 <div>
                     {{ form.mobile_number_comments.label}}
                 </div>
+                <div>
+                    {{ form.mobile_number_comments.help_text}}
+                </div>
             </td>
             <td colspan="2">
                 <div>
@@ -70,7 +69,7 @@
         </tr>
         <tr>
             <td>
-                Alternative phone number
+                Other phone number
             </td>
             <td style="word-wrap: break-word">
                 {{add_phone_number}}
@@ -83,6 +82,9 @@
             <td colspan="1">
                 <div>
                     {{ form.add_phone_number_comments.label}}
+                </div>
+                <div>
+                    {{ form.add_phone_number_comments.help_text}}
                 </div>
             </td>
             <td colspan="2">
