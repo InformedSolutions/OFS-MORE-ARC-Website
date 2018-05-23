@@ -76,13 +76,16 @@ def personal_details_summary(request):
             name_save_successful = save_comments(request, name_comments)
             address_save_successful = save_comments(request, address_comments)
 
+            application = Application.objects.get(pk=application_id_local)
+
             if not birthdate_comments and not name_comments and not address_comments:
                 section_status = 'COMPLETED'
+                application.personal_details_arc_flagged = False
             else:
                 section_status = 'FLAGGED'
-                application = Application.objects.get(pk=application_id_local)
                 application.personal_details_arc_flagged = True
-                application.save()
+
+            application.save()
 
             if birthdate_save_successful and name_save_successful and address_save_successful:
 
