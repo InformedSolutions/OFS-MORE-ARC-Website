@@ -558,12 +558,13 @@ class SearchForm(GOVUKForm):
     GOV.UK form for the Your login and contact details: email page
     """
     field_label_classes = 'form-label-bold'
+    field_help_classes = 'search-help-text form-hint'
     auto_replace_widgets = True
     error_summary_title = "There was a problem on this page"
 
     reference_search_field = forms.CharField(label='Application number', required=False)
     name_search_field = forms.CharField(label='Name', required=False)
-    dob_search_field = forms.CharField(label='Date of birth', required=False, help_text='For example, 31 03 1980')
+    dob_search_field = forms.CharField(label='Date of birth', required=False, help_text='e.g. 31 03 1980')
     home_postcode_search_field = forms.CharField(label='Home postcode', required=False)
     care_location_postcode_search_field = forms.CharField(label='Work postcode', required=False)
 
