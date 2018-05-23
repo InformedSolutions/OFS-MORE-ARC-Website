@@ -26,11 +26,16 @@ class EFYSCheckSummaryView(View):
         if form.is_valid():
             comment_list = request_to_comment(eyfs_id, self.table_name, form.cleaned_data)
             save_successful = save_comments(request, comment_list)
+            application = Application.objects.get(pk=application_id_local)
 
             if not comment_list:
                 section_status = 'COMPLETED'
+                application.eyfs_training_arc_flagged = False
             else:
                 section_status = 'FLAGGED'
+                application.eyfs_training_arc_flagged = False
+
+            application.save()
 
             if save_successful:
                 status = Arc.objects.get(pk=application_id_local)
