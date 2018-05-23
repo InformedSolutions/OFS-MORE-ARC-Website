@@ -29,13 +29,16 @@ def first_aid_training_summary(request):
             comment_list = request_to_comment(first_aid_id, table_name, form.cleaned_data)
             save_successful = save_comments(request, comment_list)
 
+            application = Application.objects.get(pk=application_id_local)
+
             if not comment_list:
                 section_status = 'COMPLETED'
+                application.first_aid_training_arc_flagged = False
             else:
                 section_status = 'FLAGGED'
-                application = Application.objects.get(pk=application_id_local)
                 application.first_aid_training_arc_flagged = True
-                application.save()
+
+            application.save()
 
             if save_successful:
                 status = Arc.objects.get(pk=application_id_local)
