@@ -18,6 +18,7 @@ from ..models import ApplicantName, ApplicantPersonalDetails, Application, Arc, 
 from .base import release_application
 from ..notify import send_email
 
+
 @login_required()
 def task_list(request):
     """
@@ -30,74 +31,51 @@ def task_list(request):
     if has_group(request.user, 'arc'):
         if request.method == 'GET':
             application_id = request.GET['id']
-            application = Arc.objects.get(application_id=application_id)
+            application = Application.objects.get(application_id=application_id)
+            arc_application = Arc.objects.get(application_id=application_id)
             personal_details_record = ApplicantPersonalDetails.objects.get(application_id=application_id)
             name_record = ApplicantName.objects.get(personal_detail_id=personal_details_record.personal_detail_id)
             childcare_type_record = ChildcareType.objects.get(application_id=application_id)
-            reviewed = []
 
-            queryset = TimelineLog.objects.filter(object_id=application_id).order_by('-timestamp')
+            review_fields_to_check = (
+                'login_details_review',
+                'personal_details_review',
+                'childcare_type_review',
+                'first_aid_review',
+                'dbs_review',
+                'eyfs_review',
+                'health_review',
+                'references_review',
+                'people_in_home_review'
+            )
 
-            resubmitted = False
-            for log in queryset:
-                log_message = log.get_message()
-                if "Application resubmitted" in log_message:
-                    resubmitted = True
-                    break
+            flagged_fields_to_check = (
+                "childcare_type_arc_flagged",
+                "criminal_record_check_arc_flagged",
+                "eyfs_training_arc_flagged",
+                "first_aid_training_arc_flagged",
+                "health_arc_flagged",
+                "login_details_arc_flagged",
+                "people_in_home_arc_flagged",
+                "personal_details_arc_flagged",
+                "references_arc_flagged"
+            )
 
-            if resubmitted:
-                if application.login_details_review == 'COMPLETED':
-                    reviewed.append('login_details')
-                if application.personal_details_review == 'COMPLETED':
-                    reviewed.append('personal_details')
-                if application.childcare_type_review == 'COMPLETED':
-                    reviewed.append('childcare_type')
-                if application.first_aid_review == 'COMPLETED':
-                    reviewed.append('first_aid')
-                if application.dbs_review == 'COMPLETED':
-                    reviewed.append('dbs_check')
-                if application.eyfs_review == 'COMPLETED':
-                    reviewed.append('eyfs_review')
-                if application.health_review == 'COMPLETED':
-                    reviewed.append('health')
-                if application.references_review == 'COMPLETED':
-                    reviewed.append('references')
-                if application.people_in_home_review == 'COMPLETED':
-                    reviewed.append('people_in_home')
+            review_count = sum([1 for field in review_fields_to_check if getattr(arc_application, field) == 'COMPLETED'])
+            review_count += sum([1 for field in flagged_fields_to_check if getattr(application, field)])
 
-            else:
-                if application.login_details_review == 'COMPLETED' or application.login_details_review == 'FLAGGED':
-                    reviewed.append('login_details')
-                if application.personal_details_review == 'COMPLETED' or application.personal_details_review == 'FLAGGED':
-                    reviewed.append('personal_details')
-                if application.childcare_type_review == 'COMPLETED' or application.childcare_type_review == 'FLAGGED':
-                    reviewed.append('childcare_type')
-                if application.first_aid_review == 'COMPLETED' or application.first_aid_review == 'FLAGGED':
-                    reviewed.append('first_aid')
-                if application.dbs_review == 'COMPLETED' or application.dbs_review == 'FLAGGED':
-                    reviewed.append('dbs_check')
-                if application.eyfs_review == 'COMPLETED' or application.eyfs_review == 'FLAGGED':
-                    reviewed.append('eyfs_review')
-                if application.health_review == 'COMPLETED' or application.health_review == 'FLAGGED':
-                    reviewed.append('health')
-                if application.references_review == 'COMPLETED' or application.references_review == 'FLAGGED':
-                    reviewed.append('references')
-                if application.people_in_home_review == 'COMPLETED' or application.people_in_home_review == 'FLAGGED':
-                    reviewed.append('people_in_home')
-
-            review_count = len(reviewed)
             # Load review status
             application_status_context = {
                 'application_id': application_id,
-                'login_details_status': application.login_details_review,
-                'personal_details_status': application.personal_details_review,
-                'childcare_type_status': application.childcare_type_review,
-                'first_aid_training_status': application.first_aid_review,
-                'criminal_record_check_status': application.dbs_review,
-                'eyfs_status': application.eyfs_review,
-                'health_status': application.health_review,
-                'reference_status': application.references_review,
-                'people_in_home_status': application.people_in_home_review,
+                'login_details_status': arc_application.login_details_review,
+                'personal_details_status': arc_application.personal_details_review,
+                'childcare_type_status': arc_application.childcare_type_review,
+                'first_aid_training_status': arc_application.first_aid_review,
+                'criminal_record_check_status': arc_application.dbs_review,
+                'eyfs_status': arc_application.eyfs_review,
+                'health_status': arc_application.health_review,
+                'reference_status': arc_application.references_review,
+                'people_in_home_status': arc_application.people_in_home_review,
                 'birth_day': personal_details_record.birth_day,
                 'birth_month': personal_details_record.birth_month,
                 'birth_year': personal_details_record.birth_year,
