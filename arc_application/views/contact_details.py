@@ -42,10 +42,12 @@ def contact_summary(request):
             # Therefore it has been completed
             if not comment_list:
                 section_status = 'COMPLETED'
+                application.login_details_arc_flagged = False
             else:
                 section_status = 'FLAGGED'
                 application.login_details_arc_flagged = True
-                application.save()
+
+            application.save()
 
             # If the save has been successful , save and redirect
             if save_successful:
