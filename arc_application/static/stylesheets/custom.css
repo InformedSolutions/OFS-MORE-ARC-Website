@@ -99,6 +99,12 @@
   float: left;
 }
 
+@media (max-width: 639px) {
+    .task-name{
+        width: 70%
+    }
+}
+
 .task-completed {
   display: -moz-inline-stack;
   display: inline-block;

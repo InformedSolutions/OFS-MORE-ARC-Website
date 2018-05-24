@@ -109,7 +109,7 @@ def format_data(results):
         i.type = 'Childminder'
         i.sub_type = 'New'
 
-        if hasattr(i, 'order_code'):
+        if hasattr(i, 'application_reference'):
             app_id = i.application_id
         else:
             app_id = i.application_id.pk
@@ -126,7 +126,7 @@ def search_query(name, dob, home_postcode, care_location_postcode, reference):
     """
     if len(dob) == 0:
         return Application.objects.filter(
-            Q(order_code__icontains=reference),  # Contains reference AND
+            Q(application_reference__icontains=reference),  # Contains reference AND
             Q(
                 Q(applicantname__first_name__icontains=name) |
                 Q(applicantname__last_name__icontains=name)
@@ -156,7 +156,7 @@ def search_query(name, dob, home_postcode, care_location_postcode, reference):
                 current_century_year = split_dob[0]
 
             return Application.objects.filter(
-                Q(order_code__icontains=reference),  # Contains reference AND
+                Q(application_reference__icontains=reference),  # Contains reference AND
                 Q(
                     Q(applicantname__first_name__icontains=name) |
                     Q(applicantname__last_name__icontains=name)
@@ -187,7 +187,7 @@ def search_query(name, dob, home_postcode, care_location_postcode, reference):
                 current_century_year = split_dob[1]
 
             return Application.objects.filter(
-                Q(order_code__icontains=reference),  # Contains reference AND
+                Q(application_reference__icontains=reference),  # Contains reference AND
                 Q(
                     Q(applicantname__first_name__icontains=name) |
                     Q(applicantname__last_name__icontains=name)
@@ -219,7 +219,7 @@ def search_query(name, dob, home_postcode, care_location_postcode, reference):
                 current_century_year = split_dob[2]
 
             return Application.objects.filter(
-                Q(order_code__icontains=reference),  # Contains reference AND
+                Q(application_reference__icontains=reference),  # Contains reference AND
                 Q(
                     Q(applicantname__first_name__icontains=name) |
                     Q(applicantname__last_name__icontains=name)

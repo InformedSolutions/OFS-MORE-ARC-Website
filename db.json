@@ -1189,7 +1189,6 @@
     "date_created": "2018-04-06T10:19:14.361Z",
     "date_updated": "2018-04-06T10:20:18.339Z",
     "date_accepted": null,
-    "order_code": null,
     "date_submitted": null
   }
 },
@@ -1420,7 +1419,6 @@
     "date_created": "2018-04-06T11:41:40.532Z",
     "date_updated": "2018-04-06T11:41:40.532Z",
     "date_accepted": null,
-    "order_code": null,
     "date_submitted": null
   }
 },
@@ -1453,7 +1451,6 @@
     "date_created": "2018-04-09T09:18:00.331Z",
     "date_updated": "2018-04-09T09:18:00.331Z",
     "date_accepted": null,
-    "order_code": null,
     "date_submitted": null
   }
 },
@@ -1486,7 +1483,6 @@
     "date_created": "2018-04-10T14:58:10.393Z",
     "date_updated": "2018-04-10T14:58:34.504Z",
     "date_accepted": null,
-    "order_code": "224a1ed5-5057-4d04-9251-e16b354927be",
     "date_submitted": "2018-04-10T14:58:36.244Z"
   }
 },
@@ -1519,7 +1515,6 @@
     "date_created": "2018-04-09T09:18:48.660Z",
     "date_updated": "2018-04-09T09:19:04.488Z",
     "date_accepted": null,
-    "order_code": null,
     "date_submitted": null
   }
 },
@@ -1552,7 +1547,6 @@
     "date_created": "2018-04-06T11:42:13.854Z",
     "date_updated": "2018-04-06T11:42:18.064Z",
     "date_accepted": null,
-    "order_code": null,
     "date_submitted": null
   }
 },
@@ -1585,7 +1579,6 @@
     "date_created": "2018-04-10T14:52:55.160Z",
     "date_updated": "2018-04-10T14:52:59.622Z",
     "date_accepted": null,
-    "order_code": null,
     "date_submitted": null
   }
 },
@@ -1618,7 +1611,6 @@
     "date_created": "2018-04-09T09:06:25.224Z",
     "date_updated": "2018-04-09T09:06:27.610Z",
     "date_accepted": null,
-    "order_code": null,
     "date_submitted": null
   }
 },
@@ -1651,7 +1643,6 @@
     "date_created": "2018-04-06T08:21:13.427Z",
     "date_updated": "2018-04-06T08:24:40.573Z",
     "date_accepted": null,
-    "order_code": "f910898d-5c35-47e0-8207-00aa7b816a90",
     "date_submitted": "2018-04-06T08:25:04.015Z"
   }
 },
@@ -1684,7 +1675,6 @@
     "date_created": "2018-04-09T09:08:16.165Z",
     "date_updated": "2018-04-09T09:08:16.165Z",
     "date_accepted": null,
-    "order_code": null,
     "date_submitted": null
   }
 },
@@ -1717,7 +1707,6 @@
     "date_created": "2018-04-05T16:19:51.900Z",
     "date_updated": "2018-04-05T16:19:57.206Z",
     "date_accepted": null,
-    "order_code": null,
     "date_submitted": null
   }
 },
