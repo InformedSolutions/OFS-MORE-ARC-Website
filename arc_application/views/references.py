@@ -41,13 +41,16 @@ def references_summary(request):
             reference1_saved = save_comments(request, form_comments)
             reference2_saved = save_comments(request, form2_comments)
 
+            application = Application.objects.get(pk=application_id_local)
+
             if not form_comments and not form2_comments:
                 section_status = 'COMPLETED'
+                application.references_arc_flagged = False
             else:
                 section_status = 'FLAGGED'
-                application = Application.objects.get(pk=application_id_local)
                 application.references_arc_flagged = True
-                application.save()
+
+            application.save()
 
             if reference1_saved and reference2_saved:
                 status = Arc.objects.get(pk=application_id_local)
