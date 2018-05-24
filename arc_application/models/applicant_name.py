@@ -3,7 +3,6 @@ from django.db import models
 from .applicant_personal_details import ApplicantPersonalDetails
 from .application import Application
 
-
 class ApplicantName(models.Model):
     """
     Model for APPLICANT_NAME table
