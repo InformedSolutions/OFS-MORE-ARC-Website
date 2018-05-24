@@ -61,7 +61,6 @@ def create_application():
         date_created=datetime.datetime.today(),
         date_updated=datetime.datetime.today(),
         date_accepted=None,
-        order_code=None
     )
 
     details = ApplicantPersonalDetails.objects.create(

@@ -103,7 +103,7 @@
             </tr>
             </tbody>
         </table>
-        {% for id ,name, day, month, year, relationship, dbs_certificate_number, permission, formsetadult in adult_lists %}
+        {% for id ,name, day, month, year, relationship, dbs_certificate_number, formsetadult in adult_lists %}
         <table class="check-your-answers form-group">
             <thead>
             <tr>
@@ -263,43 +263,6 @@
                 <td colspan="2">
                     <div>
                         {{ formsetadult.dbs_certificate_number_comments}}
-                    </div>
-                </td>
-            </tr>
-            <tr>
-            <tr>
-                <td style="word-wrap: break-word">
-                    Permission for checks
-                </td>
-                {% if permission is True %}
-                <td style="word-wrap: break-word">
-                    Yes
-                </td>
-                {% elif permission is False %}
-                <td style="word-wrap: break-word">
-                    No
-                </td>
-                {% else %}
-                <td style="word-wrap: break-word">
-
-                </td>
-                {% endif %}
-                <td class="change-answer">
-                    {{ formsetadult.permission_declare }}
-                </td>
-            </tr>
-            <tr class="js-hidden" id="permission_declare{{formsetadult.instance_id.initial}}">
-                <td colspan="1">
-                    <div>
-                        {{ formsetadult.permission_comments.label}}
-                    </div>
-                    <div>
-                        {{ formsetadult.permission_comments.help_text}}
-                    </div>
-                </td>
-                <td colspan="2">
-                    <div>
-                        {{ formsetadult.permission_comments}}
                     </div>
                 </td>
             </tr>

@@ -99,6 +99,12 @@
   float: left;
 }
 
+@media (max-width: 639px) {
+    .task-name{
+        width: 70%
+    }
+}
+
 .task-completed {
   display: -moz-inline-stack;
   display: inline-block;
@@ -387,4 +393,8 @@
 
 .error-field-label {
   padding-left: 10px;
+}
+
+.search-help-text {
+  display: inline !important;
 }

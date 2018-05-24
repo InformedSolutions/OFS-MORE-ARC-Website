@@ -90,7 +90,7 @@ def name_converter(name):
 
                   ]
 
-    name_list = ['Your email', 'Mobile phone number', 'Alternative phone number', 'Knowledge based question',
+    name_list = ['Your email', 'Your mobile number', 'Other phone number', 'Knowledge based question',
                  'Knowledge based answer',
                  'What age groups will you be caring for?', 'Are you providing overnight care?',
                  'Your name', 'Your date of birth', 'Home address', 'Childcare location',
@@ -162,8 +162,8 @@ def load_login_details(app):
         table = [
             {"title": "Your sign in details", "id": login_record.pk},
             {"name": "Your email", "value": login_record.email},
-            {"name": "Mobile phone number", "value": login_record.mobile_number},
-            {"name": "Alternative phone number", "value": login_record.add_phone_number},
+            {"name": "Your mobile number", "value": login_record.mobile_number},
+            {"name": "Other phone number", "value": login_record.add_phone_number},
         ]
         return table
     return False
