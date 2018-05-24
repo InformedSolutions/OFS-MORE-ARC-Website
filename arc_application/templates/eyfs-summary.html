@@ -7,17 +7,11 @@
 
 <form method="post" novalidate>
     <h1 class="form-title heading-large">Review: Early years training</h1>
+    <p>
+        Please check the boxes if there are errors.
+    </p>
     {% csrf_token %}
     <table class="check-your-answers form-group">
-        <thead>
-        <tr>
-            <th colspan="3">
-                <div class="heading-medium">
-                    Early years training course
-                </div>
-            </th>
-        </tr>
-        </thead>
         <tbody>
         <tr>
             <td>
@@ -34,6 +28,9 @@
             <td colspan="1">
                 <div>
                     {{ form.title_of_course_comments.label }}
+                </div>
+                <div>
+                    {{ form.title_of_course_comments.help_text }}
                 </div>
             </td>
             <td colspan="2">
@@ -104,6 +101,9 @@
             <td colspan="1">
                 <div>
                     {{ form.date_of_course_comments.label }}
+                </div>
+                <div>
+                    {{ form.date_of_course_comments.help_text }}
                 </div>
             </td>
             <td colspan="2">

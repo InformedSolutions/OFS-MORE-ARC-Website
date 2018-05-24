@@ -19,6 +19,8 @@
         {% include 'submit_button.html' %}
     </form>
     <br>
-    {% include 'return_to_list.html' with location='search' application_id=application_id %}
+    {% if not cc_user %}
+        {% include 'return-to-list.html' with location='search' application_id=application_id %}
+    {% endif %}
 </div>
 {% endblock %}

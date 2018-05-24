@@ -388,3 +388,7 @@
 .error-field-label {
   padding-left: 10px;
 }
+
+.search-help-text {
+  display: inline !important;
+}

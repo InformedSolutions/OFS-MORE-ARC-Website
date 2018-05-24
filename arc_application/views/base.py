@@ -328,9 +328,12 @@ class AuditlogListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super(AuditlogListView, self).get_context_data(**kwargs)
+        app_id = self.request.GET.get('id')
+        context['orderCode'] = Application.objects.get(application_id=app_id).order_code
 
         if has_group(self.request.user, settings.CONTACT_CENTRE):
             context['back'] = reverse('search')
+            context['cc_user'] = True
 
         if has_group(self.request.user, settings.ARC_GROUP):
             context['back'] = reverse('task_list') + '?id=' + self.request.GET.get('id')

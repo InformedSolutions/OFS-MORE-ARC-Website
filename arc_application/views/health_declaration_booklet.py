@@ -39,7 +39,7 @@ def health_check_answers(request):
                 status = Arc.objects.get(pk=application_id_local)
                 status.health_review = section_status
                 status.save()
-                default = '/other-people/summary'
+                default = '/dbs-check/summary'
                 redirect_link = redirect_selection(request, default)
 
                 return HttpResponseRedirect(settings.URL_PREFIX + redirect_link + '?id=' + application_id_local)

@@ -10,6 +10,9 @@
 <form method="post" novalidate>
 
     <h1 class="form-title heading-large">Review: your personal details</h1>
+    <p>
+        Please check the boxes if there are errors.
+    </p>
 
     <table class="check-your-answers form-group">
         <thead>
@@ -43,6 +46,9 @@
             <td colspan="1">
                 <div>
                     {{ form.name_comments.label}}
+                </div>
+                <div>
+                    {{ form.name_comments.help_text}}
                 </div>
             </td>
             <td colspan="2">
@@ -113,6 +119,9 @@
             <td colspan="1">
                 <div>
                     {{ form.date_of_birth_comments.label}}
+                </div>
+                <div>
+                    {{ form.date_of_birth_comments.help_text}}
                 </div>
             </td>
             <td colspan="2">
@@ -188,6 +197,9 @@
                 <div>
                     {{ form.home_address_comments.label}}
                 </div>
+                <div>
+                    {{ form.home_address_comments.help_text}}
+                </div>
             </td>
             <td colspan="2">
                 <div>
@@ -254,6 +266,9 @@
             <td colspan="1">
                 <div>
                     {{ form.childcare_location_comments.label}}
+                </div>
+                <div>
+                    {{ form.childcare_location_comments.help_text}}
                 </div>
             </td>
             <td colspan="2">

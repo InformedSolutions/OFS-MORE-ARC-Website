@@ -6,7 +6,7 @@ from timeline_logger.models import TimelineLog
 
 from ..summary_page_data import link_dict
 from ..models import *
-from .review import review
+from .review import review, has_group
 
 
 def arc_summary(request):
@@ -28,22 +28,27 @@ def arc_summary(request):
 
 
 def cc_summary(request):
+    cc_user = has_group(request.user, settings.CONTACT_CENTRE)
+    arc_user = has_group(request.user, settings.ARC_GROUP)
+
     if request.method == 'GET':
         application_id_local = request.GET["id"]
         json = load_json(application_id_local)
         json[0][1]['link'] = (reverse('update_email') + '?id=' + str(application_id_local))
         json[0][2]['link'] = (reverse('update_phone_number') + '?id=' + str(application_id_local))
         json[0][3]['link'] = (reverse('update_add_number') + '?id=' + str(application_id_local))
+        user_type = 'contact center' if cc_user else 'reviewer'
         TimelineLog.objects.create(
             content_object=Application.objects.get(pk=application_id_local),
             user=request.user,
             template='timeline_logger/application_action_contact_center.txt',
-            extra_data={'user_type': 'contact center', 'entity': 'application', 'action': "viewed"}
+            extra_data={'user_type': user_type, 'entity': 'application', 'action': "viewed"}
         )
 
         variables = {
             'json': json,
-            'application_id': application_id_local
+            'application_id': application_id_local,
+            'cc_user': cc_user
         }
         return render(request, 'search-summary.html', variables)
     elif request.method == 'POST':
@@ -85,7 +90,7 @@ def name_converter(name):
 
                   ]
 
-    name_list = ['Your email', 'Mobile phone number', 'Alternative phone number', 'Knowledge based question',
+    name_list = ['Your email', 'Your mobile number', 'Other phone number', 'Knowledge based question',
                  'Knowledge based answer',
                  'What age groups will you be caring for?', 'Are you providing overnight care?',
                  'Your name', 'Your date of birth', 'Home address', 'Childcare location',
@@ -157,8 +162,8 @@ def load_login_details(app):
         table = [
             {"title": "Your sign in details", "id": login_record.pk},
             {"name": "Your email", "value": login_record.email},
-            {"name": "Mobile phone number", "value": login_record.mobile_number},
-            {"name": "Alternative phone number", "value": login_record.add_phone_number},
+            {"name": "Your mobile number", "value": login_record.mobile_number},
+            {"name": "Other phone number", "value": login_record.add_phone_number},
         ]
         return table
     return False

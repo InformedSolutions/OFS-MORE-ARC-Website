@@ -8,6 +8,7 @@ from django.contrib.auth.models import Group
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.views import View
+from timeline_logger.models import TimelineLog
 
 from ..forms.form import PreviousRegistrationDetailsForm
 from ..forms.form import AdultInYourHomeForm, ChildInYourHomeForm, CommentsForm
@@ -34,24 +35,56 @@ def task_list(request):
             name_record = ApplicantName.objects.get(personal_detail_id=personal_details_record.personal_detail_id)
             childcare_type_record = ChildcareType.objects.get(application_id=application_id)
             reviewed = []
-            if application.login_details_review == 'COMPLETED' or application.login_details_review == 'FLAGGED':
-                reviewed.append('login_details')
-            if application.personal_details_review == 'COMPLETED' or application.personal_details_review == 'FLAGGED':
-                reviewed.append('personal_details')
-            if application.childcare_type_review == 'COMPLETED' or application.childcare_type_review == 'FLAGGED':
-                reviewed.append('childcare_type')
-            if application.first_aid_review == 'COMPLETED' or application.first_aid_review == 'FLAGGED':
-                reviewed.append('first_aid')
-            if application.dbs_review == 'COMPLETED' or application.dbs_review == 'FLAGGED':
-                reviewed.append('dbs_check')
-            if application.eyfs_review == 'COMPLETED' or application.eyfs_review == 'FLAGGED':
-                reviewed.append('eyfs_review')
-            if application.health_review == 'COMPLETED' or application.health_review == 'FLAGGED':
-                reviewed.append('health')
-            if application.references_review == 'COMPLETED' or application.references_review == 'FLAGGED':
-                reviewed.append('references')
-            if application.people_in_home_review == 'COMPLETED' or application.people_in_home_review == 'FLAGGED':
-                reviewed.append('people_in_home')
+
+            queryset = TimelineLog.objects.filter(object_id=application_id).order_by('-timestamp')
+
+            resubmitted = False
+            for log in queryset:
+                log_message = log.get_message()
+                if "Application resubmitted" in log_message:
+                    resubmitted = True
+                    break
+
+            if resubmitted:
+                if application.login_details_review == 'COMPLETED':
+                    reviewed.append('login_details')
+                if application.personal_details_review == 'COMPLETED':
+                    reviewed.append('personal_details')
+                if application.childcare_type_review == 'COMPLETED':
+                    reviewed.append('childcare_type')
+                if application.first_aid_review == 'COMPLETED':
+                    reviewed.append('first_aid')
+                if application.dbs_review == 'COMPLETED':
+                    reviewed.append('dbs_check')
+                if application.eyfs_review == 'COMPLETED':
+                    reviewed.append('eyfs_review')
+                if application.health_review == 'COMPLETED':
+                    reviewed.append('health')
+                if application.references_review == 'COMPLETED':
+                    reviewed.append('references')
+                if application.people_in_home_review == 'COMPLETED':
+                    reviewed.append('people_in_home')
+
+            else:
+                if application.login_details_review == 'COMPLETED' or application.login_details_review == 'FLAGGED':
+                    reviewed.append('login_details')
+                if application.personal_details_review == 'COMPLETED' or application.personal_details_review == 'FLAGGED':
+                    reviewed.append('personal_details')
+                if application.childcare_type_review == 'COMPLETED' or application.childcare_type_review == 'FLAGGED':
+                    reviewed.append('childcare_type')
+                if application.first_aid_review == 'COMPLETED' or application.first_aid_review == 'FLAGGED':
+                    reviewed.append('first_aid')
+                if application.dbs_review == 'COMPLETED' or application.dbs_review == 'FLAGGED':
+                    reviewed.append('dbs_check')
+                if application.eyfs_review == 'COMPLETED' or application.eyfs_review == 'FLAGGED':
+                    reviewed.append('eyfs_review')
+                if application.health_review == 'COMPLETED' or application.health_review == 'FLAGGED':
+                    reviewed.append('health')
+                if application.references_review == 'COMPLETED' or application.references_review == 'FLAGGED':
+                    reviewed.append('references')
+                if application.people_in_home_review == 'COMPLETED' or application.people_in_home_review == 'FLAGGED':
+                    reviewed.append('people_in_home')
+
             review_count = len(reviewed)
             # Load review status
             application_status_context = {

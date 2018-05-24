@@ -67,7 +67,7 @@ def other_people_summary(request):
                         application = Application.objects.get(pk=application_id_local)
                         application.people_in_home_arc_flagged = True
                         application.save()
-                    successful = save_comments(person_comments)
+                    successful = save_comments(request, person_comments)
                     if not successful:
                         return render(request, '500.html')
 
@@ -97,7 +97,6 @@ def other_people_summary(request):
     adult_birth_year_list = []
     adult_relationship_list = []
     adult_dbs_list = []
-    adult_permission_list = []
     children_list = ChildInHome.objects.filter(application_id=application_id_local).order_by('child')
     child_id_list = []
     child_name_list = []
@@ -118,7 +117,6 @@ def other_people_summary(request):
         adult_birth_year_list.append(adult.birth_year)
         adult_relationship_list.append(adult.relationship)
         adult_dbs_list.append(adult.dbs_certificate_number)
-        adult_permission_list.append(adult.permission_declare)
     # Defines the data required for rendering the amount of forms in the below formset
     amount_of_adults = str(len(adult_name_list))
     data = {
@@ -135,7 +133,7 @@ def other_people_summary(request):
     # Zips the formset into the list of adults
     adult_lists = zip(adult_id_list, adult_name_list, adult_birth_day_list, adult_birth_month_list,
                       adult_birth_year_list,
-                      adult_relationship_list, adult_dbs_list, adult_permission_list, formset_adult)
+                      adult_relationship_list, adult_dbs_list, formset_adult)
 
     # Converts it to a list, there was trouble parsing the form objects when it was in a zip object
     adult_lists = list(adult_lists)
