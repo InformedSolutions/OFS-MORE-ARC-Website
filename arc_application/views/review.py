@@ -67,6 +67,7 @@ def task_list(request):
             # Load review status
             application_status_context = {
                 'application_id': application_id,
+                'application_reference': application.application_reference,
                 'login_details_status': arc_application.login_details_review,
                 'personal_details_status': arc_application.personal_details_review,
                 'childcare_type_status': arc_application.childcare_type_review,
