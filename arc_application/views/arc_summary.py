@@ -8,11 +8,20 @@ from ..summary_page_data import link_dict
 from ..models import *
 from .review import review, has_group
 
+"""
+    to merge multiple models inside a table, represent them as a list within the ordered_models list.
+    the get_summary_table method for these nested models should contain a key for each row called 'index',
+    determining the order of the rows in the merged table
+"""
+ordered_models = [UserDetails, ChildcareType, [ApplicantPersonalDetails, ApplicantName, ApplicantHomeAddress],
+                  FirstAidTraining, EYFS, HealthDeclarationBooklet, CriminalRecordCheck, Application,
+                  AdultInHome, ChildInHome, Reference]
+
 
 def arc_summary(request):
     if request.method == 'GET':
         application_id_local = request.GET["id"]
-        json = load_json(application_id_local)
+        json = load_json(application_id_local, ordered_models, False)
         json = add_comments(json, application_id_local)
         variables = {
             'json': json,
@@ -33,7 +42,7 @@ def cc_summary(request):
 
     if request.method == 'GET':
         application_id_local = request.GET["id"]
-        json = load_json(application_id_local)
+        json = load_json(application_id_local, ordered_models, False)
         json[0][1]['link'] = (reverse('update_email') + '?id=' + str(application_id_local))
         json[0][2]['link'] = (reverse('update_phone_number') + '?id=' + str(application_id_local))
         json[0][3]['link'] = (reverse('update_add_number') + '?id=' + str(application_id_local))
@@ -61,18 +70,22 @@ def cc_summary(request):
 
 def add_comments(json, app_id):
     for table in json:
-        title_row = table[0]
-        id = title_row['id']
-        label = link_dict[title_row['title']]
-        for row in table[1:]:
-            if 'pk' in row:
-                id = row['pk']
-            name = row['name']
-            field = name_converter(name)
-            row['comment'] = get_comment(id, field)
-            # row['comment'] = load_comment(lookup, id, name)
-            row['link'] = reverse(label) + '?id=' + app_id
-        row = row
+        if isinstance(table[0], list):
+            add_comments(table, app_id)
+        else:
+            title_row = table[0]
+            id = title_row['id']
+            title = title_row['title']
+            label = link_dict[title] if title in link_dict.keys() else 'other_people_summary'
+            for row in table[1:]:
+                if 'pk' in row:
+                    id = row['pk']
+                name = row['name']
+                field = name_converter(name)
+                row['comment'] = get_comment(id, field)
+                # row['comment'] = load_comment(lookup, id, name)
+                row['link'] = reverse(label) + '?id=' + app_id
+            row = row
     return json
 
 
@@ -119,226 +132,31 @@ def get_comment(pk, field):
         return '    '
 
 
-def load_json(application_id_local):
+def load_json(application_id_local, ordered_models, recurse):
+    """
+    Dynamically builds a JSON to be consumed by the HTML summary page
+    :param application_id_local: the id of the application being handled
+    :param ordered_models: the models to be built for the summary page
+    :param recurse: flag to indicate whether the method is currently recursing
+    :return:
+    """
     application = Application.objects.get(application_id=application_id_local)
-
-    login_details_table = load_login_details(application)
-
-    childcare_type_table = load_childcare_type(application)
-
-    personal_detail_table = load_personal_detail_table(application)
-
-    first_aid_table = load_first_aid(application)
-
-    eyfs_table = load_eyfs_record(application)
-
-    health_check_table = load_health_check(application)
-
-    criminal_record_table = load_criminal_record(application)
-
-    first_reference_table = load_reference(application, 1)
-
-    second_reference_table = load_reference(application, 2)
-
-    adult_home_table = load_adult_home(application)
-
-    child_home_table = load_child_home(application)
-
-    table_list = [login_details_table, childcare_type_table, personal_detail_table, first_aid_table, eyfs_table,
-                  health_check_table,
-                  criminal_record_table, adult_home_table, child_home_table, first_reference_table, second_reference_table]
-    l = []
-    for i in table_list:
-        if not i:
-            pass
-        else:
-            l.append(i)
-    return l
-
-
-def load_login_details(app):
-    if UserDetails.objects.filter(application_id=app).exists():
-        login_record = UserDetails.objects.get(application_id=app)
-        table = [
-            {"title": "Your sign in details", "id": login_record.pk},
-            {"name": "Your email", "value": login_record.email},
-            {"name": "Your mobile number", "value": login_record.mobile_number},
-            {"name": "Other phone number", "value": login_record.add_phone_number},
-        ]
-        return table
-    return False
-
-
-def load_childcare_type(app):
-    if ChildcareType.objects.filter(application_id=app).exists():
-        childcare_record = ChildcareType.objects.get(application_id=app)
-        zero_to_five = childcare_record.zero_to_five
-        five_to_eight = childcare_record.five_to_eight
-        eight_plus = childcare_record.eight_plus
-        register = ''
-        if zero_to_five and five_to_eight or zero_to_five and not five_to_eight and eight_plus:
-            register = 'Early Years Register, Childcare Register'
-        if not zero_to_five and five_to_eight and eight_plus:
-            register = 'Childcare Register (compulsory & voluntary parts)'
-        if zero_to_five and not five_to_eight and not eight_plus:
-            register = 'Early Years Register'
-        if not zero_to_five and five_to_eight and not eight_plus:
-            register = 'Childcare Register (compulsory part)'
-        if not zero_to_five and not five_to_eight and eight_plus:
-            register = 'Childcare Register (voluntary part)'
-
-        table = [
-            {"title": "Type of childcare", "id": childcare_record.pk},
-            {"name": "Looking after 0 to 5 year olds?", "value": childcare_record.zero_to_five},
-            {"name": "Looking after 5 to 7 year olds? ", "value": childcare_record.five_to_eight},
-            {"name": "Looking after 8 year olds and older? ", "value": childcare_record.eight_plus},
-            {"name": "Registers", "value": register}
-        ]
-        return table
-    return False
-
-
-def load_personal_detail_table(app):
-    if ApplicantName.objects.filter(application_id=app).exists():
-        applicant_name_record = ApplicantName.objects.get(application_id=app)
-
-        if ApplicantPersonalDetails.objects.filter(application_id=app).exists():
-            applicant_record = ApplicantPersonalDetails.objects.get(application_id=app)
-
-            if ApplicantHomeAddress.objects.filter(application_id=app, current_address=True).exists():
-                applicant_home_address_record = ApplicantHomeAddress.objects.get(application_id=app,
-                                                                                 current_address=True)
-
-                if ApplicantHomeAddress.objects.filter(application_id=app, childcare_address=True,
-                                                       current_address=False).exists():
-                    childcare_address_record = ApplicantHomeAddress.objects.get(application_id=app,
-                                                                                childcare_address=True,
-                                                                                current_address=False)
-                    childcare_address = childcare_address_record.street_line1 + ', ' + childcare_address_record.street_line2 \
-                                        + ', ' + childcare_address_record.town + ', ' + childcare_address_record.postcode
+    table_list = []
+    for model in ordered_models:
+        if isinstance(model, list):
+            table_list.append(load_json(application_id_local, model, True))
+        elif model == Application:
+            table_list.append(application.get_summary_table_adult())
+            table_list.append(application.get_summary_table_child())
+        elif model.objects.filter(application_id=application).exists():
+            records = model.objects.filter(application_id=application)
+            for record in records:
+                table = record.get_summary_table()
+                if recurse:
+                    table_list = table_list + table
                 else:
-                    childcare_address = 'Same as home address'
+                    table_list.append(table)
 
-                home_address = applicant_home_address_record.street_line1 + ', ' + applicant_home_address_record.street_line2 \
-                               + ', ' + applicant_home_address_record.town + ', ' + applicant_home_address_record.postcode
-
-                table = [
-                    {"title": "Your personal details", "id": applicant_record.personal_detail_id},
-                    {"name": "Your name",
-                     "value": applicant_name_record.first_name + ' ' + applicant_name_record.middle_names + ' ' + applicant_name_record.last_name,
-                     'pk': applicant_name_record.pk},
-                    {"name": "Your date of birth",
-                     "value": str(applicant_record.birth_day) + '/' + str(applicant_record.birth_month) + '/' + str(
-                         applicant_record.birth_year), 'pk': applicant_record.pk},
-                    {"name": "Home address", "value": home_address, 'pk': applicant_home_address_record.pk},
-                    {"name": "Childcare location", "value": childcare_address,
-                     'pk': applicant_home_address_record.pk}
-                ]
-                return table
-    return False
-
-
-def load_first_aid(app):
-    if FirstAidTraining.objects.filter(application_id=app).exists():
-        first_aid_record = FirstAidTraining.objects.get(application_id=app)
-
-        table = [
-            {"title": "First aid training", "id": first_aid_record.pk},
-            {"name": "First aid training provider", "value": first_aid_record.training_organisation},
-            {"name": "Title of first aid course", "value": first_aid_record.course_title},
-            {"name": "Date of first aid certificate",
-             "value": str(first_aid_record.course_day) + '/' + str(first_aid_record.course_month) + '/' + str(
-                 first_aid_record.course_year)}
-        ]
-        return table
-    return False
-
-
-def load_eyfs_record(app):
-    if EYFS.objects.filter(application_id=app).exists():
-        eyfs_record = EYFS.objects.get(application_id=app)
-
-        table = [
-            {"title": "Early Years training", "id": eyfs_record.pk},
-            {"name": "Title of training course", "value": eyfs_record.eyfs_course_name},
-            {"name": "Date you completed course",
-             "value": str(eyfs_record.eyfs_course_date_day) + '/' + str(eyfs_record.eyfs_course_date_month) + '/' + str(
-                 eyfs_record.eyfs_course_date_year)}
-        ]
-        return table
-    return False
-
-
-def load_criminal_record(app):
-    if CriminalRecordCheck.objects.filter(application_id=app).exists():
-        dbs_record = CriminalRecordCheck.objects.get(application_id=app)
-
-        table = [
-            {"title": "Criminal record (DBS) check", "id": dbs_record.pk},
-            {"name": "DBS certificate number", "value": dbs_record.dbs_certificate_number},
-            {"name": "Do you have any cautions or convictions?", "value": dbs_record.cautions_convictions}
-        ]
-        return table
-    return False
-
-
-def load_health_check(app):
-    if HealthDeclarationBooklet.objects.filter(application_id=app).exists():
-        hdb_record = HealthDeclarationBooklet.objects.get(application_id=app)
-
-        table = [
-            {"title": "Health declaration booklet", "id": hdb_record.pk},
-            {"name": "Provide a Health Declaration Booklet?", "value": hdb_record.send_hdb_declare}
-        ]
-        return table
-    return False
-
-
-def load_reference(app, num):
-    if Reference.objects.filter(application_id=app, reference=num).exists():
-        first_reference_record = Reference.objects.get(application_id=app, reference=num)
-        ref1_address = first_reference_record.street_line1 + ', ' + first_reference_record.street_line2 + ', ' + first_reference_record.town + ', ' + first_reference_record.postcode
-        if num == 1:
-            ref_num = 'First'
-        if num == 2:
-            ref_num = 'Second'
-        months = first_reference_record.months_known
-        months_str = str(months) + ' months, ' if months != 1 else str(months) + ' month, '
-        years = first_reference_record.years_known
-        years_str = str(years) + ' years' if years != 1 else str(years) + ' year'
-        table = [
-            {"title": ref_num + " reference", "id": first_reference_record.pk},
-            {"name": "Full name", "value": first_reference_record.first_name + ' ' + first_reference_record.last_name},
-            {"name": "How they know you", "value": first_reference_record.relationship},
-            {"name": "Known for", "value": months_str + years_str},
-            {"name": "Address", "value": ref1_address},
-            {"name": "Phone number", "value": first_reference_record.phone_number},
-            {"name": "Email address", "value": first_reference_record.email}
-
-        ]
-        return table
-    return False
-
-
-def load_adult_home(app):
-    if UserDetails.objects.filter(application_id=app).exists():
-        login_record = UserDetails.objects.get(application_id=app)
-
-        table = [
-            {"title": "Adults in your home", "id": login_record.pk},
-            {"name": "Do you live with anyone who is 16 or over?", "value": app.adults_in_home}
-        ]
-        return table
-    return False
-
-
-def load_child_home(app):
-    if UserDetails.objects.filter(application_id=app).exists():
-        login_record = UserDetails.objects.get(application_id=app)
-
-        table = [
-            {"title": "Children in your home", "id": login_record.pk},
-            {"name": "Do you live with any children?", "value": app.children_in_home}
-        ]
-        return table
-    return False
+    if recurse:
+        table_list = sorted(table_list, key=lambda k: k['index'])
+    return table_list

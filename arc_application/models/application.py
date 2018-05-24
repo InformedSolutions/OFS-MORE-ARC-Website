@@ -74,5 +74,25 @@ class Application(models.Model):
     def get_id(cls, app_id):
         return cls.objects.get(pk=app_id)
 
+    def get_bool_as_string(self, bool_field):
+        if bool_field:
+            return 'Yes'
+        else:
+            return 'No'
+
+    def get_summary_table_adult(self):
+        return [
+            {"title": "Adults in your home", "id": self.pk},
+            {"name": "Do you live with anyone who is 16 or over?",
+             "value": self.get_bool_as_string(self.adults_in_home)}
+        ]
+
+    def get_summary_table_child(self):
+        return [
+            {"title": "Children in your home", "id": self.pk},
+            {"name": "Do you live with any children?",
+             "value": self.get_bool_as_string(self.children_in_home)}
+        ]
+
     class Meta:
         db_table = 'APPLICATION'

@@ -1,5 +1,6 @@
 from datetime import datetime
 from uuid import uuid4
+import calendar
 from django.db import models
 from .application import Application
 
@@ -61,6 +62,21 @@ class AdultInHome(models.Model):
     def get_id(cls, app_id):
         return cls.objects.get(application_id=app_id)
 
+    def get_name(self):
+        return self.first_name + " " + self.middle_names + " " + self.last_name
+
+    def get_birthday(self):
+        return ' '.join([str(self.birth_day), calendar.month_name[self.birth_month], str(self.birth_year)])
+
+    def get_summary_table(self):
+        return [
+                {"title": self.get_name(), "id": self.pk},
+                {"name": "Name", "value": self.get_name()},
+                {"name": "Date of birth", "value": self.get_birthday()},
+                {"name": "Relationship", "value": self.relationship},
+                {"name": "DBS certificate number", "value": self.dbs_certificate_number}
+            ]
+      
     # Date of birth property created to keep DRY
     @property
     def date_of_birth(self):

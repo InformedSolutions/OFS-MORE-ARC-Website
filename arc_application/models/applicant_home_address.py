@@ -56,5 +56,20 @@ class ApplicantHomeAddress(models.Model):
         personal_detail_id = ApplicantPersonalDetails.get_id(app_id)
         return cls.objects.get(personal_detail_id=personal_detail_id)
 
+    def get_address(self):
+        return self.street_line1 + ', ' + self.street_line2 + ', ' + self.town + ', ' + self.postcode
+
+    def get_summary_table(self):
+        if self.childcare_address and not self.current_address:
+            childcare_address = self.get_address()
+        else:
+            childcare_address = 'Same as home address'
+
+        return [
+            {"name": "Home address", "value": self.get_address(), 'pk': self.pk, "index": 3},
+            {"name": "Childcare location", "value": childcare_address,
+             'pk': self.pk, "index": 4}
+        ]
+
     class Meta:
         db_table = 'APPLICANT_HOME_ADDRESS'

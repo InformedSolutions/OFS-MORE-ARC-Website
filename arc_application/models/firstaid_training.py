@@ -44,5 +44,15 @@ class FirstAidTraining(models.Model):
     def get_id(cls, app_id):
         return cls.objects.get(application_id=app_id)
 
+    def get_summary_table(self):
+        return [
+            {"title": "First aid training", "id": self.pk},
+            {"name": "First aid training provider", "value": self.training_organisation},
+            {"name": "Title of first aid course", "value": self.course_title},
+            {"name": "Date of first aid certificate",
+             "value": str(self.course_day) + '/' + str(self.course_month) + '/' + str(
+                 self.course_year)}
+        ]
+
     class Meta:
         db_table = 'FIRST_AID_TRAINING'
