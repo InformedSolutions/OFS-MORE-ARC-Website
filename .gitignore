@@ -16,7 +16,6 @@ staticfiles/
 .idea/
 .venv/
 .makerc
-.settings/
 geckodriver.log
 
 
