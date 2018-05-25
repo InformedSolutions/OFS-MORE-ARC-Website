@@ -33,7 +33,8 @@ class EFYSCheckSummaryView(View):
                 application.eyfs_training_arc_flagged = False
             else:
                 section_status = 'FLAGGED'
-                application.eyfs_training_arc_flagged = False
+                application.eyfs_training_arc_flagged = True
+                application.eyfs_training_status = section_status
 
             application.save()
 

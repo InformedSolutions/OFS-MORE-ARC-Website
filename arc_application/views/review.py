@@ -182,7 +182,7 @@ def all_complete(id, flag):
     if Arc.objects.filter(application_id=id):
         arc = Arc.objects.get(application_id=id)
         list = [arc.login_details_review, arc.childcare_type_review, arc.personal_details_review,
-                arc.first_aid_review, arc.dbs_review, arc.health_review, arc.references_review,
+                arc.first_aid_review, arc.eyfs_review, arc.dbs_review, arc.health_review, arc.references_review,
                 arc.people_in_home_review]
 
         for i in list:

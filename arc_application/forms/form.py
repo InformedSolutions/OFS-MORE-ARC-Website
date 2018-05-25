@@ -78,7 +78,7 @@ class PersonalDetailsForm(GOVUKForm):
     """
     GOV.UK form for the Personal details page
     """
-    # customisations:
+    # customisations:first_
     auto_replace_widgets = True
 
     field_label_classes = 'form-label-bold'
@@ -161,19 +161,19 @@ class EYFSCheckForm(GOVUKForm):
     """
     auto_replace_widgets = True
 
-    title_of_course_declare = forms.BooleanField(label='This information is correct',
+    eyfs_course_name_declare = forms.BooleanField(label='This information is correct',
                                                   widget=custom_field_widgets.CustomCheckboxInput,
                                                   required=False)
-    title_of_course_comments = forms.CharField(label='Enter your reasoning', help_text='(Tip: be clear and concise)', 
+    eyfs_course_name_comments = forms.CharField(label='Enter your reasoning', help_text='(Tip: be clear and concise)', 
                                                widget=custom_field_widgets.Textarea, required=False)
 
-    date_of_course_declare = forms.BooleanField(label='This information is correct',
+    eyfs_course_date_declare = forms.BooleanField(label='This information is correct',
                                                 widget=custom_field_widgets.CustomCheckboxInput, required=False)
-    date_of_course_comments = forms.CharField(label='Enter your reasoning', help_text='(Tip: be clear and concise)', 
+    eyfs_course_date_comments = forms.CharField(label='Enter your reasoning', help_text='(Tip: be clear and concise)', 
                                               widget=custom_field_widgets.Textarea, required=False)
 
-    checkboxes = [(title_of_course_declare, 'title_of_course'),
-                  (date_of_course_declare, 'date_of_course')]
+    checkboxes = [(eyfs_course_name_declare, 'eyfs_course_name'),
+                  (eyfs_course_date_declare, 'eyfs_course_date')]
 
     for box in checkboxes:
         box[0].widget.attrs.update({'data_target': box[1],
@@ -197,10 +197,6 @@ class DBSCheckForm(GOVUKForm):
                                                         widget=custom_field_widgets.CustomCheckboxInput, required=False)
     dbs_certificate_number_comments = forms.CharField(label='Enter your reasoning', help_text='(Tip: be clear and concise)', 
                                                       widget=custom_field_widgets.Textarea, required=False)
-    dbs_submission_consent_declare = forms.BooleanField(label='This information is correct',
-                                                        widget=custom_field_widgets.CustomCheckboxInput, required=False)
-    dbs_submission_consent_comments = forms.CharField(label='Enter your reasoning', help_text='(Tip: be clear and concise)', 
-                                                      widget=custom_field_widgets.Textarea, required=False)
     cautions_or_convictions_declare = forms.BooleanField(label='This information is correct',
                                                          widget=custom_field_widgets.CustomCheckboxInput,
                                                          required=False)
@@ -208,7 +204,6 @@ class DBSCheckForm(GOVUKForm):
                                                        widget=custom_field_widgets.Textarea, required=False)
 
     checkboxes = [(dbs_certificate_number_declare, 'dbs_certificate_number'),
-                  (dbs_submission_consent_declare, 'dbs_submission_consent'),
                   (cautions_or_convictions_declare, 'cautions_or_convictions')]
 
     for box in checkboxes:
