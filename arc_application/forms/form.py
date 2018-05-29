@@ -78,7 +78,7 @@ class PersonalDetailsForm(GOVUKForm):
     """
     GOV.UK form for the Personal details page
     """
-    # customisations:first_
+    # customisations:
     auto_replace_widgets = True
 
     field_label_classes = 'form-label-bold'

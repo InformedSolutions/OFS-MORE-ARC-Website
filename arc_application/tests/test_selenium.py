@@ -316,11 +316,11 @@ class TestArcFunctions(LiveServerTestCase):
             selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Confirm and continue']").click()
             WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("Review: early years training"))
 
-            selenium_task_executor.get_driver().find_element_by_id("id_title_of_course_declare").click()
+            selenium_task_executor.get_driver().find_element_by_id("id_eyfs_course_name_declare").click()
             selenium_task_executor.get_driver().find_element_by_id(
-                "id_title_of_course_comments").send_keys("Fake news")
-            selenium_task_executor.get_driver().find_element_by_id("id_date_of_course_declare").click()
-            selenium_task_executor.get_driver().find_element_by_id("id_date_of_course_comments").send_keys("Test")
+                "id_eyfs_course_name_comments").send_keys("Fake news")
+            selenium_task_executor.get_driver().find_element_by_id("id_eyfs_course_date_declare").click()
+            selenium_task_executor.get_driver().find_element_by_id("id_eyfs_course_date_comments").send_keys("Test")
             selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Confirm and continue']").click()
             WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(
                 expected_conditions.title_contains("Review: health declaration booklet"))
@@ -330,8 +330,8 @@ class TestArcFunctions(LiveServerTestCase):
 
             selenium_task_executor.get_driver().find_element_by_id("id_dbs_certificate_number_declare").click()
             selenium_task_executor.get_driver().find_element_by_id("id_dbs_certificate_number_comments").send_keys("Test")
-            selenium_task_executor.get_driver().find_element_by_id("id_dbs_submission_consent_declare").click()
-            selenium_task_executor.get_driver().find_element_by_id("id_dbs_submission_consent_comments").send_keys("Test")
+            selenium_task_executor.get_driver().find_element_by_id("id_cautions_convictions_declare").click()
+            selenium_task_executor.get_driver().find_element_by_id("id_cautions_convictions_comments").send_keys("Test")
             selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Confirm and continue']").click()
             WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("Review: people in your home"))
 
