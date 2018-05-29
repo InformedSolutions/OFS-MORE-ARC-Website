@@ -124,21 +124,18 @@ def search_query(name, dob, home_postcode, care_location_postcode, reference):
     :param query: Either a search for DoB, Name, or Application Id
     :return: A querystring of results
     """
-    if len(dob) == 0:
-        return Application.objects.filter(
-            Q(application_reference__icontains=reference),  # Contains reference AND
-            Q(
-                Q(applicantname__first_name__icontains=name) |
-                Q(applicantname__last_name__icontains=name)
-            ),  # Contains either first name OR last name matching query AND
-            Q(applicanthomeaddress__postcode__icontains=home_postcode),  # Matches postcode for home address AND
-            Q(
-                Q(applicanthomeaddress__childcare_address=True),  # Matches childcare address
-                Q(applicanthomeaddress__postcode__icontains=care_location_postcode)
-            )
-        ).distinct()
+    query = Q()
 
-    # If a DOB has been supplied
+    if len(reference) > 0:
+        query.add(Q(application_reference__icontains=reference), Q.AND)
+
+    query.add(
+        Q(
+            Q(applicantname__first_name__icontains=name) |
+            Q(applicantname__last_name__icontains=name)
+        ), Q.AND
+    )
+
     if len(dob) > 0:
         # Split DOB by non-alpha characters
         split_dob = re.split(r"[^0-9]", dob)
@@ -155,24 +152,14 @@ def search_query(name, dob, home_postcode, care_location_postcode, reference):
                 previous_century_year = split_dob[0]
                 current_century_year = split_dob[0]
 
-            return Application.objects.filter(
-                Q(application_reference__icontains=reference),  # Contains reference AND
-                Q(
-                    Q(applicantname__first_name__icontains=name) |
-                    Q(applicantname__last_name__icontains=name)
-                ),  # Contains either first name OR last name matching query AND
-                Q(applicanthomeaddress__postcode__icontains=home_postcode),  # Matches postcode for home address AND
-                Q(
-                    Q(applicanthomeaddress__childcare_address=True),  # Matches childcare address
-                    Q(applicanthomeaddress__postcode__icontains=care_location_postcode)
-                ),
+            query.add(
                 Q(
                     Q(applicantpersonaldetails__birth_day=int(split_dob[0])) |
                     Q(applicantpersonaldetails__birth_month=int(split_dob[0])) |
                     Q(applicantpersonaldetails__birth_year=int(previous_century_year)) |
                     Q(applicantpersonaldetails__birth_year=int(current_century_year))
-                ),
-            ).distinct()
+                ), Q.AND
+            )
 
         if len(split_dob) == 2:
             # If two DOBs part have been supplied, again assume second part is either a month or a year
@@ -186,27 +173,16 @@ def search_query(name, dob, home_postcode, care_location_postcode, reference):
                 previous_century_year = split_dob[1]
                 current_century_year = split_dob[1]
 
-            return Application.objects.filter(
-                Q(application_reference__icontains=reference),  # Contains reference AND
-                Q(
-                    Q(applicantname__first_name__icontains=name) |
-                    Q(applicantname__last_name__icontains=name)
-                ),  # Contains either first name OR last name matching query AND
-                Q(applicanthomeaddress__postcode__icontains=home_postcode),  # Matches postcode for home address AND
-                Q(
-                    Q(applicanthomeaddress__childcare_address=True),  # Matches childcare address
-                    Q(applicanthomeaddress__postcode__icontains=care_location_postcode)
-                ),
+            query.add(
                 Q(
                     Q(applicantpersonaldetails__birth_day=int(split_dob[0])),
                     Q(applicantpersonaldetails__birth_month=int(split_dob[0])) |
                     Q(applicantpersonaldetails__birth_month=int(split_dob[1])) |
                     Q(applicantpersonaldetails__birth_year=int(previous_century_year)) |
                     Q(applicantpersonaldetails__birth_year=int(current_century_year))
-                ),
-            ).distinct()
+                ), Q.AND
+            )
 
-        # If a full DOB parts have been provided, assume day month year ordering
         if len(split_dob) == 3:
 
             # Create four digit year if 2 digit year supplied
@@ -218,21 +194,43 @@ def search_query(name, dob, home_postcode, care_location_postcode, reference):
                 previous_century_year = split_dob[2]
                 current_century_year = split_dob[2]
 
-            return Application.objects.filter(
-                Q(application_reference__icontains=reference),  # Contains reference AND
-                Q(
-                    Q(applicantname__first_name__icontains=name) |
-                    Q(applicantname__last_name__icontains=name)
-                ),  # Contains either first name OR last name matching query AND
-                Q(applicanthomeaddress__postcode__icontains=home_postcode),  # Matches postcode for home address AND
-                Q(
-                    Q(applicanthomeaddress__childcare_address=True),  # Matches childcare address
-                    Q(applicanthomeaddress__postcode__icontains=care_location_postcode)
-                ),
+            query.add(
                 Q(
                     Q(applicantpersonaldetails__birth_day=int(split_dob[0])),
-                    Q(applicantpersonaldetails__birth_month=int(split_dob[1])),
+                    Q(applicantpersonaldetails__birth_month=int(split_dob[0])) |
+                    Q(applicantpersonaldetails__birth_month=int(split_dob[1])) |
                     Q(applicantpersonaldetails__birth_year=int(previous_century_year)) |
                     Q(applicantpersonaldetails__birth_year=int(current_century_year))
-                ),
-            ).distinct()
+                ), Q.AND
+            )
+
+    address_query = Q()
+
+    home_address_query = Q()
+    home_address_query.add(
+        Q(
+            Q(applicanthomeaddress__childcare_address=False),
+            Q(applicanthomeaddress__postcode__icontains=home_postcode)
+        ), Q.AND
+    )
+
+    home_address_query.add(
+        Q(applicanthomeaddress__postcode__icontains=home_postcode), Q.OR
+    )
+
+    childcare_address_query = Q()
+    childcare_address_query.add(
+        Q(
+            Q(applicanthomeaddress__childcare_address=True),
+            Q(applicanthomeaddress__postcode__icontains=care_location_postcode)
+        ), Q.AND
+    )
+
+    address_query.add(home_address_query, Q.OR)
+    address_query.add(childcare_address_query, Q.AND)
+
+    query.add(address_query, Q.AND)
+
+    return Application.objects.filter(
+        query
+    )

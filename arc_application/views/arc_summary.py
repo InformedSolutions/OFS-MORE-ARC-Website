@@ -42,13 +42,14 @@ def cc_summary(request):
 
     if request.method == 'GET':
         application_id_local = request.GET["id"]
+        application = Application.objects.get(pk=application_id_local)
         json = load_json(application_id_local, ordered_models, False)
         json[0][1]['link'] = (reverse('update_email') + '?id=' + str(application_id_local))
         json[0][2]['link'] = (reverse('update_phone_number') + '?id=' + str(application_id_local))
         json[0][3]['link'] = (reverse('update_add_number') + '?id=' + str(application_id_local))
         user_type = 'contact center' if cc_user else 'reviewer'
         TimelineLog.objects.create(
-            content_object=Application.objects.get(pk=application_id_local),
+            content_object=application,
             user=request.user,
             template='timeline_logger/application_action_contact_center.txt',
             extra_data={'user_type': user_type, 'entity': 'application', 'action': "viewed"}
@@ -57,6 +58,7 @@ def cc_summary(request):
         variables = {
             'json': json,
             'application_id': application_id_local,
+            'application_reference': application.application_reference or None,
             'cc_user': cc_user
         }
         return render(request, 'search-summary.html', variables)

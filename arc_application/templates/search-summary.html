@@ -13,6 +13,9 @@
     <div class="column-two-thirds">
         <div class="grid-row">
             <h1 class="heading-large">Application summary</h1>
+           <h2 class="heading-medium">
+              Application number: {{ application_reference | default_if_none:"N/A" }}
+           </h2>
         </div>
     </div>
 
