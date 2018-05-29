@@ -197,14 +197,14 @@ class DBSCheckForm(GOVUKForm):
                                                         widget=custom_field_widgets.CustomCheckboxInput, required=False)
     dbs_certificate_number_comments = forms.CharField(label='Enter your reasoning', help_text='(Tip: be clear and concise)', 
                                                       widget=custom_field_widgets.Textarea, required=False)
-    cautions_or_convictions_declare = forms.BooleanField(label='This information is correct',
+    cautions_convictions_declare = forms.BooleanField(label='This information is correct',
                                                          widget=custom_field_widgets.CustomCheckboxInput,
                                                          required=False)
-    cautions_or_convictions_comments = forms.CharField(label='Enter your reasoning', help_text='(Tip: be clear and concise)', 
+    cautions_convictions_comments = forms.CharField(label='Enter your reasoning', help_text='(Tip: be clear and concise)',
                                                        widget=custom_field_widgets.Textarea, required=False)
 
     checkboxes = [(dbs_certificate_number_declare, 'dbs_certificate_number'),
-                  (cautions_or_convictions_declare, 'cautions_or_convictions')]
+                  (cautions_convictions_declare, 'cautions_convictions')]
 
     for box in checkboxes:
         box[0].widget.attrs.update({'data_target': box[1],

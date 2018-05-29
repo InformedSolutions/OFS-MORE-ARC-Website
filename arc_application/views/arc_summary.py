@@ -95,7 +95,7 @@ def name_converter(name):
                   'name', 'date_of_birth', 'home_address', 'childcare_location',
                   'first_aid_training_organisation', 'title_of_training_course', 'course_date',
                   'health_submission_consent',
-                  'dbs_certificate_number', 'dbs_submission_consent',
+                  'dbs_certificate_number', 'cautions_convictions',
                   'full_name', 'date_of_birth', 'relationship', 'dbs_certificate_number', 'permission',
                   'adults_in_home',
                   'children_in_home',
