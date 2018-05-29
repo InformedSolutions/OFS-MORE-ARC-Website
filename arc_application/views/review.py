@@ -101,6 +101,7 @@ def review(request):
     """
     application_id_local = request.GET["id"]
     application = Application.objects.get(application_id=application_id_local)
+    app_ref = application.application_reference
     account = UserDetails.objects.get(application_id=application)
     login_id = account.pk
     first_name = ''
@@ -115,7 +116,7 @@ def review(request):
             first_name = applicant_name.first_name
 
     if all_complete(application_id_local, True):
-        accepted_email(email, first_name, application_id_local)
+        accepted_email(email, first_name, app_ref)
         # If successful
         release_application(request, application_id_local, 'ACCEPTED')
         variables = {
@@ -134,7 +135,7 @@ def review(request):
         link = settings.CHILDMINDER_EMAIL_VALIDATION_URL + '/' + magic_link
         returned_email(email, first_name, application_id_local, link)
 
-        # Copy Arc status' to Chilminder App
+        # Copy Arc status' to Childminder App
         if Arc.objects.filter(pk=application_id_local):
             arc = Arc.objects.get(pk=application_id_local)
             app = Application.objects.get(pk=application_id_local)
