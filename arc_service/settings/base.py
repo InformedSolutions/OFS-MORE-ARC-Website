@@ -110,6 +110,10 @@ URL_PREFIX = '/arc'
 STATIC_URL = URL_PREFIX + '/static/'
 REVIEW_URL_PREFIX = '/arc/review'
 
+SECURE_BROWSER_XSS_FILTER = True
+CSRF_COOKIE_HTTPONLY = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
+
 STATICFILES_FINDERS = [
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
