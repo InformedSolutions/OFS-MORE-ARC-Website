@@ -107,7 +107,14 @@ def format_data(results):
             i.accessed = None
 
         i.type = 'Childminder'
-        i.sub_type = 'New'
+        if app.application_status == 'DRAFTING':
+            i.sub_type = 'New'
+        elif app.application_status == 'FURTHER_INFORMATION':
+            i.sub_type = 'Returned'
+        elif app.application_status == 'ACCEPTED':
+            i.sub_type = 'Pending checks'
+        else:
+            i.sub_type = ''
 
         if hasattr(i, 'application_reference'):
             app_id = i.application_id
