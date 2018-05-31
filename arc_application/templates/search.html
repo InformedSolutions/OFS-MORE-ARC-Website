@@ -38,6 +38,9 @@
         <thead>
         <tr>
             <th scope="col">
+                Application Reference
+            </th>
+            <th scope="col">
                 Application Type
             </th>
             <th scope="col">
@@ -64,6 +67,11 @@
         <tbody>
         {% for app in app %}
         <tr>
+            <td>
+                <b>
+                    {{ app.application_reference | default_if_none:""  }}
+                </b>
+            </td>
             <td>
                 <b>
                     {{ app.type }}
