@@ -1,4 +1,5 @@
 import time
+from datetime import datetime
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
@@ -118,6 +119,8 @@ def review(request):
         accepted_email(email, first_name, app_ref)
         # If successful
         release_application(request, application_id_local, 'ACCEPTED')
+        application.ofsted_visit_email_sent = datetime.now()
+        application.save()
         variables = {
             'application_id': application_id_local,
         }
