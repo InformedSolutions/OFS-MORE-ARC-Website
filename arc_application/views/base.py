@@ -1,9 +1,11 @@
+import six
 from django import forms
 from django.conf import settings
 from django.contrib.auth import authenticate, login as auth_login
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.forms import UserModel
 from django.contrib.auth.models import Group
+from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.views.generic import ListView
@@ -248,6 +250,25 @@ def has_group(user, group_name):
     return True if group in user.groups.all() else False
 
 
+def group_required(group, login_url=None, raise_exception=False):
+    """
+    Decorator for views that checks whether a user has a group permission,
+    redirecting to the log-in page if necessary.
+    If the raise_exception parameter is given the PermissionDenied exception
+    is raised.
+    """
+    def check_perms(user):
+        if isinstance(group, six.string_types):
+            groups = (group,)
+        else:
+            groups = group
+
+        if user.groups.filter(name__in=groups).exists():
+            return True
+        raise PermissionDenied
+    return user_passes_test(check_perms, login_url=login_url)
+
+
 @login_required()
 def release(request, application_id):
     """
@@ -336,6 +357,7 @@ class AuditlogListView(ListView):
             context['cc_user'] = True
 
         if has_group(self.request.user, settings.ARC_GROUP):
+            context['arc_user'] = True
             context['back'] = reverse('task_list') + '?id=' + self.request.GET.get('id')
 
         return context
@@ -343,6 +365,16 @@ class AuditlogListView(ListView):
 
 ######################################################################################################
 # Error Pages copied from Childminder
+
+def error_403(request):
+    """
+    Method returning the 403 (Forbidden) error template
+    :param request: a request object used to generate the HttpResponse
+    :return: an HttpResponse object with the rendered 403 error template
+    """
+    data = {}
+    return render(request, '403.html', data)
+
 
 def error_404(request):
     """

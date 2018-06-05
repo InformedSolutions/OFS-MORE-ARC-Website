@@ -1,6 +1,4 @@
-import json
 import time
-import requests
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
@@ -8,7 +6,6 @@ from django.contrib.auth.models import Group
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.views import View
-from timeline_logger.models import TimelineLog
 
 from ..forms.form import PreviousRegistrationDetailsForm
 from ..forms.form import AdultInYourHomeForm, ChildInYourHomeForm, CommentsForm
@@ -17,9 +14,11 @@ from ..models import PreviousRegistrationDetails
 from ..models import ApplicantName, ApplicantPersonalDetails, Application, Arc, ArcComments, ChildcareType, UserDetails
 from .base import release_application
 from ..notify import send_email
+from .base import group_required
 
 
 @login_required()
+@group_required(settings.ARC_GROUP)
 def task_list(request):
     """
     Generates the full task list for ARC users
@@ -28,71 +27,71 @@ def task_list(request):
     """
 
     # If the user has signed in and is a member of the ARC group
-    if has_group(request.user, 'arc'):
-        if request.method == 'GET':
-            application_id = request.GET['id']
-            application = Application.objects.get(application_id=application_id)
-            arc_application = Arc.objects.get(application_id=application_id)
-            personal_details_record = ApplicantPersonalDetails.objects.get(application_id=application_id)
-            name_record = ApplicantName.objects.get(personal_detail_id=personal_details_record.personal_detail_id)
-            childcare_type_record = ChildcareType.objects.get(application_id=application_id)
+    if request.method == 'GET':
+        application_id = request.GET['id']
+        application = Application.objects.get(application_id=application_id)
+        arc_application = Arc.objects.get(application_id=application_id)
+        personal_details_record = ApplicantPersonalDetails.objects.get(application_id=application_id)
+        name_record = ApplicantName.objects.get(personal_detail_id=personal_details_record.personal_detail_id)
+        childcare_type_record = ChildcareType.objects.get(application_id=application_id)
 
-            review_fields_to_check = (
-                'login_details_review',
-                'personal_details_review',
-                'childcare_type_review',
-                'first_aid_review',
-                'dbs_review',
-                'eyfs_review',
-                'health_review',
-                'references_review',
-                'people_in_home_review'
-            )
+        review_fields_to_check = (
+            'login_details_review',
+            'personal_details_review',
+            'childcare_type_review',
+            'first_aid_review',
+            'dbs_review',
+            'eyfs_review',
+            'health_review',
+            'references_review',
+            'people_in_home_review'
+        )
 
-            flagged_fields_to_check = (
-                "childcare_type_arc_flagged",
-                "criminal_record_check_arc_flagged",
-                "eyfs_training_arc_flagged",
-                "first_aid_training_arc_flagged",
-                "health_arc_flagged",
-                "login_details_arc_flagged",
-                "people_in_home_arc_flagged",
-                "personal_details_arc_flagged",
-                "references_arc_flagged"
-            )
+        flagged_fields_to_check = (
+            "childcare_type_arc_flagged",
+            "criminal_record_check_arc_flagged",
+            "eyfs_training_arc_flagged",
+            "first_aid_training_arc_flagged",
+            "health_arc_flagged",
+            "login_details_arc_flagged",
+            "people_in_home_arc_flagged",
+            "personal_details_arc_flagged",
+            "references_arc_flagged"
+        )
 
-            review_count = sum([1 for field in review_fields_to_check if getattr(arc_application, field) == 'COMPLETED'])
-            review_count += sum([1 for field in flagged_fields_to_check if getattr(application, field)])
+        review_count = sum([1 for field in review_fields_to_check if getattr(arc_application, field) == 'COMPLETED'])
+        review_count += sum([1 for field in flagged_fields_to_check if getattr(application, field)])
 
-            # Load review status
-            application_status_context = {
-                'application_id': application_id,
-                'application_reference': application.application_reference,
-                'login_details_status': arc_application.login_details_review,
-                'personal_details_status': arc_application.personal_details_review,
-                'childcare_type_status': arc_application.childcare_type_review,
-                'first_aid_training_status': arc_application.first_aid_review,
-                'criminal_record_check_status': arc_application.dbs_review,
-                'eyfs_status': arc_application.eyfs_review,
-                'health_status': arc_application.health_review,
-                'reference_status': arc_application.references_review,
-                'people_in_home_status': arc_application.people_in_home_review,
-                'birth_day': personal_details_record.birth_day,
-                'birth_month': personal_details_record.birth_month,
-                'birth_year': personal_details_record.birth_year,
-                'first_name': name_record.first_name,
-                'middle_names': name_record.middle_names,
-                'last_name': name_record.last_name,
-                'zero_to_five': childcare_type_record.zero_to_five,
-                'five_to_eight': childcare_type_record.five_to_eight,
-                'eight_plus': childcare_type_record.eight_plus,
-                'review_count': review_count,
-                'all_complete': all_complete(application_id, False)
-            }
+        # Load review status
+        application_status_context = {
+            'application_id': application_id,
+            'application_reference': application.application_reference,
+            'login_details_status': arc_application.login_details_review,
+            'personal_details_status': arc_application.personal_details_review,
+            'childcare_type_status': arc_application.childcare_type_review,
+            'first_aid_training_status': arc_application.first_aid_review,
+            'criminal_record_check_status': arc_application.dbs_review,
+            'eyfs_status': arc_application.eyfs_review,
+            'health_status': arc_application.health_review,
+            'reference_status': arc_application.references_review,
+            'people_in_home_status': arc_application.people_in_home_review,
+            'birth_day': personal_details_record.birth_day,
+            'birth_month': personal_details_record.birth_month,
+            'birth_year': personal_details_record.birth_year,
+            'first_name': name_record.first_name,
+            'middle_names': name_record.middle_names,
+            'last_name': name_record.last_name,
+            'zero_to_five': childcare_type_record.zero_to_five,
+            'five_to_eight': childcare_type_record.five_to_eight,
+            'eight_plus': childcare_type_record.eight_plus,
+            'review_count': review_count,
+            'all_complete': all_complete(application_id, False)
+        }
 
     return render(request, 'task-list.html', application_status_context)
 
 
+@group_required(settings.ARC_GROUP)
 def review(request):
     """
     Confirmation Page
@@ -155,10 +154,6 @@ def review(request):
         }
 
         return render(request, 'review-sent-back.html', variables)
-
-    variables = {
-        'application_id': application_id_local,
-    }
 
     return render(request, 'review-sent-back.html', variables)
 

@@ -19,7 +19,7 @@
         {% include 'submit_button.html' %}
     </form>
     <br>
-    {% if not cc_user %}
+    {% if arc_user %}
         {% include 'return-to-list.html' with location='search' application_id=application_id %}
     {% endif %}
 </div>

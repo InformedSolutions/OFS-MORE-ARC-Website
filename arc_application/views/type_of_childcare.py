@@ -3,8 +3,10 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from ..models import Arc, ChildcareType
 from ..review_util import redirect_selection
+from .base import group_required
 
 
+@group_required(settings.ARC_GROUP)
 def type_of_childcare_age_groups(request):
     """
     Method returning the template for the Type of childcare: age groups page (for a given application) and navigating

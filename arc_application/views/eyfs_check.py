@@ -6,6 +6,7 @@ from django.views import View
 from ..forms.form import EYFSCheckForm
 from ..models import Application, Arc, EYFS
 from ..review_util import redirect_selection, request_to_comment, save_comments
+from .base import group_required
 
 
 class EFYSCheckSummaryView(View):
@@ -50,6 +51,7 @@ class EFYSCheckSummaryView(View):
 
         else:
             return self.render_summary_with_context(request, form=form, app_id_local=application_id_local)
+
 
     def render_summary_with_context(self, request, form, app_id_local):
         eyfs_check = EYFS.objects.get(application_id=app_id_local)

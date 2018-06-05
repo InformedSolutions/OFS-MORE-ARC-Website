@@ -36,7 +36,7 @@
                <li>
                  <a href="{{ URL_PREFIX }}/search" class="{% if link.link_is_view_name and link.link == request.resolver_match.view_name %}active{% endif %}">Search</a>
                </li>
-              {% if not cc_user %}
+              {% if SHOW_REVIEW_TAB %}
                <li>
                  <a href="{{ URL_PREFIX }}/summary" class="{% if link.link_is_view_name and link.link == request.resolver_match.view_name %}active{% endif %}">Review</a>
                </li>

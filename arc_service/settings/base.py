@@ -71,6 +71,7 @@ TEMPLATES = [
                 'govuk_template_base.context_processors.govuk_template_base',
                 "arc_application.middleware.globalise_url_prefix",
                 "arc_application.middleware.globalise_server_name",
+                "arc_application.middleware.set_review_tab_visibility",
             ],
         },
     },
@@ -109,6 +110,11 @@ USE_TZ = True
 URL_PREFIX = '/arc'
 STATIC_URL = URL_PREFIX + '/static/'
 REVIEW_URL_PREFIX = '/arc/review'
+LOGIN_URL = URL_PREFIX + '/login'
+
+SECURE_BROWSER_XSS_FILTER = True
+CSRF_COOKIE_HTTPONLY = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
 
 SECURE_BROWSER_XSS_FILTER = True
 CSRF_COOKIE_HTTPONLY = True
