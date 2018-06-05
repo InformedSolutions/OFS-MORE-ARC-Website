@@ -5,8 +5,10 @@ from django.shortcuts import render
 from ..forms.form import ReferencesForm, ReferencesForm2
 from ..models import Application, Arc, Reference
 from ..review_util import redirect_selection, request_to_comment, save_comments
+from .base import group_required
 
 
+@group_required(settings.ARC_GROUP)
 def references_summary(request):
     """
     Method returning the template for the 2 references: summary page (for a given application)

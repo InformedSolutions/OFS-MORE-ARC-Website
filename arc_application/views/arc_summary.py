@@ -7,6 +7,7 @@ from timeline_logger.models import TimelineLog
 from ..summary_page_data import link_dict
 from ..models import *
 from .review import review, has_group
+from .base import group_required
 
 """
     to merge multiple models inside a table, represent them as a list within the ordered_models list.
@@ -18,6 +19,7 @@ ordered_models = [UserDetails, ChildcareType, [ApplicantPersonalDetails, Applica
                   AdultInHome, ChildInHome, Reference]
 
 
+@group_required(settings.ARC_GROUP)
 def arc_summary(request):
     if request.method == 'GET':
         application_id_local = request.GET["id"]
@@ -40,7 +42,6 @@ def arc_summary(request):
 
 def cc_summary(request):
     cc_user = has_group(request.user, settings.CONTACT_CENTRE)
-    arc_user = has_group(request.user, settings.ARC_GROUP)
 
     if request.method == 'GET':
         application_id_local = request.GET["id"]
