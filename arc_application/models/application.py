@@ -83,7 +83,7 @@ class Application(models.Model):
     def get_summary_table_adult(self):
         return [
             {"title": "Adults in your home", "id": self.pk},
-            {"name": "Do you live with anyone who is 16 or over?",
+            {"name": "Does anyone aged 16 or over live or work in your home?",
              "value": self.get_bool_as_string(self.adults_in_home)}
         ]
 

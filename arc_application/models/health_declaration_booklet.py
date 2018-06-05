@@ -41,7 +41,7 @@ class HealthDeclarationBooklet(models.Model):
     def get_summary_table(self):
         return [
             {"title": "Health declaration booklet", "id": self.pk},
-            {"name": "Provide a Health Declaration Booklet?", "value": self.get_bool_as_string(self.send_hdb_declare)}
+            {"name": "I will post a completed booklet to Ofsted", "value": self.get_bool_as_string(self.send_hdb_declare)}
         ]
 
     class Meta:

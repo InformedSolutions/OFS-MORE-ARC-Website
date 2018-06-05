@@ -71,9 +71,11 @@ class AdultInHome(models.Model):
     def get_summary_table(self):
         return [
                 {"title": self.get_name(), "id": self.pk},
+                {"name": "Health check status", "value": self.health_check_status},
                 {"name": "Name", "value": self.get_name()},
                 {"name": "Date of birth", "value": self.get_birthday()},
                 {"name": "Relationship", "value": self.relationship},
+                {"name": "Email", "value": self.email},
                 {"name": "DBS certificate number", "value": self.dbs_certificate_number}
             ]
       

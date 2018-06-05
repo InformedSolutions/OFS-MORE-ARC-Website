@@ -66,9 +66,9 @@ class ChildcareType(models.Model):
             {"name": "Looking after 0 to 5 year olds?", "value": self.get_bool_as_string(self.zero_to_five)},
             {"name": "Looking after 5 to 7 year olds? ", "value": self.get_bool_as_string(self.five_to_eight)},
             {"name": "Looking after 8 year olds and older? ", "value": self.get_bool_as_string(self.eight_plus)},
-            {"name": "Registers", "value": self.get_register_name()}
+            {"name": "Registers", "value": self.get_register_name()},
+            {"name": "Looking after children overnight?", "value": self.get_bool_as_string(self.overnight_care)}
         ]
-
 
     class Meta:
         db_table = 'CHILDCARE_TYPE'

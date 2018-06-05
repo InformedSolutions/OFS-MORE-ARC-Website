@@ -23,9 +23,11 @@ def arc_summary(request):
         application_id_local = request.GET["id"]
         json = load_json(application_id_local, ordered_models, False)
         json = add_comments(json, application_id_local)
+        application_reference = Application.objects.get(pk=application_id_local).application_reference
         variables = {
             'json': json,
-            'application_id': application_id_local
+            'application_id': application_id_local,
+            'application_reference': application_reference
         }
         return render(request, 'arc-summary.html', variables)
     elif request.method == 'POST':

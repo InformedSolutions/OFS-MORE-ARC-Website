@@ -34,7 +34,7 @@ class ApplicantPersonalDetails(models.Model):
     def get_summary_table(self):
         return [
                 {"title": "Your personal details", "id": self.personal_detail_id, "index": 0},
-                {"name": "Your date of birth",
+                {"name": "Date of birth",
                  "value": str(self.birth_day) + '/' + str(self.birth_month) + '/' + str(
                      self.birth_year), 'pk': self.pk, "index": 2}
             ]
