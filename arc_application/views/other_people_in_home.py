@@ -10,8 +10,10 @@ from ..forms.form import AdultInYourHomeForm, ChildInYourHomeForm, OtherPeopleIn
 from arc_application.models import ChildInHome, AdultInHome, Arc, Application, PreviousAddress
 from arc_application.review_util import request_to_comment, save_comments, redirect_selection, build_url
 from arc_application.views import other_people_initial_population
+from .base import group_required
 
 
+@group_required(settings.ARC_GROUP)
 def other_people_summary(request):
     """
     Method returning the template for the People in your home: summary page (for a given application)
@@ -207,12 +209,14 @@ def person_data_selector(request):
     pass
 
 
+@group_required(settings.ARC_GROUP)
 def add_previous_address(request):
     if request.method == "GET":
         app_id = request.GET["id"]
         person_id = request.GET["person_id"]
 
 
+@group_required(settings.ARC_GROUP)
 def add_previous_name(request):
     """
     View to handle previous name formset for the either adults or children in the home

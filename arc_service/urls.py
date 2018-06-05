@@ -6,7 +6,7 @@ OFS-MORE-CCN3: Apply to be a Childminder Beta
 """
 import re
 
-from arc_application.views import assign_new_application, custom_login, error_404, error_500, release, \
+from arc_application.views import assign_new_application, custom_login, error_403, error_404, error_500, release, \
     summary_page, arc_summary, review, task_list, AuditlogListView, cc_summary
 from arc_application.views.contact_details import contact_summary
 from arc_application.views.dbs_check import dbs_check_summary
@@ -24,9 +24,11 @@ from arc_application.views.arc_summary import cc_summary
 from arc_application.views.contact_centre.change_details import UpdateEmailView, UpdatePhoneNumberView, \
     UpdateAddPhoneNumberView
 from arc_application.contact_centre import search
+from arc_application.views.base import group_required
 from django.conf import settings
 from django.conf.urls import include, url
 from django.contrib import admin
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import logout
 
 from arc_application.views.personal_details_addresses import personal_details_previous_address
@@ -47,7 +49,7 @@ urlpatterns = [
         name='personal_details_previous_addresses'),
     url(r'^first-aid/summary/', first_aid_training_summary, name='first_aid_training_summary'),
     url(r'^dbs-check/summary/', dbs_check_summary, name='dbs_check_summary'),
-    url(r'^eyfs-check/summary/', EFYSCheckSummaryView.as_view(), name='eyfs_check_summary'),
+    url(r'^eyfs-check/summary/', group_required(settings.ARC_GROUP)(EFYSCheckSummaryView.as_view()), name='eyfs_check_summary'),
     url(r'^references/summary/', references_summary, name='references_summary'),
     url(r'^other-people/summary/', other_people_summary, name='other_people_summary'),
     url(r'^people-in-home/previous_names', add_previous_name, name='other-people-previous-names'),
@@ -55,14 +57,14 @@ urlpatterns = [
     url(r'^health/check-answers/', health_check_answers, name='health_check_answers'),
     url(r'^confirmation/', review, name='review'),
     url(r'^arc-summary/', arc_summary, name='arc-summary'),
-    url(r'^auditlog/', AuditlogListView.as_view(), name='auditlog'),
+    url(r'^auditlog/', login_required(AuditlogListView.as_view()), name='auditlog'),
     url(r'^search/', search, name='search'),
     url(r'^search-summary/', cc_summary, name='search_summary'),
     url(r'^contact-centre/contact-details/email-address', UpdateEmailView.as_view(), name='update_email'),
     url(r'^contact-centre/contact-details/phone-number', UpdatePhoneNumberView.as_view(), name='update_phone_number'),
     url(r'^contact-centre/contact-details/add-phone-number', UpdateAddPhoneNumberView.as_view(),
         name='update_add_number'),
-    url(r'^personal-details/previous-registration', PreviousRegistrationDetailsView.as_view(),
+    url(r'^personal-details/previous-registration', group_required(settings.ARC_GROUP)(PreviousRegistrationDetailsView.as_view()),
         name='previous_registration_details'),
 ]
 
@@ -80,5 +82,6 @@ if settings.DEBUG:
                       url(r'^__debug__/', include(debug_toolbar.urls)),
                   ] + urlpatterns
 
+handler403 = error_403
 handler404 = error_404
 handler500 = error_500

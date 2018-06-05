@@ -27,3 +27,10 @@ def globalise_server_name(request):
         return {'SERVER_LABEL': settings.SERVER_LABEL}
     else:
         return {'SERVER_LABEL': None}
+
+
+def set_review_tab_visibility(request):
+    """
+    Middleware function for exposing ARC group name setting to templates
+    """
+    return {'SHOW_REVIEW_TAB': request.user.groups.filter(name=settings.ARC_GROUP).exists()}

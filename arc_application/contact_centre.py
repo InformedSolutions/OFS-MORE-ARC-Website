@@ -22,6 +22,7 @@ def search(request):
     arc_user = has_group(request.user, settings.ARC_GROUP)
     context = {
                 'cc_user': cc_user,
+                'arc_user': arc_user,
                 'empty': True
             }
 

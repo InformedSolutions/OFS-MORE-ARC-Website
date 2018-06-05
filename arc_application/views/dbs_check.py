@@ -5,8 +5,10 @@ from django.shortcuts import render
 from ..forms.form import DBSCheckForm
 from ..models import Application, Arc, CriminalRecordCheck
 from ..review_util import redirect_selection, request_to_comment, save_comments
+from .base import group_required
 
 
+@group_required(settings.ARC_GROUP)
 def dbs_check_summary(request):
     """
     Method returning the template for the Your criminal record (DBS) check: summary page (for a given application)
