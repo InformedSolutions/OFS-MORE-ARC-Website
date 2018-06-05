@@ -61,16 +61,26 @@ class ApplicantHomeAddress(models.Model):
 
     def get_summary_table(self):
         array = []
-        if self.childcare_address:
-            if self.current_address:
-                childcare_address = self.get_address()
-            elif not self.current_address:
-                childcare_address = 'Same as home address'
-            array.append({"name": "Childcare location", "value": childcare_address, 'pk': self.pk, "index": 4})
-        elif not self.childcare_address:
+        # If the home address is the same as the childcare address
+        if self.current_address and self.childcare_address:
             home_address = self.get_address()
-            array.append({"name": "Your home address", "value": home_address, 'pk': self.pk, "index": 3})
-        return array
+            childcare_address = 'Same as home address'
+            return [
+                {"name": "Your home address", "value": home_address, 'pk': self.pk, "index": 3},
+                {"name": "Childcare location", "value": childcare_address, 'pk': self.pk, "index": 4}
+            ]
+        # If the address is only a home address
+        if self.current_address and not self.childcare_address:
+            home_address = self.get_address()
+            return [
+                {"name": "Your home address", "value": home_address, 'pk': self.pk, "index": 3}
+            ]
+        # If the address is only a childcare address
+        if not self.current_address and self.childcare_address:
+            childcare_address = self.get_address()
+            return [
+                {"name": "Childcare location", "value": childcare_address, 'pk': self.pk, "index": 4}
+            ]
 
     class Meta:
         db_table = 'APPLICANT_HOME_ADDRESS'
