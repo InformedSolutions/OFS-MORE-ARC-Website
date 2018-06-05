@@ -41,7 +41,7 @@ class EYFS(models.Model):
 
     def get_summary_table(self):
         return [
-            {"title": "Early Years training", "id": self.pk},
+            {"title": "Early years training", "id": self.pk},
             {"name": "Title of training course", "value": self.eyfs_course_name},
             {"name": "Date you completed course",
              "value": str(self.eyfs_course_date_day) + '/' + str(self.eyfs_course_date_month) + '/' + str(

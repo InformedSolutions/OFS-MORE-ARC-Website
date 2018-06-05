@@ -47,9 +47,9 @@ class FirstAidTraining(models.Model):
     def get_summary_table(self):
         return [
             {"title": "First aid training", "id": self.pk},
-            {"name": "First aid training provider", "value": self.training_organisation},
-            {"name": "Title of first aid course", "value": self.course_title},
-            {"name": "Date of first aid certificate",
+            {"name": "Training organisation", "value": self.training_organisation},
+            {"name": "Title of training course", "value": self.course_title},
+            {"name": "Date you completed course",
              "value": str(self.course_day) + '/' + str(self.course_month) + '/' + str(
                  self.course_year)}
         ]

@@ -44,7 +44,7 @@ class CriminalRecordCheck(models.Model):
         return [
             {"title": "Criminal record (DBS) check", "id": self.pk},
             {"name": "DBS certificate number", "value": self.dbs_certificate_number},
-            {"name": "Do you have any cautions or convictions?",
+            {"name": "Do you have any criminal cautions or convictions?",
              "value": self.get_bool_as_string(self.cautions_convictions)}
         ]
 

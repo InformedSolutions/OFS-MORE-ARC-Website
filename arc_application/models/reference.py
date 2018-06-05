@@ -73,14 +73,14 @@ class Reference(models.Model):
     def get_summary_table(self):
         return [
             {"title": self.get_ref_as_string() + " reference", "id": self.pk},
-            {"name": "Full name", "value": self.first_name + ' ' + self.last_name},
+            {"name": "Name", "value": self.first_name + ' ' + self.last_name},
             {"name": "How they know you", "value": self.relationship},
             {"name": "Known for", "value": self.get_time_known()},
             {"name": "Address", "value": self.get_address()},
             {"name": "Phone number", "value": self.phone_number},
             {"name": "Email address", "value": self.email}
-
         ]
 
     class Meta:
         db_table = 'REFERENCE'
+        ordering = ['reference']

@@ -8,9 +8,12 @@
 <h1 class="form-title heading-large">
     Check and confirm all details
 </h1>
+<h2 class="heading-medium">
+    Application number: {{ application_reference }}
+</h2>
 {% with "4" as col %}
 {% for section in json %}
-    {% include 'summary_tables.html' %}
+{% include 'summary_tables.html' %}
 {% endfor %}
 {% endwith %}
 <form method="post">

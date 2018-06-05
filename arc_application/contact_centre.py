@@ -109,11 +109,15 @@ def format_data(results):
 
         i.type = 'Childminder'
         if app.application_status == 'DRAFTING':
-            i.sub_type = 'New'
-        elif app.application_status == 'FURTHER_INFORMATION':
-            i.sub_type = 'Returned'
+            i.sub_type = 'Draft'
         elif app.application_status == 'ACCEPTED':
             i.sub_type = 'Pending checks'
+        elif app.application_status == 'FURTHER_INFORMATION':
+            i.sub_type = 'Returned'
+        elif app.application_status == 'SUBMITTED':
+            i.sub_type = 'New'
+        elif app.application_status == 'ARC_REVIEW':
+            i.sub_type = 'Assigned'
         else:
             i.sub_type = ''
 
