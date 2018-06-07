@@ -434,6 +434,12 @@ class AdultInYourHomeForm(GOVUKForm):
     GOV.UK form for each adult other person in an application
     """
 
+    health_check_status_declare = forms.BooleanField(label='This information is correct',
+                                                     widget=custom_field_widgets.CustomCheckboxInput, required=False)
+    health_check_status_comments = forms.CharField(label='Enter your reasoning', help_text='(Tip: be clear and concise)',
+                                                   widget=custom_field_widgets.Textarea,
+                                                   required=False)
+
     full_name_declare = forms.BooleanField(label='This information is correct',
                                            widget=custom_field_widgets.CustomCheckboxInput, required=False)
     full_name_comments = forms.CharField(label='Enter your reasoning', help_text='(Tip: be clear and concise)',  widget=custom_field_widgets.Textarea,
@@ -460,7 +466,7 @@ class AdultInYourHomeForm(GOVUKForm):
     permission_comments = forms.CharField(label='Enter your reasoning', help_text='(Tip: be clear and concise)', 
                                           widget=custom_field_widgets.Textarea, required=False)
 
-    # This is the id appended to all htmls names ot make the individual form instance unique, this is given a alue in
+    # This is the id appended to all htmls names ot make the individual form instance unique, this is given a value in
     # the init
     instance_id = forms.CharField(widget=forms.HiddenInput, required=False)
 
@@ -469,13 +475,15 @@ class AdultInYourHomeForm(GOVUKForm):
         # Create unique id value and populate the instance_id field with it
         id_value = str(uuid.uuid4())
         self.fields['instance_id'].initial = id_value
-        # print(self.fields['instance_id'].initial)
         # Make all checkbox names refer the the name with the correct instance id, making each conditional reveal unique
-        checkboxes = [((self.fields['full_name_declare']), 'full_name' + id_value),
-                      ((self.fields['date_of_birth_declare']), 'date_of_birth' + id_value),
-                      ((self.fields['relationship_declare']), 'relationship' + id_value),
-                      ((self.fields['dbs_certificate_number_declare']), 'dbs_certificate_number' + id_value),
-                      ((self.fields['permission_declare']), 'permission_declare' + id_value)]
+        checkboxes = [
+            ((self.fields['health_check_status_declare']), 'health_check_status' + id_value),
+            ((self.fields['full_name_declare']), 'full_name' + id_value),
+            ((self.fields['date_of_birth_declare']), 'date_of_birth' + id_value),
+            ((self.fields['relationship_declare']), 'relationship' + id_value),
+            ((self.fields['dbs_certificate_number_declare']), 'dbs_certificate_number' + id_value),
+            ((self.fields['permission_declare']), 'permission_declare' + id_value)
+        ]
 
         for box in checkboxes:
             box[0].widget.attrs.update({'data_target': box[1],
