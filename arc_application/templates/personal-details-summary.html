@@ -132,6 +132,10 @@
         </tr>
         </tbody>
     </table>
+
+    <a href="{% url 'personal_details_previous_names' %}?id={{ application_id }}&person_id={{ application_id }}&type=APPLICANT" class="button button-secondary">Add previous names</a>
+
+
     <table class="check-your-answers form-group">
         <thead>
         <tr>
@@ -281,6 +285,10 @@
     </table>
     <br>
 
+    <a href="{% url 'personal_details_previous_addresses' %}?id={{ application_id }}&state=entry&person_id={{ application_id }}&person_type=APPLICANT" class = "button button-secondary">Add previous addresses</a>
+
+    <br>
+
     {% if previous_names %}
     <table class="check-your-answers form-group">
         <thead>
@@ -413,15 +421,14 @@
     {% endblock %}
     {% csrf_token %}
 
-    <input type="submit" class="button" value="Confirm and continue"/>
-    <input type="hidden" value="{{application_id}}" name="id"/>
-
-   <a href="{% url 'personal_details_previous_names' %}?id={{ application_id }}&person_id={{ application_id }}&type=APPLICANT"
-   class="button button-secondary button-secondary-inline">Add previous names and addresses</a>
-
     <button type="submit" name="previous_registration_details" class="button button-secondary button-add-another" value="/personal-details/previous-registration/">
         Add previous registration
     </button>
+
+    <input type="submit" class="button" value="Confirm and continue"/>
+    <input type="hidden" value="{{application_id}}" name="id"/>
+
+
 
     {% include 'return-to-list.html' %}
 
