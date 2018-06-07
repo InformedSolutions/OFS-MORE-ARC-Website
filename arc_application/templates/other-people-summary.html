@@ -270,7 +270,10 @@
             <input type="hidden" value="{{ application_id }}" name="id" />
 
         </table>
-        <a href="{% url 'other-people-previous-names' %}?id={{ application_id }}&person_id={{ id }}&type=ADULT" class="button">Add previous names and addresses</a>
+        <a href="{% url 'other-people-previous-names' %}?id={{ application_id }}&person_id={{ id }}&type=ADULT" class="button button-secondary">Add previous names</a>
+        <br>
+        <a href="{% url 'other-people-previous-addresses' %}?id={{ application_id }}&state=entry&person_id={{id}}&person_type=ADULT" class="button button-secondary">Add previous addresses</a>
+
         {% endfor %}
         {% for id, name, day, month, year, relationship, formsetchild in child_lists %}
         <table class="check-your-answers form-group">
@@ -411,7 +414,10 @@
             </tbody>
         </table>
 
-        <a href="{% url 'other-people-previous-names' %}?id={{ application_id }}&person_id={{ id }}&type=CHILD" class="button">Add previous names and addresses</a>
+        <a href="{% url 'other-people-previous-names' %}?id={{ application_id }}&person_id={{ id }}&type=CHILD" class="button button-secondary">Add previous names</a>
+        <br>
+        <a href="{% url 'other-people-previous-addresses' %}?id={{ application_id }}&state=entry&person_id={{id}}&person_type=CHILD" class="button button-secondary">Add previous addresses</a>
+
 
         {% endfor %}
         {% for id, name, previous_names, previous_addresses in adult_ebulk_lists %}
