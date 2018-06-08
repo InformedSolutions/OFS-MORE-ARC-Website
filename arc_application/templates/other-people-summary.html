@@ -103,7 +103,7 @@
             </tr>
             </tbody>
         </table>
-        {% for id ,name, day, month, year, relationship, dbs_certificate_number, formsetadult in adult_lists %}
+        {% for record, id , health_check_status, name, day, month, year, relationship, dbs_certificate_number, formsetadult, current_illness_set, serious_illness_set, hospital_admission_set in adult_lists %}
         <table class="check-your-answers form-group">
             <thead>
             <tr>
@@ -116,6 +116,32 @@
             </thead>
 
             <tbody>
+            <tr>
+                <td style="word-wrap: break-word">
+                    Health check status
+                </td>
+                <td style="word-wrap: break-word">
+                    {{health_check_status}}
+                </td>
+                <td class="change-answer">
+                    {{ formsetadult.health_check_status_declare }}
+                </td>
+            </tr>
+            <tr class="js-hidden" id="health_check_status{{formsetadult.instance_id.initial}}">
+                <td colspan="1">
+                    <div>
+                        {{ formsetadult.health_check_status_comments.label}}
+                    </div>
+                    <div>
+                        {{ formsetadult.health_check_status_comments.help_text}}
+                    </div>
+                </td>
+                <td colspan="2">
+                    <div>
+                        {{ formsetadult.health_check_status_comments}}
+                    </div>
+                </td>
+            </tr>
             <tr>
                 <td style="word-wrap: break-word">
                     Name
@@ -271,6 +297,94 @@
 
         </table>
         <a href="{% url 'other-people-previous-names' %}?id={{ application_id }}&person_id={{ id }}&type=ADULT" class="button">Add previous names and addresses</a>
+
+         <table class="check-your-answers">
+            <colgroup>
+                <col class="summary-column">
+                <col class="summary-column">
+                <col class="change-answer">
+            </colgroup>
+            <thead>
+                <th colspan="3">
+                        <h2 class="heading-medium">
+                            Current treatment
+                        </h2>
+                </th>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class=summary-column> Are you currently being treated by your GP, another doctor or a hospital?</td>
+                    <td class=summary-column> {{ record.current_treatment|yesno:"Yes,No" }} </td>
+                </tr>
+                {% if record.current_treatment %}
+                {% for treatment in current_treatment_set %}
+                <tr>
+                    <td class=summary-column>Details of the illness or condition</td>
+                    <td class=summary-column>{{ treatment.description }}</td>
+                </tr>
+                {% endfor %}
+                {% endif %}
+            </tbody>
+        </table>
+
+        <table class="check-your-answers">
+            <colgroup>
+                <col class="summary-column">
+                <col class="summary-column">
+                <col class="change-answer">
+            </colgroup>
+            <thead>
+                <th colspan="3">
+                        <h2 class="heading-medium">
+                            Serious illnesses
+                        </h2>
+                </th>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class=summary-column>Have you had any serious illnesses within the last five years?</td>
+                    <td class=summary-column>{{ record.serious_illness|yesno:"Yes,No" }}</td>
+                </tr>
+                {% if record.serious_illness %}
+                {% for illness in serious_illness_set %}
+                <tr>
+                    <td class=summary-column>{{ illness.description }}</td>
+                    <td class=summary-column>{{ illness.start_date|date:"d/m/Y" }} to {{ illness.end_date|date:"d/m/Y" }}</td>
+                </tr>
+                {% endfor %}
+                {% endif %}
+            </tbody>
+        </table>
+
+        <table class="check-your-answers">
+            <colgroup>
+                <col class="summary-column">
+                <col class="summary-column">
+                <col class="change-answer">
+            </colgroup>
+            <thead>
+                <th colspan="3">
+                        <h2 class="heading-medium">
+                            Hospital admissions
+                        </h2>
+                </th>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Have you been admitted to hospital in the last 2 years?</td>
+                    <td>{{ record.hospital_admission|yesno:"Yes,No" }}</td>
+                </tr>
+                {% if record.hospital_admission %}
+                {% for illness in hospital_admission_set %}
+                <tr>
+                    <td>{{ illness.description }}</td>
+                    <td>{{ illness.start_date|date:"d/m/Y" }} to {{ illness.end_date|date:"d/m/Y" }}</td>
+                </tr>
+                {% endfor %}
+                {% endif %}
+            </tbody>
+        </table>
+
         {% endfor %}
         {% for id, name, day, month, year, relationship, formsetchild in child_lists %}
         <table class="check-your-answers form-group">

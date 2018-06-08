@@ -1,6 +1,6 @@
 from timeline_logger.models import TimelineLog
 
-from .models import ArcComments, Application
+from .models import ArcComments, Application, AdultInHome
 from urllib.parse import urlencode
 from django.core.urlresolvers import reverse
 
@@ -75,6 +75,13 @@ def save_comments(request, comment_list):
 
             existing_comment_present = ArcComments.objects.filter(table_pk=single_comment[0],
                                                                            field_name=single_comment[2]).count() > 0
+
+            if single_comment[2] == 'health_check_status':
+                application_id = request.POST['id']
+                adult = AdultInHome.objects.get(application_id=application_id)
+                adult.health_check_status = 'Flagged'
+                adult.save()
+
             # If a field already has a comment, this will update it, otherwise it will use the 'default' dictionary
             ArcComments.objects.update_or_create(table_pk=single_comment[0],
                                                                            field_name=single_comment[2],

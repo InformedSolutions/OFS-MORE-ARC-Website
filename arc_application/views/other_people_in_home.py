@@ -7,7 +7,8 @@ from django.shortcuts import render
 
 from arc_application.models.previous_name import PreviousName
 from ..forms.form import AdultInYourHomeForm, ChildInYourHomeForm, OtherPeopleInYourHomeForm, OtherPersonPreviousNames
-from arc_application.models import ChildInHome, AdultInHome, Arc, Application, PreviousAddress
+from arc_application.models import ChildInHome, AdultInHome, Arc, Application, PreviousAddress, HealthCheckCurrent, \
+    HealthCheckSerious, HealthCheckHospital
 from arc_application.review_util import request_to_comment, save_comments, redirect_selection, build_url
 from arc_application.views import other_people_initial_population
 from .base import group_required
@@ -92,7 +93,9 @@ def other_people_summary(request):
             return HttpResponseRedirect(settings.URL_PREFIX + redirect_link + '?id=' + application_id_local)
 
     adults_list = AdultInHome.objects.filter(application_id=application_id_local).order_by('adult')
+    adult_record_list = []
     adult_id_list = []
+    adult_health_check_status_list = []
     adult_name_list = []
     adult_birth_day_list = []
     adult_birth_month_list = []
@@ -106,19 +109,27 @@ def other_people_summary(request):
     child_birth_month_list = []
     child_birth_year_list = []
     child_relationship_list = []
+    current_illnesses = []
+    serious_illnesses = []
+    hospital_admissions = []
     application = Application.objects.get(pk=application_id_local)
     for adult in adults_list:
         if adult.middle_names != '':
             name = adult.first_name + ' ' + adult.middle_names + ' ' + adult.last_name
         elif adult.middle_names == '':
             name = adult.first_name + ' ' + adult.last_name
+        adult_record_list.append(adult)
         adult_id_list.append(adult.adult_id)
+        adult_health_check_status_list.append(adult.health_check_status)
         adult_name_list.append(name)
         adult_birth_day_list.append(adult.birth_day)
         adult_birth_month_list.append(adult.birth_month)
         adult_birth_year_list.append(adult.birth_year)
         adult_relationship_list.append(adult.relationship)
         adult_dbs_list.append(adult.dbs_certificate_number)
+        current_illnesses.append(HealthCheckCurrent.objects.filter(person_id=adult.pk))
+        serious_illnesses.append(HealthCheckSerious.objects.filter(person_id=adult.pk))
+        hospital_admissions.append(HealthCheckHospital.objects.filter(person_id=adult.pk))
     # Defines the data required for rendering the amount of forms in the below formset
     amount_of_adults = str(len(adult_name_list))
     data = {
@@ -133,12 +144,10 @@ def other_people_summary(request):
     formset_adult = adult_form_set(initial=initial_adult_data, prefix='adult')
 
     # Zips the formset into the list of adults
-    adult_lists = zip(adult_id_list, adult_name_list, adult_birth_day_list, adult_birth_month_list,
-                      adult_birth_year_list,
-                      adult_relationship_list, adult_dbs_list, formset_adult)
-
     # Converts it to a list, there was trouble parsing the form objects when it was in a zip object
-    adult_lists = list(adult_lists)
+    adult_lists = list(zip(adult_record_list, adult_id_list, adult_health_check_status_list, adult_name_list, adult_birth_day_list,
+                           adult_birth_month_list, adult_birth_year_list, adult_relationship_list, adult_dbs_list,
+                           formset_adult, current_illnesses, serious_illnesses, hospital_admissions))
 
     for child in children_list:
         if child.middle_names != '':
@@ -160,10 +169,10 @@ def other_people_summary(request):
                       child_birth_year_list,
                       child_relationship_list, formset_child)
 
-    adult_ids = []
-    adult_names = []
-    name_querysets = []
-    address_querysets = []
+    adult_ids = list()
+    adult_names = list()
+    name_querysets = list()
+    address_querysets = list()
 
     for adult_id, adult_name in zip(adult_id_list, adult_name_list):
         adult_ids.append(adult_id)
@@ -173,10 +182,10 @@ def other_people_summary(request):
 
     adult_ebulk_lists = list(zip(adult_ids, adult_names, name_querysets, address_querysets))
 
-    child_ids = []
-    child_names = []
-    name_querysets = []
-    address_querysets = []
+    child_ids = list()
+    child_names = list()
+    name_querysets = list()
+    address_querysets = list()
 
     for child_id, child_name in zip(child_id_list, child_name_list):
         child_ids.append(child_id)
