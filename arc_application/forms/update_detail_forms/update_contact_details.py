@@ -6,6 +6,7 @@ OFS-MORE-CCN3: ARC Review Service
 """
 import re
 
+from django.conf import settings
 from govuk_forms.forms import GOVUKForm
 from django import forms
 from ...models import UserDetails, Application
@@ -32,7 +33,7 @@ class UpdateEmail(GOVUKForm):
         """
         email = self.cleaned_data['email']
         # RegEx for valid e-mail addresses
-        if re.match("^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$", email) is None:
+        if re.match(settings.REGEX['EMAIL'], email) is None:
             raise forms.ValidationError('Please enter a valid email address')
         if len(email) == 0:
             raise forms.ValidationError('Please enter an email address')
@@ -59,7 +60,7 @@ class UpdatePhoneNumber(GOVUKForm):
         """
         mobile_number = self.cleaned_data['mobile_number']
         no_space_mobile_number = mobile_number.replace(' ', '')
-        if re.match("^(07\d{8,12}|447\d{7,11})$", no_space_mobile_number) is None:
+        if re.match(settings.REGEX['MOBILE'], no_space_mobile_number) is None:
             raise forms.ValidationError('TBC')
         if len(no_space_mobile_number) > 11:
             raise forms.ValidationError('TBC')
@@ -86,7 +87,7 @@ class UpdateAddPhoneNumber(GOVUKForm):
         add_phone_number = self.cleaned_data['add_phone_number']
         no_space_add_phone_number = add_phone_number.replace(' ', '')
         if add_phone_number != '':
-            if re.match("^(0\d{8,12}|447\d{7,11})$", no_space_add_phone_number) is None:
+            if re.match(settings.REGEX['PHONE'], no_space_add_phone_number) is None:
                 raise forms.ValidationError('TBC')
             if len(no_space_add_phone_number) > 11:
                 raise forms.ValidationError('TBC')
