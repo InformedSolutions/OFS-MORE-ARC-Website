@@ -7,6 +7,7 @@ OFS-MORE-CCN3: Apply to be a Childminder Beta
 import uuid
 
 import re
+from django.conf import settings
 from django import forms
 from django.forms import ModelForm
 from govuk_forms.forms import GOVUKForm
@@ -648,7 +649,7 @@ class OtherPersonPreviousPostcodeEntry(GOVUKForm):
         postcode = self.cleaned_data['postcode']
         postcode_no_space = postcode.replace(" ", "")
         postcode_uppercase = postcode_no_space.upper()
-        if re.match("^[A-Z]{1,2}[0-9]{1,2}[A-Z]?[0-9][A-Z][A-Z]$", postcode_uppercase) is None:
+        if re.match(settings.REGEX['POSTCODE_UPPERCASE'], postcode_uppercase) is None:
             raise forms.ValidationError('Please enter a valid postcode')
         return postcode
 
@@ -736,7 +737,7 @@ class OtherPeoplePreviousAddressManualForm(GOVUKForm):
         :return: string
         """
         town = self.cleaned_data['town']
-        if re.match("^[A-Za-z- ]+$", town) is None:
+        if re.match(settings.REGEX['TOWN'], town) is None:
             raise forms.ValidationError('Please spell out the name of the town or city using letters')
         if len(town) > 50:
             raise forms.ValidationError('The name of the town or city must be under 50 characters long')
@@ -749,7 +750,7 @@ class OtherPeoplePreviousAddressManualForm(GOVUKForm):
         """
         county = self.cleaned_data['county']
         if county != '':
-            if re.match("^[A-Za-z- ]+$", county) is None:
+            if re.match(settings.REGEX['COUNTY'], county) is None:
                 raise forms.ValidationError('Please spell out the name of the county using letters')
             if len(county) > 50:
                 raise forms.ValidationError('The name of the county must be under 50 characters long')
@@ -763,7 +764,7 @@ class OtherPeoplePreviousAddressManualForm(GOVUKForm):
         postcode = self.cleaned_data['postcode']
         postcode_no_space = postcode.replace(" ", "")
         postcode_uppercase = postcode_no_space.upper()
-        if re.match("^[A-Z]{1,2}[0-9]{1,2}[A-Z]?[0-9][A-Z][A-Z]$", postcode_uppercase) is None:
+        if re.match(settings.REGEX['POSTCODE_UPPERCASE'], postcode_uppercase) is None:
             raise forms.ValidationError('Please enter a valid postcode')
         return postcode
 
@@ -802,7 +803,7 @@ class PersonalDetailsPreviousPostcodeEntry(GOVUKForm):
         postcode = self.cleaned_data['postcode']
         postcode_no_space = postcode.replace(" ", "")
         postcode_uppercase = postcode_no_space.upper()
-        if re.match("^[A-Z]{1,2}[0-9]{1,2}[A-Z]?[0-9][A-Z][A-Z]$", postcode_uppercase) is None:
+        if re.match(settings.REGEX['POSTCODE_UPPERCASE'], postcode_uppercase) is None:
             raise forms.ValidationError('Please enter a valid postcode')
         return postcode
 
@@ -890,7 +891,7 @@ class PersonalDetailsPreviousAddressManualForm(GOVUKForm):
         :return: string
         """
         town = self.cleaned_data['town']
-        if re.match("^[A-Za-z- ]+$", town) is None:
+        if re.match(settings.REGEX['TOWN'], town) is None:
             raise forms.ValidationError('Please spell out the name of the town or city using letters')
         if len(town) > 50:
             raise forms.ValidationError('The name of the town or city must be under 50 characters long')
@@ -903,7 +904,7 @@ class PersonalDetailsPreviousAddressManualForm(GOVUKForm):
         """
         county = self.cleaned_data['county']
         if county != '':
-            if re.match("^[A-Za-z- ]+$", county) is None:
+            if re.match(settings.REGEX['COUNTY'], county) is None:
                 raise forms.ValidationError('Please spell out the name of the county using letters')
             if len(county) > 50:
                 raise forms.ValidationError('The name of the county must be under 50 characters long')
@@ -917,6 +918,6 @@ class PersonalDetailsPreviousAddressManualForm(GOVUKForm):
         postcode = self.cleaned_data['postcode']
         postcode_no_space = postcode.replace(" ", "")
         postcode_uppercase = postcode_no_space.upper()
-        if re.match("^[A-Z]{1,2}[0-9]{1,2}[A-Z]?[0-9][A-Z][A-Z]$", postcode_uppercase) is None:
+        if re.match(settings.REGEX['POSTCODE_UPPERCASE'], postcode_uppercase) is None:
             raise forms.ValidationError('Please enter a valid postcode')
         return postcode
