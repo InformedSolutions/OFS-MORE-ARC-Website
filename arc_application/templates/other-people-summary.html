@@ -626,8 +626,8 @@
             {% endif %}
         {% endfor %}
 
-        {% for id, name, previous_registration in previous_registration_lists %}
-        {% if previous_registration_lists %}
+        {% for id, name, previous_registrations in previous_registration_lists %}
+        {% for previous_registration in previous_registrations %}
                 <table class="check-your-answers form-group">
                     <thead>
                     <tr>
@@ -658,7 +658,7 @@
                     </tr>
                     </tbody>
                 </table>
-                    {% endif %}
+                    {% endfor %}
         {% endfor %}
 
         <input type="submit" class="button" value="Confirm and continue"/>
