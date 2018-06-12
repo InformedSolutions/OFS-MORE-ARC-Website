@@ -21,5 +21,6 @@ from .previous_registration_details import *
 from .reference import *
 from .user_details import *
 from .other_person_health_check_models import *
+from .other_person_previous_registration_details import *
 from .previous_address import *
 from .previous_name import *

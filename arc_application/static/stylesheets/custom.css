@@ -398,3 +398,13 @@
 .search-help-text {
   display: inline !important;
 }
+
+.two-thirds {
+  width: 66%;
+}
+
+@media (max-width: 640px) {
+    .two-thirds {
+      width: 100%;
+    }
+}

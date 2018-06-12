@@ -7,8 +7,9 @@ from django.shortcuts import render
 
 from arc_application.models.previous_name import PreviousName
 from ..forms.form import AdultInYourHomeForm, ChildInYourHomeForm, OtherPeopleInYourHomeForm, OtherPersonPreviousNames
-from arc_application.models import ChildInHome, AdultInHome, Arc, Application, PreviousAddress, HealthCheckCurrent, \
-    HealthCheckSerious, HealthCheckHospital
+from arc_application.models import ChildInHome, AdultInHome, Arc, Application, PreviousAddress, \
+    OtherPersonPreviousRegistrationDetails, HealthCheckCurrent, HealthCheckSerious, HealthCheckHospital
+
 from arc_application.review_util import request_to_comment, save_comments, redirect_selection, build_url
 from arc_application.views import other_people_initial_population
 from .base import group_required
@@ -195,6 +196,17 @@ def other_people_summary(request):
 
     child_ebulk_lists = zip(child_ids, child_names, name_querysets, address_querysets)
 
+    adult_ids = []
+    adult_names = []
+    previous_registration_querysets = []
+
+    for adult_id, adult_name in zip(adult_id_list, adult_name_list):
+        adult_ids.append(adult_id)
+        adult_names.append(adult_name)
+        previous_registration_querysets.append(OtherPersonPreviousRegistrationDetails.objects.get(person_id_id=adult_id))
+
+    previous_registration_lists = list(zip(adult_ids, adult_names, previous_registration_querysets))
+
     variables = {
         'form': form,
         'formset_adult': formset_adult,
@@ -208,6 +220,7 @@ def other_people_summary(request):
         'child_lists': child_lists,
         'adult_ebulk_lists': adult_ebulk_lists,
         'child_ebulk_lists': child_ebulk_lists,
+        'previous_registration_lists': previous_registration_lists,
         'turning_16': application.children_turning_16,
         'people_in_home_status': application.people_in_home_status
     }

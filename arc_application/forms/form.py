@@ -13,6 +13,8 @@ from django.forms import ModelForm
 from govuk_forms.forms import GOVUKForm
 from govuk_forms.widgets import InlineRadioSelect, NumberInput
 
+from ..models import OtherPersonPreviousRegistrationDetails
+from ..widgets.ConditionalPostChoiceWidget import ConditionalPostInlineRadioSelect
 from .. import custom_field_widgets
 from ..models import Arc as ArcReview, PreviousAddress, PreviousName
 from ..models import Arc as ArcReview, PreviousRegistrationDetails
@@ -921,3 +923,53 @@ class PersonalDetailsPreviousAddressManualForm(GOVUKForm):
         if re.match(settings.REGEX['POSTCODE_UPPERCASE'], postcode_uppercase) is None:
             raise forms.ValidationError('Please enter a valid postcode')
         return postcode
+
+
+class OtherPersonPreviousRegistrationDetailsForm(GOVUKForm):
+    """
+    GOV.UK form for adding details of previous registration.
+    """
+    error_summary_template_name = 'standard-error-summary.html'
+    error_summary_title = 'There was a problem on this page'
+    field_label_classes = 'form-label-bold'
+    auto_replace_widgets = True
+    reveal_conditionally = {'previous_registration': {True: 'individual_id'}}
+
+    choices = (
+        (False, 'No'),
+        (True, 'Yes')
+    )
+
+    previous_registration = forms.ChoiceField(choices=choices, label='Has the person previously registered with Ofsted?',
+                                              widget=ConditionalPostInlineRadioSelect, required=True, error_messages={'required': "Please select one"})
+    custom_number_input=NumberInput()
+    custom_number_input.input_classes = 'form-control form-control-1-4'
+    individual_id = forms.IntegerField(label='Individual ID', widget=custom_number_input, required=False)
+    five_years_in_UK = forms.ChoiceField(choices=choices, label='Has the person lived in England for more than 5 years?',
+                                         widget=InlineRadioSelect, required=True, error_messages={'required': "Please select one"})
+
+
+    def __init__(self, *args, **kwargs):
+        self.person_id = kwargs.pop('id')
+        super(OtherPersonPreviousRegistrationDetailsForm, self).__init__(*args, **kwargs)
+        if OtherPersonPreviousRegistrationDetails.objects.filter(person_id=self.person_id).exists():
+            previous_reg_details = OtherPersonPreviousRegistrationDetails.objects.get(person_id=self.person_id)
+            self.fields['previous_registration'].initial = previous_reg_details.previous_registration
+            self.fields['individual_id'].initial = previous_reg_details.individual_id
+            self.fields['five_years_in_UK'].initial = previous_reg_details.five_years_in_UK
+
+    def clean_individual_id(self):
+        try:
+            previous_registration = self.cleaned_data['previous_registration']
+        except:
+            previous_registration = None
+        if previous_registration == 'True':
+            individual_id = self.cleaned_data['individual_id']
+        else:
+            individual_id = None
+        if previous_registration=='True':
+            if individual_id is None:
+                raise forms.ValidationError("Please select one")
+            if len(str(individual_id)) > 7:
+                raise forms.ValidationError("Individual ID must be fewer than 7 digits")
+        return individual_id
