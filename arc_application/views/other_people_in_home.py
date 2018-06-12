@@ -203,7 +203,7 @@ def other_people_summary(request):
     for adult_id, adult_name in zip(adult_id_list, adult_name_list):
         adult_ids.append(adult_id)
         adult_names.append(adult_name)
-        previous_registration_querysets.append(OtherPersonPreviousRegistrationDetails.objects.get(person_id_id=adult_id))
+        previous_registration_querysets.append(OtherPersonPreviousRegistrationDetails.objects.filter(person_id_id=adult_id))
 
     previous_registration_lists = list(zip(adult_ids, adult_names, previous_registration_querysets))
 
