@@ -240,6 +240,7 @@ def add_previous_address(request):
 
 
 @group_required(settings.ARC_GROUP)
+@user_assigned_application
 def add_previous_name(request):
     """
     View to handle previous name formset for the either adults or children in the home
