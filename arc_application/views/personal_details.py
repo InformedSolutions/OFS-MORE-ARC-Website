@@ -242,10 +242,6 @@ def add_applicant_previous_name(request):
                 if referrer == 'None':
                     # If they've come from the 'add ebulk' button
                     return HttpResponseRedirect(build_url('personal_details_summary', get={'id': app_id}))
-                    # return HttpResponseRedirect(build_url('personal_details_previous_addresses', get={"id": app_id,
-                    #                                                                               "person_id": person_id,
-                    #                                                                               "person_type": person_type,
-                    #                                                                               "state": "entry"}))
                 else:
                     # If they've come from the summary page (using a change link)
                     return HttpResponseRedirect(build_url('personal_details_summary', get={'id': app_id}))
