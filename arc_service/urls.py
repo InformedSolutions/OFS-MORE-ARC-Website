@@ -24,7 +24,6 @@ from arc_application.views.arc_summary import cc_summary
 from arc_application.views.contact_centre.change_details import UpdateEmailView, UpdatePhoneNumberView, \
     UpdateAddPhoneNumberView
 from arc_application.contact_centre import search
-from arc_application.views.base import group_required
 from django.conf import settings
 from django.conf.urls import include, url
 from django.contrib import admin
@@ -49,7 +48,7 @@ urlpatterns = [
         name='personal_details_previous_addresses'),
     url(r'^first-aid/summary/', first_aid_training_summary, name='first_aid_training_summary'),
     url(r'^dbs-check/summary/', dbs_check_summary, name='dbs_check_summary'),
-    url(r'^eyfs-check/summary/', group_required(settings.ARC_GROUP)(EFYSCheckSummaryView.as_view()), name='eyfs_check_summary'),
+    url(r'^eyfs-check/summary/', EFYSCheckSummaryView.as_view(), name='eyfs_check_summary'),
     url(r'^references/summary/', references_summary, name='references_summary'),
     url(r'^other-people/summary/', other_people_summary, name='other_people_summary'),
     url(r'^people-in-home/previous_names', add_previous_name, name='other-people-previous-names'),
@@ -65,7 +64,7 @@ urlpatterns = [
     url(r'^contact-centre/contact-details/phone-number', UpdatePhoneNumberView.as_view(), name='update_phone_number'),
     url(r'^contact-centre/contact-details/add-phone-number', UpdateAddPhoneNumberView.as_view(),
         name='update_add_number'),
-    url(r'^personal-details/previous-registration', group_required(settings.ARC_GROUP)(PreviousRegistrationDetailsView.as_view()),
+    url(r'^personal-details/previous-registration', PreviousRegistrationDetailsView.as_view(),
         name='previous_registration_details'),
 ]
 

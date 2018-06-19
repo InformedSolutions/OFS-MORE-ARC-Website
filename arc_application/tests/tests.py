@@ -23,7 +23,8 @@ name = None
 user_details = None
 arc_records = None
 flagged_status = 'FLAGGED'
-
+arc_test_user = None
+cc_test_user = None
 
 def create_application():
     global application
@@ -175,8 +176,11 @@ def create_application():
         email='test@informed.com'
     )
 
-    arc_records = Arc.objects.create(
+    global arc_test_user
+
+    Arc.objects.create(
         application_id=application.application_id,
+        user_id=arc_test_user.id
     )
 
 
@@ -212,10 +216,17 @@ class ArcSummaryTest(TestCase):
             username='arc_test', email='test@test.com', password='my_secret')
         g = Group.objects.create(name=settings.ARC_GROUP)
         g.user_set.add(self.user)
+
+        global arc_test_user
+        arc_test_user = self.user
+
         self.user = User.objects.create_user(
             username='cc_test', email='testing@test.com', password='my_secret')
         g2 = Group.objects.create(name=settings.CONTACT_CENTRE)
         g2.user_set.add(self.user)
+
+        global cc_test_user
+        cc_test_user = self.user
 
     def test_user_group(self):
         self.assertEqual(Group.objects.filter(name=settings.ARC_GROUP).count(), 1)
@@ -242,6 +253,7 @@ class ArcSummaryTest(TestCase):
 
         # Act
         self.client.login(username='arc_test', password='my_secret')
+
         response = self.client.post(reverse('contact_summary'), post_dictionary)
 
         # Assert
@@ -367,6 +379,7 @@ class ArcSummaryTest(TestCase):
 
         # Act
         self.client.login(username='arc_test', password='my_secret')
+
         response = self.client.post(reverse('dbs_check_summary') + '?id=' + application.application_id,
                                     post_dictionary)
 

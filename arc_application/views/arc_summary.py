@@ -7,7 +7,7 @@ from timeline_logger.models import TimelineLog
 from ..summary_page_data import link_dict
 from ..models import *
 from .review import review, has_group
-from .base import group_required
+from ..decorators import group_required
 
 """
     to merge multiple models inside a table, represent them as a list within the ordered_models list.

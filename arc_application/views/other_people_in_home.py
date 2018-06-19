@@ -12,10 +12,11 @@ from arc_application.models import ChildInHome, AdultInHome, Arc, Application, P
 
 from arc_application.review_util import request_to_comment, save_comments, redirect_selection, build_url
 from arc_application.views import other_people_initial_population
-from .base import group_required
+from ..decorators import group_required, user_assigned_application
 
 
 @group_required(settings.ARC_GROUP)
+@user_assigned_application
 def other_people_summary(request):
     """
     Method returning the template for the People in your home: summary page (for a given application)

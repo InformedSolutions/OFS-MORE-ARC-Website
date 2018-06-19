@@ -10,10 +10,11 @@ from ..models import ApplicantPersonalDetails, ApplicantName, ApplicantHomeAddre
     PreviousName, uuid4
 from ..review_util import request_to_comment, save_comments, redirect_selection, build_url
 from ..views.personal_details_addresses import get_stored_addresses
-from .base import group_required
+from ..decorators import group_required, user_assigned_application
 
 
 @group_required(settings.ARC_GROUP, raise_exception=True)
+@user_assigned_application
 def personal_details_summary(request):
     """
     Method returning the template for the Your personal details: summary page (for a given application)

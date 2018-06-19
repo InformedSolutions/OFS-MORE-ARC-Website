@@ -9,10 +9,11 @@ from arc_application.forms.form import OtherPersonPreviousPostcodeEntry, OtherPe
     OtherPeoplePreviousAddressManualForm
 from arc_application.models import PreviousAddress
 from arc_application.review_util import build_url
-from .base import group_required
+from ..decorators import group_required, user_assigned_application
 
 
 @group_required(settings.ARC_GROUP)
+@user_assigned_application
 def address_state_dispatcher(request):
     """
     Dispatcher function to handle the different pages to be rendered

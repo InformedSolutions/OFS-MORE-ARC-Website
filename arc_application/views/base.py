@@ -250,25 +250,6 @@ def has_group(user, group_name):
     return True if group in user.groups.all() else False
 
 
-def group_required(group, login_url=None, raise_exception=False):
-    """
-    Decorator for views that checks whether a user has a group permission,
-    redirecting to the log-in page if necessary.
-    If the raise_exception parameter is given the PermissionDenied exception
-    is raised.
-    """
-    def check_perms(user):
-        if isinstance(group, six.string_types):
-            groups = (group,)
-        else:
-            groups = group
-
-        if user.groups.filter(name__in=groups).exists():
-            return True
-        raise PermissionDenied
-    return user_passes_test(check_perms, login_url=login_url)
-
-
 @login_required()
 def release(request, application_id):
     """

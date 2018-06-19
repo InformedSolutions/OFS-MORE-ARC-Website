@@ -6,6 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
+from django.utils.decorators import method_decorator
 from django.views import View
 
 from arc_application.models import AdultInHome
@@ -16,8 +17,9 @@ from ..models import PreviousRegistrationDetails, OtherPersonPreviousRegistratio
 from ..models import ApplicantName, ApplicantPersonalDetails, Application, Arc, ArcComments, ChildcareType, UserDetails
 from .base import release_application
 from ..notify import send_email
-from .base import group_required
+from ..decorators import group_required, user_assigned_application
 
+decorators = [group_required(settings.ARC_GROUP), user_assigned_application]
 
 @login_required()
 @group_required(settings.ARC_GROUP)
@@ -265,6 +267,7 @@ def other_people_initial_population(adult, person_list):
     return initial_data
 
 
+@method_decorator(decorators, name='dispatch')
 class PreviousRegistrationDetailsView(View):
 
     def get(self, request):
@@ -309,6 +312,7 @@ class PreviousRegistrationDetailsView(View):
             return render(request, 'add-previous-registration.html', context=variables)
 
 
+@method_decorator(decorators, name='dispatch')
 class OtherPersonPreviousRegistrationDetailsView(View):
 
     def get(self, request):

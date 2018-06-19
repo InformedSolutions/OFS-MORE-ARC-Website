@@ -5,10 +5,11 @@ from django.shortcuts import render
 from ..forms.form import LogInDetailsForm
 from ..models import Application, Arc, UserDetails
 from ..review_util import redirect_selection, request_to_comment, save_comments
-from .base import group_required
+from ..decorators import group_required, user_assigned_application
 
 
 @group_required(settings.ARC_GROUP)
+@user_assigned_application
 def contact_summary(request):
     """
     Method returning the template for the Your login and contact details: summary page (for a given application)

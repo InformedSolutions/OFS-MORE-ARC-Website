@@ -9,10 +9,11 @@ from ..forms.form import OtherPersonPreviousPostcodeEntry, OtherPeoplePreviousAd
     OtherPeoplePreviousAddressManualForm
 from ..models import PreviousAddress
 from ..review_util import build_url
-from .base import group_required
+from ..decorators import group_required, user_assigned_application
 
 
 @group_required(settings.ARC_GROUP)
+@user_assigned_application
 def personal_details_previous_address(request):
     """
     Dispatcher function to handle the different pages to be rendered

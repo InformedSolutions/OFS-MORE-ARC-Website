@@ -1,14 +1,18 @@
 from django.conf import settings
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
+from django.utils.decorators import method_decorator
 from django.views import View
 
 from ..forms.form import EYFSCheckForm
 from ..models import Application, Arc, EYFS
 from ..review_util import redirect_selection, request_to_comment, save_comments
-from .base import group_required
+from ..decorators import group_required, user_assigned_application
 
 
+decorators = [group_required(settings.ARC_GROUP), user_assigned_application]
+
+@method_decorator(decorators, name='dispatch')
 class EFYSCheckSummaryView(View):
     table_name = 'EYFS'
 
@@ -64,3 +68,4 @@ class EFYSCheckSummaryView(View):
         'eyfs_course_date_year': eyfs_check.eyfs_course_date_year
         }
         return render(request, 'eyfs-summary.html', context=context)
+
