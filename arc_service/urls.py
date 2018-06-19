@@ -17,7 +17,7 @@ from arc_application.views.other_people_addresses import address_state_dispatche
 from arc_application.views.other_people_in_home import other_people_summary, add_previous_name
 from arc_application.views.personal_details import personal_details_summary, add_applicant_previous_name
 from arc_application.views.references import references_summary
-from arc_application.views.review import review, task_list, PreviousRegistrationDetailsView
+from arc_application.views.review import review, task_list, PreviousRegistrationDetailsView, OtherPersonPreviousRegistrationDetailsView
 from arc_application.views.type_of_childcare import type_of_childcare_age_groups
 from arc_application.views.base import AuditlogListView
 from arc_application.views.arc_summary import cc_summary
@@ -54,6 +54,7 @@ urlpatterns = [
     url(r'^other-people/summary/', other_people_summary, name='other_people_summary'),
     url(r'^people-in-home/previous_names', add_previous_name, name='other-people-previous-names'),
     url(r'^people-in-home/previous_addresses', address_state_dispatcher, name='other-people-previous-addresses'),
+    url(r'^people-in-home/previous-registration$', OtherPersonPreviousRegistrationDetailsView.as_view(), name='other-people-previous-registration'),
     url(r'^health/check-answers/', health_check_answers, name='health_check_answers'),
     url(r'^confirmation/', review, name='review'),
     url(r'^arc-summary/', arc_summary, name='arc-summary'),

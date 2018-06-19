@@ -16,6 +16,9 @@
     {{ form.as_div }}
     <input type="submit" class="button" value="Save and continue">
     <input type="hidden" value="{{application_id}}" name="id"/>
+    {% if person_id %}
+        <input type="hidden" value="{{person_id}}" name="person_id">
+    {% endif %}
 </form>
 
 {% include 'return-to-list.html' %}

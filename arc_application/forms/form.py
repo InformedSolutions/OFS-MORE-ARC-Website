@@ -7,11 +7,14 @@ OFS-MORE-CCN3: Apply to be a Childminder Beta
 import uuid
 
 import re
+from django.conf import settings
 from django import forms
 from django.forms import ModelForm
 from govuk_forms.forms import GOVUKForm
 from govuk_forms.widgets import InlineRadioSelect, NumberInput
 
+from ..models import OtherPersonPreviousRegistrationDetails
+from ..widgets.ConditionalPostChoiceWidget import ConditionalPostInlineRadioSelect
 from .. import custom_field_widgets
 from ..models import Arc as ArcReview, PreviousAddress, PreviousName
 from ..models import Arc as ArcReview, PreviousRegistrationDetails
@@ -434,6 +437,12 @@ class AdultInYourHomeForm(GOVUKForm):
     GOV.UK form for each adult other person in an application
     """
 
+    health_check_status_declare = forms.BooleanField(label='This information is correct',
+                                                     widget=custom_field_widgets.CustomCheckboxInput, required=False)
+    health_check_status_comments = forms.CharField(label='Enter your reasoning', help_text='(Tip: be clear and concise)',
+                                                   widget=custom_field_widgets.Textarea,
+                                                   required=False)
+
     full_name_declare = forms.BooleanField(label='This information is correct',
                                            widget=custom_field_widgets.CustomCheckboxInput, required=False)
     full_name_comments = forms.CharField(label='Enter your reasoning', help_text='(Tip: be clear and concise)',  widget=custom_field_widgets.Textarea,
@@ -460,7 +469,7 @@ class AdultInYourHomeForm(GOVUKForm):
     permission_comments = forms.CharField(label='Enter your reasoning', help_text='(Tip: be clear and concise)', 
                                           widget=custom_field_widgets.Textarea, required=False)
 
-    # This is the id appended to all htmls names ot make the individual form instance unique, this is given a alue in
+    # This is the id appended to all htmls names ot make the individual form instance unique, this is given a value in
     # the init
     instance_id = forms.CharField(widget=forms.HiddenInput, required=False)
 
@@ -469,13 +478,15 @@ class AdultInYourHomeForm(GOVUKForm):
         # Create unique id value and populate the instance_id field with it
         id_value = str(uuid.uuid4())
         self.fields['instance_id'].initial = id_value
-        # print(self.fields['instance_id'].initial)
         # Make all checkbox names refer the the name with the correct instance id, making each conditional reveal unique
-        checkboxes = [((self.fields['full_name_declare']), 'full_name' + id_value),
-                      ((self.fields['date_of_birth_declare']), 'date_of_birth' + id_value),
-                      ((self.fields['relationship_declare']), 'relationship' + id_value),
-                      ((self.fields['dbs_certificate_number_declare']), 'dbs_certificate_number' + id_value),
-                      ((self.fields['permission_declare']), 'permission_declare' + id_value)]
+        checkboxes = [
+            ((self.fields['health_check_status_declare']), 'health_check_status' + id_value),
+            ((self.fields['full_name_declare']), 'full_name' + id_value),
+            ((self.fields['date_of_birth_declare']), 'date_of_birth' + id_value),
+            ((self.fields['relationship_declare']), 'relationship' + id_value),
+            ((self.fields['dbs_certificate_number_declare']), 'dbs_certificate_number' + id_value),
+            ((self.fields['permission_declare']), 'permission_declare' + id_value)
+        ]
 
         for box in checkboxes:
             box[0].widget.attrs.update({'data_target': box[1],
@@ -640,7 +651,7 @@ class OtherPersonPreviousPostcodeEntry(GOVUKForm):
         postcode = self.cleaned_data['postcode']
         postcode_no_space = postcode.replace(" ", "")
         postcode_uppercase = postcode_no_space.upper()
-        if re.match("^[A-Z]{1,2}[0-9]{1,2}[A-Z]?[0-9][A-Z][A-Z]$", postcode_uppercase) is None:
+        if re.match(settings.REGEX['POSTCODE_UPPERCASE'], postcode_uppercase) is None:
             raise forms.ValidationError('Please enter a valid postcode')
         return postcode
 
@@ -728,7 +739,7 @@ class OtherPeoplePreviousAddressManualForm(GOVUKForm):
         :return: string
         """
         town = self.cleaned_data['town']
-        if re.match("^[A-Za-z- ]+$", town) is None:
+        if re.match(settings.REGEX['TOWN'], town) is None:
             raise forms.ValidationError('Please spell out the name of the town or city using letters')
         if len(town) > 50:
             raise forms.ValidationError('The name of the town or city must be under 50 characters long')
@@ -741,7 +752,7 @@ class OtherPeoplePreviousAddressManualForm(GOVUKForm):
         """
         county = self.cleaned_data['county']
         if county != '':
-            if re.match("^[A-Za-z- ]+$", county) is None:
+            if re.match(settings.REGEX['COUNTY'], county) is None:
                 raise forms.ValidationError('Please spell out the name of the county using letters')
             if len(county) > 50:
                 raise forms.ValidationError('The name of the county must be under 50 characters long')
@@ -755,7 +766,7 @@ class OtherPeoplePreviousAddressManualForm(GOVUKForm):
         postcode = self.cleaned_data['postcode']
         postcode_no_space = postcode.replace(" ", "")
         postcode_uppercase = postcode_no_space.upper()
-        if re.match("^[A-Z]{1,2}[0-9]{1,2}[A-Z]?[0-9][A-Z][A-Z]$", postcode_uppercase) is None:
+        if re.match(settings.REGEX['POSTCODE_UPPERCASE'], postcode_uppercase) is None:
             raise forms.ValidationError('Please enter a valid postcode')
         return postcode
 
@@ -794,7 +805,7 @@ class PersonalDetailsPreviousPostcodeEntry(GOVUKForm):
         postcode = self.cleaned_data['postcode']
         postcode_no_space = postcode.replace(" ", "")
         postcode_uppercase = postcode_no_space.upper()
-        if re.match("^[A-Z]{1,2}[0-9]{1,2}[A-Z]?[0-9][A-Z][A-Z]$", postcode_uppercase) is None:
+        if re.match(settings.REGEX['POSTCODE_UPPERCASE'], postcode_uppercase) is None:
             raise forms.ValidationError('Please enter a valid postcode')
         return postcode
 
@@ -882,7 +893,7 @@ class PersonalDetailsPreviousAddressManualForm(GOVUKForm):
         :return: string
         """
         town = self.cleaned_data['town']
-        if re.match("^[A-Za-z- ]+$", town) is None:
+        if re.match(settings.REGEX['TOWN'], town) is None:
             raise forms.ValidationError('Please spell out the name of the town or city using letters')
         if len(town) > 50:
             raise forms.ValidationError('The name of the town or city must be under 50 characters long')
@@ -895,7 +906,7 @@ class PersonalDetailsPreviousAddressManualForm(GOVUKForm):
         """
         county = self.cleaned_data['county']
         if county != '':
-            if re.match("^[A-Za-z- ]+$", county) is None:
+            if re.match(settings.REGEX['COUNTY'], county) is None:
                 raise forms.ValidationError('Please spell out the name of the county using letters')
             if len(county) > 50:
                 raise forms.ValidationError('The name of the county must be under 50 characters long')
@@ -909,6 +920,56 @@ class PersonalDetailsPreviousAddressManualForm(GOVUKForm):
         postcode = self.cleaned_data['postcode']
         postcode_no_space = postcode.replace(" ", "")
         postcode_uppercase = postcode_no_space.upper()
-        if re.match("^[A-Z]{1,2}[0-9]{1,2}[A-Z]?[0-9][A-Z][A-Z]$", postcode_uppercase) is None:
+        if re.match(settings.REGEX['POSTCODE_UPPERCASE'], postcode_uppercase) is None:
             raise forms.ValidationError('Please enter a valid postcode')
         return postcode
+
+
+class OtherPersonPreviousRegistrationDetailsForm(GOVUKForm):
+    """
+    GOV.UK form for adding details of previous registration.
+    """
+    error_summary_template_name = 'standard-error-summary.html'
+    error_summary_title = 'There was a problem on this page'
+    field_label_classes = 'form-label-bold'
+    auto_replace_widgets = True
+    reveal_conditionally = {'previous_registration': {True: 'individual_id'}}
+
+    choices = (
+        (False, 'No'),
+        (True, 'Yes')
+    )
+
+    previous_registration = forms.ChoiceField(choices=choices, label='Has the person previously registered with Ofsted?',
+                                              widget=ConditionalPostInlineRadioSelect, required=True, error_messages={'required': "Please select one"})
+    custom_number_input=NumberInput()
+    custom_number_input.input_classes = 'form-control form-control-1-4'
+    individual_id = forms.IntegerField(label='Individual ID', widget=custom_number_input, required=False)
+    five_years_in_UK = forms.ChoiceField(choices=choices, label='Has the person lived in England for more than 5 years?',
+                                         widget=InlineRadioSelect, required=True, error_messages={'required': "Please select one"})
+
+
+    def __init__(self, *args, **kwargs):
+        self.person_id = kwargs.pop('id')
+        super(OtherPersonPreviousRegistrationDetailsForm, self).__init__(*args, **kwargs)
+        if OtherPersonPreviousRegistrationDetails.objects.filter(person_id=self.person_id).exists():
+            previous_reg_details = OtherPersonPreviousRegistrationDetails.objects.get(person_id=self.person_id)
+            self.fields['previous_registration'].initial = previous_reg_details.previous_registration
+            self.fields['individual_id'].initial = previous_reg_details.individual_id
+            self.fields['five_years_in_UK'].initial = previous_reg_details.five_years_in_UK
+
+    def clean_individual_id(self):
+        try:
+            previous_registration = self.cleaned_data['previous_registration']
+        except:
+            previous_registration = None
+        if previous_registration == 'True':
+            individual_id = self.cleaned_data['individual_id']
+        else:
+            individual_id = None
+        if previous_registration=='True':
+            if individual_id is None:
+                raise forms.ValidationError("Please select one")
+            if len(str(individual_id)) > 7:
+                raise forms.ValidationError("Individual ID must be fewer than 7 digits")
+        return individual_id

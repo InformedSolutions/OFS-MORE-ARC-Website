@@ -8,10 +8,11 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.views import View
 
-from ..forms.form import PreviousRegistrationDetailsForm
+from arc_application.models import AdultInHome
+from ..forms.form import PreviousRegistrationDetailsForm, OtherPersonPreviousRegistrationDetailsForm
 from ..forms.form import AdultInYourHomeForm, ChildInYourHomeForm, CommentsForm
 from ..magic_link import generate_magic_link
-from ..models import PreviousRegistrationDetails
+from ..models import PreviousRegistrationDetails, OtherPersonPreviousRegistrationDetails
 from ..models import ApplicantName, ApplicantPersonalDetails, Application, Arc, ArcComments, ChildcareType, UserDetails
 from .base import release_application
 from ..notify import send_email
@@ -117,10 +118,16 @@ def review(request):
 
     if all_complete(application_id_local, True):
         accepted_email(email, first_name, app_ref)
+
         # If successful
         release_application(request, application_id_local, 'ACCEPTED')
-        application.ofsted_visit_email_sent = datetime.now()
-        application.save()
+
+        # Get fresh version of application as it will have been updated in method call
+        if Application.objects.filter(application_id=application_id_local).exists():
+            application = Application.objects.get(application_id=application_id_local)
+            application.ofsted_visit_email_sent = datetime.now()
+            application.save()
+
         variables = {
             'application_id': application_id_local,
         }
@@ -268,7 +275,7 @@ class PreviousRegistrationDetailsView(View):
             'application_id': application_id_local,
         }
 
-        return render(request, 'add-previous-registration.html', context=variables)
+        return render(request, 'add-previous-registration.html', variables)
 
     def post(self, request):
         application_id_local = request.POST["id"]
@@ -297,6 +304,55 @@ class PreviousRegistrationDetailsView(View):
             variables = {
                 'form': form,
                 'application_id': application_id_local,
+            }
+
+            return render(request, 'add-previous-registration.html', context=variables)
+
+
+class OtherPersonPreviousRegistrationDetailsView(View):
+
+    def get(self, request):
+        application_id_local = request.GET["id"]
+        person_id = request.GET["person_id"]
+        form = OtherPersonPreviousRegistrationDetailsForm(id=person_id)
+        variables = {
+            'form': form,
+            'application_id': application_id_local,
+            'person_id': person_id,
+        }
+
+        return render(request, 'add-previous-registration.html', context=variables)
+
+    def post(self, request):
+        application_id_local = request.POST["id"]
+        person_id = request.POST["person_id"]
+        person_record = AdultInHome.objects.get(adult_id=person_id)
+        form = OtherPersonPreviousRegistrationDetailsForm(request.POST, id=person_id)
+
+        if form.is_valid():
+            app = Application.objects.get(pk=application_id_local)
+            previous_registration = form.cleaned_data.get('previous_registration')
+            individual_id = form.cleaned_data.get('individual_id')
+            five_years_in_uk = form.cleaned_data.get('five_years_in_UK')
+
+            if OtherPersonPreviousRegistrationDetails.objects.filter(person_id=person_record).exists():
+                previous_reg_details = OtherPersonPreviousRegistrationDetails.objects.get(person_id=person_record)
+            else:
+                previous_reg_details = OtherPersonPreviousRegistrationDetails(person_id=person_record)
+
+            previous_reg_details.previous_registration = previous_registration
+            previous_reg_details.individual_id = individual_id
+            previous_reg_details.five_years_in_UK = five_years_in_uk
+            previous_reg_details.save()
+
+            redirect_link = '/other-people/summary'
+            return HttpResponseRedirect(settings.URL_PREFIX + redirect_link + '?id=' + application_id_local)
+
+        else:
+            variables = {
+                'form': form,
+                'application_id': application_id_local,
+                'person_id': person_id,
             }
 
             return render(request, 'add-previous-registration.html', context=variables)
