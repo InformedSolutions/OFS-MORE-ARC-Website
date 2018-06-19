@@ -97,6 +97,14 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+# Session settings
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+
+# Left hand portion of below is the number of minutes after
+# which a user will be logged out due to inactivity
+SESSION_COOKIE_AGE = 30 * 60
+SESSION_SAVE_EVERY_REQUEST = True
+
 # Locales
 
 LANGUAGE_CODE = 'en-GB'
