@@ -5,7 +5,7 @@ DEBUG = True
 ALLOWED_HOSTS = ['*']
 
 DEV_APPS = [
-  'django_extensions',
+  #'django_extensions',
 ]
 
 INSTALLED_APPS = BUILTIN_APPS + THIRD_PARTY_APPS + DEV_APPS + PROJECT_APPS

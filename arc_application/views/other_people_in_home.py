@@ -312,10 +312,7 @@ def add_previous_name(request):
                 formset.save()
                 if referrer == 'None':
                     # If they've come from the 'add ebulk' button
-                    return HttpResponseRedirect(build_url('other-people-previous-addresses', get={"id": app_id,
-                                                                                                  "person_id": person_id,
-                                                                                                  "person_type": person_type,
-                                                                                                  "state": "entry"}))
+                    return HttpResponseRedirect(build_url('other_people_summary', get={'id': app_id}))
                 else:
                     # If they've come from the summary page (using a change link)
                     return HttpResponseRedirect(build_url('other_people_summary', get={'id': app_id}))
