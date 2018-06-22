@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.utils.decorators import method_decorator
@@ -10,7 +11,8 @@ from ..review_util import redirect_selection, request_to_comment, save_comments
 from ..decorators import group_required, user_assigned_application
 
 
-decorators = [group_required(settings.ARC_GROUP), user_assigned_application]
+decorators = [login_required, group_required(settings.ARC_GROUP), user_assigned_application]
+
 
 @method_decorator(decorators, name='dispatch')
 class EFYSCheckSummaryView(View):

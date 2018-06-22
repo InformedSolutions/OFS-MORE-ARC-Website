@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 
@@ -8,6 +9,7 @@ from ..review_util import redirect_selection, request_to_comment, save_comments
 from ..decorators import group_required, user_assigned_application
 
 
+@login_required
 @group_required(settings.ARC_GROUP)
 @user_assigned_application
 def first_aid_training_summary(request):

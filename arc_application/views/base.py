@@ -18,7 +18,7 @@ from timeline_logger.models import TimelineLog
 from ..models import ApplicantName, ApplicantPersonalDetails, Application, Arc
 
 
-@login_required()
+@login_required
 def summary_page(request):
     """
     Arc Summary page to view assigned applications and manage them
@@ -250,7 +250,7 @@ def has_group(user, group_name):
     return True if group in user.groups.all() else False
 
 
-@login_required()
+@login_required
 def release(request, application_id):
     """
     This is purely to handle the /release url on the arc summary page
@@ -267,6 +267,7 @@ def release(request, application_id):
 # 2. If status == 'FURTHER_INFORMATION' it needs to be returned to the applicant (BDD #3)
 # 3. If status == 'ACCEPTED' it has been submitted to Cygnum (BDD #8)
 
+@login_required
 def release_application(request, application_id, status):
     """
     Release application- essentiall remove the user_id field so that it's not assigned to anyone but the review status

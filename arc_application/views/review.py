@@ -19,9 +19,9 @@ from .base import release_application
 from ..notify import send_email
 from ..decorators import group_required, user_assigned_application
 
-decorators = [group_required(settings.ARC_GROUP), user_assigned_application]
+decorators = [login_required, group_required(settings.ARC_GROUP), user_assigned_application]
 
-@login_required()
+@login_required
 @group_required(settings.ARC_GROUP)
 def task_list(request):
     """

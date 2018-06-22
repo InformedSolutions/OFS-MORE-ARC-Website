@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
@@ -19,6 +20,7 @@ ordered_models = [UserDetails, ChildcareType, [ApplicantPersonalDetails, Applica
                   AdultInHome, ChildInHome, Reference]
 
 
+@login_required
 @group_required(settings.ARC_GROUP)
 def arc_summary(request):
     if request.method == 'GET':
@@ -40,6 +42,7 @@ def arc_summary(request):
         return review(request)
 
 
+@login_required
 def cc_summary(request):
     cc_user = has_group(request.user, settings.CONTACT_CENTRE)
 

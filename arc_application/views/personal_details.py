@@ -1,6 +1,7 @@
 from uuid import UUID
 
 from django.conf import settings
+from django.contrib.auth.decorators import login_required
 from django.forms import modelformset_factory
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
@@ -13,6 +14,7 @@ from ..views.personal_details_addresses import get_stored_addresses
 from ..decorators import group_required, user_assigned_application
 
 
+@login_required
 @group_required(settings.ARC_GROUP, raise_exception=True)
 @user_assigned_application
 def personal_details_summary(request):

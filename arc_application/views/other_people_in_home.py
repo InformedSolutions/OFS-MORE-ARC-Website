@@ -1,6 +1,7 @@
 from uuid import uuid4, UUID
 
 from django.conf import settings
+from django.contrib.auth.decorators import login_required
 from django.forms import formset_factory, modelformset_factory
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
@@ -15,6 +16,7 @@ from arc_application.views import other_people_initial_population
 from ..decorators import group_required, user_assigned_application
 
 
+@login_required
 @group_required(settings.ARC_GROUP)
 @user_assigned_application
 def other_people_summary(request):

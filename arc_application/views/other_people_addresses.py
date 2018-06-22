@@ -1,6 +1,7 @@
 import json
 
 from django.conf import settings
+from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 
@@ -12,6 +13,7 @@ from arc_application.review_util import build_url
 from ..decorators import group_required, user_assigned_application
 
 
+@login_required
 @group_required(settings.ARC_GROUP)
 @user_assigned_application
 def address_state_dispatcher(request):

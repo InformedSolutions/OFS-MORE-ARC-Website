@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from ..models import Arc, ChildcareType
@@ -6,6 +7,7 @@ from ..review_util import redirect_selection
 from ..decorators import group_required
 
 
+@login_required
 @group_required(settings.ARC_GROUP)
 def type_of_childcare_age_groups(request):
     """
