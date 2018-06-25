@@ -343,7 +343,7 @@
                 {{address.postcode}}{% if address.postcode %}<br />{% endif %}
             </td>
             <td class="change-answer">
-                <a href="{% url 'personal_details_previous_addresses' %}?id={{ application_id }}&state=update&person_id={{ application_id }}&person_type=APPLICANT&address_id={{address.pk}}" alt="Change the {{ forloop.counter|inflect }} previous name">Change</a>
+                <a href="{% url 'personal_details_previous_addresses' %}?id={{ application_id }}&state=update&person_id={{ application_id }}&person_type=APPLICANT&address_id={{address.pk}}" alt="Change the {{ forloop.counter|inflect }} previous address">Change</a>
             </td>
         </tr>
         {% endfor %}
