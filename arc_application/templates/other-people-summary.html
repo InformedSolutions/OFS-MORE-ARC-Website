@@ -390,8 +390,6 @@
         </table>
         <a href="{% url 'other-people-previous-registration' %}?id={{ application_id }}&person_id={{ id }}" class="button button-secondary">Add previous registration details</a>
 
-        <a href="{% url 'other-people-previous-names' %}?id={{ application_id }}&person_id={{ id }}&type=ADULT" class="button">Add previous names and addresses</a>
-
         {% endfor %}
         {% for id, name, day, month, year, relationship, formsetchild in child_lists %}
         <table class="check-your-answers form-group">
@@ -532,11 +530,6 @@
             </tbody>
         </table>
 
-        <a href="{% url 'other-people-previous-names' %}?id={{ application_id }}&person_id={{ id }}&type=CHILD" class="button button-secondary">Add previous names</a>
-        <br>
-        <a href="{% url 'other-people-previous-addresses' %}?id={{ application_id }}&state=entry&person_id={{id}}&person_type=CHILD" class="button button-secondary">Add previous addresses</a>
-
-
         {% endfor %}
         {% for id, name, previous_names, previous_addresses in adult_ebulk_lists %}
         <table class="check-your-answers form-group">
@@ -584,54 +577,7 @@
             </tbody>
         </table>
         {% endfor %}
-        {% for id, name, previous_names, previous_addresses in child_ebulk_lists %}
-            {% if previous_names %}
-                <table class="check-your-answers form-group">
-                    <thead>
-                    <tr>
-                        <th colspan="3">
-                            <div class="heading-medium">
-                                {{name}}'s eBulk details
-                            </div>
-                        </th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {% for name in previous_names %}
-                    <tr>
-                        <td>
-                            Previous name ({{ forloop.counter }})
-                        </td>
-                        <td>
-                            {{ name.first_name }} {{name.middle_names}} {{name.last_name}}
-                        </td>
-                        <td class="change-answer">
-                            <a href="{% url 'other-people-previous-names' %}?id={{ application_id }}&person_id={{ id }}&type=CHILD&referrer=list">Change</a>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                    {% for address in previous_addresses%}
-                    <tr>
-                        <td>
-                            Previous address ({{ forloop.counter }})
-                        </td>
-                        <td>
-                            {{address.street_line1}}{% if address.street_line1 %}<br />{% endif %}
-                            {{address.street_line2}}{% if address.street_line2 %}<br />{% endif %}
-                            {{address.town}}{% if address.town %}<br />{% endif %}
-                            {{address.county}}{% if address.county %}<br />{% endif %}
-                            {{address.country}}{% if address.country %}<br />{% endif %}
-                            {{address.postcode}}{% if address.postcode %}<br />{% endif %}
-                        </td>
-                        <td class="change-answer">
-                            <a href="{% url 'other-people-previous-addresses' %}?id={{ application_id }}&state=update&person_id={{id}}&person_type=CHILD&address_id={{address.previous_name_id}}">Change</a>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-            {% endif %}
-        {% endfor %}
+
 
         {% for id, name, previous_registrations in previous_registration_lists %}
         {% for previous_registration in previous_registrations %}
