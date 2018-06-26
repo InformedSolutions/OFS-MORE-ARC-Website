@@ -195,11 +195,11 @@ def postcode_submission(request, context):
         # Next state is set to entry, so that they may enter a new address or continue
         context['state'] = 'entry'
         if context['referrer'] == 'add-another':
-            return HttpResponseRedirect(build_url('personal_details_previous_addresses', get=context))
+            return HttpResponseRedirect(build_url('other-people-previous-addresses', get=context))
         elif context['referrer'] == 'save-and-continue':
             return HttpResponseRedirect(build_url('other_people_summary', get=context))
         else:
-            return HttpResponseRedirect(build_url('personal_details_previous_addresses', get=context))
+            return HttpResponseRedirect(build_url('other_people_summary', get=context))
 
 
 def address_update(request, context):
