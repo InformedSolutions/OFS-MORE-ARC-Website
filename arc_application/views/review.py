@@ -350,7 +350,7 @@ class OtherPersonPreviousRegistrationDetailsView(View):
             previous_reg_details.five_years_in_UK = five_years_in_uk
             previous_reg_details.save()
 
-            redirect_link = '/other-people/summary'
+            redirect_link = '/people/summary'
             return HttpResponseRedirect(settings.URL_PREFIX + redirect_link + '?id=' + application_id_local)
 
         else:
