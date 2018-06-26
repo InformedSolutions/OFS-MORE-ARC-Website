@@ -23,6 +23,7 @@ decorators = [login_required, group_required(settings.ARC_GROUP), user_assigned_
 
 @login_required
 @group_required(settings.ARC_GROUP)
+@user_assigned_application
 def task_list(request):
     """
     Generates the full task list for ARC users
