@@ -1,21 +1,20 @@
-#!/bin/bash
+#!/bin/sh
 
 # Create database migration files
 echo "Create database migration files"
 python manage.py makemigrations
-python manage.py makemigrations arc_application
 
 # Apply database migrations
 echo "Apply database migrations"
-python manage.py migrate --settings=$PROJECT_SETTINGS
-python manage.py migrate arc_application --settings=$PROJECT_SETTINGS
+python manage.py migrate --fake-initial --settings=$PROJECT_SETTINGS
 
 #Collect static resources
 echo "Collecting static assets"
-mkdir static
+mkdir -p static
 python manage.py collectstatic --noinput --settings=$PROJECT_SETTINGS
 
-echo "from django.contrib.auth.models import User; User.objects.filter(username='root').delete(); User.objects.create_superuser('root', 'root@admin.com', 'default-password')" | python manage.py shell --settings=$PROJECT_SETTINGS
+python manage.py loaddata initial_root_user --settings=$PROJECT_SETTINGS
+python manage.py loaddata initial_arc_user --settings=$PROJECT_SETTINGS
 
 # Start server
 echo "Starting server"

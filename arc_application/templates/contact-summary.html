@@ -1,56 +1,44 @@
 {% extends 'govuk_template.html' %}
-{% block page_title %}Your account{% endblock %}
+{% block page_title %}Review: your sign in details{% endblock %}
 {% load static %}
 {% load govuk_template_base %}
-
 {% block inner_content %}
+{% include 'back-button.html' %}
 
-<div class="column-full">
-    <div class="form-group grid-row" style="padding-top: 30px;">
-        <!-- Back button -->
-        <a href="{{ URL_PREFIX }}/review?id={{application_id}}" class="link-back"
-           style="margin-right: 10px; line-height: 28px" alt='Back to application list'>
-            Back
-        </a>
-    </div>
-    <form method="post" novalidate>
-            {% csrf_token %}
-    <div class="grid-row">
-        <h1 class="form-title heading-large">Review - Login Details</h1>
-    </div>
+<form method="post" novalidate>
+    {% csrf_token %}
+
+    <h1 class="form-title heading-large">
+        Review: your sign in details
+    </h1>
+    <p>
+        Please check the boxes if there are errors.
+    </p>
     <!-- Login details -->
-    <table class="check-your-answers form-group grid-row" style="table-layout: fixed; width: 100%">
-        <thead>
-        <tr>
-            <th colspan="3">
-                <div class="heading-medium">
-                    Your login details
-                </div>
-            </th>
-        </tr>
-        </thead>
+    <table class="check-your-answers form-group">
         <tbody>
         <tr>
             <td>
-                Your email
+                Email
             </td>
             <td style="word-wrap: break-word">
                 {{email}}
             </td>
             <td class="change-answer">
-                {{ form.email_declare }}
+                {{ form.email_address_declare }}
             </td>
         </tr>
-        <tr class="js-hidden" id="email" >
-            <td colspan="1"style="width:100%">
-                <div >
-                    {{ form.email_comments.label}}
+        <tr class="js-hidden" id="email_address">
+            <td colspan="1">
+                <div>
+                    {{ form.email_address_comments.label}}
+                </div>
+                <div>
+                    {{ form.email_address_comments.help_text}}
                 </div>
             </td>
-            <td colspan="2"style="width:100%">
-                <div >
-                    {{ form.email_comments}}
-                </div>
+            <td colspan="2">
+                {{ form.email_address_comments}}
             </td>
         </tr>
         <tr>
@@ -61,102 +49,58 @@
                 {{mobile_number}}
             </td>
             <td class="change-answer">
-                {{ form.mobile_phone_number_declare }}
+                {{ form.mobile_number_declare }}
             </td>
         </tr>
-        <tr class="js-hidden" id="mobile_phone_number" >
-            <td colspan="1"style="width:100%">
-                <div >
-                    {{ form.mobile_phone_number_comments.label}}
+        <tr class="js-hidden" id="mobile_number">
+            <td colspan="1">
+                <div>
+                    {{ form.mobile_number_comments.label}}
+                </div>
+                <div>
+                    {{ form.mobile_number_comments.help_text}}
                 </div>
             </td>
-            <td colspan="2"style="width:100%">
-                <div >
-                    {{ form.mobile_phone_number_comments}}
+            <td colspan="2">
+                <div>
+                    {{ form.mobile_number_comments}}
                 </div>
             </td>
         </tr>
         <tr>
             <td>
-                Alternative phone number
+                Other phone number
             </td>
             <td style="word-wrap: break-word">
                 {{add_phone_number}}
             </td>
             <td class="change-answer">
-                {{ form.alternative_phone_number_declare }}
+                {{ form.add_phone_number_declare }}
             </td>
         </tr>
-        <tr class="js-hidden" id="alternative_phone_number" >
-            <td colspan="1"style="width:100%">
-                <div >
-                    {{ form.alternative_phone_number_comments.label}}
+        <tr class="js-hidden" id="add_phone_number">
+            <td colspan="1">
+                <div>
+                    {{ form.add_phone_number_comments.label}}
+                </div>
+                <div>
+                    {{ form.add_phone_number_comments.help_text}}
                 </div>
             </td>
-            <td colspan="2"style="width:100%">
-                <div >
-                    {{ form.alternative_phone_number_comments}}
+            <td colspan="2">
+                <div>
+                    {{ form.add_phone_number_comments}}
                 </div>
             </td>
-        </tr>
-        <tr>
-            <td>
-                Knowledge based question
-            </td>
-            <td style="word-wrap: break-word">
-                {{security_question}}
-            </td>
-            <td class="change-answer">
-                {{ form.knowledge_based_question_declare }}
-            </td>
-        </tr>
-        <tr class="js-hidden" id="knowledge_based_question" >
-            <td colspan="1"style="width:100%">
-                <div >
-                    {{ form.knowledge_based_question_comments.label}}
-                </div>
-            </td>
-            <td colspan="2"style="width:100%">
-                <div >
-                    {{ form.knowledge_based_question_comments}}
-                </div>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                Knowledge based answer
-            </td>
-            <td style="word-wrap: break-word">
-                {{security_answer}}
-            </td>
-            <td class="change-answer">
-                {{ form.knowledge_based_answer_declare }}
-            </td>
-        </tr>
-        <tr class="js-hidden" id="knowledge_based_answer" >
-            <td colspan="1"style="width:100%">
-                <div >
-                    {{ form.knowledge_based_answer_comments.label}}
-                </div>
-            </td>
-            <td colspan="2"style="width:100%">
-                <div >
-                    {{ form.knowledge_based_answer_comments}}
-                </div>
-            </td>
-        </tr>
         </tr>
         </tbody>
     </table>
-    <br>
-    <div class="form-group grid-row">
 
+    <input type="submit" class="button" value="Confirm and continue"/>
+    <input type="hidden" value="{{application_id}}" name="id"/>
 
-            <input type="submit" class="button" value="Confirm and continue"/>
-            <input type="hidden" value="{{application_id}}" name="id"/>
-        </form>
-    </div>
-    <br>
-</div>
+   {% include 'return-to-list.html' %}
+
+</form>
 
 {% endblock %}

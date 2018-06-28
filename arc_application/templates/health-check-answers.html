@@ -1,31 +1,14 @@
 {% extends 'govuk_template.html' %}
-{% block page_title %}Check your answers: health declaration booklet{% endblock %}
+{% block page_title %}Review: health declaration booklet{% endblock %}
 {% load static %}
 {% load govuk_template_base %}
-
 {% block inner_content %}
+{% include 'back-button.html' %}
 
-<div class="column-full">
-    <div class="form-group grid-row" style="padding-top: 30px;">
-        <!-- Back button -->
-        <a href="{{ URL_PREFIX }}/review?id={{application_id}}" class="link-back"
-           style="margin-right: 10px; line-height: 28px" alt='Back to application list'>
-            Back
-        </a>
-    </div>
-    <div class="grid-row">
-        <h1 class="form-title heading-large">Check your answers: your health</h1>
-    </div>
-    <table class="check-your-answers form-group grid-row" style="table-layout: fixed; width: 100%">
-        <thead>
-        <tr>
-            <th colspan="3">
-                <div class="heading-medium">
-                    Your health
-                </div>
-            </th>
-        </tr>
-        </thead>
+<form method="post" novalidate>
+    <h1 class="form-title heading-large">Review: health declaration booklet</h1>
+    {% csrf_token %}
+    <table class="check-your-answers form-group">
         <tbody>
         <tr>
             <td>
@@ -41,32 +24,13 @@
             </td>
             {% endif %}
             <td class="change-answer">
-                {{ form.health_submission_consent_declare }}
-            </td>
-        </tr>
-        <tr class="js-hidden" id="health_submission_consent" >
-            <td colspan="1"style="width:100%">
-                <div >
-                    {{ form.health_submission_consent_comments.label}}
-                </div>
-            </td>
-            <td colspan="2"style="width:100%">
-                <div >
-                    {{ form.health_submission_consent_comments}}
-                </div>
             </td>
         </tr>
         </tbody>
     </table>
-    <br>
-    <div class="form-group grid-row">
-        <form method="post">
-            {% csrf_token %}
-            <input type="submit" class="button" value="Confirm and continue"/>
-            <input type="hidden" value="{{application_id}}" name="id"/>
-        </form>
-    </div>
-    <br>
-</div>
+    <input type="submit" class="button" value="Confirm and continue"/>
+    <input type="hidden" value="{{application_id}}" name="id"/>
+    {% include 'return-to-list.html' %}
+</form>
 
 {% endblock %}

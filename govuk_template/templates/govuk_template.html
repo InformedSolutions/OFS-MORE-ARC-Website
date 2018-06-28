@@ -8,6 +8,7 @@
 {% block head %}
   {{ block.super }}
   <link href="{% static 'stylesheets/base.css' %}" media="screen" rel="stylesheet" />
+  <link href="{% static 'stylesheets/custom.css' %}" media="screen" rel="stylesheet" />
 {% endblock %}
 
 {% block cookie_message %}
@@ -24,18 +25,24 @@
   {% get_service_settings as service_settings %}
   <div class="header-proposition">
     <div class="content">
-      {% if service_settings.has_header_links %}
-        <a href="#proposition-links" class="js-header-toggle menu">{% trans 'Menu' %}</a>
-      {% endif %}
+      <a href="#proposition-links" class="js-header-toggle menu" aria-controls="navigation" aria-label="Show or hide Top Level Navigation">{% trans 'Menu' %}</a>
       <nav id="proposition-menu">
         <a href="{{ URL_PREFIX }}/login" id="proposition-name">
-          {% block proposition %}Childminder Application Review{% endblock %}
+          {% block proposition %}Childminder application review{% endblock %}
         </a>
         {% block proposition_menu %}
           {% if user.is_authenticated %}
             <ul id="proposition-links">
                <li>
-                 <a href="{{ URL_PREFIX }}/logout" class="{% if link.link_is_view_name and link.link == request.resolver_match.view_name %}active{% endif %}">Logout</a>
+                 <a href="{{ URL_PREFIX }}/search" class="{% if link.link_is_view_name and link.link == request.resolver_match.view_name %}active{% endif %}">Search</a>
+               </li>
+              {% if SHOW_REVIEW_TAB %}
+               <li>
+                 <a href="{{ URL_PREFIX }}/summary" class="{% if link.link_is_view_name and link.link == request.resolver_match.view_name %}active{% endif %}">Review</a>
+               </li>
+              {% endif %}
+               <li>
+                 <a href="{{ URL_PREFIX }}/logout" class="{% if link.link_is_view_name and link.link == request.resolver_match.view_name %}active{% endif %}">Sign out</a>
                </li>
             </ul>
             {% endif %}

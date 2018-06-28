@@ -1,0 +1,48 @@
+{% extends 'govuk_template.html' %}
+{% block page_title %}Previous addresses {% if person_type != 'APPLICANT' %}of adults in your home{% endif %}{% endblock %}
+{% load static %}
+{% load govuk_template_base %}
+
+{% block inner_content %}
+
+{% include "back-button.html" %}
+
+<!-- Initialise error summary for page -->
+{{form.error_summary}}
+
+
+
+<!-- Form -->
+<form method="post" novalidate {% if form.is_multipart %}enctype="multipart/form-data" {% endif %}>
+    <!-- Content -->
+    <div class="form-group">
+        <h1 class="form-title heading-large">
+            Previous {% if person_type == 'APPLICANT' %}home {% endif %}address {{previous_addresses|length|add:"1"}}
+        </h1>
+        {% include 'previous-address-snippet.html' with queryset=previous_addresses %}
+
+        <h2 class="form-title heading-small">Postcode</h2>
+        <p class="form-label-bold">{{postcode}} <a
+                href="{{ entry_url }}">Change</a></p>
+
+        {{form}}
+        {% csrf_token %}
+        <a href="{{ manual_url }}" name="manual"
+           id="manual">I
+            can't find my address in the list</a>
+        <br>
+        <br>
+        <input type="hidden" id="id" name="id" value="{{id}}"/>
+        <input type="hidden" name="state" value="selection"/>
+        <input type="hidden" name="person_id" value="{{ person_id }}"/>
+        <input type="hidden" name="person_type" value="{{ person_type }}"/>
+        <input type="hidden" name="postcode" value="{{ postcode }}"/>
+        <input type="submit" class="button button-secondary" name="add-another" value="Add another address">
+    </div>
+
+    <input type="submit" class="button" name="save-and-continue" value = "Save and continue"><br/>
+</form>
+
+{% include 'return-to-list.html' %}
+
+{% endblock %}

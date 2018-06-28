@@ -4,16 +4,23 @@ import os
 SERVER_LABEL = 'Test_1'
 
 ARC_GROUP = 'arc'
+CONTACT_CENTRE= 'contact-centre'
 APPLICATION_LIMIT = 5
 
-# Base URL of notify gateway
-NOTIFY_URL = 'http://130.130.52.132:8095/notify-gateway'
+NOTIFY_URL = os.environ.get('APP_NOTIFY_URL')
+
+# Base URL of addressing-service gateway
+ADDRESSING_URL = os.environ.get('APP_ADDRESSING_URL')
+
+CHILDMINDER_EMAIL_VALIDATION_URL = os.environ.get('CHILDMINDER_EMAIL_VALIDATION_URL')
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'm$9lif+zcnb5i5n21q9yecn8vs4h%(%7=!k%#6rlbhkfuq1mfq'
+
+EXECUTING_AS_TEST = os.environ.get('EXECUTING_AS_TEST')
 
 # Application definition
 
@@ -30,6 +37,7 @@ THIRD_PARTY_APPS = [
     'govuk_forms',
     'govuk_template',
     'govuk_template_base',
+    'timeline_logger',
 ]
 
 PROJECT_APPS = [
@@ -63,6 +71,7 @@ TEMPLATES = [
                 'govuk_template_base.context_processors.govuk_template_base',
                 "arc_application.middleware.globalise_url_prefix",
                 "arc_application.middleware.globalise_server_name",
+                "arc_application.middleware.set_review_tab_visibility",
             ],
         },
     },
@@ -101,6 +110,15 @@ USE_TZ = True
 URL_PREFIX = '/arc'
 STATIC_URL = URL_PREFIX + '/static/'
 REVIEW_URL_PREFIX = '/arc/review'
+LOGIN_URL = URL_PREFIX + '/login'
+
+SECURE_BROWSER_XSS_FILTER = True
+CSRF_COOKIE_HTTPONLY = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
+
+SECURE_BROWSER_XSS_FILTER = True
+CSRF_COOKIE_HTTPONLY = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
 
 STATICFILES_FINDERS = [
     'django.contrib.staticfiles.finders.FileSystemFinder',
@@ -119,3 +137,4 @@ TEST_OUTPUT_VERBOSE = True
 TEST_OUTPUT_DESCRIPTIONS = True
 TEST_OUTPUT_DIR = 'xmlrunner'
 
+MIGRATION_MODULES = {}

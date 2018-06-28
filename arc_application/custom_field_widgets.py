@@ -13,6 +13,9 @@ class Widget(widgets.Widget):
 
 
 class CustomCheckboxInput(widgets.CheckboxInput, Widget):
+    """
+    Custom checkbox field to import conditional revealing and set attributes associated with this
+    """
     template_name = 'widgets/checkbox.html'
     inherit_label_from_field = True
     label = None
@@ -21,10 +24,22 @@ class CustomCheckboxInput(widgets.CheckboxInput, Widget):
         super().__init__(*args, **kwargs)
         self.conditionally_revealed = {}
 
-
     def get_context(self, name, value, attrs):
         context = super().get_context(name, value, attrs)
         if self.label:
             context['widget']['label'] = self.label
         context['conditionally_revealed'] = self.conditionally_revealed.get(True)
         return context
+
+
+class Textarea(widgets.Textarea, Widget):
+    """
+    Custom textarea field to give better text area size
+    """
+    template_name = 'widgets/textarea.html'
+    
+    def __init__(self, attrs=None):
+        default_attrs = {'cols': '40', 'rows': '3'}
+        if attrs:
+            default_attrs.update(attrs)
+        super().__init__()

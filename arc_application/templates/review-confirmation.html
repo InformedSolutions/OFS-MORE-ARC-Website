@@ -1,22 +1,17 @@
 {% extends 'govuk_template.html' %}
-{% block page_title %}Review Confirmation{% endblock %}
+{% block page_title %}Review approved{% endblock %}
 {% load static %}
 {% load govuk_template_base %}
 
 {% block inner_content %}
+{% include 'back-button.html' %}
 
-<div class="column-full">
-    <div class="grid-row">
-        <a href="{{ URL_PREFIX }}/summary" class="link-back"
-           style="margin-right: 10px; line-height: 28px" alt='Back to application list'>
-            Back
-        </a>
-        <h1 class="form-title heading-large">
-            Review Confirmation
-        </h1>
-        <p>The application has been successfully returned to the applicant.</p>
-        <a href="{{URL_PREFIX}}/summary">Return to applications</a>
-    </div>
-</div>
+<h1 class="form-title heading-large">
+    Review approved
+</h1>
+
+<p>The application has been approved and confirmation sent to the applicant</p>
+
+<a href="{% url 'summary' %}">Return to applications</a>
 
 {% endblock %}

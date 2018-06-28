@@ -1,31 +1,17 @@
 {% extends 'govuk_template.html' %}
-{% block page_title %}First aid training{% endblock %}
+{% block page_title %}Review: first aid training{% endblock %}
 {% load static %}
 {% load govuk_template_base %}
-
 {% block inner_content %}
+{% include 'back-button.html' %}
 
-<div class="column-full">
-    <div class="form-group grid-row" style="padding-top: 30px;">
-        <!-- Back button -->
-        <a href="{{ URL_PREFIX }}/review?id={{application_id}}" class="link-back"
-           style="margin-right: 10px; line-height: 28px" alt='Back to application list'>
-            Back
-        </a>
-    </div>
-    <div class="grid-row">
-        <h1 class="form-title heading-large">Check your answers: first aid training</h1>
-    </div>
-    <table class="check-your-answers form-group grid-row" style="table-layout: fixed; width: 100%">
-        <thead>
-        <tr>
-            <th colspan="3">
-                <div class="heading-medium">
-                    First aid training
-                </div>
-            </th>
-        </tr>
-        </thead>
+<form method="post" novalidate>
+    <h1 class="form-title heading-large">Review: first aid training</h1>
+    <p>
+        Please check the boxes if there are errors.
+    </p>
+    {% csrf_token %}
+    <table class="check-your-answers form-group">
         <tbody>
         <tr>
             <td>
@@ -35,18 +21,21 @@
                 {{training_organisation}}
             </td>
             <td class="change-answer">
-                {{ form.training_organisation_declare }}
+                {{ form.first_aid_training_organisation_declare }}
             </td>
         </tr>
-        <tr class="js-hidden" id="training_organisation" >
-            <td colspan="1"style="width:100%">
-                <div >
-                    {{ form.training_organisation_comments.label}}
+        <tr class="js-hidden" id="first_aid_training_organisation">
+            <td colspan="1">
+                <div>
+                    {{ form.first_aid_training_organisation_comments.label}}
+                </div>
+                <div>
+                    {{ form.first_aid_training_organisation_comments.help_text}}
                 </div>
             </td>
-            <td colspan="2"style="width:100%">
-                <div >
-                    {{ form.training_organisation_comments}}
+            <td colspan="2">
+                <div>
+                    {{ form.first_aid_training_organisation_comments}}
                 </div>
             </td>
         </tr>
@@ -58,18 +47,21 @@
                 {{training_course}}
             </td>
             <td class="change-answer">
-                {{ form.title_of_first_aid_course_declare }}
+                {{ form.title_of_training_course_declare }}
             </td>
         </tr>
-        <tr class="js-hidden" id="title_of_first_aid_course" >
-            <td colspan="1"style="width:100%">
-                <div >
-                    {{ form.title_of_first_aid_course_comments.label}}
+        <tr class="js-hidden" id="title_of_training_course">
+            <td colspan="1">
+                <div>
+                    {{ form.title_of_training_course_comments.label}}
+                </div>
+                <div>
+                    {{ form.title_of_training_course_comments.help_text}}
                 </div>
             </td>
-            <td colspan="2"style="width:100%">
-                <div >
-                    {{ form.title_of_first_aid_course_comments}}
+            <td colspan="2">
+                <div>
+                    {{ form.title_of_training_course_comments}}
                 </div>
             </td>
         </tr>
@@ -127,33 +119,32 @@
             </td>
             {% endif %}
             <td class="change-answer">
-                {{ form.date_of_certificate_declare }}
+                {{ form.course_date_declare }}
             </td>
         </tr>
-        <tr class="js-hidden" id="date_of_certificate" >
-            <td colspan="1"style="width:100%">
-                <div >
-                    {{ form.date_of_certificate_comments.label}}
+        <tr class="js-hidden" id="course_date">
+            <td colspan="1">
+                <div>
+                    {{ form.course_date_comments.label}}
+                </div>
+                <div>
+                    {{ form.course_date_comments.help_text}}
                 </div>
             </td>
-            <td colspan="2"style="width:100%">
-                <div >
-                    {{ form.date_of_certificate_comments}}
+            <td colspan="2">
+                <div>
+                    {{ form.course_date_comments}}
                 </div>
             </td>
         </tr>
 
         </tbody>
     </table>
-    <br>
-    <div class="form-group grid-row">
-        <form method="post">
-            {% csrf_token %}
-            <input type="submit" class="button" value="Confirm and continue"/>
-            <input type="hidden" value="{{application_id}}" name="id"/>
-        </form>
-    </div>
-    <br>
-</div>
+
+    <input type="submit" class="button" value="Confirm and continue"/>
+    <input type="hidden" value="{{application_id}}" name="id"/>
+
+    {% include 'return-to-list.html' %}
+</form>
 
 {% endblock %}
