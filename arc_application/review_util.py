@@ -77,8 +77,7 @@ def save_comments(request, comment_list):
                                                                            field_name=single_comment[2]).count() > 0
 
             if single_comment[2] == 'health_check_status':
-                application_id = request.POST['id']
-                adult = AdultInHome.objects.get(application_id=application_id)
+                adult = AdultInHome.objects.get(adult_id=single_comment[0])
                 adult.health_check_status = 'Flagged'
                 adult.save()
 
