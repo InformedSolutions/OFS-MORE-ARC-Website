@@ -145,7 +145,7 @@ def review(request):
         user_details.magic_link_email = magic_link
         user_details.save()
         link = settings.CHILDMINDER_EMAIL_VALIDATION_URL + '/' + magic_link
-        returned_email(email, first_name, application_id_local, link)
+        returned_email(email, first_name, app_ref, link)
 
         # Copy Arc status' to Childminder App
         if Arc.objects.filter(pk=application_id_local):
