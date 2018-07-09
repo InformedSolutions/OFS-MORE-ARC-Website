@@ -957,8 +957,8 @@ class OtherPersonPreviousRegistrationDetailsForm(GOVUKForm):
     reveal_conditionally = {'previous_registration': {True: 'individual_id'}}
 
     choices = (
+        (True, 'Yes'),
         (False, 'No'),
-        (True, 'Yes')
     )
 
     previous_registration = forms.ChoiceField(choices=choices, label='Has the person previously registered with Ofsted?',
