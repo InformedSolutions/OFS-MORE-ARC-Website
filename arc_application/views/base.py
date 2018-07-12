@@ -14,6 +14,7 @@ from django.utils.text import capfirst
 from django.urls import reverse
 from govuk_forms.forms import GOVUKForm
 from timeline_logger.models import TimelineLog
+from ..review_util import reset_declaration
 
 from ..models import ApplicantName, ApplicantPersonalDetails, Application, Arc
 
@@ -295,6 +296,9 @@ def release_application(request, application_id, status):
         app = Application.objects.get(application_id=application_id)
         app.application_status = status
         app.save()
+
+        # reset declaration task
+        reset_declaration(app)
 
     if Arc.objects.filter(application_id=application_id).exists():
         arc = Arc.objects.get(pk=application_id)
