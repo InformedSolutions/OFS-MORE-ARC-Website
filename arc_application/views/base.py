@@ -298,7 +298,8 @@ def release_application(request, application_id, status):
         app.save()
 
         # reset declaration task
-        reset_declaration(app)
+        if status == 'FURTHER_INFORMATION':
+            reset_declaration(app)
 
     if Arc.objects.filter(application_id=application_id).exists():
         arc = Arc.objects.get(pk=application_id)
