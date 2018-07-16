@@ -42,7 +42,7 @@ LOGGING = {
         'filename': 'logs/output.log',
         'formatter': 'console',
         'maxBytes': 1 * 1024 * 1024,
-        'backupCount': '30'
+        'backupCount': 30
     },
    },
    'loggers': {
