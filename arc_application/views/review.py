@@ -128,7 +128,7 @@ def review(request):
         # Get fresh version of application as it will have been updated in method call
         if Application.objects.filter(application_id=application_id_local).exists():
             application = Application.objects.get(application_id=application_id_local)
-            application.ofsted_visit_email_sent = datetime.now()
+            application.date_accepted = datetime.now()
             application.save()
 
         variables = {
