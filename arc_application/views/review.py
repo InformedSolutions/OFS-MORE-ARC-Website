@@ -156,7 +156,7 @@ def review(request):
             app.childcare_type_status = arc.childcare_type_review
             app.first_aid_training_status = arc.first_aid_review
             app.health_status = arc.health_review
-            app.eyfs_review = arc.eyfs_review
+            app.eyfs_training_status = arc.eyfs_review
             app.criminal_record_check_status = arc.dbs_review
             app.references_status = arc.references_review
             app.people_in_home_status = arc.people_in_home_review
