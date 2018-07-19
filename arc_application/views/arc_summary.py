@@ -39,8 +39,6 @@ def arc_summary(request):
         application_id_local = request.POST["id"]
         status = Arc.objects.get(pk=application_id_local)
 
-        arc_review_statuses = ["login_details_review"]
-
         flag_and_review_dict = [
             {"flag": "childcare_type_arc_flagged", "review": "childcare_type_review"},
             {"flag": "criminal_record_check_arc_flagged", "review": "dbs_review"},
