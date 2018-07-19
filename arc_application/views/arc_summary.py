@@ -38,6 +38,27 @@ def arc_summary(request):
     elif request.method == 'POST':
         application_id_local = request.POST["id"]
         status = Arc.objects.get(pk=application_id_local)
+
+        arc_review_statuses = ["login_details_review"]
+
+        flag_and_review_dict = [
+            {"flag": "childcare_type_arc_flagged", "review": "childcare_type_review"},
+            {"flag": "criminal_record_check_arc_flagged", "review": "dbs_review"},
+            {"flag": "eyfs_training_arc_flagged", "review": "eyfs_review"},
+            {"flag": "first_aid_training_arc_flagged", "review": "first_aid_review"},
+            {"flag": "health_arc_flagged", "review": "health_review"},
+            {"flag": "login_details_arc_flagged", "review": "login_details_review"},
+            {"flag": "people_in_home_arc_flagged", "review": "people_in_home_review"},
+            {"flag": "personal_details_arc_flagged", "review": "personal_details_review"},
+            {"flag": "references_arc_flagged", "review": "references_review"}
+        ]
+
+        application = Application.objects.get(pk=application_id_local)
+        for flag_review in flag_and_review_dict:
+            if getattr(status, flag_review["review"]) == 'FLAGGED':
+                setattr(application, flag_review["flag"], True)
+        application.save()
+
         status.declaration_review = 'COMPLETED'
         status.save()
         return review(request)
