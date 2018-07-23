@@ -1,3 +1,0 @@
-pydotplus
-pylint
-pylint-django
