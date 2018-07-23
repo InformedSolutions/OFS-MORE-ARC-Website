@@ -1,0 +1,36 @@
+{% extends 'govuk_template.html' %}
+{% block page_title %}Review: health declaration booklet{% endblock %}
+{% load static %}
+{% load govuk_template_base %}
+{% block inner_content %}
+{% include 'back-button.html' %}
+
+<form method="post" novalidate>
+    <h1 class="form-title heading-large">Review: health declaration booklet</h1>
+    {% csrf_token %}
+    <table class="check-your-answers form-group">
+        <tbody>
+        <tr>
+            <td>
+                Will you submit a health declaration booklet to Ofsted?
+            </td>
+            {% if send_hdb_declare is True %}
+            <td style="word-wrap: break-word">
+                Yes
+            </td>
+            {% elif send_hdb_declare is False %}
+            <td style="word-wrap: break-word">
+                No
+            </td>
+            {% endif %}
+            <td class="change-answer">
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <input type="submit" class="button" value="Confirm and continue"/>
+    <input type="hidden" value="{{application_id}}" name="id"/>
+    {% include 'return-to-list.html' %}
+</form>
+
+{% endblock %}

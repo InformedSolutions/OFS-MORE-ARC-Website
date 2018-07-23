@@ -1,0 +1,41 @@
+{% extends 'govuk_template.html' %}
+{% block page_title %}Application summary{% endblock %}
+{% load static %}
+{% load govuk_template_base %}
+
+{% block inner_content %}
+
+<div>
+    {% include 'back-button.html' %}
+</div>
+
+<div>
+    <div class="column-two-thirds">
+        <div class="grid-row">
+            <h1 class="heading-large">Application summary</h1>
+           <h2 class="heading-medium">
+              Application number: {{ application_reference | default_if_none:"N/A" }}
+           </h2>
+        </div>
+    </div>
+
+    <div class="column-third information-panel">
+        <b class="bold">Application history:</b>
+        <br/>
+        <a href="/arc/auditlog/?id={{application_id}}">Audit log</a>
+    </div>
+</div>
+
+
+{% with "4" as col %}
+{% for section in json %}
+{% include 'summary_tables.html' %}
+{% endfor %}
+{% endwith %}
+
+ <form method="get" action="/arc/search">
+        <input type="submit" class="button" value="Continue"/>
+    </form>
+
+{% endblock %}
+
