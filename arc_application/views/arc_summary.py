@@ -132,23 +132,26 @@ def add_comments(json, app_id):
                     id = row['pk']
                 name = row['name']
 
-                #This check is added because the following phrases appear twice in rows (not unique).
-                if name == 'Title of training course':
-                    if "Early" in title:
-                        field = name_field_dict['eyfs_title']
-                    elif "First aid" in title:
-                        field = name_field_dict['first_aid_title']
+                try:
+                    #This check is added because the following phrases appear twice in rows (not unique).
+                    if name == 'Title of training course':
+                        if "Early" in title:
+                            field = name_field_dict['eyfs_title']
+                        elif "First aid" in title:
+                            field = name_field_dict['first_aid_title']
+                        else:
+                            field = None
+                    elif name == 'Date you completed course':
+                        if "Early" in title:
+                            field = name_field_dict['eyfs_date']
+                        elif "First aid" in title:
+                            field = name_field_dict['first_aid_date']
+                        else:
+                            field = None
                     else:
-                        field = None
-                elif name == 'Date you completed course':
-                    if "Early" in title:
-                        field = name_field_dict['eyfs_date']
-                    elif "First aid" in title:
-                        field = name_field_dict['first_aid_date']
-                    else:
-                        field = None
-                else:
-                    field = name_field_dict[name]
+                        field = name_field_dict[name]
+                except:
+                    field = None
 
                 row['comment'] = get_comment(id, field)
                 # row['comment'] = load_comment(lookup, id, name)
