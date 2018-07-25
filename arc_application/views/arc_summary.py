@@ -19,6 +19,47 @@ ordered_models = [UserDetails, ChildcareType, [ApplicantPersonalDetails, Applica
                   FirstAidTraining, EYFS, HealthDeclarationBooklet, CriminalRecordCheck, Application,
                   AdultInHome, ChildInHome, Reference]
 
+name_field_dict = {'Your email': 'email_address',
+                   'Your mobile number': 'mobile_number',
+                   'Other phone number': 'add_phone_number',
+                   'Looking after 0 to 5 year olds?': None,
+                   'Looking after 5 to 7 year olds? ': None,
+                   'Looking after 8 year olds and older? ': None,
+                   'Registers': None,
+                   'Looking after children overnight?': None,
+                   'Knowledge based question': 'security_question',
+                   'Knowledge based answer': 'security_answer',
+                   'What age groups will you be caring for?': 'childcare_age_groups',
+                   'Are you providing overnight care?': 'overnight_care',
+                   'Your name': 'name',
+                   'Your date of birth': 'date_of_birth',
+                   'Your home address': 'home_address',
+                   'Childcare location': 'childcare_location',
+                   'Training organisation': 'first_aid_training_organisation',
+                   'first_aid_title': 'title_of_training_course',
+                   'first_aid_date': 'course_date',
+                   'Provide a Health Declaration Booklet?': 'health_submission_consent',
+                   'DBS certificate number': 'dbs_certificate_number',
+                   'Do you have any cautions or convictions?': 'cautions_convictions',
+                   'Health check status': 'health_check_status',
+                   'Name': 'full_name',
+                   'Date of birth': 'date_of_birth',
+                   'Relationship': 'relationship',
+                   'Email': 'email',
+                   #'Do you live with anyone who is 16 or over?': 'adults_in_home',
+                   'Do you live with any children?': 'children_in_home',
+                   'Full name': 'full_name',
+                   'How they know you': 'relationship',
+                   'Known for': 'time_known',
+                   'Address': 'address',
+                   'Phone number': 'phone_number',
+                   'Email address': 'email_address',
+                   'eyfs_title': 'eyfs_course_name',
+                   'eyfs_date': 'eyfs_course_date',
+                   'I will post a completed booklet to Ofsted': None,
+                   'Do you have any criminal cautions or convictions?': 'cautions_convictions',
+                   'Does anyone aged 16 or over live or work in your home?': 'adults_in_home',
+                   }
 
 @login_required
 @group_required(settings.ARC_GROUP)
@@ -109,44 +150,33 @@ def add_comments(json, app_id):
                 if 'pk' in row:
                     id = row['pk']
                 name = row['name']
-                field = name_converter(name)
+
+                try:
+                    #This check is added because the following phrases appear twice in rows (not unique).
+                    if name == 'Title of training course':
+                        if "Early" in title:
+                            field = name_field_dict['eyfs_title']
+                        elif "First aid" in title:
+                            field = name_field_dict['first_aid_title']
+                        else:
+                            field = None
+                    elif name == 'Date you completed course':
+                        if "Early" in title:
+                            field = name_field_dict['eyfs_date']
+                        elif "First aid" in title:
+                            field = name_field_dict['first_aid_date']
+                        else:
+                            field = None
+                    else:
+                        field = name_field_dict[name]
+                except:
+                    field = None
+
                 row['comment'] = get_comment(id, field)
                 # row['comment'] = load_comment(lookup, id, name)
                 row['link'] = reverse(label) + '?id=' + app_id
             row = row
     return json
-
-
-def name_converter(name):
-    field_list = ['email_address', 'mobile_number', 'add_phone_number', 'security_question', 'security_answer',
-                  'childcare_age_groups', 'overnight_care',
-                  'name', 'date_of_birth', 'home_address', 'childcare_location',
-                  'first_aid_training_organisation', 'title_of_training_course', 'course_date',
-                  'health_submission_consent',
-                  'dbs_certificate_number', 'cautions_convictions', 'health_check_status',
-                  'full_name', 'date_of_birth', 'relationship', 'email', 'dbs_certificate_number',
-                  'adults_in_home',
-                  'children_in_home',
-                  'full_name', 'relationship', 'time_known', 'address', 'phone_number', 'email_address',
-                  'eyfs_course_name', 'eyfs_course_date'
-                  ]
-
-    name_list = ['Your email', 'Your mobile number', 'Other phone number', 'Knowledge based question',
-                 'Knowledge based answer',
-                 'What age groups will you be caring for?', 'Are you providing overnight care?',
-                 'Your name', 'Your date of birth', 'Home address', 'Childcare location',
-                 'First aid training provider', 'Title of first aid course', 'Date of first aid certificate',
-                 'Provide a Health Declaration Booklet?',
-                 'DBS certificate number', 'Do you have any cautions or convictions?', 'Health check status',
-                 'Name', 'Date of birth', 'Relationship', 'Email', 'DBS certificate number',
-                 'Do you live with anyone who is 16 or over?',
-                 'Do you live with any children?',
-                 'Full name', 'How they know you', 'Known for', 'Address', 'Phone number', 'Email address',
-                 'Title of training course', 'Date you completed course'
-                 ]
-    for i in range(len(name_list)):
-        if name in name_list[i]:
-            return field_list[i]
 
 
 def get_comment(pk, field):
