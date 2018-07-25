@@ -19,9 +19,9 @@ ordered_models = [UserDetails, ChildcareType, [ApplicantPersonalDetails, Applica
                   FirstAidTraining, EYFS, HealthDeclarationBooklet, CriminalRecordCheck, Application,
                   AdultInHome, ChildInHome, Reference]
 
-name_field_dict = {'Your email': 'email_address',
-                   'Your mobile number': 'mobile_number',
-                   'Other phone number': 'add_phone_number',
+name_field_dict = {'Your email': None,
+                   'Your mobile number': None,
+                   'Other phone number': None,
                    'Looking after 0 to 5 year olds?': None,
                    'Looking after 5 to 7 year olds? ': None,
                    'Looking after 8 year olds and older? ': None,
