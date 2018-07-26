@@ -232,7 +232,7 @@ class TestArcFunctions(LiveServerTestCase):
         Tests that an ARC user can complete a review without flagging any questions
         """
         global selenium_task_executor
-        title_change_wait = 15
+        title_change_wait = 20
 
         try:
             self.login_as_arc_user()
