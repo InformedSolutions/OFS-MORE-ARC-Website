@@ -33,44 +33,6 @@ class LogInDetailsForm(GOVUKForm):
     auto_replace_widgets = True
     field_label_classes = 'form-label-bold'
 
-    email_address_declare = forms.BooleanField(label='This information is correct',
-                                               widget=custom_field_widgets.CustomCheckboxInput(), required=False)
-    email_address_comments = forms.CharField(label='Enter your reasoning', help_text='(Tip: be clear and concise)',
-                                             widget=custom_field_widgets.Textarea(attrs={'cols': '40', 'rows': '3'}),
-                                             required=False)
-    mobile_number_declare = forms.BooleanField(label='This information is correct',
-                                               widget=custom_field_widgets.CustomCheckboxInput, required=False)
-    mobile_number_comments = forms.CharField(label='Enter your reasoning', help_text='(Tip: be clear and concise)',
-                                             widget=custom_field_widgets.Textarea, required=False)
-    add_phone_number_declare = forms.BooleanField(label='This information is correct',
-                                                  widget=custom_field_widgets.CustomCheckboxInput,
-                                                  required=False)
-    add_phone_number_comments = forms.CharField(label='Enter your reasoning', help_text='(Tip: be clear and concise)',
-                                                widget=custom_field_widgets.Textarea, required=False)
-    security_question_declare = forms.BooleanField(label='This information is correct',
-                                                   widget=custom_field_widgets.CustomCheckboxInput,
-                                                   required=False)
-    security_question_comments = forms.CharField(label='Enter your reasoning', help_text='(Tip: be clear and concise)',
-                                                 widget=custom_field_widgets.Textarea, required=False)
-    security_answer_declare = forms.BooleanField(label='This information is correct',
-                                                 widget=custom_field_widgets.CustomCheckboxInput, required=False)
-    security_answer_comments = forms.CharField(label='Enter your reasoning', help_text='(Tip: be clear and concise)',
-                                               widget=custom_field_widgets.Textarea, required=False)
-
-    # As this will only happen once per page, we can do this in the form itself rather than __init
-    # Each checkbox must be assigned a name for the html injection
-    checkboxes = [(email_address_declare, 'email_address'), (mobile_number_declare, 'mobile_number'),
-                  (add_phone_number_declare, 'add_phone_number'),
-                  (security_question_declare, 'security_question'),
-                  (security_answer_declare, 'security_answer')]
-
-    # This is where the html is added that assigns each checkbox with the correct name, so the javascript knows where
-    # act
-    for box in checkboxes:
-        box[0].widget.attrs.update({'data_target': box[1],
-                                    'aria-controls': box[1],
-                                    'aria-expanded': 'false'}, )
-
     def __init__(self, *args, **kwargs):
         self.table_keys = kwargs.pop('table_keys')
         super(LogInDetailsForm, self).__init__(*args, **kwargs)

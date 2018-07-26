@@ -38,33 +38,14 @@ def contact_summary(request):
         form = LogInDetailsForm(request.POST, table_keys=[login_id])
 
         if form.is_valid():
-            # Convert the data from the form into a series of comments with the
-            # table id to be stored in the ARC COMMENTS Table
-            comment_list = request_to_comment(login_id, table_name, form.cleaned_data)
-            save_successful = save_comments(request, comment_list)
 
-            # If no comments have been made, the status has not been flagged
-            # Therefore it has been completed
-            if not comment_list:
-                section_status = 'COMPLETED'
-                application.login_details_arc_flagged = False
-            else:
-                section_status = 'FLAGGED'
-                application.login_details_arc_flagged = True
+            status = Arc.objects.get(pk=application_id_local)
+            status.login_details_review = 'COMPLETED'
+            status.save()
+            default = '/childcare/age-groups'
+            redirect_link = redirect_selection(request, default)
 
-            application.save()
-
-            # If the save has been successful , save and redirect
-            if save_successful:
-                status = Arc.objects.get(pk=application_id_local)
-                status.login_details_review = section_status
-                status.save()
-                default = '/childcare/age-groups'
-                redirect_link = redirect_selection(request, default)
-
-                return HttpResponseRedirect(settings.URL_PREFIX + redirect_link + '?id=' + application_id_local)
-            else:
-                return ChildProcessError
+            return HttpResponseRedirect(settings.URL_PREFIX + redirect_link + '?id=' + application_id_local)
 
     application = Application.objects.get(pk=application_id_local)
     user_details = UserDetails.objects.get(application_id=application)
