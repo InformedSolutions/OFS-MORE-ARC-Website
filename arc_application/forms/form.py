@@ -41,21 +41,21 @@ class LogInDetailsForm(GOVUKForm):
     mobile_number_declare = forms.BooleanField(label='This information is correct',
                                                widget=custom_field_widgets.CustomCheckboxInput, required=False)
     mobile_number_comments = forms.CharField(label='Enter your reasoning', help_text='(Tip: be clear and concise)',
-                                             widget=custom_field_widgets.Textarea, required=False)
+                                             widget=custom_field_widgets.Textarea, required=False, max_length=250)
     add_phone_number_declare = forms.BooleanField(label='This information is correct',
                                                   widget=custom_field_widgets.CustomCheckboxInput,
                                                   required=False)
     add_phone_number_comments = forms.CharField(label='Enter your reasoning', help_text='(Tip: be clear and concise)',
-                                                widget=custom_field_widgets.Textarea, required=False)
+                                                widget=custom_field_widgets.Textarea, required=False, max_length=250)
     security_question_declare = forms.BooleanField(label='This information is correct',
                                                    widget=custom_field_widgets.CustomCheckboxInput,
                                                    required=False)
     security_question_comments = forms.CharField(label='Enter your reasoning', help_text='(Tip: be clear and concise)',
-                                                 widget=custom_field_widgets.Textarea, required=False)
+                                                 widget=custom_field_widgets.Textarea, required=False, max_length=250)
     security_answer_declare = forms.BooleanField(label='This information is correct',
                                                  widget=custom_field_widgets.CustomCheckboxInput, required=False)
     security_answer_comments = forms.CharField(label='Enter your reasoning', help_text='(Tip: be clear and concise)',
-                                               widget=custom_field_widgets.Textarea, required=False)
+                                               widget=custom_field_widgets.Textarea, required=False, max_length=250)
 
     # As this will only happen once per page, we can do this in the form itself rather than __init
     # Each checkbox must be assigned a name for the html injection
@@ -78,7 +78,7 @@ class LogInDetailsForm(GOVUKForm):
 
     def clean_email_address_comments(self):
         """
-        Comments validation
+        Email address comments validation
         :return: string
         """
         email_address_declare = self.cleaned_data['email_address_declare']
@@ -90,6 +90,66 @@ class LogInDetailsForm(GOVUKForm):
                 raise forms.ValidationError('You must give reasons')
 
         return email_address_comments
+
+    def clean_mobile_number_comments(self):
+        """
+        Mobile number comments validation
+        :return: string
+        """
+        mobile_number_declare = self.cleaned_data['mobile_number_declare']
+        mobile_number_comments = self.cleaned_data['mobile_number_comments']
+
+        # Only check if a comment has been entered if the field has been flagged
+        if mobile_number_declare is True:
+            if mobile_number_comments == '':
+                raise forms.ValidationError('You must give reasons')
+
+        return mobile_number_comments
+
+    def clean_add_phone_number_comments(self):
+        """
+        Additional phone number comments validation
+        :return: string
+        """
+        add_phone_number_declare = self.cleaned_data['add_phone_number_declare']
+        add_phone_number_comments = self.cleaned_data['add_phone_number_comments']
+
+        # Only check if a comment has been entered if the field has been flagged
+        if add_phone_number_declare is True:
+            if add_phone_number_comments == '':
+                raise forms.ValidationError('You must give reasons')
+
+        return add_phone_number_comments
+
+    def clean_security_question_comments(self):
+        """
+        Security question comments validation
+        :return: string
+        """
+        security_question_declare = self.cleaned_data['security_question_declare']
+        security_question_comments = self.cleaned_data['security_question_comments']
+
+        # Only check if a comment has been entered if the field has been flagged
+        if security_question_declare is True:
+            if security_question_comments == '':
+                raise forms.ValidationError('You must give reasons')
+
+        return security_question_comments
+
+    def clean_security_answer_comments(self):
+        """
+        Security answer comments validation
+        :return: string
+        """
+        security_answer_declare = self.cleaned_data['security_answer_declare']
+        security_answer_comments = self.cleaned_data['security_answer_comments']
+
+        # Only check if a comment has been entered if the field has been flagged
+        if security_answer_declare is True:
+            if security_answer_comments == '':
+                raise forms.ValidationError('You must give reasons')
+
+        return security_answer_comments
 
 
 class PersonalDetailsForm(GOVUKForm):
