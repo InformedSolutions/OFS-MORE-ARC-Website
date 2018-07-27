@@ -39,6 +39,9 @@ def search(request):
                 context['empty'] = False
                 context['app'] = data
 
+            else:
+                context['empty'] = True
+
             return render(request, 'search.html', context)
 
         elif request.method == 'POST':
@@ -66,6 +69,9 @@ def search(request):
                         context['empty'] = False
                         context['app'] = data
 
+                    else:
+                        context['empty'] = True
+
                     return render(request, 'search.html', context)
 
                 results = search_query(name, dob, home_postcode, care_location_postcode, reference)
@@ -87,6 +93,9 @@ def search(request):
                         data = format_data(results)
                         context['empty'] = False
                         context['app'] = data
+
+                    else:
+                        context['empty'] = True
 
                     return render(request, 'search.html', context)
 
