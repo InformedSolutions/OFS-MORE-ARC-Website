@@ -417,13 +417,15 @@ class DBSCheckForm(GOVUKForm):
                                                         widget=custom_field_widgets.CustomCheckboxInput, required=False)
     dbs_certificate_number_comments = forms.CharField(label='Enter your reasoning',
                                                       help_text='(Tip: be clear and concise)',
-                                                      widget=custom_field_widgets.Textarea, required=False)
+                                                      widget=custom_field_widgets.Textarea, required=False,
+                                                      max_length=250)
     cautions_convictions_declare = forms.BooleanField(label='This information is correct',
                                                       widget=custom_field_widgets.CustomCheckboxInput,
                                                       required=False)
     cautions_convictions_comments = forms.CharField(label='Enter your reasoning',
                                                     help_text='(Tip: be clear and concise)',
-                                                    widget=custom_field_widgets.Textarea, required=False)
+                                                    widget=custom_field_widgets.Textarea, required=False,
+                                                    max_length=250)
 
     checkboxes = [(dbs_certificate_number_declare, 'dbs_certificate_number'),
                   (cautions_convictions_declare, 'cautions_convictions')]
@@ -438,6 +440,35 @@ class DBSCheckForm(GOVUKForm):
         super(DBSCheckForm, self).__init__(*args, **kwargs)
         populate_initial_values(self)
 
+    def clean_dbs_certificate_number_comments(self):
+        """
+        DBS certificate number comments validation
+        :return: string
+        """
+        dbs_certificate_number_declare = self.cleaned_data['dbs_certificate_number_declare']
+        dbs_certificate_number_comments = self.cleaned_data['dbs_certificate_number_comments']
+
+        # Only check if a comment has been entered if the field has been flagged
+        if dbs_certificate_number_declare is True:
+            if dbs_certificate_number_comments == '':
+                raise forms.ValidationError('You must give reasons')
+
+        return dbs_certificate_number_comments
+
+    def clean_cautions_convictions_comments(self):
+        """
+        Cautions and convictions comments validation
+        :return: string
+        """
+        cautions_convictions_declare = self.cleaned_data['cautions_convictions_declare']
+        cautions_convictions_comments = self.cleaned_data['cautions_convictions_comments']
+
+        # Only check if a comment has been entered if the field has been flagged
+        if cautions_convictions_declare is True:
+            if cautions_convictions_comments == '':
+                raise forms.ValidationError('You must give reasons')
+
+        return cautions_convictions_comments
 
 class HealthForm(GOVUKForm):
     """
