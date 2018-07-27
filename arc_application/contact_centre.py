@@ -30,6 +30,15 @@ def search(request):
 
         if request.method == 'GET':
             context['form'] = SearchForm()
+
+            # Display all applications on search page
+            results = Application.objects.filter()
+
+            if results is not None and len(results) > 0:
+                data = format_data(results)
+                context['empty'] = False
+                context['app'] = data
+
             return render(request, 'search.html', context)
 
         elif request.method == 'POST':
@@ -45,9 +54,18 @@ def search(request):
 
                 # If no search terms have been entered
                 if not name and not dob and not home_postcode and not care_location_postcode and not reference:
-                    context['empty'] = 'error'
+                    context['empty_error'] = True
                     context['error_title'] = 'There was a problem with your search'
                     context['error_text'] = 'Please use at least one filter'
+
+                    # Display all applications on search page
+                    results = Application.objects.filter()
+
+                    if results is not None and len(results) > 0:
+                        data = format_data(results)
+                        context['empty'] = False
+                        context['app'] = data
+
                     return render(request, 'search.html', context)
 
                 results = search_query(name, dob, home_postcode, care_location_postcode, reference)
@@ -58,9 +76,18 @@ def search(request):
                     context['app'] = data
                     return render(request, 'search.html', context)
                 else:
-                    context['empty'] = 'error'
+                    context['empty_error'] = True
                     context['error_title'] = 'No results found'
                     context['error_text'] = 'Check that you have the correct details and spelling.'
+
+                    # Display all applications on search page
+                    results = Application.objects.filter()
+
+                    if results is not None and len(results) > 0:
+                        data = format_data(results)
+                        context['empty'] = False
+                        context['app'] = data
+
                     return render(request, 'search.html', context)
 
             return render(request, 'search.html', context)
