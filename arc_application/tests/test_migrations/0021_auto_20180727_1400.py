@@ -8,7 +8,8 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('application', '0020_nannyapplication_references_status'),
+        ('arc_application', '0001_initial'),
+        ('arc_application', '0002_auto_20180612_1653')
     ]
 
     operations = [
