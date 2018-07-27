@@ -5,7 +5,7 @@ from django.contrib.auth.models import Group, User
 from django.test import TestCase, RequestFactory
 from django.urls import reverse
 
-from ..models import (ApplicantHomeAddress,
+from arc_application.models import (ApplicantHomeAddress,
                       ApplicantName,
                       ApplicantPersonalDetails,
                       Application,
@@ -25,6 +25,7 @@ arc_records = None
 flagged_status = 'FLAGGED'
 arc_test_user = None
 cc_test_user = None
+
 
 def create_application():
     global application

@@ -14,9 +14,9 @@ from django.utils.text import capfirst
 from django.urls import reverse
 from govuk_forms.forms import GOVUKForm
 from timeline_logger.models import TimelineLog
-from ..review_util import reset_declaration
+from arc_application.review_util import reset_declaration
 
-from ..models import ApplicantName, ApplicantPersonalDetails, Application, Arc
+from arc_application.models import ApplicantName, ApplicantPersonalDetails, Application, Arc
 
 
 @login_required
@@ -71,7 +71,7 @@ def summary_page(request):
             'error_text': error_text
         }
 
-        return render(request, './summary.html', variables)
+        return render(request, 'childminder_templates/summary.html', variables)
     else:
         return HttpResponseRedirect(settings.URL_PREFIX + '/login/')
 
@@ -233,7 +233,7 @@ def custom_login(request):
     variables = {
         'form': form
     }
-    return render(request, './registration/login.html', variables)
+    return render(request, 'registration/login.html', variables)
 
 
 def get_user(self, uidb64):
@@ -326,7 +326,7 @@ def release_application(request, application_id, status):
 
 
 class AuditlogListView(ListView):
-    template_name = "auditlog_list.html"
+    template_name = "childminder_templates/auditlog_list.html"
     paginate_by = settings.TIMELINE_PAGINATE_BY
 
     def get_queryset(self, **kwargs):
