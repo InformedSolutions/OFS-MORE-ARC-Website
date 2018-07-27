@@ -164,24 +164,24 @@ class PersonalDetailsForm(GOVUKForm):
                                       widget=custom_field_widgets.CustomCheckboxInput, required=False)
     name_comments = forms.CharField(label='Enter your reasoning', help_text='(Tip: be clear and concise)',
                                     widget=custom_field_widgets.Textarea,
-                                    required=False)
+                                    required=False, max_length=250)
 
     date_of_birth_declare = forms.BooleanField(label='This information is correct',
                                                widget=custom_field_widgets.CustomCheckboxInput, required=False)
     date_of_birth_comments = forms.CharField(label='Enter your reasoning', help_text='(Tip: be clear and concise)',
                                              widget=custom_field_widgets.Textarea,
-                                             required=False)
+                                             required=False, max_length=250)
 
     home_address_declare = forms.BooleanField(label='This information is correct',
                                               widget=custom_field_widgets.CustomCheckboxInput, required=False)
     home_address_comments = forms.CharField(label='Enter your reasoning', help_text='(Tip: be clear and concise)',
                                             widget=custom_field_widgets.Textarea,
-                                            required=False)
+                                            required=False, max_length=250)
 
     childcare_location_declare = forms.BooleanField(label='This information is correct',
                                                     widget=custom_field_widgets.CustomCheckboxInput, required=False)
     childcare_location_comments = forms.CharField(label='Enter your reasoning', help_text='(Tip: be clear and concise)',
-                                                  widget=custom_field_widgets.Textarea, required=False)
+                                                  widget=custom_field_widgets.Textarea, required=False, max_length=250)
 
     checkboxes = [(name_declare, 'name'), (date_of_birth_declare, 'date_of_birth'),
                   (home_address_declare, 'home_address'), (childcare_location_declare, 'childcare_location')]
@@ -195,6 +195,66 @@ class PersonalDetailsForm(GOVUKForm):
         self.table_keys = kwargs.pop('table_keys')
         super(PersonalDetailsForm, self).__init__(*args, **kwargs)
         populate_initial_values(self)
+
+    def clean_name_comments(self):
+        """
+        Name comments validation
+        :return: string
+        """
+        name_declare = self.cleaned_data['name_declare']
+        name_comments = self.cleaned_data['name_comments']
+
+        # Only check if a comment has been entered if the field has been flagged
+        if name_declare is True:
+            if name_comments == '':
+                raise forms.ValidationError('You must give reasons')
+
+        return name_comments
+
+    def clean_date_of_birth_comments(self):
+        """
+        Date of birth comments validation
+        :return: string
+        """
+        date_of_birth_declare = self.cleaned_data['date_of_birth_declare']
+        date_of_birth_comments = self.cleaned_data['date_of_birth_comments']
+
+        # Only check if a comment has been entered if the field has been flagged
+        if date_of_birth_declare is True:
+            if date_of_birth_comments == '':
+                raise forms.ValidationError('You must give reasons')
+
+        return date_of_birth_comments
+
+    def clean_home_address_comments(self):
+        """
+        Home address comments validation
+        :return: string
+        """
+        home_address_declare = self.cleaned_data['home_address_declare']
+        home_address_comments = self.cleaned_data['home_address_comments']
+
+        # Only check if a comment has been entered if the field has been flagged
+        if home_address_declare is True:
+            if home_address_comments == '':
+                raise forms.ValidationError('You must give reasons')
+
+        return home_address_comments
+
+    def clean_childcare_location_comments(self):
+        """
+        Childcare location comments validation
+        :return: string
+        """
+        childcare_location_declare = self.cleaned_data['childcare_location_declare']
+        childcare_location_comments = self.cleaned_data['childcare_location_comments']
+
+        # Only check if a comment has been entered if the field has been flagged
+        if childcare_location_declare is True:
+            if childcare_location_comments == '':
+                raise forms.ValidationError('You must give reasons')
+
+        return childcare_location_comments
 
 
 class FirstAidTrainingForm(GOVUKForm):
