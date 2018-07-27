@@ -5,6 +5,9 @@
 {% block inner_content %}
 {% include 'back-button.html' %}
 
+{{form.error_summary}}
+{{form2.error_summary}}
+
 <form method="post" novalidate>
     <h1 class="form-title heading-large">Review: references</h1>
     <p>

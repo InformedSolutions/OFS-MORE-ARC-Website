@@ -470,6 +470,7 @@ class DBSCheckForm(GOVUKForm):
 
         return cautions_convictions_comments
 
+
 class HealthForm(GOVUKForm):
     """
     Comments form for the Health declaration booklet review page
@@ -482,7 +483,8 @@ class HealthForm(GOVUKForm):
                                                            required=False)
     health_submission_consent_comments = forms.CharField(label='Enter your reasoning',
                                                          help_text='(Tip: be clear and concise)',
-                                                         widget=custom_field_widgets.Textarea, required=False)
+                                                         widget=custom_field_widgets.Textarea, required=False,
+                                                         max_length=250)
 
     checkboxes = [(health_submission_consent_declare, 'health_submission_consent')]
 
@@ -495,6 +497,21 @@ class HealthForm(GOVUKForm):
         self.table_keys = kwargs.pop('table_keys')
         super(HealthForm, self).__init__(*args, **kwargs)
         populate_initial_values(self)
+
+    def clean_health_submission_consent_comments(self):
+        """
+        Health submission consent comments validation
+        :return: string
+        """
+        health_submission_consent_declare = self.cleaned_data['health_submission_consent_declare']
+        health_submission_consent_comments = self.cleaned_data['health_submission_consent_comments']
+
+        # Only check if a comment has been entered if the field has been flagged
+        if health_submission_consent_declare is True:
+            if health_submission_consent_comments == '':
+                raise forms.ValidationError('You must give reasons')
+
+        return health_submission_consent_comments
 
 
 class PreviousRegistrationDetailsForm(GOVUKForm):
@@ -561,36 +578,36 @@ class ReferencesForm(GOVUKForm):
                                            widget=custom_field_widgets.CustomCheckboxInput, required=False)
     full_name_comments = forms.CharField(label='Enter your reasoning', help_text='(Tip: be clear and concise)',
                                          widget=custom_field_widgets.Textarea,
-                                         required=False)
+                                         required=False, max_length=250)
 
     relationship_declare = forms.BooleanField(label='This information is correct',
                                               widget=custom_field_widgets.CustomCheckboxInput, required=False)
     relationship_comments = forms.CharField(label='Enter your reasoning', help_text='(Tip: be clear and concise)',
-                                            widget=custom_field_widgets.Textarea, required=False)
+                                            widget=custom_field_widgets.Textarea, required=False, max_length=250)
 
     time_known_declare = forms.BooleanField(label='This information is correct',
                                             widget=custom_field_widgets.CustomCheckboxInput, required=False)
     time_known_comments = forms.CharField(label='Enter your reasoning', help_text='(Tip: be clear and concise)',
                                           widget=custom_field_widgets.Textarea,
-                                          required=False)
+                                          required=False, max_length=250)
 
     address_declare = forms.BooleanField(label='This information is correct',
                                          widget=custom_field_widgets.CustomCheckboxInput, required=False)
     address_comments = forms.CharField(label='Enter your reasoning', help_text='(Tip: be clear and concise)',
                                        widget=custom_field_widgets.Textarea,
-                                       required=False)
+                                       required=False, max_length=250)
 
     phone_number_declare = forms.BooleanField(label='This information is correct',
                                               widget=custom_field_widgets.CustomCheckboxInput, required=False)
     phone_number_comments = forms.CharField(label='Enter your reasoning', help_text='(Tip: be clear and concise)',
                                             widget=custom_field_widgets.Textarea,
-                                            required=False)
+                                            required=False, max_length=250)
 
     email_address_declare = forms.BooleanField(label='This information is correct',
                                                widget=custom_field_widgets.CustomCheckboxInput, required=False)
     email_address_comments = forms.CharField(label='Enter your reasoning', help_text='(Tip: be clear and concise)',
                                              widget=custom_field_widgets.Textarea,
-                                             required=False)
+                                             required=False, max_length=250)
 
     checkboxes = [(full_name_declare, 'full_name'), (relationship_declare, 'relationship'),
                   (time_known_declare, 'time_known'), (address_declare, 'address'),
@@ -606,6 +623,96 @@ class ReferencesForm(GOVUKForm):
         super(ReferencesForm, self).__init__(*args, **kwargs)
         populate_initial_values(self)
 
+    def clean_full_name_comments(self):
+        """
+        Full name comments validation
+        :return: string
+        """
+        full_name_declare = self.cleaned_data['full_name_declare']
+        full_name_comments = self.cleaned_data['full_name_comments']
+
+        # Only check if a comment has been entered if the field has been flagged
+        if full_name_declare is True:
+            if full_name_comments == '':
+                raise forms.ValidationError('You must give reasons')
+
+        return full_name_comments
+
+    def clean_relationship_comments(self):
+        """
+        Relationship comments validation
+        :return: string
+        """
+        relationship_declare = self.cleaned_data['relationship_declare']
+        relationship_comments = self.cleaned_data['relationship_comments']
+
+        # Only check if a comment has been entered if the field has been flagged
+        if relationship_declare is True:
+            if relationship_comments == '':
+                raise forms.ValidationError('You must give reasons')
+
+        return relationship_comments
+
+    def clean_time_known_comments(self):
+        """
+        Time known comments validation
+        :return: string
+        """
+        time_known_declare = self.cleaned_data['time_known_declare']
+        time_known_comments = self.cleaned_data['time_known_comments']
+
+        # Only check if a comment has been entered if the field has been flagged
+        if time_known_declare is True:
+            if time_known_comments == '':
+                raise forms.ValidationError('You must give reasons')
+
+        return time_known_comments
+
+    def clean_address_comments(self):
+        """
+        Address comments validation
+        :return: string
+        """
+        address_declare = self.cleaned_data['address_declare']
+        address_comments = self.cleaned_data['address_comments']
+
+        # Only check if a comment has been entered if the field has been flagged
+        if address_declare is True:
+            if address_comments == '':
+                raise forms.ValidationError('You must give reasons')
+
+        return address_comments
+
+    def clean_phone_number_comments(self):
+        """
+        Phone number comments validation
+        :return: string
+        """
+        phone_number_declare = self.cleaned_data['phone_number_declare']
+        phone_number_comments = self.cleaned_data['phone_number_comments']
+
+        # Only check if a comment has been entered if the field has been flagged
+        if phone_number_declare is True:
+            if phone_number_comments == '':
+                raise forms.ValidationError('You must give reasons')
+
+        return phone_number_comments
+
+    def clean_email_address_comments(self):
+        """
+        Email address comments validation
+        :return: string
+        """
+        email_address_declare = self.cleaned_data['email_address_declare']
+        email_address_comments = self.cleaned_data['email_address_comments']
+
+        # Only check if a comment has been entered if the field has been flagged
+        if email_address_declare is True:
+            if email_address_comments == '':
+                raise forms.ValidationError('You must give reasons')
+
+        return email_address_comments
+
 
 class ReferencesForm2(GOVUKForm):
     """
@@ -618,36 +725,36 @@ class ReferencesForm2(GOVUKForm):
                                            widget=custom_field_widgets.CustomCheckboxInput, required=False)
     full_name_comments = forms.CharField(label='Enter your reasoning', help_text='(Tip: be clear and concise)',
                                          widget=custom_field_widgets.Textarea,
-                                         required=False)
+                                         required=False, max_length=250)
 
     relationship_declare = forms.BooleanField(label='This information is correct',
                                               widget=custom_field_widgets.CustomCheckboxInput, required=False)
     relationship_comments = forms.CharField(label='Enter your reasoning', help_text='(Tip: be clear and concise)',
-                                            widget=custom_field_widgets.Textarea, required=False)
+                                            widget=custom_field_widgets.Textarea, required=False, max_length=250)
 
     time_known_declare = forms.BooleanField(label='This information is correct',
                                             widget=custom_field_widgets.CustomCheckboxInput, required=False)
     time_known_comments = forms.CharField(label='Enter your reasoning', help_text='(Tip: be clear and concise)',
                                           widget=custom_field_widgets.Textarea,
-                                          required=False)
+                                          required=False, max_length=250)
 
     address_declare = forms.BooleanField(label='This information is correct',
                                          widget=custom_field_widgets.CustomCheckboxInput, required=False)
     address_comments = forms.CharField(label='Enter your reasoning', help_text='(Tip: be clear and concise)',
                                        widget=custom_field_widgets.Textarea,
-                                       required=False)
+                                       required=False, max_length=250)
 
     phone_number_declare = forms.BooleanField(label='This information is correct',
                                               widget=custom_field_widgets.CustomCheckboxInput, required=False)
     phone_number_comments = forms.CharField(label='Enter your reasoning', help_text='(Tip: be clear and concise)',
                                             widget=custom_field_widgets.Textarea,
-                                            required=False)
+                                            required=False, max_length=250)
 
     email_address_declare = forms.BooleanField(label='This information is correct',
                                                widget=custom_field_widgets.CustomCheckboxInput, required=False)
     email_address_comments = forms.CharField(label='Enter your reasoning', help_text='(Tip: be clear and concise)',
                                              widget=custom_field_widgets.Textarea,
-                                             required=False)
+                                             required=False, max_length=250)
 
     checkboxes = [(full_name_declare, 'full_name2'),
                   (relationship_declare, 'relationship2'),
@@ -664,6 +771,96 @@ class ReferencesForm2(GOVUKForm):
         self.table_keys = kwargs.pop('table_keys')
         super(ReferencesForm2, self).__init__(*args, **kwargs)
         populate_initial_values(self)
+
+    def clean_full_name_comments(self):
+        """
+        Full name comments validation
+        :return: string
+        """
+        full_name_declare = self.cleaned_data['full_name_declare']
+        full_name_comments = self.cleaned_data['full_name_comments']
+
+        # Only check if a comment has been entered if the field has been flagged
+        if full_name_declare is True:
+            if full_name_comments == '':
+                raise forms.ValidationError('You must give reasons')
+
+        return full_name_comments
+
+    def clean_relationship_comments(self):
+        """
+        Relationship comments validation
+        :return: string
+        """
+        relationship_declare = self.cleaned_data['relationship_declare']
+        relationship_comments = self.cleaned_data['relationship_comments']
+
+        # Only check if a comment has been entered if the field has been flagged
+        if relationship_declare is True:
+            if relationship_comments == '':
+                raise forms.ValidationError('You must give reasons')
+
+        return relationship_comments
+
+    def clean_time_known_comments(self):
+        """
+        Time known comments validation
+        :return: string
+        """
+        time_known_declare = self.cleaned_data['time_known_declare']
+        time_known_comments = self.cleaned_data['time_known_comments']
+
+        # Only check if a comment has been entered if the field has been flagged
+        if time_known_declare is True:
+            if time_known_comments == '':
+                raise forms.ValidationError('You must give reasons')
+
+        return time_known_comments
+
+    def clean_address_comments(self):
+        """
+        Address comments validation
+        :return: string
+        """
+        address_declare = self.cleaned_data['address_declare']
+        address_comments = self.cleaned_data['address_comments']
+
+        # Only check if a comment has been entered if the field has been flagged
+        if address_declare is True:
+            if address_comments == '':
+                raise forms.ValidationError('You must give reasons')
+
+        return address_comments
+
+    def clean_phone_number_comments(self):
+        """
+        Phone number comments validation
+        :return: string
+        """
+        phone_number_declare = self.cleaned_data['phone_number_declare']
+        phone_number_comments = self.cleaned_data['phone_number_comments']
+
+        # Only check if a comment has been entered if the field has been flagged
+        if phone_number_declare is True:
+            if phone_number_comments == '':
+                raise forms.ValidationError('You must give reasons')
+
+        return phone_number_comments
+
+    def clean_email_address_comments(self):
+        """
+        Email address comments validation
+        :return: string
+        """
+        email_address_declare = self.cleaned_data['email_address_declare']
+        email_address_comments = self.cleaned_data['email_address_comments']
+
+        # Only check if a comment has been entered if the field has been flagged
+        if email_address_declare is True:
+            if email_address_comments == '':
+                raise forms.ValidationError('You must give reasons')
+
+        return email_address_comments
 
 
 class OtherPeopleInYourHomeForm(GOVUKForm):

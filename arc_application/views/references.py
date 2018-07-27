@@ -34,7 +34,9 @@ def references_summary(request):
         reference_id_2 = Reference.objects.get(application_id=application_id_local, reference=2).reference_id
         # Grab form data from post
         form = ReferencesForm(request.POST, table_keys=[reference_id_1], prefix="form")
+        form.error_summary_title = 'There was a problem with the form (Reference 1)'
         form2 = ReferencesForm2(request.POST, table_keys=[reference_id_2], prefix="form2")
+        form2.error_summary_title = 'There was a problem with the form (Reference 2)'
         # As form data prefixed in above lines to separate the two forms, this prefix must be removed before
         # storage, this is to allow for easier retrieval form the database
 
