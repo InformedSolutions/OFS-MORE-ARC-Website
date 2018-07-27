@@ -28,16 +28,16 @@ def search(request):
 
     if (cc_user or arc_user) and request.user.is_authenticated():
 
+        # Display all applications on search page
+        results = Application.objects.filter()
+
+        if results is not None and len(results) > 0:
+            data = format_data(results)
+            context['empty'] = False
+            context['app'] = data
+
         if request.method == 'GET':
             context['form'] = SearchForm()
-
-            # Display all applications on search page
-            results = Application.objects.filter()
-
-            if results is not None and len(results) > 0:
-                data = format_data(results)
-                context['empty'] = False
-                context['app'] = data
 
             return render(request, 'search.html', context)
 
@@ -58,37 +58,20 @@ def search(request):
                     context['error_title'] = 'There was a problem with your search'
                     context['error_text'] = 'Please use at least one filter'
 
-                    # Display all applications on search page
-                    results = Application.objects.filter()
-
-                    if results is not None and len(results) > 0:
-                        data = format_data(results)
-                        context['empty'] = False
-                        context['app'] = data
-
                     return render(request, 'search.html', context)
 
-                results = search_query(name, dob, home_postcode, care_location_postcode, reference)
+                search_results = search_query(name, dob, home_postcode, care_location_postcode, reference)
 
-                if results is not None and len(results) > 0:
-                    data = format_data(results)
-                    context['empty'] = False
+                if search_results is not None and len(search_results) > 0:
+                    data = format_data(search_results)
                     context['app'] = data
-                    return render(request, 'search.html', context)
+
                 else:
                     context['empty_error'] = True
                     context['error_title'] = 'No results found'
                     context['error_text'] = 'Check that you have the correct details and spelling.'
 
-                    # Display all applications on search page
-                    results = Application.objects.filter()
-
-                    if results is not None and len(results) > 0:
-                        data = format_data(results)
-                        context['empty'] = False
-                        context['app'] = data
-
-                    return render(request, 'search.html', context)
+                return render(request, 'search.html', context)
 
             return render(request, 'search.html', context)
     else:
