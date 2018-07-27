@@ -76,11 +76,3 @@ class UpdatePhoneNumberView(ChangeDetails):
 class UpdateAddPhoneNumberView(ChangeDetails):
     form = UpdateAddPhoneNumber
     page_title = "Update the applicant's alternative phone number"
-
-
-class UpdateSecurityQuestionView(ChangeDetails):
-    pass
-
-
-class UpdateSecurityAnswerView(ChangeDetails):
-    pass
