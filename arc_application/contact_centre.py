@@ -18,6 +18,9 @@ def search(request):
     :param request: An Http request- you must be logged in.
     :return: The search template on GET request, or submit it and return the search results on POST
     """
+
+    SEARCH_TEMPLATE_PATH = 'childminder_templates/search.html'
+
     cc_user = has_group(request.user, settings.CONTACT_CENTRE)
     arc_user = has_group(request.user, settings.ARC_GROUP)
     context = {
@@ -30,7 +33,7 @@ def search(request):
 
         if request.method == 'GET':
             context['form'] = SearchForm()
-            return render(request, 'childminder_templates/search.html', context)
+            return render(request, SEARCH_TEMPLATE_PATH, context)
 
         elif request.method == 'POST':
             form = SearchForm(request.POST)
@@ -48,7 +51,7 @@ def search(request):
                     context['empty'] = 'error'
                     context['error_title'] = 'There was a problem with your search'
                     context['error_text'] = 'Please use at least one filter'
-                    return render(request, 'childminder_templates/search.html', context)
+                    return render(request, SEARCH_TEMPLATE_PATH, context)
 
                 results = search_query(name, dob, home_postcode, care_location_postcode, reference)
 
@@ -56,14 +59,14 @@ def search(request):
                     data = format_data(results)
                     context['empty'] = False
                     context['app'] = data
-                    return render(request, 'childminder_templates/search.html', context)
+                    return render(request, SEARCH_TEMPLATE_PATH, context)
                 else:
                     context['empty'] = 'error'
                     context['error_title'] = 'No results found'
                     context['error_text'] = 'Check that you have the correct details and spelling.'
-                    return render(request, 'childminder_templates/search.html', context)
+                    return render(request, SEARCH_TEMPLATE_PATH, context)
 
-            return render(request, 'childminder_templates/search.html', context)
+            return render(request, SEARCH_TEMPLATE_PATH, context)
     else:
         return HttpResponseRedirect(settings.URL_PREFIX + '/login/')
 
