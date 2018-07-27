@@ -27,7 +27,7 @@ class CheckBox(GOVUKForm):
 
 class LogInDetailsForm(GOVUKForm):
     """
-    GOV.UK form for the Your login and contact details: email page
+    Comments form for the Your sign in details review page
     """
     # customisations:
     auto_replace_widgets = True
@@ -154,7 +154,7 @@ class LogInDetailsForm(GOVUKForm):
 
 class PersonalDetailsForm(GOVUKForm):
     """
-    GOV.UK form for the Personal details page
+    Comments form for the Your personal details review page
     """
     # customisations:
     auto_replace_widgets = True
@@ -259,7 +259,7 @@ class PersonalDetailsForm(GOVUKForm):
 
 class FirstAidTrainingForm(GOVUKForm):
     """
-    GOV.UK form for the First Aid Training Form
+    Comments form for the First aid training review page
     """
     # customisations:
     auto_replace_widgets = True
@@ -347,7 +347,7 @@ class FirstAidTrainingForm(GOVUKForm):
 
 class EYFSCheckForm(GOVUKForm):
     """
-    GOV.UK form for the Early years training page.
+    Comments form for the Early years training review page
     """
     auto_replace_widgets = True
 
@@ -408,7 +408,7 @@ class EYFSCheckForm(GOVUKForm):
 
 class DBSCheckForm(GOVUKForm):
     """
-    GOV.UK form for the Your login and contact details: email page
+    Comments form for the Criminal record (DBS) check review page
     """
     # customisations:
     auto_replace_widgets = True
@@ -441,7 +441,7 @@ class DBSCheckForm(GOVUKForm):
 
 class HealthForm(GOVUKForm):
     """
-    GOV.UK form for the Health Page
+    Comments form for the Health declaration booklet review page
     """
     # customisations:
     auto_replace_widgets = True
@@ -468,7 +468,7 @@ class HealthForm(GOVUKForm):
 
 class PreviousRegistrationDetailsForm(GOVUKForm):
     """
-    GOV.UK form for adding details of previous registration.
+    GOV.UK form for adding details of previous registration
     """
     error_summary_template_name = 'standard-error-summary.html'
     error_summary_title = 'There was a problem on this page'
@@ -521,7 +521,7 @@ class PreviousRegistrationDetailsForm(GOVUKForm):
 
 class ReferencesForm(GOVUKForm):
     """
-    GOV.UK form for the first reference
+    Comments form for the References review page: first reference
     """
     # customisations:
     auto_replace_widgets = True
@@ -578,7 +578,7 @@ class ReferencesForm(GOVUKForm):
 
 class ReferencesForm2(GOVUKForm):
     """
-    GOV.UK form for the second reference, this can be deleted later if these are done dynamically
+    Comments form for the References review page: second reference
     """
     # customisations:
     auto_replace_widgets = True
@@ -637,7 +637,7 @@ class ReferencesForm2(GOVUKForm):
 
 class OtherPeopleInYourHomeForm(GOVUKForm):
     """
-    GOV.UK form for the top part ot the other people form, that isnt rendered manually
+    Comments form for the People in your home review page
     """
 
     auto_replace_widgets = True
@@ -669,7 +669,7 @@ class OtherPeopleInYourHomeForm(GOVUKForm):
 
 class AdultInYourHomeForm(GOVUKForm):
     """
-    GOV.UK form for each adult other person in an application
+    Comments form for the Your sign in details review page: adults in home
     """
 
     health_check_status_declare = forms.BooleanField(label='This information is correct',
@@ -736,7 +736,7 @@ class AdultInYourHomeForm(GOVUKForm):
 
 class ChildInYourHomeForm(GOVUKForm):
     """
-    GOV.UK form for each child other person in an application, see adult form for comment explanation
+    Comments form for the Your sign in details review page: children in home
     """
     full_name_declare = forms.BooleanField(label='This information is correct',
                                            widget=custom_field_widgets.CustomCheckboxInput, required=False)
@@ -775,7 +775,7 @@ class ChildInYourHomeForm(GOVUKForm):
 
 class CommentsForm(GOVUKForm):
     """
-    GOV.UK form for the Your login and contact details: email page
+    Form for Comments page
     """
     field_label_classes = 'form-label-bold'
     auto_replace_widgets = True
@@ -803,7 +803,7 @@ class CommentsForm(GOVUKForm):
 
 class SearchForm(GOVUKForm):
     """
-    GOV.UK form for the Your login and contact details: email page
+    Search page form
     """
     field_label_classes = 'form-label-bold'
     field_help_classes = 'search-help-text form-hint'
@@ -860,6 +860,9 @@ class SearchForm(GOVUKForm):
 
 
 class OtherPersonPreviousNames(GOVUKForm, ModelForm):
+    """
+    Form for previous names of adults in home
+    """
     field_label_classes = 'form-label-bold'
     auto_replace_widgets = True
     error_summary_title = "There was a problem on this page"
@@ -900,6 +903,9 @@ class OtherPersonPreviousNames(GOVUKForm, ModelForm):
 
 
 class OtherPersonPreviousPostcodeEntry(GOVUKForm):
+    """
+    Form for previous postcode entry of adults in home
+    """
     field_label_classes = 'form-label-bold'
     auto_replace_widgets = True
     error_summary_title = "There was a problem on this page"
@@ -920,6 +926,9 @@ class OtherPersonPreviousPostcodeEntry(GOVUKForm):
 
 
 class OtherPeoplePreviousAddressLookupForm(GOVUKForm):
+    """
+    Form for previous address lookup for adults in home
+    """
     field_label_classes = 'form-label-bold'
     auto_replace_widgets = True
     error_summary_title = "There was a problem on this page"
@@ -940,7 +949,7 @@ class OtherPeoplePreviousAddressLookupForm(GOVUKForm):
 
 class OtherPeoplePreviousAddressManualForm(GOVUKForm):
     """
-    GOV.UK form for the Your personal details: home address page for manual entry
+    Form for manual previous address entry for adults in home
     """
     field_label_classes = 'form-label-bold'
     auto_replace_widgets = True
@@ -1035,6 +1044,9 @@ class OtherPeoplePreviousAddressManualForm(GOVUKForm):
 
 
 class PersonalDetailsPreviousNames(GOVUKForm, ModelForm):
+    """
+    Form for previous names
+    """
     field_label_classes = 'form-label-bold'
     auto_replace_widgets = True
     error_summary_title = "There was a problem on this page"
@@ -1054,6 +1066,9 @@ class PersonalDetailsPreviousNames(GOVUKForm, ModelForm):
 
 
 class PersonalDetailsPreviousPostcodeEntry(GOVUKForm):
+    """
+    Form for previous postcode entry
+    """
     field_label_classes = 'form-label-bold'
     auto_replace_widgets = True
     error_summary_title = "There was a problem on this page"
@@ -1074,6 +1089,9 @@ class PersonalDetailsPreviousPostcodeEntry(GOVUKForm):
 
 
 class PersonalDetailsPreviousAddressLookupForm(GOVUKForm):
+    """
+    Form for previous address lookup
+    """
     field_label_classes = 'form-label-bold'
     auto_replace_widgets = True
     error_summary_title = "There was a problem on this page"
