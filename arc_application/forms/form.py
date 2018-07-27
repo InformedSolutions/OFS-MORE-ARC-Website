@@ -37,7 +37,7 @@ class LogInDetailsForm(GOVUKForm):
                                                widget=custom_field_widgets.CustomCheckboxInput(), required=False)
     email_address_comments = forms.CharField(label='Enter your reasoning', help_text='(Tip: be clear and concise)',
                                              widget=custom_field_widgets.Textarea(attrs={'cols': '40', 'rows': '3'}),
-                                             required=False)
+                                             required=False, max_length=250)
     mobile_number_declare = forms.BooleanField(label='This information is correct',
                                                widget=custom_field_widgets.CustomCheckboxInput, required=False)
     mobile_number_comments = forms.CharField(label='Enter your reasoning', help_text='(Tip: be clear and concise)',
@@ -75,6 +75,21 @@ class LogInDetailsForm(GOVUKForm):
         self.table_keys = kwargs.pop('table_keys')
         super(LogInDetailsForm, self).__init__(*args, **kwargs)
         populate_initial_values(self)
+
+    def clean_email_address_comments(self):
+        """
+        Comments validation
+        :return: string
+        """
+        email_address_declare = self.cleaned_data['email_address_declare']
+        email_address_comments = self.cleaned_data['email_address_comments']
+
+        # Only check if a comment has been entered if the field has been flagged
+        if email_address_declare is True:
+            if email_address_comments == '':
+                raise forms.ValidationError('You must give reasons')
+
+        return email_address_comments
 
 
 class PersonalDetailsForm(GOVUKForm):
