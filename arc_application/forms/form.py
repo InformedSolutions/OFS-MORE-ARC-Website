@@ -269,19 +269,21 @@ class FirstAidTrainingForm(GOVUKForm):
                                                                  required=False)
     first_aid_training_organisation_comments = forms.CharField(label='Enter your reasoning',
                                                                help_text='(Tip: be clear and concise)',
-                                                               widget=custom_field_widgets.Textarea, required=False)
+                                                               widget=custom_field_widgets.Textarea, required=False,
+                                                               max_length=250)
 
     title_of_training_course_declare = forms.BooleanField(label='This information is correct',
                                                           widget=custom_field_widgets.CustomCheckboxInput,
                                                           required=False)
     title_of_training_course_comments = forms.CharField(label='Enter your reasoning',
                                                         help_text='(Tip: be clear and concise)',
-                                                        widget=custom_field_widgets.Textarea, required=False)
+                                                        widget=custom_field_widgets.Textarea, required=False,
+                                                        max_length=250)
 
     course_date_declare = forms.BooleanField(label='This information is correct',
                                              widget=custom_field_widgets.CustomCheckboxInput, required=False)
     course_date_comments = forms.CharField(label='Enter your reasoning', help_text='(Tip: be clear and concise)',
-                                           widget=custom_field_widgets.Textarea, required=False)
+                                           widget=custom_field_widgets.Textarea, required=False, max_length=250)
 
     checkboxes = [(first_aid_training_organisation_declare, 'first_aid_training_organisation'),
                   (title_of_training_course_declare, 'title_of_training_course'),
@@ -296,6 +298,51 @@ class FirstAidTrainingForm(GOVUKForm):
         self.table_keys = kwargs.pop('table_keys')
         super(FirstAidTrainingForm, self).__init__(*args, **kwargs)
         populate_initial_values(self)
+
+    def clean_first_aid_training_organisation_comments(self):
+        """
+        First aid training organisation comments validation
+        :return: string
+        """
+        first_aid_training_organisation_declare = self.cleaned_data['first_aid_training_organisation_declare']
+        first_aid_training_organisation_comments = self.cleaned_data['first_aid_training_organisation_comments']
+
+        # Only check if a comment has been entered if the field has been flagged
+        if first_aid_training_organisation_declare is True:
+            if first_aid_training_organisation_comments == '':
+                raise forms.ValidationError('You must give reasons')
+
+        return first_aid_training_organisation_comments
+
+    def clean_title_of_training_course_comments(self):
+        """
+        Title of training course comments validation
+        :return: string
+        """
+        title_of_training_course_declare = self.cleaned_data['title_of_training_course_declare']
+        title_of_training_course_comments = self.cleaned_data['title_of_training_course_comments']
+
+        # Only check if a comment has been entered if the field has been flagged
+        if title_of_training_course_declare is True:
+            if title_of_training_course_comments == '':
+                raise forms.ValidationError('You must give reasons')
+
+        return title_of_training_course_comments
+
+    def clean_course_date_comments(self):
+        """
+        Course date comments validation
+        :return: string
+        """
+        course_date_declare = self.cleaned_data['course_date_declare']
+        course_date_comments = self.cleaned_data['course_date_comments']
+
+        # Only check if a comment has been entered if the field has been flagged
+        if course_date_declare is True:
+            if course_date_comments == '':
+                raise forms.ValidationError('You must give reasons')
+
+        return course_date_comments
 
 
 class EYFSCheckForm(GOVUKForm):
