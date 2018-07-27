@@ -355,12 +355,12 @@ class EYFSCheckForm(GOVUKForm):
                                                   widget=custom_field_widgets.CustomCheckboxInput,
                                                   required=False)
     eyfs_course_name_comments = forms.CharField(label='Enter your reasoning', help_text='(Tip: be clear and concise)',
-                                                widget=custom_field_widgets.Textarea, required=False)
+                                                widget=custom_field_widgets.Textarea, required=False, max_length=250)
 
     eyfs_course_date_declare = forms.BooleanField(label='This information is correct',
                                                   widget=custom_field_widgets.CustomCheckboxInput, required=False)
     eyfs_course_date_comments = forms.CharField(label='Enter your reasoning', help_text='(Tip: be clear and concise)',
-                                                widget=custom_field_widgets.Textarea, required=False)
+                                                widget=custom_field_widgets.Textarea, required=False, max_length=250)
 
     checkboxes = [(eyfs_course_name_declare, 'eyfs_course_name'),
                   (eyfs_course_date_declare, 'eyfs_course_date')]
@@ -374,6 +374,36 @@ class EYFSCheckForm(GOVUKForm):
         self.table_keys = kwargs.pop('table_keys')
         super(EYFSCheckForm, self).__init__(*args, **kwargs)
         populate_initial_values(self)
+
+    def clean_eyfs_course_name_comments(self):
+        """
+        EYFS course name comments validation
+        :return: string
+        """
+        eyfs_course_name_declare = self.cleaned_data['eyfs_course_name_declare']
+        eyfs_course_name_comments = self.cleaned_data['eyfs_course_name_comments']
+
+        # Only check if a comment has been entered if the field has been flagged
+        if eyfs_course_name_declare is True:
+            if eyfs_course_name_comments == '':
+                raise forms.ValidationError('You must give reasons')
+
+        return eyfs_course_name_comments
+
+    def clean_eyfs_course_date_comments(self):
+        """
+        EYFS course date comments validation
+        :return: string
+        """
+        eyfs_course_date_declare = self.cleaned_data['eyfs_course_date_declare']
+        eyfs_course_date_comments = self.cleaned_data['eyfs_course_date_comments']
+
+        # Only check if a comment has been entered if the field has been flagged
+        if eyfs_course_date_declare is True:
+            if eyfs_course_date_comments == '':
+                raise forms.ValidationError('You must give reasons')
+
+        return eyfs_course_date_comments
 
 
 class DBSCheckForm(GOVUKForm):
