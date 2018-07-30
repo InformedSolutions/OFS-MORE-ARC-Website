@@ -226,7 +226,7 @@ class FirstAidTrainingForm(GOVUKForm):
     first_aid_training_organisation_declare = forms.BooleanField(label='This information is correct',
                                                                  widget=custom_field_widgets.CustomCheckboxInput,
                                                                  required=False)
-    first_aid_training_organisation_comments = forms.CharField(label='Enter your reasoning',
+    first_aid_training_organisation_comments = forms.CharField(label='Training organisation',
                                                                help_text='(Tip: be clear and concise)',
                                                                widget=custom_field_widgets.Textarea, required=False,
                                                                max_length=250)
@@ -234,14 +234,14 @@ class FirstAidTrainingForm(GOVUKForm):
     title_of_training_course_declare = forms.BooleanField(label='This information is correct',
                                                           widget=custom_field_widgets.CustomCheckboxInput,
                                                           required=False)
-    title_of_training_course_comments = forms.CharField(label='Enter your reasoning',
+    title_of_training_course_comments = forms.CharField(label='Title of first aid course',
                                                         help_text='(Tip: be clear and concise)',
                                                         widget=custom_field_widgets.Textarea, required=False,
                                                         max_length=250)
 
     course_date_declare = forms.BooleanField(label='This information is correct',
                                              widget=custom_field_widgets.CustomCheckboxInput, required=False)
-    course_date_comments = forms.CharField(label='Enter your reasoning', help_text='(Tip: be clear and concise)',
+    course_date_comments = forms.CharField(label='Date of certificate', help_text='(Tip: be clear and concise)',
                                            widget=custom_field_widgets.Textarea, required=False, max_length=250)
 
     checkboxes = [(first_aid_training_organisation_declare, 'first_aid_training_organisation'),
