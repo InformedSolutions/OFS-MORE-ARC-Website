@@ -874,12 +874,12 @@ class OtherPeopleInYourHomeForm(GOVUKForm):
                                                 widget=custom_field_widgets.CustomCheckboxInput, required=False)
     adults_in_home_comments = forms.CharField(label='Enter your reasoning', help_text='(Tip: be clear and concise)',
                                               widget=custom_field_widgets.Textarea,
-                                              required=False)
+                                              required=False, max_length=250)
     children_in_home_declare = forms.BooleanField(label='This information is correct',
                                                   widget=custom_field_widgets.CustomCheckboxInput, required=False)
     children_in_home_comments = forms.CharField(label='Enter your reasoning', help_text='(Tip: be clear and concise)',
                                                 widget=custom_field_widgets.Textarea,
-                                                required=False)
+                                                required=False, max_length=250)
 
     checkboxes = [(adults_in_home_declare, 'adults_in_home'),
                   (children_in_home_declare, 'children_in_home')]
@@ -894,10 +894,40 @@ class OtherPeopleInYourHomeForm(GOVUKForm):
         super(OtherPeopleInYourHomeForm, self).__init__(*args, **kwargs)
         populate_initial_values(self)
 
+    def clean_adults_in_home_comments(self):
+        """
+        Adults in home comments validation
+        :return: string
+        """
+        adults_in_home_declare = self.cleaned_data['adults_in_home_declare']
+        adults_in_home_comments = self.cleaned_data['adults_in_home_comments']
+
+        # Only check if a comment has been entered if the field has been flagged
+        if adults_in_home_declare is True:
+            if adults_in_home_comments == '':
+                raise forms.ValidationError('You must give reasons')
+
+        return adults_in_home_comments
+
+    def clean_children_in_home_comments(self):
+        """
+        Children in home comments validation
+        :return: string
+        """
+        children_in_home_declare = self.cleaned_data['children_in_home_declare']
+        children_in_home_comments = self.cleaned_data['children_in_home_comments']
+
+        # Only check if a comment has been entered if the field has been flagged
+        if children_in_home_declare is True:
+            if children_in_home_comments == '':
+                raise forms.ValidationError('You must give reasons')
+
+        return children_in_home_comments
+
 
 class AdultInYourHomeForm(GOVUKForm):
     """
-    Comments form for the Your sign in details review page: adults in home
+    Comments form for the People in your home review page: adults in home
     """
 
     health_check_status_declare = forms.BooleanField(label='This information is correct',
@@ -905,37 +935,37 @@ class AdultInYourHomeForm(GOVUKForm):
     health_check_status_comments = forms.CharField(label='Enter your reasoning',
                                                    help_text='(Tip: be clear and concise)',
                                                    widget=custom_field_widgets.Textarea,
-                                                   required=False)
+                                                   required=False, max_length=250)
 
     full_name_declare = forms.BooleanField(label='This information is correct',
                                            widget=custom_field_widgets.CustomCheckboxInput, required=False)
     full_name_comments = forms.CharField(label='Enter your reasoning', help_text='(Tip: be clear and concise)',
                                          widget=custom_field_widgets.Textarea,
-                                         required=False)
+                                         required=False, max_length=250)
 
     date_of_birth_declare = forms.BooleanField(label='This information is correct',
                                                widget=custom_field_widgets.CustomCheckboxInput, required=False)
     date_of_birth_comments = forms.CharField(label='Enter your reasoning', help_text='(Tip: be clear and concise)',
                                              widget=custom_field_widgets.Textarea,
-                                             required=False)
+                                             required=False, max_length=250)
 
     relationship_declare = forms.BooleanField(label='This information is correct',
                                               widget=custom_field_widgets.CustomCheckboxInput, required=False)
     relationship_comments = forms.CharField(label='Enter your reasoning', help_text='(Tip: be clear and concise)',
                                             widget=custom_field_widgets.Textarea,
-                                            required=False)
+                                            required=False, max_length=250)
 
     dbs_certificate_number_declare = forms.BooleanField(label='This information is correct',
                                                         widget=custom_field_widgets.CustomCheckboxInput, required=False)
     dbs_certificate_number_comments = forms.CharField(label='Enter your reasoning',
                                                       help_text='(Tip: be clear and concise)',
                                                       widget=custom_field_widgets.Textarea,
-                                                      required=False)
+                                                      required=False, max_length=250)
 
     permission_declare = forms.BooleanField(label='This information is correct',
                                             widget=custom_field_widgets.CustomCheckboxInput, required=False)
     permission_comments = forms.CharField(label='Enter your reasoning', help_text='(Tip: be clear and concise)',
-                                          widget=custom_field_widgets.Textarea, required=False)
+                                          widget=custom_field_widgets.Textarea, required=False, max_length=250)
 
     # This is the id appended to all htmls names ot make the individual form instance unique, this is given a value in
     # the init
@@ -961,28 +991,118 @@ class AdultInYourHomeForm(GOVUKForm):
                                         'aria-controls': box[1],
                                         'aria-expanded': 'false'}, )
 
+    def clean_health_check_status_comments(self):
+        """
+        Health check status comments validation
+        :return: string
+        """
+        health_check_status_declare = self.cleaned_data['health_check_status_declare']
+        health_check_status_comments = self.cleaned_data['health_check_status_comments']
+
+        # Only check if a comment has been entered if the field has been flagged
+        if health_check_status_declare is True:
+            if health_check_status_comments == '':
+                raise forms.ValidationError('You must give reasons')
+
+        return health_check_status_comments
+
+    def clean_full_name_comments(self):
+        """
+        Full name comments validation
+        :return: string
+        """
+        full_name_declare = self.cleaned_data['full_name_declare']
+        full_name_comments = self.cleaned_data['full_name_comments']
+
+        # Only check if a comment has been entered if the field has been flagged
+        if full_name_declare is True:
+            if full_name_comments == '':
+                raise forms.ValidationError('You must give reasons')
+
+        return full_name_comments
+
+    def clean_date_of_birth_comments(self):
+        """
+        Date of birth comments validation
+        :return: string
+        """
+        date_of_birth_declare = self.cleaned_data['date_of_birth_declare']
+        date_of_birth_comments = self.cleaned_data['date_of_birth_comments']
+
+        # Only check if a comment has been entered if the field has been flagged
+        if date_of_birth_declare is True:
+            if date_of_birth_comments == '':
+                raise forms.ValidationError('You must give reasons')
+
+        return date_of_birth_comments
+
+    def clean_relationship_comments(self):
+        """
+        Relationship comments validation
+        :return: string
+        """
+        relationship_declare = self.cleaned_data['relationship_declare']
+        relationship_comments = self.cleaned_data['relationship_comments']
+
+        # Only check if a comment has been entered if the field has been flagged
+        if relationship_declare is True:
+            if relationship_comments == '':
+                raise forms.ValidationError('You must give reasons')
+
+        return relationship_comments
+
+    def clean_dbs_certificate_number_comments(self):
+        """
+        DBS certificate number comments validation
+        :return: string
+        """
+        dbs_certificate_number_declare = self.cleaned_data['dbs_certificate_number_declare']
+        dbs_certificate_number_comments = self.cleaned_data['dbs_certificate_number_comments']
+
+        # Only check if a comment has been entered if the field has been flagged
+        if dbs_certificate_number_declare is True:
+            if dbs_certificate_number_comments == '':
+                raise forms.ValidationError('You must give reasons')
+
+        return dbs_certificate_number_comments
+
+    def clean_permission_comments(self):
+        """
+        Permission comments validation
+        :return: string
+        """
+        permission_declare = self.cleaned_data['permission_declare']
+        permission_comments = self.cleaned_data['permission_comments']
+
+        # Only check if a comment has been entered if the field has been flagged
+        if permission_declare is True:
+            if permission_comments == '':
+                raise forms.ValidationError('You must give reasons')
+
+        return permission_comments
+
 
 class ChildInYourHomeForm(GOVUKForm):
     """
-    Comments form for the Your sign in details review page: children in home
+    Comments form for the People in your home review page: children in home
     """
     full_name_declare = forms.BooleanField(label='This information is correct',
                                            widget=custom_field_widgets.CustomCheckboxInput, required=False)
     full_name_comments = forms.CharField(label='Enter your reasoning', help_text='(Tip: be clear and concise)',
                                          widget=custom_field_widgets.Textarea(attrs={'cols': '40', 'rows': '3'}),
-                                         required=False)
+                                         required=False, max_length=250)
 
     date_of_birth_declare = forms.BooleanField(label='This information is correct',
                                                widget=custom_field_widgets.CustomCheckboxInput, required=False)
     date_of_birth_comments = forms.CharField(label='Enter your reasoning', help_text='(Tip: be clear and concise)',
                                              widget=custom_field_widgets.Textarea,
-                                             required=False)
+                                             required=False, max_length=250)
 
     relationship_declare = forms.BooleanField(label='This information is correct',
                                               widget=custom_field_widgets.CustomCheckboxInput, required=False)
     relationship_comments = forms.CharField(label='Enter your reasoning', help_text='(Tip: be clear and concise)',
                                             widget=custom_field_widgets.Textarea,
-                                            required=False)
+                                            required=False, max_length=250)
 
     instance_id = forms.CharField(widget=forms.HiddenInput, required=False)
 
@@ -999,6 +1119,51 @@ class ChildInYourHomeForm(GOVUKForm):
             box[0].widget.attrs.update({'data_target': box[1],
                                         'aria-controls': box[1],
                                         'aria-expanded': 'false'}, )
+
+    def clean_full_name_comments(self):
+        """
+        Full name comments validation
+        :return: string
+        """
+        full_name_declare = self.cleaned_data['full_name_declare']
+        full_name_comments = self.cleaned_data['full_name_comments']
+
+        # Only check if a comment has been entered if the field has been flagged
+        if full_name_declare is True:
+            if full_name_comments == '':
+                raise forms.ValidationError('You must give reasons')
+
+        return full_name_comments
+
+    def clean_date_of_birth_comments(self):
+        """
+        Date of birth comments validation
+        :return: string
+        """
+        date_of_birth_declare = self.cleaned_data['date_of_birth_declare']
+        date_of_birth_comments = self.cleaned_data['date_of_birth_comments']
+
+        # Only check if a comment has been entered if the field has been flagged
+        if date_of_birth_declare is True:
+            if date_of_birth_comments == '':
+                raise forms.ValidationError('You must give reasons')
+
+        return date_of_birth_comments
+
+    def clean_relationship_comments(self):
+        """
+        Relationship comments validation
+        :return: string
+        """
+        relationship_declare = self.cleaned_data['relationship_declare']
+        relationship_comments = self.cleaned_data['relationship_comments']
+
+        # Only check if a comment has been entered if the field has been flagged
+        if relationship_declare is True:
+            if relationship_comments == '':
+                raise forms.ValidationError('You must give reasons')
+
+        return relationship_comments
 
 
 class CommentsForm(GOVUKForm):
