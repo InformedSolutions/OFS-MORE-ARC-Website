@@ -35,17 +35,17 @@ class LogInDetailsForm(GOVUKForm):
 
     email_address_declare = forms.BooleanField(label='This information is correct',
                                                widget=custom_field_widgets.CustomCheckboxInput(), required=False)
-    email_address_comments = forms.CharField(label='Enter your reasoning', help_text='(Tip: be clear and concise)',
+    email_address_comments = forms.CharField(label='Email', help_text='(Tip: be clear and concise)',
                                              widget=custom_field_widgets.Textarea(attrs={'cols': '40', 'rows': '3'}),
                                              required=False, max_length=250)
     mobile_number_declare = forms.BooleanField(label='This information is correct',
                                                widget=custom_field_widgets.CustomCheckboxInput, required=False)
-    mobile_number_comments = forms.CharField(label='Enter your reasoning', help_text='(Tip: be clear and concise)',
+    mobile_number_comments = forms.CharField(label='Mobile phone number', help_text='(Tip: be clear and concise)',
                                              widget=custom_field_widgets.Textarea, required=False, max_length=250)
     add_phone_number_declare = forms.BooleanField(label='This information is correct',
                                                   widget=custom_field_widgets.CustomCheckboxInput,
                                                   required=False)
-    add_phone_number_comments = forms.CharField(label='Enter your reasoning', help_text='(Tip: be clear and concise)',
+    add_phone_number_comments = forms.CharField(label='Other phone number', help_text='(Tip: be clear and concise)',
                                                 widget=custom_field_widgets.Textarea, required=False, max_length=250)
     security_question_declare = forms.BooleanField(label='This information is correct',
                                                    widget=custom_field_widgets.CustomCheckboxInput,

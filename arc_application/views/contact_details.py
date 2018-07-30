@@ -29,6 +29,7 @@ def contact_summary(request):
         # Table keys are supplied in a list format for use in init
         form = LogInDetailsForm(table_keys=[login_id])
         application_id_local = request.GET["id"]
+
     elif request.method == 'POST':
         # Populate the form with the received data
         application_id_local = request.POST["id"]
@@ -71,6 +72,7 @@ def contact_summary(request):
     email = user_details.email
     mobile_number = user_details.mobile_number
     add_phone_number = user_details.add_phone_number
+    form.error_summary_title = 'There was a problem'
     variables = {
         'form': form,
         'application_id': application_id_local,
