@@ -60,6 +60,7 @@ def dbs_check_summary(request):
     dbs_certificate_number = criminal_record_check.dbs_certificate_number
     cautions_convictions = criminal_record_check.cautions_convictions
     application = Application.objects.get(pk=application_id_local)
+    form.error_summary_title = 'There was a problem'
     variables = {
         'form': form,
         'application_id': application_id_local,
