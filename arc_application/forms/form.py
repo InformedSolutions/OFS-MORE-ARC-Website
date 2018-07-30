@@ -376,14 +376,14 @@ class DBSCheckForm(GOVUKForm):
 
     dbs_certificate_number_declare = forms.BooleanField(label='This information is correct',
                                                         widget=custom_field_widgets.CustomCheckboxInput, required=False)
-    dbs_certificate_number_comments = forms.CharField(label='Enter your reasoning',
+    dbs_certificate_number_comments = forms.CharField(label='DBS certificate number',
                                                       help_text='(Tip: be clear and concise)',
                                                       widget=custom_field_widgets.Textarea, required=False,
                                                       max_length=250)
     cautions_convictions_declare = forms.BooleanField(label='This information is correct',
                                                       widget=custom_field_widgets.CustomCheckboxInput,
                                                       required=False)
-    cautions_convictions_comments = forms.CharField(label='Enter your reasoning',
+    cautions_convictions_comments = forms.CharField(label='Do you have any cautions or convictions?',
                                                     help_text='(Tip: be clear and concise)',
                                                     widget=custom_field_widgets.Textarea, required=False,
                                                     max_length=250)
