@@ -210,6 +210,8 @@ def other_people_summary(request):
 
     previous_registration_lists = list(zip(adult_ids, adult_names, previous_registration_querysets))
 
+    form.error_summary_title = 'There was a problem'
+
     variables = {
         'form': form,
         'formset_adult': formset_adult,

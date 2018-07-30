@@ -7,6 +7,7 @@
 {% include 'back-button.html' %}
 
 {{form.error_summary}}
+{{adult_formset.form.error_summary}}
 
     <form method="post" novalidate>
         <h1 class="form-title heading-large">Review: people in your home</h1>
@@ -47,7 +48,7 @@
             <tr class="js-hidden" id="adults_in_home">
                 <td colspan="1">
                     <div>
-                        {{ form.adults_in_home_comments.label}}
+                        Enter your reasoning
                     </div>
                     <div>
                         {{ form.adults_in_home_comments.help_text}}
@@ -92,7 +93,7 @@
             <tr class="js-hidden" id="children_in_home">
                 <td colspan="1">
                     <div>
-                        {{ form.children_in_home_comments.label}}
+                        Enter your reasoning
                     </div>
                     <div>
                         {{ form.children_in_home_comments.help_text}}
@@ -107,6 +108,7 @@
             </tbody>
         </table>
         {% for record, id , health_check_status, name, day, month, year, relationship, dbs_certificate_number, formsetadult, current_illness_set, serious_illness_set, hospital_admission_set in adult_lists %}
+        {{ formsetadult.error_summary }}
         <table class="check-your-answers form-group">
             <thead>
             <tr>
@@ -133,7 +135,7 @@
             <tr class="js-hidden" id="health_check_status{{formsetadult.instance_id.initial}}">
                 <td colspan="1">
                     <div>
-                        {{ formsetadult.health_check_status_comments.label}}
+                        Enter your reasoning
                     </div>
                     <div>
                         {{ formsetadult.health_check_status_comments.help_text}}
@@ -159,7 +161,7 @@
             <tr class="js-hidden" id="full_name{{formsetadult.instance_id.initial}}">
                 <td colspan="1">
                     <div>
-                        {{ formsetadult.full_name_comments.label}}
+                        Enter your reasoning
                     </div>
                     <div>
                         {{ formsetadult.full_name_comments.help_text}}
@@ -231,7 +233,7 @@
             <tr class="js-hidden" id="date_of_birth{{formsetadult.instance_id.initial}}">
                 <td colspan="1">
                     <div>
-                        {{ formsetadult.date_of_birth_comments.label}}
+                        Enter your reasoning
                     </div>
                     <div>
                         {{ formsetadult.date_of_birth_comments.help_text}}
@@ -257,7 +259,7 @@
             <tr class="js-hidden" id="relationship{{formsetadult.instance_id.initial}}">
                 <td colspan="1">
                     <div>
-                        {{ formsetadult.relationship_comments.label}}
+                        Enter your reasoning
                     </div>
                     <div>
                         {{ formsetadult.relationship_comments.help_text}}
@@ -283,7 +285,7 @@
             <tr class="js-hidden" id="dbs_certificate_number{{formsetadult.instance_id.initial}}">
                 <td colspan="1">
                     <div>
-                        {{ formsetadult.dbs_certificate_number_comments.label}}
+                        Enter your reasoning
                     </div>
                     <div>
                         {{ formsetadult.dbs_certificate_number_comments.help_text}}

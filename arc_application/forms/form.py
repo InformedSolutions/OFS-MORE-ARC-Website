@@ -537,36 +537,36 @@ class ReferencesForm(GOVUKForm):
 
     full_name_declare = forms.BooleanField(label='This information is correct',
                                            widget=custom_field_widgets.CustomCheckboxInput, required=False)
-    full_name_comments = forms.CharField(label='Enter your reasoning', help_text='(Tip: be clear and concise)',
+    full_name_comments = forms.CharField(label='Full name', help_text='(Tip: be clear and concise)',
                                          widget=custom_field_widgets.Textarea,
                                          required=False, max_length=250)
 
     relationship_declare = forms.BooleanField(label='This information is correct',
                                               widget=custom_field_widgets.CustomCheckboxInput, required=False)
-    relationship_comments = forms.CharField(label='Enter your reasoning', help_text='(Tip: be clear and concise)',
+    relationship_comments = forms.CharField(label='How they know you', help_text='(Tip: be clear and concise)',
                                             widget=custom_field_widgets.Textarea, required=False, max_length=250)
 
     time_known_declare = forms.BooleanField(label='This information is correct',
                                             widget=custom_field_widgets.CustomCheckboxInput, required=False)
-    time_known_comments = forms.CharField(label='Enter your reasoning', help_text='(Tip: be clear and concise)',
+    time_known_comments = forms.CharField(label='Known for', help_text='(Tip: be clear and concise)',
                                           widget=custom_field_widgets.Textarea,
                                           required=False, max_length=250)
 
     address_declare = forms.BooleanField(label='This information is correct',
                                          widget=custom_field_widgets.CustomCheckboxInput, required=False)
-    address_comments = forms.CharField(label='Enter your reasoning', help_text='(Tip: be clear and concise)',
+    address_comments = forms.CharField(label='Address', help_text='(Tip: be clear and concise)',
                                        widget=custom_field_widgets.Textarea,
                                        required=False, max_length=250)
 
     phone_number_declare = forms.BooleanField(label='This information is correct',
                                               widget=custom_field_widgets.CustomCheckboxInput, required=False)
-    phone_number_comments = forms.CharField(label='Enter your reasoning', help_text='(Tip: be clear and concise)',
+    phone_number_comments = forms.CharField(label='Phone number', help_text='(Tip: be clear and concise)',
                                             widget=custom_field_widgets.Textarea,
                                             required=False, max_length=250)
 
     email_address_declare = forms.BooleanField(label='This information is correct',
                                                widget=custom_field_widgets.CustomCheckboxInput, required=False)
-    email_address_comments = forms.CharField(label='Enter your reasoning', help_text='(Tip: be clear and concise)',
+    email_address_comments = forms.CharField(label='Email address', help_text='(Tip: be clear and concise)',
                                              widget=custom_field_widgets.Textarea,
                                              required=False, max_length=250)
 
@@ -684,36 +684,36 @@ class ReferencesForm2(GOVUKForm):
 
     full_name_declare = forms.BooleanField(label='This information is correct',
                                            widget=custom_field_widgets.CustomCheckboxInput, required=False)
-    full_name_comments = forms.CharField(label='Enter your reasoning', help_text='(Tip: be clear and concise)',
+    full_name_comments = forms.CharField(label='Full name', help_text='(Tip: be clear and concise)',
                                          widget=custom_field_widgets.Textarea,
                                          required=False, max_length=250)
 
     relationship_declare = forms.BooleanField(label='This information is correct',
                                               widget=custom_field_widgets.CustomCheckboxInput, required=False)
-    relationship_comments = forms.CharField(label='Enter your reasoning', help_text='(Tip: be clear and concise)',
+    relationship_comments = forms.CharField(label='How they know you', help_text='(Tip: be clear and concise)',
                                             widget=custom_field_widgets.Textarea, required=False, max_length=250)
 
     time_known_declare = forms.BooleanField(label='This information is correct',
                                             widget=custom_field_widgets.CustomCheckboxInput, required=False)
-    time_known_comments = forms.CharField(label='Enter your reasoning', help_text='(Tip: be clear and concise)',
+    time_known_comments = forms.CharField(label='Known for', help_text='(Tip: be clear and concise)',
                                           widget=custom_field_widgets.Textarea,
                                           required=False, max_length=250)
 
     address_declare = forms.BooleanField(label='This information is correct',
                                          widget=custom_field_widgets.CustomCheckboxInput, required=False)
-    address_comments = forms.CharField(label='Enter your reasoning', help_text='(Tip: be clear and concise)',
+    address_comments = forms.CharField(label='Address', help_text='(Tip: be clear and concise)',
                                        widget=custom_field_widgets.Textarea,
                                        required=False, max_length=250)
 
     phone_number_declare = forms.BooleanField(label='This information is correct',
                                               widget=custom_field_widgets.CustomCheckboxInput, required=False)
-    phone_number_comments = forms.CharField(label='Enter your reasoning', help_text='(Tip: be clear and concise)',
+    phone_number_comments = forms.CharField(label='Phone number', help_text='(Tip: be clear and concise)',
                                             widget=custom_field_widgets.Textarea,
                                             required=False, max_length=250)
 
     email_address_declare = forms.BooleanField(label='This information is correct',
                                                widget=custom_field_widgets.CustomCheckboxInput, required=False)
-    email_address_comments = forms.CharField(label='Enter your reasoning', help_text='(Tip: be clear and concise)',
+    email_address_comments = forms.CharField(label='Email address', help_text='(Tip: be clear and concise)',
                                              widget=custom_field_widgets.Textarea,
                                              required=False, max_length=250)
 
@@ -833,12 +833,14 @@ class OtherPeopleInYourHomeForm(GOVUKForm):
 
     adults_in_home_declare = forms.BooleanField(label='This information is correct',
                                                 widget=custom_field_widgets.CustomCheckboxInput, required=False)
-    adults_in_home_comments = forms.CharField(label='Enter your reasoning', help_text='(Tip: be clear and concise)',
+    adults_in_home_comments = forms.CharField(label='Do you live with anyone who is 16 or over?',
+                                              help_text='(Tip: be clear and concise)',
                                               widget=custom_field_widgets.Textarea,
                                               required=False, max_length=250)
     children_in_home_declare = forms.BooleanField(label='This information is correct',
                                                   widget=custom_field_widgets.CustomCheckboxInput, required=False)
-    children_in_home_comments = forms.CharField(label='Enter your reasoning', help_text='(Tip: be clear and concise)',
+    children_in_home_comments = forms.CharField(label='Do you live with any children?',
+                                                help_text='(Tip: be clear and concise)',
                                                 widget=custom_field_widgets.Textarea,
                                                 required=False, max_length=250)
 
@@ -893,40 +895,35 @@ class AdultInYourHomeForm(GOVUKForm):
 
     health_check_status_declare = forms.BooleanField(label='This information is correct',
                                                      widget=custom_field_widgets.CustomCheckboxInput, required=False)
-    health_check_status_comments = forms.CharField(label='Enter your reasoning',
+    health_check_status_comments = forms.CharField(label='Health check status',
                                                    help_text='(Tip: be clear and concise)',
                                                    widget=custom_field_widgets.Textarea,
                                                    required=False, max_length=250)
 
     full_name_declare = forms.BooleanField(label='This information is correct',
                                            widget=custom_field_widgets.CustomCheckboxInput, required=False)
-    full_name_comments = forms.CharField(label='Enter your reasoning', help_text='(Tip: be clear and concise)',
+    full_name_comments = forms.CharField(label='Name', help_text='(Tip: be clear and concise)',
                                          widget=custom_field_widgets.Textarea,
                                          required=False, max_length=250)
 
     date_of_birth_declare = forms.BooleanField(label='This information is correct',
                                                widget=custom_field_widgets.CustomCheckboxInput, required=False)
-    date_of_birth_comments = forms.CharField(label='Enter your reasoning', help_text='(Tip: be clear and concise)',
+    date_of_birth_comments = forms.CharField(label='Date of birth', help_text='(Tip: be clear and concise)',
                                              widget=custom_field_widgets.Textarea,
                                              required=False, max_length=250)
 
     relationship_declare = forms.BooleanField(label='This information is correct',
                                               widget=custom_field_widgets.CustomCheckboxInput, required=False)
-    relationship_comments = forms.CharField(label='Enter your reasoning', help_text='(Tip: be clear and concise)',
+    relationship_comments = forms.CharField(label='Relationship', help_text='(Tip: be clear and concise)',
                                             widget=custom_field_widgets.Textarea,
                                             required=False, max_length=250)
 
     dbs_certificate_number_declare = forms.BooleanField(label='This information is correct',
                                                         widget=custom_field_widgets.CustomCheckboxInput, required=False)
-    dbs_certificate_number_comments = forms.CharField(label='Enter your reasoning',
+    dbs_certificate_number_comments = forms.CharField(label='DBS certificate number',
                                                       help_text='(Tip: be clear and concise)',
                                                       widget=custom_field_widgets.Textarea,
                                                       required=False, max_length=250)
-
-    permission_declare = forms.BooleanField(label='This information is correct',
-                                            widget=custom_field_widgets.CustomCheckboxInput, required=False)
-    permission_comments = forms.CharField(label='Enter your reasoning', help_text='(Tip: be clear and concise)',
-                                          widget=custom_field_widgets.Textarea, required=False, max_length=250)
 
     # This is the id appended to all htmls names ot make the individual form instance unique, this is given a value in
     # the init
@@ -943,8 +940,7 @@ class AdultInYourHomeForm(GOVUKForm):
             ((self.fields['full_name_declare']), 'full_name' + id_value),
             ((self.fields['date_of_birth_declare']), 'date_of_birth' + id_value),
             ((self.fields['relationship_declare']), 'relationship' + id_value),
-            ((self.fields['dbs_certificate_number_declare']), 'dbs_certificate_number' + id_value),
-            ((self.fields['permission_declare']), 'permission_declare' + id_value)
+            ((self.fields['dbs_certificate_number_declare']), 'dbs_certificate_number' + id_value)
         ]
 
         for box in checkboxes:
@@ -1026,21 +1022,6 @@ class AdultInYourHomeForm(GOVUKForm):
                 raise forms.ValidationError('You must give reasons')
 
         return dbs_certificate_number_comments
-
-    def clean_permission_comments(self):
-        """
-        Permission comments validation
-        :return: string
-        """
-        permission_declare = self.cleaned_data['permission_declare']
-        permission_comments = self.cleaned_data['permission_comments']
-
-        # Only check if a comment has been entered if the field has been flagged
-        if permission_declare is True:
-            if permission_comments == '':
-                raise forms.ValidationError('You must give reasons')
-
-        return permission_comments
 
 
 class ChildInYourHomeForm(GOVUKForm):
