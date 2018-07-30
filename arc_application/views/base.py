@@ -29,15 +29,26 @@ def summary_page(request):
     # Check if user has access and initiate error messages
     if has_group(request.user, settings.ARC_GROUP):
 
-        error_exist = 'false'
+        error_exist = False
         error_title = ''
         error_text = ''
-        empty = 'false'
+        empty = False
         assign_response = True
 
         # If the 'New Application' button has been clicked get new application
         if request.method == 'POST':
-            assign_response = assign_new_application(request)
+
+            nanny_button_byte_name = b"nanny_button"
+            childminder_button_byte_name = b"childminder_button"
+
+            if nanny_button_byte_name in request.body:
+                print("Nanny Button Pressed")
+            elif childminder_button_byte_name in request.body:
+                assign_response = assign_new_childminder_application(request)
+            else:
+                raise NameError("Couldn't find {0} or {1} in request body, did the input names change?".format(
+                    nanny_button_byte_name, childminder_button_byte_name))
+
         entries = Arc.objects.filter(user_id=request.user.id)
         obj = []
 
@@ -49,17 +60,17 @@ def summary_page(request):
         # If no applications are assigned hide the table
 
         if len(obj) == 0:
-            empty = 'true'
+            empty = True
 
         # If you have reached the limit you will receive an error message
         if assign_response == 'LIMIT_REACHED':
-            error_exist = 'true'
+            error_exist = True
             error_title = 'You have reached the limit'
             error_text = 'You have already reached the maximum (' + str(settings.APPLICATION_LIMIT) + ') applications'
 
         # No applications available for review
         if not assign_response:
-            error_exist = 'true'
+            error_exist = True
             error_title = 'No available applications'
             error_text = 'There are currently no more applications ready for a review'
 
@@ -99,7 +110,7 @@ def get_table_data(obj):
     return obj
 
 
-def assign_new_application(request):
+def assign_new_childminder_application(request):
     """
     Assign a new application and initiate ArcStatus row
     :param request: HTTP request

@@ -6,7 +6,7 @@ OFS-MORE-CCN3: Apply to be a Childminder Beta
 """
 import re
 
-from arc_application.views.base import assign_new_application, custom_login, error_403, error_404, error_500, release, \
+from arc_application.views.base import assign_new_childminder_application, custom_login, error_403, error_404, error_500, release, \
     summary_page, AuditlogListView
 from arc_application.views.childminder_views.contact_details import contact_summary
 from arc_application.views.childminder_views.dbs_check import dbs_check_summary
@@ -34,7 +34,7 @@ from arc_application.views.childminder_views.personal_details_addresses import p
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^release/(?P<application_id>[\w\- ]+)', release, name='release'),
-    url(r'^accounts/profile/', assign_new_application, name='new_application'),
+    url(r'^accounts/profile/', assign_new_childminder_application, name='new_childminder_application'),
     url(r'^login/', custom_login, name='login'),
     url(r'^logout/', logout, {'next_page': settings.URL_PREFIX + '/login/'}),
     url(r'^summary/', summary_page, name='summary'),
