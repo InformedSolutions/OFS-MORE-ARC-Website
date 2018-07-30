@@ -47,22 +47,11 @@ class LogInDetailsForm(GOVUKForm):
                                                   required=False)
     add_phone_number_comments = forms.CharField(label='Other phone number', help_text='(Tip: be clear and concise)',
                                                 widget=custom_field_widgets.Textarea, required=False, max_length=250)
-    security_question_declare = forms.BooleanField(label='This information is correct',
-                                                   widget=custom_field_widgets.CustomCheckboxInput,
-                                                   required=False)
-    security_question_comments = forms.CharField(label='Enter your reasoning', help_text='(Tip: be clear and concise)',
-                                                 widget=custom_field_widgets.Textarea, required=False, max_length=250)
-    security_answer_declare = forms.BooleanField(label='This information is correct',
-                                                 widget=custom_field_widgets.CustomCheckboxInput, required=False)
-    security_answer_comments = forms.CharField(label='Enter your reasoning', help_text='(Tip: be clear and concise)',
-                                               widget=custom_field_widgets.Textarea, required=False, max_length=250)
 
     # As this will only happen once per page, we can do this in the form itself rather than __init
     # Each checkbox must be assigned a name for the html injection
     checkboxes = [(email_address_declare, 'email_address'), (mobile_number_declare, 'mobile_number'),
-                  (add_phone_number_declare, 'add_phone_number'),
-                  (security_question_declare, 'security_question'),
-                  (security_answer_declare, 'security_answer')]
+                  (add_phone_number_declare, 'add_phone_number')]
 
     # This is where the html is added that assigns each checkbox with the correct name, so the javascript knows where
     # act
@@ -121,36 +110,6 @@ class LogInDetailsForm(GOVUKForm):
 
         return add_phone_number_comments
 
-    def clean_security_question_comments(self):
-        """
-        Security question comments validation
-        :return: string
-        """
-        security_question_declare = self.cleaned_data['security_question_declare']
-        security_question_comments = self.cleaned_data['security_question_comments']
-
-        # Only check if a comment has been entered if the field has been flagged
-        if security_question_declare is True:
-            if security_question_comments == '':
-                raise forms.ValidationError('You must give reasons')
-
-        return security_question_comments
-
-    def clean_security_answer_comments(self):
-        """
-        Security answer comments validation
-        :return: string
-        """
-        security_answer_declare = self.cleaned_data['security_answer_declare']
-        security_answer_comments = self.cleaned_data['security_answer_comments']
-
-        # Only check if a comment has been entered if the field has been flagged
-        if security_answer_declare is True:
-            if security_answer_comments == '':
-                raise forms.ValidationError('You must give reasons')
-
-        return security_answer_comments
-
 
 class PersonalDetailsForm(GOVUKForm):
     """
@@ -162,25 +121,25 @@ class PersonalDetailsForm(GOVUKForm):
     field_label_classes = 'form-label-bold'
     name_declare = forms.BooleanField(label='This information is correct',
                                       widget=custom_field_widgets.CustomCheckboxInput, required=False)
-    name_comments = forms.CharField(label='Enter your reasoning', help_text='(Tip: be clear and concise)',
+    name_comments = forms.CharField(label='Your name', help_text='(Tip: be clear and concise)',
                                     widget=custom_field_widgets.Textarea,
                                     required=False, max_length=250)
 
     date_of_birth_declare = forms.BooleanField(label='This information is correct',
                                                widget=custom_field_widgets.CustomCheckboxInput, required=False)
-    date_of_birth_comments = forms.CharField(label='Enter your reasoning', help_text='(Tip: be clear and concise)',
+    date_of_birth_comments = forms.CharField(label='Your date of birth', help_text='(Tip: be clear and concise)',
                                              widget=custom_field_widgets.Textarea,
                                              required=False, max_length=250)
 
     home_address_declare = forms.BooleanField(label='This information is correct',
                                               widget=custom_field_widgets.CustomCheckboxInput, required=False)
-    home_address_comments = forms.CharField(label='Enter your reasoning', help_text='(Tip: be clear and concise)',
+    home_address_comments = forms.CharField(label='Home address', help_text='(Tip: be clear and concise)',
                                             widget=custom_field_widgets.Textarea,
                                             required=False, max_length=250)
 
     childcare_location_declare = forms.BooleanField(label='This information is correct',
                                                     widget=custom_field_widgets.CustomCheckboxInput, required=False)
-    childcare_location_comments = forms.CharField(label='Enter your reasoning', help_text='(Tip: be clear and concise)',
+    childcare_location_comments = forms.CharField(label='Childcare location', help_text='(Tip: be clear and concise)',
                                                   widget=custom_field_widgets.Textarea, required=False, max_length=250)
 
     checkboxes = [(name_declare, 'name'), (date_of_birth_declare, 'date_of_birth'),
