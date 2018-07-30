@@ -100,6 +100,10 @@ def references_summary(request):
     second_reference_phone_number = second_reference_record.phone_number
     second_reference_email = second_reference_record.email
     application = Application.objects.get(pk=application_id_local)
+
+    form.error_summary_title = 'There was a problem (first reference)'
+    form2.error_summary_title = 'There was a problem (second reference)'
+
     variables = {
         'form': form,
         'form2': form2,
