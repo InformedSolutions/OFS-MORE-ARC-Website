@@ -11,18 +11,23 @@ class DBGatewayActions:
         response = requests.get(self.target_url_prefix + endpoint + '/', data=params)
 
         if response.status_code == 200:
-            response.record = json.loads(requests.get(self.target_url_prefix + endpoint + '/', data=params).text)
+            response.record = json.loads(response.text)
 
         return response
 
     def read(self, endpoint, params):
-        return json.loads(requests.get(self.target_url_prefix + endpoint + '/' + params['application_id'] + '/', data=params).text)
+        response = requests.get(self.target_url_prefix + endpoint + '/' + params['application_id'] + '/', data=params)
+
+        if response.status_code == 200:
+            response.record = json.loads(response.text)
+
+        return response
 
     def create(self, endpoint, params):
         response = requests.post(self.target_url_prefix + endpoint + '/', data=params)
 
         if response.status_code == 201:
-            response.record = json.loads(requests.get(self.target_url_prefix + endpoint + '/', data=params).text)
+            response.record = json.loads(response.text)
 
         return response
 
@@ -30,7 +35,7 @@ class DBGatewayActions:
         response = requests.patch(self.target_url_prefix + endpoint + '/' + params['application_id'] + '/', data=params)
 
         if response.status_code == 200:
-            response.record = json.loads(requests.get(self.target_url_prefix + endpoint + '/', data=params).text)
+            response.record = json.loads(response.text)
 
         return response
 
@@ -38,7 +43,7 @@ class DBGatewayActions:
         response = requests.put(self.target_url_prefix + endpoint + '/' + params['application_id'] + '/', data=params)
 
         if response.status_code == 200:
-            response.record = json.loads(requests.get(self.target_url_prefix + endpoint + '/', data=params).text)
+            response.record = json.loads(response.text)
 
         return response
 
@@ -50,5 +55,5 @@ class IdentityGatewayActions(DBGatewayActions):
     target_url_prefix = os.environ.get('APP_IDENTITY_URL') + 'api/v1/'
 
 
-class NannyGatewayActions:
+class NannyGatewayActions(DBGatewayActions):
     target_url_prefix = os.environ.get('APP_NANNY_GATEWAY_URL') + '/api/v1/'

@@ -1,0 +1,170 @@
+{% extends 'govuk_template.html' %}
+{% block page_title %}Application overview{% endblock %}
+{% load static %}
+{% load govuk_template_base %}
+{% block inner_content %}
+
+<div class="column-two-thirds">
+   {% include "back-button.html" %}
+   <h1 class="heading-xlarge">
+      Application overview
+   </h1>
+   <h2 class="heading-medium">
+      Application number: {{ application_reference }}
+   </h2>
+</div>
+
+<div class="column-two-thirds">
+   <table id="your-details">
+      <tbody>
+
+         <tr id="nanny_account_details">
+            <td class="task">
+               <a href="{% url 'nanny_contact_summary' %}?id={{application_id}}">
+                  <span class="task-name">Your sign in details</span>
+                  {% if login_details_status == 'NOT_STARTED' %}
+                  <strong class="task-finished task-to-do">To do</strong>
+                  {% elif login_details_status == 'COMPLETED' %}
+                  <strong class="task-finished">Reviewed</strong>
+                  {% endif %}
+               </a>
+            </td>
+         </tr>
+
+         <tr id="nanny_personal_details">
+            <td class="task">
+               <a href="{% url 'nanny_personal_details_summary' %}?id={{application_id}}">
+                  <span class="task-name">Your personal details</span>
+                  {% if personal_details_status == 'NOT_STARTED' %}
+                  <strong class="task-finished task-to-do">To do</strong>
+                  {% elif personal_details_status == 'FLAGGED' %}
+                  <strong class="task-finished task-flagged">Flagged</strong>
+                  {% elif personal_details_status == 'COMPLETED' %}
+                  <strong class="task-finished">Reviewed</strong>
+                  {% endif %}
+               </a>
+            </td>
+         </tr>
+
+         <tr id="nanny_childcare_address">
+            <td class="task">
+               <a href="{% url 'nanny_childcare_address_summary' %}?id={{application_id}}">
+                  <span class="task-name">Childcare address</span>
+                  {% if childcare_address_status == 'NOT_STARTED' %}
+                  <strong class="task-finished task-to-do">To do</strong>
+                  {% elif childcare_address_status == 'FLAGGED' %}
+                  <strong class="task-finished task-flagged">Flagged</strong>
+                  {% elif childcare_address_status == 'COMPLETED' %}
+                  <strong class="task-finished">Reviewed</strong>
+                  {% endif %}
+               </a>
+            </td>
+         </tr>
+
+         <tr id="nanny_first_aid_training">
+            <td class="task">
+               <a href="{% url 'nanny_first_aid_training_summary' %}?id={{application_id}}">
+                  <span class="task-name">First aid training</span>
+                  {% if first_aid_status == 'NOT_STARTED' %}
+                  <strong class="task-finished task-to-do">To do</strong>
+                  {% elif first_aid_status == 'FLAGGED' %}
+                  <strong class="task-finished task-flagged">Flagged</strong>
+                  {% elif first_aid_status == 'COMPLETED' %}
+                  <strong class="task-finished">Reviewed</strong>
+                  {% endif %}
+               </a>
+            </td>
+         </tr>
+
+         <tr id="nanny_childcare_training">
+            <td class="task">
+               <a href="{% url 'nanny_childcare_training_summary' %}?id={{application_id}}">
+                  <span class="task-name">Childcare training</span>
+                  {% if childcare_training_status == 'NOT_STARTED' %}
+                  <strong class="task-finished task-to-do">To do</strong>
+                  {% elif childcare_training_status == 'FLAGGED' %}
+                  <strong class="task-finished task-flagged">Flagged</strong>
+                  {% elif childcare_training_status == 'COMPLETED' %}
+                  <strong class="task-finished">Reviewed</strong>
+                  {% endif %}
+               </a>
+            </td>
+         </tr>
+
+         <tr id="nanny_dbs">
+            <td class="task">
+               <a href="{% url 'nanny_dbs_summary' %}?id={{application_id}}">
+                  <span class="task-name">Criminal record (DBS) check</span>
+                  {% if dbs_status == 'NOT_STARTED' %}
+                  <strong class="task-finished task-to-do">To do</strong>
+                  {% elif dbs_status == 'FLAGGED' %}
+                  <strong class="task-finished task-flagged">Flagged</strong>
+                  {% elif dbs_status == 'COMPLETED' %}
+                  <strong class="task-finished">Reviewed</strong>
+                  {% endif %}
+               </a>
+            </td>
+         </tr>
+
+         <tr id="nanny_insurance_cover">
+            <td class="task">
+               <a href="{% url 'nanny_insurance_cover_summary' %}?id={{application_id}}">
+                  <span class="task-name">Insurance cover</span>
+                  {% if insurance_cover_status == 'NOT_STARTED' %}
+                  <strong class="task-finished task-to-do">To do</strong>
+                  {% elif insurance_cover_status == 'FLAGGED' %}
+                  <strong class="task-finished task-flagged">Flagged</strong>
+                  {% elif insurance_cover_status == 'COMPLETED' %}
+                  <strong class="task-finished">Reviewed</strong>
+                  {% endif %}
+               </a>
+            </td>
+         </tr>
+
+      </tbody>
+   </table>
+   {% if all_complete == True %}
+      <div class="top-padded">
+         <a href="{% url 'nanny_arc_summary' %}?id={{application_id}}" class="button">Complete review</a>
+      </div>
+   {% endif %}
+</div>
+
+<div class="column-third information-panel">
+    <p>
+        <b class="bold">Progress:</b>
+        {{review_count}} of 9 sections complete
+    </p>
+
+    <p>
+        <b class="bold">Name:</b>
+        <b style="text-transform: capitalize;">{{first_name}} {{ middle_names|default_if_none:"" }} {{last_name}}</b>
+    </p>
+
+    <p>
+        <b class="bold">D.O.B.:</b>
+       {% if birth_day < 10 and birth_month < 10 %}
+            0{{birth_day}}/0{{birth_month}}/{{birth_year}}
+       {% elif birth_day < 10 and birth_month >= 10 %}
+            0{{birth_day}}/{{birth_month}}/{{birth_year}}
+       {% elif birth_day >= 10 and birth_month < 10 %}
+           {{birth_day}}/0{{birth_month}}/{{birth_year}}
+       {% elif birth_day >= 10 and birth_month >= 10 %}
+            {{birth_day}}/{{birth_month}}/{{birth_year}}
+       {% endif %}
+    </p>
+
+    <p>
+        <b class="bold">Register type(s):</b>
+        <br/>
+        Nannies
+    </p>
+
+</div>
+
+<div class="column-third information-panel">
+   <b style="font-weight: bold;">Application history:</b>
+   <br>
+   <a href="{% url 'auditlog' %}?id={{application_id}}">Audit log</a>
+</div>
+{% endblock %}
