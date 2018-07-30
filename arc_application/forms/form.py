@@ -313,12 +313,14 @@ class EYFSCheckForm(GOVUKForm):
     eyfs_course_name_declare = forms.BooleanField(label='This information is correct',
                                                   widget=custom_field_widgets.CustomCheckboxInput,
                                                   required=False)
-    eyfs_course_name_comments = forms.CharField(label='Enter your reasoning', help_text='(Tip: be clear and concise)',
+    eyfs_course_name_comments = forms.CharField(label='Title of training course',
+                                                help_text='(Tip: be clear and concise)',
                                                 widget=custom_field_widgets.Textarea, required=False, max_length=250)
 
     eyfs_course_date_declare = forms.BooleanField(label='This information is correct',
                                                   widget=custom_field_widgets.CustomCheckboxInput, required=False)
-    eyfs_course_date_comments = forms.CharField(label='Enter your reasoning', help_text='(Tip: be clear and concise)',
+    eyfs_course_date_comments = forms.CharField(label='Date of training course',
+                                                help_text='(Tip: be clear and concise)',
                                                 widget=custom_field_widgets.Textarea, required=False, max_length=250)
 
     checkboxes = [(eyfs_course_name_declare, 'eyfs_course_name'),
