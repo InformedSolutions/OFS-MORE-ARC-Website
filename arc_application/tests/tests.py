@@ -17,6 +17,8 @@ from arc_application.models import (ApplicantHomeAddress,
                       Reference,
                       UserDetails)
 
+from arc_application.views.base import sort_by_dict_field
+
 application = None
 personal_details = None
 name = None
@@ -460,3 +462,119 @@ class ArcSummaryTest(TestCase):
         # 4. Check flagged boolean indicator is set on the application record
         reloaded_application = Application.objects.get(pk=application.application_id)
         self.assertTrue(reloaded_application.references_arc_flagged)
+
+class TestImportingApplication(TestCase):
+    def setUp(self):
+        super().setUp()
+
+        self.integer_lidict = {
+            'test': [
+                {'a': 2},
+                {'a': 1}
+            ],
+            'correct': [
+                {'a': 1},
+                {'a': 2}
+            ]
+        }
+
+        self.date_lidict = {
+            'test': [
+                {'a': datetime.date(2018, 12, 1)},
+                {'a': datetime.date(2017, 12, 1)},
+                {'a': datetime.date(2016, 6, 1)},
+                {'a': datetime.date(2016, 12, 1)},
+                {'a': datetime.date(2014, 1, 1)}
+            ],
+            'correct': [
+                {'a': datetime.date(2014, 1, 1)},
+                {'a': datetime.date(2016, 6, 1)},
+                {'a': datetime.date(2016, 12, 1)},
+                {'a': datetime.date(2017, 12, 1)},
+                {'a': datetime.date(2018, 12, 1)}
+            ]
+        }
+
+        self.date_lidict_with_other_entries = {
+            'test': [
+                {
+                    'a': datetime.date(2018, 12, 1),
+                    'b': "other entry"
+                 },
+                {
+                    'a': datetime.date(2017, 12, 1),
+                    'b': "another other entry"
+                },
+                {
+                    'a': datetime.date(2016, 6, 1),
+                    'c': 5
+                },
+                {
+                    'a': datetime.date(2016, 12, 1),
+                    'd': "other entry"
+                },
+                {
+                    'a': datetime.date(2014, 1, 1),
+                    'b': "final entry"
+                }
+            ],
+            'correct': [
+                {
+                    'a': datetime.date(2014, 1, 1),
+                    'b': "final entry"
+                },
+                {
+                    'a': datetime.date(2016, 6, 1),
+                    'c': 5
+                },
+                {
+                    'a': datetime.date(2016, 12, 1),
+                    'd': "other entry"
+                },
+                {
+                    'a': datetime.date(2017, 12, 1),
+                    'b': "another other entry"
+                },
+                {
+                    'a': datetime.date(2018, 12, 1),
+                    'b': "other entry"
+                }
+            ]
+        }
+
+        self.reversed_date_lidict = {
+            'test': [
+                {'a': datetime.date(2018, 12, 1)},
+                {'a': datetime.date(2017, 12, 1)},
+                {'a': datetime.date(2016, 6, 1)},
+                {'a': datetime.date(2016, 12, 1)},
+                {'a': datetime.date(2014, 1, 1)}
+            ],
+            'correct': [
+                {'a': datetime.date(2018, 12, 1)},
+                {'a': datetime.date(2017, 12, 1)},
+                {'a': datetime.date(2016, 12, 1)},
+                {'a': datetime.date(2016, 6, 1)},
+                {'a': datetime.date(2014, 1, 1)}
+            ]
+        }
+
+    def test_correct_integer_lidict(self):
+        assert (testing_correct_lidicts(self.integer_lidict) is True)
+
+    def test_correct_date_lidict(self):
+        assert (testing_correct_lidicts(self.date_lidict) is True)
+
+    def test_correct_date_lidict_with_other_entries(self):
+        assert (testing_correct_lidicts(self.date_lidict_with_other_entries) is True)
+
+    def test_correct_reversed_date_lidict(self):
+        assert (testing_correct_reversed_lidicts(self.reversed_date_lidict) is True)
+
+
+def testing_correct_lidicts(test_case):
+    return sort_by_dict_field(test_case['test'], 'a') == test_case['correct']
+
+def testing_correct_reversed_lidicts(test_case):
+    return sort_by_dict_field(test_case['test'], 'a', reverse_ordering=True) == test_case['correct']
+

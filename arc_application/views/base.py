@@ -361,6 +361,25 @@ class AuditlogListView(ListView):
         return context
 
 
+def sort_by_dict_field(dicts, field, reverse_ordering=False):
+    """
+    Method to sort a list of dictionaries by the given dictionary field.
+    :param dicts: a list of dictionaries.
+    :param field: a field within those dictionaries used to sort the list.
+    :param reverse_ordering: optional boolean, when True, returns list in descending order. False by default.
+    :return: a sorted list of dictionaries.
+    """
+
+    if not isinstance(field, str):
+        raise TypeError("The field object given is not a string.")
+    if not isinstance(dicts, list):
+        raise TypeError("The dicts object given is not in a list format.")
+    else:
+        for obj in dicts:
+            if not isinstance(obj, dict):
+                raise TypeError("The dicts object given is a list, but is object {0} is not a dictionary.".format(obj))
+    return sorted(dicts, key=lambda entry: entry[field], reverse=reverse_ordering)
+
 ######################################################################################################
 # Error Pages copied from Childminder
 
