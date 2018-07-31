@@ -38,13 +38,5 @@ class UserDetails(models.Model):
             'add_phone_number',
         )
 
-    def get_summary_table(self):
-        return [
-            {"title": "Your sign in details", "id": self.pk},
-            {"name": "Your email", "value": self.email},
-            {"name": "Your mobile number", "value": self.mobile_number},
-            {"name": "Other phone number", "value": self.add_phone_number},
-        ]
-
     class Meta:
         db_table = 'USER_DETAILS'

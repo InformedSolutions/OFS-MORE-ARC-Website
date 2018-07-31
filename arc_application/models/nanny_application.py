@@ -4,7 +4,7 @@ from django.core.validators import RegexValidator
 from django.db import models
 
 
-class Application(models.Model):
+class NannyApplication(models.Model):
     """
     Model for APPLICATION table
     """
@@ -40,24 +40,18 @@ class Application(models.Model):
     login_details_arc_flagged = models.BooleanField(default=False)
     personal_details_status = models.CharField(choices=TASK_STATUS, max_length=50)
     personal_details_arc_flagged = models.BooleanField(default=False)
-    childcare_type_status = models.CharField(choices=TASK_STATUS, max_length=50)
-    childcare_type_arc_flagged = models.BooleanField(default=False)
+    childcare_address_status = models.CharField(choices=TASK_STATUS, max_length=50)
+    childcare_address_arc_flagged = models.BooleanField(default=False)
     first_aid_training_status = models.CharField(choices=TASK_STATUS, max_length=50)
     first_aid_training_arc_flagged = models.BooleanField(default=False)
-    eyfs_training_status = models.CharField(choices=TASK_STATUS, max_length=50)
-    eyfs_training_arc_flagged = models.BooleanField(default=False)
+    childcare_training_status = models.CharField(choices=TASK_STATUS, max_length=50)
+    childcare_training_arc_flagged = models.BooleanField(default=False)
     criminal_record_check_status = models.CharField(choices=TASK_STATUS, max_length=50)
     criminal_record_check_arc_flagged = models.BooleanField(default=False)
-    health_status = models.CharField(choices=TASK_STATUS, max_length=50)
-    health_arc_flagged = models.BooleanField(default=False)
-    references_status = models.CharField(choices=TASK_STATUS, max_length=50)
-    references_arc_flagged = models.BooleanField(default=False)
-    people_in_home_status = models.CharField(choices=TASK_STATUS, max_length=50)
-    people_in_home_arc_flagged = models.BooleanField(default=False)
-    adults_in_home = models.NullBooleanField(blank=True, null=True, default=None)
-    children_in_home = models.NullBooleanField(blank=True, null=True, default=None)
-    children_turning_16 = models.NullBooleanField(blank=True, null=True, default=None)
+    insurance_cover_status = models.CharField(choices=TASK_STATUS, max_length=50)
+    insurance_cover_arc_flagged = models.BooleanField(default=False)
     declarations_status = models.CharField(choices=TASK_STATUS, max_length=50)
+    references_status = models.CharField(choices=TASK_STATUS, max_length=50, default='NOT_STARTED')
     share_info_declare = models.NullBooleanField(blank=True, null=True, default=None)
     display_contact_details_on_web = models.NullBooleanField(blank=True, null=True, default=None)
     suitable_declare = models.NullBooleanField(blank=True, null=True, default=None)
@@ -76,4 +70,4 @@ class Application(models.Model):
         return cls.objects.get(pk=app_id)
 
     class Meta:
-        db_table = 'APPLICATION'
+        db_table = 'NANNY_APPLICATION'
