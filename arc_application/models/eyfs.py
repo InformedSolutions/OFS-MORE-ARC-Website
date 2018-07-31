@@ -39,5 +39,14 @@ class EYFS(models.Model):
     def get_id(cls, app_id):
         return cls.objects.get(application_id=app_id)
 
+    def get_summary_table(self):
+        return [
+            {"title": "Early years training", "id": self.pk},
+            {"name": "Title of training course", "value": self.eyfs_course_name},
+            {"name": "Date you completed course",
+             "value": str(self.eyfs_course_date_day) + '/' + str(self.eyfs_course_date_month) + '/' + str(
+                 self.eyfs_course_date_year)}
+        ]
+
     class Meta:
         db_table = 'EYFS'

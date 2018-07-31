@@ -32,5 +32,17 @@ class HealthDeclarationBooklet(models.Model):
     def get_id(cls, app_id):
         return cls.objects.get(application_id=app_id)
 
+    def get_bool_as_string(self, bool_field):
+        if bool_field:
+            return 'Yes'
+        else:
+            return 'No'
+
+    def get_summary_table(self):
+        return [
+            {"title": "Health declaration booklet", "id": self.pk},
+            {"name": "I will post a completed booklet to Ofsted", "value": self.get_bool_as_string(self.send_hdb_declare)}
+        ]
+
     class Meta:
         db_table = 'HDB'
