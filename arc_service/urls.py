@@ -8,6 +8,7 @@ import re
 
 from arc_application.views.base import assign_new_application, custom_login, error_403, error_404, error_500, release, \
     summary_page, AuditlogListView
+from arc_application.views.arc_user_summary import ARCUserSummaryView
 from arc_application.views.childminder_views.contact_details import contact_summary
 from arc_application.views.childminder_views.dbs_check import dbs_check_summary
 from arc_application.views.childminder_views.eyfs_check import EFYSCheckSummaryView
@@ -31,13 +32,14 @@ from django.contrib.auth.views import logout
 
 from arc_application.views.childminder_views.personal_details_addresses import personal_details_previous_address
 
+
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^release/(?P<application_id>[\w\- ]+)', release, name='release'),
     url(r'^accounts/profile/', assign_new_application, name='new_application'),
     url(r'^login/', custom_login, name='login'),
     url(r'^logout/', logout, {'next_page': settings.URL_PREFIX + '/login/'}),
-    url(r'^summary/', summary_page, name='summary'),
+    url(r'^summary/', ARCUserSummaryView.as_view(), name='summary'),
     url(r'^review/', task_list, name='task_list'),
     url(r'^account/summary/', contact_summary, name='contact_summary'),
     url(r'^childcare/age-groups/', type_of_childcare_age_groups, name='type_of_childcare_age_groups'),
