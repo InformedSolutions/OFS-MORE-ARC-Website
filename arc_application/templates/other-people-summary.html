@@ -7,7 +7,12 @@
 {% include 'back-button.html' %}
 
 {{form.error_summary}}
-{{adult_formset.form.error_summary}}
+{% for form in formset_adult %}
+    {{form.error_summary}}
+{% endfor %}
+{% for form in formset_child %}
+    {{form.error_summary}}
+{% endfor %}
 
     <form method="post" novalidate>
         <h1 class="form-title heading-large">Review: people in your home</h1>
@@ -108,7 +113,6 @@
             </tbody>
         </table>
         {% for record, id , health_check_status, name, day, month, year, relationship, dbs_certificate_number, formsetadult, current_illness_set, serious_illness_set, hospital_admission_set in adult_lists %}
-        {{ formsetadult.error_summary }}
         <table class="check-your-answers form-group">
             <thead>
             <tr>
@@ -422,7 +426,7 @@
             <tr class="js-hidden" id="full_name{{formsetchild.instance_id.initial}}">
                 <td colspan="1">
                     <div>
-                        {{ formsetchild.full_name_comments.label}}
+                        Enter your reasoning
                     </div>
                     <div>
                         {{ formsetchild.full_name_comments.help_text}}
@@ -494,7 +498,7 @@
             <tr class="js-hidden" id="date_of_birth{{formsetchild.instance_id.initial}}">
                 <td colspan="1">
                     <div>
-                        {{ formsetchild.date_of_birth_comments.label}}
+                        Enter your reasoning
                     </div>
                     <div>
                         {{ formsetchild.date_of_birth_comments.help_text}}
@@ -520,7 +524,7 @@
             <tr class="js-hidden" id="relationship{{formsetchild.instance_id.initial}}">
                 <td colspan="1">
                     <div>
-                        {{ formsetchild.relationship_comments.label}}
+                        Enter your reasoning
                     </div>
                     <div>
                         {{ formsetchild.relationship_comments.help_text}}

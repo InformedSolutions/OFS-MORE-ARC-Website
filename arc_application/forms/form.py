@@ -1030,19 +1030,19 @@ class ChildInYourHomeForm(GOVUKForm):
     """
     full_name_declare = forms.BooleanField(label='This information is correct',
                                            widget=custom_field_widgets.CustomCheckboxInput, required=False)
-    full_name_comments = forms.CharField(label='Enter your reasoning', help_text='(Tip: be clear and concise)',
+    full_name_comments = forms.CharField(label='Name', help_text='(Tip: be clear and concise)',
                                          widget=custom_field_widgets.Textarea(attrs={'cols': '40', 'rows': '3'}),
                                          required=False, max_length=250)
 
     date_of_birth_declare = forms.BooleanField(label='This information is correct',
                                                widget=custom_field_widgets.CustomCheckboxInput, required=False)
-    date_of_birth_comments = forms.CharField(label='Enter your reasoning', help_text='(Tip: be clear and concise)',
+    date_of_birth_comments = forms.CharField(label='Date of birth', help_text='(Tip: be clear and concise)',
                                              widget=custom_field_widgets.Textarea,
                                              required=False, max_length=250)
 
     relationship_declare = forms.BooleanField(label='This information is correct',
                                               widget=custom_field_widgets.CustomCheckboxInput, required=False)
-    relationship_comments = forms.CharField(label='Enter your reasoning', help_text='(Tip: be clear and concise)',
+    relationship_comments = forms.CharField(label='Relationship', help_text='(Tip: be clear and concise)',
                                             widget=custom_field_widgets.Textarea,
                                             required=False, max_length=250)
 
