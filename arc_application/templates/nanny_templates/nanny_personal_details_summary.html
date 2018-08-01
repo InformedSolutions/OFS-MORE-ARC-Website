@@ -62,55 +62,9 @@
             <td>
                 Your date of birth
             </td>
-            {% if birth_month == 1 %}
             <td style="word-wrap: break-word">
-                {{birth_day}} January {{birth_year}}
+                {{date_of_birth}}
             </td>
-            {% elif birth_month == 2 %}
-            <td style="word-wrap: break-word">
-                {{birth_day}} February {{birth_year}}
-            </td>
-            {% elif birth_month == 3 %}
-            <td style="word-wrap: break-word">
-                {{birth_day}} March {{birth_year}}
-            </td>
-            {% elif birth_month == 4 %}
-            <td style="word-wrap: break-word">
-                {{birth_day}} April {{birth_year}}
-            </td>
-            {% elif birth_month == 5 %}
-            <td style="word-wrap: break-word">
-                {{birth_day}} May {{birth_year}}
-            </td>
-            {% elif birth_month == 6 %}
-            <td style="word-wrap: break-word">
-                {{birth_day}} June {{birth_year}}
-            </td>
-            {% elif birth_month == 7 %}
-            <td style="word-wrap: break-word">
-                {{birth_day}} July {{birth_year}}
-            </td>
-            {% elif birth_month == 8 %}
-            <td style="word-wrap: break-word">
-                {{birth_day}} August {{birth_year}}
-            </td>
-            {% elif birth_month == 9 %}
-            <td>
-                {{birth_day}} September {{birth_year}}
-            </td>
-            {% elif birth_month == 10 %}
-            <td>
-                {{birth_day}} October {{birth_year}}
-            </td>
-            {% elif birth_month == 11 %}
-            <td style="word-wrap: break-word">
-                {{birth_day}} November {{birth_year}}
-            </td>
-            {% elif birth_month == 12 %}
-            <td style="word-wrap: break-word">
-                {{birth_day}} December {{birth_year}}
-            </td>
-            {% endif %}
             <td class="change-answer">
                 {{ form.date_of_birth_declare }}
             </td>
@@ -152,47 +106,27 @@
             <td>
                 Home address
             </td>
-            {% if street_line2 and county %}
+
             <td style="word-wrap: break-word">
                 {{street_line1}}
-                </br>
-                {{street_line2}}
-                </br>
+
+                {% if street_line2 %}
+                    <br>
+                    {{street_line2}}
+                {% endif %}
+
+                <br>
                 {{town}}
-                </br>
-                {{county}}
-                </br>
+
+                {% if county %}
+                    <br>
+                    {{county}}
+                {% endif %}
+
+                <br>
                 {{postcode}}
+
             </td>
-            {% elif street_line2 and not county %}
-            <td style="word-wrap: break-word">
-                {{street_line1}}
-                </br>
-                {{street_line2}}
-                </br>
-                {{town}}
-                </br>
-                {{postcode}}
-            </td>
-            {% elif not street_line2 and county %}
-            <td style="word-wrap: break-word">
-                {{street_line1}}
-                </br>
-                {{town}}
-                </br>
-                {{county}}
-                </br>
-                {{postcode}}
-            </td>
-            {% elif not street_line2 and not county %}
-            <td style="word-wrap: break-word">
-                {{street_line1}}
-                </br>
-                {{town}}
-                </br>
-                {{postcode}}
-            </td>
-            {% endif %}
             <td class="change-answer">
                 {{ form.home_address_declare }}
             </td>
@@ -216,53 +150,15 @@
             <td>
                 Childcare location
             </td>
-            {% if location_of_childcare == True %}
             <td style="word-wrap: break-word">
-                Yes
+                {% if lived_abroad == True %}
+                    Yes
+                {% elif lived_abroad == False %}
+                    No
+                {% else %}
+                    ERROR, lived_abroad is incorrect
+                {% endif %}
             </td>
-            {% elif location_of_childcare == False %}
-            {% if childcare_street_line2 and childcare_county %}
-            <td style="word-wrap: break-word">
-                {{childcare_street_line1}}
-                </br>
-                {{childcare_street_line2}}
-                </br>
-                {{childcare_town}}
-                </br>
-                {{childcare_county}}
-                </br>
-                {{childcare_postcode}}
-            </td>
-            {% elif childcare_street_line2 and not childcare_county %}
-            <td style="word-wrap: break-word">
-                {{childcare_street_line1}}
-                </br>
-                {{childcare_street_line2}}
-                </br>
-                {{childcare_town}}
-                </br>
-                {{childcare_postcode}}
-            </td>
-            {% elif not childcare_street_line2 and childcare_county %}
-            <td style="word-wrap: break-word">
-                {{childcare_street_line1}}
-                </br>
-                {{childcare_town}}
-                </br>
-                {{childcare_county}}
-                </br>
-                {{childcare_postcode}}
-            </td>
-            {% elif not childcare_street_line2 and not childcare_county %}
-            <td style="word-wrap: break-word">
-                {{childcare_street_line1}}
-                </br>
-                {{childcare_town}}
-                </br>
-                {{childcare_postcode}}
-            </td>
-            {% endif %}
-            {% endif %}
             <td class="change-answer">
                 {{ form.childcare_location_declare }}
             </td>

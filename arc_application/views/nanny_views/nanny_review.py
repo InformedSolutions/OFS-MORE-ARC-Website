@@ -21,6 +21,7 @@ from arc_application.notify import send_email
 from arc_application.decorators import group_required, user_assigned_application
 
 from arc_application.db_gateways import IdentityGatewayActions, NannyGatewayActions
+from arc_application.views.nanny_views.nanny_view_helpers import parse_date_of_birth
 
 decorators = [login_required, group_required(settings.ARC_GROUP), user_assigned_application]
 
@@ -95,30 +96,6 @@ def nanny_task_list(request):
         }
 
     return render(request, 'nanny_templates/nanny-task-list.html', application_status_context)
-
-
-def parse_date_of_birth(dob_str):
-    '''
-    Converts dob_str to it's corresponding parts.
-    :param dob_str: The date of birth in assumed format YYYY-MM-DD
-    :return: A dictionary containing strings birth_year, birth_month and birth_day.
-    '''
-
-    if len(dob_str) == 10:
-        birth_year = dob_str[:4]
-        birth_month = dob_str[5:-3]
-        birth_day = dob_str[-2:]
-
-        dob_dict = {
-            'birth_year': birth_year,
-            'birth_month': birth_month,
-            'birth_day': birth_day
-        }
-
-        return dob_dict
-
-    else:
-        raise ValueError("{0} is not a valid dob_str, the length should be 10 but it is {1}".format(dob_str, len(dob_str)))
 
 
 def nanny_all_complete(id, flag):
