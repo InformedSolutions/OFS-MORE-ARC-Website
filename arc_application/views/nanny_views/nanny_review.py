@@ -20,7 +20,7 @@ from arc_application.views.base import release_application
 from arc_application.notify import send_email
 from arc_application.decorators import group_required, user_assigned_application
 
-from arc_application.db_gateways import IdentityGatewayActions
+from arc_application.db_gateways import IdentityGatewayActions, NannyGatewayActions
 
 decorators = [login_required, group_required(settings.ARC_GROUP), user_assigned_application]
 
@@ -38,14 +38,14 @@ def nanny_task_list(request):
     if request.method == 'GET':
         application_id = request.GET['id']
 
-        identity_actions = IdentityGatewayActions()
-        test = identity_actions.read('user', params={'application_id': application_id})
 
-        #application = Application.objects.get(application_id=application_id)
-        #arc_application = Arc.objects.get(application_id=application_id)
-        #personal_details_record = ApplicantPersonalDetails.objects.get(application_id=application_id)
-        #name_record = ApplicantName.objects.get(personal_detail_id=personal_details_record.personal_detail_id)
-        #childcare_type_record = ChildcareType.objects.get(application_id=application_id)
+        idg_actions = IdentityGatewayActions()
+        nanny_actions = NannyGatewayActions()
+        #test = identity_actions.read('user', params={'application_id': application_id})
+
+        application = nanny_actions.read('application', params={'application_id': application_id}).record
+        arc_application = Arc.objects.get(application_id=application_id)
+        personal_details_record = nanny_actions.read('applicant-personal-details', params={'application_id': application_id}).record
 
         review_fields_to_check = (
             'login_details_review',
@@ -73,120 +73,35 @@ def nanny_task_list(request):
 
         # Load review status
         application_status_context = {
-             'application_id': '200', #application_id,
-             'application_reference': '012301230123021', #application.application_reference,
-            # 'login_details_status': arc_application.login_details_review,
-            # 'personal_details_status': arc_application.personal_details_review,
-            # 'childcare_type_status': arc_application.childcare_type_review,
-            # 'first_aid_training_status': arc_application.first_aid_review,
-            # 'criminal_record_check_status': arc_application.dbs_review,
-            # 'eyfs_status': arc_application.eyfs_review,
-            # 'health_status': arc_application.health_review,
-            # 'reference_status': arc_application.references_review,
-            # 'people_in_home_status': arc_application.people_in_home_review,
+             'application_id': application_id,
+             'application_reference': application['application_reference'],
             # 'birth_day': personal_details_record.birth_day,
             # 'birth_month': personal_details_record.birth_month,
             # 'birth_year': personal_details_record.birth_year,
-            # 'first_name': name_record.first_name,
-            # 'middle_names': name_record.middle_names,
-            # 'last_name': name_record.last_name,
-            # 'zero_to_five': childcare_type_record.zero_to_five,
-            # 'five_to_eight': childcare_type_record.five_to_eight,
-            # 'eight_plus': childcare_type_record.eight_plus,
+            'first_name': personal_details_record['first_name'],
+            'middle_names': personal_details_record['middle_names'],
+            'last_name': personal_details_record['last_name'],
             'review_count': review_count,
-            # 'all_complete': all_complete(application_id, False)
+            'all_complete': True, # all_complete(application_id, False)
 
-            'login_details_status': 'NOT_STARTED',
-            'personal_details_status': 'FLAGGED',
-            'childcare_address_status': 'COMPLETED',
-            'first_aid_status': 'NOT_STARTED',
-            'childcare_training_status': 'FLAGGED',
-            'dbs_status': 'COMPLETED',
-            'insurance_cover_status': 'NOT_STARTED',
-            'birth_day': 0o02,
-            'birth_month': 0o03,
+            'login_details_status': arc_application.login_details_review,
+            'personal_details_status': arc_application.personal_details_review,
+            'childcare_address_status': arc_application.childcare_address_review,
+            'first_aid_status': arc_application.first_aid_review,
+            'childcare_training_status': arc_application.childcare_training_review,
+            'dbs_status': arc_application.dbs_review,
+            'insurance_cover_status': arc_application.insurance_cover_review,
+            'birth_day': 2,
+            'birth_month': 3,
             'birth_year': 1995,
-            'first_name': 'Test',
-            'last_name': 'Testington'
+            'birth_string': personal_details_record['date_of_birth']
 
         }
 
     return render(request, 'nanny_templates/nanny-task-list.html', application_status_context)
 
 
-@group_required(settings.ARC_GROUP)
-def review(request):
-    """
-    Confirmation Page
-    :param request: a request object used to generate the HttpResponse
-    :return: an HttpResponse object with the rendered Your App Review Confirmation template
-    """
-    application_id_local = request.GET["id"]
-    application = Application.objects.get(application_id=application_id_local)
-    app_ref = application.application_reference
-    account = UserDetails.objects.get(application_id=application)
-    login_id = account.pk
-    first_name = ''
-
-    if UserDetails.objects.filter(login_id=login_id).exists():
-        user_details = UserDetails.objects.get(login_id=login_id)
-        email = user_details.email
-
-        if ApplicantPersonalDetails.objects.filter(application_id=application_id_local).exists():
-            personal_details = ApplicantPersonalDetails.objects.get(application_id=application_id_local)
-            applicant_name = ApplicantName.objects.get(personal_detail_id=personal_details.personal_detail_id)
-            first_name = applicant_name.first_name
-
-    if all_complete(application_id_local, True):
-        accepted_email(email, first_name, app_ref)
-
-        # If successful
-        release_application(request, application_id_local, 'ACCEPTED')
-
-        # Get fresh version of application as it will have been updated in method call
-        if Application.objects.filter(application_id=application_id_local).exists():
-            application = Application.objects.get(application_id=application_id_local)
-            application.date_accepted = datetime.now()
-            application.save()
-
-        variables = {
-            'application_id': application_id_local,
-        }
-
-        return render(request, 'childminder_templates/review-confirmation.html', variables)
-
-    else:
-        release_application(request, application_id_local, 'FURTHER_INFORMATION')
-        magic_link = generate_magic_link()
-        expiry = int(time.time())
-        user_details.email_expiry_date = expiry
-        user_details.magic_link_email = magic_link
-        user_details.save()
-        link = settings.CHILDMINDER_EMAIL_VALIDATION_URL + '/' + magic_link
-        returned_email(email, first_name, app_ref, link)
-
-        # Copy Arc status' to Childminder App
-        if Arc.objects.filter(pk=application_id_local):
-            arc = Arc.objects.get(pk=application_id_local)
-            app = Application.objects.get(pk=application_id_local)
-            app.login_details_status = arc.login_details_review
-            app.personal_details_status = arc.personal_details_review
-            app.childcare_type_status = arc.childcare_type_review
-            app.first_aid_training_status = arc.first_aid_review
-            app.health_status = arc.health_review
-            app.eyfs_training_status = arc.eyfs_review
-            app.criminal_record_check_status = arc.dbs_review
-            app.references_status = arc.references_review
-            app.people_in_home_status = arc.people_in_home_review
-            app.save()
-
-        variables = {
-            'application_id': application_id_local,
-        }
-
-        return render(request, 'childminder_templates/review-sent-back.html', variables)
-
-    return render(request, 'childminder_templates/review-sent-back.html', variables)
+def parse_date_of_birth(dob_str):
 
 
 def has_group(user, group_name):
@@ -219,7 +134,6 @@ def all_complete(id, flag):
         return True
 
 
-# Add personalisation and create template
 def accepted_email(email, first_name, ref):
     """
     Method to send an email using the Notify Gateway API
@@ -251,7 +165,7 @@ def returned_email(email, first_name, ref, link):
         return send_email(email, personalisation, template_id)
 
 
-# Including the below file elsewhere caused cyclical import error, keeping here till this can be debugged
+# Add personalisation and create template
 def other_people_initial_population(adult, person_list):
     initial_data = []
 
@@ -286,6 +200,9 @@ def other_people_initial_population(adult, person_list):
     return initial_data
 
 
+# Including the below file elsewhere caused cyclical import error, keeping here till this can be debugged
+
+
 @method_decorator(decorators, name='dispatch')
 class PreviousRegistrationDetailsView(View):
 
@@ -298,7 +215,6 @@ class PreviousRegistrationDetailsView(View):
         }
 
         return render(request, 'childminder_templates/add-previous-registration.html', variables)
-
     def post(self, request):
         application_id_local = request.POST["id"]
         form = PreviousRegistrationDetailsForm(request.POST, id=application_id_local)
@@ -345,7 +261,6 @@ class OtherPersonPreviousRegistrationDetailsView(View):
         }
 
         return render(request, 'childminder_templates/add-previous-registration.html', context=variables)
-
     def post(self, request):
         application_id_local = request.POST["id"]
         person_id = request.POST["person_id"]
@@ -379,3 +294,77 @@ class OtherPersonPreviousRegistrationDetailsView(View):
             }
 
             return render(request, 'childminder_templates/add-previous-registration.html', context=variables)
+
+# @group_required(settings.ARC_GROUP)
+# def review(request):
+#     """
+#     Confirmation Page
+#     :param request: a request object used to generate the HttpResponse
+#     :return: an HttpResponse object with the rendered Your App Review Confirmation template
+#     """
+#     application_id_local = request.GET["id"]
+#     application = Application.objects.get(application_id=application_id_local)
+#     app_ref = application.application_reference
+#     account = UserDetails.objects.get(application_id=application)
+#     login_id = account.pk
+#     first_name = ''
+#
+#     if UserDetails.objects.filter(login_id=login_id).exists():
+#         user_details = UserDetails.objects.get(login_id=login_id)
+#         email = user_details.email
+#
+#         if ApplicantPersonalDetails.objects.filter(application_id=application_id_local).exists():
+#             personal_details = ApplicantPersonalDetails.objects.get(application_id=application_id_local)
+#             applicant_name = ApplicantName.objects.get(personal_detail_id=personal_details.personal_detail_id)
+#             first_name = applicant_name.first_name
+#
+#     if all_complete(application_id_local, True):
+#         accepted_email(email, first_name, app_ref)
+#
+#         # If successful
+#         release_application(request, application_id_local, 'ACCEPTED')
+#
+#         # Get fresh version of application as it will have been updated in method call
+#         if Application.objects.filter(application_id=application_id_local).exists():
+#             application = Application.objects.get(application_id=application_id_local)
+#             application.date_accepted = datetime.now()
+#             application.save()
+#
+#         variables = {
+#             'application_id': application_id_local,
+#         }
+#
+#         return render(request, 'childminder_templates/review-confirmation.html', variables)
+#
+#     else:
+#         release_application(request, application_id_local, 'FURTHER_INFORMATION')
+#         magic_link = generate_magic_link()
+#         expiry = int(time.time())
+#         user_details.email_expiry_date = expiry
+#         user_details.magic_link_email = magic_link
+#         user_details.save()
+#         link = settings.CHILDMINDER_EMAIL_VALIDATION_URL + '/' + magic_link
+#         returned_email(email, first_name, app_ref, link)
+#
+#         # Copy Arc status' to Childminder App
+#         if Arc.objects.filter(pk=application_id_local):
+#             arc = Arc.objects.get(pk=application_id_local)
+#             app = Application.objects.get(pk=application_id_local)
+#             app.login_details_status = arc.login_details_review
+#             app.personal_details_status = arc.personal_details_review
+#             app.childcare_type_status = arc.childcare_type_review
+#             app.first_aid_training_status = arc.first_aid_review
+#             app.health_status = arc.health_review
+#             app.eyfs_training_status = arc.eyfs_review
+#             app.criminal_record_check_status = arc.dbs_review
+#             app.references_status = arc.references_review
+#             app.people_in_home_status = arc.people_in_home_review
+#             app.save()
+#
+#         variables = {
+#             'application_id': application_id_local,
+#         }
+#
+#         return render(request, 'childminder_templates/review-sent-back.html', variables)
+#
+#     return render(request, 'childminder_templates/review-sent-back.html', variables)
