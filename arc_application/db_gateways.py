@@ -8,7 +8,9 @@ class DBGatewayActions:
     target_url_prefix = None
 
     def list(self, endpoint, params):
-        response = requests.get(self.target_url_prefix + endpoint + '/', data=params)
+        query_params = ''.join(['&' + key + '=' + value for key, value in params.items()])
+
+        response = requests.get(self.target_url_prefix + endpoint + '/?' + query_params)
 
         if response.status_code == 200:
             response.record = json.loads(response.text)
@@ -16,7 +18,10 @@ class DBGatewayActions:
         return response
 
     def read(self, endpoint, params):
-        response = requests.get(self.target_url_prefix + endpoint + '/' + params['application_id'] + '/', data=params)
+        if endpoint == 'childcare-address':
+            response = requests.get(self.target_url_prefix + endpoint + '/' + params['childcare_address_id'] + '/', data=params)
+        else:
+            response = requests.get(self.target_url_prefix + endpoint + '/' + params['application_id'] + '/', data=params)
 
         if response.status_code == 200:
             response.record = json.loads(response.text)
@@ -40,7 +45,10 @@ class DBGatewayActions:
         return response
 
     def put(self, endpoint, params):
-        response = requests.put(self.target_url_prefix + endpoint + '/' + params['application_id'] + '/', data=params)
+        if endpoint == 'childcare-address':
+            response = requests.put(self.target_url_prefix + endpoint + '/' + params['childcare_address_id'] + '/', data=params)
+        else:
+            response = requests.put(self.target_url_prefix + endpoint + '/' + params['application_id'] + '/', data=params)
 
         if response.status_code == 200:
             response.record = json.loads(response.text)
