@@ -61,29 +61,26 @@ def nanny_task_list(request):
             'login_details_arc_flagged',
             'personal_details_arc_flagged',
             'childcare_address_arc_flagged',
-            'first_aid_arc_flagged',
+            'first_aid_training_arc_flagged',
             'childcare_training_arc_flagged',
-            'dbs_arc_flagged',
+            'criminal_record_check_arc_flagged',
             'insurance_cover_arc_flagged'
         )
 
-        #review_count = sum([1 for field in review_fields_to_check if getattr(arc_application, field) == 'COMPLETED'])
-        #review_count += sum([1 for field in flagged_fields_to_check if getattr(application, field)])
-        review_count = 5
+        review_count = sum([1 for field in review_fields_to_check if getattr(arc_application, field) == 'COMPLETED'])
+        review_count += sum([1 for field in flagged_fields_to_check if application[field]])
 
         # Load review status
+        dob_str = personal_details_record['date_of_birth']
+        birth_dict = parse_date_of_birth(dob_str)
+
         application_status_context = {
-             'application_id': application_id,
-             'application_reference': application['application_reference'],
-            # 'birth_day': personal_details_record.birth_day,
-            # 'birth_month': personal_details_record.birth_month,
-            # 'birth_year': personal_details_record.birth_year,
+            'application_id': application_id,
+            'application_reference': application['application_reference'],
             'first_name': personal_details_record['first_name'],
             'middle_names': personal_details_record['middle_names'],
             'last_name': personal_details_record['last_name'],
             'review_count': review_count,
-            'all_complete': True, # all_complete(application_id, False)
-
             'login_details_status': arc_application.login_details_review,
             'personal_details_status': arc_application.personal_details_review,
             'childcare_address_status': arc_application.childcare_address_review,
@@ -91,209 +88,258 @@ def nanny_task_list(request):
             'childcare_training_status': arc_application.childcare_training_review,
             'dbs_status': arc_application.dbs_review,
             'insurance_cover_status': arc_application.insurance_cover_review,
-            'birth_day': 2,
-            'birth_month': 3,
-            'birth_year': 1995,
-            'birth_string': personal_details_record['date_of_birth']
-
+            'birth_day': int(birth_dict['birth_day']),
+            'birth_month': int(birth_dict['birth_month']),
+            'birth_year': int(birth_dict['birth_year']),
+            'all_complete': nanny_all_complete(application_id, False)
         }
 
     return render(request, 'nanny_templates/nanny-task-list.html', application_status_context)
 
 
 def parse_date_of_birth(dob_str):
+    '''
+    Converts dob_str to it's corresponding parts.
+    :param dob_str: The date of birth in assumed format YYYY-MM-DD
+    :return: A dictionary containing strings birth_year, birth_month and birth_day.
+    '''
+
+    if len(dob_str) == 10:
+        birth_year = dob_str[:4]
+        birth_month = dob_str[5:-3]
+        birth_day = dob_str[-2:]
+
+        dob_dict = {
+            'birth_year': birth_year,
+            'birth_month': birth_month,
+            'birth_day': birth_day
+        }
+
+        return dob_dict
+
+    else:
+        raise ValueError("{0} is not a valid dob_str, the length should be 10 but it is {1}".format(dob_str, len(dob_str)))
 
 
-def has_group(user, group_name):
-    """
-    Check if user is in group
-    :return: True if user is in group, else false
-    """
-    group = Group.objects.get(name=group_name)
-
-    return True if group in user.groups.all() else False
-
-
-def all_complete(id, flag):
+def nanny_all_complete(id, flag):
     """
     Check the status of all sections
     :param id: Application Id
-    :return: True or False dependingo n whether all sections have been reviewed
+    :return: True or False depending on whether all sections have been reviewed
     """
+
+    #TODO: Redo this function.
+
     if Arc.objects.filter(application_id=id):
         arc = Arc.objects.get(application_id=id)
-        list = [arc.login_details_review, arc.childcare_type_review, arc.personal_details_review,
-                arc.first_aid_review, arc.eyfs_review, arc.dbs_review, arc.health_review, arc.references_review,
-                arc.people_in_home_review]
+        list = [arc.login_details_review,
+                arc.personal_details_review,
+                arc.childcare_address_review,
+                arc.first_aid_review,
+                arc.childcare_training_review,
+                arc.dbs_review,
+                arc.insurance_cover_review,
+        ]
 
         for i in list:
-
             if (i == 'NOT_STARTED' and not flag) or (i != 'COMPLETED' and flag):
                 return False
 
         return True
 
+    else:
+        return Error
 
-def accepted_email(email, first_name, ref):
-    """
-    Method to send an email using the Notify Gateway API
-    :param email: string containing the e-mail address to send the e-mail to
-    :param first_name: string first name
-    :param ref: string ref
-    :return: HTTP response
-    """
-    if hasattr(settings, 'NOTIFY_URL'):
-        email = str(email)
-        template_id = 'b973c5a2-cadd-46a5-baf7-beae65ab11dc'
-        personalisation = {'first_name': first_name, 'ref': ref}
-        return send_email(email, personalisation, template_id)
-
-
-# Add personalisation and create template
-def returned_email(email, first_name, ref, link):
-    """
-    Method to send an email using the Notify Gateway API
-    :param email: string containing the e-mail address to send the e-mail to
-    :param first_name: string first name
-    :param ref: string ref
-    :return: HTTP response
-    """
-    if hasattr(settings, 'NOTIFY_URL'):
-        email = str(email)
-        template_id = 'c9157aaa-02cd-4294-8094-df2184c12930'
-        personalisation = {'first_name': first_name, 'ref': ref, 'link': link}
-        return send_email(email, personalisation, template_id)
-
-
-# Add personalisation and create template
-def other_people_initial_population(adult, person_list):
-    initial_data = []
-
-    for person in person_list:
-        temp_dict = {}
-
-        if not adult:
-            table_id = person.child_id
-            form_instance = ChildInYourHomeForm()
-        else:
-            table_id = person.adult_id
-            form_instance = AdultInYourHomeForm()
-
-        for field in form_instance.fields:
-            try:
-
-                if field[-8:] == 'comments':
-                    field_name_local = field[:-9]
-                    comment = (ArcComments.objects.filter(table_pk=table_id).get(field_name=field_name_local)).comment
-                    temp_dict[field] = comment
-
-                if field[-7:] == 'declare':
-                    field_name_local = field[:-8]
-                    checkbox = (ArcComments.objects.filter(table_pk=table_id).get(field_name=field_name_local)).flagged
-                    temp_dict[field] = checkbox
-
-            except ArcComments.DoesNotExist:
-                pass
-
-        initial_data.append(temp_dict)
-
-    return initial_data
-
-
-# Including the below file elsewhere caused cyclical import error, keeping here till this can be debugged
-
-
-@method_decorator(decorators, name='dispatch')
-class PreviousRegistrationDetailsView(View):
-
-    def get(self, request):
-        application_id_local = request.GET["id"]
-        form = PreviousRegistrationDetailsForm(id=application_id_local)
-        variables = {
-            'form': form,
-            'application_id': application_id_local,
-        }
-
-        return render(request, 'childminder_templates/add-previous-registration.html', variables)
-    def post(self, request):
-        application_id_local = request.POST["id"]
-        form = PreviousRegistrationDetailsForm(request.POST, id=application_id_local)
-
-        if form.is_valid():
-            app = Application.objects.get(pk=application_id_local)
-            previous_registration = form.cleaned_data.get('previous_registration')
-            individual_id = form.cleaned_data.get('individual_id')
-            five_years_in_uk = form.cleaned_data.get('five_years_in_UK')
-
-            if PreviousRegistrationDetails.objects.filter(application_id=app).exists():
-                previous_reg_details = PreviousRegistrationDetails.objects.get(application_id=app)
-            else:
-                previous_reg_details = PreviousRegistrationDetails(application_id=app)
-
-            previous_reg_details.previous_registration = previous_registration
-            previous_reg_details.individual_id = individual_id
-            previous_reg_details.five_years_in_UK = five_years_in_uk
-            previous_reg_details.save()
-
-            redirect_link = '/personal-details/summary'
-            return HttpResponseRedirect(settings.URL_PREFIX + redirect_link + '?id=' + application_id_local)
-
-        else:
-            variables = {
-                'form': form,
-                'application_id': application_id_local,
-            }
-
-            return render(request, 'childminder_templates/add-previous-registration.html', context=variables)
-
-
-@method_decorator(decorators, name='dispatch')
-class OtherPersonPreviousRegistrationDetailsView(View):
-
-    def get(self, request):
-        application_id_local = request.GET["id"]
-        person_id = request.GET["person_id"]
-        form = OtherPersonPreviousRegistrationDetailsForm(id=person_id)
-        variables = {
-            'form': form,
-            'application_id': application_id_local,
-            'person_id': person_id,
-        }
-
-        return render(request, 'childminder_templates/add-previous-registration.html', context=variables)
-    def post(self, request):
-        application_id_local = request.POST["id"]
-        person_id = request.POST["person_id"]
-        person_record = AdultInHome.objects.get(adult_id=person_id)
-        form = OtherPersonPreviousRegistrationDetailsForm(request.POST, id=person_id)
-
-        if form.is_valid():
-            app = Application.objects.get(pk=application_id_local)
-            previous_registration = form.cleaned_data.get('previous_registration')
-            individual_id = form.cleaned_data.get('individual_id')
-            five_years_in_uk = form.cleaned_data.get('five_years_in_UK')
-
-            if OtherPersonPreviousRegistrationDetails.objects.filter(person_id=person_record).exists():
-                previous_reg_details = OtherPersonPreviousRegistrationDetails.objects.get(person_id=person_record)
-            else:
-                previous_reg_details = OtherPersonPreviousRegistrationDetails(person_id=person_record)
-
-            previous_reg_details.previous_registration = previous_registration
-            previous_reg_details.individual_id = individual_id
-            previous_reg_details.five_years_in_UK = five_years_in_uk
-            previous_reg_details.save()
-
-            redirect_link = '/people/summary'
-            return HttpResponseRedirect(settings.URL_PREFIX + redirect_link + '?id=' + application_id_local)
-
-        else:
-            variables = {
-                'form': form,
-                'application_id': application_id_local,
-                'person_id': person_id,
-            }
-
-            return render(request, 'childminder_templates/add-previous-registration.html', context=variables)
+# def has_group(user, group_name):
+#     """
+#     Check if user is in group
+#     :return: True if user is in group, else false
+#     """
+#     group = Group.objects.get(name=group_name)
+#
+#     return True if group in user.groups.all() else False
+#
+#
+# def all_complete(id, flag):
+#     """
+#     Check the status of all sections
+#     :param id: Application Id
+#     :return: True or False dependingo n whether all sections have been reviewed
+#     """
+#     if Arc.objects.filter(application_id=id):
+#         arc = Arc.objects.get(application_id=id)
+#         list = [arc.login_details_review, arc.childcare_type_review, arc.personal_details_review,
+#                 arc.first_aid_review, arc.eyfs_review, arc.dbs_review, arc.health_review, arc.references_review,
+#                 arc.people_in_home_review]
+#
+#         for i in list:
+#
+#             if (i == 'NOT_STARTED' and not flag) or (i != 'COMPLETED' and flag):
+#                 return False
+#
+#         return True
+#
+#
+# def accepted_email(email, first_name, ref):
+#     """
+#     Method to send an email using the Notify Gateway API
+#     :param email: string containing the e-mail address to send the e-mail to
+#     :param first_name: string first name
+#     :param ref: string ref
+#     :return: HTTP response
+#     """
+#     if hasattr(settings, 'NOTIFY_URL'):
+#         email = str(email)
+#         template_id = 'b973c5a2-cadd-46a5-baf7-beae65ab11dc'
+#         personalisation = {'first_name': first_name, 'ref': ref}
+#         return send_email(email, personalisation, template_id)
+#
+#
+# # Add personalisation and create template
+# def returned_email(email, first_name, ref, link):
+#     """
+#     Method to send an email using the Notify Gateway API
+#     :param email: string containing the e-mail address to send the e-mail to
+#     :param first_name: string first name
+#     :param ref: string ref
+#     :return: HTTP response
+#     """
+#     if hasattr(settings, 'NOTIFY_URL'):
+#         email = str(email)
+#         template_id = 'c9157aaa-02cd-4294-8094-df2184c12930'
+#         personalisation = {'first_name': first_name, 'ref': ref, 'link': link}
+#         return send_email(email, personalisation, template_id)
+#
+#
+# # Add personalisation and create template
+# def other_people_initial_population(adult, person_list):
+#     initial_data = []
+#
+#     for person in person_list:
+#         temp_dict = {}
+#
+#         if not adult:
+#             table_id = person.child_id
+#             form_instance = ChildInYourHomeForm()
+#         else:
+#             table_id = person.adult_id
+#             form_instance = AdultInYourHomeForm()
+#
+#         for field in form_instance.fields:
+#             try:
+#
+#                 if field[-8:] == 'comments':
+#                     field_name_local = field[:-9]
+#                     comment = (ArcComments.objects.filter(table_pk=table_id).get(field_name=field_name_local)).comment
+#                     temp_dict[field] = comment
+#
+#                 if field[-7:] == 'declare':
+#                     field_name_local = field[:-8]
+#                     checkbox = (ArcComments.objects.filter(table_pk=table_id).get(field_name=field_name_local)).flagged
+#                     temp_dict[field] = checkbox
+#
+#             except ArcComments.DoesNotExist:
+#                 pass
+#
+#         initial_data.append(temp_dict)
+#
+#     return initial_data
+#
+#
+# # Including the below file elsewhere caused cyclical import error, keeping here till this can be debugged
+#
+#
+# @method_decorator(decorators, name='dispatch')
+# class PreviousRegistrationDetailsView(View):
+#
+#     def get(self, request):
+#         application_id_local = request.GET["id"]
+#         form = PreviousRegistrationDetailsForm(id=application_id_local)
+#         variables = {
+#             'form': form,
+#             'application_id': application_id_local,
+#         }
+#
+#         return render(request, 'childminder_templates/add-previous-registration.html', variables)
+#     def post(self, request):
+#         application_id_local = request.POST["id"]
+#         form = PreviousRegistrationDetailsForm(request.POST, id=application_id_local)
+#
+#         if form.is_valid():
+#             app = Application.objects.get(pk=application_id_local)
+#             previous_registration = form.cleaned_data.get('previous_registration')
+#             individual_id = form.cleaned_data.get('individual_id')
+#             five_years_in_uk = form.cleaned_data.get('five_years_in_UK')
+#
+#             if PreviousRegistrationDetails.objects.filter(application_id=app).exists():
+#                 previous_reg_details = PreviousRegistrationDetails.objects.get(application_id=app)
+#             else:
+#                 previous_reg_details = PreviousRegistrationDetails(application_id=app)
+#
+#             previous_reg_details.previous_registration = previous_registration
+#             previous_reg_details.individual_id = individual_id
+#             previous_reg_details.five_years_in_UK = five_years_in_uk
+#             previous_reg_details.save()
+#
+#             redirect_link = '/personal-details/summary'
+#             return HttpResponseRedirect(settings.URL_PREFIX + redirect_link + '?id=' + application_id_local)
+#
+#         else:
+#             variables = {
+#                 'form': form,
+#                 'application_id': application_id_local,
+#             }
+#
+#             return render(request, 'childminder_templates/add-previous-registration.html', context=variables)
+#
+#
+# @method_decorator(decorators, name='dispatch')
+# class OtherPersonPreviousRegistrationDetailsView(View):
+#
+#     def get(self, request):
+#         application_id_local = request.GET["id"]
+#         person_id = request.GET["person_id"]
+#         form = OtherPersonPreviousRegistrationDetailsForm(id=person_id)
+#         variables = {
+#             'form': form,
+#             'application_id': application_id_local,
+#             'person_id': person_id,
+#         }
+#
+#         return render(request, 'childminder_templates/add-previous-registration.html', context=variables)
+#     def post(self, request):
+#         application_id_local = request.POST["id"]
+#         person_id = request.POST["person_id"]
+#         person_record = AdultInHome.objects.get(adult_id=person_id)
+#         form = OtherPersonPreviousRegistrationDetailsForm(request.POST, id=person_id)
+#
+#         if form.is_valid():
+#             app = Application.objects.get(pk=application_id_local)
+#             previous_registration = form.cleaned_data.get('previous_registration')
+#             individual_id = form.cleaned_data.get('individual_id')
+#             five_years_in_uk = form.cleaned_data.get('five_years_in_UK')
+#
+#             if OtherPersonPreviousRegistrationDetails.objects.filter(person_id=person_record).exists():
+#                 previous_reg_details = OtherPersonPreviousRegistrationDetails.objects.get(person_id=person_record)
+#             else:
+#                 previous_reg_details = OtherPersonPreviousRegistrationDetails(person_id=person_record)
+#
+#             previous_reg_details.previous_registration = previous_registration
+#             previous_reg_details.individual_id = individual_id
+#             previous_reg_details.five_years_in_UK = five_years_in_uk
+#             previous_reg_details.save()
+#
+#             redirect_link = '/people/summary'
+#             return HttpResponseRedirect(settings.URL_PREFIX + redirect_link + '?id=' + application_id_local)
+#
+#         else:
+#             variables = {
+#                 'form': form,
+#                 'application_id': application_id_local,
+#                 'person_id': person_id,
+#             }
+#
+#             return render(request, 'childminder_templates/add-previous-registration.html', context=variables)
 
 # @group_required(settings.ARC_GROUP)
 # def review(request):
