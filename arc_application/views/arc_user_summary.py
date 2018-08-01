@@ -39,8 +39,13 @@ class ARCUserSummaryView(View):
         return render(request, self.template_name, context=context)
 
     def get_context_data(self):
-        entries = ApplicationHandlerTemplate(arc_user=self.request.user).get_all_table_data()
-        return {'entries': entries}
+        context = dict()
+        context['entries'] = ApplicationHandlerTemplate(arc_user=self.request.user).get_all_table_data()
+
+        if not len(context['entries']):
+            context['empty'] = 'true'
+
+        return context
 
 
 class ApplicationHandlerTemplate:
