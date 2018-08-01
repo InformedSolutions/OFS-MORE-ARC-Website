@@ -22,6 +22,10 @@ SECRET_KEY = 'm$9lif+zcnb5i5n21q9yecn8vs4h%(%7=!k%#6rlbhkfuq1mfq'
 
 EXECUTING_AS_TEST = os.environ.get('EXECUTING_AS_TEST')
 
+APPLICATION_QUEUE_NAME = os.environ.get('APPLICATION_QUEUE_NAME')
+AWS_SQS_ACCESS_KEY_ID = os.environ.get('AWS_SQS_ACCESS_KEY_ID')
+AWS_SQS_SECRET_ACCESS_KEY = os.environ.get('AWS_SQS_SECRET_ACCESS_KEY')
+
 # Application definition
 
 BUILTIN_APPS = [

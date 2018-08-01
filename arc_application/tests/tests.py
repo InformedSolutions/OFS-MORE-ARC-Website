@@ -5,6 +5,8 @@ from django.contrib.auth.models import Group, User
 from django.test import TestCase, RequestFactory
 from django.urls import reverse
 
+from unittest import mock
+
 from ..models import (ApplicantHomeAddress,
                       ApplicantName,
                       ApplicantPersonalDetails,
@@ -501,3 +503,39 @@ class ArcSummaryTest(TestCase):
         # 4. Check flagged boolean indicator is set on the application record
         reloaded_application = Application.objects.get(pk=application.application_id)
         self.assertTrue(reloaded_application.references_arc_flagged)
+
+
+    def test_can_accept_application(self):
+        with mock.patch('arc_application.notify.send_email') as post_email_mock:
+            post_email_mock.return_value.status_code = 201
+            # Assemble
+            create_application()
+            app_id = application.application_id
+            arc = Arc.objects.get(pk=app_id)
+            arc.login_details_review = 'COMPLETED'
+            arc.childcare_type_review = 'COMPLETED'
+            arc.personal_details_review = 'COMPLETED'
+            arc.first_aid_review = 'COMPLETED'
+            arc.eyfs_review = 'COMPLETED'
+            arc.dbs_review = 'COMPLETED'
+            arc.health_review = 'COMPLETED'
+            arc.references_review = 'COMPLETED'
+            arc.people_in_home_review = 'COMPLETED'
+            arc.save()
+
+            post_dictionary = {
+                'id': app_id
+            }
+
+            # Act
+            self.client.login(username='arc_test', password='my_secret')
+            response = self.client.post(reverse('arc-summary') + '?id=' + app_id,
+                                        post_dictionary)
+
+            # Assert
+
+            # 1. Check HTTP status code correct
+            self.assertEqual(response.status_code, 200)
+
+            reloaded_app = Application.objects.get(pk=app_id)
+            self.assertEqual(reloaded_app.application_status, 'ACCEPTED')

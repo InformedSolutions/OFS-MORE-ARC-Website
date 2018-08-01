@@ -4,22 +4,25 @@ from datetime import datetime
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group
+from django.core import serializers
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.utils.decorators import method_decorator
 from django.views import View
 
-from arc_application.models import AdultInHome
 from ..forms.form import PreviousRegistrationDetailsForm, OtherPersonPreviousRegistrationDetailsForm
 from ..forms.form import AdultInYourHomeForm, ChildInYourHomeForm, CommentsForm
 from ..magic_link import generate_magic_link
 from ..models import PreviousRegistrationDetails, OtherPersonPreviousRegistrationDetails
-from ..models import ApplicantName, ApplicantPersonalDetails, Application, Arc, ArcComments, ChildcareType, UserDetails
+from ..models import ApplicantName, ApplicantPersonalDetails, Application, Arc, ArcComments, ChildcareType, UserDetails, PreviousName, \
+PreviousAddress, HealthDeclarationBooklet, FirstAidTraining, EYFS, CriminalRecordCheck, ChildInHome, ApplicantHomeAddress, AdultInHome
 from .base import release_application
 from ..notify import send_email
 from ..decorators import group_required, user_assigned_application
+from ..messaging.sqs_handler import SQSHandler
 
 decorators = [login_required, group_required(settings.ARC_GROUP), user_assigned_application]
+sqs_handler = SQSHandler(settings.APPLICATION_QUEUE_NAME)
 
 @login_required
 @group_required(settings.ARC_GROUP)
@@ -134,6 +137,9 @@ def review(request):
         variables = {
             'application_id': application_id_local,
         }
+        
+        export = __create_full_application_export(application_id_local)
+        sqs_handler.send_message(export)
 
         return render(request, 'review-confirmation.html', variables)
 
@@ -361,3 +367,67 @@ class OtherPersonPreviousRegistrationDetailsView(View):
             }
 
             return render(request, 'add-previous-registration.html', context=variables)
+
+
+def __create_full_application_export(application_id):
+    """
+    Method for exporting a full application in a dictionary format
+    :param application_id: the identifier of the application to be exported
+    :return: a dictionary export of an application
+    """
+
+    export = {}
+
+    application = Application.objects.filter(application_id=application_id)
+    export['application'] = serializers.serialize('json', list(application))
+
+    adults_in_home = AdultInHome.objects.filter(application_id=application_id).order_by('adult')
+    adults_in_home_export = []
+    export['adults_in_home'] = serializers.serialize('json', list(adults_in_home))
+
+    # Iterate adults in home, appending prior names and addresses
+
+    for adult_in_home in adults_in_home:
+        previous_name = PreviousName.objects.filter(person_id=adult_in_home.person_id)
+        previous_address = PreviousAddress.objects.filter(person_id=adult_in_home.person_id)
+
+        adults_in_home_export.append({
+            'adult': serializers.serialize('json', list(adult_in_home)),
+            'previous_names': serializers.serialize('json', list(previous_name)),
+            'previous_address': serializers.serialize('json', list(previous_address)),
+        })
+
+    applicant_name = ApplicantName.objects.filter(application_id=application_id)
+    export['applicant_name'] = serializers.serialize('json', applicant_name)
+
+    applicant_personal_details = ApplicantPersonalDetails.objects.filter(application_id=application_id)
+    export['applicant_personal_details'] = serializers.serialize('json', list(applicant_personal_details))
+
+    applicant_home_address = ApplicantHomeAddress.objects.filter(application_id=application_id)
+    export['applicant_home_address'] = serializers.serialize('json', list(applicant_home_address))
+
+    child_in_home = ChildInHome.objects.filter(application_id=application_id)
+    export['child_in_home'] = serializers.serialize('json', list(child_in_home))
+
+    childcare_type = ChildcareType.objects.filter(application_id=application_id)
+    export['childcare_type'] = serializers.serialize('json', list(childcare_type))
+
+    criminal_record_check = CriminalRecordCheck.objects.filter(application_id=application_id)
+    export['criminal_record_check'] = serializers.serialize('json', list(criminal_record_check))
+
+    eyfs = EYFS.objects.filter(application_id=application_id)
+    export['eyfs'] = serializers.serialize('json', list(eyfs))
+
+    first_aid_training = FirstAidTraining.objects.filter(application_id=application_id)
+    export['first_aid_training'] = serializers.serialize('json', list(first_aid_training))
+
+    health_declaration_booklet = HealthDeclarationBooklet.objects.filter(application_id=application_id)
+    export['health_declaration_booklet'] = serializers.serialize('json', list(health_declaration_booklet))
+
+    previous_registration_details = PreviousRegistrationDetails.objects.filter(application_id=application_id)
+    export['previous_name'] = serializers.serialize('json', list(previous_registration_details))
+
+    user_details = UserDetails.objects.filter(application_id=application_id)
+    export['user_details'] = serializers.serialize('json', list(user_details))
+
+    return export
