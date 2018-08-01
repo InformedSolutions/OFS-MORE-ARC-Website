@@ -137,7 +137,8 @@ def review(request):
         variables = {
             'application_id': application_id_local,
         }
-        
+
+        # create application export and send it to SQS
         export = __create_full_application_export(application_id_local)
         sqs_handler.send_message(export)
 

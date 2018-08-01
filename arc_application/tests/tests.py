@@ -504,7 +504,6 @@ class ArcSummaryTest(TestCase):
         reloaded_application = Application.objects.get(pk=application.application_id)
         self.assertTrue(reloaded_application.references_arc_flagged)
 
-
     def test_can_accept_application(self):
         with mock.patch('arc_application.notify.send_email') as post_email_mock:
             post_email_mock.return_value.status_code = 201
