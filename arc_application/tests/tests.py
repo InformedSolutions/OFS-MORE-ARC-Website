@@ -13,8 +13,10 @@ from ..models import (ApplicantHomeAddress,
                       Application,
                       Arc,
                       ArcComments,
+                      ChildcareType,
                       ChildInHome,
                       CriminalRecordCheck,
+                      EYFS,
                       FirstAidTraining,
                       Reference,
                       UserDetails)
@@ -27,6 +29,7 @@ arc_records = None
 flagged_status = 'FLAGGED'
 arc_test_user = None
 cc_test_user = None
+
 
 def create_application():
     global application
@@ -64,6 +67,15 @@ def create_application():
         date_created=datetime.datetime.today(),
         date_updated=datetime.datetime.today(),
         date_accepted=None,
+    )
+
+    childcare_type = ChildcareType.objects.create(
+        childcare_id='2bc1fa3c-5b19-4198-9bca-fb3761dc172e',
+        zero_to_five=True,
+        five_to_eight=False,
+        eight_plus=False,
+        overnight_care=True,
+        application_id=application
     )
 
     details = ApplicantPersonalDetails.objects.create(
@@ -118,6 +130,15 @@ def create_application():
         course_year='2018',
         show_certificate=True,
         renew_certificate=True
+    )
+
+    eyfs = EYFS.objects.create(
+        eyfs_id='e220f870-df41-4bd8-872d-6e69e0680c0b',
+        application_id=application,
+        eyfs_course_date_day='01',
+        eyfs_course_date_month='01',
+        eyfs_course_date_year='2018',
+        eyfs_course_name='Test EYFS'
     )
 
     criminal_record_check = CriminalRecordCheck.objects.create(

@@ -13,7 +13,7 @@ from django.views import View
 from ..forms.form import PreviousRegistrationDetailsForm, OtherPersonPreviousRegistrationDetailsForm
 from ..forms.form import AdultInYourHomeForm, ChildInYourHomeForm, CommentsForm
 from ..magic_link import generate_magic_link
-from ..models import PreviousRegistrationDetails, OtherPersonPreviousRegistrationDetails
+from ..models import PreviousRegistrationDetails, OtherPersonPreviousRegistrationDetails, Reference
 from ..models import ApplicantName, ApplicantPersonalDetails, Application, Arc, ArcComments, ChildcareType, UserDetails, PreviousName, \
 PreviousAddress, HealthDeclarationBooklet, FirstAidTraining, EYFS, CriminalRecordCheck, ChildInHome, ApplicantHomeAddress, AdultInHome
 from .base import release_application
@@ -427,6 +427,9 @@ def __create_full_application_export(application_id):
 
     previous_registration_details = PreviousRegistrationDetails.objects.filter(application_id=application_id)
     export['previous_name'] = serializers.serialize('json', list(previous_registration_details))
+
+    references = Reference.objects.filter(application_id=application_id)
+    export['references'] = serializers.serialize('json', list(references))
 
     user_details = UserDetails.objects.filter(application_id=application_id)
     export['user_details'] = serializers.serialize('json', list(user_details))
