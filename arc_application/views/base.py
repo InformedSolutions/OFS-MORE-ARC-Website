@@ -18,176 +18,7 @@ from arc_application.review_util import reset_declaration
 
 from arc_application.models import ApplicantName, ApplicantPersonalDetails, Application, Arc
 
-
-@login_required
-def summary_page(request):
-    """
-    Arc Summary page to view assigned applications and manage them
-    :param request: Http request, must be logged in with a user that has access
-    :return: render static template
-    """
-    # Check if user has access and initiate error messages
-    if has_group(request.user, settings.ARC_GROUP):
-
-        error_exist = 'false'
-        error_title = ''
-        error_text = ''
-        empty = 'false'
-        assign_response = True
-
-        # If the 'New Application' button has been clicked get new application
-        if request.method == 'POST':
-            assign_response = assign_new_application(request)
-        entries = Arc.objects.filter(user_id=request.user.id)
-        obj = []
-
-        # For each application assigned to the user
-        for entry in entries:
-            # Get data to display in table
-            response = get_table_data(entry)
-            obj.append(response)
-        # If no applications are assigned hide the table
-
-        if len(obj) == 0:
-            empty = 'true'
-
-        # If you have reached the limit you will receive an error message
-        if assign_response == 'LIMIT_REACHED':
-            error_exist = 'true'
-            error_title = 'You have reached the limit'
-            error_text = 'You have already reached the maximum (' + str(settings.APPLICATION_LIMIT) + ') applications'
-
-        # No applications available for review
-        if not assign_response:
-            error_exist = 'true'
-            error_title = 'No available applications'
-            error_text = 'There are currently no more applications ready for a review'
-
-        variables = {
-            'entries': obj,
-            'empty': empty,
-            'error_exist': error_exist,
-            'error_title': error_title,
-            'error_text': error_text
-        }
-
-        return render(request, 'childminder_templates/summary.html', variables)
-    else:
-        return HttpResponseRedirect(settings.URL_PREFIX + '/login/')
-
-
-def get_table_data(obj):
-    """
-    Get data to display in summary table
-    :param obj: Arc object
-    :return: Dict that essentially extends Arc and includes a few more fields
-    """
-
-    local_application_id = obj.application_id
-
-    if Application.objects.filter(pk=local_application_id).count() > 0:
-        obj.application = Application.objects.get(application_id=local_application_id)
-        arc_user = Arc.objects.get(application_id=local_application_id)
-        obj.date_submitted = obj.application.date_submitted
-        obj.last_accessed = arc_user.last_accessed
-        obj.app_type = 'Childminder'
-
-    if ApplicantPersonalDetails.objects.filter(application_id=local_application_id).count() > 0:
-        personal_details = ApplicantPersonalDetails.objects.get(application_id=local_application_id)
-        applicant_name = ApplicantName.objects.get(personal_detail_id=personal_details.personal_detail_id)
-        obj.applicant_name = applicant_name.first_name + ' ' + applicant_name.last_name
-    return obj
-
-
-def assign_new_application(request):
-    """
-    Assign a new application and initiate ArcStatus row
-    :param request: HTTP request
-    :return: A Json with the Application Id, 'Limit Reached' if a user has too many already assigned, and False if none availible
-    """
-    if Arc.objects.filter(user_id=request.user.id).count() == settings.APPLICATION_LIMIT:
-        return 'LIMIT_REACHED'
-
-    app_id = get_oldest_application_id()
-
-    if app_id is None:
-        return False
-
-    # TRIGGER
-    # This is where all applications are assigned to the arc users
-    # This is BDD scenario 2
-    # According to the mockup it should say 'Assigned to USERNAME'
-
-    if Application.objects.filter(pk=app_id).count() > 0:
-
-        application = Application.objects.get(application_id=app_id)
-
-        # Update app status to Arc review when assigned to an arc user
-        application.application_status = 'ARC_REVIEW'
-        application.save()
-
-        if not Arc.objects.filter(pk=app_id).exists():
-
-            arc_user = Arc.objects.create(application_id=app_id)
-            arc_user.login_details_review = "NOT_STARTED"
-            arc_user.childcare_type_review = "NOT_STARTED"
-            arc_user.personal_details_review = "NOT_STARTED"
-            arc_user.first_aid_review = "NOT_STARTED"
-            arc_user.dbs_review = "NOT_STARTED"
-            arc_user.health_review = "NOT_STARTED"
-            arc_user.references_review = "NOT_STARTED"
-            arc_user.people_in_home_review = "NOT_STARTED"
-            arc_user.declaration_review = "NOT_STARTED"
-            arc_user.eyfs_review = "NOT_STARTED"
-
-            arc_user.app_type = 'Childminder'
-            arc_user.last_accessed = str(application.date_updated.strftime('%d/%m/%Y'))
-            arc_user.user_id = request.user.id
-            arc_user.save()
-
-        else:
-
-            # If an Arc review has already started (but the application was released or resubmitted) then add user_id,
-            # and update last_accessed
-
-            arc_user = Arc.objects.get(pk=app_id)
-            arc_user.last_accessed = str(application.date_updated.strftime('%d/%m/%Y'))
-            arc_user.user_id = request.user.id
-            arc_user.save()
-
-        TimelineLog.objects.create(
-            content_object=arc_user,
-            user=request.user,
-            template='timeline_logger/application_action.txt',
-            extra_data={'user_type': 'reviewer', 'action': 'assigned to', 'entity': 'application'}
-        )
-
-        return JsonResponse({'message': arc_user.application_id})
-
-
-def get_assigned_apps(request):
-    """
-    Get applications currently supplied to the user
-    :param request: HTTP Request
-    :return: a list of Arc Review objects
-    """
-    apps = Arc.objects.all()
-    arr = []
-    for i in apps:
-        arr.append(i)
-    return arr
-
-
-def get_oldest_application_id():
-    """
-    Get the oldest application (where payment is successful)
-    :return: Application ID
-    """
-    application_list = Application.objects.exclude(date_submitted=None)
-    for application in application_list:
-        # Only return applications that have been submitted successfully by childminder (or released by arc)
-        if application.application_status == 'SUBMITTED':
-            return application.application_id
+from arc_application.db_gateways import NannyGatewayActions
 
 
 def custom_login(request):
@@ -262,12 +93,6 @@ def release(request, application_id):
     return release_application(request, application_id, 'SUBMITTED')
 
 
-# TRIGGER
-# This is where all applications are released (3 different messages)
-# 1. If status == 'COMPLETED' it has been released by Arc User (not mentioned in BDD)
-# 2. If status == 'FURTHER_INFORMATION' it needs to be returned to the applicant (BDD #3)
-# 3. If status == 'ACCEPTED' it has been submitted to Cygnum (BDD #8)
-
 @login_required
 def release_application(request, application_id, status):
     """
@@ -279,19 +104,6 @@ def release_application(request, application_id, status):
     :param status: what status to update the application with on release
     :return: Either redirect on success, or return error page (TBC)
     """
-
-    # Logging
-    """
-    if ApplicantPersonalDetails.objects.filter(application_id=local_application_id).count() > 0:
-                personal_details = ApplicantPersonalDetails.objects.get(
-                    application_id=local_application_id
-                )
-                applicant_name = ApplicantName.objects.get(
-                    personal_detail_id=personal_details.personal_detail_id
-                )
-                obj.applicant_name = applicant_name.first_name + ' ' + applicant_name.last_name
-    """
-
     if Application.objects.filter(application_id=application_id).exists():
         app = Application.objects.get(application_id=application_id)
         app.application_status = status
@@ -300,6 +112,13 @@ def release_application(request, application_id, status):
         # reset declaration task
         if status == 'FURTHER_INFORMATION':
             reset_declaration(app)
+
+    # If application_id doesn't correspond to a Childminder application, it must be a Nanny one.
+    else:
+        nanny_api_response = NannyGatewayActions().read('application', params={'application_id': application_id})
+        record = nanny_api_response.record
+        record['application_status'] = 'SUBMITTED'
+        NannyGatewayActions().put('application', params=record)
 
     if Arc.objects.filter(application_id=application_id).exists():
         arc = Arc.objects.get(pk=application_id)
