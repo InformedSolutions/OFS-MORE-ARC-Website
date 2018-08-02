@@ -7,7 +7,7 @@ from django.utils.decorators import method_decorator
 from django.urls import reverse_lazy
 
 from arc_application.db_gateways import NannyGatewayActions
-from arc_application.views.nanny_views.nanny_view_helpers import parse_date_of_birth
+from arc_application.models import Arc
 
 
 @method_decorator(login_required, name='get')
@@ -23,13 +23,42 @@ class NannyChildcareAddressSummary(View):
         # Get application ID
         application_id = request.GET["id"]
 
+        context = self.create_context(application_id)
+
+        return render(request, self.TEMPLATE_NAME, context=context)
+
+    def post(self, request):
+        # TODO -o first_aid_training post
+
+        # Get application ID
+        application_id = request.POST["id"]
+
+        # # Update task status to FLAGGED
+        # arc_application = Arc.objects.get(application_id=application_id)
+        # arc_application.childcare_address_review = 'FLAGGED'
+        # arc_application.save()
+
+        # Update task status to COMPLETED
+        arc_application = Arc.objects.get(application_id=application_id)
+        arc_application.childcare_address_review = 'COMPLETED'
+        arc_application.save()
+
+        redirect_address = settings.URL_PREFIX + self.REDIRECT_LINK + '?id=' + application_id
+
+        return HttpResponseRedirect(redirect_address)
+
+    def create_context(self, application_id):
+        '''
+
+        :return: Context for the form
+        '''
+
         # Get nanny information
         nanny_actions = NannyGatewayActions()
         home_address_info = nanny_actions.read('applicant-home-address',
-                                                params={'application_id': application_id}).record
+                                               params={'application_id': application_id}).record
 
-
-        work_location_bool = home_address_info['childcare_address'] # TODO Find work_location field
+        work_location_bool = home_address_info['childcare_address']  # TODO Find work_location field
         work_at_home_bool = home_address_info['childcare_address']
         home_address_locations = nanny_actions.list('childcare-address',
                                                     params={'application_id': application_id}).record
@@ -53,16 +82,4 @@ class NannyChildcareAddressSummary(View):
             # 'childcare_address_index_lookup_list': childcare_address_index_lookup_list
         }
 
-        return render(request, self.TEMPLATE_NAME, context=context)
-
-    def post(self, request):
-        # TODO -o childcare_address post
-
-        # Get application ID
-        application_id = request.GET["id"]
-
-        context = {}
-
-        redirect_address = settings.URL_PREFIX + self.REDIRECT_LINK + '?id=' + application_id
-
-        return HttpResponseRedirect(redirect_address)
+        return context

@@ -1,0 +1,53 @@
+{% extends 'govuk_template.html' %}
+{% block page_title %}Review: Insurance cover{% endblock %}
+{% load static %}
+{% load govuk_template_base %}
+{% block inner_content %}
+{% include 'back-button.html' %}
+
+<form method="post" novalidate>
+    {% csrf_token %}
+
+    <h1 class="form-title heading-large">
+        Review: Insurance cover
+    </h1>
+    <p>
+        Please check the boxes if there are errors.
+    </p>
+
+    <!-- Do you have public liability insurance? -->
+    <table class="check-your-answers form-group">
+        <tbody>
+        <tr>
+            <td>
+                Do you have public liability insurance?
+            </td>
+            <td style="word-wrap: break-word">
+                {{insurance_bool}}
+            </td>
+        </tr>
+        <tr class="js-hidden" id="insurance_bool">
+            <td colspan="1">
+                <div>
+                    {{ form.insurance_bool_comments.label}}
+                </div>
+                <div>
+                    {{ form.insurance_bool_comments.help_text}}
+                </div>
+            </td>
+            <td colspan="2">
+                {{ form.insurance_bool_comments}}
+            </td>
+        </tr>
+
+        </tbody>
+    </table>
+
+    <input type="submit" class="button" value="Confirm and continue"/>
+    <input type="hidden" value="{{application_id}}" name="id"/>
+
+   {% include 'nanny_templates/nanny-return-to-list.html' %}
+
+</form>
+
+{% endblock %}

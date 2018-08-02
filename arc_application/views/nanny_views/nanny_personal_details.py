@@ -8,6 +8,7 @@ from django.urls import reverse_lazy
 
 from arc_application.db_gateways import NannyGatewayActions
 from arc_application.views.nanny_views.nanny_view_helpers import parse_date_of_birth
+from arc_application.models import Arc
 
 
 @method_decorator(login_required, name='get')
@@ -22,6 +23,59 @@ class NannyPersonalDetailsSummary(View):
 
         # Get application ID
         application_id = request.GET["id"]
+
+        context = self.create_context(application_id)
+
+        return render(request, self.TEMPLATE_NAME, context=context)
+
+    def post(self, request):
+        # TODO -o personal_details post
+
+        # Get application ID
+        application_id = request.POST["id"]
+
+        # # Update task status to FLAGGED
+        # arc_application = Arc.objects.get(application_id=application_id)
+        # arc_application.personal_details_review = 'FLAGGED'
+        # arc_application.save()
+
+        # Update task status to COMPLETED
+        arc_application = Arc.objects.get(application_id=application_id)
+        arc_application.personal_details_review = 'COMPLETED'
+        arc_application.save()
+
+        redirect_address = settings.URL_PREFIX + self.REDIRECT_LINK + '?id=' + application_id
+
+        return HttpResponseRedirect(redirect_address)
+
+    def month_converter(self, dob_string):
+        month_list = ["January",
+                      "Februrary",
+                      "March",
+                      "April",
+                      "May",
+                      "June",
+                      "July",
+                      "August",
+                      "September",
+                      "October",
+                      "November",
+                      "December"]
+
+        dob_dict = parse_date_of_birth(dob_string)
+        birth_day = dob_dict['birth_day']
+        birth_month = dob_dict['birth_month']
+        birth_year = dob_dict['birth_year']
+
+        month = month_list[int(birth_month) + 1]
+
+        return "{0} {1} {2}".format(birth_day, month, birth_year)
+
+    def create_context(self, application_id):
+        '''
+
+        :return: Context for the form
+        '''
 
         # Get nanny information
         nanny_actions = NannyGatewayActions()
@@ -61,38 +115,4 @@ class NannyPersonalDetailsSummary(View):
             'lived_abroad': lived_abroad
         }
 
-        return render(request, self.TEMPLATE_NAME, context=context)
-
-    def post(self, request):
-
-        # Get application ID
-        application_id = request.GET["id"]
-
-        context = {}
-
-        redirect_address = settings.URL_PREFIX + self.REDIRECT_LINK + '?id=' + application_id
-
-        return HttpResponseRedirect(redirect_address)
-
-    def month_converter(self, dob_string):
-        month_list = ["January",
-                      "Februrary",
-                      "March",
-                      "April",
-                      "May",
-                      "June",
-                      "July",
-                      "August",
-                      "September",
-                      "October",
-                      "November",
-                      "December"]
-
-        dob_dict = parse_date_of_birth(dob_string)
-        birth_day = dob_dict['birth_day']
-        birth_month = dob_dict['birth_month']
-        birth_year = dob_dict['birth_year']
-
-        month = month_list[int(birth_month) + 1]
-
-        return "{0} {1} {2}".format(birth_day, month, birth_year)
+        return context

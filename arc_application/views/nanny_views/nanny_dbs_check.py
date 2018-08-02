@@ -6,17 +6,18 @@ from django.views import View
 from django.utils.decorators import method_decorator
 from django.urls import reverse_lazy
 
-from arc_application.db_gateways import IdentityGatewayActions
+from arc_application.db_gateways import IdentityGatewayActions, NannyGatewayActions
+from arc_application.views.nanny_views.nanny_view_helpers import parse_date_of_birth
 from arc_application.models import Arc
 
 
 @method_decorator(login_required, name='get')
 @method_decorator(login_required, name='post')
-class NannyContactDetailsSummary(View):
-    TEMPLATE_NAME = 'nanny_contact_details_summary.html'
+class NannyDbsCheckSummary(View):
+    TEMPLATE_NAME = 'nanny_dbs_check_summary.html'
     FORM_NAME = ''
-    # TODO Fix to allow use of reverse_lazy
-    REDIRECT_LINK = '/nanny/personal-details' #reverse_lazy('nanny_childcare_address_summary')
+    # TODO -o Fix to allow use of reverse_lazy
+    REDIRECT_LINK = '/nanny/insurance-cover' #reverse_lazy('nanny_childcare_address_summary')
 
     def get(self, request):
 
@@ -28,19 +29,19 @@ class NannyContactDetailsSummary(View):
         return render(request, self.TEMPLATE_NAME, context=context)
 
     def post(self, request):
-        # TODO -o contact_details post
+        # TODO -o dbs_check post
 
         # Get application ID
         application_id = request.POST["id"]
 
         # # Update task status to FLAGGED
         # arc_application = Arc.objects.get(application_id=application_id)
-        # arc_application.first_aid_review = 'FLAGGED'
+        # arc_application.dbs_review = 'FLAGGED'
         # arc_application.save()
 
         # Update task status to COMPLETED
         arc_application = Arc.objects.get(application_id=application_id)
-        arc_application.login_details_review = 'COMPLETED'
+        arc_application.dbs_review = 'COMPLETED'
         arc_application.save()
 
         redirect_address = settings.URL_PREFIX + self.REDIRECT_LINK + '?id=' + application_id
@@ -54,21 +55,19 @@ class NannyContactDetailsSummary(View):
         '''
 
         # Get nanny information
-        identity_actions = IdentityGatewayActions()
-        contact_details = identity_actions.read('user',
-                                                params={'application_id': application_id}).record
+        nanny_actions = NannyGatewayActions()
+        dbs_check_dict = nanny_actions.read('dbs-check',
+                                            params={'application_id': application_id}).record
 
-        email = contact_details['email']
-        mobile_phone_number = contact_details['mobile_number']
-        other_phone_number = contact_details['add_phone_number']
+        dbs_certificate_number = dbs_check_dict['dbs_number']
+        criminal_bool = dbs_check_dict['convictions']
 
         # Set up context
         context = {
             # 'form': '',
             'application_id': application_id,
-            'email': email,
-            'mobile_number': mobile_phone_number,
-            'add_phone_number': other_phone_number
+            'dbs_certificate_number': dbs_certificate_number,
+            'criminal_bool': criminal_bool
         }
 
         return context

@@ -7,7 +7,7 @@ from django.utils.decorators import method_decorator
 from django.urls import reverse_lazy
 
 from arc_application.db_gateways import IdentityGatewayActions, NannyGatewayActions
-from arc_application.views.nanny_views.nanny_view_helpers import parse_date_of_birth
+from arc_application.models import Arc
 
 
 @method_decorator(login_required, name='get')
@@ -23,12 +23,42 @@ class NannyFirstAidTrainingSummary(View):
         # Get application ID
         application_id = request.GET["id"]
 
+        context = self.create_context(application_id)
+
+        return render(request, self.TEMPLATE_NAME, context=context)
+
+    def post(self, request):
+        # TODO -o first_aid_training post
+
+        # Get application ID
+        application_id = request.POST["id"]
+
+        # # Update task status to FLAGGED
+        # arc_application = Arc.objects.get(application_id=application_id)
+        # arc_application.first_aid_review = 'FLAGGED'
+        # arc_application.save()
+
+        # Update task status to COMPLETED
+        arc_application = Arc.objects.get(application_id=application_id)
+        arc_application.first_aid_review = 'COMPLETED'
+        arc_application.save()
+
+        redirect_address = settings.URL_PREFIX + self.REDIRECT_LINK + '?id=' + application_id
+
+        return HttpResponseRedirect(redirect_address)
+
+    def create_context(self, application_id):
+        '''
+
+        :return: Context for the form
+        '''
+
         # Get nanny information
         nanny_actions = NannyGatewayActions()
         first_aid_dict = nanny_actions.read('first-aid',
-                                                params={'application_id': application_id}).record
+                                            params={'application_id': application_id}).record
 
-        training_organisation = first_aid_dict['training_organisation'] # TODO Find work_location field
+        training_organisation = first_aid_dict['training_organisation']  # TODO Find work_location field
         training_course_title = first_aid_dict['course_title']
         date_course_completed = first_aid_dict['course_date']
 
@@ -41,16 +71,4 @@ class NannyFirstAidTrainingSummary(View):
             'date_course_completed': date_course_completed,
         }
 
-        return render(request, self.TEMPLATE_NAME, context=context)
-
-    def post(self, request):
-        # TODO -o childcare_address post
-
-        # Get application ID
-        application_id = request.GET["id"]
-
-        context = {}
-
-        redirect_address = settings.URL_PREFIX + self.REDIRECT_LINK + '?id=' + application_id
-
-        return HttpResponseRedirect(redirect_address)
+        return context

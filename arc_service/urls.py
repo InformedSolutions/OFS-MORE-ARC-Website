@@ -35,6 +35,10 @@ from arc_application.views.nanny_views.nanny_contact_details import NannyContact
 from arc_application.views.nanny_views.nanny_personal_details import NannyPersonalDetailsSummary
 from arc_application.views.nanny_views.nanny_childcare_address import NannyChildcareAddressSummary
 from arc_application.views.nanny_views.nanny_first_aid import NannyFirstAidTrainingSummary
+from arc_application.views.nanny_views.nanny_childcare_training import NannyChildcareTrainingSummary
+from arc_application.views.nanny_views.nanny_dbs_check import NannyDbsCheckSummary
+from arc_application.views.nanny_views.nanny_insurance_cover import NannyInsuranceCoverSummary
+from arc_application.views.nanny_views.nanny_arc_summary import NannyArcSummary
 
 from django.conf import settings
 from django.conf.urls import include, url
@@ -90,10 +94,10 @@ urlpatterns = [
     url(r'^nanny/personal-details', NannyPersonalDetailsSummary.as_view(), name='nanny_personal_details_summary'),
     url(r'^nanny/childcare-address', NannyChildcareAddressSummary.as_view(), name='nanny_childcare_address_summary'),
     url(r'^nanny/first-aid-training', NannyFirstAidTrainingSummary.as_view(), name='nanny_first_aid_training_summary'),
-    url(r'^nanny/childcare-training', nanny_childcare_training_summary, name='nanny_childcare_training_summary'),
-    url(r'^nanny/dbs', nanny_dbs_summary, name='nanny_dbs_summary'),
-    url(r'^nanny/insurance-cover', nanny_insurance_cover_summary, name='nanny_insurance_cover_summary'),
-    url(r'^nanny/arc-summary', nanny_arc_summary, name='nanny_arc_summary'),
+    url(r'^nanny/childcare-training', NannyChildcareTrainingSummary.as_view(), name='nanny_childcare_training_summary'),
+    url(r'^nanny/dbs', NannyDbsCheckSummary.as_view(), name='nanny_dbs_summary'),
+    url(r'^nanny/insurance-cover', NannyInsuranceCoverSummary.as_view(), name='nanny_insurance_cover_summary'),
+    url(r'^nanny/arc-summary', NannyArcSummary.as_view(), name='nanny_arc_summary'),
 ]
 
 if settings.URL_PREFIX:

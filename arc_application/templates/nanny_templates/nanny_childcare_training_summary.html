@@ -1,5 +1,5 @@
 {% extends 'govuk_template.html' %}
-{% block page_title %}Review: your sign in details{% endblock %}
+{% block page_title %}Review: Childcare training{% endblock %}
 {% load static %}
 {% load govuk_template_base %}
 {% block inner_content %}
@@ -9,7 +9,7 @@
     {% csrf_token %}
 
     <h1 class="form-title heading-large">
-        Review: your sign in details
+        Review: Childcare training
     </h1>
     <p>
         Please check the boxes if there are errors.
@@ -19,68 +19,45 @@
         <tbody>
         <tr>
             <td>
-                Email
+                Do you have a childcare qualification?
             </td>
             <td style="word-wrap: break-word">
-                {{email}}
+                {{qualification_bool}}
             </td>
         </tr>
-        <tr class="js-hidden" id="email_address">
+        <tr class="js-hidden" id="qualification_bool">
             <td colspan="1">
                 <div>
-                    {{ form.email_address_comments.label}}
+                    {{ form.qualification_bool_comments.label}}
                 </div>
                 <div>
-                    {{ form.email_address_comments.help_text}}
+                    {{ form.qualification_bool_comments.help_text}}
                 </div>
             </td>
             <td colspan="2">
-                {{ form.email_address_comments}}
+                {{ form.qualification_bool_comments}}
             </td>
         </tr>
         <tr>
             <td>
-                Mobile phone number
+                Have you had common core training?
             </td>
             <td style="word-wrap: break-word">
-                {{mobile_number}}
+                {{core_training_bool}}
             </td>
         </tr>
-        <tr class="js-hidden" id="mobile_number">
+        <tr class="js-hidden" id="core_training_bool">
             <td colspan="1">
                 <div>
-                    {{ form.mobile_number_comments.label}}
+                    {{ form.core_training_bool_comments.label}}
                 </div>
                 <div>
-                    {{ form.mobile_number_comments.help_text}}
+                    {{ form.core_training_bool_comments.help_text}}
                 </div>
             </td>
             <td colspan="2">
                 <div>
-                    {{ form.mobile_number_comments}}
-                </div>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                Other phone number
-            </td>
-            <td style="word-wrap: break-word">
-                {{add_phone_number}}
-            </td>
-        </tr>
-        <tr class="js-hidden" id="add_phone_number">
-            <td colspan="1">
-                <div>
-                    {{ form.add_phone_number_comments.label}}
-                </div>
-                <div>
-                    {{ form.add_phone_number_comments.help_text}}
-                </div>
-            </td>
-            <td colspan="2">
-                <div>
-                    {{ form.add_phone_number_comments}}
+                    {{ form.core_training_bool_comments}}
                 </div>
             </td>
         </tr>

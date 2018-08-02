@@ -1,5 +1,5 @@
 {% extends 'govuk_template.html' %}
-{% block page_title %}Review: your sign in details{% endblock %}
+{% block page_title %}Review: Your sign in details{% endblock %}
 {% load static %}
 {% load govuk_template_base %}
 {% block inner_content %}
@@ -9,14 +9,16 @@
     {% csrf_token %}
 
     <h1 class="form-title heading-large">
-        Review: your sign in details
+        Review: Your sign in details
     </h1>
     <p>
         Please check the boxes if there are errors.
     </p>
-    <!-- Login details -->
+
     <table class="check-your-answers form-group">
         <tbody>
+
+        <!-- Email -->
         <tr>
             <td>
                 Email
@@ -38,6 +40,8 @@
                 {{ form.email_address_comments}}
             </td>
         </tr>
+
+        <!-- Mobile phone number -->
         <tr>
             <td>
                 Mobile phone number
@@ -61,6 +65,8 @@
                 </div>
             </td>
         </tr>
+
+        <!-- Other phone number -->
         <tr>
             <td>
                 Other phone number

@@ -1,0 +1,69 @@
+{% extends 'govuk_template.html' %}
+{% block page_title %}Application summary{% endblock %}
+{% load static %}
+{% load govuk_template_base %}
+{% block inner_content %}
+{% include 'back-button.html' %}
+
+<h1 class="form-title heading-large">
+    Check and confirm all details
+</h1>
+<h2 class="heading-medium">
+    Application number: {{ application_reference }}
+</h2>
+<!-- Likely a temporary method of representing the context -->
+<div class="two-thirds">
+    <table class="check-your-answers form-group">
+
+        <!-- Contact Details -->
+        <thead>
+            <tr>
+                <h2 class="heading-medium">
+                Your sign in details
+                </h2>
+            </tr>
+        </thead>
+
+        <!-- Email -->
+        <tr>
+            <td>
+                Email
+            </td>
+            <td style="word-wrap: break-word">
+                {{email}}
+            </td>
+        </tr>
+        <!-- Mobile phone number -->
+        <tr>
+            <td>
+                Mobile phone number
+            </td>
+            <td style="word-wrap: break-word">
+                {{mobile_number}}
+            </td>
+        </tr>
+        <!-- Other phone number -->
+        <tr>
+            <td>
+                Other phone number
+            </td>
+            <td style="word-wrap: break-word">
+                {{add_phone_number}}
+            </td>
+        </tr>
+        <!-- Personal Details -->
+        <h2 class="heading-medium">
+            Your personal details
+        </h2>
+
+    </table>
+</div>
+
+<form method="post">
+    {% csrf_token %}
+    <input type="submit" class="button" value="Confirm and continue"/>
+    <input type="hidden" value="{{application_id}}" name="id"/>
+</form>
+{% include 'childminder_templates/return-to-list.html' %}
+
+{% endblock %}
