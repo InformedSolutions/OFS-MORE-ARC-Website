@@ -19,57 +19,83 @@
         <tbody>
         <tr>
             <td>
-                Email
+                Do you know where you will be working?
             </td>
             <td style="word-wrap: break-word">
-                {{email}}
+                {{work_location_bool}}
             </td>
         </tr>
-        <tr class="js-hidden" id="email_address">
+        <tr class="js-hidden" id="work_location">
             <td colspan="1">
                 <div>
-                    {{ form.email_address_comments.label}}
+                    {{ form.work_location_comments.label}}
                 </div>
                 <div>
-                    {{ form.email_address_comments.help_text}}
+                    {{ form.work_location_comments.help_text}}
                 </div>
             </td>
             <td colspan="2">
-                {{ form.email_address_comments}}
+                {{ form.work_location_comments}}
             </td>
         </tr>
         <tr>
             <td>
-                Mobile phone number
+                Do you work and live at the same address?
             </td>
             <td style="word-wrap: break-word">
-                {{mobile_number}}
+                {{work_at_home_bool}}
             </td>
         </tr>
-        <tr class="js-hidden" id="mobile_number">
+        <tr class="js-hidden" id="work_at_home">
             <td colspan="1">
                 <div>
-                    {{ form.mobile_number_comments.label}}
+                    {{ form.work_at_home_comments.label}}
                 </div>
                 <div>
-                    {{ form.mobile_number_comments.help_text}}
+                    {{ form.work_at_home_comments.help_text}}
                 </div>
             </td>
             <td colspan="2">
                 <div>
-                    {{ form.mobile_number_comments}}
+                    {{ form.work_at_home_comments}}
                 </div>
             </td>
         </tr>
+        {% for home_address in home_address_locations %}
         <tr>
+
             <td>
-                Other phone number
+                Childcare address {{forloop.counter}}
             </td>
-            <td style="word-wrap: break-word">
-                {{add_phone_number}}
-            </td>
+                <td style="word-wrap: break-word">
+
+                    {% if home_address.street_line1 %}
+                        {{ home_address.street_line1 }}
+                    {% endif %}
+
+                    {% if home_address.street_line2 %}
+                        <br>
+                        {{home_address.street_line2}}
+                    {% endif %}
+
+                    {% if home_address.town %}
+                        <br>
+                        {{home_address.town}}
+                    {% endif %}
+
+                    {% if home_address.county %}
+                        <br>
+                        {{home_address.county}}
+                    {% endif %}
+
+                    {% if home_address.postcode %}
+                        <br>
+                        {{home_address.postcode}}
+                    {% endif %}
+
+                </td>
         </tr>
-        <tr class="js-hidden" id="add_phone_number">
+        <tr class="js-hidden" id="childcare_address">
             <td colspan="1">
                 <div>
                     {{ form.add_phone_number_comments.label}}
@@ -84,6 +110,7 @@
                 </div>
             </td>
         </tr>
+        {% endfor %}
         </tbody>
     </table>
 

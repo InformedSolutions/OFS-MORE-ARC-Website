@@ -14,73 +14,72 @@
     <p>
         Please check the boxes if there are errors.
     </p>
-    <!-- Login details -->
     <table class="check-your-answers form-group">
         <tbody>
         <tr>
             <td>
-                Email
+                Training organisation
             </td>
             <td style="word-wrap: break-word">
-                {{email}}
+                {{training_organisation}}
             </td>
         </tr>
-        <tr class="js-hidden" id="email_address">
+        <tr class="js-hidden" id="training_organisation">
             <td colspan="1">
                 <div>
-                    {{ form.email_address_comments.label}}
+                    {{ form.training_organisation_comments.label}}
                 </div>
                 <div>
-                    {{ form.email_address_comments.help_text}}
+                    {{ form.training_organisation_comments.help_text}}
                 </div>
             </td>
             <td colspan="2">
-                {{ form.email_address_comments}}
+                {{ form.training_organisation_comments}}
             </td>
         </tr>
         <tr>
             <td>
-                Mobile phone number
+                Title of training course
             </td>
             <td style="word-wrap: break-word">
-                {{mobile_number}}
+                {{training_course_title}}
             </td>
         </tr>
-        <tr class="js-hidden" id="mobile_number">
+        <tr class="js-hidden" id="training_course_title">
             <td colspan="1">
                 <div>
-                    {{ form.mobile_number_comments.label}}
+                    {{ form.training_course_title_comments.label}}
                 </div>
                 <div>
-                    {{ form.mobile_number_comments.help_text}}
+                    {{ form.training_course_title_comments.help_text}}
                 </div>
             </td>
             <td colspan="2">
                 <div>
-                    {{ form.mobile_number_comments}}
+                    {{ form.training_course_title_comments}}
                 </div>
             </td>
         </tr>
         <tr>
             <td>
-                Other phone number
+                Date you completed the course
             </td>
             <td style="word-wrap: break-word">
-                {{add_phone_number}}
+                {{date_course_completed}}
             </td>
         </tr>
-        <tr class="js-hidden" id="add_phone_number">
+        <tr class="js-hidden" id="date_course_completed">
             <td colspan="1">
                 <div>
-                    {{ form.add_phone_number_comments.label}}
+                    {{ form.date_course_completed_comments.label}}
                 </div>
                 <div>
-                    {{ form.add_phone_number_comments.help_text}}
+                    {{ form.date_course_completed_comments.help_text}}
                 </div>
             </td>
             <td colspan="2">
                 <div>
-                    {{ form.add_phone_number_comments}}
+                    {{ form.date_course_completed_comments}}
                 </div>
             </td>
         </tr>

@@ -9,6 +9,10 @@ import re
 from arc_application.views.base import assign_new_application, custom_login, error_403, error_404, error_500, release, \
     summary_page, AuditlogListView
 from arc_application.views.arc_user_summary import ARCUserSummaryView
+from arc_application.contact_centre import search
+
+# Childminder Views
+
 from arc_application.views.childminder_views.contact_details import contact_summary
 from arc_application.views.childminder_views.dbs_check import dbs_check_summary
 from arc_application.views.childminder_views.eyfs_check import EFYSCheckSummaryView
@@ -23,9 +27,14 @@ from arc_application.views.childminder_views.type_of_childcare import type_of_ch
 from arc_application.views.childminder_views.arc_summary import cc_summary, arc_summary
 from arc_application.views.contact_centre.change_details import UpdateEmailView, UpdatePhoneNumberView, \
     UpdateAddPhoneNumberView
-from arc_application.contact_centre import search
+
+# Nanny Views
+
 from arc_application.views.nanny_views.nanny_review import nanny_task_list
+from arc_application.views.nanny_views.nanny_contact_details import NannyContactDetailsSummary
 from arc_application.views.nanny_views.nanny_personal_details import NannyPersonalDetailsSummary
+from arc_application.views.nanny_views.nanny_childcare_address import NannyChildcareAddressSummary
+from arc_application.views.nanny_views.nanny_first_aid import NannyFirstAidTrainingSummary
 
 from django.conf import settings
 from django.conf.urls import include, url
@@ -37,9 +46,6 @@ from arc_application.views.childminder_views.personal_details_addresses import p
 
 
 #PLACEHOLDERS, reroutes these views to the nanny task list view.
-nanny_contact_summary = nanny_task_list
-nanny_childcare_address_summary = nanny_task_list
-nanny_first_aid_training_summary = nanny_task_list
 nanny_childcare_training_summary = nanny_task_list
 nanny_dbs_summary = nanny_task_list
 nanny_insurance_cover_summary = nanny_task_list
@@ -80,10 +86,10 @@ urlpatterns = [
     url(r'^personal-details/previous-registration', PreviousRegistrationDetailsView.as_view(),
         name='previous_registration_details'),
     url(r'^nanny/review', nanny_task_list, name='nanny_task_list'),
-    url(r'^nanny/contact-details', nanny_contact_summary, name='nanny_contact_summary'),
+    url(r'^nanny/contact-details', NannyContactDetailsSummary.as_view(), name='nanny_contact_summary'),
     url(r'^nanny/personal-details', NannyPersonalDetailsSummary.as_view(), name='nanny_personal_details_summary'),
-    url(r'^nanny/childcare-address', nanny_childcare_address_summary, name='nanny_childcare_address_summary'),
-    url(r'^nanny/first-aid-training', nanny_first_aid_training_summary, name='nanny_first_aid_training_summary'),
+    url(r'^nanny/childcare-address', NannyChildcareAddressSummary.as_view(), name='nanny_childcare_address_summary'),
+    url(r'^nanny/first-aid-training', NannyFirstAidTrainingSummary.as_view(), name='nanny_first_aid_training_summary'),
     url(r'^nanny/childcare-training', nanny_childcare_training_summary, name='nanny_childcare_training_summary'),
     url(r'^nanny/dbs', nanny_dbs_summary, name='nanny_dbs_summary'),
     url(r'^nanny/insurance-cover', nanny_insurance_cover_summary, name='nanny_insurance_cover_summary'),
