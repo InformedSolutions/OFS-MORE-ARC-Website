@@ -78,7 +78,8 @@ def save_comments(request, comment_list):
 
             if single_comment[2] == 'health_check_status':
                 adult = AdultInHome.objects.get(adult_id=single_comment[0])
-                adult.health_check_status = 'Flagged'
+                adult.health_check_status = 'Started'
+                adult.email_resent = 0
                 adult.save()
 
             # If a field already has a comment, this will update it, otherwise it will use the 'default' dictionary
