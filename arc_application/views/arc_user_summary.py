@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.decorators import login_required
@@ -103,7 +105,15 @@ class ApplicationHandlerTemplate:
 
         application_record = NannyGatewayActions().read('application', params={'application_id': str(application_id)}).record
         row_data['application_id'] = application_record['application_id']
-        row_data['date_submitted'] = application_record['date_submitted']
+
+        # date_submitted = datetime.strptime(application_record['date_submitted'][:10], '%Y-%m-%d')
+        # date_submitted = datetime.strptime(application_record['date_submitted'][:10], '%d-%mm-%Y')
+
+        date_submitted = datetime.strptime(application_record['date_submitted'][:10], '%Y-%m-%d').strftime('%d %b %Y')
+        time_submitted = datetime.strptime(application_record['date_submitted'][11:16], '%H:%M').strftime('%-I:%M %p')
+        time_submitted = time_submitted.lower()
+
+        row_data['date_submitted'] = date_submitted + ', ' + time_submitted
         row_data['last_accessed'] = application_record['date_updated']  #self.arc_user.last_accessed
         row_data['app_type'] = 'Nanny'
 
