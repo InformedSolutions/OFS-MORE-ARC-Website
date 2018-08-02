@@ -2,6 +2,7 @@ from unittest import mock
 
 from django.conf import settings
 from django.contrib.auth.models import Group, User
+from django.http import HttpResponse
 from django.test import tag, TestCase
 from django.urls import reverse
 
@@ -12,8 +13,8 @@ from arc_application.views.arc_user_summary import ARCUserSummaryView, NannyAppl
 mock_nanny_application = {
     'application_status': 'SUBMITTED',
     'application_id': '998fd8ec-b96b-4a71-a1a1-a7a3ae186729',
-    'date_submitted': '2018-07-31',
-    'date_updated': '2018-07-31',
+    'date_submitted': '2018-07-31 17:20:46.011717+00',
+    'date_updated': '2018-07-31 17:20:46.011717+00',
 }
 
 mock_personal_details_record = {
@@ -21,18 +22,24 @@ mock_personal_details_record = {
     'last_name': 'Selenium',
 }
 
+
+nanny_application_response = HttpResponse()
+nanny_application_response.status_code = 200
+nanny_application_response.record = mock_nanny_application
+
+personal_details_response = HttpResponse()
+personal_details_response.status_code = 200
+personal_details_response.record = mock_personal_details_record
+
+
 mock_endpoint_return_values = {
-    'application': mock_nanny_application,
-    'applicant-personal-details': mock_personal_details_record
+    'application': nanny_application_response,
+    'applicant-personal-details': personal_details_response,
 }
 
 
 def side_effect(endpoint_name, *args, **kwargs):
     return mock_endpoint_return_values[endpoint_name]
-
-
-class ARCMock(mock.MagicMock):
-    pass
 
 
 class ArcUserSummaryPageTests(TestCase):
@@ -151,27 +158,19 @@ class ArcUserSummaryPageTests(TestCase):
 
     @tag('http')
     def test_assigns_nanny_app_if_one_available(self):
-        """with mock.patch('arc_application.db_gateways.NannyGatewayActions.list') as mock_nanny_list, \
+        with mock.patch('arc_application.db_gateways.NannyGatewayActions.list') as mock_nanny_list, \
                 mock.patch('arc_application.db_gateways.NannyGatewayActions.read') as mock_nanny_read:
 
-            mock_nanny_list.return_value.record = [mock_nanny_application]
             mock_nanny_list.return_value.status_code = 200
-            # mock_nanny_read.return_value.record = mock_nanny_application
-            # mock_identity_read.return_value.record = mock_personal_details_record
+            mock_nanny_list.return_value.record = [mock_nanny_application]
             mock_nanny_read.side_effect = side_effect
-
-            # mock_nanny_read.mock_add_spec(mock_nanny_read.spec.append('record'))
-
-            mock_nanny_read.return_value.record = mock.PropertyMock(side_effect=side_effect)
 
             self.client.post(reverse('summary'), data={'add_nanny_application': 'add_nanny_application'})
 
             arc_filter_query = Arc.objects.filter(user_id=self.user.id)
 
             self.assertTrue(arc_filter_query.exists())
-            self.assertEqual(arc_filter_query[0].application_id, mock_nanny_application['application_id'])"""
-
-        pass
+            self.assertEqual(str(arc_filter_query[0].application_id), mock_nanny_application['application_id'])
 
     @tag('http')
     def test_cannot_assign_more_than_five_applications(self):
