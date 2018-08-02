@@ -5,8 +5,9 @@ from django.shortcuts import render
 from django.views import View
 from django.utils.decorators import method_decorator
 
-from arc_application.models import Arc
+from timeline_logger.models import TimelineLog
 
+from arc_application.models import Arc, Application, ApplicantName
 from arc_application.db_gateways import NannyGatewayActions
 
 
@@ -82,7 +83,7 @@ class ApplicationHandlerTemplate:
 
         for assigned_application in assigned_applications:
             if assigned_application.app_type == 'Childminder':
-                pass
+                table_data.append(self.__get_childminder_table_data(assigned_application.application_id))
             elif assigned_application.app_type == 'Nanny':
                 table_data.append(self.__get_nanny_table_data(assigned_application.application_id))
 
@@ -113,7 +114,22 @@ class ApplicationHandlerTemplate:
             }
         ).record
 
-        row_data['applicant_name'] = personal_details_record['first_name'] + '' + personal_details_record['last_name']
+        row_data['applicant_name'] = personal_details_record['first_name'] + ' ' + personal_details_record['last_name']
+
+        return row_data
+
+    def __get_childminder_table_data(self, application_id):
+        row_data = dict()
+
+        application = Application.objects.get(application_id=application_id)
+        row_data['application_id'] = application_id
+        row_data['date_submitted'] = application.date_submitted
+        row_data['last_accessed'] = application.date_updated
+        row_data['app_type'] = 'Childminder'
+
+        applicant_name = ApplicantName.objects.get(application_id=application_id)
+
+        row_data['applicant_name'] = applicant_name.first_name + ' ' + applicant_name.last_name
 
         return row_data
 
@@ -121,13 +137,46 @@ class ApplicationHandlerTemplate:
 class ChildminderApplicationHandler(ApplicationHandlerTemplate):
 
     def _get_oldest_app_id(self):
-        pass
+
+        childminder_apps_for_review = Application.objects.filter(application_status='SUBMITTED')
+        if childminder_apps_for_review.exists():
+            childminder_apps_for_review.order_by('date_updated')
+            return childminder_apps_for_review[0].application_id
+        else:
+            return None
 
     def _assign_app_to_user(self, application_id):
-        pass
+        application_record = Application.objects.get(application_id=application_id)
+        application_record.application_status = 'ARC_REVIEW'
+        application_record.save()
+
+        if not Arc.objects.filter(pk=application_id).exists():
+            app_review = Arc.objects.create(application_id=application_id)
+
+            for field in self._list_tasks_for_review():
+                setattr(app_review, field, 'NOT_STARTED')
+
+            app_review.app_type = 'Childminder'
+            app_review.last_accessed = application_record.date_updated
+            app_review.user_id = self.arc_user.id
+            app_review.save()
+
+        else:
+            arc_user = Arc.objects.get(pk=application_id)
+            arc_user.last_accessed = application_record.date_updated
+            arc_user.user_id = self.arc_user.id
+            arc_user.save()
+
+            TimelineLog.objects.create(
+                content_object=self.arc_user,
+                user=self.arc_user,
+                template='timeline_logger/application_action.txt',
+                extra_data={'user_type': 'reviewer', 'action': 'assigned to', 'entity': 'application'}
+            )
 
     def _list_tasks_for_review(self):
-        pass
+        example_application = Application.objects.all()[0]
+        return [i.name[:-12] for i in example_application._meta.fields if i.name[-12:] == '_arc_flagged']
 
 
 class NannyApplicationHandler(ApplicationHandlerTemplate):
