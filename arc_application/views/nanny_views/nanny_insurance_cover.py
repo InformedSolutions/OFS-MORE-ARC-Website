@@ -14,7 +14,7 @@ from arc_application.models import Arc
 @method_decorator(login_required, name='get')
 @method_decorator(login_required, name='post')
 class NannyInsuranceCoverSummary(View):
-    TEMPLATE_NAME = 'nanny_insurance_cover_summary.html'
+    TEMPLATE_NAME = 'nanny_general_template.html'
     FORM_NAME = ''
     # TODO -o Fix to allow use of reverse_lazy
     REDIRECT_LINK = '/nanny/review' #reverse_lazy('nanny_childcare_address_summary')
@@ -63,9 +63,16 @@ class NannyInsuranceCoverSummary(View):
 
         # Set up context
         context = {
-            # 'form': '',
             'application_id': application_id,
-            'insurance_bool': insurance_bool
+            'title': 'Review: Childcare training',
+            # 'form': '',
+            'rows': [
+                {
+                    'id': 'insurance_bool',
+                    'name': 'Do you have public liability insurance?',
+                    'info': insurance_bool
+                }
+            ]
         }
 
         return context

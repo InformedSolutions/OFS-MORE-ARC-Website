@@ -1,0 +1,42 @@
+<!-- {{row.name}} -->
+<tr>
+    <td>
+        {{row.name}}
+    </td>
+    <td style="word-wrap: break-word">
+        {% load general_table_extras %}
+
+        {% if row.info|template_is_instance:'str' %}
+            {{row.info}}
+
+        {% elif row.info|template_is_instance:'bool' %}
+            {% if row.info %}
+                Yes
+            {% else %}
+                No
+            {% endif %}
+
+        {% elif row.info|template_is_instance:'dict' %}
+            {% include 'nanny_general_address_template.html' %}
+
+        {% else %}
+        ERROR: TYPE NOT FOUND
+
+        {% endif %}
+    </td>
+</tr>
+
+
+<tr class="js-hidden" id="{{row.id}}">
+    <td colspan="1">
+        <div>
+            {{ form.email_address_comments.label}}
+        </div>
+        <div>
+            {{ form.email_address_comments.help_text}}
+        </div>
+    </td>
+    <td colspan="2">
+        {{ form.email_address_comments}}
+    </td>
+</tr>

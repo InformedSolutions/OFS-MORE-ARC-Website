@@ -13,7 +13,7 @@ from arc_application.models import Arc
 @method_decorator(login_required, name='get')
 @method_decorator(login_required, name='post')
 class NannyFirstAidTrainingSummary(View):
-    TEMPLATE_NAME = 'nanny_first_aid_training_summary.html'
+    TEMPLATE_NAME = 'nanny_general_template.html'
     FORM_NAME = ''
     # TODO -o Fix to allow use of reverse_lazy
     REDIRECT_LINK = '/nanny/childcare-training' #reverse_lazy('nanny_childcare_address_summary')
@@ -64,11 +64,27 @@ class NannyFirstAidTrainingSummary(View):
 
         # Set up context
         context = {
-            # 'form': '',
             'application_id': application_id,
-            'training_organisation': training_organisation,
-            'training_course_title': training_course_title,
-            'date_course_completed': date_course_completed,
+            'title': 'Review: First aid training',
+            # 'form': '',
+            'rows': [
+                {
+                    'id': 'training_organisation',
+                    'name': 'Training organisation',
+                    'info': training_organisation
+                },
+                {
+                    'id': 'training_course_title',
+                    'name': 'Title of training course',
+                    'info': training_course_title
+                },
+                {
+                    'id': 'date_course_completed',
+                    'name': 'Date you completed the course',
+                    'info': date_course_completed
+                }
+            ]
+
         }
 
         return context

@@ -87,6 +87,7 @@ class NannyPersonalDetailsSummary(View):
         first_name = personal_details['first_name']
         middle_names = personal_details['middle_names']
         last_name = personal_details['last_name']
+        full_name = "{0} {1} {2}".format(first_name, middle_names, last_name)
 
         dob_string = personal_details['date_of_birth']
         dob_string_with_month = self.month_converter(dob_string)
@@ -94,25 +95,45 @@ class NannyPersonalDetailsSummary(View):
         street_line1 = home_address['street_line1']
         street_line2 = home_address['street_line2']
         town = home_address['town']
-        county = None  # home_address['county']
+        county = home_address['county']
         postcode = home_address['postcode']
 
         lived_abroad = personal_details['lived_abroad']
 
         # Set up context
         context = {
-            # 'form': '',
             'application_id': application_id,
-            'first_name': first_name,
-            'middle_names': middle_names,
-            'last_name': last_name,
-            'date_of_birth': dob_string_with_month,
-            'street_line1': street_line1,
-            'street_line2': street_line2,
-            'town': town,
-            'county': county,
-            'postcode': postcode,
-            'lived_abroad': lived_abroad
+            'title': 'Review: Your sign in details',
+            # 'form': '',
+            'rows': [
+                {
+                    'id': 'your_name',
+                    'name': 'Your name',
+                    'info': full_name
+                },
+                {
+                    'id': 'your_date_of_birth',
+                    'name': 'Your date of birth',
+                    'info': dob_string_with_month
+                },
+                {
+                    'id': 'home_address',
+                    'name': 'Home address',
+                    'info': {
+                        'street_line1': street_line1,
+                        'street_line2': street_line2,
+                        'town': town,
+                        'county': county,
+                        'postcode': postcode,
+                    }
+                },
+                {
+                    'id': 'lived_abroad',
+                    'name': 'Have you lived abroad in the last 5 years?',
+                    'info': lived_abroad
+                }
+            ]
+
         }
 
         return context

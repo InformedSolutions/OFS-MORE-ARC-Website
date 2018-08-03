@@ -1,5 +1,5 @@
 {% extends 'govuk_template.html' %}
-{% block page_title %}Review: Your sign in details{% endblock %}
+{% block page_title %}{{title}}{% endblock %}
 {% load static %}
 {% load govuk_template_base %}
 {% block inner_content %}
@@ -19,29 +19,16 @@
         <tbody>
 
         {% for row in rows %}
-        <!-- {{row.name}} -->
-        <tr>
-            <td>
-                {{row.name}}
-            </td>
-            <td style="word-wrap: break-word">
-                {{row.info}}
-            </td>
-        </tr>
-        <tr class="js-hidden" id="{{row.name}}">
-            <td colspan="1">
-                <div>
-                    {{ form.email_address_comments.label}}
-                </div>
-                <div>
-                    {{ form.email_address_comments.help_text}}
-                </div>
-            </td>
-            <td colspan="2">
-                {{ form.email_address_comments}}
-            </td>
-        </tr>
+        {% if row.id == 'home_address_locations' %}
+            {% for home_address in row.info %}
+                {% include 'nanny_childcare_address_template.html' %}
+            {% endfor %}
 
+        {% else %}
+
+        {% include 'nanny_general_table_template.html' %}
+
+        {% endif %}
         {% endfor %}
 
         </tbody>

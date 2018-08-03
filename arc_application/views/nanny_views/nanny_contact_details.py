@@ -13,7 +13,7 @@ from arc_application.models import Arc
 @method_decorator(login_required, name='get')
 @method_decorator(login_required, name='post')
 class NannyContactDetailsSummary(View):
-    TEMPLATE_NAME = 'nanny_contact_details_summary.html'
+    TEMPLATE_NAME = 'nanny_general_template.html'
     FORM_NAME = ''
     # TODO Fix to allow use of reverse_lazy
     REDIRECT_LINK = '/nanny/personal-details' #reverse_lazy('nanny_childcare_address_summary')
@@ -64,11 +64,27 @@ class NannyContactDetailsSummary(View):
 
         # Set up context
         context = {
-            # 'form': '',
             'application_id': application_id,
-            'email': email,
-            'mobile_number': mobile_phone_number,
-            'add_phone_number': other_phone_number
+            'title': 'Review: Your sign in details',
+            # 'form': '',
+            'rows': [
+                {
+                    'id': 'email',
+                    'name': 'Email',
+                    'info': email
+                },
+                {
+                    'id': 'mobile_phone_number',
+                    'name': 'Mobile phone number',
+                    'info': mobile_phone_number
+                },
+                {
+                    'id': 'mobile_phone_number',
+                    'name': 'Other phone number',
+                    'info': other_phone_number
+                }
+            ]
+
         }
 
         return context

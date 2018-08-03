@@ -91,11 +91,6 @@ class NannyArcSummary(View):
         for context in context_list:
             summary_context = self.merge_dicts(summary_context, context)
 
-        nanny_summary_dict = nanny_actions.read('summary',
-                                                    params={'application_id': application_id}).record
-
-        print(nanny_summary_dict)
-
         return summary_context
 
     def make_json(self, application_id):
