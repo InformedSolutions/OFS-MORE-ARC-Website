@@ -30,7 +30,7 @@ from arc_application.views.contact_centre.change_details import UpdateEmailView,
 
 # Nanny Views
 
-from arc_application.views.nanny_views.nanny_review import nanny_task_list
+from arc_application.views.nanny_views.nanny_review import NannyTaskList
 from arc_application.views.nanny_views.nanny_contact_details import NannyContactDetailsSummary
 from arc_application.views.nanny_views.nanny_personal_details import NannyPersonalDetailsSummary
 from arc_application.views.nanny_views.nanny_childcare_address import NannyChildcareAddressSummary
@@ -47,13 +47,6 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import logout
 
 from arc_application.views.childminder_views.personal_details_addresses import personal_details_previous_address
-
-
-#PLACEHOLDERS, reroutes these views to the nanny task list view.
-nanny_childcare_training_summary = nanny_task_list
-nanny_dbs_summary = nanny_task_list
-nanny_insurance_cover_summary = nanny_task_list
-nanny_arc_summary = nanny_task_list
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
@@ -89,7 +82,7 @@ urlpatterns = [
         name='update_add_number'),
     url(r'^personal-details/previous-registration', PreviousRegistrationDetailsView.as_view(),
         name='previous_registration_details'),
-    url(r'^nanny/review', nanny_task_list, name='nanny_task_list'),
+    url(r'^nanny/review', NannyTaskList.as_view(), name='nanny_task_list'),
     url(r'^nanny/contact-details', NannyContactDetailsSummary.as_view(), name='nanny_contact_summary'),
     url(r'^nanny/personal-details', NannyPersonalDetailsSummary.as_view(), name='nanny_personal_details_summary'),
     url(r'^nanny/childcare-address', NannyChildcareAddressSummary.as_view(), name='nanny_childcare_address_summary'),
