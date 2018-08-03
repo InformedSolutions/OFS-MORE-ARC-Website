@@ -112,45 +112,39 @@ class ArcUserSummaryPageTests(TestCase):
 
     @tag('http')
     def test_page_renders_without_table_if_user_has_no_assigned_apps(self):
-        # response = self.client.get(reverse('summary'))
-        #
-        # self.assertNotContains(response, '<table class="table table-hover" id="request-table">', html=True)
+        with mock.patch('arc_application.models.Arc.objects.filter') as arc_objects_filter:
 
-        pass
+            arc_objects_filter.return_value = Arc.objects.none()
+
+            response = self.client.get(reverse('summary'))
+
+            self.assertNotContains(response, '<table class="table table-hover" id="request-table">', html=True)
 
     @tag('http')
     def test_page_renders_with_error_if_no_nanny_apps_available(self):
+        with mock.patch('arc_application.db_gateways.NannyGatewayActions.list') as mock_nanny_list:
 
-        # TODO: Ensure no nanny apps available.
+            mock_nanny_list.return_value.status_code = 404
 
-        # response = self.client.post(
-        #     reverse('summary'),
-        #     data={
-        #         'add_nanny_application': 'add_nanny_application'
-        #     }
-        # )
-        #
-        # self.assertEqual(200, response.status_code)
-        # self.assertEqual(response.resolver_match.func.__name__, ARCUserSummaryView.as_view().__name__)
-        # self.assertContains(response, '<li class="non-field-error">There are currently no more applications ready for a review</li>', html=True)
+            response = self.client.post(reverse('summary'), data={'add_nanny_application': 'add_nanny_application'})
 
-        pass
+            self.assertEqual(200, response.status_code)
+            self.assertEqual(response.resolver_match.func.__name__, ARCUserSummaryView.as_view().__name__)
+            self.assertContains(response, '<li class="non-field-error">There are currently no more applications ready for a review</li>', html=True)
 
     @tag('http')
     def test_page_renders_with_error_if_no_childminder_apps_available(self):
+        with mock.patch('arc_application.models.Arc.objects.filter') as arc_objects_filter:
 
-        # TODO: Ensure no childminder apps available.
+            arc_objects_filter.return_value = Arc.objects.none()
 
-        # response = self.client.post(
-        #     reverse('summary'),
-        #     data={'add_childminder_application': 'add_childminder_application'}
-        # )
-        #
-        # self.assertEqual(200, response.status_code)
-        # self.assertEqual(response.resolver_match.func.__name__, ARCUserSummaryView.as_view().__name__)
-        # self.assertContains(response, '<li class="non-field-error">There are currently no more applications ready for a review</li>', html=True)
+            response = self.client.post(
+                reverse('summary'), data={'add_childminder_application': 'add_childminder_application'}
+            )
 
-        pass
+            self.assertEqual(200, response.status_code)
+            self.assertEqual(response.resolver_match.func.__name__, ARCUserSummaryView.as_view().__name__)
+            self.assertContains(response, '<li class="non-field-error">There are currently no more applications ready for a review</li>', html=True)
 
     @tag('http')
     def test_assigns_childminder_app_if_one_available(self):
@@ -175,6 +169,17 @@ class ArcUserSummaryPageTests(TestCase):
     @tag('http')
     def test_cannot_assign_more_than_five_applications(self):
         pass
+
+        # with mock.patch('django.db.models.query.QuerySet.count') as mock_count:
+        #     mock_count.return_value = 5
+        #
+        #     response = self.client.post(reverse('summary'), data={'add_nanny_application': 'add_nanny_application'})
+        #     self.assertContains(response, 'You have already reached the maximum (' + str(settings.APPLICATION_LIMIT) + ') applications', html=True)
+        #
+        #     response = self.client.post(
+        #         reverse('summary'), data={'add_childminder_application': 'add_childminder_application'}
+        #     )
+        #     self.assertContains(response, 'You have already reached the maximum (' + str(settings.APPLICATION_LIMIT) + ') applications', html=True)
 
     # ---------- #
     # UNIT tests #
