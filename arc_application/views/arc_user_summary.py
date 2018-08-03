@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from django.conf import settings
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from django.views import View
@@ -33,11 +33,18 @@ class ARCUserSummaryView(View):
         try:
             app_handler.add_application_from_pool()
             context = self.get_context_data()
+
         except ObjectDoesNotExist:
             context = self.get_context_data()
             context['error_exist'] = 'true'
             context['error_title'] = 'No available applications'
             context['error_text'] = 'There are currently no more applications ready for a review'
+
+        except PermissionDenied:
+            context = self.get_context_data()
+            context['error_exist'] = 'true'
+            context['error_title'] = 'You have reached the limit'
+            context['error_text'] = 'You have already reached the maximum (' + str(settings.APPLICATION_LIMIT) + ') applications'
 
         return render(request, self.template_name, context=context)
 
@@ -59,24 +66,23 @@ class ApplicationHandlerTemplate:
     def __init__(self, arc_user):
         self.arc_user = arc_user
 
-    def __count_assigned_apps(self, arc_user):
-        return Arc.objects.filter(user_id=arc_user.id).count()
+    def __get_assigned_applications(self):
+        return Arc.objects.filter(user_id=self.arc_user.id)
 
     def add_application_from_pool(self):
-        if self.__count_assigned_apps(arc_user=self.arc_user) < settings.APPLICATION_LIMIT:
+        if self.__get_assigned_applications().count() <= settings.APPLICATION_LIMIT:
+
             app_id = self._get_oldest_app_id()
-            if app_id is not None:
-                self._assign_app_to_user(app_id)
-            else:
-                raise ObjectDoesNotExist('No applications available.')
+            self._assign_app_to_user(app_id)
+
         else:
-            raise RuntimeError('Maximum applications reached.')
+            raise PermissionDenied('Maximum applications reached.')
 
     def release_application(self):
         pass
 
     def get_all_table_data(self):
-        assigned_applications = Arc.objects.filter(user_id=self.arc_user.id)
+        assigned_applications = self.__get_assigned_applications()
 
         table_data = []
 
@@ -110,11 +116,7 @@ class ApplicationHandlerTemplate:
         row_data['app_type'] = 'Nanny'
 
         personal_details_record = NannyGatewayActions().read(
-            'applicant-personal-details',
-            params={
-                'application_id': str(application_id)
-            }
-        ).record
+            'applicant-personal-details', params={'application_id': str(application_id)}).record
 
         row_data['applicant_name'] = personal_details_record['first_name'] + ' ' + personal_details_record['last_name']
 
@@ -139,13 +141,14 @@ class ApplicationHandlerTemplate:
 class ChildminderApplicationHandler(ApplicationHandlerTemplate):
 
     def _get_oldest_app_id(self):
-
         childminder_apps_for_review = Application.objects.filter(application_status='SUBMITTED')
+
         if childminder_apps_for_review.exists():
             childminder_apps_for_review.order_by('date_updated')
             return childminder_apps_for_review[0].application_id
+
         else:
-            return None
+            raise ObjectDoesNotExist('No applications available.')
 
     def _assign_app_to_user(self, application_id):
         application_record = Application.objects.get(application_id=application_id)
@@ -185,17 +188,14 @@ class NannyApplicationHandler(ApplicationHandlerTemplate):
 
     def _get_oldest_app_id(self):
         response = NannyGatewayActions().list(
-            'application',
-            params={
-                'application_status': 'SUBMITTED',
-                'ordering': 'date_submitted'
-            }
-        )
+            'application', params={'application_status': 'SUBMITTED', 'ordering': 'date_submitted'})
+
         if response.status_code == 200:
             submitted_apps = response.record
-            return submitted_apps[0]['application_id']  # TODO Check that this returns newest application.
+            return submitted_apps[0]['application_id']
+
         else:
-            return None
+            raise ObjectDoesNotExist('No applications available.')
 
     def _assign_app_to_user(self, application_id):
         app_record = NannyGatewayActions().read('application', params={'application_id': application_id}).record
