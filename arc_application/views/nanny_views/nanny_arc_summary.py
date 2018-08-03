@@ -66,8 +66,8 @@ class NannyArcSummary(View):
         nanny_actions = NannyGatewayActions()
         nanny_application_dict = nanny_actions.read('application',
                                                     params={'application_id': application_id}).record
+
         application_reference = nanny_application_dict['application_reference']
-        application_reference_dict = {'application_reference': application_reference}
 
         contact_details_context = NannyContactDetailsSummary().create_context(application_id)
         personal_details_context = NannyPersonalDetailsSummary().create_context(application_id)
@@ -77,28 +77,25 @@ class NannyArcSummary(View):
         dbs_check_context = NannyDbsCheckSummary().create_context(application_id)
         insurance_cover_context = NannyInsuranceCoverSummary().create_context(application_id)
 
-        context_list = [application_reference_dict,
-                        contact_details_context,
-                        personal_details_context,
-                        childcare_address_context,
-                        first_aid_training_context,
-                        childcare_training_context,
-                        dbs_check_context,
-                        insurance_cover_context]
+        context_list = [
+            contact_details_context,
+            personal_details_context,
+            childcare_address_context,
+            first_aid_training_context,
+            childcare_training_context,
+            dbs_check_context,
+            insurance_cover_context
+        ]
 
-        summary_context = {}
+        # Set up context
+        context = {
+            'application_id': application_id,
+            'application_reference': application_reference,
+            'title': 'Check and confirm all details',
+            'html_title': 'Application summary',
+            # 'form': '',
+            'context_list': context_list
 
-        for context in context_list:
-            summary_context = self.merge_dicts(summary_context, context)
+        }
 
-        return summary_context
-
-    def make_json(self, application_id):
-        pass
-
-
-
-    def merge_dicts(self, dict1, dict2):
-        new_dict = dict1.copy()
-        new_dict.update(dict2)
-        return new_dict
+        return context

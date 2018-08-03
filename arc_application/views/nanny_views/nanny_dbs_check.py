@@ -65,7 +65,7 @@ class NannyDbsCheckSummary(View):
         # Set up context
         context = {
             'application_id': application_id,
-            'title': 'Review: Childcare training',
+            'title': 'Review: Criminal record (DBS) check',
             # 'form': '',
             'rows': [
                 {

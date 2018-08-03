@@ -55,33 +55,17 @@ class NannyChildcareAddressSummary(View):
 
         # Get nanny information
         nanny_actions = NannyGatewayActions()
+        nanny_application = nanny_actions.read('application',
+                                               params={'application_id': application_id}).record
         home_address_info = nanny_actions.read('applicant-home-address',
                                                params={'application_id': application_id}).record
 
-        work_location_bool = home_address_info['childcare_address']  # TODO Find work_location field
+        work_location_bool = nanny_application['address_to_be_provided']
         work_at_home_bool = home_address_info['childcare_address']
         home_address_locations = nanny_actions.list('childcare-address',
                                                     params={'application_id': application_id}).record
-        # TODO -o Implement first second third format
-        # childcare_address_index_lookup_list = [
-        #     'Childcare address',
-        #     'Second childcare address',
-        #     'Third childcare address',
-        #     'Fourth childcare address',
-        #     'Fifth childcare address',
-        #     'Sixth childcare address'
-        # ]
 
         # Set up context
-        context = {
-            # 'form': '',
-            'application_id': application_id,
-            'work_location_bool': work_location_bool,
-            'work_at_home_bool': work_at_home_bool,
-            'home_address_locations': home_address_locations,
-            # 'childcare_address_index_lookup_list': childcare_address_index_lookup_list
-        }
-
         context = {
             'application_id': application_id,
             'title': 'Review: Childcare address',

@@ -103,7 +103,7 @@ class NannyPersonalDetailsSummary(View):
         # Set up context
         context = {
             'application_id': application_id,
-            'title': 'Review: Your sign in details',
+            'title': 'Review: Your personal details',
             # 'form': '',
             'rows': [
                 {

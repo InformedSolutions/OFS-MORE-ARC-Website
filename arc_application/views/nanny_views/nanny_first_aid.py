@@ -58,7 +58,7 @@ class NannyFirstAidTrainingSummary(View):
         first_aid_dict = nanny_actions.read('first-aid',
                                             params={'application_id': application_id}).record
 
-        training_organisation = first_aid_dict['training_organisation']  # TODO Find work_location field
+        training_organisation = first_aid_dict['training_organisation']
         training_course_title = first_aid_dict['course_title']
         date_course_completed = first_aid_dict['course_date']
 

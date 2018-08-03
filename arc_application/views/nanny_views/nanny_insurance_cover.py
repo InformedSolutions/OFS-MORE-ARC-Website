@@ -64,7 +64,7 @@ class NannyInsuranceCoverSummary(View):
         # Set up context
         context = {
             'application_id': application_id,
-            'title': 'Review: Childcare training',
+            'title': 'Review: Insurance cover',
             # 'form': '',
             'rows': [
                 {
