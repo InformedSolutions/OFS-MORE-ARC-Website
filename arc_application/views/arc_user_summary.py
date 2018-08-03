@@ -105,16 +105,8 @@ class ApplicationHandlerTemplate:
 
         application_record = NannyGatewayActions().read('application', params={'application_id': str(application_id)}).record
         row_data['application_id'] = application_record['application_id']
-
-        # date_submitted = datetime.strptime(application_record['date_submitted'][:10], '%Y-%m-%d')
-        # date_submitted = datetime.strptime(application_record['date_submitted'][:10], '%d-%mm-%Y')
-
-        date_submitted = datetime.strptime(application_record['date_submitted'][:10], '%Y-%m-%d').strftime('%d %b %Y')
-        time_submitted = datetime.strptime(application_record['date_submitted'][11:16], '%H:%M').strftime('%-I:%M %p')
-        time_submitted = time_submitted.lower()
-
-        row_data['date_submitted'] = date_submitted + ', ' + time_submitted
-        row_data['last_accessed'] = application_record['date_updated']  #self.arc_user.last_accessed
+        row_data['date_submitted'] = datetime.strptime(application_record['date_submitted'][:10], '%Y-%M-%d').strftime('%d/%m/%Y')
+        row_data['last_accessed'] = datetime.strptime(application_record['date_updated'][:10], '%Y-%M-%d').strftime('%d/%m/%Y')
         row_data['app_type'] = 'Nanny'
 
         personal_details_record = NannyGatewayActions().read(
@@ -133,8 +125,8 @@ class ApplicationHandlerTemplate:
 
         application = Application.objects.get(application_id=application_id)
         row_data['application_id'] = application_id
-        row_data['date_submitted'] = application.date_submitted
-        row_data['last_accessed'] = application.date_updated
+        row_data['date_submitted'] = application.date_submitted.date().strftime('%d/%m/%Y')
+        row_data['last_accessed'] = application.date_updated.date().strftime('%d/%m/%Y')
         row_data['app_type'] = 'Childminder'
 
         applicant_name = ApplicantName.objects.get(application_id=application_id)
