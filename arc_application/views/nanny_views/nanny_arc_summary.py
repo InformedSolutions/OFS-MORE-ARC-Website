@@ -4,11 +4,10 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.views import View
 from django.utils.decorators import method_decorator
-from django.urls import reverse_lazy
 
-from arc_application.db_gateways import IdentityGatewayActions, NannyGatewayActions
+from arc_application.db_gateways import NannyGatewayActions
 from arc_application.models import Arc
-
+from arc_application.review_util import build_url
 # Nanny View Classes
 
 from arc_application.views.nanny_views.nanny_contact_details import NannyContactDetailsSummary
@@ -25,8 +24,7 @@ from arc_application.views.nanny_views.nanny_insurance_cover import NannyInsuran
 class NannyArcSummary(View):
     TEMPLATE_NAME = 'nanny_arc_summary.html'
     FORM_NAME = ''
-    # TODO -o Fix to allow use of reverse_lazy
-    REDIRECT_LINK = '/nanny/review-confirmation' #reverse_lazy('nanny_childcare_address_summary')
+    REDIRECT_NAME = 'nanny_review_confirmation'
 
     def get(self, request):
 
@@ -38,22 +36,16 @@ class NannyArcSummary(View):
         return render(request, self.TEMPLATE_NAME, context=context)
 
     def post(self, request):
-        # TODO -o first_aid_training post
 
         # Get application ID
         application_id = request.POST["id"]
-
-        # # Update task status to FLAGGED
-        # arc_application = Arc.objects.get(application_id=application_id)
-        # arc_application.first_aid_review = 'FLAGGED'
-        # arc_application.save()
 
         # Update task status to COMPLETED
         arc_application = Arc.objects.get(application_id=application_id)
         arc_application.first_aid_review = 'COMPLETED'
         arc_application.save()
 
-        redirect_address = settings.URL_PREFIX + self.REDIRECT_LINK + '?id=' + application_id
+        redirect_address = build_url(self.REDIRECT_NAME, get={'id': application_id})
 
         return HttpResponseRedirect(redirect_address)
 

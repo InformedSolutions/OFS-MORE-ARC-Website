@@ -1,13 +1,12 @@
-from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.views import View
 from django.utils.decorators import method_decorator
-from django.urls import reverse_lazy
 
 from arc_application.db_gateways import IdentityGatewayActions
 from arc_application.models import Arc
+from arc_application.review_util import build_url
 
 
 @method_decorator(login_required, name='get')
@@ -15,8 +14,7 @@ from arc_application.models import Arc
 class NannyContactDetailsSummary(View):
     TEMPLATE_NAME = 'nanny_general_template.html'
     FORM_NAME = ''
-    # TODO Fix to allow use of reverse_lazy
-    REDIRECT_LINK = '/nanny/personal-details' #reverse_lazy('nanny_childcare_address_summary')
+    REDIRECT_NAME = 'nanny_personal_details_summary'
 
     def get(self, request):
 
@@ -28,22 +26,16 @@ class NannyContactDetailsSummary(View):
         return render(request, self.TEMPLATE_NAME, context=context)
 
     def post(self, request):
-        # TODO -o contact_details post
 
         # Get application ID
         application_id = request.POST["id"]
-
-        # # Update task status to FLAGGED
-        # arc_application = Arc.objects.get(application_id=application_id)
-        # arc_application.first_aid_review = 'FLAGGED'
-        # arc_application.save()
 
         # Update task status to COMPLETED
         arc_application = Arc.objects.get(application_id=application_id)
         arc_application.login_details_review = 'COMPLETED'
         arc_application.save()
 
-        redirect_address = settings.URL_PREFIX + self.REDIRECT_LINK + '?id=' + application_id
+        redirect_address = build_url(self.REDIRECT_NAME, get={'id': application_id})
 
         return HttpResponseRedirect(redirect_address)
 

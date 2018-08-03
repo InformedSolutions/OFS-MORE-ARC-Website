@@ -20,21 +20,3 @@ def parse_date_of_birth(dob_str):
 
     else:
         raise ValueError("{0} is not a valid dob_str, the length should be 10 but it is {1}".format(dob_str, len(dob_str)))
-
-# def update_info_bool_to_string(dict):
-#     '''
-#
-#     :param dict: dictionary object to be updated, in arc_nanny context format.
-#     :return: Updated dictionary
-#     '''
-#     if 'rows' in dict is not None:
-#         rows_dict = dict['rows']
-#
-#         for row in rows_dict:
-#             if 'info' in row:
-#                 if isinstance(row['info'], bool) or row['info'] in ['True', 'False', 'true', 'false']:
-#                     row['info'] = 'Yes'
-#                 else:
-#                     row['info'] = 'No'
-#
-#     return dict
