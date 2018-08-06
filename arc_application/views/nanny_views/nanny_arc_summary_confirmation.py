@@ -13,7 +13,6 @@ class NannyTest(View):
     FORM_NAME = ''
 
     def get(self, request):
-        print("Test")
 
         # Get application ID
         application_id = request.GET["id"]
