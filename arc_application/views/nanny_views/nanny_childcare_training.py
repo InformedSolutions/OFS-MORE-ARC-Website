@@ -14,7 +14,6 @@ from arc_application.review_util import build_url
 class NannyChildcareTrainingSummary(View):
     TEMPLATE_NAME = 'nanny_general_template.html'
     FORM_NAME = ''
-    # TODO -o Fix to allow use of reverse_lazy
     REDIRECT_NAME = 'nanny_dbs_summary'
 
     def get(self, request):

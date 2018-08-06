@@ -27,7 +27,6 @@ class NannyPersonalDetailsSummary(View):
         return render(request, self.TEMPLATE_NAME, context=context)
 
     def post(self, request):
-        # TODO -o personal_details post
 
         # Get application ID
         application_id = request.POST["id"]
