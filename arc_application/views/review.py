@@ -15,7 +15,8 @@ from ..forms.form import AdultInYourHomeForm, ChildInYourHomeForm, CommentsForm
 from ..magic_link import generate_magic_link
 from ..models import PreviousRegistrationDetails, OtherPersonPreviousRegistrationDetails, Reference
 from ..models import ApplicantName, ApplicantPersonalDetails, Application, Arc, ArcComments, ChildcareType, UserDetails, PreviousName, \
-PreviousAddress, HealthDeclarationBooklet, FirstAidTraining, EYFS, CriminalRecordCheck, ChildInHome, ApplicantHomeAddress, AdultInHome
+PreviousAddress, HealthDeclarationBooklet, FirstAidTraining, EYFS, CriminalRecordCheck, ChildInHome, ApplicantHomeAddress, AdultInHome, \
+HealthCheckHospital, HealthCheckSerious, HealthCheckCurrent
 from .base import release_application
 from ..notify import send_email
 from ..decorators import group_required, user_assigned_application
@@ -389,14 +390,22 @@ def __create_full_application_export(application_id):
     # Iterate adults in home, appending prior names and addresses
 
     for adult_in_home in adults_in_home:
-        previous_name = PreviousName.objects.filter(person_id=adult_in_home.person_id)
-        previous_address = PreviousAddress.objects.filter(person_id=adult_in_home.person_id)
+        previous_name = PreviousName.objects.filter(person_id=adult_in_home.pk)
+        previous_address = PreviousAddress.objects.filter(person_id=adult_in_home.pk)
+        serious_illness = HealthCheckSerious.objects.filter(person_id=adult_in_home.pk)
+        hospital_admissions = HealthCheckHospital.objects.filter(person_id=adult_in_home.pk)
+        current_illnesses = HealthCheckCurrent.objects.filter(person_id=adult_in_home.pk)
 
         adults_in_home_export.append({
-            'adult': serializers.serialize('json', list(adult_in_home)),
+            'adult': adult_in_home.adult,
             'previous_names': serializers.serialize('json', list(previous_name)),
             'previous_address': serializers.serialize('json', list(previous_address)),
+            'serious_illness': serializers.serialize('json', list(serious_illness)),
+            'hospital_admissions': serializers.serialize('json', list(hospital_admissions)),
+            'current_illnesses': serializers.serialize('json', list(current_illnesses))
         })
+
+    export['health'] = adults_in_home_export
 
     applicant_name = ApplicantName.objects.filter(application_id=application_id)
     export['applicant_name'] = serializers.serialize('json', applicant_name)

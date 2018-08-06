@@ -7,7 +7,8 @@ from django.urls import reverse
 
 from unittest import mock
 
-from ..models import (ApplicantHomeAddress,
+from ..models import (AdultInHome,
+                      ApplicantHomeAddress,
                       ApplicantName,
                       ApplicantPersonalDetails,
                       Application,
@@ -19,6 +20,9 @@ from ..models import (ApplicantHomeAddress,
                       EYFS,
                       FirstAidTraining,
                       Reference,
+                      HealthCheckHospital,
+                      HealthCheckSerious,
+                      HealthCheckCurrent,
                       UserDetails)
 
 application = None
@@ -67,6 +71,7 @@ def create_application():
         date_created=datetime.datetime.today(),
         date_updated=datetime.datetime.today(),
         date_accepted=None,
+        application_reference='2734739'
     )
 
     childcare_type = ChildcareType.objects.create(
@@ -112,6 +117,79 @@ def create_application():
         first_name='Erik',
         middle_names='Tolstrup',
         last_name='Odense'
+    )
+
+    adult1 = AdultInHome.objects.create(
+        adult=1,
+        first_name='First',
+        middle_names='Middle',
+        last_name='Last',
+        birth_day=1,
+        birth_month=1,
+        birth_year=1980,
+        relationship='Partner',
+        dbs_certificate_number='123456789123',
+        application_id=application,
+        email='tester@informed.com',
+        validated=True,
+        serious_illness=False,
+        hospital_admission=False,
+        current_treatment=False,
+        health_check_status='COMPLETED',
+        email_resent=0
+    )
+
+    adult2 = AdultInHome.objects.create(
+        adult=2,
+        first_name='Second',
+        middle_names='Middle',
+        last_name='Last',
+        birth_day=2,
+        birth_month=2,
+        birth_year=1980,
+        relationship='Friend',
+        dbs_certificate_number='123456789122',
+        application_id=application,
+        email='tester2@informed.com',
+        validated=True,
+        serious_illness=True,
+        hospital_admission=True,
+        current_treatment=True,
+        health_check_status='COMPLETED',
+        email_resent=0
+    )
+
+    serious_illness = HealthCheckSerious.objects.create(
+        description='influenza',
+        start_date='2017-01-01',
+        end_date='2018-01-01',
+        person_id_id=adult2.pk
+    )
+
+    serious_illness = HealthCheckSerious.objects.create(
+        description='gangrene',
+        start_date='2016-12-01',
+        end_date='2017-01-01',
+        person_id_id=adult2.pk
+    )
+
+    hospital_admissions = HealthCheckHospital.objects.create(
+        description='surgery',
+        start_date='2017-01-01',
+        end_date='2017-01-02',
+        person_id_id=adult2.pk
+    )
+
+    hospital_admissions = HealthCheckHospital.objects.create(
+        description='appendix removal',
+        start_date='2018-01-01',
+        end_date='2018-02-02',
+        person_id_id=adult2.pk
+    )
+
+    current_illness = HealthCheckCurrent.objects.create(
+        description='plague',
+        person_id_id=adult2.pk
     )
 
     user_details = UserDetails.objects.create(
