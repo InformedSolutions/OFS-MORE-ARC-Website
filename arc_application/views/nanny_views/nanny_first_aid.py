@@ -8,13 +8,14 @@ from django.utils.decorators import method_decorator
 from arc_application.db_gateways import NannyGatewayActions
 from arc_application.models import Arc
 from arc_application.review_util import build_url
+from arc_application.forms.nanny_forms.nanny_first_aid_training_form import FirstAidTrainingForm
 
 
 @method_decorator(login_required, name='get')
 @method_decorator(login_required, name='post')
 class NannyFirstAidTrainingSummary(View):
     TEMPLATE_NAME = 'nanny_general_template.html'
-    FORM_NAME = ''
+    FORM = FirstAidTrainingForm
     REDIRECT_NAME = 'nanny_childcare_training_summary'
 
     def get(self, request):
@@ -46,6 +47,9 @@ class NannyFirstAidTrainingSummary(View):
         :return: Context for the form
         '''
 
+        #Setup form
+        #form = self.FORM() # table_keys=[first_aid_id]
+
         # Get nanny information
         nanny_actions = NannyGatewayActions()
         first_aid_dict = nanny_actions.read('first-aid',
@@ -59,7 +63,7 @@ class NannyFirstAidTrainingSummary(View):
         context = {
             'application_id': application_id,
             'title': 'Review: First aid training',
-            # 'form': '',
+            'form': form,
             'rows': [
                 {
                     'id': 'training_organisation',
