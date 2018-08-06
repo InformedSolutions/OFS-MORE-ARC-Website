@@ -5,7 +5,7 @@ from django.shortcuts import render
 from django.views import View
 from django.utils.decorators import method_decorator
 
-from arc_application.db_gateways import NannyGatewayActions
+from arc_application.services.db_gateways import NannyGatewayActions
 from arc_application.models import Arc
 from arc_application.review_util import build_url
 

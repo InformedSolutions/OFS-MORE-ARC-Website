@@ -29,7 +29,7 @@ from arc_application.views.contact_centre.change_details import UpdateEmailView,
 
 # Nanny Views
 
-from arc_application.views.nanny_views.nanny_review import NannyTaskList
+from arc_application.views.nanny_views.nanny_task_list import NannyTaskList
 from arc_application.views.nanny_views.nanny_contact_details import NannyContactDetailsSummary
 from arc_application.views.nanny_views.nanny_personal_details import NannyPersonalDetailsSummary
 from arc_application.views.nanny_views.nanny_childcare_address import NannyChildcareAddressSummary
