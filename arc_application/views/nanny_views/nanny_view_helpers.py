@@ -25,15 +25,30 @@ def parse_date_of_birth(dob_str):
 
 
 def nanny_all_completed(arc_application):
+    """
+    Returns a boolean representing if all tasks have been reviewed AND marked as 'COMPLETED'.
+    :param arc_application: A direct reference to an arc_application.
+    :return: Boolean only.
+    """
     return check_all_task_statuses(arc_application, 'COMPLETED')
 
 
 def nanny_all_reviewed(arc_application):
-
+    """
+    Returns a boolean representing if all tasks have been reviewed AND marked as 'COMPLETED'.
+    :param arc_application: A direct reference to an arc_application.
+    :return: Boolean only.
+    """
     return check_all_task_statuses(arc_application, ['FLAGGED', 'COMPLETED'])
 
 
 def check_all_task_statuses(arc_application, status_list):
+    """
+    Iterates through the arc_application task's statuses and compares each task status to a given status.
+    :param arc_application: A direct reference to an arc_application.
+    :param status_list: A list of statuses to check against, e.g ['NOT_STARTED', 'COMPLETED']
+    :return: Boolean only.
+    """
 
     field_list = [arc_application.login_details_review,
                   arc_application.personal_details_review,

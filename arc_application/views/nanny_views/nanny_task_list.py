@@ -25,8 +25,9 @@ class NannyTaskList(View):
 
     def create_context(self, application_id):
         """
-        :param application_id: Current application's id
-        :return: Context information in dictionary format
+        Creates the context dictionary for this view.
+        :param application_id: Reviewed application's id.
+        :return: Context dictionary.
         """
 
         # Get nanny information

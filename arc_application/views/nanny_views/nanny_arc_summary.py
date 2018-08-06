@@ -45,10 +45,11 @@ class NannyArcSummary(View):
         return HttpResponseRedirect(redirect_address)
 
     def create_context(self, application_id):
-        '''
-
-        :return: Dictionary of all view's contexts.
-        '''
+        """
+        Creates the context dictionary for this view.
+        :param application_id: Reviewed application's id.
+        :return: Context dictionary.
+        """
 
         nanny_actions = NannyGatewayActions()
         nanny_application_dict = nanny_actions.read('application',

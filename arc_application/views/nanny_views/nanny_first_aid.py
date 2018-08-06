@@ -42,10 +42,11 @@ class NannyFirstAidTrainingSummary(View):
         return HttpResponseRedirect(redirect_address)
 
     def create_context(self, application_id):
-        '''
-
-        :return: Context for the form
-        '''
+        """
+        Creates the context dictionary for this view.
+        :param application_id: Reviewed application's id.
+        :return: Context dictionary.
+        """
 
         #Setup form
         #form = self.FORM() # table_keys=[first_aid_id]

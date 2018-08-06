@@ -46,6 +46,14 @@ class NannyPersonalDetailsSummary(View):
         return HttpResponseRedirect(redirect_address)
 
     def month_converter(self, dob_string):
+        """
+        Converts a numerical month into the related string month.
+        :param dob_string: a Date Of Birth string in the format 'DD-MM-YYYY'
+        :return: a DOB string in format 'DD-Month-YYYY'
+        """
+
+        # TODO: This could be done more simply with a DateTime object
+
         month_list = ["January",
                       "Februrary",
                       "March",
@@ -69,10 +77,11 @@ class NannyPersonalDetailsSummary(View):
         return "{0} {1} {2}".format(birth_day, month, birth_year)
 
     def create_context(self, application_id):
-        '''
-
-        :return: Context for the form
-        '''
+        """
+        Creates the context dictionary for this view.
+        :param application_id: Reviewed application's id.
+        :return: Context dictionary.
+        """
 
         # Get nanny information
         nanny_actions = NannyGatewayActions()

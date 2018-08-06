@@ -25,6 +25,11 @@ class NannyTest(View):
         return render(request, template)
 
     def get_template(self, application_id):
+        """
+        Decides which template should be rendered.
+        :param application_id: Reviewed application's id.
+        :return: A string of a template's name, one of the self.TEMPLATE_NAMES defined.
+        """
 
         # Get applications
         arc_application = Arc.objects.get(application_id=application_id)
