@@ -115,7 +115,7 @@ class TestArcFunctions(LiveServerTestCase):
         try:
             Application.objects.all().delete()
             self.login_as_arc_user()
-            selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Add from queue']").click()
+            selenium_task_executor.get_driver().find_element_by_name("add_childminder_application").click()
             self.assertTrue(
                 selenium_task_executor.get_driver().find_element_by_class_name('error-summary').is_displayed()
             )
@@ -134,7 +134,7 @@ class TestArcFunctions(LiveServerTestCase):
 
         try:
             self.login_as_arc_user()
-            selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Add from queue']").click()
+            selenium_task_executor.get_driver().find_element_by_name("add_childminder_application").click()
             selenium_task_executor.get_driver().find_element_by_xpath("//*[@id='request-table']/tbody/tr[1]/td[5]/a").click()
             self.assertEqual("Application overview", selenium_task_executor.get_driver().title)
             self.release_arc_application()
@@ -153,7 +153,7 @@ class TestArcFunctions(LiveServerTestCase):
 
         try:
             self.login_as_arc_user()
-            selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Add from queue']").click()
+            selenium_task_executor.get_driver().find_element_by_name("add_childminder_application").click()
             selenium_task_executor.get_driver().find_element_by_xpath("//*[@id='request-table']/tbody/tr[1]/td[5]/a").click()
             selenium_task_executor.get_driver().find_element_by_link_text("Audit log").click()
             self.assertEqual("Audit log", selenium_task_executor.get_driver().title)
@@ -172,7 +172,7 @@ class TestArcFunctions(LiveServerTestCase):
 
         try:
             self.login_as_arc_user()
-            selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Add from queue']").click()
+            selenium_task_executor.get_driver().find_element_by_name("add_childminder_application").click()
             selenium_task_executor.get_driver().find_element_by_xpath("//*[@id='request-table']/tbody/tr[1]/td[5]/a").click()
             selenium_task_executor.get_driver().find_element_by_link_text("Audit log").click()
             self.assertEqual("Audit log", selenium_task_executor.get_driver().title)
@@ -236,7 +236,7 @@ class TestArcFunctions(LiveServerTestCase):
 
         try:
             self.login_as_arc_user()
-            selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Add from queue']").click()
+            selenium_task_executor.get_driver().find_element_by_name("add_childminder_application").click()
             selenium_task_executor.get_driver().find_element_by_xpath("//*[@id='request-table']/tbody/tr[1]/td[5]/a").click()
             selenium_task_executor.get_driver().find_element_by_xpath("//tr[@id='account_details']/td/a/span").click()
             WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("Review: your sign in details"))
@@ -280,7 +280,7 @@ class TestArcFunctions(LiveServerTestCase):
         try:
             self.login_as_arc_user()
 
-            selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Add from queue']").click()
+            selenium_task_executor.get_driver().find_element_by_name("add_childminder_application").click()
             selenium_task_executor.get_driver().find_element_by_xpath("//*[@id='request-table']/tbody/tr[1]/td[5]/a").click()
             selenium_task_executor.get_driver().find_element_by_xpath("//tr[@id='account_details']/td/a/span").click()
             WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("Review: your sign in details"))
@@ -437,7 +437,7 @@ class TestArcFunctions(LiveServerTestCase):
 
         try:
             selenium_task_executor.get_driver().find_element_by_id("proposition-name").click()
-            selenium_task_executor.get_driver().find_element_by_link_text("Release to queue").click()
+            selenium_task_executor.get_driver().find_element_by_name("add_childminder_application").click()
         except Exception as e:
             self.capture_screenshot()
             raise e
