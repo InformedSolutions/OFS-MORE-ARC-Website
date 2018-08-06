@@ -1,12 +1,10 @@
-import six
 from django import forms
 from django.conf import settings
 from django.contrib.auth import authenticate, login as auth_login
-from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserModel
 from django.contrib.auth.models import Group
-from django.core.exceptions import PermissionDenied
-from django.http import HttpResponseRedirect, JsonResponse
+from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.views.generic import ListView
 from django.utils.http import urlsafe_base64_decode
@@ -16,9 +14,9 @@ from govuk_forms.forms import GOVUKForm
 from timeline_logger.models import TimelineLog
 from arc_application.review_util import reset_declaration
 
-from arc_application.models import ApplicantName, ApplicantPersonalDetails, Application, Arc
+from arc_application.models import Application, Arc
 
-from arc_application.db_gateways import NannyGatewayActions
+from arc_application.services.db_gateways import NannyGatewayActions
 
 
 def custom_login(request):

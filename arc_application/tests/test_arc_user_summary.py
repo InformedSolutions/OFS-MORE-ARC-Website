@@ -7,7 +7,8 @@ from django.test import tag, TestCase
 from django.urls import reverse
 
 from arc_application.models import Arc
-from arc_application.views.arc_user_summary import ARCUserSummaryView, NannyApplicationHandler
+from arc_application.services.application_handler import NannyApplicationHandler
+from arc_application.views.arc_user_summary import ARCUserSummaryView
 
 
 mock_nanny_application = {
