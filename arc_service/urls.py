@@ -39,6 +39,7 @@ from arc_application.views.nanny_views.nanny_childcare_training import NannyChil
 from arc_application.views.nanny_views.nanny_dbs_check import NannyDbsCheckSummary
 from arc_application.views.nanny_views.nanny_insurance_cover import NannyInsuranceCoverSummary
 from arc_application.views.nanny_views.nanny_arc_summary import NannyArcSummary
+from arc_application.views.nanny_views.nanny_arc_summary_confirmation import NannyArcSummaryConfirmation
 
 from django.conf import settings
 from django.conf.urls import include, url
@@ -91,6 +92,7 @@ urlpatterns = [
     url(r'^nanny/dbs', NannyDbsCheckSummary.as_view(), name='nanny_dbs_summary'),
     url(r'^nanny/insurance-cover', NannyInsuranceCoverSummary.as_view(), name='nanny_insurance_cover_summary'),
     url(r'^nanny/arc-summary', NannyArcSummary.as_view(), name='nanny_arc_summary'),
+    url(r'^nanny/arc-summary-confirmation', NannyArcSummaryConfirmation.as_view(), name='nanny_arc_summary_confirmation')
 ]
 
 if settings.URL_PREFIX:

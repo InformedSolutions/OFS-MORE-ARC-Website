@@ -5,7 +5,8 @@ from django.utils.decorators import method_decorator
 
 from arc_application.db_gateways import NannyGatewayActions
 from arc_application.models import Arc
-from arc_application.views.nanny_views.nanny_view_helpers import parse_date_of_birth
+from arc_application.views.nanny_views.nanny_view_helpers import parse_date_of_birth, \
+    nanny_all_reviewed
 
 
 @method_decorator(login_required, name='get')
@@ -65,39 +66,8 @@ class NannyTaskList(View):
             'birth_day': int(birth_dict['birth_day']),
             'birth_month': int(birth_dict['birth_month']),
             'birth_year': int(birth_dict['birth_year']),
-            'all_complete': self.nanny_all_complete(application_id, False)
+            'all_complete': nanny_all_reviewed(arc_application)
         }
-
-        return context
-
-    def nanny_all_complete(self, id, flag):
-        """
-        Check the status of all sections
-        :param id: Application Id
-        :return: True or False depending on whether all sections have been reviewed
-        """
-
-        # TODO: Redo this function.
-
-        if Arc.objects.filter(application_id=id):
-            arc = Arc.objects.get(application_id=id)
-            list = [arc.login_details_review,
-                    arc.personal_details_review,
-                    arc.childcare_address_review,
-                    arc.first_aid_review,
-                    arc.childcare_training_review,
-                    arc.dbs_review,
-                    arc.insurance_cover_review,
-                    ]
-
-            for i in list:
-                if (i == 'NOT_STARTED' and not flag) or (i != 'COMPLETED' and flag):
-                    return False
-
-            return True
-
-        else:
-            return False
 
         return context
 

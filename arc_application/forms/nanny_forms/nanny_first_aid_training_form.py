@@ -4,7 +4,9 @@ from govuk_forms.forms import GOVUKForm
 from arc_application import custom_field_widgets
 from arc_application.review_util import populate_initial_values
 
-
+# This form exists in this edition of the code purely as an example template for later.
+# rename_me needs renaming, I simply don't fully understand how checkbox widgets work at this time.
+# If you are reading this and working on a new ticket, delete these comments.
 class FirstAidTrainingForm(GOVUKForm):
     """
     GOV.UK form for the First Aid Training Form
@@ -36,8 +38,9 @@ class FirstAidTrainingForm(GOVUKForm):
                   (course_date_declare, 'course_date')]
 
     for box in checkboxes:
-        box[0].widget.attrs.update({'data_target': box[1],
-                                    'aria-controls': box[1],
+        declare, rename_me = box
+        declare.widget.attrs.update({'data_target': rename_me,
+                                    'aria-controls': rename_me,
                                     'aria-expanded': 'false'}, )
 
     def __init__(self, *args, **kwargs):
