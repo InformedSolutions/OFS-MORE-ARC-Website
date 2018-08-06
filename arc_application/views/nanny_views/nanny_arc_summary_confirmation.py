@@ -8,11 +8,12 @@ from arc_application.views.nanny_views.nanny_view_helpers import nanny_all_compl
 
 
 @method_decorator(login_required, name='get')
-class NannyArcSummaryConfirmation(View):
+class NannyTest(View):
     TEMPLATE_NAMES = ('review-confirmation.html', 'review-sent-back.html')
     FORM_NAME = ''
 
     def get(self, request):
+        print("Test")
 
         # Get application ID
         application_id = request.GET["id"]

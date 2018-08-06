@@ -24,7 +24,7 @@ from arc_application.views.nanny_views.nanny_insurance_cover import NannyInsuran
 class NannyArcSummary(View):
     TEMPLATE_NAME = 'nanny_arc_summary.html'
     FORM_NAME = ''
-    REDIRECT_NAME = 'nanny_review_confirmation'
+    REDIRECT_NAME = 'nanny_confirmation'
 
     def get(self, request):
 
@@ -39,11 +39,6 @@ class NannyArcSummary(View):
 
         # Get application ID
         application_id = request.POST["id"]
-
-        # Update task status to COMPLETED
-        arc_application = Arc.objects.get(application_id=application_id)
-        arc_application.first_aid_review = 'COMPLETED'
-        arc_application.save()
 
         redirect_address = build_url(self.REDIRECT_NAME, get={'id': application_id})
 
