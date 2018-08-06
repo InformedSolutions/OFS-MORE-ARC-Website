@@ -63,7 +63,7 @@ class NannyFirstAidTrainingSummary(View):
         context = {
             'application_id': application_id,
             'title': 'Review: First aid training',
-            'form': form,
+            #'form': form,
             'rows': [
                 {
                     'id': 'training_organisation',
