@@ -84,7 +84,8 @@ class ArcUserSummaryPageTests(TestCase):
             'insurance_cover'
         ]
 
-        self.assertEqual(tasks_list, expected_list)
+        for task in tasks_list:
+            self.assertIn(task, expected_list)
 
     # ---------------- #
     # HTTP level tests #
