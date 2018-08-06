@@ -5,6 +5,9 @@ import requests
 
 
 class DBGatewayActions:
+    """
+    Base class for handling all requests to Database gateway services at specified target_url_prefix.
+    """
     target_url_prefix = None
 
     def list(self, endpoint, params):
@@ -60,8 +63,14 @@ class DBGatewayActions:
 
 
 class IdentityGatewayActions(DBGatewayActions):
+    """
+    Class for handling all requests to the Identity Gateway service.
+    """
     target_url_prefix = os.environ.get('APP_IDENTITY_URL') + 'api/v1/'
 
 
 class NannyGatewayActions(DBGatewayActions):
+    """
+    Class for handling all requests to the Nanny Gateway service.
+    """
     target_url_prefix = os.environ.get('APP_NANNY_GATEWAY_URL') + '/api/v1/'
