@@ -35,9 +35,6 @@
         </tbody>
     </table>
 
-    <!--<a href="{% url 'personal_details_previous_names' %}?id={{ application_id }}&person_id={{ application_id }}&type=APPLICANT" class="button button-secondary">Add previous names</a>-->
-
-
     <table class="check-your-answers form-group">
         <thead>
         <tr>
@@ -59,145 +56,10 @@
         </tbody>
     </table>
 
-    <!--<a href="{% url 'personal_details_previous_addresses' %}?id={{ application_id }}&state=entry&person_id={{ application_id }}&person_type=APPLICANT" class = "button button-secondary">Add previous addresses</a>-->
-
-    <!--<br>-->
-
-    <!--{% if previous_names %}-->
-    <!--<table class="check-your-answers form-group">-->
-        <!--<thead>-->
-        <!--<tr>-->
-            <!--<th colspan="3">-->
-                <!--<div class="heading-medium">-->
-                    <!--Previous names-->
-                <!--</div>-->
-            <!--</th>-->
-        <!--</tr>-->
-        <!--</thead>-->
-        <!--<tbody>-->
-        <!--{% for name in previous_names %}-->
-            <!--<tr>-->
-                <!--<td>-->
-                    <!--Your previous name {{ forloop.counter }}-->
-                <!--</td>-->
-                <!--<td>-->
-                    <!--{{ name.first_name }}  {{ name.middle_names }} {{ name.last_name }}-->
-                <!--</td>-->
-                <!--<td class="change-answer">-->
-                    <!--<a href="{% url 'personal_details_previous_names' %}?id={{ application_id }}&person_id={{ application_id }}&type=APPLICANT&referrer=list" alt="Change the {{ forloop.counter|inflect }} previous name">Change</a>-->
-                <!--</td>-->
-            <!--</tr>-->
-        <!--{% endfor %}-->
-        <!--</tbody>-->
-    <!--</table>-->
-    <!--{% endif %}-->
-
-    <!--{% if previous_addresses %}-->
-    <!--<table class="check-your-answers form-group">-->
-        <!--<thead>-->
-        <!--<tr>-->
-            <!--<th colspan="3">-->
-                <!--<div class="heading-medium">-->
-                    <!--Previous home addresses-->
-                <!--</div>-->
-            <!--</th>-->
-        <!--</tr>-->
-        <!--</thead>-->
-        <!--<tbody>-->
-        <!--{% for address in previous_addresses %}-->
-        <!--<tr>-->
-            <!--<td>-->
-                <!--Your previous home address {{ forloop.counter }}-->
-            <!--</td>-->
-            <!--<td>-->
-                <!--{{address.street_line1}}{% if address.street_line1 %}<br />{% endif %}-->
-                <!--{{address.street_line2}}{% if address.street_line2 %}<br />{% endif %}-->
-                <!--{{address.town}}{% if address.town %}<br />{% endif %}-->
-                <!--{{address.county}}{% if address.county %}<br />{% endif %}-->
-                <!--{{address.country}}{% if address.country %}<br />{% endif %}-->
-                <!--{{address.postcode}}{% if address.postcode %}<br />{% endif %}-->
-            <!--</td>-->
-            <!--<td class="change-answer">-->
-                <!--<a href="{% url 'personal_details_previous_addresses' %}?id={{ application_id }}&state=update&person_id={{ application_id }}&person_type=APPLICANT&address_id={{address.pk}}" alt="Change the {{ forloop.counter|inflect }} previous address">Change</a>-->
-            <!--</td>-->
-        <!--</tr>-->
-        <!--{% endfor %}-->
-        <!--</tbody>-->
-    <!--</table>-->
-    <!--{% endif %}-->
-
-    <!--{% block has_previously_applied %}-->
-        <!--{% if has_previously_applied %}-->
-            <!--<table class="check-your-answers form-group">-->
-                <!--<tr>-->
-                    <!--<th colspan="3">-->
-                        <!--<div class="heading-medium">-->
-                            <!--Previous Registration-->
-                        <!--</div>-->
-                    <!--</th>-->
-                <!--</tr>-->
-                <!--<tbody>-->
-                <!--<tr>-->
-                    <!--<td>-->
-                        <!--Has the applicant previously registered with Ofsted?-->
-                    <!--</td>-->
-                    <!--<td>-->
-                        <!--{% if previous_registration %}-->
-                            <!--Yes-->
-                        <!--{% else %}-->
-                            <!--No-->
-                        <!--{% endif %}-->
-                    <!--</td>-->
-                    <!--<td class="change-answer">-->
-                        <!--<a href="{% url 'previous_registration_details' %}/?id={{application_id}}">Change</a>-->
-                    <!--</td>-->
-                <!--</tr>-->
-                <!--{% if individual_id != 'None' %}-->
-                <!--<tr>-->
-                    <!--<td>-->
-                        <!--Individual ID-->
-                    <!--</td>-->
-                    <!--<td>-->
-                        <!--{% if individual_id %}-->
-                            <!--{{ individual_id }}-->
-                        <!--{% else %}-->
-                            <!--None-->
-                        <!--{% endif %}-->
-                    <!--</td>-->
-                    <!--<td class="change-answer">-->
-                        <!--<a href="{% url 'previous_registration_details' %}/?id={{application_id}}">Change</a>-->
-                    <!--</td>-->
-                <!--</tr>-->
-                <!--{% endif %}-->
-                <!--<tr>-->
-                    <!--<td>-->
-                        <!--Has the applicant lived in England for more than 5 years?-->
-                    <!--</td>-->
-                    <!--<td>-->
-                        <!--{% if five_years_in_UK %}-->
-                            <!--Yes-->
-                        <!--{% else %}-->
-                            <!--No-->
-                        <!--{% endif %}-->
-                    <!--</td>-->
-                    <!--<td class="change-answer">-->
-                        <!--<a href="{% url 'previous_registration_details' %}/?id={{application_id}}">Change</a>-->
-                    <!--</td>-->
-                <!--</tr>-->
-                <!--</tbody>-->
-            <!--</table>-->
-        <!--{% endif %}-->
-    <!--{% endblock %}-->
     {% csrf_token %}
 
-    <!--<button type="submit" name="previous_registration_details" class="button button-secondary button-add-another" value="/personal-details/previous-registration/">-->
-        <!--Add previous registration-->
-    <!--</button>-->
-    <!--<br>-->
     <input type="submit" class="button" value="Confirm and continue"/>
     <input type="hidden" value="{{application_id}}" name="id"/>
-
-
 
     {% include 'nanny_templates/nanny_return_to_list.html' %}
 

@@ -56,7 +56,7 @@
                 {% elif entry.app_type == 'Childminder' %}
                 <a href="{% url 'task_list' %}?id={{entry.application_id}}">
                 {% else %}
-                <a href="ERROR: URL NOT FOUND">
+                <a href="{% url 'task_list' %}/404">
                 {% endif %}
                     Review
                 </a>
