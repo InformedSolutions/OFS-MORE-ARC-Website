@@ -31,6 +31,14 @@ def search(request):
 
     if (cc_user or arc_user) and request.user.is_authenticated():
 
+        # Display all applications on search page
+        results = Application.objects.filter()
+
+        if results is not None and len(results) > 0:
+            data = format_data(results)
+            context['empty'] = False
+            context['app'] = data
+
         if request.method == 'GET':
             context['form'] = SearchForm()
             return render(request, SEARCH_TEMPLATE_PATH, context)
@@ -48,23 +56,21 @@ def search(request):
 
                 # If no search terms have been entered
                 if not name and not dob and not home_postcode and not care_location_postcode and not reference:
-                    context['empty'] = 'error'
+                    context['empty_error'] = True
                     context['error_title'] = 'There was a problem with your search'
                     context['error_text'] = 'Please use at least one filter'
                     return render(request, SEARCH_TEMPLATE_PATH, context)
 
-                results = search_query(name, dob, home_postcode, care_location_postcode, reference)
+                search_results = search_query(name, dob, home_postcode, care_location_postcode, reference)
 
-                if results is not None and len(results) > 0:
-                    data = format_data(results)
-                    context['empty'] = False
+                if search_results is not None and len(search_results) > 0:
+                    data = format_data(search_results)
                     context['app'] = data
-                    return render(request, SEARCH_TEMPLATE_PATH, context)
+
                 else:
-                    context['empty'] = 'error'
+                    context['empty_error'] = True
                     context['error_title'] = 'No results found'
                     context['error_text'] = 'Check that you have the correct details and spelling.'
-                    return render(request, SEARCH_TEMPLATE_PATH, context)
 
             return render(request, SEARCH_TEMPLATE_PATH, context)
     else:
