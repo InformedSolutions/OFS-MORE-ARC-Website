@@ -19,9 +19,6 @@
         {% elif row.info|template_is_instance:'dict' %}
             {% include 'nanny_general_address_template.html' %}
 
-        {% else %}
-        ERROR: TYPE NOT FOUND
-
         {% endif %}
     </td>
 </tr>
