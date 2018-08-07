@@ -8,7 +8,7 @@ from arc_application.views.nanny_views.nanny_view_helpers import nanny_all_compl
 
 
 @method_decorator(login_required, name='get')
-class NannyTest(View):
+class NannyArcSummaryConfirmation(View):
     TEMPLATE_NAMES = ('review-confirmation.html', 'review-sent-back.html')
     FORM_NAME = ''
 
