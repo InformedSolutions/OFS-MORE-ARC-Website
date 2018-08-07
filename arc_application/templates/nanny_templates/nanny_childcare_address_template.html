@@ -1,0 +1,48 @@
+<tr>
+
+    <td>
+        Childcare address {{forloop.counter}}
+    </td>
+        <td style="word-wrap: break-word">
+
+            {% if home_address.street_line1 %}
+                {{ home_address.street_line1 }}
+            {% endif %}
+
+            {% if home_address.street_line2 %}
+                <br>
+                {{home_address.street_line2}}
+            {% endif %}
+
+            {% if home_address.town %}
+                <br>
+                {{home_address.town}}
+            {% endif %}
+
+            {% if home_address.county %}
+                <br>
+                {{home_address.county}}
+            {% endif %}
+
+            {% if home_address.postcode %}
+                <br>
+                {{home_address.postcode}}
+            {% endif %}
+
+        </td>
+</tr>
+<tr class="js-hidden" id="childcare_address">
+    <td colspan="1">
+        <div>
+            {{ form.add_phone_number_comments.label}}
+        </div>
+        <div>
+            {{ form.add_phone_number_comments.help_text}}
+        </div>
+    </td>
+    <td colspan="2">
+        <div>
+            {{ form.add_phone_number_comments}}
+        </div>
+    </td>
+</tr>

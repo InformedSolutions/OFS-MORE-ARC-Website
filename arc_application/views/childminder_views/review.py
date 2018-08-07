@@ -110,6 +110,7 @@ def review(request):
     login_id = account.pk
     first_name = ''
 
+    # Get Application's related email and first_name to send an email.
     if UserDetails.objects.filter(login_id=login_id).exists():
         user_details = UserDetails.objects.get(login_id=login_id)
         email = user_details.email
@@ -135,7 +136,7 @@ def review(request):
             'application_id': application_id_local,
         }
 
-        return render(request, 'childminder_templates/review-confirmation.html', variables)
+        return render(request, 'review-confirmation.html', variables)
 
     else:
         release_application(request, application_id_local, 'FURTHER_INFORMATION')
@@ -166,9 +167,9 @@ def review(request):
             'application_id': application_id_local,
         }
 
-        return render(request, 'childminder_templates/review-sent-back.html', variables)
+        return render(request, 'review-sent-back.html', variables)
 
-    return render(request, 'childminder_templates/review-sent-back.html', variables)
+    return render(request, 'review-sent-back.html', variables)
 
 
 def has_group(user, group_name):
