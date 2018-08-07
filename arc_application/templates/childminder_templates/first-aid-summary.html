@@ -1,0 +1,150 @@
+{% extends 'govuk_template.html' %}
+{% block page_title %}Review: first aid training{% endblock %}
+{% load static %}
+{% load govuk_template_base %}
+{% block inner_content %}
+{% include 'back-button.html' %}
+
+<form method="post" novalidate>
+    <h1 class="form-title heading-large">Review: first aid training</h1>
+    <p>
+        Please check the boxes if there are errors.
+    </p>
+    {% csrf_token %}
+    <table class="check-your-answers form-group">
+        <tbody>
+        <tr>
+            <td>
+                Training organisation
+            </td>
+            <td style="word-wrap: break-word">
+                {{training_organisation}}
+            </td>
+            <td class="change-answer">
+                {{ form.first_aid_training_organisation_declare }}
+            </td>
+        </tr>
+        <tr class="js-hidden" id="first_aid_training_organisation">
+            <td colspan="1">
+                <div>
+                    {{ form.first_aid_training_organisation_comments.label}}
+                </div>
+                <div>
+                    {{ form.first_aid_training_organisation_comments.help_text}}
+                </div>
+            </td>
+            <td colspan="2">
+                <div>
+                    {{ form.first_aid_training_organisation_comments}}
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Title of first aid course
+            </td>
+            <td style="word-wrap: break-word">
+                {{training_course}}
+            </td>
+            <td class="change-answer">
+                {{ form.title_of_training_course_declare }}
+            </td>
+        </tr>
+        <tr class="js-hidden" id="title_of_training_course">
+            <td colspan="1">
+                <div>
+                    {{ form.title_of_training_course_comments.label}}
+                </div>
+                <div>
+                    {{ form.title_of_training_course_comments.help_text}}
+                </div>
+            </td>
+            <td colspan="2">
+                <div>
+                    {{ form.title_of_training_course_comments}}
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Date of certificate
+            </td>
+            {% if certificate_month == 1 %}
+            <td style="word-wrap: break-word">
+                {{certificate_day}} January {{certificate_year}}
+            </td>
+            {% elif certificate_month == 2 %}
+            <td style="word-wrap: break-word">
+                {{certificate_day}} February {{certificate_year}}
+            </td>
+            {% elif certificate_month == 3 %}
+            <td style="word-wrap: break-word">
+                {{certificate_day}} March {{certificate_year}}
+            </td>
+            {% elif certificate_month == 4 %}
+            <td style="word-wrap: break-word">
+                {{certificate_day}} April {{certificate_year}}
+            </td>
+            {% elif certificate_month == 5 %}
+            <td style="word-wrap: break-word">
+                {{certificate_day}} May {{certificate_year}}
+            </td>
+            {% elif certificate_month == 6 %}
+            <td style="word-wrap: break-word">
+                {{certificate_day}} June {{certificate_year}}
+            </td>
+            {% elif certificate_month == 7 %}
+            <td style="word-wrap: break-word">
+                {{certificate_day}} July {{certificate_year}}
+            </td>
+            {% elif certificate_month == 8 %}
+            <td style="word-wrap: break-word">
+                {{certificate_day}} August {{certificate_year}}
+            </td>
+            {% elif certificate_month == 9 %}
+            <td style="word-wrap: break-word">
+                {{certificate_day}} September {{certificate_year}}
+            </td>
+            {% elif certificate_month == 10 %}
+            <td style="word-wrap: break-word">
+                {{certificate_day}} October {{certificate_year}}
+            </td>
+            {% elif certificate_month == 11 %}
+            <td style="word-wrap: break-word">
+                {{certificate_day}} November {{certificate_year}}
+            </td>
+            {% elif certificate_month == 12 %}
+            <td style="word-wrap: break-word">
+                {{certificate_day}} December {{certificate_year}}
+            </td>
+            {% endif %}
+            <td class="change-answer">
+                {{ form.course_date_declare }}
+            </td>
+        </tr>
+        <tr class="js-hidden" id="course_date">
+            <td colspan="1">
+                <div>
+                    {{ form.course_date_comments.label}}
+                </div>
+                <div>
+                    {{ form.course_date_comments.help_text}}
+                </div>
+            </td>
+            <td colspan="2">
+                <div>
+                    {{ form.course_date_comments}}
+                </div>
+            </td>
+        </tr>
+
+        </tbody>
+    </table>
+
+    <input type="submit" class="button" value="Confirm and continue"/>
+    <input type="hidden" value="{{application_id}}" name="id"/>
+
+    {% include 'childminder_templates/return-to-list.html' %}
+</form>
+
+{% endblock %}

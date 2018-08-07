@@ -1,0 +1,83 @@
+{% extends 'govuk_template.html' %}
+{% block page_title %}Review: criminal record (DBS) check{% endblock %}
+{% load static %}
+{% load govuk_template_base %}
+{% block inner_content %}
+{% include 'back-button.html' %}
+
+<form method="post" novalidate>
+    <h1 class="form-title heading-large">Review: criminal record (DBS) check</h1>
+    <p>
+        Please check the boxes if there are errors.
+    </p>
+    {% csrf_token %}
+    <table class="check-your-answers form-group">
+        <tbody>
+        <tr>
+            <td>
+                DBS certificate number
+            </td>
+            <td style="word-wrap: break-word">
+                {{dbs_certificate_number}}
+            </td>
+            <td class="change-answer">
+                {{ form.dbs_certificate_number_declare }}
+            </td>
+        </tr>
+        <tr class="js-hidden" id="dbs_certificate_number">
+            <td colspan="1">
+                <div>
+                    {{ form.dbs_certificate_number_comments.label}}
+                </div>
+                <div>
+                    {{ form.dbs_certificate_number_comments.help_text}}
+                </div>
+            </td>
+            <td colspan="2">
+                <div>
+                    {{ form.dbs_certificate_number_comments}}
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Do you have any cautions or convictions?
+            </td>
+            {% if cautions_convictions is True %}
+            <td style="word-wrap: break-word">
+                Yes
+            </td>
+            {% elif cautions_convictions is False %}
+            <td style="word-wrap: break-word">
+                No
+            </td>
+            {% endif %}
+            <td class="change-answer">
+                {{ form.cautions_convictions_declare }}
+            </td>
+        </tr>
+        <tr class="js-hidden" id="cautions_convictions">
+            <td colspan="1">
+                <div>
+                    {{ form.cautions_convictions_comments.label}}
+                </div>
+                <div>
+                    {{ form.cautions_convictions_comments.help_text}}
+                </div>
+            </td>
+            <td colspan="2">
+                <div>
+                    {{ form.cautions_convictions_comments}}
+                </div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <input type="submit" class="button" value="Confirm and continue"/>
+    <input type="hidden" value="{{application_id}}" name="id"/>
+
+    {% include 'childminder_templates/return-to-list.html' %}
+</form>
+
+{% endblock %}

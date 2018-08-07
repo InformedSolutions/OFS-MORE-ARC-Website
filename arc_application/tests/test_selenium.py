@@ -115,7 +115,7 @@ class TestArcFunctions(LiveServerTestCase):
         try:
             Application.objects.all().delete()
             self.login_as_arc_user()
-            selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Add from queue']").click()
+            selenium_task_executor.get_driver().find_element_by_name("add_childminder_application").click()
             self.assertTrue(
                 selenium_task_executor.get_driver().find_element_by_class_name('error-summary').is_displayed()
             )
@@ -134,7 +134,7 @@ class TestArcFunctions(LiveServerTestCase):
 
         try:
             self.login_as_arc_user()
-            selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Add from queue']").click()
+            selenium_task_executor.get_driver().find_element_by_name("add_childminder_application").click()
             selenium_task_executor.get_driver().find_element_by_xpath("//*[@id='request-table']/tbody/tr[1]/td[5]/a").click()
             self.assertEqual("Application overview", selenium_task_executor.get_driver().title)
             self.release_arc_application()
@@ -153,7 +153,7 @@ class TestArcFunctions(LiveServerTestCase):
 
         try:
             self.login_as_arc_user()
-            selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Add from queue']").click()
+            selenium_task_executor.get_driver().find_element_by_name("add_childminder_application").click()
             selenium_task_executor.get_driver().find_element_by_xpath("//*[@id='request-table']/tbody/tr[1]/td[5]/a").click()
             selenium_task_executor.get_driver().find_element_by_link_text("Audit log").click()
             self.assertEqual("Audit log", selenium_task_executor.get_driver().title)
@@ -172,7 +172,7 @@ class TestArcFunctions(LiveServerTestCase):
 
         try:
             self.login_as_arc_user()
-            selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Add from queue']").click()
+            selenium_task_executor.get_driver().find_element_by_name("add_childminder_application").click()
             selenium_task_executor.get_driver().find_element_by_xpath("//*[@id='request-table']/tbody/tr[1]/td[5]/a").click()
             selenium_task_executor.get_driver().find_element_by_link_text("Audit log").click()
             self.assertEqual("Audit log", selenium_task_executor.get_driver().title)
@@ -232,11 +232,11 @@ class TestArcFunctions(LiveServerTestCase):
         Tests that an ARC user can complete a review without flagging any questions
         """
         global selenium_task_executor
-        title_change_wait = 15
+        title_change_wait = 30
 
         try:
             self.login_as_arc_user()
-            selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Add from queue']").click()
+            selenium_task_executor.get_driver().find_element_by_name("add_childminder_application").click()
             selenium_task_executor.get_driver().find_element_by_xpath("//*[@id='request-table']/tbody/tr[1]/td[5]/a").click()
             selenium_task_executor.get_driver().find_element_by_xpath("//tr[@id='account_details']/td/a/span").click()
             WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("Review: your sign in details"))
@@ -261,6 +261,7 @@ class TestArcFunctions(LiveServerTestCase):
             selenium_task_executor.get_driver().find_element_by_link_text("Complete review").click()
             WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("Application summary"))
             selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Confirm and continue']").click()
+            WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("Review approved"))
             self.assertEqual("Review approved", selenium_task_executor.get_driver().title)
         except Exception as e:
             self.capture_screenshot()
@@ -279,7 +280,7 @@ class TestArcFunctions(LiveServerTestCase):
         try:
             self.login_as_arc_user()
 
-            selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Add from queue']").click()
+            selenium_task_executor.get_driver().find_element_by_name("add_childminder_application").click()
             selenium_task_executor.get_driver().find_element_by_xpath("//*[@id='request-table']/tbody/tr[1]/td[5]/a").click()
             selenium_task_executor.get_driver().find_element_by_xpath("//tr[@id='account_details']/td/a/span").click()
             WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("Review: your sign in details"))
@@ -436,7 +437,7 @@ class TestArcFunctions(LiveServerTestCase):
 
         try:
             selenium_task_executor.get_driver().find_element_by_id("proposition-name").click()
-            selenium_task_executor.get_driver().find_element_by_link_text("Release to queue").click()
+            selenium_task_executor.get_driver().find_element_by_name("add_childminder_application").click()
         except Exception as e:
             self.capture_screenshot()
             raise e

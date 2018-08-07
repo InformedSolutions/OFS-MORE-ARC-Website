@@ -1,3 +1,1 @@
-from .base import *
-from .review import *
-from .arc_summary import *
+from arc_application.views.childminder_views import *

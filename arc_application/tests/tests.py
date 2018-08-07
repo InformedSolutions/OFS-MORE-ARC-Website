@@ -5,7 +5,7 @@ from django.contrib.auth.models import Group, User
 from django.test import TestCase, RequestFactory
 from django.urls import reverse
 
-from ..models import (ApplicantHomeAddress,
+from arc_application.models import (ApplicantHomeAddress,
                       ApplicantName,
                       ApplicantPersonalDetails,
                       Application,
@@ -25,6 +25,7 @@ arc_records = None
 flagged_status = 'FLAGGED'
 arc_test_user = None
 cc_test_user = None
+
 
 def create_application():
     global application
@@ -240,48 +241,6 @@ class ArcSummaryTest(TestCase):
         resp = self.client.get('/arc/login/')
         self.assertEqual(resp.url, '/arc/summary')
         self.assertEqual(resp.status_code, 302)
-
-    def test_task_flagged_with_comment_login_details(self):
-        # Assemble
-        create_application()
-
-        post_dictionary = {
-            'id': application.application_id,
-            'mobile_number_declare': True,
-            'mobile_number_comments': 'There was a test issue with this field'
-        }
-
-        # Act
-        self.client.login(username='arc_test', password='my_secret')
-
-        response = self.client.post(reverse('contact_summary'), post_dictionary)
-
-        # Assert
-
-        # 1. Check HTTP status code correct
-        self.assertEqual(response.status_code, 302)
-
-        # 2. Ensure overall task status marked as FLAGGED in ARC view
-        reloaded_arc_record = Arc.objects.get(pk=application.application_id)
-        self.assertEqual(reloaded_arc_record.login_details_review, flagged_status)
-
-        # 3. Check that comment has been correctly appended to application
-        try:
-            arc_comments = ArcComments.objects.get(
-                table_pk='8362d470-ecc9-4069-876b-9b3ddc2cae07',
-                table_name='USER_DETAILS',
-                field_name='mobile_number',
-                comment='There was a test issue with this field',
-                flagged=True,
-            )
-        except:
-            self.fail('ARC comment could not be retrieved for flagged field')
-
-        self.assertIsNotNone(arc_comments)
-
-        # 4. Check flagged boolean indicator is set on the application record
-        reloaded_application = Application.objects.get(pk=application.application_id)
-        self.assertTrue(reloaded_application.login_details_arc_flagged)
 
     def test_task_flagged_with_comment_personal_details(self):
         # Assemble

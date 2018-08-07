@@ -1,0 +1,44 @@
+{% extends 'govuk_template.html' %}
+{% block page_title %}{{title}}{% endblock %}
+{% load static %}
+{% load govuk_template_base %}
+{% block inner_content %}
+{% include 'back-button.html' %}
+
+<form method="post" novalidate>
+    {% csrf_token %}
+
+    <h1 class="form-title heading-large">
+        {{title}}
+    </h1>
+    <p>
+        Please check the boxes if there are errors.
+    </p>
+
+    <table class="check-your-answers form-group">
+        <tbody>
+
+        {% for row in rows %}
+        {% if row.id == 'home_address_locations' %}
+            {% for home_address in row.info %}
+                {% include 'nanny_childcare_address_template.html' %}
+            {% endfor %}
+
+        {% else %}
+
+        {% include 'nanny_general_table_template.html' %}
+
+        {% endif %}
+        {% endfor %}
+
+        </tbody>
+    </table>
+
+    <input type="submit" class="button" value="Confirm and continue"/>
+    <input type="hidden" value="{{application_id}}" name="id"/>
+
+   {% include 'nanny_templates/nanny_return_to_list.html' %}
+
+</form>
+
+{% endblock %}
