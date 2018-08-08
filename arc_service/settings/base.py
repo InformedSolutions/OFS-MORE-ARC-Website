@@ -167,3 +167,40 @@ REGEX = {
     "MAESTRO": "^(?:5[0678]\d\d|6304|6390|67\d\d)\d{8,15}$",
     "CARD_SECURITY_NUMBER": "^[0-9]{3,4}$"
 }
+
+LOGGING = {
+  'version': 1,
+  'disable_existing_loggers': False,
+  'formatters': {
+    'console': {
+            # exact format is not important, this is the minimum information
+            'format': '%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
+        },
+        },
+  'handlers': {
+    'file': {
+        'level': 'DEBUG',
+        'class': 'logging.handlers.TimedRotatingFileHandler',
+        'filename': 'logs/output.log',
+        'formatter': 'console',
+        'when': 'midnight',
+        'backupCount': 10
+    },
+    'console': {
+        'level': 'DEBUG',
+        'class': 'logging.StreamHandler'
+    },
+   },
+   'loggers': {
+     '': {
+       'handlers': ['file', 'console'],
+         'level': 'DEBUG',
+           'propagate': True,
+      },
+      'django.server': {
+       'handlers': ['file', 'console'],
+         'level': 'INFO',
+           'propagate': True,
+      },
+    },
+}
