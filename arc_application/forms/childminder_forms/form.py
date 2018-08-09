@@ -591,7 +591,7 @@ class SearchForm(GOVUKForm):
         if len(reference) != 0 and len(reference) < 3:
             self.add_error('reference_search_field', length_error_text)
 
-        if len(name) != 0 and len(name) < 3:
+        if len(name) != 0 and len(name) < 2:
             self.add_error('name_search_field', length_error_text)
 
         if len(dob) != 0 and len(dob) < 3:
