@@ -23,14 +23,11 @@ class NannyFormBuilder:
     def __init__(self, field_names):
         self.field_names = field_names
         self.form_fields = dict()
-        self.checkboxes = None
-        self.form = None
 
     def create_form(self):
         self.get_form_fields()
-        self.update_checkbox_widgets()
-        self.form = NannyARCForm(form_fields=self.form_fields)
-        return self.form
+        self.update_checkbox_field_widgets()
+        return NannyARCForm(form_fields=self.form_fields)
 
     def get_form_fields(self):
         for field in self.field_names:
@@ -46,7 +43,7 @@ class NannyFormBuilder:
                                                         required=False
                                                     )
 
-    def update_checkbox_widgets(self):
+    def update_checkbox_field_widgets(self):
         checkboxes = [(field, name[:-8]) for name, field in self.form_fields.items() if name[-8:] == '_declare']
 
         for box in checkboxes:
@@ -68,6 +65,7 @@ sign_in_form_fields = [
 
 personal_details_fields = [
     'name',
+    'date_of_birth',
     'home_address',
     'lived_abroad',
 ]
@@ -95,5 +93,14 @@ dbs_check_fields = [
     'convictions',
 ]
 
+insurance_cover_fields = [
+    'public_liability_insurance',
+]
 
-dbs_form = NannyFormBuilder(dbs_check_fields).create_form()
+
+personal_details_form   = NannyFormBuilder(personal_details_fields).create_form()
+childcare_address_form  = None
+first_aid_form          = NannyFormBuilder(first_aid_training_fields).create_form()
+childcare_training_form = NannyFormBuilder(childcare_training_fields).create_form()
+dbs_form                = NannyFormBuilder(dbs_check_fields).create_form()
+insurance_cover_form    = NannyFormBuilder(insurance_cover_fields).create_form()
