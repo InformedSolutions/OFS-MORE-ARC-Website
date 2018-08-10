@@ -5,6 +5,7 @@ from django.views import View
 from django.utils.decorators import method_decorator
 
 from arc_application.services.db_gateways import NannyGatewayActions
+from arc_application.forms.nanny_forms.nanny_form_builder import dbs_form
 from arc_application.models import Arc
 from arc_application.review_util import build_url
 
@@ -58,20 +59,23 @@ class NannyDbsCheckSummary(View):
         context = {
             'application_id': application_id,
             'title': 'Review: Criminal record (DBS) check',
-            # 'form': '',
+            'form': dbs_form,
             'rows': [
                 {
-                    'id': 'dbs_certificate_number',
+                    'id': 'dbs_number',
                     'name': 'DBS certificate number',
-                    'info': dbs_certificate_number
+                    'info': dbs_certificate_number,
+                    'declare': dbs_form['dbs_number_declare'],
+                    'comments': dbs_form['dbs_number_comments'],
                 },
                 {
-                    'id': 'criminal_bool',
+                    'id': 'convictions',
                     'name': 'Do you have any criminal cautions or convictions?',
-                    'info': criminal_bool
+                    'info': criminal_bool,
+                    'declare': dbs_form['convictions_declare'],
+                    'comments': dbs_form['convictions_comments'],
                 }
             ]
-
         }
 
         return context
