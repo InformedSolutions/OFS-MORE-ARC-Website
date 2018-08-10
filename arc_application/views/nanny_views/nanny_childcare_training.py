@@ -7,6 +7,8 @@ from django.utils.decorators import method_decorator
 from arc_application.services.db_gateways import NannyGatewayActions
 from arc_application.models import Arc
 from arc_application.review_util import build_url
+from arc_application.forms.nanny_forms.nanny_form_builder import childcare_training_form
+
 
 
 @method_decorator(login_required, name='get')
@@ -51,24 +53,28 @@ class NannyChildcareTrainingSummary(View):
         childcare_training_dict = nanny_actions.read('childcare-training',
                                                      params={'application_id': application_id}).record
 
-        qualification_bool = childcare_training_dict['level_2_training']
-        core_training_bool = childcare_training_dict['common_core_training']
+        level_2_training = childcare_training_dict['level_2_training']
+        common_core_training = childcare_training_dict['common_core_training']
 
         # Set up context
         context = {
             'application_id': application_id,
             'title': 'Review: Childcare training',
-            # 'form': '',
+            'form': childcare_training_form,
             'rows': [
                 {
-                    'id': 'qualification_bool',
+                    'id': 'level_2_training',
                     'name': 'Do you have a childcare qualification?',
-                    'info': qualification_bool
+                    'info': level_2_training,
+                    'declare': childcare_training_form['level_2_training_declare'],
+                    'comments': childcare_training_form['level_2_training_comments'],
                 },
                 {
-                    'id': 'core_training_bool',
+                    'id': 'common_core_training',
                     'name': 'Have you had common core training?',
-                    'info': core_training_bool
+                    'info': common_core_training,
+                    'declare': childcare_training_form['common_core_training_declare'],
+                    'comments': childcare_training_form['common_core_training_comments'],
                 }
             ]
 
