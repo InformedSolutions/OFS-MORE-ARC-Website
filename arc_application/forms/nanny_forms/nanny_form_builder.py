@@ -33,31 +33,28 @@ class NannyFormBuilder:
         return self.form
 
     def get_form_fields(self):
-
-        bool_field = forms.BooleanField(
-            label='This information is correct',
-            widget=custom_field_widgets.CustomCheckboxInput,
-            required=False
-        )
-        char_field = forms.CharField(
-            label='Enter your reasoning',
-            help_text='(Tip: be clear and concise)',
-            widget=custom_field_widgets.Textarea,
-            required=False
-        )
-
         for field in self.field_names:
-            self.form_fields[field + '_declare'] = bool_field
-            self.form_fields[field + '_comments'] = char_field
+            self.form_fields[field + '_declare'] = forms.BooleanField(
+                                                        label='This information is correct',
+                                                        widget=custom_field_widgets.CustomCheckboxInput,
+                                                        required=False
+                                                    )
+            self.form_fields[field + '_comments'] = forms.CharField(
+                                                        label='Enter your reasoning',
+                                                        help_text='(Tip: be clear and concise)',
+                                                        widget=custom_field_widgets.Textarea,
+                                                        required=False
+                                                    )
 
     def update_checkbox_widgets(self):
         checkboxes = [(field, name[:-8]) for name, field in self.form_fields.items() if name[-8:] == '_declare']
 
         for box in checkboxes:
-            box[0].widget.attrs.update(
+            declare_field, target_html_id_tag = box
+            declare_field.widget.attrs.update(
                 {
-                    'data_target': box[1],
-                    'aria-controls': box[1],
+                    'data_target': target_html_id_tag,
+                    'aria-controls': target_html_id_tag,
                     'aria-expanded': 'false'
                 }
             )
