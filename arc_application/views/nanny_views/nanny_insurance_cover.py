@@ -1,4 +1,3 @@
-from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
@@ -8,6 +7,7 @@ from django.utils.decorators import method_decorator
 from arc_application.services.db_gateways import NannyGatewayActions
 from arc_application.models import Arc
 from arc_application.review_util import build_url
+from arc_application.forms.nanny_forms.nanny_form_builder import insurance_cover_form
 
 
 @method_decorator(login_required, name='get')
@@ -58,12 +58,14 @@ class NannyInsuranceCoverSummary(View):
         context = {
             'application_id': application_id,
             'title': 'Review: Insurance cover',
-            # 'form': '',
+            'form': insurance_cover_form,
             'rows': [
                 {
-                    'id': 'insurance_bool',
+                    'id': 'public_liability_insurance',
                     'name': 'Do you have public liability insurance?',
-                    'info': insurance_bool
+                    'info': insurance_bool,
+                    'declare': insurance_cover_form['public_liability_insurance_declare'],
+                    'comments': insurance_cover_form['public_liability_insurance_comments'],
                 }
             ]
         }
