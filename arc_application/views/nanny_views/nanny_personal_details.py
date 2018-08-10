@@ -8,6 +8,7 @@ from arc_application.services.db_gateways import NannyGatewayActions
 from arc_application.views.nanny_views.nanny_view_helpers import parse_date_of_birth
 from arc_application.models import Arc
 from arc_application.review_util import build_url
+from arc_application.forms.nanny_forms.nanny_form_builder import personal_details_form
 
 
 @method_decorator(login_required, name='get')
@@ -110,21 +111,27 @@ class NannyPersonalDetailsSummary(View):
         context = {
             'application_id': application_id,
             'title': 'Review: Your personal details',
-            # 'form': '',
+            'form': personal_details_form,
             'rows': [
                 {
-                    'id': 'your_name',
+                    'id': 'name',
                     'name': 'Your name',
-                    'info': full_name
+                    'info': full_name,
+                    'declare': personal_details_form['name_declare'],
+                    'comments': personal_details_form['name_comments'],
                 },
                 {
-                    'id': 'your_date_of_birth',
+                    'id': 'date_of_birth',
                     'name': 'Your date of birth',
-                    'info': dob_string_with_month
+                    'info': dob_string_with_month,
+                    'declare': personal_details_form['date_of_birth_declare'],
+                    'comments': personal_details_form['date_of_birth_comments'],
                 },
                 {
                     'id': 'home_address',
                     'name': 'Home address',
+                    'declare': personal_details_form['home_address_declare'],
+                    'comments': personal_details_form['home_address_comments'],
                     'info': {
                         'street_line1': street_line1,
                         'street_line2': street_line2,
@@ -136,7 +143,9 @@ class NannyPersonalDetailsSummary(View):
                 {
                     'id': 'lived_abroad',
                     'name': 'Have you lived abroad in the last 5 years?',
-                    'info': lived_abroad
+                    'info': lived_abroad,
+                    'declare': personal_details_form['lived_abroad_declare'],
+                    'comments': personal_details_form['lived_abroad_comments'],
                 }
             ]
 
