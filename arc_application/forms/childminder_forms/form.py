@@ -587,7 +587,7 @@ class SearchForm(GOVUKForm):
         reference = self.cleaned_data['reference_search_field']
 
         length_error_text = 'Please enter more than 2 characters'
-        name_length_error_text = 'Please enter more than 1 character -TBC'
+        name_length_error_text = 'Please enter more than one character'
 
         if len(reference) != 0 and len(reference) < 3:
             self.add_error('reference_search_field', length_error_text)
