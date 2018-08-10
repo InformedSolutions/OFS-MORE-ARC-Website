@@ -1,4 +1,3 @@
-from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
@@ -9,6 +8,8 @@ from arc_application.services.db_gateways import NannyGatewayActions
 from arc_application.models import Arc
 from arc_application.review_util import build_url
 from arc_application.forms.nanny_forms.nanny_first_aid_training_form import FirstAidTrainingForm
+
+from arc_application.forms.nanny_forms.nanny_form_builder import first_aid_form
 
 
 @method_decorator(login_required, name='get')
@@ -47,10 +48,6 @@ class NannyFirstAidTrainingSummary(View):
         :param application_id: Reviewed application's id.
         :return: Context dictionary.
         """
-
-        #Setup form
-        #form = self.FORM() # table_keys=[first_aid_id]
-
         # Get nanny information
         nanny_actions = NannyGatewayActions()
         first_aid_dict = nanny_actions.read('first-aid',
@@ -64,25 +61,30 @@ class NannyFirstAidTrainingSummary(View):
         context = {
             'application_id': application_id,
             'title': 'Review: First aid training',
-            #'form': form,
+            'form': first_aid_form,
             'rows': [
                 {
                     'id': 'training_organisation',
                     'name': 'Training organisation',
-                    'info': training_organisation
+                    'info': training_organisation,
+                    'declare': first_aid_form['training_organisation_declare'],
+                    'comments': first_aid_form['training_organisation_comments']
                 },
                 {
-                    'id': 'training_course_title',
+                    'id': 'course_title',
                     'name': 'Title of training course',
-                    'info': training_course_title
+                    'info': training_course_title,
+                    'declare': first_aid_form['course_title_declare'],
+                    'comments': first_aid_form['course_title_comments']
                 },
                 {
-                    'id': 'date_course_completed',
+                    'id': 'course_date',
                     'name': 'Date you completed the course',
-                    'info': date_course_completed
+                    'info': date_course_completed,
+                    'declare': first_aid_form['course_date_declare'],
+                    'comments': first_aid_form['course_date_comments']
                 }
             ]
-
         }
 
         return context
