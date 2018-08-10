@@ -27,7 +27,7 @@
         <tbody>
         {% load general_table_extras %}
         {% for row in rows %}
-        {% if row.id|template_string_in_list:'your_name your_date_of_birth' %}
+        {% if row.id|template_string_in_list:'name date_of_birth' %}
         {% include 'nanny_general_table_template.html' %}
         {% endif %}
         {% endfor %}
