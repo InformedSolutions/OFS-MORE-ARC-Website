@@ -79,8 +79,11 @@ sign_in_form_fields = [
 personal_details_fields = [
     'name',
     'date_of_birth',
-    'home_address',
     'lived_abroad',
+]
+
+home_address_fields = [
+    'home_address',
 ]
 
 childcare_address_fields = [
@@ -111,9 +114,10 @@ insurance_cover_fields = [
 ]
 
 
-personal_details_form   = None  # NannyFormBuilder(personal_details_fields, 'personal_detail_id').create_form()
+PersonalDetailsForm     = NannyFormBuilder(personal_details_fields, pk_field_name='personal_detail_id', api_endpoint_name='applicant-personal-details').create_form()
+HomeAddressForm         = NannyFormBuilder(home_address_fields, pk_field_name='home_address_id', api_endpoint_name='applicant-home-address').create_form()
 childcare_address_form  = None
-FirstAidForm            = NannyFormBuilder(first_aid_training_fields, 'first_aid_id', api_endpoint_name='first-aid').create_form()
-ChildcareTrainingForm   = NannyFormBuilder(childcare_training_fields, 'childcare_training_id', api_endpoint_name='childcare-training').create_form()
+FirstAidForm            = NannyFormBuilder(first_aid_training_fields, pk_field_name='first_aid_id', api_endpoint_name='first-aid').create_form()
+ChildcareTrainingForm   = NannyFormBuilder(childcare_training_fields, pk_field_name='childcare_training_id', api_endpoint_name='childcare-training').create_form()
 DBSForm                 = NannyFormBuilder(dbs_check_fields, pk_field_name='dbs_id', api_endpoint_name='dbs-check').create_form()
 InsuranceCoverForm      = NannyFormBuilder(insurance_cover_fields, pk_field_name='insurance_cover_id', api_endpoint_name='insurance-cover').create_form()
