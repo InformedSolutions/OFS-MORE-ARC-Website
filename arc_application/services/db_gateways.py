@@ -24,7 +24,7 @@ class DBGatewayActions:
         if endpoint == 'childcare-address':
             response = requests.get(self.target_url_prefix + endpoint + '/' + params['childcare_address_id'] + '/', data=params)
         elif endpoint == 'arc-comments':
-            response = requests.get(self.target_url_prefix + endpoint + '/' + params['table_pk'] + '/', data=params)
+            response = requests.get(self.target_url_prefix + endpoint + '/' + params['id'] + '/', data=params)
         else:
             response = requests.get(self.target_url_prefix + endpoint + '/' + params['application_id'] + '/', data=params)
 
@@ -53,7 +53,7 @@ class DBGatewayActions:
         if endpoint == 'childcare-address':
             response = requests.put(self.target_url_prefix + endpoint + '/' + params['childcare_address_id'] + '/', data=params)
         elif endpoint == 'arc-comments':
-            response = requests.put(self.target_url_prefix + endpoint + '/' + params['table_pk'] + '/', data=params)
+            response = requests.put(self.target_url_prefix + endpoint + '/' + params['id'] + '/', data=params)
         else:
             response = requests.put(self.target_url_prefix + endpoint + '/' + params['application_id'] + '/', data=params)
 
@@ -64,7 +64,7 @@ class DBGatewayActions:
 
     def delete(self, endpoint, params):
         if endpoint == 'arc-comments':
-            return requests.delete(self.target_url_prefix + endpoint + '/' + params['table_pk'] + '/', data=params)
+            return requests.delete(self.target_url_prefix + endpoint + '/' + params['id'] + '/', data=params)
         else:
             return requests.delete(self.target_url_prefix + endpoint + '/' + params['application_id'] + '/', data=params)
 
