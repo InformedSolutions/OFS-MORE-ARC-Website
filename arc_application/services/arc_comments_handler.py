@@ -10,7 +10,8 @@ def save_arc_comments_from_request(request, endpoint, table_pk):
     :param table_pk: pk of the entry for which comments are being made.
     :return: True if comments were made, else False.
     """
-    table_pk = NannyGatewayActions().read(endpoint, params={'application_id': request.GET['id']}).record[table_pk]
+    application_id = request.GET['id']
+    table_pk = NannyGatewayActions().read(endpoint, params={'application_id': application_id}).record[table_pk]
     existing_comments = NannyGatewayActions().list('arc-comments', params={'table_pk': table_pk})
 
     # Delete existing ArcComments
@@ -54,6 +55,15 @@ def update_arc_review_status(application_id, flagged_fields, reviewed_task):
     else:
         setattr(arc_application, reviewed_task, 'COMPLETED')
     arc_application.save()
+
+
+def update_application_arc_flagged_status(flagged_fields, application_id, reviewed_task):
+    task_name = reviewed_task[:-7] + '_arc_flagged'
+
+    if flagged_fields:
+        NannyGatewayActions().patch('application', {'application_id': application_id, task_name: True})
+    else:
+        NannyGatewayActions().patch('application', {'application_id': application_id, task_name: False})
 
 
 def get_form_initial_values(form, application_id):
