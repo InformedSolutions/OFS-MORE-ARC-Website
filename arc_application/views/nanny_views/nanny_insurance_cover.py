@@ -1,71 +1,39 @@
-from django.contrib.auth.decorators import login_required
-from django.http import HttpResponseRedirect
-from django.shortcuts import render
-from django.views import View
-from django.utils.decorators import method_decorator
-
+from arc_application.forms.nanny_forms.nanny_form_builder import InsuranceCoverForm
 from arc_application.services.db_gateways import NannyGatewayActions
-from arc_application.models import Arc
-from arc_application.review_util import build_url
-from arc_application.forms.nanny_forms.nanny_form_builder import insurance_cover_form
+from arc_application.views.nanny_views.nanny_form_view import NannyARCFormView
 
 
-@method_decorator(login_required, name='get')
-@method_decorator(login_required, name='post')
-class NannyInsuranceCoverSummary(View):
-    TEMPLATE_NAME = 'nanny_general_template.html'
-    FORM_NAME = ''
-    REDIRECT_NAME = 'nanny_task_list'
+class NannyInsuranceCoverSummary(NannyARCFormView):
+    template_name = 'nanny_general_template.html'
+    success_url = 'nanny_task_list'
+    task_for_review = 'insurance_cover_review'
+    form_class = InsuranceCoverForm
 
-    def get(self, request):
-
-        # Get application ID
-        application_id = request.GET["id"]
-
-        context = self.create_context(application_id)
-
-        return render(request, self.TEMPLATE_NAME, context=context)
-
-    def post(self, request):
-
-        # Get application ID
-        application_id = request.POST["id"]
-
-        # Update task status to COMPLETED
-        arc_application = Arc.objects.get(application_id=application_id)
-        arc_application.insurance_cover_review = 'COMPLETED'
-        arc_application.save()
-
-        redirect_address = build_url(self.REDIRECT_NAME, get={'id': application_id})
-
-        return HttpResponseRedirect(redirect_address)
-
-    def create_context(self, application_id):
+    def get_context_data(self, application_id):
         """
         Creates the context dictionary for this view.
         :param application_id: Reviewed application's id.
         :return: Context dictionary.
         """
-
-        # Get nanny information
         nanny_actions = NannyGatewayActions()
         insurance_cover_dict = nanny_actions.read('insurance-cover',
                                                   params={'application_id': application_id}).record
 
         insurance_bool = insurance_cover_dict['public_liability']
 
-        # Set up context
+        form = self.get_form()
+
         context = {
             'application_id': application_id,
             'title': 'Review: Insurance cover',
-            'form': insurance_cover_form,
+            'form': form,
             'rows': [
                 {
                     'id': 'public_liability_insurance',
                     'name': 'Do you have public liability insurance?',
                     'info': insurance_bool,
-                    'declare': insurance_cover_form['public_liability_insurance_declare'],
-                    'comments': insurance_cover_form['public_liability_insurance_comments'],
+                    'declare': form['public_liability_insurance_declare'],
+                    'comments': form['public_liability_insurance_comments'],
                 }
             ]
         }
