@@ -3,13 +3,14 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.utils.decorators import method_decorator
 from django.views.generic import FormView
+from django.views.decorators.cache import never_cache
 
 from arc_application.review_util import build_url
 from arc_application.services.arc_comments_handler import save_arc_comments_from_request, update_arc_review_status
 
 
-@method_decorator(login_required, name='get')
-@method_decorator(login_required, name='post')
+@method_decorator(never_cache, name='dispatch')
+@method_decorator(login_required, name='dispatch')
 class NannyARCFormView(FormView):
     """
     Parent FormView class from which all subsequent FormViews will inherit.
