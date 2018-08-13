@@ -6,7 +6,8 @@ from django.views.generic import FormView
 from django.views.decorators.cache import never_cache
 
 from arc_application.review_util import build_url
-from arc_application.services.arc_comments_handler import save_arc_comments_from_request, update_arc_review_status, get_form_initial_values
+from arc_application.services.arc_comments_handler import save_arc_comments_from_request, \
+    update_arc_review_status, get_form_initial_values, update_application_arc_flagged_status
 
 
 @method_decorator(never_cache, name='dispatch')
@@ -45,6 +46,9 @@ class NannyARCFormView(FormView):
         reviewed_task = self.get_task_for_review()
         application_id = self.request.GET['id']
         update_arc_review_status(application_id, flagged_fields, reviewed_task=reviewed_task)
+
+        # Update {{task}}_arc_flagged status for NannyApplication table.
+        update_application_arc_flagged_status(flagged_fields, application_id, reviewed_task)
 
     def get_form(self, form_class=None):
         if form_class is None:
