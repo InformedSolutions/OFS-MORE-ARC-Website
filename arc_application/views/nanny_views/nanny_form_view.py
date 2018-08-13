@@ -27,21 +27,33 @@ class NannyARCFormView(FormView):
     def post(self, request, *args, **kwargs):
         application_id = request.GET['id']
 
-        # Write ArcComments to db from form.
-        endpoint = self.form_class.api_endpoint_name
-        table_pk = self.form_class.pk_field_name
-        flagged_fields = save_arc_comments_from_request(request=request, endpoint=endpoint, table_pk=table_pk)
-
-        # Update {{task}}_review status for ARC user.
-        reviewed_task = self.get_task_for_review()
-        update_arc_review_status(application_id, flagged_fields, reviewed_task=reviewed_task)
+        if isinstance(self.form_class, list):
+            for form in self.form_class:
+                self.handle_post_data(form)
+        else:
+            self.handle_post_data(self.form_class)
 
         return HttpResponseRedirect(build_url(self.success_url, get={'id': application_id}))
 
-    def get_form(self, *args, **kwargs):
-        form_class = self.get_form_class()
+    def handle_post_data(self, form):
+        # Write ArcComments to db from form.
+        endpoint = form.api_endpoint_name
+        table_pk = form.pk_field_name
+        flagged_fields = save_arc_comments_from_request(request=self.request, endpoint=endpoint, table_pk=table_pk)
+
+        # Update {{task}}_review status for ARC user.
+        reviewed_task = self.get_task_for_review()
+        application_id = self.request.GET['id']
+        update_arc_review_status(application_id, flagged_fields, reviewed_task=reviewed_task)
+
+    def get_form(self, form_class=None):
+        if form_class is None:
+            form_class = self.get_form_class()
         form = form_class()
         return get_form_initial_values(form, application_id=self.request.GET['id'])
+
+    def get_forms(self):
+        return [self.get_form(form_class=form_class) for form_class in self.form_class]
 
     def get_context_data(self, *args, **kwargs):
         raise NotImplementedError('You must set the context_data and pk for this FormView with the record from the db.')
