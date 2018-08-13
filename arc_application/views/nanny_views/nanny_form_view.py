@@ -6,7 +6,7 @@ from django.views.generic import FormView
 from django.views.decorators.cache import never_cache
 
 from arc_application.review_util import build_url
-from arc_application.services.arc_comments_handler import save_arc_comments_from_request, update_arc_review_status
+from arc_application.services.arc_comments_handler import save_arc_comments_from_request, update_arc_review_status, get_form_initial_values
 
 
 @method_decorator(never_cache, name='dispatch')
@@ -18,7 +18,6 @@ class NannyARCFormView(FormView):
     template_name = None
     success_url = None
     task_for_review = None
-    form = None
 
     def get(self, request, *args, **kwargs):
         application_id = request.GET['id']
@@ -29,8 +28,8 @@ class NannyARCFormView(FormView):
         application_id = request.GET['id']
 
         # Write ArcComments to db from form.
-        endpoint = self.form.api_endpoint_name
-        table_pk = self.form.pk_field_name
+        endpoint = self.form_class.api_endpoint_name
+        table_pk = self.form_class.pk_field_name
         flagged_fields = save_arc_comments_from_request(request=request, endpoint=endpoint, table_pk=table_pk)
 
         # Update {{task}}_review status for ARC user.
@@ -38,6 +37,11 @@ class NannyARCFormView(FormView):
         update_arc_review_status(application_id, flagged_fields, reviewed_task=reviewed_task)
 
         return HttpResponseRedirect(build_url(self.success_url, get={'id': application_id}))
+
+    def get_form(self, *args, **kwargs):
+        form_class = self.get_form_class()
+        form = form_class()
+        return get_form_initial_values(form, application_id=self.request.GET['id'])
 
     def get_context_data(self, *args, **kwargs):
         raise NotImplementedError('You must set the context_data and pk for this FormView with the record from the db.')
