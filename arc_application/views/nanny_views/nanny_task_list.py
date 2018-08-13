@@ -93,9 +93,9 @@ class NannyTaskList(View):
             'login_details_arc_flagged',
             'personal_details_arc_flagged',
             'childcare_address_arc_flagged',
-            'first_aid_training_arc_flagged',
+            'first_aid_arc_flagged',
             'childcare_training_arc_flagged',
-            'criminal_record_check_arc_flagged',
+            'dbs_arc_flagged',
             'insurance_cover_arc_flagged'
         )
 
