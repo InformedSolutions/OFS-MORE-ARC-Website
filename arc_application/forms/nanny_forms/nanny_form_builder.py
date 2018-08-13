@@ -3,25 +3,11 @@ from django import forms
 from arc_application import custom_field_widgets
 
 
-class NannyARCForm(forms.Form):
-    auto_replace_widgets = True
-
-    def __init__(self, *args, **kwargs):
-        fields_to_add          = kwargs.pop('form_fields')
-        self.pk_field_name     = kwargs.pop('pk_field_name')
-        self.api_endpoint_name = kwargs.pop('api_endpoint_name')
-
-        super(NannyARCForm, self).__init__(*args, **kwargs)
-
-        for field_name, field_value in fields_to_add.items():
-            self.fields[field_name] = field_value
-
-
 class NannyFormBuilder:
     """
     Builder class for generating Nanny ARC forms dynamically, given a list of fields required for that form.
-    :return form with a _declare and _comments field for each field in the list passed. These are the fields for
-            flagging and commenting upon a field of submitted data.
+    :return: form with a {{field_name}}_declare and {{field_name}}_comments field for each field in the list passed.
+             These are the fields for flagging and commenting upon a field of submitted data.
     """
     def __init__(self, field_names, pk_field_name=None, api_endpoint_name=None):
         self.field_names = field_names
@@ -44,9 +30,17 @@ class NannyFormBuilder:
     def create_form(self):
         self.get_form_fields()
         self.update_checkbox_field_widgets()
-        return NannyARCForm(form_fields=self.form_fields,
-                            pk_field_name=self.get_pk_field_name(),
-                            api_endpoint_name=self.get_api_endpoint_name())
+
+        class NannyARCForm(forms.Form):
+            auto_replace_widgets = True
+            field_names = self.field_names
+            pk_field_name = self.get_pk_field_name()
+            api_endpoint_name = self.get_api_endpoint_name()
+
+        for field_name, field in self.form_fields.items():
+            NannyARCForm.base_fields[field_name] = field
+
+        return NannyARCForm
 
     def get_form_fields(self):
         for field in self.field_names:
@@ -119,7 +113,7 @@ insurance_cover_fields = [
 
 personal_details_form   = None  # NannyFormBuilder(personal_details_fields, 'personal_detail_id').create_form()
 childcare_address_form  = None
-first_aid_form          = None  # NannyFormBuilder(first_aid_training_fields, 'first_aid_id').create_form()
-childcare_training_form = None  # NannyFormBuilder(childcare_training_fields, 'childcare_training_id').create_form()
-dbs_form                = NannyFormBuilder(dbs_check_fields, pk_field_name='dbs_id', api_endpoint_name='dbs-check').create_form()
-insurance_cover_form    = None  # NannyFormBuilder(insurance_cover_fields, 'insurance_cover_id').create_form()
+FirstAidForm            = NannyFormBuilder(first_aid_training_fields, 'first_aid_id', api_endpoint_name='first-aid').create_form()
+ChildcareTrainingForm   = NannyFormBuilder(childcare_training_fields, 'childcare_training_id', api_endpoint_name='childcare-training').create_form()
+DBSForm                 = NannyFormBuilder(dbs_check_fields, pk_field_name='dbs_id', api_endpoint_name='dbs-check').create_form()
+InsuranceCoverForm      = NannyFormBuilder(insurance_cover_fields, pk_field_name='insurance_cover_id', api_endpoint_name='insurance-cover').create_form()
