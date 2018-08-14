@@ -113,7 +113,6 @@ def testing_check_all_task_statuses(mock_arc, status_list):
     arc_app = Arc.objects.create(**mock_arc)
     return check_all_task_statuses(arc_app, status_list)
 
-
 def testing_all_completed(mock_arc):
     arc_app = Arc.objects.create(**mock_arc)
     return nanny_all_completed(arc_app)
