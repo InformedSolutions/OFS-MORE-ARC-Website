@@ -101,7 +101,7 @@ class NannyHelperTests(TestCase):
 
         mock_app = create_mock_dictionary(self.mock_general_data,
                                           self.mock_arc_application_all_flagged)
-        self.assertFalse(testing_all_reviewed(mock_app))
+        self.assertTrue(testing_all_reviewed(mock_app))
         delete_mock_application(app_id)
 
 

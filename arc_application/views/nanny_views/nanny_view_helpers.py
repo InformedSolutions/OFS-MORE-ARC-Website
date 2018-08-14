@@ -45,7 +45,6 @@ def check_all_task_statuses(arc_application, status_list):
     
     for i in field_list:
         if i not in status_list:
-            print(i, status_list)
             return False
     
     return True
