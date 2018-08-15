@@ -33,10 +33,7 @@ class NannyPersonalDetailsSummary(NannyARCFormView):
                       "November",
                       "December"]
 
-        dob_dict = parse_date_of_birth(dob_string)
-        birth_day = dob_dict['birth_day']
-        birth_month = dob_dict['birth_month']
-        birth_year = dob_dict['birth_year']
+        birth_year, birth_month, birth_day = parse_date_of_birth(dob_string)
 
         month = month_list[int(birth_month) + 1]
 
