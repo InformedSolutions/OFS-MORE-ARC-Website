@@ -20,7 +20,7 @@ def save_arc_comments_from_request(request, endpoint, table_pk):
     if existing_comments.status_code == 200:
         for arc_comments_record in existing_comments.record:
             record_id = arc_comments_record['review_id']
-            NannyGatewayActions().delete('arc-comments', params={'id': str(record_id)})
+            NannyGatewayActions().delete('arc-comments', params={'review_id': str(record_id)})
     else:
         pass
 
