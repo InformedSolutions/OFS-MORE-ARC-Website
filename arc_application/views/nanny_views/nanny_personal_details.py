@@ -38,7 +38,7 @@ class NannyPersonalDetailsSummary(NannyARCFormView):
         birth_month = dob_dict['birth_month']
         birth_year = dob_dict['birth_year']
 
-        month = month_list[int(birth_month) + 1]
+        month = month_list[int(birth_month) - 1]
 
         return "{0} {1} {2}".format(birth_day, month, birth_year)
 
