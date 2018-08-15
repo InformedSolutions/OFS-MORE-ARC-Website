@@ -1,8 +1,8 @@
-from arc_application.forms.nanny_forms.nanny_form_builder import HomeAddressForm, PersonalDetailsForm
-from arc_application.services.db_gateways import NannyGatewayActions
-from arc_application.views.nanny_views.nanny_form_view import NannyARCFormView
+from ...forms.nanny_forms.nanny_form_builder import HomeAddressForm, PersonalDetailsForm
+from ...services.db_gateways import NannyGatewayActions
+from .nanny_form_view import NannyARCFormView
 
-from arc_application.views.nanny_views.nanny_view_helpers import parse_date_of_birth
+from .nanny_view_helpers import parse_date_of_birth
 
 
 class NannyPersonalDetailsSummary(NannyARCFormView):
@@ -48,6 +48,7 @@ class NannyPersonalDetailsSummary(NannyARCFormView):
         :param application_id: Reviewed application's id.
         :return: Context dictionary.
         """
+        self.application_id = application_id
         nanny_actions = NannyGatewayActions()
         personal_details = nanny_actions.read('applicant-personal-details',
                                               params={'application_id': application_id}).record
@@ -82,21 +83,21 @@ class NannyPersonalDetailsSummary(NannyARCFormView):
                     'id': 'name',
                     'name': 'Your name',
                     'info': full_name,
-                    'declare': personal_details_form['name_declare'],
-                    'comments': personal_details_form['name_comments'],
+                    'declare': personal_details_form['name_declare'] if hasattr(self, 'request') else '',
+                    'comments': personal_details_form['name_comments'] if hasattr(self, 'request') else '',
                 },
                 {
                     'id': 'date_of_birth',
                     'name': 'Your date of birth',
                     'info': dob_string_with_month,
-                    'declare': personal_details_form['date_of_birth_declare'],
-                    'comments': personal_details_form['date_of_birth_comments'],
+                    'declare': personal_details_form['date_of_birth_declare'] if hasattr(self, 'request') else '',
+                    'comments': personal_details_form['date_of_birth_comments'] if hasattr(self, 'request') else '',
                 },
                 {
                     'id': 'home_address',
                     'name': 'Home address',
-                    'declare': home_address_form['home_address_declare'],
-                    'comments': home_address_form['home_address_comments'],
+                    'declare': home_address_form['home_address_declare'] if hasattr(self, 'request') else '',
+                    'comments': home_address_form['home_address_comments'] if hasattr(self, 'request') else '',
                     'info': {
                         'street_line1': street_line1,
                         'street_line2': street_line2,
@@ -109,8 +110,8 @@ class NannyPersonalDetailsSummary(NannyARCFormView):
                     'id': 'lived_abroad',
                     'name': 'Have you lived abroad in the last 5 years?',
                     'info': lived_abroad,
-                    'declare': personal_details_form['lived_abroad_declare'],
-                    'comments': personal_details_form['lived_abroad_comments'],
+                    'declare': personal_details_form['lived_abroad_declare'] if hasattr(self, 'request') else '',
+                    'comments': personal_details_form['lived_abroad_comments'] if hasattr(self, 'request') else '',
                 }
             ]
         }

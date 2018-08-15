@@ -1,6 +1,6 @@
-from arc_application.forms.nanny_forms.nanny_form_builder import FirstAidForm
-from arc_application.services.db_gateways import NannyGatewayActions
-from arc_application.views.nanny_views.nanny_form_view import NannyARCFormView
+from ...forms.nanny_forms.nanny_form_builder import FirstAidForm
+from ...services.db_gateways import NannyGatewayActions
+from .nanny_form_view import NannyARCFormView
 
 
 class NannyFirstAidTrainingSummary(NannyARCFormView):
@@ -15,6 +15,7 @@ class NannyFirstAidTrainingSummary(NannyARCFormView):
         :param application_id: Reviewed application's id.
         :return: Context dictionary.
         """
+        self.application_id = application_id
         nanny_actions = NannyGatewayActions()
         first_aid_dict = nanny_actions.read('first-aid',
                                             params={'application_id': application_id}).record
@@ -34,22 +35,22 @@ class NannyFirstAidTrainingSummary(NannyARCFormView):
                     'id': 'training_organisation',
                     'name': 'Training organisation',
                     'info': training_organisation,
-                    'declare': form['training_organisation_declare'],
-                    'comments': form['training_organisation_comments']
+                    'declare': form['training_organisation_declare'] if hasattr(self, 'request') else '',
+                    'comments': form['training_organisation_comments'] if hasattr(self, 'request') else ''
                 },
                 {
                     'id': 'course_title',
                     'name': 'Title of training course',
                     'info': training_course_title,
-                    'declare': form['course_title_declare'],
-                    'comments': form['course_title_comments']
+                    'declare': form['course_title_declare'] if hasattr(self, 'request') else '',
+                    'comments': form['course_title_comments'] if hasattr(self, 'request') else ''
                 },
                 {
                     'id': 'course_date',
                     'name': 'Date you completed the course',
                     'info': date_course_completed,
-                    'declare': form['course_date_declare'],
-                    'comments': form['course_date_comments']
+                    'declare': form['course_date_declare'] if hasattr(self, 'request') else '',
+                    'comments': form['course_date_comments'] if hasattr(self, 'request') else ''
                 }
             ]
         }

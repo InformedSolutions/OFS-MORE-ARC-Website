@@ -1,6 +1,6 @@
-from arc_application.forms.nanny_forms.nanny_form_builder import InsuranceCoverForm
-from arc_application.services.db_gateways import NannyGatewayActions
-from arc_application.views.nanny_views.nanny_form_view import NannyARCFormView
+from ...forms.nanny_forms.nanny_form_builder import InsuranceCoverForm
+from ...services.db_gateways import NannyGatewayActions
+from .nanny_form_view import NannyARCFormView
 
 
 class NannyInsuranceCoverSummary(NannyARCFormView):
@@ -15,6 +15,7 @@ class NannyInsuranceCoverSummary(NannyARCFormView):
         :param application_id: Reviewed application's id.
         :return: Context dictionary.
         """
+        self.application_id = application_id
         nanny_actions = NannyGatewayActions()
         insurance_cover_dict = nanny_actions.read('insurance-cover',
                                                   params={'application_id': application_id}).record
@@ -32,8 +33,8 @@ class NannyInsuranceCoverSummary(NannyARCFormView):
                     'id': 'public_liability_insurance',
                     'name': 'Do you have public liability insurance?',
                     'info': insurance_bool,
-                    'declare': form['public_liability_insurance_declare'],
-                    'comments': form['public_liability_insurance_comments'],
+                    'declare': form['public_liability_insurance_declare'] if hasattr(self, 'request') else '',
+                    'comments': form['public_liability_insurance_comments'] if hasattr(self, 'request') else '',
                 }
             ]
         }

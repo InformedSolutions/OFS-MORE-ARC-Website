@@ -1,6 +1,6 @@
-from arc_application.forms.nanny_forms.nanny_form_builder import ChildcareTrainingForm
-from arc_application.services.db_gateways import NannyGatewayActions
-from arc_application.views.nanny_views.nanny_form_view import NannyARCFormView
+from ...forms.nanny_forms.nanny_form_builder import ChildcareTrainingForm
+from ...services.db_gateways import NannyGatewayActions
+from .nanny_form_view import NannyARCFormView
 
 
 class NannyChildcareTrainingSummary(NannyARCFormView):
@@ -15,6 +15,7 @@ class NannyChildcareTrainingSummary(NannyARCFormView):
         :param application_id: Reviewed application's id.
         :return: Context dictionary.
         """
+        self.application_id = application_id
         nanny_actions = NannyGatewayActions()
         childcare_training_dict = nanny_actions.read('childcare-training',
                                                      params={'application_id': application_id}).record
@@ -33,15 +34,15 @@ class NannyChildcareTrainingSummary(NannyARCFormView):
                     'id': 'level_2_training',
                     'name': 'Do you have a childcare qualification?',
                     'info': level_2_training,
-                    'declare': form['level_2_training_declare'],
-                    'comments': form['level_2_training_comments'],
+                    'declare': form['level_2_training_declare'] if hasattr(self, 'request') else '',
+                    'comments': form['level_2_training_comments'] if hasattr(self, 'request') else '',
                 },
                 {
                     'id': 'common_core_training',
                     'name': 'Have you had common core training?',
                     'info': common_core_training,
-                    'declare': form['common_core_training_declare'],
-                    'comments': form['common_core_training_comments'],
+                    'declare': form['common_core_training_declare'] if hasattr(self, 'request') else '',
+                    'comments': form['common_core_training_comments'] if hasattr(self, 'request') else '',
                 }
             ]
         }

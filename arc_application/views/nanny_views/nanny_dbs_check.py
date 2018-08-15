@@ -1,6 +1,6 @@
-from arc_application.services.db_gateways import NannyGatewayActions
-from arc_application.forms.nanny_forms.nanny_form_builder import DBSForm
-from arc_application.views.nanny_views.nanny_form_view import NannyARCFormView
+from ...services.db_gateways import NannyGatewayActions
+from ...forms.nanny_forms.nanny_form_builder import DBSForm
+from .nanny_form_view import NannyARCFormView
 
 
 class NannyDbsCheckSummary(NannyARCFormView):
@@ -15,6 +15,7 @@ class NannyDbsCheckSummary(NannyARCFormView):
         :param application_id: Reviewed application's id.
         :return: Context dictionary.
         """
+        self.application_id = application_id
         # Get nanny information
         nanny_actions = NannyGatewayActions()
         dbs_check_dict = nanny_actions.read('dbs-check', params={'application_id': application_id}).record
@@ -33,15 +34,15 @@ class NannyDbsCheckSummary(NannyARCFormView):
                     'id': 'dbs_number',
                     'name': 'DBS certificate number',
                     'info': dbs_certificate_number,
-                    'declare': form['dbs_number_declare'],
-                    'comments': form['dbs_number_comments'],
+                    'declare': form['dbs_number_declare'] if hasattr(self, 'request') else '',
+                    'comments': form['dbs_number_comments'] if hasattr(self, 'request') else '',
                 },
                 {
                     'id': 'convictions',
                     'name': 'Do you have any criminal cautions or convictions?',
                     'info': criminal_bool,
-                    'declare': form['convictions_declare'],
-                    'comments': form['convictions_comments'],
+                    'declare': form['convictions_declare'] if hasattr(self, 'request') else '',
+                    'comments': form['convictions_comments'] if hasattr(self, 'request') else '',
                 }
             ]
         }

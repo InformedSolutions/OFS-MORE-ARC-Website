@@ -1,22 +1,19 @@
-from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.views import View
 from django.utils.decorators import method_decorator
 
-from arc_application.services.db_gateways import NannyGatewayActions
-from arc_application.models import Arc
-from arc_application.review_util import build_url
-# Nanny View Classes
+from ...services.db_gateways import NannyGatewayActions
+from ...review_util import build_url
 
-from arc_application.views.nanny_views.nanny_contact_details import NannyContactDetailsSummary
-from arc_application.views.nanny_views.nanny_personal_details import NannyPersonalDetailsSummary
-from arc_application.views.nanny_views.nanny_childcare_address import NannyChildcareAddressSummary
-from arc_application.views.nanny_views.nanny_first_aid import NannyFirstAidTrainingSummary
-from arc_application.views.nanny_views.nanny_childcare_training import NannyChildcareTrainingSummary
-from arc_application.views.nanny_views.nanny_dbs_check import NannyDbsCheckSummary
-from arc_application.views.nanny_views.nanny_insurance_cover import NannyInsuranceCoverSummary
+from .nanny_contact_details import NannyContactDetailsSummary
+from .nanny_personal_details import NannyPersonalDetailsSummary
+from .nanny_childcare_address import NannyChildcareAddressSummary
+from .nanny_first_aid import NannyFirstAidTrainingSummary
+from .nanny_childcare_training import NannyChildcareTrainingSummary
+from .nanny_dbs_check import NannyDbsCheckSummary
+from .nanny_insurance_cover import NannyInsuranceCoverSummary
 
 
 @method_decorator(login_required, name='get')
@@ -58,12 +55,12 @@ class NannyArcSummary(View):
         application_reference = nanny_application_dict['application_reference']
 
         contact_details_context = NannyContactDetailsSummary().create_context(application_id)
-        personal_details_context = NannyPersonalDetailsSummary().create_context(application_id)
+        personal_details_context = NannyPersonalDetailsSummary().get_context_data(application_id)
         childcare_address_context = NannyChildcareAddressSummary().create_context(application_id)
-        first_aid_training_context = NannyFirstAidTrainingSummary().create_context(application_id)
-        childcare_training_context = NannyChildcareTrainingSummary().create_context(application_id)
-        dbs_check_context = NannyDbsCheckSummary().create_context(application_id)
-        insurance_cover_context = NannyInsuranceCoverSummary().create_context(application_id)
+        first_aid_training_context = NannyFirstAidTrainingSummary().get_context_data(application_id)
+        childcare_training_context = NannyChildcareTrainingSummary().get_context_data(application_id)
+        dbs_check_context = NannyDbsCheckSummary().get_context_data(application_id)
+        insurance_cover_context = NannyInsuranceCoverSummary().get_context_data(application_id)
 
         context_list = [
             contact_details_context,
