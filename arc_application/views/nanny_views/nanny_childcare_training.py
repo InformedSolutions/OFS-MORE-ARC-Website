@@ -34,15 +34,16 @@ class NannyChildcareTrainingSummary(NannyARCFormView):
                     'id': 'level_2_training',
                     'name': 'Do you have a childcare qualification?',
                     'info': level_2_training,
+                    # Prevent checkbox appearing if summary page is calling get_context_data.
                     'declare': form['level_2_training_declare'] if hasattr(self, 'request') else '',
-                    'comments': form['level_2_training_comments'] if hasattr(self, 'request') else '',
+                    'comments': form['level_2_training_comments']
                 },
                 {
                     'id': 'common_core_training',
                     'name': 'Have you had common core training?',
                     'info': common_core_training,
                     'declare': form['common_core_training_declare'] if hasattr(self, 'request') else '',
-                    'comments': form['common_core_training_comments'] if hasattr(self, 'request') else '',
+                    'comments': form['common_core_training_comments']
                 }
             ]
         }

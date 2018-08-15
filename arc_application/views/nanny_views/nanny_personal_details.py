@@ -83,21 +83,22 @@ class NannyPersonalDetailsSummary(NannyARCFormView):
                     'id': 'name',
                     'name': 'Your name',
                     'info': full_name,
+                    # Prevent checkbox appearing if summary page is calling get_context_data.
                     'declare': personal_details_form['name_declare'] if hasattr(self, 'request') else '',
-                    'comments': personal_details_form['name_comments'] if hasattr(self, 'request') else '',
+                    'comments': personal_details_form['name_comments'],
                 },
                 {
                     'id': 'date_of_birth',
                     'name': 'Your date of birth',
                     'info': dob_string_with_month,
                     'declare': personal_details_form['date_of_birth_declare'] if hasattr(self, 'request') else '',
-                    'comments': personal_details_form['date_of_birth_comments'] if hasattr(self, 'request') else '',
+                    'comments': personal_details_form['date_of_birth_comments'],
                 },
                 {
                     'id': 'home_address',
                     'name': 'Home address',
                     'declare': home_address_form['home_address_declare'] if hasattr(self, 'request') else '',
-                    'comments': home_address_form['home_address_comments'] if hasattr(self, 'request') else '',
+                    'comments': home_address_form['home_address_comments'],
                     'info': {
                         'street_line1': street_line1,
                         'street_line2': street_line2,
@@ -111,7 +112,7 @@ class NannyPersonalDetailsSummary(NannyARCFormView):
                     'name': 'Have you lived abroad in the last 5 years?',
                     'info': lived_abroad,
                     'declare': personal_details_form['lived_abroad_declare'] if hasattr(self, 'request') else '',
-                    'comments': personal_details_form['lived_abroad_comments'] if hasattr(self, 'request') else '',
+                    'comments': personal_details_form['lived_abroad_comments'],
                 }
             ]
         }

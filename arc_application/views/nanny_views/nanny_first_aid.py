@@ -35,22 +35,23 @@ class NannyFirstAidTrainingSummary(NannyARCFormView):
                     'id': 'training_organisation',
                     'name': 'Training organisation',
                     'info': training_organisation,
+                    # Prevent checkbox appearing if summary page is calling get_context_data.
                     'declare': form['training_organisation_declare'] if hasattr(self, 'request') else '',
-                    'comments': form['training_organisation_comments'] if hasattr(self, 'request') else ''
+                    'comments': form['training_organisation_comments']
                 },
                 {
                     'id': 'course_title',
                     'name': 'Title of training course',
                     'info': training_course_title,
                     'declare': form['course_title_declare'] if hasattr(self, 'request') else '',
-                    'comments': form['course_title_comments'] if hasattr(self, 'request') else ''
+                    'comments': form['course_title_comments']
                 },
                 {
                     'id': 'course_date',
                     'name': 'Date you completed the course',
                     'info': date_course_completed,
                     'declare': form['course_date_declare'] if hasattr(self, 'request') else '',
-                    'comments': form['course_date_comments'] if hasattr(self, 'request') else ''
+                    'comments': form['course_date_comments']
                 }
             ]
         }
