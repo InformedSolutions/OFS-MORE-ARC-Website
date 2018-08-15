@@ -34,15 +34,16 @@ class NannyDbsCheckSummary(NannyARCFormView):
                     'id': 'dbs_number',
                     'name': 'DBS certificate number',
                     'info': dbs_certificate_number,
+                    # Prevent checkbox appearing if summary page is calling get_context_data.
                     'declare': form['dbs_number_declare'] if hasattr(self, 'request') else '',
-                    'comments': form['dbs_number_comments'] if hasattr(self, 'request') else '',
+                    'comments': form['dbs_number_comments'],
                 },
                 {
                     'id': 'convictions',
                     'name': 'Do you have any criminal cautions or convictions?',
                     'info': criminal_bool,
                     'declare': form['convictions_declare'] if hasattr(self, 'request') else '',
-                    'comments': form['convictions_comments'] if hasattr(self, 'request') else '',
+                    'comments': form['convictions_comments'],
                 }
             ]
         }

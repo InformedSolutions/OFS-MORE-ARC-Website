@@ -3,8 +3,7 @@ from django.shortcuts import render
 from django.views import View
 from django.utils.decorators import method_decorator
 
-from ...models.arc import Arc
-from .nanny_view_helpers import nanny_all_completed
+from arc_application.services.db_gateways import NannyGatewayActions
 
 
 @method_decorator(login_required, name='get')
@@ -25,19 +24,16 @@ class NannyArcSummaryConfirmation(View):
 
     def get_template(self, application_id):
         """
-        Decides which template should be rendered.
+        Decides which template should be rendered and performs a send_email for the relevant template.
         :param application_id: Reviewed application's id.
         :return: A string of a template's name, one of the self.TEMPLATE_NAMES defined.
         """
-
-        # Get applications
-        arc_application = Arc.objects.get(application_id=application_id)
-
         # Get possible templates
         confirmation, sent_back = self.TEMPLATE_NAMES
 
-        # If all sections are marked 'COMPLETED'
-        if nanny_all_completed(arc_application):
+        nanny_application = NannyGatewayActions().read('application', params={'application_id': application_id}).record
+
+        if nanny_application['application_status'] == 'ACCEPTED':
             return confirmation
-        else:
+        elif nanny_application['application_status'] == 'FURTHER_INFORMATION':
             return sent_back

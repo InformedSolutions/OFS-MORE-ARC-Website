@@ -12,7 +12,11 @@ NOTIFY_URL = os.environ.get('APP_NOTIFY_URL')
 # Base URL of addressing-service gateway
 ADDRESSING_URL = os.environ.get('APP_ADDRESSING_URL')
 
+# Address of Childminder application
 CHILDMINDER_EMAIL_VALIDATION_URL = os.environ.get('CHILDMINDER_EMAIL_VALIDATION_URL')
+
+# Address of Nanny application
+NANNY_EMAIL_VALIDATION_URL = os.environ.get('NANNY_EMAIL_VALIDATION_URL')
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -168,4 +172,41 @@ REGEX = {
     "MASTERCARD": "^(?:5[1-5][0-9]{2}|222[1-9]|22[3-9][0-9]|2[3-6][0-9]{2}|27[01][0-9]|2720)[0-9]{12}$",
     "MAESTRO": "^(?:5[0678]\d\d|6304|6390|67\d\d)\d{8,15}$",
     "CARD_SECURITY_NUMBER": "^[0-9]{3,4}$"
+}
+
+LOGGING = {
+  'version': 1,
+  'disable_existing_loggers': False,
+  'formatters': {
+    'console': {
+            # exact format is not important, this is the minimum information
+            'format': '%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
+        },
+        },
+  'handlers': {
+    'file': {
+        'level': 'DEBUG',
+        'class': 'logging.handlers.TimedRotatingFileHandler',
+        'filename': 'logs/output.log',
+        'formatter': 'console',
+        'when': 'midnight',
+        'backupCount': 10
+    },
+    'console': {
+        'level': 'DEBUG',
+        'class': 'logging.StreamHandler'
+    },
+   },
+   'loggers': {
+     '': {
+       'handlers': ['file', 'console'],
+         'level': 'DEBUG',
+           'propagate': True,
+      },
+      'django.server': {
+       'handlers': ['file', 'console'],
+         'level': 'INFO',
+           'propagate': True,
+      },
+    },
 }

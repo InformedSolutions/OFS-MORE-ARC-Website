@@ -56,8 +56,12 @@ class NannyChildcareAddressSummary(View):
 
         work_location_bool = nanny_application['address_to_be_provided']
         work_at_home_bool = home_address_info['childcare_address']
-        home_address_locations = nanny_actions.list('childcare-address',
+
+        if work_location_bool:
+            home_address_locations = nanny_actions.list('childcare-address',
                                                     params={'application_id': application_id}).record
+        else:
+            home_address_locations = {}
 
         # Set up context
         context = {

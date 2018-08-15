@@ -4,7 +4,8 @@ from django.shortcuts import render
 from django.views import View
 from django.utils.decorators import method_decorator
 
-from ...services.db_gateways import NannyGatewayActions
+from ...services.db_gateways import NannyGatewayActions, IdentityGatewayActions
+from ...models import Arc
 from ...review_util import build_url
 
 from .nanny_contact_details import NannyContactDetailsSummary
@@ -14,6 +15,9 @@ from .nanny_first_aid import NannyFirstAidTrainingSummary
 from .nanny_childcare_training import NannyChildcareTrainingSummary
 from .nanny_dbs_check import NannyDbsCheckSummary
 from .nanny_insurance_cover import NannyInsuranceCoverSummary
+
+from arc_application.views.nanny_views.nanny_view_helpers import nanny_all_completed
+from arc_application.views.nanny_views.nanny_email_helpers import send_accepted_email, send_returned_email
 
 
 @method_decorator(login_required, name='get')
@@ -38,6 +42,30 @@ class NannyArcSummary(View):
         application_id = request.POST["id"]
 
         redirect_address = build_url(self.REDIRECT_NAME, get={'id': application_id})
+
+        arc_application = Arc.objects.get(application_id=application_id)
+        params = {'application_id': application_id}
+        nanny_application = NannyGatewayActions().read('application', params=params).record
+        nanny_personal_details = NannyGatewayActions().read('applicant-personal-details', params=params).record
+        identity_user = IdentityGatewayActions().read('user', params=params).record
+
+        email_personalisation = {'email': identity_user['email'],
+                                 'first_name': nanny_personal_details['first_name'],
+                                 'ref': nanny_application['application_reference']}
+
+        flags_exist = nanny_all_completed(arc_application)
+
+        if flags_exist:
+            send_accepted_email(**email_personalisation)
+            nanny_application['application_status'] = 'ACCEPTED'
+        else:
+            send_returned_email(**email_personalisation)
+            nanny_application['application_status'] = 'FURTHER_INFORMATION'
+
+        NannyGatewayActions().put('application', params=nanny_application)
+
+        obj = Arc.objects.get(application_id=application_id)
+        obj.delete()
 
         return HttpResponseRedirect(redirect_address)
 
