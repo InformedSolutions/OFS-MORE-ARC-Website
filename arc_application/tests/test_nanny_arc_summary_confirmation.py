@@ -1,4 +1,5 @@
 from unittest import mock
+from unittest.mock import patch
 
 from django.conf import settings
 from django.contrib.auth.models import Group, User
