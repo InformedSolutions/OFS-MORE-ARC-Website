@@ -10,7 +10,7 @@
         Audit log
     </h1>
     <p class="bold">
-        Application number: {{ application_reference }}
+        Application number: {{ application_reference | default_if_none:"N/A" }}
     </p>
     <table>
         <thead>

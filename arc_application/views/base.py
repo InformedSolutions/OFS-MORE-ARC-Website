@@ -4,6 +4,7 @@ from django.contrib.auth import authenticate, login as auth_login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserModel
 from django.contrib.auth.models import Group
+from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.views.generic import ListView
@@ -154,7 +155,10 @@ class AuditlogListView(ListView):
     def get_context_data(self, **kwargs):
         context = super(AuditlogListView, self).get_context_data(**kwargs)
         app_id = self.request.GET.get('id')
-        context['application_reference'] = Application.objects.get(application_id=app_id).application_reference
+        try:
+            context['application_reference'] = Application.objects.get(application_id=app_id).application_reference
+        except ObjectDoesNotExist:
+            context['application_reference'] = None
 
         if has_group(self.request.user, settings.CONTACT_CENTRE):
             context['back'] = reverse('search')
