@@ -3,8 +3,8 @@ from django.shortcuts import render
 from django.views import View
 from django.utils.decorators import method_decorator
 
-from arc_application.models import Arc
-from arc_application.views.nanny_views.nanny_view_helpers import nanny_all_completed
+from ...models.arc import Arc
+from .nanny_view_helpers import nanny_all_completed
 
 
 @method_decorator(login_required, name='get')

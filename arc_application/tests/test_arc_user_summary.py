@@ -79,9 +79,9 @@ class ArcUserSummaryPageTests(TestCase):
             'login_details',
             'personal_details',
             'childcare_address',
-            'first_aid_training',
+            'first_aid',
             'childcare_training',
-            'criminal_record_check',
+            'dbs',
             'insurance_cover'
         ]
 

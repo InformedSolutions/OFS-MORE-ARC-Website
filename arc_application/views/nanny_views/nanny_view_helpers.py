@@ -30,7 +30,7 @@ def nanny_all_completed(arc_application):
     :param arc_application: A direct reference to an arc_application.
     :return: Boolean only.
     """
-    return check_all_task_statuses(arc_application, 'COMPLETED')
+    return check_all_task_statuses(arc_application, ['COMPLETED'])
 
 
 def nanny_all_reviewed(arc_application):
