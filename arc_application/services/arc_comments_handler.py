@@ -1,3 +1,5 @@
+from uuid import uuid4
+
 from arc_application.models import Arc
 from .db_gateways import NannyGatewayActions
 
@@ -17,7 +19,7 @@ def save_arc_comments_from_request(request, endpoint, table_pk):
     # Delete existing ArcComments
     if existing_comments.status_code == 200:
         for arc_comments_record in existing_comments.record:
-            record_id = arc_comments_record['id']
+            record_id = arc_comments_record['review_id']
             NannyGatewayActions().delete('arc-comments', params={'id': str(record_id)})
     else:
         pass
@@ -29,7 +31,9 @@ def save_arc_comments_from_request(request, endpoint, table_pk):
         NannyGatewayActions().create(
             'arc-comments',
             params={
+                'review_id': str(uuid4()),
                 'table_pk': table_pk,
+                'application_id': application_id,
                 'table_name': '',
                 'field_name': field_name,
                 'comment': comment,
