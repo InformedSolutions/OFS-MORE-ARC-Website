@@ -75,7 +75,7 @@ class ArcUserSummaryPageTests(TestCase):
         If we were to mock the Gateway response, this test will continue to pass even if the models are updated.
         Must therefore be an integration test.
         """
-        test_uuid = uuid4()
+        test_uuid = str(uuid4())
         NannyGatewayActions().create('application', params={'application_id': test_uuid})
         tasks_list = NannyApplicationHandler(arc_user=self.user)._list_tasks_for_review()
 
