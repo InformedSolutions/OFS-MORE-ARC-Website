@@ -8,8 +8,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('arc_application', '0001_initial'),
-        ('arc_application', '0002_auto_20180612_1653')
+        ('arc_application', '0001_initial')
     ]
 
     operations = [
