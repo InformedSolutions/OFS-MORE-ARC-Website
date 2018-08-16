@@ -1,4 +1,5 @@
 from unittest import mock
+from uuid import uuid4
 
 from django.conf import settings
 from django.contrib.auth.models import Group, User
@@ -8,6 +9,7 @@ from django.urls import reverse
 
 from arc_application.models import Arc
 from arc_application.services.application_handler import NannyApplicationHandler
+from arc_application.services.db_gateways import NannyGatewayActions
 from arc_application.views.arc_user_summary import ARCUserSummaryView
 
 
@@ -73,6 +75,8 @@ class ArcUserSummaryPageTests(TestCase):
         If we were to mock the Gateway response, this test will continue to pass even if the models are updated.
         Must therefore be an integration test.
         """
+        test_uuid = uuid4()
+        NannyGatewayActions().create('application', params={'application_id': test_uuid})
         tasks_list = NannyApplicationHandler(arc_user=self.user)._list_tasks_for_review()
 
         expected_list = [
@@ -89,6 +93,8 @@ class ArcUserSummaryPageTests(TestCase):
 
         for task in tasks_list:
             self.assertIn(task, expected_list)
+
+        NannyGatewayActions().delete('application', params={'application_id': test_uuid})
 
     # ---------------- #
     # HTTP level tests #
