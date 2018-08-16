@@ -81,7 +81,9 @@ class ArcUserSummaryPageTests(TestCase):
             'childcare_address',
             'first_aid_training',
             'childcare_training',
+            'criminal_record_check',
             'dbs',
+            'first-aid',
             'insurance_cover'
         ]
 
