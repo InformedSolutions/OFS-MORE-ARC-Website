@@ -66,7 +66,7 @@ def first_aid_training_summary(request):
     form.error_summary_title = 'There was a problem'
 
     variables = {
-        #'form': form,
+        'form': form,
         'application_id': application_id_local,
         'training_organisation': training_organisation,
         'training_course': training_course,
