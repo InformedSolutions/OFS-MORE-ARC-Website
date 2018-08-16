@@ -79,7 +79,7 @@ class ArcUserSummaryPageTests(TestCase):
             'login_details',
             'personal_details',
             'childcare_address',
-            'first_aid',
+            'first_aid_training',
             'childcare_training',
             'criminal_record_check',
             'insurance_cover'
