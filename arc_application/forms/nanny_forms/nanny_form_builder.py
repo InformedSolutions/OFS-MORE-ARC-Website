@@ -19,13 +19,13 @@ class NannyFormBuilder:
         if self._pk_field_name is not None:
             return self._pk_field_name
         else:
-            raise NotImplementedError('You must supply the pk_name of the table for which the ArcComment will be saved.')
+            raise AttributeError('You must supply the pk_name of the table for which the ArcComment will be saved.')
 
     def get_api_endpoint_name(self):
         if self._api_endpoint_name is not None:
             return self._api_endpoint_name
         else:
-            raise NotImplementedError('You must supply the pk_name of the table for which the ArcComment will be saved.')
+            raise AttributeError('You must supply the pk_name of the table for which the ArcComment will be saved.')
 
     def create_form(self):
         self.get_form_fields()
