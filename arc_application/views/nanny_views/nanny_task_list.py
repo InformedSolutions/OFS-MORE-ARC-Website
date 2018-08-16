@@ -5,7 +5,7 @@ from django.utils.decorators import method_decorator
 
 from arc_application.services.db_gateways import NannyGatewayActions
 from arc_application.models import Arc
-from arc_application.views.nanny_views.nanny_view_helpers import parse_date_of_birth, \
+from arc_application.services.nanny_view_helpers import parse_date_of_birth, \
     nanny_all_reviewed
 
 
@@ -93,9 +93,9 @@ class NannyTaskList(View):
             'login_details_arc_flagged',
             'personal_details_arc_flagged',
             'childcare_address_arc_flagged',
-            'first_aid_training_arc_flagged',
+            'first_aid_arc_flagged',
             'childcare_training_arc_flagged',
-            'criminal_record_check_arc_flagged',
+            'dbs_arc_flagged',
             'insurance_cover_arc_flagged'
         )
 

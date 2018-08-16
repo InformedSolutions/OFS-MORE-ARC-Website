@@ -1,10 +1,8 @@
-from unittest import mock
-
 from django.test import TestCase, tag
 
 from arc_application.models import Arc
 
-from arc_application.views.nanny_views.nanny_view_helpers import *
+from arc_application.services.nanny_view_helpers import *
 
 class NannyHelperTests(TestCase):
     """

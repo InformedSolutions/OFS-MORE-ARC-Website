@@ -1,6 +1,22 @@
-<!-- {{row.name}} -->
+{% if row.comments and row.comments.initial != '' %} <!-- If there is an existing ARC Comment -->
+<tr class="error-row">
+    <td colspan="3" class="error-container notice">
+        <i class="icon icon-important">
+           <span class="visually-hidden">Warning</span>
+         </i>
+         <strong class="bold-small">
+            {{ row.comments.initial }}
+          </strong>
+    </td>
+</tr>
+
+<!-- If error, ensure row with data also has appropriate css classes - else just <tr> and <td> -->
+<tr class="error-row">
+    <td class="error-field-label">
+{% else %}
 <tr>
     <td>
+{% endif %}
         {{row.name}}
     </td>
     <td style="word-wrap: break-word">
@@ -21,17 +37,20 @@
 
         {% endif %}
     </td>
+    <td class="change-answer">
+        {{ row.declare }}
+    </td>
 </tr>
 <tr class="js-hidden" id="{{row.id}}">
     <td colspan="1">
         <div>
-            {{ form.row.id.label}}
+            {{ row.comments.label }}
         </div>
         <div>
-            {{ form.row.id.help_text}}
+            {{ row.comments.help_text }}
         </div>
     </td>
     <td colspan="2">
-        {{ form.row.id.comments}}
+        {{ row.comments }}
     </td>
 </tr>
