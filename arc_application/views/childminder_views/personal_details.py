@@ -134,6 +134,8 @@ def personal_details_summary(request):
     previous_names = PreviousName.objects.filter(other_person_type=PERSON_TYPE, person_id=application_id_local)
     previous_addresses = get_stored_addresses(application_id_local, PERSON_TYPE)
 
+    form.error_summary_title = 'There was a problem'
+
     variables = {
         'form': form,
         'application_id': application_id_local,

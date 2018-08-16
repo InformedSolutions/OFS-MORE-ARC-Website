@@ -286,12 +286,18 @@ class TestArcFunctions(LiveServerTestCase):
             WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("Review: your sign in details"))
 
             selenium_task_executor.get_driver().find_element_by_id("id_mobile_number_declare").click()
+            # Submit empty comment box and check that error displays
             selenium_task_executor.get_driver().find_element_by_id("id_mobile_number_comments").clear()
-            selenium_task_executor.get_driver().find_element_by_id("id_mobile_number_comments").send_keys("Test")
             selenium_task_executor.get_driver().find_element_by_id("id_add_phone_number_declare").click()
             selenium_task_executor.get_driver().find_element_by_id("id_add_phone_number_comments").clear()
             selenium_task_executor.get_driver().find_element_by_id("id_add_phone_number_comments").send_keys("Test")
             selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Confirm and continue']").click()
+            selenium_task_executor.get_driver().find_element_by_class_name("error-summary")
+            # Submit valid comment
+            selenium_task_executor.get_driver().find_element_by_id("id_mobile_number_comments").clear()
+            selenium_task_executor.get_driver().find_element_by_id("id_add_phone_number_comments").send_keys("Test")
+            selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Confirm and continue']").click()
+
             WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("Review: type of childcare"))
 
             selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Confirm and continue']").click()

@@ -5,6 +5,8 @@
 {% block inner_content %}
 {% include 'back-button.html' %}
 
+{{form.error_summary}}
+
 <form method="post" novalidate>
     <h1 class="form-title heading-large">Review: Early years training</h1>
     <p>
@@ -27,7 +29,7 @@
         <tr class="js-hidden" id="eyfs_course_name">
             <td colspan="1">
                 <div>
-                    {{ form.eyfs_course_name_comments.label }}
+                    Enter your reasoning
                 </div>
                 <div>
                     {{ form.eyfs_course_name_comments.help_text }}
@@ -100,7 +102,7 @@
         <tr class="js-hidden" id="eyfs_course_date">
             <td colspan="1">
                 <div>
-                    {{ form.eyfs_course_date_comments.label }}
+                    Enter your reasoning
                 </div>
                 <div>
                     {{ form.eyfs_course_date_comments.help_text }}

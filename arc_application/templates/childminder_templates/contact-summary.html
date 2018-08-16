@@ -4,6 +4,7 @@
 {% load govuk_template_base %}
 {% block inner_content %}
 {% include 'back-button.html' %}
+{{form.error_summary}}
 
 <form method="post" novalidate>
     {% csrf_token %}
@@ -28,7 +29,7 @@
         <tr class="js-hidden" id="email_address">
             <td colspan="1">
                 <div>
-                    {{ form.email_address_comments.label}}
+                    Enter your reasoning
                 </div>
                 <div>
                     {{ form.email_address_comments.help_text}}
@@ -49,7 +50,7 @@
         <tr class="js-hidden" id="mobile_number">
             <td colspan="1">
                 <div>
-                    {{ form.mobile_number_comments.label}}
+                    Enter your reasoning
                 </div>
                 <div>
                     {{ form.mobile_number_comments.help_text}}
@@ -72,7 +73,7 @@
         <tr class="js-hidden" id="add_phone_number">
             <td colspan="1">
                 <div>
-                    {{ form.add_phone_number_comments.label}}
+                    Enter your reasoning
                 </div>
                 <div>
                     {{ form.add_phone_number_comments.help_text}}

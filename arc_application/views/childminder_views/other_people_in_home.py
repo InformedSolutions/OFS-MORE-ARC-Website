@@ -6,14 +6,15 @@ from django.forms import formset_factory, modelformset_factory
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 
-from arc_application.models.previous_name import PreviousName
+
+from ...models.previous_name import PreviousName
 from ...forms.childminder_forms.form import AdultInYourHomeForm, ChildInYourHomeForm, OtherPeopleInYourHomeForm, OtherPersonPreviousNames
-from arc_application.models import ChildInHome, AdultInHome, Arc, Application, PreviousAddress, \
+from ...models import ChildInHome, AdultInHome, Arc, Application, PreviousAddress, \
     OtherPersonPreviousRegistrationDetails, HealthCheckCurrent, HealthCheckSerious, HealthCheckHospital
 
-from arc_application.review_util import request_to_comment, save_comments, redirect_selection, build_url
-from arc_application.views import other_people_initial_population
-from arc_application.decorators import group_required, user_assigned_application
+from ...review_util import request_to_comment, save_comments, redirect_selection, build_url
+from ...views import other_people_initial_population
+from ...decorators import group_required, user_assigned_application
 
 
 @login_required
@@ -30,25 +31,120 @@ def other_people_summary(request):
     adult_form_set = formset_factory(AdultInYourHomeForm)
     child_form_set = formset_factory(ChildInYourHomeForm)
     table_names = ['ADULT_IN_HOME', 'CHILD_IN_HOME']
+    application_id_local = request.GET.get('id') or request.POST.get('id')
+    application = Application.objects.get(pk=application_id_local)
+
+    form = OtherPeopleInYourHomeForm(request.POST, table_keys=[application_id_local], prefix='static')
+
+    # Adult data
+    adults = AdultInHome.objects.filter(application_id=application_id_local).order_by('adult')
+    adult_record_list = []
+    adult_id_list = []
+    adult_health_check_status_list = []
+    adult_name_list = []
+    adult_birth_day_list = []
+    adult_birth_month_list = []
+    adult_birth_year_list = []
+    adult_relationship_list = []
+    adult_dbs_list = []
+    current_illnesses = []
+    serious_illnesses = []
+    hospital_admissions = []
+    adult_name_querysets = []
+    adult_address_querysets = []
+    previous_registration_querysets = []
+
+    # Children data
+    children = ChildInHome.objects.filter(application_id=application_id_local).order_by('child')
+    child_id_list = []
+    child_name_list = []
+    child_birth_day_list = []
+    child_birth_month_list = []
+    child_birth_year_list = []
+    child_relationship_list = []
+
+    for adult in adults:
+        if adult.middle_names and adult.middle_names != '':
+            name = adult.first_name + ' ' + adult.middle_names + ' ' + adult.last_name
+        else:
+            name = adult.first_name + ' ' + adult.last_name
+        adult_record_list.append(adult)
+        adult_id_list.append(adult.adult_id)
+        adult_health_check_status_list.append(adult.health_check_status)
+        adult_name_list.append(name)
+        adult_birth_day_list.append(adult.birth_day)
+        adult_birth_month_list.append(adult.birth_month)
+        adult_birth_year_list.append(adult.birth_year)
+        adult_relationship_list.append(adult.relationship)
+        adult_dbs_list.append(adult.dbs_certificate_number)
+        current_illnesses.append(HealthCheckCurrent.objects.filter(person_id=adult.pk))
+        serious_illnesses.append(HealthCheckSerious.objects.filter(person_id=adult.pk))
+        hospital_admissions.append(HealthCheckHospital.objects.filter(person_id=adult.pk))
+
+    for child in children:
+        if child.middle_names and child.middle_names != '':
+            name = child.first_name + ' ' + child.middle_names + ' ' + child.last_name
+        else:
+            name = child.first_name + ' ' + child.last_name
+        child_id_list.append(child.child_id)
+        child_name_list.append(name)
+        child_birth_day_list.append(child.birth_day)
+        child_birth_month_list.append(child.birth_month)
+        child_birth_year_list.append(child.birth_year)
+        child_relationship_list.append(child.relationship)
+
+    for adult_id, adult_name in zip(adult_id_list, adult_name_list):
+        adult_name_querysets.append(PreviousName.objects.filter(person_id=adult_id, other_person_type='ADULT'))
+        adult_address_querysets.append(PreviousAddress.objects.filter(person_id=adult_id, person_type='ADULT'))
+        previous_registration_querysets.append(
+            OtherPersonPreviousRegistrationDetails.objects.filter(person_id_id=adult_id))
+
+    adult_ebulk_lists = list(zip(adult_id_list, adult_name_list, adult_name_querysets, adult_address_querysets))
+    previous_registration_lists = list(zip(adult_id_list, adult_name_list, previous_registration_querysets))
+
+    form.error_summary_title = 'There was a problem'
 
     if request.method == 'GET':
         # Defines the static form at the top of the page
 
-        application_id_local = request.GET["id"]
-        form = OtherPeopleInYourHomeForm(table_keys=[application_id_local], prefix='static')
+        initial_adult_data = other_people_initial_population(True, adults)
+
+        # Instantiates the formset with the management data defined above, forcing a set amount of forms
+        formset_adult = adult_form_set(initial=initial_adult_data, prefix='adult')
+
+        # Zips the formset into the list of adults
+        # Converts it to a list, there was trouble parsing the form objects when it was in a zip object
+        adult_lists = list(zip(adult_record_list, adult_id_list, adult_health_check_status_list, adult_name_list, adult_birth_day_list,
+                               adult_birth_month_list, adult_birth_year_list, adult_relationship_list, adult_dbs_list,
+                               formset_adult, current_illnesses, serious_illnesses, hospital_admissions))
+
+        initial_child_data = other_people_initial_population(False, children)
+
+        formset_child = child_form_set(initial=initial_child_data, prefix='child')
+
+        child_lists = zip(child_id_list, child_name_list, child_birth_day_list, child_birth_month_list,
+                          child_birth_year_list,
+                          child_relationship_list, formset_child)
+
+        variables = {
+            'form': form,
+            'formset_adult': formset_adult,
+            'formset_child': formset_child,
+            'application_id': application_id_local,
+            'adults_in_home': application.adults_in_home,
+            'children_in_home': application.children_in_home,
+            'adult_lists': adult_lists,
+            'child_lists': child_lists,
+            'adult_ebulk_lists': adult_ebulk_lists,
+            'previous_registration_lists': previous_registration_lists
+        }
+        return render(request, 'other-people-summary.html', variables)
 
     elif request.method == 'POST':
-        application_id_local = request.POST["id"]
-        form = OtherPeopleInYourHomeForm(request.POST, prefix='static', table_keys=[application_id_local])
         child_formset = child_form_set(request.POST, prefix='child')
         adult_formset = adult_form_set(request.POST, prefix='adult')
 
-        application_id_local = request.POST["id"]
-
         if all([form.is_valid(), child_formset.is_valid(), adult_formset.is_valid()]):
-            child_objects = ChildInHome.objects.filter(application_id=application_id_local).order_by('child')
-            adult_objects = AdultInHome.objects.filter(application_id=application_id_local).order_by('adult')
-
             child_data_list = child_formset.cleaned_data
             adult_data_list = adult_formset.cleaned_data
 
@@ -56,7 +152,7 @@ def other_people_summary(request):
             adult_data_list.pop()
 
             request_list = [adult_data_list, child_data_list]
-            object_list = [adult_objects, child_objects]
+            object_list = [adults, children]
             attr_list = ['adult_id', 'child_id']
 
             section_status = 'COMPLETED'
@@ -96,150 +192,39 @@ def other_people_summary(request):
 
             return HttpResponseRedirect(settings.URL_PREFIX + redirect_link + '?id=' + application_id_local)
 
-    adults_list = AdultInHome.objects.filter(application_id=application_id_local).order_by('adult')
-    adult_record_list = []
-    adult_id_list = []
-    adult_health_check_status_list = []
-    adult_name_list = []
-    adult_birth_day_list = []
-    adult_birth_month_list = []
-    adult_birth_year_list = []
-    adult_relationship_list = []
-    adult_dbs_list = []
-    children_list = ChildInHome.objects.filter(application_id=application_id_local).order_by('child')
-    child_id_list = []
-    child_name_list = []
-    child_birth_day_list = []
-    child_birth_month_list = []
-    child_birth_year_list = []
-    child_relationship_list = []
-    current_illnesses = []
-    serious_illnesses = []
-    hospital_admissions = []
-    application = Application.objects.get(pk=application_id_local)
-    for adult in adults_list:
-        if adult.middle_names != '':
-            name = adult.first_name + ' ' + adult.middle_names + ' ' + adult.last_name
-        elif adult.middle_names == '':
-            name = adult.first_name + ' ' + adult.last_name
-        adult_record_list.append(adult)
-        adult_id_list.append(adult.adult_id)
-        adult_health_check_status_list.append(adult.health_check_status)
-        adult_name_list.append(name)
-        adult_birth_day_list.append(adult.birth_day)
-        adult_birth_month_list.append(adult.birth_month)
-        adult_birth_year_list.append(adult.birth_year)
-        adult_relationship_list.append(adult.relationship)
-        adult_dbs_list.append(adult.dbs_certificate_number)
-        current_illnesses.append(HealthCheckCurrent.objects.filter(person_id=adult.pk))
-        serious_illnesses.append(HealthCheckSerious.objects.filter(person_id=adult.pk))
-        hospital_admissions.append(HealthCheckHospital.objects.filter(person_id=adult.pk))
-    # Defines the data required for rendering the amount of forms in the below formset
-    amount_of_adults = str(len(adult_name_list))
-    data = {
-        'adult-TOTAL_FORMS': amount_of_adults,
-        'adult-INITIAL_FORMS': amount_of_adults,
-        'adult-MAX_NUM_FORMS': '',
-    }
+        else:
 
-    initial_adult_data = other_people_initial_population(True, adults_list)
+            # Zips the formset into the list of adults
+            # Converts it to a list, there was trouble parsing the form objects when it was in a zip object
+            adult_lists = list(zip(adult_record_list, adult_id_list, adult_health_check_status_list, adult_name_list,
+                                   adult_birth_day_list,
+                                   adult_birth_month_list, adult_birth_year_list, adult_relationship_list,
+                                   adult_dbs_list,
+                                   adult_formset, current_illnesses, serious_illnesses, hospital_admissions))
 
-    # Instantiates the formset with the management data defined above, forcing a set amount of forms
-    formset_adult = adult_form_set(initial=initial_adult_data, prefix='adult')
+            child_lists = zip(child_id_list, child_name_list, child_birth_day_list, child_birth_month_list,
+                              child_birth_year_list,
+                              child_relationship_list, child_formset)
 
-    # Zips the formset into the list of adults
-    # Converts it to a list, there was trouble parsing the form objects when it was in a zip object
-    adult_lists = list(zip(adult_record_list, adult_id_list, adult_health_check_status_list, adult_name_list, adult_birth_day_list,
-                           adult_birth_month_list, adult_birth_year_list, adult_relationship_list, adult_dbs_list,
-                           formset_adult, current_illnesses, serious_illnesses, hospital_admissions))
+            for adult_form, adult_name in zip(adult_formset, adult_name_list):
+                adult_form.error_summary_title = 'There was a problem (' + adult_name + ')'
 
-    for child in children_list:
-        if child.middle_names != '':
-            name = child.first_name + ' ' + child.middle_names + ' ' + child.last_name
-        elif child.middle_names == '':
-            name = child.first_name + ' ' + child.last_name
-        child_id_list.append(child.child_id)
-        child_name_list.append(name)
-        child_birth_day_list.append(child.birth_day)
-        child_birth_month_list.append(child.birth_month)
-        child_birth_year_list.append(child.birth_year)
-        child_relationship_list.append(child.relationship)
+            for child_form, child_name in zip(child_formset, child_name_list):
+                child_form.error_summary_title = 'There was a problem (' + child_name + ')'
 
-    initial_child_data = other_people_initial_population(False, children_list)
-
-    formset_child = child_form_set(initial=initial_child_data, prefix='child')
-
-    child_lists = zip(child_id_list, child_name_list, child_birth_day_list, child_birth_month_list,
-                      child_birth_year_list,
-                      child_relationship_list, formset_child)
-
-    adult_ids = list()
-    adult_names = list()
-    name_querysets = list()
-    address_querysets = list()
-
-    for adult_id, adult_name in zip(adult_id_list, adult_name_list):
-        adult_ids.append(adult_id)
-        adult_names.append(adult_name)
-        name_querysets.append(PreviousName.objects.filter(person_id=adult_id, other_person_type='ADULT'))
-        address_querysets.append(PreviousAddress.objects.filter(person_id=adult_id, person_type='ADULT'))
-
-    adult_ebulk_lists = list(zip(adult_ids, adult_names, name_querysets, address_querysets))
-
-    child_ids = list()
-    child_names = list()
-    name_querysets = list()
-    address_querysets = list()
-
-    for child_id, child_name in zip(child_id_list, child_name_list):
-        child_ids.append(child_id)
-        child_names.append(child_name)
-        name_querysets.append(PreviousName.objects.filter(person_id=child_id, other_person_type='CHILD'))
-        address_querysets.append(PreviousAddress.objects.filter(person_id=child_id, person_type='CHILD'))
-
-    child_ebulk_lists = zip(child_ids, child_names, name_querysets, address_querysets)
-
-    adult_ids = []
-    adult_names = []
-    previous_registration_querysets = []
-
-    for adult_id, adult_name in zip(adult_id_list, adult_name_list):
-        adult_ids.append(adult_id)
-        adult_names.append(adult_name)
-        previous_registration_querysets.append(OtherPersonPreviousRegistrationDetails.objects.filter(person_id_id=adult_id))
-
-    previous_registration_lists = list(zip(adult_ids, adult_names, previous_registration_querysets))
-
-    variables = {
-        'form': form,
-        'formset_adult': formset_adult,
-        'formset_child': formset_child,
-        'application_id': application_id_local,
-        'adults_in_home': application.adults_in_home,
-        'children_in_home': application.children_in_home,
-        'number_of_adults': adults_list.count(),
-        'number_of_children': children_list.count(),
-        'adult_lists': adult_lists,
-        'child_lists': child_lists,
-        'adult_ebulk_lists': adult_ebulk_lists,
-        'child_ebulk_lists': child_ebulk_lists,
-        'previous_registration_lists': previous_registration_lists,
-        'turning_16': application.children_turning_16,
-        'people_in_home_status': application.people_in_home_status
-    }
-    return render(request, 'childminder_templates/other-people-summary.html', variables)
-
-
-def person_data_selector(request):
-    pass
-
-
-@group_required(settings.ARC_GROUP)
-def add_previous_address(request):
-    if request.method == "GET":
-        app_id = request.GET["id"]
-        person_id = request.GET["person_id"]
-
+            variables = {
+                'form': form,
+                'formset_adult': adult_formset,
+                'formset_child': child_formset,
+                'application_id': application_id_local,
+                'adults_in_home': application.adults_in_home,
+                'children_in_home': application.children_in_home,
+                'adult_lists': adult_lists,
+                'child_lists': child_lists,
+                'adult_ebulk_lists': adult_ebulk_lists,
+                'previous_registration_lists': previous_registration_lists
+            }
+            return render(request, 'other-people-summary.html', variables)
 
 @group_required(settings.ARC_GROUP)
 @user_assigned_application
@@ -255,7 +240,8 @@ def add_previous_name(request):
         app_id = request.POST["id"]
         person_id = request.POST["person_id"]
         person_type = request.POST["type"]
-        # If the user is updating from the summary page, referrer is set to let the update now to redirect back to summary
+        # If the user is updating from the summary page, referrer is set to let the update now to redirect back to
+        # summary
         try:
             referrer = request.POST["referrer"]
         except:
@@ -292,7 +278,6 @@ def add_previous_name(request):
             for key in request.POST.keys():
                 try:
                     # This trys to cast each key as a uuid, dismisses it if this fails
-                    test_val = UUID(key, version=4)
                     if request.POST[key] == 'Remove this name':
                         # If the associated value in the POST dict is 'Remove this person'
 

@@ -7,6 +7,8 @@
 {% block inner_content %}
 {% include 'back-button.html' %}
 
+{{form.error_summary}}
+
 <form method="post" novalidate>
 
     <h1 class="form-title heading-large">Review: your personal details</h1>
@@ -45,7 +47,7 @@
         <tr class="js-hidden" id="name">
             <td colspan="1">
                 <div>
-                    {{ form.name_comments.label}}
+                    Enter your reasoning
                 </div>
                 <div>
                     {{ form.name_comments.help_text}}
@@ -118,7 +120,7 @@
         <tr class="js-hidden" id="date_of_birth">
             <td colspan="1">
                 <div>
-                    {{ form.date_of_birth_comments.label}}
+                    Enter your reasoning
                 </div>
                 <div>
                     {{ form.date_of_birth_comments.help_text}}
@@ -199,7 +201,7 @@
         <tr class="js-hidden" id="home_address">
             <td colspan="1">
                 <div>
-                    {{ form.home_address_comments.label}}
+                    Enter your reasoning
                 </div>
                 <div>
                     {{ form.home_address_comments.help_text}}
@@ -269,7 +271,7 @@
         <tr class="js-hidden" id="childcare_location">
             <td colspan="1">
                 <div>
-                    {{ form.childcare_location_comments.label}}
+                    Enter your reasoning
                 </div>
                 <div>
                     {{ form.childcare_location_comments.help_text}}

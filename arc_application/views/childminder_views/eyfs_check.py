@@ -56,10 +56,13 @@ class EFYSCheckSummaryView(View):
                 return render(request, '500.html')
 
         else:
+
+            form.error_summary_title = 'There was a problem'
+
             return self.render_summary_with_context(request, form=form, app_id_local=application_id_local)
 
-
     def render_summary_with_context(self, request, form, app_id_local):
+
         eyfs_check = EYFS.objects.get(application_id=app_id_local)
         context = {
         'form': form,

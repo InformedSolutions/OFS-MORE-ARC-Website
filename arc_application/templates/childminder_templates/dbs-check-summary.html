@@ -5,6 +5,8 @@
 {% block inner_content %}
 {% include 'back-button.html' %}
 
+{{form.error_summary}}
+
 <form method="post" novalidate>
     <h1 class="form-title heading-large">Review: criminal record (DBS) check</h1>
     <p>
@@ -27,7 +29,7 @@
         <tr class="js-hidden" id="dbs_certificate_number">
             <td colspan="1">
                 <div>
-                    {{ form.dbs_certificate_number_comments.label}}
+                    Enter your reasoning
                 </div>
                 <div>
                     {{ form.dbs_certificate_number_comments.help_text}}
@@ -59,7 +61,7 @@
         <tr class="js-hidden" id="cautions_convictions">
             <td colspan="1">
                 <div>
-                    {{ form.cautions_convictions_comments.label}}
+                    Enter your reasoning
                 </div>
                 <div>
                     {{ form.cautions_convictions_comments.help_text}}

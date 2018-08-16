@@ -62,6 +62,9 @@ def first_aid_training_summary(request):
     certificate_month = FirstAidTraining.objects.get(application_id=application_id_local).course_month
     certificate_year = FirstAidTraining.objects.get(application_id=application_id_local).course_year
     application = Application.objects.get(pk=application_id_local)
+
+    form.error_summary_title = 'There was a problem'
+
     variables = {
         #'form': form,
         'application_id': application_id_local,
