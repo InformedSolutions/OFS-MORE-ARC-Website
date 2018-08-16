@@ -46,7 +46,7 @@ class NannyTaskList(View):
         review_count = self.get_review_count(nanny_application_dict, arc_application)
 
         dob_str = personal_details_dict['date_of_birth']
-        birth_dict = parse_date_of_birth(dob_str)
+        birth_list = parse_date_of_birth(dob_str)
 
         # Set up context
         context = {
@@ -64,9 +64,9 @@ class NannyTaskList(View):
             'childcare_training_status': arc_application.childcare_training_review,
             'dbs_status': arc_application.dbs_review,
             'insurance_cover_status': arc_application.insurance_cover_review,
-            'birth_day': int(birth_dict['birth_day']),
-            'birth_month': int(birth_dict['birth_month']),
-            'birth_year': int(birth_dict['birth_year']),
+            'birth_day': int(birth_list[2]),
+            'birth_month': int(birth_list[1]),
+            'birth_year': int(birth_list[0]),
             'all_complete': nanny_all_reviewed(arc_application)
         }
 
