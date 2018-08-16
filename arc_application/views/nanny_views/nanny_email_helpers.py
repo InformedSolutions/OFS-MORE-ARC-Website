@@ -29,7 +29,7 @@ def send_returned_email(email, first_name, ref):
     if hasattr(settings, 'NOTIFY_URL'):
         email = str(email)
         template_id = '4b9d4146-cbec-436a-81ea-efb444ef5180'
-        link = settings.NANNY_EMAIL_VALIDATION_URL + '/sign-in/new-application/?'
+        link = settings.NANNY_PUBLIC_URL + '/sign-in/new-application/?'
 
         personalisation = {'first_name': first_name, 'ref': ref, 'link': link}
         return send_email(email, personalisation, template_id)
