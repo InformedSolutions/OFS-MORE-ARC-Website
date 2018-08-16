@@ -17,7 +17,7 @@ from .nanny_dbs_check import NannyDbsCheckSummary
 from .nanny_insurance_cover import NannyInsuranceCoverSummary
 
 from arc_application.services.nanny_view_helpers import nanny_all_completed
-from arc_application.views.nanny_views.nanny_email_helpers import send_accepted_email, send_returned_email
+from arc_application.services.nanny_email_helpers import send_accepted_email, send_returned_email
 
 
 @method_decorator(login_required, name='get')
