@@ -15,7 +15,7 @@ def send_accepted_email(email, first_name, ref):
         template_id = '4b9d4146-cbec-436a-81ea-efb444ef5180'
 
         personalisation = {'first_name': first_name, 'ref': ref}
-        return send_email(email, personalisation, template_id)
+        return send_email(email, personalisation, template_id, nanny_email=True)
 
 
 def send_returned_email(email, first_name, ref):
@@ -28,8 +28,8 @@ def send_returned_email(email, first_name, ref):
     """
     if hasattr(settings, 'NOTIFY_URL'):
         email = str(email)
-        template_id = '4b9d4146-cbec-436a-81ea-efb444ef5180'
+        template_id = 'ea2bb1f9-246c-4d42-9dbf-2411cd34aa5f'
         link = settings.NANNY_PUBLIC_URL + '/sign-in/new-application/?'
 
         personalisation = {'first_name': first_name, 'ref': ref, 'link': link}
-        return send_email(email, personalisation, template_id)
+        return send_email(email, personalisation, template_id, nanny_email=True)
