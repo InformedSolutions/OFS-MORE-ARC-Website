@@ -16,6 +16,7 @@ from .nanny_childcare_training import NannyChildcareTrainingSummary
 from .nanny_dbs_check import NannyDbsCheckSummary
 from .nanny_insurance_cover import NannyInsuranceCoverSummary
 
+from arc_application.services.arc_comments_handler import update_returned_application_statuses
 from arc_application.services.nanny_view_helpers import nanny_all_completed
 from arc_application.services.nanny_email_helpers import send_accepted_email, send_returned_email
 
@@ -28,19 +29,12 @@ class NannyArcSummary(View):
     REDIRECT_NAME = 'nanny_confirmation'
 
     def get(self, request):
-
-        # Get application ID
         application_id = request.GET["id"]
-
         context = self.create_context(application_id)
-
         return render(request, self.TEMPLATE_NAME, context=context)
 
     def post(self, request):
-
-        # Get application ID
         application_id = request.POST["id"]
-
         redirect_address = build_url(self.REDIRECT_NAME, get={'id': application_id})
 
         arc_application = Arc.objects.get(application_id=application_id)
@@ -64,8 +58,8 @@ class NannyArcSummary(View):
 
         NannyGatewayActions().put('application', params=nanny_application)
 
-        obj = Arc.objects.get(application_id=application_id)
-        obj.delete()
+        update_returned_application_statuses(application_id)
+        arc_application.delete()
 
         return HttpResponseRedirect(redirect_address)
 
@@ -75,7 +69,6 @@ class NannyArcSummary(View):
         :param application_id: Reviewed application's id.
         :return: Context dictionary.
         """
-
         nanny_actions = NannyGatewayActions()
         nanny_application_dict = nanny_actions.read('application',
                                                     params={'application_id': application_id}).record
@@ -104,7 +97,6 @@ class NannyArcSummary(View):
         for context in context_list:
             context['title'] = context['title'][7:]
 
-        # Set up context
         context = {
             'application_id': application_id,
             'application_reference': application_reference,
