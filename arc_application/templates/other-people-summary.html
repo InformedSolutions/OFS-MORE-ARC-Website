@@ -329,14 +329,13 @@
                     <td class=summary-column> Are you currently being treated by your GP, another doctor or a hospital?</td>
                     <td class=summary-column> {{ record.current_treatment|yesno:"Yes,No" }} </td>
                 </tr>
-                {% if record.current_treatment %}
-                {% for treatment in current_treatment_set %}
+
+                {% for treatment in current_illness_set %}
                 <tr>
                     <td class=summary-column>Details of the illness or condition</td>
                     <td class=summary-column>{{ treatment.description }}</td>
                 </tr>
                 {% endfor %}
-                {% endif %}
             </tbody>
         </table>
 
