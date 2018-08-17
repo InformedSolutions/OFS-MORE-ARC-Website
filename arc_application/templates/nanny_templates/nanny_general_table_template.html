@@ -1,4 +1,4 @@
-{% if row.comments and row.comments.initial != '' %} <!-- If there is an existing ARC Comment -->
+{% if row.comments and row.comments.initial != '' and summary_page %} <!-- If there is an existing ARC Comment -->
 <tr class="error-row">
     <td colspan="3" class="error-container notice">
         <i class="icon icon-important">

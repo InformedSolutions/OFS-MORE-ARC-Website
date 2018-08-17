@@ -110,9 +110,8 @@ class NannyArcSummary(View):
             'application_reference': application_reference,
             'title': 'Check and confirm all details',
             'html_title': 'Application summary',
-            # 'form': '',
-            'context_list': context_list
-
+            'context_list': context_list,
+            'summary_page': True
         }
 
         return context
