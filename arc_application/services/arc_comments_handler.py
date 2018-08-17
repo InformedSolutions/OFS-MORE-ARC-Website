@@ -88,3 +88,16 @@ def get_form_initial_values(form, application_id):
             form[field_name + '_comments'].initial = ''
 
     return form
+
+
+def update_returned_application_statuses(application_id):
+    application_record = NannyGatewayActions().read('application', params={'application_id': application_id}).record
+    review_record = Arc.objects.get(application_id=application_id)
+
+    fields_for_review = [i[:-12] for i in application_record.keys() if i[-12:] == '_arc_flagged']
+    for field in fields_for_review:
+        if getattr(review_record, field + '_review') == 'FLAGGED':
+            application_record[field + '_arc_flagged'] = True
+            application_record[field + '_status'] = 'FLAGGED'
+
+    NannyGatewayActions().put('application', params=application_record)
