@@ -100,6 +100,10 @@ class NannyArcSummary(View):
             insurance_cover_context
         ]
 
+        # Remove 'Review: ' from page titles.
+        for context in context_list:
+            context['title'] = context['title'][7:]
+
         # Set up context
         context = {
             'application_id': application_id,
