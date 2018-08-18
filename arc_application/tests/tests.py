@@ -26,6 +26,7 @@ flagged_status = 'FLAGGED'
 arc_test_user = None
 cc_test_user = None
 
+
 def create_application():
     global application
     global personal_details
