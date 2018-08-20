@@ -38,6 +38,7 @@ BUILTIN_APPS = [
 ]
 
 THIRD_PARTY_APPS = [
+    'django_extensions',
     'govuk_forms',
     'govuk_template',
     'govuk_template_base',
