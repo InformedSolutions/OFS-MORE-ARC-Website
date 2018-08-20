@@ -23,6 +23,13 @@ class NannyChildcareTrainingSummary(NannyARCFormView):
         level_2_training = childcare_training_dict['level_2_training']
         common_core_training = childcare_training_dict['common_core_training']
 
+        if level_2_training and common_core_training:
+            childcare_training = 'Childcare qualification (level 2 or higher) and training in common core skills'
+        elif level_2_training:
+            childcare_training = 'Childcare qualification (level 2 or higher)'
+        else:
+            childcare_training = 'Training in common core skills'
+
         form = self.get_form()
 
         context = {
@@ -31,20 +38,13 @@ class NannyChildcareTrainingSummary(NannyARCFormView):
             'form': form,
             'rows': [
                 {
-                    'id': 'level_2_training',
-                    'name': 'Do you have a childcare qualification?',
-                    'info': level_2_training,
+                    'id': 'childcare_training',
+                    'name': 'What type of childcare course have you completed?',
+                    'info': childcare_training,
                     # Prevent checkbox appearing if summary page is calling get_context_data.
-                    'declare': form['level_2_training_declare'] if hasattr(self, 'request') else '',
-                    'comments': form['level_2_training_comments']
+                    'declare': form['childcare_training_declare'] if hasattr(self, 'request') else '',
+                    'comments': form['childcare_training_comments']
                 },
-                {
-                    'id': 'common_core_training',
-                    'name': 'Have you had common core training?',
-                    'info': common_core_training,
-                    'declare': form['common_core_training_declare'] if hasattr(self, 'request') else '',
-                    'comments': form['common_core_training_comments']
-                }
             ]
         }
 
