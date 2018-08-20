@@ -110,7 +110,7 @@ dbs_check_fields = [
 ]
 
 insurance_cover_fields = [
-    'public_liability_insurance',
+    'public_liability',
 ]
 
 
