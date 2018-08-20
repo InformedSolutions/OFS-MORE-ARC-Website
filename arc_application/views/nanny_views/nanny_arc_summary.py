@@ -86,6 +86,14 @@ class NannyArcSummary(View):
         dbs_check_context = NannyDbsCheckSummary().get_context_data(application_id)
         insurance_cover_context = NannyInsuranceCoverSummary().get_context_data(application_id)
 
+        contact_details_context['change_link'] = 'nanny_contact_summary'
+        personal_details_context['change_link'] = 'nanny_personal_details_summary'
+        childcare_address_context['change_link'] = 'nanny_childcare_address_summary'
+        first_aid_training_context['change_link'] = 'nanny_first_aid_training_summary'
+        childcare_training_context['change_link'] = 'nanny_childcare_training_summary'
+        dbs_check_context['change_link'] = 'nanny_dbs_summary'
+        insurance_cover_context['change_link'] = 'nanny_insurance_cover_summary'
+
         context_list = [
             contact_details_context,
             personal_details_context,
