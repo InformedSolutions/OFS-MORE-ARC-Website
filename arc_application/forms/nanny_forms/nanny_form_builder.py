@@ -100,8 +100,7 @@ first_aid_training_fields = [
 ]
 
 childcare_training_fields = [
-    'level_2_training',
-    'common_core_training',
+    'childcare_training',
 ]
 
 dbs_check_fields = [
