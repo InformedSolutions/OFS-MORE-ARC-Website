@@ -37,3 +37,7 @@ class NannyArcSummaryConfirmation(View):
             return confirmation
         elif nanny_application['application_status'] == 'FURTHER_INFORMATION':
             return sent_back
+        else:
+            raise ValueError("""
+            nanny_application["application_status"] should be either "ACCEPTED" or "FURTHER_INFORMATION",
+             but is {0}.'.format()nanny_application['application_status']""")

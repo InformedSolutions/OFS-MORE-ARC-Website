@@ -47,16 +47,19 @@ class NannyArcSummary(View):
                                  'first_name': nanny_personal_details['first_name'],
                                  'ref': nanny_application['application_reference']}
 
-        flags_exist = nanny_all_completed(arc_application)
+        no_flags_exist = nanny_all_completed(arc_application)
 
-        if flags_exist:
+        if no_flags_exist:
             send_accepted_email(**email_personalisation)
             nanny_application['application_status'] = 'ACCEPTED'
         else:
             send_returned_email(**email_personalisation)
             nanny_application['application_status'] = 'FURTHER_INFORMATION'
 
-        NannyGatewayActions().put('application', params=nanny_application)
+        update_response = NannyGatewayActions().put('application', params=nanny_application)
+
+        if update_response.status_code != 200:
+            raise BrokenPipeError('Failed to update nanny_application status')
 
         update_returned_application_statuses(application_id)
         arc_application.delete()
