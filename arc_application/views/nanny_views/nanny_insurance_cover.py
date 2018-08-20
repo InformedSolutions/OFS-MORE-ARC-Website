@@ -34,8 +34,8 @@ class NannyInsuranceCoverSummary(NannyARCFormView):
                     'name': 'Do you have public liability insurance?',
                     'info': insurance_bool,
                     # Prevent checkbox appearing if summary page is calling get_context_data.
-                    'declare': form['public_liability_insurance_declare'] if hasattr(self, 'request') else '',
-                    'comments': form['public_liability_insurance_comments']
+                    'declare': form['public_liability_declare'] if hasattr(self, 'request') else '',
+                    'comments': form['public_liability_comments']
                 }
             ]
         }
