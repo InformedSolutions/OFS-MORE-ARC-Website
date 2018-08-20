@@ -30,7 +30,7 @@ class NannyInsuranceCoverSummary(NannyARCFormView):
             'form': form,
             'rows': [
                 {
-                    'id': 'public_liability_insurance',
+                    'id': 'public_liability',
                     'name': 'Do you have public liability insurance?',
                     'info': insurance_bool,
                     # Prevent checkbox appearing if summary page is calling get_context_data.
