@@ -29,6 +29,7 @@ EXECUTING_AS_TEST = os.environ.get('EXECUTING_AS_TEST')
 # Application definition
 
 BUILTIN_APPS = [
+    'django_extensions',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -38,7 +39,6 @@ BUILTIN_APPS = [
 ]
 
 THIRD_PARTY_APPS = [
-    'django_extensions',
     'govuk_forms',
     'govuk_template',
     'govuk_template_base',
