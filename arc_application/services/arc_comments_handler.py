@@ -18,25 +18,27 @@ def save_arc_comments_from_request(request, endpoint, table_pk):
     comments = dict((key[:-8], request.POST[key[:-8] + '_comments']) for key in request.POST.keys() if request.POST[key] == 'on')
 
     for field_name in list(comments.keys()):
-        existing_comments = NannyGatewayActions().list('arc-comments', params={'application_id': application_id, 'field_name': field_name})
+        existing_comment = NannyGatewayActions().list('arc-comments', params={'application_id': application_id, 'field_name': field_name})
 
         # Delete existing ArcComment
-        if existing_comments.status_code == 200:
-            record_id = existing_comments.record['review_id']
+        if existing_comment.status_code == 200:
+            record_id = existing_comment.record[0]['review_id']
             NannyGatewayActions().delete('arc-comments', params={'review_id': str(record_id)})
         else:
             pass
 
     # FIXME: For personal details, this function is called for EACH form - it will therefore create ARC comments with
     # FIXME: the wrong table_pk, since each form has its own table_pk.
-    # table_record = NannyGatewayActions().read(endpoint, params={'application_id': application_id}).record
+    # FIXME: This then means the name field in the personal-details form can't find its initial value when the ARC
+    # FIXME: reviewer returns to the page.
+    table_record = NannyGatewayActions().read(endpoint, params={'application_id': application_id}).record
 
     for field_name, comment in comments.items():
         NannyGatewayActions().create(
             'arc-comments',
             params={
                 'review_id': str(uuid4()),
-                # 'table_pk': table_record[table_pk],
+                'table_pk': table_record[table_pk],
                 'application_id': application_id,
                 'table_name': '',
                 'field_name': field_name,
