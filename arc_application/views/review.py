@@ -66,6 +66,7 @@ def task_list(request):
 
         review_count = sum([1 for field in review_fields_to_check if getattr(arc_application, field) == 'COMPLETED'])
         review_count += sum([1 for field in flagged_fields_to_check if getattr(application, field)])
+        number_of_tasks = 7 if not childcare_type_record.zero_to_five else 9
 
         # Load review status
         application_status_context = {
@@ -90,7 +91,8 @@ def task_list(request):
             'five_to_eight': childcare_type_record.five_to_eight,
             'eight_plus': childcare_type_record.eight_plus,
             'review_count': review_count,
-            'all_complete': all_complete(application_id, False)
+            'all_complete': all_complete(application_id, False),
+            'number_of_tasks': number_of_tasks
         }
 
     return render(request, 'task-list.html', application_status_context)

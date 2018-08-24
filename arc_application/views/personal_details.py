@@ -1,4 +1,5 @@
 from uuid import UUID
+import logging
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
@@ -12,6 +13,9 @@ from ..models import ApplicantPersonalDetails, ApplicantName, ApplicantHomeAddre
 from ..review_util import request_to_comment, save_comments, redirect_selection, build_url
 from ..views.personal_details_addresses import get_stored_addresses
 from ..decorators import group_required, user_assigned_application
+
+
+logger = logging.getLogger()
 
 
 @login_required
@@ -122,13 +126,16 @@ def personal_details_summary(request):
     county = applicant_home_address_record.county
     postcode = applicant_home_address_record.postcode
     location_of_childcare = applicant_home_address_record.childcare_address
-    applicant_childcare_address_record = ApplicantHomeAddress.objects.get(personal_detail_id=personal_detail_id,
-                                                                          childcare_address=True)
-    childcare_street_line1 = applicant_childcare_address_record.street_line1
-    childcare_street_line2 = applicant_childcare_address_record.street_line2
-    childcare_town = applicant_childcare_address_record.town
-    childcare_county = applicant_childcare_address_record.county
-    childcare_postcode = applicant_childcare_address_record.postcode
+
+    # This code is pending a later ticket.
+    # applicant_childcare_address_record = ApplicantHomeAddress.objects.get(personal_detail_id=personal_detail_id,
+    #                                                                       childcare_address=True)
+    # childcare_street_line1 = applicant_childcare_address_record.street_line1
+    # childcare_street_line2 = applicant_childcare_address_record.street_line2
+    # childcare_town = applicant_childcare_address_record.town
+    # childcare_county = applicant_childcare_address_record.county
+    # childcare_postcode = applicant_childcare_address_record.postcode
+
     application = Application.objects.get(pk=application_id_local)
 
     previous_names = PreviousName.objects.filter(other_person_type=PERSON_TYPE, person_id=application_id_local)
@@ -151,11 +158,11 @@ def personal_details_summary(request):
         'county': county,
         'postcode': postcode,
         'location_of_childcare': location_of_childcare,
-        'childcare_street_line1': childcare_street_line1,
-        'childcare_street_line2': childcare_street_line2,
-        'childcare_town': childcare_town,
-        'childcare_county': childcare_county,
-        'childcare_postcode': childcare_postcode,
+        # 'childcare_street_line1': childcare_street_line1,
+        # 'childcare_street_line2': childcare_street_line2,
+        # 'childcare_town': childcare_town,
+        # 'childcare_county': childcare_county,
+        # 'childcare_postcode': childcare_postcode,
         'personal_details_status': application.personal_details_status,
         'previous_names': previous_names,
         'previous_addresses': previous_addresses,

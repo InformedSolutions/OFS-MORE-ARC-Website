@@ -222,47 +222,52 @@
                 Same as home address
             </td>
             {% elif location_of_childcare == False %}
-            {% if childcare_street_line2 and childcare_county %}
             <td style="word-wrap: break-word">
-                {{childcare_street_line1}}
-                </br>
-                {{childcare_street_line2}}
-                </br>
-                {{childcare_town}}
-                </br>
-                {{childcare_county}}
-                </br>
-                {{childcare_postcode}}
+                Other
             </td>
-            {% elif childcare_street_line2 and not childcare_county %}
-            <td style="word-wrap: break-word">
-                {{childcare_street_line1}}
-                </br>
-                {{childcare_street_line2}}
-                </br>
-                {{childcare_town}}
-                </br>
-                {{childcare_postcode}}
-            </td>
-            {% elif not childcare_street_line2 and childcare_county %}
-            <td style="word-wrap: break-word">
-                {{childcare_street_line1}}
-                </br>
-                {{childcare_town}}
-                </br>
-                {{childcare_county}}
-                </br>
-                {{childcare_postcode}}
-            </td>
-            {% elif not childcare_street_line2 and not childcare_county %}
-            <td style="word-wrap: break-word">
-                {{childcare_street_line1}}
-                </br>
-                {{childcare_town}}
-                </br>
-                {{childcare_postcode}}
-            </td>
-            {% endif %}
+            <!--
+                {% if childcare_street_line2 and childcare_county %}
+                <td style="word-wrap: break-word">
+                    {{childcare_street_line1}}
+                    </br>
+                    {{childcare_street_line2}}
+                    </br>
+                    {{childcare_town}}
+                    </br>
+                    {{childcare_county}}
+                    </br>
+                    {{childcare_postcode}}
+                </td>
+                {% elif childcare_street_line2 and not childcare_county %}
+                <td style="word-wrap: break-word">
+                    {{childcare_street_line1}}
+                    </br>
+                    {{childcare_street_line2}}
+                    </br>
+                    {{childcare_town}}
+                    </br>
+                    {{childcare_postcode}}
+                </td>
+                {% elif not childcare_street_line2 and childcare_county %}
+                <td style="word-wrap: break-word">
+                    {{childcare_street_line1}}
+                    </br>
+                    {{childcare_town}}
+                    </br>
+                    {{childcare_county}}
+                    </br>
+                    {{childcare_postcode}}
+                </td>
+                {% elif not childcare_street_line2 and not childcare_county %}
+                <td style="word-wrap: break-word">
+                    {{childcare_street_line1}}
+                    </br>
+                    {{childcare_town}}
+                    </br>
+                    {{childcare_postcode}}
+                </td>
+                {% endif %}
+            -->
             {% endif %}
             <td class="change-answer">
                 {{ form.childcare_location_declare }}
