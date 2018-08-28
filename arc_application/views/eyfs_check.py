@@ -6,7 +6,7 @@ from django.utils.decorators import method_decorator
 from django.views import View
 
 from ..forms.form import EYFSCheckForm
-from ..models import Application, Arc, EYFS
+from ..models import Application, Arc, EYFS, ChildcareType
 from ..review_util import redirect_selection, request_to_comment, save_comments
 from ..decorators import group_required, user_assigned_application
 
@@ -49,7 +49,8 @@ class EFYSCheckSummaryView(View):
                 status = Arc.objects.get(pk=application_id_local)
                 status.eyfs_review = section_status
                 status.save()
-                default = '/health/check-answers'
+                childcare_type = ChildcareType.objects.get(application_id=application_id_local)
+                default = '/health/check-answers' if childcare_type.zero_to_five else '/dbs-check/summary'
                 redirect_link = redirect_selection(request, default)
                 return HttpResponseRedirect(settings.URL_PREFIX + redirect_link + '?id=' + application_id_local)
             else:

@@ -191,11 +191,14 @@ def all_complete(id, flag):
     """
     if Arc.objects.filter(application_id=id):
         arc = Arc.objects.get(application_id=id)
-        list = [arc.login_details_review, arc.childcare_type_review, arc.personal_details_review,
-                arc.first_aid_review, arc.eyfs_review, arc.dbs_review, arc.health_review, arc.references_review,
-                arc.people_in_home_review]
+        tasks = [arc.login_details_review, arc.childcare_type_review, arc.personal_details_review,
+                arc.first_aid_review, arc.eyfs_review, arc.dbs_review, arc.people_in_home_review]
+        zero_to_five = ChildcareType.objects.get(application_id=id).zero_to_five
+        if zero_to_five:
+            tasks.append(arc.health_review)
+            tasks.append(arc.references_review)
 
-        for i in list:
+        for i in tasks:
 
             if (i == 'NOT_STARTED' and not flag) or (i != 'COMPLETED' and flag):
                 return False

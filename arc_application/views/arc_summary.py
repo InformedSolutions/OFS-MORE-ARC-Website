@@ -16,8 +16,8 @@ from ..decorators import group_required, user_assigned_application
     determining the order of the rows in the merged table
 """
 ordered_models = [UserDetails, ChildcareType, [ApplicantPersonalDetails, ApplicantName, ApplicantHomeAddress],
-                  FirstAidTraining, EYFS, HealthDeclarationBooklet, CriminalRecordCheck, Application,
-                  AdultInHome, ChildInHome, Reference]
+                  FirstAidTraining, EYFS, CriminalRecordCheck, Application,
+                  AdultInHome, ChildInHome]
 
 
 @login_required
@@ -26,6 +26,10 @@ ordered_models = [UserDetails, ChildcareType, [ApplicantPersonalDetails, Applica
 def arc_summary(request):
     if request.method == 'GET':
         application_id_local = request.GET["id"]
+        zero_to_five = ChildcareType.objects.get(application_id=application_id_local).zero_to_five
+        if zero_to_five:
+            ordered_models.insert(5, HealthDeclarationBooklet)
+            ordered_models.append(Reference)
         json = load_json(application_id_local, ordered_models, False)
         json = add_comments(json, application_id_local)
         application_reference = Application.objects.get(pk=application_id_local).application_reference

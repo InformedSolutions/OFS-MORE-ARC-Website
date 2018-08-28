@@ -15,7 +15,8 @@ from ..models import (ApplicantHomeAddress,
                       CriminalRecordCheck,
                       FirstAidTraining,
                       Reference,
-                      UserDetails)
+                      UserDetails,
+                      ChildcareType)
 
 application = None
 personal_details = None
@@ -71,6 +72,14 @@ def create_application():
         birth_day='01',
         birth_month='01',
         birth_year='2001'
+    )
+
+    childcare_type = ChildcareType.objects.create(
+        application_id=application,
+        zero_to_five=True,
+        five_to_eight=True,
+        eight_plus=True,
+        overnight_care=True
     )
 
     personal_details = details
