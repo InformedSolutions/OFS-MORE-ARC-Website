@@ -1,4 +1,5 @@
 from uuid import uuid4
+import calendar
 from django.db import models
 from .application import Application
 
@@ -45,6 +46,20 @@ class ChildInHome(models.Model):
             'birth_year',
             'relationship'
         )
+
+    def get_name(self):
+        return self.first_name + " " + self.middle_names + " " + self.last_name
+
+    def get_birthday(self):
+        return ' '.join([str(self.birth_day), calendar.month_name[self.birth_month], str(self.birth_year)])
+
+    def get_summary_table(self):
+        return [
+                {"title": self.get_name(), "id": self.pk},
+                {"name": "Name", "value": self.get_name()},
+                {"name": "Date of birth", "value": self.get_birthday()},
+                {"name": "Relationship", "value": self.relationship}
+            ]
 
     class Meta:
         db_table = 'CHILD_IN_HOME'

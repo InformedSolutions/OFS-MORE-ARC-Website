@@ -57,5 +57,30 @@ class Reference(models.Model):
     def get_id(cls, app_id):
         return cls.objects.get(application_id=app_id)
 
+    def get_address(self):
+        return self.street_line1 + ', ' + self.street_line2 + ', ' + self.town + ', ' + self.postcode
+
+    def get_time_known(self):
+        months = self.months_known
+        months_str = str(months) + ' months, ' if months != 1 else str(months) + ' month, '
+        years = self.years_known
+        years_str = str(years) + ' years' if years != 1 else str(years) + ' year'
+        return months_str + years_str
+    
+    def get_ref_as_string(self):
+        return 'First' if self.reference == 1 else 'Second'
+
+    def get_summary_table(self):
+        return [
+            {"title": self.get_ref_as_string() + " reference", "id": self.pk},
+            {"name": "Name", "value": self.first_name + ' ' + self.last_name},
+            {"name": "How they know you", "value": self.relationship},
+            {"name": "Known for", "value": self.get_time_known()},
+            {"name": "Address", "value": self.get_address()},
+            {"name": "Phone number", "value": self.phone_number},
+            {"name": "Email address", "value": self.email}
+        ]
+
     class Meta:
         db_table = 'REFERENCE'
+        ordering = ['reference']

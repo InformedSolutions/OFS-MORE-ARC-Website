@@ -44,8 +44,8 @@ class Application(models.Model):
     childcare_type_arc_flagged = models.BooleanField(default=False)
     first_aid_training_status = models.CharField(choices=TASK_STATUS, max_length=50)
     first_aid_training_arc_flagged = models.BooleanField(default=False)
-    childcare_training_status = models.CharField(choices=TASK_STATUS, max_length=50)
-    childcare_training_arc_flagged = models.BooleanField(default=False)
+    eyfs_training_status = models.CharField(choices=TASK_STATUS, max_length=50)
+    eyfs_training_arc_flagged = models.BooleanField(default=False)
     criminal_record_check_status = models.CharField(choices=TASK_STATUS, max_length=50)
     criminal_record_check_arc_flagged = models.BooleanField(default=False)
     health_status = models.CharField(choices=TASK_STATUS, max_length=50)
@@ -74,6 +74,26 @@ class Application(models.Model):
     @classmethod
     def get_id(cls, app_id):
         return cls.objects.get(pk=app_id)
+
+    def get_bool_as_string(self, bool_field):
+        if bool_field:
+            return 'Yes'
+        else:
+            return 'No'
+
+    def get_summary_table_adult(self):
+        return [
+            {"title": "Adults in your home", "id": self.pk},
+            {"name": "Does anyone aged 16 or over live or work in your home?",
+             "value": self.get_bool_as_string(self.adults_in_home)}
+        ]
+
+    def get_summary_table_child(self):
+        return [
+            {"title": "Children in your home", "id": self.pk},
+            {"name": "Do you live with any children?",
+             "value": self.get_bool_as_string(self.children_in_home)}
+        ]
 
     class Meta:
         db_table = 'APPLICATION'
