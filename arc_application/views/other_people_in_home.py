@@ -9,7 +9,7 @@ from django.shortcuts import render
 from ..models.previous_name import PreviousName
 from ..forms.form import AdultInYourHomeForm, ChildInYourHomeForm, OtherPeopleInYourHomeForm, OtherPersonPreviousNames
 from ..models import ChildInHome, AdultInHome, Arc, Application, PreviousAddress, \
-    OtherPersonPreviousRegistrationDetails, HealthCheckCurrent, HealthCheckSerious, HealthCheckHospital
+    OtherPersonPreviousRegistrationDetails, HealthCheckCurrent, HealthCheckSerious, HealthCheckHospital, ChildcareType
 
 from ..review_util import request_to_comment, save_comments, redirect_selection, build_url
 from ..views import other_people_initial_population
@@ -186,7 +186,8 @@ def other_people_summary(request):
             status = Arc.objects.get(pk=application_id_local)
             status.people_in_home_review = section_status
             status.save()
-            default = '/references/summary'
+            childcare_type = ChildcareType.objects.get(application_id=application_id_local)
+            default = '/references/summary' if childcare_type.zero_to_five else '/review'
             redirect_link = redirect_selection(request, default)
 
             return HttpResponseRedirect(settings.URL_PREFIX + redirect_link + '?id=' + application_id_local)
