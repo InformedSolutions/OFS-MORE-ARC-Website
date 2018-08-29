@@ -39,7 +39,10 @@ class ChildcareTraining(models.Model):
             'eyfs_course_name',
             'eyfs_course_date_day',
             'eyfs_course_date_month',
-            'eyfs_course_date_year'
+            'eyfs_course_date_year',
+            'eyfs_training',
+            'common_core_training',
+            'no_training'
         )
 
     @classmethod
