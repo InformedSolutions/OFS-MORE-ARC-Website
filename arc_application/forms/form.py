@@ -218,7 +218,7 @@ class FirstAidTrainingForm(GOVUKForm):
         return course_date_comments
 
 
-class EYFSCheckForm(GOVUKForm):
+class ChildcareTrainingCheckForm(GOVUKForm):
     """
     Comments form for the Early years training review page
     """
@@ -247,7 +247,7 @@ class EYFSCheckForm(GOVUKForm):
 
     def __init__(self, *args, **kwargs):
         self.table_keys = kwargs.pop('table_keys')
-        super(EYFSCheckForm, self).__init__(*args, **kwargs)
+        super(ChildcareTrainingCheckForm, self).__init__(*args, **kwargs)
         populate_initial_values(self)
 
     def clean_eyfs_course_name_comments(self):

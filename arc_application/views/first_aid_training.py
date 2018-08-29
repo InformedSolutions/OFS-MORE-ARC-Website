@@ -49,7 +49,7 @@ def first_aid_training_summary(request):
                 status = Arc.objects.get(pk=application_id_local)
                 status.first_aid_review = section_status
                 status.save()
-                default = '/eyfs-check/summary'
+                default = '/childcare-training-check/summary'
                 redirect_link = redirect_selection(request, default)
 
                 return HttpResponseRedirect(settings.URL_PREFIX + redirect_link + '?id=' + application_id_local)

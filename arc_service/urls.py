@@ -10,7 +10,7 @@ from arc_application.views import assign_new_application, custom_login, error_40
     summary_page, arc_summary, review, task_list, AuditlogListView, cc_summary
 from arc_application.views.contact_details import contact_summary
 from arc_application.views.dbs_check import dbs_check_summary
-from arc_application.views.eyfs_check import EFYSCheckSummaryView
+from arc_application.views.childcare_training_check import ChildcareTrainingCheckSummaryView
 from arc_application.views.first_aid_training import first_aid_training_summary
 from arc_application.views.health_declaration_booklet import health_check_answers
 from arc_application.views.other_people_addresses import address_state_dispatcher
@@ -48,7 +48,7 @@ urlpatterns = [
         name='personal_details_previous_addresses'),
     url(r'^first-aid/summary/', first_aid_training_summary, name='first_aid_training_summary'),
     url(r'^dbs-check/summary/', dbs_check_summary, name='dbs_check_summary'),
-    url(r'^eyfs-check/summary/', EFYSCheckSummaryView.as_view(), name='eyfs_check_summary'),
+    url(r'^childcare-training-check/summary/', ChildcareTrainingCheckSummaryView.as_view(), name='childcare_training_check_summary'),
     url(r'^references/summary/', references_summary, name='references_summary'),
     url(r'^people/summary/', other_people_summary, name='other_people_summary'),
     url(r'^people/previous-names', add_previous_name, name='other-people-previous-names'),

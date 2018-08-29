@@ -16,7 +16,7 @@ from ..decorators import group_required, user_assigned_application
     determining the order of the rows in the merged table
 """
 ordered_models = [UserDetails, ChildcareType, [ApplicantPersonalDetails, ApplicantName, ApplicantHomeAddress],
-                  FirstAidTraining, EYFS, HealthDeclarationBooklet, CriminalRecordCheck, Application,
+                  FirstAidTraining, ChildcareTraining, HealthDeclarationBooklet, CriminalRecordCheck, Application,
                   AdultInHome, ChildInHome, Reference]
 
 

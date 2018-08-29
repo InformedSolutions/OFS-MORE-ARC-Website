@@ -6,7 +6,7 @@ link_dict = {
     'Type of childcare': 'type_of_childcare_age_groups',
     'Your personal details': 'personal_details_summary',
     'First aid training': 'first_aid_training_summary',
-    'Early years training': 'eyfs_check_summary',
+    'Early years training': 'childcare_training_check_summary',
     'Health declaration booklet': 'health_check_answers',
     'Criminal record (DBS) check': 'dbs_check_summary',
     'Adults in your home': 'other_people_summary',

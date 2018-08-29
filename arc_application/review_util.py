@@ -159,7 +159,7 @@ def get_task_name(table_name, field_name):
     if table_name == "REFERENCE":
         return 'References'
 
-    if table_name == "EYFS":
+    if table_name == "ChildcareTraining":
         return 'Early years training'
 
 

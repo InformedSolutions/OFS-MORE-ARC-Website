@@ -46,7 +46,7 @@ def task_list(request):
             'childcare_type_review',
             'first_aid_review',
             'dbs_review',
-            'eyfs_review',
+            'childcare_training_review',
             'health_review',
             'references_review',
             'people_in_home_review'
@@ -55,7 +55,7 @@ def task_list(request):
         flagged_fields_to_check = (
             "childcare_type_arc_flagged",
             "criminal_record_check_arc_flagged",
-            "eyfs_training_arc_flagged",
+            "childcare_training_arc_flagged",
             "first_aid_training_arc_flagged",
             "health_arc_flagged",
             "login_details_arc_flagged",
@@ -76,7 +76,7 @@ def task_list(request):
             'childcare_type_status': arc_application.childcare_type_review,
             'first_aid_training_status': arc_application.first_aid_review,
             'criminal_record_check_status': arc_application.dbs_review,
-            'eyfs_status': arc_application.eyfs_review,
+            'childcare_training_status': arc_application.childcare_training_review,
             'health_status': arc_application.health_review,
             'reference_status': arc_application.references_review,
             'people_in_home_status': arc_application.people_in_home_review,
@@ -156,7 +156,7 @@ def review(request):
             app.childcare_type_status = arc.childcare_type_review
             app.first_aid_training_status = arc.first_aid_review
             app.health_status = arc.health_review
-            app.eyfs_training_status = arc.eyfs_review
+            app.childcare_training_status = arc.childcare_training_review
             app.criminal_record_check_status = arc.dbs_review
             app.references_status = arc.references_review
             app.people_in_home_status = arc.people_in_home_review
@@ -190,7 +190,7 @@ def all_complete(id, flag):
     if Arc.objects.filter(application_id=id):
         arc = Arc.objects.get(application_id=id)
         list = [arc.login_details_review, arc.childcare_type_review, arc.personal_details_review,
-                arc.first_aid_review, arc.eyfs_review, arc.dbs_review, arc.health_review, arc.references_review,
+                arc.first_aid_review, arc.childcare_training_review, arc.dbs_review, arc.health_review, arc.references_review,
                 arc.people_in_home_review]
 
         for i in list:
