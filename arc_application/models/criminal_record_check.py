@@ -34,19 +34,5 @@ class CriminalRecordCheck(models.Model):
     def get_id(cls, app_id):
         return cls.objects.get(application_id=app_id)
 
-    def get_bool_as_string(self, bool_field):
-        if bool_field:
-            return 'Yes'
-        else:
-            return 'No'
-
-    def get_summary_table(self):
-        return [
-            {"title": "Criminal record (DBS) check", "id": self.pk},
-            {"name": "DBS certificate number", "value": self.dbs_certificate_number},
-            {"name": "Do you have any criminal cautions or convictions?",
-             "value": self.get_bool_as_string(self.cautions_convictions)}
-        ]
-
     class Meta:
         db_table = 'CRIMINAL_RECORD_CHECK'

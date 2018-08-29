@@ -38,12 +38,5 @@ class ApplicantName(models.Model):
 
         return ('first_name', 'last_name', 'middle_names',)
 
-    def get_summary_table(self):
-        return [
-            {"name": "Your name",
-             "value": self.first_name + ' ' + self.middle_names + ' ' + self.last_name,
-             'pk': self.pk, "index": 1},
-            ]
-
     class Meta:
         db_table = 'APPLICANT_NAME'
