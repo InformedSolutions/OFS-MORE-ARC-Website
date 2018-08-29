@@ -218,9 +218,9 @@ class FirstAidTrainingForm(GOVUKForm):
         return course_date_comments
 
 
-class ChildcareTrainingCheckForm(GOVUKForm):
+class EYFSTrainingCheckForm(GOVUKForm):
     """
-    Comments form for the Early years training review page
+    Comments form for the Childcare Training review page if the applicant requires EYFS training.
     """
     auto_replace_widgets = True
 
@@ -247,7 +247,7 @@ class ChildcareTrainingCheckForm(GOVUKForm):
 
     def __init__(self, *args, **kwargs):
         self.table_keys = kwargs.pop('table_keys')
-        super(ChildcareTrainingCheckForm, self).__init__(*args, **kwargs)
+        super(EYFSTrainingCheckForm, self).__init__(*args, **kwargs)
         populate_initial_values(self)
 
     def clean_eyfs_course_name_comments(self):
@@ -279,6 +279,46 @@ class ChildcareTrainingCheckForm(GOVUKForm):
                 raise forms.ValidationError('You must give reasons')
 
         return eyfs_course_date_comments
+
+
+class TypeOfChildcareTrainingCheckForm(GOVUKForm):
+    """
+    Comments form for the Childcare Training review page if the applicant requires adding to the chlidcare register only
+    """
+    auto_replace_widgets = True
+
+    childcare_training_declare  = forms.BooleanField(label='This information is correct',
+                                                     widget=custom_field_widgets.CustomCheckboxInput, required=False)
+    childcare_training_comments = forms.CharField(label='Type of childcare training',
+                                                  help_text='(Tip: be clear and concise)',
+                                                  widget=custom_field_widgets.Textarea, required=False, max_length=250)
+
+    checkboxes = [(childcare_training_declare, 'childcare_training')]
+
+    for box in checkboxes:
+        box[0].widget.attrs.update({'data_target': box[1],
+                                    'aria-controls': box[1],
+                                    'aria-expanded': 'false'}, )
+
+    def clean_childcare_training_comments(self):
+        """
+        Childcare Training comments validation.
+        :return: childcare comments as string, if valid.
+        """
+        childcare_training_declare  = self.cleaned_data['childcare_training_declare']
+        childcare_training_comments = self.cleaned_data['childcare_training_comments']
+
+        # Only check if a comment has been entered if the field has been flagged
+        if childcare_training_declare:
+            if childcare_training_comments == '':
+                raise forms.ValidationError('You must give reasons')
+
+        return childcare_training_comments
+
+    def __init__(self, *args, **kwargs):
+        self.table_keys = kwargs.pop('table_keys')
+        super(TypeOfChildcareTrainingCheckForm, self).__init__(*args, **kwargs)
+        populate_initial_values(self)
 
 
 class DBSCheckForm(GOVUKForm):
