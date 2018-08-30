@@ -10,7 +10,11 @@ class CriminalRecordCheck(models.Model):
     application_id = models.ForeignKey(
         Application, on_delete=models.CASCADE, db_column='application_id')
     dbs_certificate_number = models.CharField(max_length=50, blank=True)
-    cautions_convictions = models.BooleanField(blank=True)
+    cautions_convictions = models.NullBooleanField(blank=True)
+    lived_abroad = models.NullBooleanField(blank=True)
+    military_base = models.NullBooleanField(blank=True)
+    capita = models.NullBooleanField(blank=True)
+    on_update = models.NullBooleanField(blank=True)
 
     @property
     def timelog_fields(self):
@@ -33,20 +37,6 @@ class CriminalRecordCheck(models.Model):
     @classmethod
     def get_id(cls, app_id):
         return cls.objects.get(application_id=app_id)
-
-    def get_bool_as_string(self, bool_field):
-        if bool_field:
-            return 'Yes'
-        else:
-            return 'No'
-
-    def get_summary_table(self):
-        return [
-            {"title": "Criminal record (DBS) check", "id": self.pk},
-            {"name": "DBS certificate number", "value": self.dbs_certificate_number},
-            {"name": "Do you have any criminal cautions or convictions?",
-             "value": self.get_bool_as_string(self.cautions_convictions)}
-        ]
 
     class Meta:
         db_table = 'CRIMINAL_RECORD_CHECK'
