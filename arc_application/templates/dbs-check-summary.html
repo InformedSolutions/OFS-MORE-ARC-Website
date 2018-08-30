@@ -8,7 +8,7 @@
 {{form.error_summary}}
 
 <form method="post" novalidate>
-    <h1 class="form-title heading-large">Review: criminal record (DBS) check</h1>
+    <h1 class="form-title heading-large">Review: criminal record checks</h1>
     <p>
         Please check the boxes if there are errors.
     </p>
@@ -16,6 +16,131 @@
     <table class="check-your-answers form-group">
         <tbody>
         <tr>
+            <td>
+                {{form.lived_abroad_comments.label}}
+            </td>
+            <td style="word-wrap: break-word">
+                {% if lived_abroad %}
+                    Yes
+                {% else %}
+                    No
+                {% endif %}
+            </td>
+            <td class="change-answer">
+                {{ form.lived_abroad_declare }}
+            </td>
+        </tr>
+        <tr class="js-hidden" id="lived_abroad">
+            <td colspan="1">
+                <div>
+                    Enter your reasoning
+                </div>
+                <div>
+                    {{ form.lived_abroad_comments.help_text}}
+                </div>
+            </td>
+            <td colspan="2">
+                <div>
+                    {{ form.lived_abroad_comments}}
+                </div>
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                {{form.military_base_comments.label}}
+            </td>
+            <td style="word-wrap: break-word">
+                {% if military_base %}
+                    Yes
+                {% else %}
+                    No
+                {% endif %}
+            </td>
+            <td class="change-answer">
+                {{ form.military_base_declare }}
+            </td>
+        </tr>
+        <tr class="js-hidden" id="military_base">
+            <td colspan="1">
+                <div>
+                    Enter your reasoning
+                </div>
+                <div>
+                    {{ form.military_base_comments.help_text}}
+                </div>
+            </td>
+            <td colspan="2">
+                <div>
+                    {{ form.military_base_comments}}
+                </div>
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                {{form.capita_comments.label}}
+            </td>
+            <td style="word-wrap: break-word">
+                {% if capita %}
+                    Yes
+                {% else %}
+                    No
+                {% endif %}
+            </td>
+            <td class="change-answer">
+                {{ form.capita_declare }}
+            </td>
+        </tr>
+        <tr class="js-hidden" id="capita">
+            <td colspan="1">
+                <div>
+                    Enter your reasoning
+                </div>
+                <div>
+                    {{ form.capita_comments.help_text}}
+                </div>
+            </td>
+            <td colspan="2">
+                <div>
+                    {{ form.capita_comments}}
+                </div>
+            </td>
+        </tr>
+        {% if on_update is not None %}
+        <tr>
+            <td>
+                {{form.on_update_comments.label}}
+            </td>
+            <td style="word-wrap: break-word">
+                {% if on_update %}
+                    Yes
+                {% else %}
+                    No
+                {% endif %}
+            </td>
+            <td class="change-answer">
+                {{ form.on_update_declare }}
+            </td>
+        </tr>
+        <tr class="js-hidden" id="on_update">
+            <td colspan="1">
+                <div>
+                    Enter your reasoning
+                </div>
+                <div>
+                    {{ form.on_update_comments.help_text}}
+                </div>
+            </td>
+            <td colspan="2">
+                <div>
+                    {{ form.on_update_comments}}
+                </div>
+            </td>
+        </tr>
+        {% endif %}
+
+                <tr>
             <td>
                 DBS certificate number
             </td>
@@ -58,6 +183,8 @@
                 {{ form.cautions_convictions_declare }}
             </td>
         </tr>
+
+        {% if cautions_convictions is not None %}
         <tr class="js-hidden" id="cautions_convictions">
             <td colspan="1">
                 <div>
@@ -73,6 +200,7 @@
                 </div>
             </td>
         </tr>
+        {% endif %}
         </tbody>
     </table>
 

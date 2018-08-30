@@ -2,6 +2,7 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
+from django.views.generic import FormView
 
 from ..forms.form import DBSCheckForm
 from ..models import Application, Arc, CriminalRecordCheck
@@ -59,6 +60,10 @@ def dbs_check_summary(request):
     criminal_record_check = CriminalRecordCheck.objects.get(application_id=application_id_local)
     dbs_certificate_number = criminal_record_check.dbs_certificate_number
     cautions_convictions = criminal_record_check.cautions_convictions
+    lived_abroad = criminal_record_check.lived_abroad
+    military_base = criminal_record_check.military_base
+    capita = criminal_record_check.capita
+    on_update = criminal_record_check.on_update
     application = Application.objects.get(pk=application_id_local)
     form.error_summary_title = 'There was a problem'
     variables = {
@@ -66,7 +71,11 @@ def dbs_check_summary(request):
         'application_id': application_id_local,
         'dbs_certificate_number': dbs_certificate_number,
         'cautions_convictions': cautions_convictions,
-        'criminal_record_check_status': application.criminal_record_check_status
+        'criminal_record_check_status': application.criminal_record_check_status,
+        'lived_abroad': lived_abroad,
+        'military_base': military_base,
+        'capita': capita,
+        'on_update': on_update
     }
 
     return render(request, 'dbs-check-summary.html', variables)

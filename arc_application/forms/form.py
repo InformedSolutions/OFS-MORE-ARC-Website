@@ -341,9 +341,37 @@ class DBSCheckForm(GOVUKForm):
                                                     help_text='(Tip: be clear and concise)',
                                                     widget=custom_field_widgets.Textarea, required=False,
                                                     max_length=250)
+    lived_abroad_declare = forms.BooleanField(label='This information is correct',
+                                              widget=custom_field_widgets.CustomCheckboxInput, required=False)
+    lived_abroad_comments = forms.CharField(label='Have you lived outside of the UK in the last 5 years?',
+                                            help_text='(Tip: be clear and concise)',
+                                            widget=custom_field_widgets.Textarea, required=False,
+                                            max_length=250)
+    military_base_declare = forms.BooleanField(label='This information is correct',
+                                               widget=custom_field_widgets.CustomCheckboxInput, required=False)
+    military_base_comments = forms.CharField(label='Have you lived or worked on a British military base in the last 5 years?',
+                                             help_text='(Tip: be clear and concise)',
+                                             widget=custom_field_widgets.Textarea, required=False,
+                                             max_length=250)
+    capita_declare = forms.BooleanField(label='This information is correct',
+                                        widget=custom_field_widgets.CustomCheckboxInput, required=False)
+    capita_comments = forms.CharField(label='Do you have an Ofsted DBS Check?',
+                                      help_text='(Tip: be clear and concise)',
+                                      widget=custom_field_widgets.Textarea, required=False,
+                                      max_length=250)
+    on_update_declare = forms.BooleanField(label='This information is correct',
+                                           widget=custom_field_widgets.CustomCheckboxInput, required=False)
+    on_update_comments = forms.CharField(label='Are you on the DBS update service?',
+                                         help_text='(Tip: be clear and concise)',
+                                         widget=custom_field_widgets.Textarea, required=False,
+                                         max_length=250)
 
     checkboxes = [(dbs_certificate_number_declare, 'dbs_certificate_number'),
-                  (cautions_convictions_declare, 'cautions_convictions')]
+                  (cautions_convictions_declare, 'cautions_convictions'),
+                  (lived_abroad_declare, 'lived_abroad'),
+                  (military_base_declare, 'military_base'),
+                  (capita_declare, 'capita'),
+                  (on_update_declare, 'on_update')]
 
     for box in checkboxes:
         box[0].widget.attrs.update({'data_target': box[1],
