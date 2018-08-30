@@ -63,7 +63,8 @@ class ChildcareTrainingCheckSummaryView(View):
                 status = Arc.objects.get(pk=application_id_local)
                 status.childcare_training_review = section_status
                 status.save()
-                default = '/health/check-answers'
+                childcare_type = ChildcareType.objects.get(application_id=application_id_local)
+                default = '/health/check-answers' if childcare_type.zero_to_five else '/dbs-check/summary'
                 redirect_link = redirect_selection(request, default)
                 return HttpResponseRedirect(settings.URL_PREFIX + redirect_link + '?id=' + application_id_local)
             else:

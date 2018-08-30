@@ -113,21 +113,21 @@ def name_converter(name):
                   'adults_in_home',
                   'children_in_home',
                   'full_name', 'relationship', 'time_known', 'address', 'phone_number', 'email_address',
-                  'eyfs_course_name', 'eyfs_course_date'
+                  'childcare_training'
                   ]
 
     name_list = ['Your email', 'Your mobile number', 'Other phone number', 'Knowledge based question',
                  'Knowledge based answer',
                  'What age groups will you be caring for?', 'Are you providing overnight care?',
-                 'Your name', 'Your date of birth', 'Home address', 'Childcare location',
-                 'First aid training provider', 'Title of first aid course', 'Date of first aid certificate',
+                 'Your name', 'Your date of birth', 'Your home address', 'Childcare location',
+                 'Training organisation', 'Title of training course', 'Date you completed course',
                  'Provide a Health Declaration Booklet?',
-                 'DBS certificate number', 'Do you have any cautions or convictions?', 'Health check status',
+                 'DBS certificate number', 'Do you have any criminal cautions or convictions?', 'Health check status',
                  'Name', 'Date of birth', 'Relationship', 'Email', 'DBS certificate number',
-                 'Do you live with anyone who is 16 or over?',
+                 'Does anyone aged 16 or over live or work in your home?',
                  'Do you live with any children?',
                  'Full name', 'How they know you', 'Known for', 'Address', 'Phone number', 'Email address',
-                 'Title of training course', 'Date you completed course'
+                 'What type of childcare training have you completed?'
                  ]
     for i in range(len(name_list)):
         if name in name_list[i]:
