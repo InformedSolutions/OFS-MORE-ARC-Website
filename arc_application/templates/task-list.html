@@ -107,12 +107,12 @@
                </a>
                {% elif childcare_training_status == 'FLAGGED' %}
                <a href="{% url 'childcare_training_check_summary' %}?id={{application_id}}">
-               <span class="task-name">Early years training</span>
+               <span class="task-name">Childcare training</span>
                <strong class="task-finished task-flagged">Flagged</strong>
                </a>
                {% elif childcare_training_status == 'COMPLETED' %}
                <a href="{% url 'childcare_training_check_summary' %}?id={{application_id}}">
-               <span class="task-name">Early years training</span>
+               <span class="task-name">Childcare training</span>
                <strong class="task-finished">Reviewed</strong>
                </a>
                {% endif %}
