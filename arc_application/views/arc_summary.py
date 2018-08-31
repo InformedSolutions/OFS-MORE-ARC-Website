@@ -106,7 +106,7 @@ def name_converter(name):
     field_list = ['email_address', 'mobile_number', 'add_phone_number', 'security_question', 'security_answer',
                   'childcare_age_groups', 'overnight_care',
                   'name', 'date_of_birth', 'home_address', 'childcare_location',
-                  'first_aid_training_organisation', 'title_of_training_course', 'course_date',
+                  'first_aid_training_organisation', 'eyfs_course_name', 'eyfs_course_date',
                   'health_submission_consent',
                   'dbs_certificate_number', 'cautions_convictions', 'health_check_status',
                   'full_name', 'date_of_birth', 'relationship', 'email', 'dbs_certificate_number',
