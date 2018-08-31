@@ -91,14 +91,12 @@ class ChildcareTrainingCheckSummaryView(View):
                 context['childcare_training'] = 'Childcare qualification (level 2 or higher) and training in common core skills'
             elif eyfs_training:
                 context['childcare_training'] = 'Childcare qualification (level 2 or higher)'
-            elif common_core_training:
-                context['childcare_training'] = 'Training in common core skills'
             else:
-                context['childcare_training'] = 'None'
+                context['childcare_training'] = 'Training in common core skills'
         else:
-            context['eyfs_course_title'] = eyfs_check.eyfs_course_name,
-            context['eyfs_course_date_day'] = eyfs_check.eyfs_course_date_day,
-            context['eyfs_course_date_month'] = eyfs_check.eyfs_course_date_month,
+            context['eyfs_course_title'] = eyfs_check.eyfs_course_name
+            context['eyfs_course_date_day'] = eyfs_check.eyfs_course_date_day
+            context['eyfs_course_date_month'] = eyfs_check.eyfs_course_date_month
             context['eyfs_course_date_year'] = eyfs_check.eyfs_course_date_year
 
         return render(request, 'childcare-training-summary.html', context=context)
