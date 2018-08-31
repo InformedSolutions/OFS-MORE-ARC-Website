@@ -15,15 +15,14 @@ from ..decorators import group_required, user_assigned_application
     the get_summary_table method for these nested models should contain a key for each row called 'index',
     determining the order of the rows in the merged table
 """
-ordered_models = [UserDetails, ChildcareType, [ApplicantPersonalDetails, ApplicantName, ApplicantHomeAddress],
-                  FirstAidTraining, ChildcareTraining, HealthDeclarationBooklet, CriminalRecordCheck, Application,
-                  AdultInHome, ChildInHome]
-
-
 @login_required
 @group_required(settings.ARC_GROUP)
 @user_assigned_application
 def arc_summary(request):
+    ordered_models = [UserDetails, ChildcareType, [ApplicantPersonalDetails, ApplicantName, ApplicantHomeAddress],
+                      FirstAidTraining, ChildcareTraining, CriminalRecordCheck, Application,
+                      AdultInHome, ChildInHome]
+
     if request.method == 'GET':
         application_id_local = request.GET["id"]
         zero_to_five = ChildcareType.objects.get(application_id=application_id_local).zero_to_five
@@ -161,8 +160,8 @@ def load_json(application_id_local, ordered_models, recurse):
         elif model == Application:
             table_list.append(application.get_summary_table_adult())
             table_list.append(application.get_summary_table_child())
-        elif model.objects.filter(application_id=application).exists():
-            records = model.objects.filter(application_id=application)
+        elif model.objects.filter(application_id=application.pk).exists():
+            records = model.objects.filter(application_id=application.pk)
             for record in records:
                 table = record.get_summary_table()
                 if recurse:
