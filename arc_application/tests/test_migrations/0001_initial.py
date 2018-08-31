@@ -123,6 +123,7 @@ class Migration(migrations.Migration):
                 ('date_submitted', models.DateTimeField(blank=True, null=True)),
                 ('application_reference', models.CharField(blank=True, max_length=9, null=True, validators=[django.core.validators.RegexValidator('(\\w{2})([0-9]{7})')])),
                 ('ofsted_visit_email_sent', models.DateTimeField(blank=True, null=True)),
+                ('publish_details', models.NullBooleanField(blank=True, null=True, default=None))
             ],
             options={
                 'db_table': 'APPLICATION',
