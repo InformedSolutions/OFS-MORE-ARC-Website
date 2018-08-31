@@ -10,6 +10,7 @@ from django.test import LiveServerTestCase, override_settings, tag
 from selenium import webdriver
 from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.support.wait import WebDriverWait
+from selenium.webdriver.chrome.options import Options
 
 from .selenium_task_executor import SeleniumTaskExecutor
 from arc_application.models import Application
@@ -48,16 +49,25 @@ class TestArcFunctions(LiveServerTestCase):
         if os.environ.get('LOCAL_SELENIUM_DRIVER') == 'True':
             # If running on a windows host, make sure to drop the
             # geckodriver.exe into your Python/Scripts installation folder
-            selenium_driver = webdriver.Firefox()
+            if os.environ.get('HEADLESS_CHROME') == 'True':
+                # To install chromedriver on an ubuntu machine:
+                # https://tecadmin.net/setup-selenium-chromedriver-on-ubuntu/
+                # For the latest version:
+                # https://github.com/joyzoursky/docker-python-chromedriver/blob/master/py3/py3.6-selenium/Dockerfile
+                path_to_chromedriver = os.popen("which chromedriver").read().rstrip()
+                chrome_options = Options()
+                chrome_options.add_argument("--headless")
+                chrome_options.add_argument("--disable-gpu")
+                selenium_driver = webdriver.Chrome(path_to_chromedriver, chrome_options=chrome_options)
+            else:
+                selenium_driver = webdriver.Firefox()
+            selenium_driver.maximize_window()
         else:
             # If not using local driver, default requests to a selenium grid server
             selenium_driver = webdriver.Remote(
                 command_executor=os.environ['SELENIUM_HOST'],
                 desired_capabilities={'platform': 'ANY', 'browserName': 'firefox', 'version': ''}
             )
-
-        selenium_driver.maximize_window()
-        selenium_driver.implicitly_wait(20)
 
         self.verification_errors = []
         self.accept_next_alert = True
@@ -247,7 +257,7 @@ class TestArcFunctions(LiveServerTestCase):
             selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Confirm and continue']").click()
             WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("Review: first aid training"))
             selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Confirm and continue']").click()
-            WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("Review: early years training"))
+            WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("Review: childcare training"))
             selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Confirm and continue']").click()
             WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("Review: health declaration booklet"))
             selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Confirm and continue']").click()
@@ -480,7 +490,7 @@ class TestArcFunctions(LiveServerTestCase):
     def capture_screenshot(self):
         now = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
         scr = selenium_driver.find_element_by_tag_name('html')
-        scr.screenshot('selenium/screenshot-%s-%s.png' % (self.__class__.__name__, now))
+        #scr.screenshot('selenium/screenshot-%s-%s.png' % (self.__class__.__name__, now))
 
     def tearDown(self):
         global selenium_driver

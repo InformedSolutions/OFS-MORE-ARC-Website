@@ -48,11 +48,18 @@ def arc_summary(request):
 
 @login_required
 def cc_summary(request):
+    ordered_models = [UserDetails, ChildcareType, [ApplicantPersonalDetails, ApplicantName, ApplicantHomeAddress],
+                      FirstAidTraining, ChildcareTraining, CriminalRecordCheck, Application,
+                      AdultInHome, ChildInHome]
     cc_user = has_group(request.user, settings.CONTACT_CENTRE)
 
     if request.method == 'GET':
         application_id_local = request.GET["id"]
         application = Application.objects.get(pk=application_id_local)
+        zero_to_five = ChildcareType.objects.get(application_id=application_id_local).zero_to_five
+        if zero_to_five:
+            ordered_models.insert(5, HealthDeclarationBooklet)
+            ordered_models.append(Reference)
         json = load_json(application_id_local, ordered_models, False)
         json[0][1]['link'] = (reverse('update_email') + '?id=' + str(application_id_local))
         json[0][2]['link'] = (reverse('update_phone_number') + '?id=' + str(application_id_local))
