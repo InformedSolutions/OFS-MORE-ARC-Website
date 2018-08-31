@@ -96,9 +96,9 @@ class ChildcareTrainingCheckSummaryView(View):
             else:
                 context['childcare_training'] = 'None'
         else:
-            context['eyfs_course_title'] = eyfs_check.eyfs_course_name,
-            context['eyfs_course_date_day'] = eyfs_check.eyfs_course_date_day,
-            context['eyfs_course_date_month'] = eyfs_check.eyfs_course_date_month,
+            context['eyfs_course_title'] = eyfs_check.eyfs_course_name
+            context['eyfs_course_date_day'] = eyfs_check.eyfs_course_date_day
+            context['eyfs_course_date_month'] = eyfs_check.eyfs_course_date_month
             context['eyfs_course_date_year'] = eyfs_check.eyfs_course_date_year
 
         return render(request, 'childcare-training-summary.html', context=context)
