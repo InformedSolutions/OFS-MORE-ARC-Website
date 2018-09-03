@@ -122,19 +122,18 @@ def name_converter(name):
          'How they know you': 'relationship', 'Known for': 'time_known', 'Address': 'address',
          'Phone number': 'phone_number', 'Email address': 'email_address',
          'What type of childcare training have you completed?': 'childcare_training',
-         'Looking after 0 to 5 year olds?': 'childcare_training',
-         'Looking after 5 to 7 year olds? ': 'childcare_training',
-         'Looking after 8 year olds and older? ': 'childcare_training',
-         'Registers': "childcare_training",
-         'Looking after children overnight?': 'childcare_training',
-         'I will post a completed booklet to Ofsted': 'childcare_training',
          'Have you lived outside of the UK in the last 5 years?': 'lived_abroad',
          "Have you lived or worked on a British military base in the last 5 years?": 'military_base',
          "Do you have an Ofsted DBS Check?": 'capita',
          "Are you on the DBS update service?": 'on_update'
          }
 
-    return name_field_dict[name]
+    try:
+        field = name_field_dict[name]
+    except KeyError:
+        field = ''
+
+    return field
 
 
 def get_comment(pk, field):
