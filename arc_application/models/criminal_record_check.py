@@ -38,5 +38,40 @@ class CriminalRecordCheck(models.Model):
     def get_id(cls, app_id):
         return cls.objects.get(application_id=app_id)
 
+    def get_bool_as_string(self, bool_field):
+        if bool_field:
+            return 'Yes'
+        else:
+            return 'No'
+
+    def get_summary_table(self):
+        summary_table_dict = [{"title": "Criminal record checks", "id": self.pk}]
+
+        if self.lived_abroad is not None:
+            summary_table_dict.append({"name": "Have you lived outside of the UK in the last 5 years?",
+                                       "value": self.get_bool_as_string(self.lived_abroad)})
+
+        if self.military_base is not None:
+            summary_table_dict.append({"name": "Have you lived or worked on a British military base in the last 5 years?",
+                                       "value": self.get_bool_as_string(self.military_base)})
+
+        if self.capita is not None:
+            summary_table_dict.append({"name": "Do you have an Ofsted DBS Check?",
+                                       "value": self.get_bool_as_string(self.capita)})
+
+        if self.on_update is not None:
+            summary_table_dict.append({"name": "Are you on the DBS update service?",
+             "value": self.get_bool_as_string(self.on_update)})
+
+        if self.dbs_certificate_number is not None:
+            summary_table_dict.append({"name": "DBS certificate number",
+                                       "value": self.dbs_certificate_number})
+
+        if self.cautions_convictions is not None:
+            summary_table_dict.append({"name": "Do you have any criminal cautions or convictions?",
+                                       "value": self.get_bool_as_string(self.cautions_convictions)})
+
+        return summary_table_dict
+
     class Meta:
         db_table = 'CRIMINAL_RECORD_CHECK'

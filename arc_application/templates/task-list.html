@@ -145,17 +145,17 @@
             <td class="task">
                {% if criminal_record_check_status == 'NOT_STARTED' %}
                <a href="{% url 'dbs_check_summary' %}?id={{application_id}}">
-               <span class="task-name">Criminal record (DBS) check</span>
+               <span class="task-name">Criminal record checks</span>
                <strong class="task-finished task-to-do">To do</strong>
                </a>
                {% elif criminal_record_check_status == 'FLAGGED' %}
                <a href="{% url 'dbs_check_summary' %}?id={{application_id}}">
-               <span class="task-name">Criminal record (DBS) check</span>
+               <span class="task-name">Criminal record checks</span>
                <strong class="task-finished task-flagged">Flagged</strong>
                </a>
                {% elif criminal_record_check_status == 'COMPLETED' %}
                <a href="{% url 'dbs_check_summary' %}?id={{application_id}}">
-               <span class="task-name">Criminal record (DBS) check</span>
+               <span class="task-name">Criminal record checks</span>
                <strong class="task-finished">Reviewed</strong>
                </a>
                {% endif %}
