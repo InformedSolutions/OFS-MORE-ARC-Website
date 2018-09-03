@@ -15,15 +15,13 @@ from ..decorators import group_required, user_assigned_application
     the get_summary_table method for these nested models should contain a key for each row called 'index',
     determining the order of the rows in the merged table
 """
-ordered_models = [UserDetails, ChildcareType, [ApplicantPersonalDetails, ApplicantName, ApplicantHomeAddress],
-                  FirstAidTraining, ChildcareTraining, HealthDeclarationBooklet, CriminalRecordCheck, Application,
-                  AdultInHome, ChildInHome]
-
-
 @login_required
 @group_required(settings.ARC_GROUP)
 @user_assigned_application
 def arc_summary(request):
+    ordered_models = [UserDetails, ChildcareType, [ApplicantPersonalDetails, ApplicantName, ApplicantHomeAddress],
+                      FirstAidTraining, ChildcareTraining, HealthDeclarationBooklet, CriminalRecordCheck, Application,
+                      AdultInHome, ChildInHome]
     if request.method == 'GET':
         application_id_local = request.GET["id"]
         zero_to_five = ChildcareType.objects.get(application_id=application_id_local).zero_to_five
@@ -49,11 +47,18 @@ def arc_summary(request):
 
 @login_required
 def cc_summary(request):
+    ordered_models = [UserDetails, ChildcareType, [ApplicantPersonalDetails, ApplicantName, ApplicantHomeAddress],
+                      FirstAidTraining, ChildcareTraining, CriminalRecordCheck, Application,
+                      AdultInHome, ChildInHome]
     cc_user = has_group(request.user, settings.CONTACT_CENTRE)
 
     if request.method == 'GET':
         application_id_local = request.GET["id"]
         application = Application.objects.get(pk=application_id_local)
+        zero_to_five = ChildcareType.objects.get(application_id=application_id_local).zero_to_five
+        if zero_to_five:
+            ordered_models.insert(5, HealthDeclarationBooklet)
+            ordered_models.append(Reference)
         json = load_json(application_id_local, ordered_models, False)
         json[0][1]['link'] = (reverse('update_email') + '?id=' + str(application_id_local))
         json[0][2]['link'] = (reverse('update_phone_number') + '?id=' + str(application_id_local))
@@ -111,7 +116,7 @@ def name_converter(name):
          'Are you providing overnight care?': 'overnight_care', 'Your name': 'name',
          'Your date of birth': 'date_of_birth', 'Your home address': 'home_address',
          'Childcare location': 'childcare_location', 'Training organisation': 'first_aid_training_organisation',
-         'Title of training course': 'title_of_training_course', 'Date you completed course': 'course_date',
+         'Title of training course': 'eyfs_course_name', 'Date you completed course': 'eyfs_course_date',
          'Provide a Health Declaration Booklet?': 'health_submission_consent',
          'DBS certificate number': 'dbs_certificate_number',
          'Do you have any criminal cautions or convictions?': 'cautions_convictions',
@@ -163,8 +168,8 @@ def load_json(application_id_local, ordered_models, recurse):
         elif model == Application:
             table_list.append(application.get_summary_table_adult())
             table_list.append(application.get_summary_table_child())
-        elif model.objects.filter(application_id=application).exists():
-            records = model.objects.filter(application_id=application)
+        elif model.objects.filter(application_id=application.pk).exists():
+            records = model.objects.filter(application_id=application.pk)
             for record in records:
                 table = record.get_summary_table()
                 if recurse:
