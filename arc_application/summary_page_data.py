@@ -8,7 +8,7 @@ link_dict = {
     'First aid training': 'first_aid_training_summary',
     'Childcare training': 'childcare_training_check_summary',
     'Health declaration booklet': 'health_check_answers',
-    'Criminal record (DBS) check': 'dbs_check_summary',
+    'Criminal record checks': 'dbs_check_summary',
     'Adults in your home': 'other_people_summary',
     'Children in your home': 'other_people_summary',
     'First reference': 'references_summary',

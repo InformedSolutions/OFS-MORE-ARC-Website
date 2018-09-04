@@ -42,12 +42,16 @@ class ChildcareType(models.Model):
         five_to_eight = self.five_to_eight
         eight_plus = self.eight_plus
         register = ''
-        if zero_to_five and five_to_eight or zero_to_five and not five_to_eight and eight_plus:
-            register = 'Early Years Register, Childcare Register'
+        if zero_to_five and five_to_eight and eight_plus:
+            register = 'Early Years Register and Childcare Register (both parts)'
         if not zero_to_five and five_to_eight and eight_plus:
-            register = 'Childcare Register (compulsory & voluntary parts)'
+            register = 'Childcare Register (both parts)'
         if zero_to_five and not five_to_eight and not eight_plus:
             register = 'Early Years Register'
+        if zero_to_five and five_to_eight and not eight_plus:
+            register = 'Early Years Register and Childcare Register (compulsory part)'
+        if zero_to_five and not five_to_eight and eight_plus:
+            register = 'Early Years Register and Childcare Register (voluntary part)'
         if not zero_to_five and five_to_eight and not eight_plus:
             register = 'Childcare Register (compulsory part)'
         if not zero_to_five and not five_to_eight and eight_plus:
