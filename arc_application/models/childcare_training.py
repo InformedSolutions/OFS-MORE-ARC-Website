@@ -59,9 +59,9 @@ class ChildcareTraining(models.Model):
             eyfs_training = self.eyfs_training
             common_core_training = self.common_core_training
             if eyfs_training and common_core_training:
-                value = 'Childcare qualification (level 2 or higher) and training in common core skills'
+                value = 'Training that covers the EYFS and training in common core skills'
             elif eyfs_training:
-                value = 'Childcare qualification (level 2 or higher)'
+                value = 'Training that covers the EYFS'
             else:
                 value = 'Training in common core skills'
 

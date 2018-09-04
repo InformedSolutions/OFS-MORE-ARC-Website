@@ -88,9 +88,9 @@ class ChildcareTrainingCheckSummaryView(View):
             eyfs_training = eyfs_check.eyfs_training
             common_core_training = eyfs_check.common_core_training
             if eyfs_training and common_core_training:
-                context['childcare_training'] = 'Childcare qualification (level 2 or higher) and training in common core skills'
+                context['childcare_training'] = 'Training that covers the EYFS and training in common core skills'
             elif eyfs_training:
-                context['childcare_training'] = 'Childcare qualification (level 2 or higher)'
+                context['childcare_training'] = 'Training that covers the EYFS'
             elif common_core_training:
                 context['childcare_training'] = 'Training in common core skills'
             else:
