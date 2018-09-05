@@ -140,7 +140,7 @@
         </tr>
         {% endif %}
 
-                <tr>
+        <tr>
             <td>
                 DBS certificate number
             </td>
@@ -166,6 +166,8 @@
                 </div>
             </td>
         </tr>
+
+        {% if cautions_convictions is not None %}
         <tr>
             <td>
                 Do you have any cautions or convictions?
@@ -183,8 +185,6 @@
                 {{ form.cautions_convictions_declare }}
             </td>
         </tr>
-
-        {% if cautions_convictions is not None %}
         <tr class="js-hidden" id="cautions_convictions">
             <td colspan="1">
                 <div>
