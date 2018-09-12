@@ -1,4 +1,5 @@
 xmlrunner/
+logs/*
 selenium/
 
 addressing_service/settings.py
