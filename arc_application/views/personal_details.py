@@ -39,7 +39,7 @@ def personal_details_summary(request):
     PERSONAL_DETAIL_FIELDS = ['date_of_birth_declare', 'date_of_birth_comments']
     NAME_FIELDS = ['name_declare', 'name_comments']
     HOME_ADDRESS_FIELDS = ['home_address_declare', 'home_address_comments']
-    CHILDCARE_ADDRESS_FIELDS = ['childcare_location_declare', 'childcare_location_comments']
+    CHILDCARE_ADDRESS_FIELDS = ['childcare_address_declare', 'childcare_address_comments']
     WORKING_IN_OTHER_CHILDMINDER_HOME_FIELDS = ['working_in_other_childminder_home_declare',
                                                 'working_in_other_childminder_home_comments']
     OWN_CHILDREN_FIELDS = ['own_children_declare', 'own_children_comments']

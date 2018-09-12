@@ -115,7 +115,7 @@ def name_converter(name):
          'What age groups will you be caring for?': 'childcare_age_groups',
          'Are you providing overnight care?': 'overnight_care', 'Your name': 'name',
          'Your date of birth': 'date_of_birth', 'Your home address': 'home_address',
-         'Childcare address': 'childcare_location',
+         'Childcare address': 'childcare_address',
          "Is this another childminder's home?": 'working_in_other_childminder_home',
          "Do you have children of your own under 16?": 'own_children',
          'Training organisation': 'first_aid_training_organisation',

@@ -51,10 +51,10 @@ class PersonalDetailsForm(GOVUKForm):
                                             widget=custom_field_widgets.Textarea,
                                             required=False, max_length=250)
 
-    childcare_location_declare = forms.BooleanField(label='This information is correct',
-                                                    widget=custom_field_widgets.CustomCheckboxInput, required=False)
-    childcare_location_comments = forms.CharField(label='Childcare location', help_text='(Tip: be clear and concise)',
-                                                  widget=custom_field_widgets.Textarea, required=False, max_length=250)
+    childcare_address_declare = forms.BooleanField(label='This information is correct',
+                                                   widget=custom_field_widgets.CustomCheckboxInput, required=False)
+    childcare_address_comments = forms.CharField(label='Childcare address', help_text='(Tip: be clear and concise)',
+                                                 widget=custom_field_widgets.Textarea, required=False, max_length=250)
 
     working_in_other_childminder_home_declare = forms.BooleanField(label='This information is correct',
                                                                    widget=custom_field_widgets.CustomCheckboxInput,
@@ -72,7 +72,7 @@ class PersonalDetailsForm(GOVUKForm):
                                             max_length=250)
 
     checkboxes = [(name_declare, 'name'), (date_of_birth_declare, 'date_of_birth'),
-                  (home_address_declare, 'home_address'), (childcare_location_declare, 'childcare_location'),
+                  (home_address_declare, 'home_address'), (childcare_address_declare, 'childcare_address'),
                   (working_in_other_childminder_home_declare, 'working_in_other_childminder_home'),
                   (own_children_declare, 'own_children')]
 
@@ -131,20 +131,20 @@ class PersonalDetailsForm(GOVUKForm):
 
         return home_address_comments
 
-    def clean_childcare_location_comments(self):
+    def clean_childcare_address_comments(self):
         """
-        Childcare location comments validation
+        Childcare address comments validation
         :return: string
         """
-        childcare_location_declare = self.cleaned_data['childcare_location_declare']
-        childcare_location_comments = self.cleaned_data['childcare_location_comments']
+        childcare_address_declare = self.cleaned_data['childcare_address_declare']
+        childcare_address_comments = self.cleaned_data['childcare_address_comments']
 
         # Only check if a comment has been entered if the field has been flagged
-        if childcare_location_declare is True:
-            if childcare_location_comments == '':
+        if childcare_address_declare is True:
+            if childcare_address_comments == '':
                 raise forms.ValidationError('You must give reasons')
 
-        return childcare_location_comments
+        return childcare_address_comments
 
     def clean_working_in_other_childminder_home_comments(self):
         """
