@@ -56,8 +56,25 @@ class PersonalDetailsForm(GOVUKForm):
     childcare_location_comments = forms.CharField(label='Childcare location', help_text='(Tip: be clear and concise)',
                                                   widget=custom_field_widgets.Textarea, required=False, max_length=250)
 
+    working_in_other_childminder_home_declare = forms.BooleanField(label='This information is correct',
+                                                                   widget=custom_field_widgets.CustomCheckboxInput,
+                                                                   required=False)
+    working_in_other_childminder_home_comments = forms.CharField(label="Is this another childminder's home?",
+                                                                 help_text='(Tip: be clear and concise)',
+                                                                 widget=custom_field_widgets.Textarea, required=False,
+                                                                 max_length=250)
+    own_children_declare = forms.BooleanField(label='This information is correct',
+                                              widget=custom_field_widgets.CustomCheckboxInput,
+                                              required=False)
+    own_children_comments = forms.CharField(label="Is this another childminder's home?",
+                                            help_text='(Tip: be clear and concise)',
+                                            widget=custom_field_widgets.Textarea, required=False,
+                                            max_length=250)
+
     checkboxes = [(name_declare, 'name'), (date_of_birth_declare, 'date_of_birth'),
-                  (home_address_declare, 'home_address'), (childcare_location_declare, 'childcare_location')]
+                  (home_address_declare, 'home_address'), (childcare_location_declare, 'childcare_location'),
+                  (working_in_other_childminder_home_declare, 'working_in_other_childminder_home'),
+                  (own_children_declare, 'own_children')]
 
     for box in checkboxes:
         box[0].widget.attrs.update({'data_target': box[1],
@@ -128,6 +145,36 @@ class PersonalDetailsForm(GOVUKForm):
                 raise forms.ValidationError('You must give reasons')
 
         return childcare_location_comments
+
+    def clean_working_in_other_childminder_home_comments(self):
+        """
+        Is this another children's home comments validation
+        :return: string
+        """
+        working_in_other_childminder_home_declare = self.cleaned_data['working_in_other_childminder_home_declare']
+        working_in_other_childminder_home_comments = self.cleaned_data['working_in_other_childminder_home_comments']
+
+        # Only check if a comment has been entered if the field has been flagged
+        if working_in_other_childminder_home_declare is True:
+            if working_in_other_childminder_home_comments == '':
+                raise forms.ValidationError('You must give reasons')
+
+        return working_in_other_childminder_home_comments
+
+    def clean_own_children_comments(self):
+        """
+        Do you have children of your own under 16 validation
+        :return: string
+        """
+        own_children_declare = self.cleaned_data['own_children_declare']
+        own_children_comments = self.cleaned_data['own_children_comments']
+
+        # Only check if a comment has been entered if the field has been flagged
+        if own_children_declare is True:
+            if own_children_comments == '':
+                raise forms.ValidationError('You must give reasons')
+
+        return own_children_comments
 
 
 class FirstAidTrainingForm(GOVUKForm):
@@ -287,8 +334,8 @@ class TypeOfChildcareTrainingCheckForm(GOVUKForm):
     """
     auto_replace_widgets = True
 
-    childcare_training_declare  = forms.BooleanField(label='This information is correct',
-                                                     widget=custom_field_widgets.CustomCheckboxInput, required=False)
+    childcare_training_declare = forms.BooleanField(label='This information is correct',
+                                                    widget=custom_field_widgets.CustomCheckboxInput, required=False)
     childcare_training_comments = forms.CharField(label='Type of childcare training',
                                                   help_text='(Tip: be clear and concise)',
                                                   widget=custom_field_widgets.Textarea, required=False, max_length=250)
@@ -305,7 +352,7 @@ class TypeOfChildcareTrainingCheckForm(GOVUKForm):
         Childcare Training comments validation.
         :return: childcare comments as string, if valid.
         """
-        childcare_training_declare  = self.cleaned_data['childcare_training_declare']
+        childcare_training_declare = self.cleaned_data['childcare_training_declare']
         childcare_training_comments = self.cleaned_data['childcare_training_comments']
 
         # Only check if a comment has been entered if the field has been flagged
@@ -349,10 +396,11 @@ class DBSCheckForm(GOVUKForm):
                                             max_length=250)
     military_base_declare = forms.BooleanField(label='This information is correct',
                                                widget=custom_field_widgets.CustomCheckboxInput, required=False)
-    military_base_comments = forms.CharField(label='Have you lived or worked on a British military base in the last 5 years?',
-                                             help_text='(Tip: be clear and concise)',
-                                             widget=custom_field_widgets.Textarea, required=False,
-                                             max_length=250)
+    military_base_comments = forms.CharField(
+        label='Have you lived or worked on a British military base in the last 5 years?',
+        help_text='(Tip: be clear and concise)',
+        widget=custom_field_widgets.Textarea, required=False,
+        max_length=250)
     capita_declare = forms.BooleanField(label='This information is correct',
                                         widget=custom_field_widgets.CustomCheckboxInput, required=False)
     capita_comments = forms.CharField(label='Do you have an Ofsted DBS Check?',

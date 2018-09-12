@@ -143,7 +143,7 @@
         <tr>
             <th colspan="3">
                 <div class="heading-medium">
-                    Your home address
+                    Your home and childcare address
                 </div>
             </th>
         </tr>
@@ -151,7 +151,7 @@
         <tbody>
         <tr>
             <td>
-                Home address
+                Your home address
             </td>
             {% if street_line2 and county %}
             <td style="word-wrap: break-word">
@@ -222,10 +222,6 @@
                 Same as home address
             </td>
             {% elif location_of_childcare == False %}
-            <td style="word-wrap: break-word">
-                Other
-            </td>
-            <!--
                 {% if childcare_street_line2 and childcare_county %}
                 <td style="word-wrap: break-word">
                     {{childcare_street_line1}}
@@ -267,7 +263,6 @@
                     {{childcare_postcode}}
                 </td>
                 {% endif %}
-            -->
             {% endif %}
             <td class="change-answer">
                 {{ form.childcare_location_declare }}
@@ -288,10 +283,89 @@
                 </div>
             </td>
         </tr>
+        <tr>
+            <td>
+                Is this another childminder's home?
+            </td>
+            {% if working_in_other_childminder_home %}
+            <td style="word-wrap: break-word">
+                Yes
+            </td>
+            {% else %}
+            <td style="word-wrap: break-word">
+                No
+            </td>
+            {% endif %}
+            <td class="change-answer">
+                {{ form.working_in_other_childminder_home_declare }}
+            </td>
+        </tr>
+        <tr class="js-hidden" id="working_in_other_childminder_home">
+            <td colspan="1">
+                <div>
+                    Enter your reasoning
+                </div>
+                <div>
+                    {{ form.working_in_other_childminder_home_comments.help_text}}
+                </div>
+            </td>
+            <td colspan="2">
+                <div>
+                    {{ form.working_in_other_childminder_home_comments}}
+                </div>
+            </td>
+        </tr>
         </tbody>
     </table>
 
     <a href="{% url 'personal_details_previous_addresses' %}?id={{ application_id }}&state=entry&person_id={{ application_id }}&person_type=APPLICANT" class = "button button-secondary">Add previous addresses</a>
+
+    <table class="check-your-answers form-group">
+        <thead>
+        <tr>
+            <th colspan="3">
+                <div class="heading-medium">
+                    Your children
+                </div>
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>
+                Do you have children of your own under 16?
+            </td>
+            {% if own_children %}
+            <td style="word-wrap: break-word">
+                Yes
+            </td>
+            {% else %}
+            <td style="word-wrap: break-word">
+                No
+            </td>
+            {% endif %}
+            <td class="change-answer">
+                {{ form.own_children_declare }}
+            </td>
+        </tr>
+        <tr class="js-hidden" id="own_children">
+            <td colspan="1">
+                <div>
+                    Enter your reasoning
+                </div>
+                <div>
+                    {{ form.own_children_comments.help_text}}
+                </div>
+            </td>
+            <td colspan="2">
+                <div>
+                    {{ form.own_children_comments}}
+                </div>
+            </td>
+        </tr>
+
+        </tbody>
+    </table>
 
     <br>
 
@@ -431,6 +505,7 @@
         Add previous registration
     </button>
     <br>
+
     <input type="submit" class="button" value="Confirm and continue"/>
     <input type="hidden" value="{{application_id}}" name="id"/>
 
