@@ -20,7 +20,7 @@ from ..decorators import group_required, user_assigned_application
 @user_assigned_application
 def arc_summary(request):
     ordered_models = [UserDetails, ChildcareType, [ApplicantPersonalDetails, ApplicantName, ApplicantHomeAddress],
-                      FirstAidTraining, ChildcareTraining, HealthDeclarationBooklet, CriminalRecordCheck, Application,
+                      FirstAidTraining, ChildcareTraining, CriminalRecordCheck, Application,
                       AdultInHome, ChildInHome]
     if request.method == 'GET':
         application_id_local = request.GET["id"]
