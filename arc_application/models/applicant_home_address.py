@@ -75,12 +75,12 @@ class ApplicantHomeAddress(models.Model):
             childcare_address = 'Same as home address'
             return [
                 {"name": "Your home address", "value": home_address, 'pk': self.pk, "index": 3},
-                {"name": "Childcare location", "value": childcare_address, 'pk': self.pk, "index": 4},
+                {"name": "Childcare address", "value": childcare_address, 'pk': self.pk, "index": 4},
                 {"name": "Is this another childminder's home?",
                  "value": self.get_bool_as_string(working_in_other_childminder_home),
-                 'pk': self.pk, "index": 5},
+                 'pk': self.application_id_id, "index": 5},
                 {"name": "Do you have children of your own under 16?", "value": self.get_bool_as_string(own_children),
-                 'pk': self.pk, "index": 6}
+                 'pk': self.application_id_id, "index": 6}
             ]
         # If the address is only a home address
         if self.current_address and not self.childcare_address:
@@ -92,11 +92,12 @@ class ApplicantHomeAddress(models.Model):
         if not self.current_address and self.childcare_address:
             childcare_address = self.get_address()
             return [
-                {"name": "Childcare location", "value": childcare_address, 'pk': self.pk, "index": 4},
+                {"name": "Childcare address", "value": childcare_address, 'pk': self.pk, "index": 4},
                 {"name": "Is this another childminder's home?",
-                 "value": self.get_bool_as_string(working_in_other_childminder_home), 'pk': self.pk, "index": 5},
+                 "value": self.get_bool_as_string(working_in_other_childminder_home), 'pk': self.application_id_id,
+                 "index": 5},
                 {"name": "Do you have children of your own under 16?", "value": self.get_bool_as_string(own_children),
-                 'pk': self.pk, "index": 6}
+                 'pk': self.application_id_id, "index": 6}
             ]
 
     class Meta:

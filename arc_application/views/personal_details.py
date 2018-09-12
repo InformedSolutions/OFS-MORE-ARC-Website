@@ -38,10 +38,10 @@ def personal_details_summary(request):
     TABLE_NAMES = ['APPLICANT_PERSONAL_DETAILS', 'APPLICANT_NAME', 'APPLICANT_HOME_ADDRESS', 'APPLICATION']
     PERSONAL_DETAIL_FIELDS = ['date_of_birth_declare', 'date_of_birth_comments']
     NAME_FIELDS = ['name_declare', 'name_comments']
-    HOME_ADDRESS_FIELDS = ['home_address_declare', 'home_address_comments',
-                           'childcare_location_declare', 'childcare_location_comments']
-    CHILDCARE_ADDRESS_FIELDS = ['working_in_other_childminder_home_declare',
-                                'working_in_other_childminder_home_comments']
+    HOME_ADDRESS_FIELDS = ['home_address_declare', 'home_address_comments']
+    CHILDCARE_ADDRESS_FIELDS = ['childcare_location_declare', 'childcare_location_comments']
+    WORKING_IN_OTHER_CHILDMINDER_HOME_FIELDS = ['working_in_other_childminder_home_declare',
+                                                'working_in_other_childminder_home_comments']
     OWN_CHILDREN_FIELDS = ['own_children_declare', 'own_children_comments']
     PERSON_TYPE = 'APPLICANT'
 
@@ -64,6 +64,7 @@ def personal_details_summary(request):
         name_dict = {}
         home_address_dict = {}
         childcare_address_dict = {}
+        working_in_other_childminder_home_dict = {}
         own_children_dict = {}
 
         form = PersonalDetailsForm(request.POST,
@@ -89,6 +90,8 @@ def personal_details_summary(request):
                     home_address_dict[field] = form.cleaned_data[field]
                 if field in CHILDCARE_ADDRESS_FIELDS:
                     childcare_address_dict[field] = form.cleaned_data[field]
+                if field in WORKING_IN_OTHER_CHILDMINDER_HOME_FIELDS:
+                    working_in_other_childminder_home_dict[field] = form.cleaned_data[field]
                 if field in OWN_CHILDREN_FIELDS:
                     own_children_dict[field] = form.cleaned_data[field]
 
@@ -98,17 +101,21 @@ def personal_details_summary(request):
             home_address_comments = request_to_comment(applicant_home_address_id, TABLE_NAMES[2], home_address_dict)
             childcare_address_comments = request_to_comment(applicant_childcare_address_id, TABLE_NAMES[2],
                                                             childcare_address_dict)
+            working_in_other_childminder_home_comments = request_to_comment(application_id_local, TABLE_NAMES[3],
+                                                                            working_in_other_childminder_home_dict)
             own_children_comments = request_to_comment(application_id_local, TABLE_NAMES[3], own_children_dict)
 
             birthdate_save_successful = save_comments(request, birthdate_comments)
             name_save_successful = save_comments(request, name_comments)
             home_address_save_successful = save_comments(request, home_address_comments)
             childcare_address_save_successful = save_comments(request, childcare_address_comments)
+            working_in_other_childminder_home_save_successful = save_comments(request,
+                                                                              working_in_other_childminder_home_comments)
             own_children_save_successful = save_comments(request, own_children_comments)
 
             application = Application.objects.get(pk=application_id_local)
 
-            if not birthdate_comments and not name_comments and not home_address_comments and not childcare_address_comments and not own_children_comments:
+            if not birthdate_comments and not name_comments and not home_address_comments and not childcare_address_comments and not working_in_other_childminder_home_comments and not own_children_comments:
                 section_status = 'COMPLETED'
                 application.personal_details_arc_flagged = False
             else:
@@ -117,7 +124,7 @@ def personal_details_summary(request):
 
             application.save()
 
-            if birthdate_save_successful and name_save_successful and home_address_save_successful and childcare_address_save_successful and own_children_save_successful:
+            if birthdate_save_successful and name_save_successful and home_address_save_successful and childcare_address_save_successful and working_in_other_childminder_home_save_successful and own_children_save_successful:
 
                 status = Arc.objects.get(pk=application_id_local)
                 status.personal_details_review = section_status
