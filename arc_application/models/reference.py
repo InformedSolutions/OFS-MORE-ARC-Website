@@ -84,3 +84,4 @@ class Reference(models.Model):
     class Meta:
         db_table = 'REFERENCE'
         ordering = ['reference']
+        app_label = 'application'

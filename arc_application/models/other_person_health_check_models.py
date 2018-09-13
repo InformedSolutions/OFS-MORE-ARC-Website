@@ -43,10 +43,12 @@ class HealthCheckSerious(HealthCheckBase):
     class Meta(HealthCheckBase.Meta):
         db_table = 'SERIOUS_ILLNESS'
         ordering = ['start_date']
+        app_label = 'application'
 
 
 class HealthCheckCurrent(HealthCheckBase):
 
     class Meta:
         db_table = 'CURRENT_ILLNESS'
+        app_label = 'application'
 
