@@ -36,3 +36,4 @@ class PreviousAddress(models.Model):
 
     class Meta:
         db_table = 'PREVIOUS_ADDRESS'
+        app_label = 'application'

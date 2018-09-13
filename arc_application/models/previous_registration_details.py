@@ -19,3 +19,4 @@ class PreviousRegistrationDetails(models.Model):
 
     class Meta:
         db_table = 'PREVIOUS_REGISTRATION_DETAILS'
+        app_label = 'application'

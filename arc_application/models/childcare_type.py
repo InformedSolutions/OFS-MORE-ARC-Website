@@ -76,3 +76,4 @@ class ChildcareType(models.Model):
 
     class Meta:
         db_table = 'CHILDCARE_TYPE'
+        app_label = 'application'

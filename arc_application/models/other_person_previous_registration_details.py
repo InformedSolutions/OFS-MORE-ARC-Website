@@ -20,3 +20,4 @@ class OtherPersonPreviousRegistrationDetails(models.Model):
 
     class Meta:
         db_table = 'OTHER_PERSON_PREVIOUS_REGISTRATION_DETAILS'
+        app_label = 'application'

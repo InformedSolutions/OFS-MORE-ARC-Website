@@ -63,3 +63,4 @@ class ChildInHome(models.Model):
 
     class Meta:
         db_table = 'CHILD_IN_HOME'
+        app_label = 'application'

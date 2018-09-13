@@ -47,3 +47,4 @@ class ApplicantName(models.Model):
 
     class Meta:
         db_table = 'APPLICANT_NAME'
+        app_label = 'application'

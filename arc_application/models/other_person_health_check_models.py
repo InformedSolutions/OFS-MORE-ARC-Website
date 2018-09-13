@@ -32,6 +32,7 @@ class HealthCheckHospital(HealthCheckBase):
     class Meta(HealthCheckBase.Meta):
         db_table = 'HOSPITAL_ADMISSION'
         ordering = ['start_date']
+        app_label = 'application'
 
 
 class HealthCheckSerious(HealthCheckBase):

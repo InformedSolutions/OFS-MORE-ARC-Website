@@ -41,3 +41,4 @@ class ApplicantPersonalDetails(models.Model):
 
     class Meta:
         db_table = 'APPLICANT_PERSONAL_DETAILS'
+        app_label = 'application'

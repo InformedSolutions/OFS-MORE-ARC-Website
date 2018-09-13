@@ -86,3 +86,4 @@ class AdultInHome(models.Model):
 
     class Meta:
         db_table = 'ADULT_IN_HOME'
+        app_label = 'application'
