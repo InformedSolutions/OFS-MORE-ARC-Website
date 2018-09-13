@@ -57,4 +57,3 @@ class ApplicantHomeAddress(models.Model):
 
     class Meta:
         db_table = 'APPLICANT_HOME_ADDRESS'
-        app_label = 'arc_application'

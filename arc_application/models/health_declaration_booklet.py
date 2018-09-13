@@ -46,4 +46,3 @@ class HealthDeclarationBooklet(models.Model):
 
     class Meta:
         db_table = 'HDB'
-        app_label = 'arc_application'

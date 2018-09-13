@@ -18,4 +18,3 @@ class ArcComments(models.Model):
 
     class Meta:
         db_table = 'ARC_COMMENTS'
-        app_label = 'arc_application'

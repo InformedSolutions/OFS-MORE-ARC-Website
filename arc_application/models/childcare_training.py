@@ -82,4 +82,3 @@ class ChildcareTraining(models.Model):
 
     class Meta:
         db_table = 'CHILDCARE_TRAINING'
-        app_label = 'arc_application'

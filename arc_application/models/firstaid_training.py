@@ -57,4 +57,3 @@ class FirstAidTraining(models.Model):
 
     class Meta:
         db_table = 'FIRST_AID_TRAINING'
-        app_label = 'arc_application'

@@ -32,4 +32,3 @@ class Payment(models.Model):
 
     class Meta:
         db_table = 'PAYMENT'
-        app_label = 'arc_application'
