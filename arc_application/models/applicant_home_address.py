@@ -55,51 +55,6 @@ class ApplicantHomeAddress(models.Model):
         personal_detail_id = ApplicantPersonalDetails.get_id(app_id)
         return cls.objects.get(personal_detail_id=personal_detail_id)
 
-    def get_bool_as_string(self, bool_field):
-        if bool_field:
-            return 'Yes'
-        else:
-            return 'No'
-
-    def get_address(self):
-        return self.street_line1 + ', ' + self.street_line2 + ', ' + self.town + ', ' + self.postcode
-
-    def get_summary_table(self):
-        array = []
-        # If the home address is the same as the childcare address
-        working_in_other_childminder_home = Application.objects.get(
-            application_id=self.application_id_id).working_in_other_childminder_home
-        own_children = Application.objects.get(application_id=self.application_id_id).own_children
-        if self.current_address and self.childcare_address:
-            home_address = self.get_address()
-            childcare_address = 'Same as home address'
-            return [
-                {"name": "Your home address", "value": home_address, 'pk': self.pk, "index": 3},
-                {"name": "Childcare address", "value": childcare_address, 'pk': self.pk, "index": 4},
-                {"name": "Is this another childminder's home?",
-                 "value": self.get_bool_as_string(working_in_other_childminder_home),
-                 'pk': self.application_id_id, "index": 5},
-                {"name": "Do you have children of your own under 16?", "value": self.get_bool_as_string(own_children),
-                 'pk': self.application_id_id, "index": 6}
-            ]
-        # If the address is only a home address
-        if self.current_address and not self.childcare_address:
-            home_address = self.get_address()
-            return [
-                {"name": "Your home address", "value": home_address, 'pk': self.pk, "index": 3}
-            ]
-        # If the address is only a childcare address
-        if not self.current_address and self.childcare_address:
-            childcare_address = self.get_address()
-            return [
-                {"name": "Childcare address", "value": childcare_address, 'pk': self.pk, "index": 4},
-                {"name": "Is this another childminder's home?",
-                 "value": self.get_bool_as_string(working_in_other_childminder_home), 'pk': self.application_id_id,
-                 "index": 5},
-                {"name": "Do you have children of your own under 16?", "value": self.get_bool_as_string(own_children),
-                 'pk': self.application_id_id, "index": 6}
-            ]
-
     class Meta:
         db_table = 'APPLICANT_HOME_ADDRESS'
         app_label = 'arc_application'
