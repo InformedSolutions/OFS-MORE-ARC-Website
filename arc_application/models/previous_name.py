@@ -49,5 +49,5 @@ class PreviousName(models.Model):
 
     class Meta:
         db_table = 'PREVIOUS_NAME'
-        app_label = 'application'
+        app_label = 'arc_application'
 

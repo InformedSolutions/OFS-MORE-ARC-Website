@@ -32,4 +32,4 @@ class Arc(models.Model):
 
     class Meta:
         db_table = 'ARC'
-        app_label = 'application'
+        app_label = 'arc_application'

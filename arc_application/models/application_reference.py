@@ -13,4 +13,4 @@ class ApplicationReference(models.Model):
 
     class Meta:
         db_table = 'APPLICATION_REFERENCE'
-        app_label = 'application'
+        app_label = 'arc_application'

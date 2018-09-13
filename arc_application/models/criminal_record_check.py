@@ -75,4 +75,4 @@ class CriminalRecordCheck(models.Model):
 
     class Meta:
         db_table = 'CRIMINAL_RECORD_CHECK'
-        app_label = 'application'
+        app_label = 'arc_application'
