@@ -77,11 +77,12 @@
                {% endif %}
             </td>
          </tr>
+         {% if own_children %}
          <tr id="your_children">
             <td class="task">
                {% if your_children_status == 'NOT_STARTED' %}
                <a href="{% url 'task_list' %}?id={{application_id}}">
-               <span class="task-name">Your children/span>
+               <span class="task-name">Your children</span>
                <strong class="task-finished task-to-do">To do</strong>
                </a>
                {% elif your_children_status == 'FLAGGED' %}
@@ -97,6 +98,7 @@
                {% endif %}
             </td>
          </tr>
+         {% endif %}
          <tr id="first_aid">
             <td class="task">
                {% if first_aid_training_status == 'NOT_STARTED' %}

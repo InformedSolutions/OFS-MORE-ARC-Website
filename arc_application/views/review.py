@@ -69,6 +69,7 @@ def task_list(request):
         review_count = sum([1 for field in review_fields_to_check if getattr(arc_application, field) == 'COMPLETED'])
         review_count += sum([1 for field in flagged_fields_to_check if getattr(application, field)])
 
+        # Set total number of tasks in right-hand side overview box
         number_of_tasks = set_number_of_tasks(application, childcare_type_record)
 
         # Load review status
@@ -77,6 +78,7 @@ def task_list(request):
             'application_reference': application.application_reference,
             'login_details_status': arc_application.login_details_review,
             'personal_details_status': arc_application.personal_details_review,
+            'your_children_status': arc_application.your_children_review,
             'childcare_type_status': arc_application.childcare_type_review,
             'first_aid_training_status': arc_application.first_aid_review,
             'criminal_record_check_status': arc_application.dbs_review,
@@ -95,7 +97,8 @@ def task_list(request):
             'eight_plus': childcare_type_record.eight_plus,
             'review_count': review_count,
             'all_complete': all_complete(application_id, False),
-            'number_of_tasks': number_of_tasks
+            'number_of_tasks': number_of_tasks,
+            'own_children': application.own_children
         }
 
     return render(request, 'task-list.html', application_status_context)
@@ -208,7 +211,7 @@ def all_complete(id, flag):
     """
     Check the status of all sections
     :param id: Application Id
-    :return: True or False dependingo n whether all sections have been reviewed
+    :return: True or False depending on whether all sections have been reviewed
     """
     if Arc.objects.filter(application_id=id):
         arc = Arc.objects.get(application_id=id)
@@ -218,6 +221,9 @@ def all_complete(id, flag):
         if zero_to_five:
             tasks.append(arc.health_review)
             tasks.append(arc.references_review)
+        application = Application.objects.get(application_id=id)
+        if application.own_children:
+            tasks.append(arc.your_children_review)
 
         for i in tasks:
 
