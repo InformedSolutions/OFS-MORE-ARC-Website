@@ -222,7 +222,7 @@ def all_complete(id, flag):
             tasks.append(arc.health_review)
             tasks.append(arc.references_review)
         application = Application.objects.get(application_id=id)
-        if application.own_children:
+        if application.own_children is True:
             tasks.append(arc.your_children_review)
 
         for i in tasks:

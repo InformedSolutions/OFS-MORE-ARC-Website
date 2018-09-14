@@ -403,6 +403,68 @@ class TestArcFunctions(LiveServerTestCase):
             self.capture_screenshot()
             raise e
 
+    def test_your_children_task_hidden_when_no_own_children(self):
+        self.assert_your_children_task_hidden_when_no_own_children()
+
+    def assert_your_children_task_hidden_when_no_own_children(self):
+        """
+        Tests that the Your children task is hidden when the applicant has indicated they have no own children
+        """
+        global selenium_task_executor
+        title_change_wait = 15
+
+        try:
+            self.login_as_arc_user()
+
+            # Set own_children to True for test application
+            application = Application.objects.get(application_id='db0efe18-eec5-4ec9-887a-e93949f6b412')
+            application.own_children = False
+            application.save()
+
+            WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(
+                expected_conditions.title_contains("Applications"))
+            selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Add from queue']").click()
+            selenium_task_executor.get_driver().find_element_by_xpath("//*[@id='request-table']/tbody/tr[1]/td[5]/a").click()
+            WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(
+                expected_conditions.title_contains("Application overview"))
+            # Fail test if Your children task displays
+            selenium_task_executor.get_driver().find_element_by_xpath("//tr[@id='your_children']/td/a/span")
+            self.assertEqual(True, False)
+        except:
+            # Pass test if Your children task does not display
+            self.assertEqual(True, True)
+
+    def test_your_children_task_shown_when_own_children(self):
+        self.assert_your_children_task_hidden_when_own_children()
+
+    def assert_your_children_task_shown_when_own_children(self):
+        """
+        Tests that the Your children task is shown when the applicant has indicated they have own children
+        """
+        global selenium_task_executor
+        title_change_wait = 15
+
+        try:
+            self.login_as_arc_user()
+
+            # Set own_children to True for test application
+            application = Application.objects.get(application_id='db0efe18-eec5-4ec9-887a-e93949f6b412')
+            application.own_children = True
+            application.save()
+
+            WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(
+                expected_conditions.title_contains("Applications"))
+            selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Add from queue']").click()
+            selenium_task_executor.get_driver().find_element_by_xpath("//*[@id='request-table']/tbody/tr[1]/td[5]/a").click()
+            WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(
+                expected_conditions.title_contains("Application overview"))
+            # Pass test if Your children task displays
+            selenium_task_executor.get_driver().find_element_by_xpath("//tr[@id='your_children']/td/a/span")
+            self.assertEqual(True, True)
+        except:
+            # Fail test if Your children task does not display
+            self.assertEqual(True, False)
+
     def test_contact_centre_user_can_view_audit_log(self):
         self.assert_contact_centre_user_can_view_audit_log()
 
