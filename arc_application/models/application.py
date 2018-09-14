@@ -98,3 +98,4 @@ class Application(models.Model):
 
     class Meta:
         db_table = 'APPLICATION'
+        app_label = 'arc_application'
