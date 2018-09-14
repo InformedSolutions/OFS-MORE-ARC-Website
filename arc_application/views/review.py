@@ -44,6 +44,7 @@ def task_list(request):
             'login_details_review',
             'personal_details_review',
             'childcare_type_review',
+            'your_children_review',
             'first_aid_review',
             'dbs_review',
             'childcare_training_review',
@@ -61,12 +62,14 @@ def task_list(request):
             "login_details_arc_flagged",
             "people_in_home_arc_flagged",
             "personal_details_arc_flagged",
-            "references_arc_flagged"
+            "references_arc_flagged",
+            'your_children_arc_flagged'
         )
 
         review_count = sum([1 for field in review_fields_to_check if getattr(arc_application, field) == 'COMPLETED'])
         review_count += sum([1 for field in flagged_fields_to_check if getattr(application, field)])
-        number_of_tasks = 7 if not childcare_type_record.zero_to_five else 9
+
+        number_of_tasks = set_number_of_tasks(application, childcare_type_record)
 
         # Load review status
         application_status_context = {
@@ -96,6 +99,24 @@ def task_list(request):
         }
 
     return render(request, 'task-list.html', application_status_context)
+
+
+def set_number_of_tasks(application, childcare_type_record):
+    """
+    Method to set the total number of tasks in the right hand summary panel
+    :param application: an Application object
+    :param childcare_type_record: a ChildcareType object
+    :return: integer
+    """
+    # Default total number of tasks
+    number_of_tasks = 9
+
+    if childcare_type_record.zero_to_five and application.own_children:
+        number_of_tasks = 10
+    elif not childcare_type_record.zero_to_five and not application.own_children:
+        number_of_tasks = 8
+
+    return number_of_tasks
 
 
 @group_required(settings.ARC_GROUP)

@@ -17,6 +17,7 @@ from ..models import (ApplicantHomeAddress,
                       Reference,
                       UserDetails,
                       ChildcareType)
+from ..views import set_number_of_tasks
 
 application = None
 personal_details = None
@@ -34,6 +35,7 @@ def create_application():
     global name
     global user_details
     global arc_records
+    global childcare_type
 
     application = Application.objects.create(
         application_type='CHILDMINDER',
@@ -495,3 +497,41 @@ class ArcSummaryTest(TestCase):
         # 4. Check flagged boolean indicator is set on the application record
         reloaded_application = Application.objects.get(pk=application.application_id)
         self.assertTrue(reloaded_application.references_arc_flagged)
+
+    def test_set_number_of_tasks(self):
+        """
+        Tests the set_number_of_tasks function
+        """
+        create_application()
+
+        childcare_type.zero_to_five = True
+        childcare_type.save()
+        application.own_children = True
+        application.save()
+
+        number_of_tasks = set_number_of_tasks(application, childcare_type)
+        self.assertEqual(10, number_of_tasks)
+
+        childcare_type.zero_to_five = True
+        childcare_type.save()
+        application.own_children = False
+        application.save()
+
+        number_of_tasks = set_number_of_tasks(application, childcare_type)
+        self.assertEqual(9, number_of_tasks)
+
+        childcare_type.zero_to_five = False
+        childcare_type.save()
+        application.own_children = False
+        application.save()
+
+        number_of_tasks = set_number_of_tasks(application, childcare_type)
+        self.assertEqual(8, number_of_tasks)
+
+        childcare_type.zero_to_five = False
+        childcare_type.save()
+        application.own_children = True
+        application.save()
+
+        number_of_tasks = set_number_of_tasks(application, childcare_type)
+        self.assertEqual(9, number_of_tasks)

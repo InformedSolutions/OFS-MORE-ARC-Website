@@ -77,6 +77,26 @@
                {% endif %}
             </td>
          </tr>
+         <tr id="your_children">
+            <td class="task">
+               {% if your_children_status == 'NOT_STARTED' %}
+               <a href="{% url 'task_list' %}?id={{application_id}}">
+               <span class="task-name">Your children/span>
+               <strong class="task-finished task-to-do">To do</strong>
+               </a>
+               {% elif your_children_status == 'FLAGGED' %}
+               <a href="{% url 'task_list' %}?id={{application_id}}">
+               <span class="task-name">Your children</span>
+               <strong class="task-finished task-flagged">Flagged</strong>
+               </a>
+               {% elif your_children_status == 'COMPLETED' %}
+               <a href="{% url 'task_list' %}?id={{application_id}}">
+               <span class="task-name">Your children</span>
+               <strong class="task-finished">Reviewed</strong>
+               </a>
+               {% endif %}
+            </td>
+         </tr>
          <tr id="first_aid">
             <td class="task">
                {% if first_aid_training_status == 'NOT_STARTED' %}
