@@ -14,7 +14,6 @@ from ..review_util import request_to_comment, save_comments, redirect_selection,
 from ..views.personal_details_addresses import get_stored_addresses
 from ..decorators import group_required, user_assigned_application
 
-
 logger = logging.getLogger()
 
 
@@ -33,12 +32,17 @@ def personal_details_summary(request):
     applicant_name_id = (ApplicantName.objects.get(personal_detail_id=personal_detail_id)).name_id
     applicant_home_address_id = (ApplicantHomeAddress.objects.get(personal_detail_id=personal_detail_id,
                                                                   current_address=True)).home_address_id
+    applicant_childcare_address_id = (ApplicantHomeAddress.objects.get(personal_detail_id=personal_detail_id,
+                                                                       childcare_address=True)).home_address_id
 
-    TABLE_NAMES = ['APPLICANT_PERSONAL_DETAILS', 'APPLICANT_NAME', 'APPLICANT_HOME_ADDRESS']
+    TABLE_NAMES = ['APPLICANT_PERSONAL_DETAILS', 'APPLICANT_NAME', 'APPLICANT_HOME_ADDRESS', 'APPLICATION']
     PERSONAL_DETAIL_FIELDS = ['date_of_birth_declare', 'date_of_birth_comments']
     NAME_FIELDS = ['name_declare', 'name_comments']
-    HOME_ADDRESS_FIELDS = ['home_address_declare', 'home_address_comments',
-                           'childcare_location_declare', 'childcare_location_comments']
+    HOME_ADDRESS_FIELDS = ['home_address_declare', 'home_address_comments']
+    CHILDCARE_ADDRESS_FIELDS = ['childcare_address_declare', 'childcare_address_comments']
+    WORKING_IN_OTHER_CHILDMINDER_HOME_FIELDS = ['working_in_other_childminder_home_declare',
+                                                'working_in_other_childminder_home_comments']
+    OWN_CHILDREN_FIELDS = ['own_children_declare', 'own_children_comments']
     PERSON_TYPE = 'APPLICANT'
 
     if request.method == 'GET':
@@ -49,24 +53,33 @@ def personal_details_summary(request):
         applicant_name_id = (ApplicantName.objects.get(personal_detail_id=personal_detail_id)).name_id
         applicant_home_address_id = (ApplicantHomeAddress.objects.get(personal_detail_id=personal_detail_id,
                                                                       current_address=True)).home_address_id
+        applicant_childcare_address_id = (ApplicantHomeAddress.objects.get(personal_detail_id=personal_detail_id,
+                                                                           childcare_address=True)).home_address_id
 
-        form = PersonalDetailsForm(table_keys=[personal_detail_id, applicant_name_id, applicant_home_address_id])
+        form = PersonalDetailsForm(table_keys=[personal_detail_id, applicant_name_id, applicant_home_address_id,
+                                               applicant_childcare_address_id, application_id_local])
 
     elif request.method == 'POST':
         birthdate_dict = {}
         name_dict = {}
-        address_dict = {}
+        home_address_dict = {}
+        childcare_address_dict = {}
+        working_in_other_childminder_home_dict = {}
+        own_children_dict = {}
 
         form = PersonalDetailsForm(request.POST,
-                                   table_keys=[personal_detail_id, applicant_name_id, applicant_home_address_id])
+                                   table_keys=[personal_detail_id, applicant_name_id, applicant_home_address_id,
+                                               applicant_childcare_address_id, application_id_local])
         application_id_local = request.POST["id"]
         personal_detail_id = (
             ApplicantPersonalDetails.objects.get(application_id=application_id_local)).personal_detail_id
         applicant_name_id = (ApplicantName.objects.get(personal_detail_id=personal_detail_id)).name_id
         applicant_home_address_id = (ApplicantHomeAddress.objects.get(personal_detail_id=personal_detail_id,
                                                                       current_address=True)).home_address_id
+        applicant_childcare_address_id = (ApplicantHomeAddress.objects.get(personal_detail_id=personal_detail_id,
+                                                                           childcare_address=True)).home_address_id
         if form.is_valid():
-            # Populate field dictionaries for use in request to comment funciton
+            # Populate field dictionaries for use in request to comment function
             # As the data required on this form is stored in three different tables, these must be sorted by table
             for field in form.cleaned_data:
                 if field in PERSONAL_DETAIL_FIELDS:
@@ -74,20 +87,35 @@ def personal_details_summary(request):
                 if field in NAME_FIELDS:
                     name_dict[field] = form.cleaned_data[field]
                 if field in HOME_ADDRESS_FIELDS:
-                    address_dict[field] = form.cleaned_data[field]
+                    home_address_dict[field] = form.cleaned_data[field]
+                if field in CHILDCARE_ADDRESS_FIELDS:
+                    childcare_address_dict[field] = form.cleaned_data[field]
+                if field in WORKING_IN_OTHER_CHILDMINDER_HOME_FIELDS:
+                    working_in_other_childminder_home_dict[field] = form.cleaned_data[field]
+                if field in OWN_CHILDREN_FIELDS:
+                    own_children_dict[field] = form.cleaned_data[field]
 
             # Populate below lists with comments by table
             birthdate_comments = request_to_comment(personal_detail_id, TABLE_NAMES[0], birthdate_dict)
             name_comments = request_to_comment(applicant_name_id, TABLE_NAMES[1], name_dict)
-            address_comments = request_to_comment(applicant_home_address_id, TABLE_NAMES[2], address_dict)
+            home_address_comments = request_to_comment(applicant_home_address_id, TABLE_NAMES[2], home_address_dict)
+            childcare_address_comments = request_to_comment(applicant_childcare_address_id, TABLE_NAMES[2],
+                                                            childcare_address_dict)
+            working_in_other_childminder_home_comments = request_to_comment(application_id_local, TABLE_NAMES[3],
+                                                                            working_in_other_childminder_home_dict)
+            own_children_comments = request_to_comment(application_id_local, TABLE_NAMES[3], own_children_dict)
 
             birthdate_save_successful = save_comments(request, birthdate_comments)
             name_save_successful = save_comments(request, name_comments)
-            address_save_successful = save_comments(request, address_comments)
+            home_address_save_successful = save_comments(request, home_address_comments)
+            childcare_address_save_successful = save_comments(request, childcare_address_comments)
+            working_in_other_childminder_home_save_successful = save_comments(request,
+                                                                              working_in_other_childminder_home_comments)
+            own_children_save_successful = save_comments(request, own_children_comments)
 
             application = Application.objects.get(pk=application_id_local)
 
-            if not birthdate_comments and not name_comments and not address_comments:
+            if not birthdate_comments and not name_comments and not home_address_comments and not childcare_address_comments and not working_in_other_childminder_home_comments and not own_children_comments:
                 section_status = 'COMPLETED'
                 application.personal_details_arc_flagged = False
             else:
@@ -96,7 +124,7 @@ def personal_details_summary(request):
 
             application.save()
 
-            if birthdate_save_successful and name_save_successful and address_save_successful:
+            if birthdate_save_successful and name_save_successful and home_address_save_successful and childcare_address_save_successful and working_in_other_childminder_home_save_successful and own_children_save_successful:
 
                 status = Arc.objects.get(pk=application_id_local)
                 status.personal_details_review = section_status
@@ -127,14 +155,13 @@ def personal_details_summary(request):
     postcode = applicant_home_address_record.postcode
     location_of_childcare = applicant_home_address_record.childcare_address
 
-    # This code is pending a later ticket.
-    # applicant_childcare_address_record = ApplicantHomeAddress.objects.get(personal_detail_id=personal_detail_id,
-    #                                                                       childcare_address=True)
-    # childcare_street_line1 = applicant_childcare_address_record.street_line1
-    # childcare_street_line2 = applicant_childcare_address_record.street_line2
-    # childcare_town = applicant_childcare_address_record.town
-    # childcare_county = applicant_childcare_address_record.county
-    # childcare_postcode = applicant_childcare_address_record.postcode
+    applicant_childcare_address_record = ApplicantHomeAddress.objects.get(personal_detail_id=personal_detail_id,
+                                                                          childcare_address=True)
+    childcare_street_line1 = applicant_childcare_address_record.street_line1
+    childcare_street_line2 = applicant_childcare_address_record.street_line2
+    childcare_town = applicant_childcare_address_record.town
+    childcare_county = applicant_childcare_address_record.county
+    childcare_postcode = applicant_childcare_address_record.postcode
 
     application = Application.objects.get(pk=application_id_local)
 
@@ -158,14 +185,15 @@ def personal_details_summary(request):
         'county': county,
         'postcode': postcode,
         'location_of_childcare': location_of_childcare,
-        # 'childcare_street_line1': childcare_street_line1,
-        # 'childcare_street_line2': childcare_street_line2,
-        # 'childcare_town': childcare_town,
-        # 'childcare_county': childcare_county,
-        # 'childcare_postcode': childcare_postcode,
+        'childcare_street_line1': childcare_street_line1,
+        'childcare_street_line2': childcare_street_line2,
+        'childcare_town': childcare_town,
+        'childcare_county': childcare_county,
+        'childcare_postcode': childcare_postcode,
         'personal_details_status': application.personal_details_status,
         'previous_names': previous_names,
         'previous_addresses': previous_addresses,
+        'own_children': application.own_children
     }
 
     try:

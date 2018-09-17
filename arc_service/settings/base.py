@@ -41,7 +41,7 @@ THIRD_PARTY_APPS = [
 ]
 
 PROJECT_APPS = [
-    'arc_application',
+    'arc_application.apps.ApplicationConfig',
 ]
 
 MIDDLEWARE = [
