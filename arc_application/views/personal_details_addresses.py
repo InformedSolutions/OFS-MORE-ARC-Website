@@ -150,10 +150,8 @@ def postcode_manual(request, context):
             # As this is a manual entry rather than a postcode lookup, this is set to false
             context['lookup'] = False
 
-            # TODO - Fix the below!
-
-            # Don't return an HttpResponseRedirect since build_url generates a url that exceeds the nginx buffer size.
-            return personal_details_previous_address(build_url('personal_details_previous_addresses', get=context))
+            # TODO - Remove entire address being added to url variables as it exceeds nginx buffer size.
+            return HttpResponseRedirect(build_url('personal_details_previous_addresses', get=context))
 
         return render(request, 'other-people-previous-address-manual.html', context)
 
@@ -258,79 +256,31 @@ def get_context(request):
     :param request: The current httprequest object
     :return:
     """
+    context = dict()
+    request_method = request.method
 
-    if request.method == 'GET':
-        app_id = request.GET['id']
-        state = request.GET['state']
-        person_id = request.GET['person_id']
-        person_type = request.GET['person_type']
+    url_variables_to_check = [
+        'id',
+        'state',
+        'person_id',
+        'person_type'
+    ]
 
-        # These variables may not exist (depends on view). In order to keep generic, caught in try catch
-        try:
-            postcode = request.GET['postcode']
-        except:
-            postcode = None
+    for var in url_variables_to_check:
+        context[var] = getattr(request, request_method)[var]
 
-        try:
-            address = request.GET['address']
-        except:
-            address = None
+    body_variables_to_check = [
+        'postcode',
+        'address',
+        'lookup',
+        'address_id',
+        'referrer'
+    ]
 
-        try:
-            lookup = request.GET['lookup']
-        except:
-            lookup = None
-        try:
-            address_id = request.GET['address_id']
-        except:
-            address_id = None
-        try:
-            referrer = request.GET['referrer']
-        except:
-            referrer = None
+    for var in body_variables_to_check:
+        context[var] = getattr(request, request_method).get(var, default=None)
 
-    if request.method == 'POST':
-        app_id = request.POST['id']
-        state = request.POST['state']
-        person_id = request.POST['person_id']
-        person_type = request.POST['person_type']
-
-        # These variables may not exist (depends on view). In order to keep generic, caught in try catch
-        try:
-            postcode = request.POST['postcode']
-        except:
-            postcode = None
-        try:
-            address = request.POST['address']
-        except:
-            address = None
-        try:
-            lookup = request.GET['lookup']
-        except:
-            lookup = None
-        try:
-            address_id = request.POST['address_id']
-        except:
-            address_id = None
-        try:
-            referrer = request.POST['referrer']
-        except:
-            referrer = None
-
-    # Actual context definition after variable assignment
-    context = {
-        'id': app_id,
-        'application_id': app_id,
-        'state': state,
-        'person_id': person_id,
-        'person_type': person_type,
-        'postcode': postcode,
-        'address': address,
-        'previous_addresses': get_stored_addresses(person_id, person_type),
-        'lookup': lookup,
-        'address_id': address_id,
-        'referrer': referrer
-    }
+    context['previous_addresses'] = get_stored_addresses(context['person_id'], context['person_type'])
 
     return context
 
