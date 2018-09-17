@@ -150,7 +150,10 @@ def postcode_manual(request, context):
             # As this is a manual entry rather than a postcode lookup, this is set to false
             context['lookup'] = False
 
-            return HttpResponseRedirect(build_url('personal_details_previous_addresses', get=context))
+            # TODO - Fix the below!
+
+            # Don't return an HttpResponseRedirect since build_url generates a url that exceeds the nginx buffer size.
+            return personal_details_previous_address(build_url('personal_details_previous_addresses', get=context))
 
         return render(request, 'other-people-previous-address-manual.html', context)
 
