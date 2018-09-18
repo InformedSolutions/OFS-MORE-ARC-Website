@@ -465,6 +465,70 @@ class TestArcFunctions(LiveServerTestCase):
             # Fail test if Your children task does not display
             self.assertEqual(True, False)
 
+    def test_people_in_home_task_hidden_when_not_working_in_other_childminder_home(self):
+        self.assert_people_in_home_task_hidden_when_not_working_in_other_childminder_home()
+
+    def assert_people_in_home_task_hidden_when_not_working_in_other_childminder_home(self):
+        """
+        Tests that the People in your home task is hidden when the applicant has indicated they work in another
+        childminder's home
+        """
+        global selenium_task_executor
+        title_change_wait = 15
+
+        try:
+            self.login_as_arc_user()
+
+            # Set own_children to True for test application
+            application = Application.objects.get(application_id='db0efe18-eec5-4ec9-887a-e93949f6b412')
+            application.working_in_other_childminder_home = True
+            application.save()
+
+            WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(
+                expected_conditions.title_contains("Applications"))
+            selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Add from queue']").click()
+            selenium_task_executor.get_driver().find_element_by_xpath("//*[@id='request-table']/tbody/tr[1]/td[5]/a").click()
+            WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(
+                expected_conditions.title_contains("Application overview"))
+            # Fail test if People in your home task displays
+            selenium_task_executor.get_driver().find_element_by_xpath("//tr[@id='other_people']/td/a/span")
+            self.assertEqual(True, False)
+        except:
+            # Pass test if People in your home task does not display
+            self.assertEqual(True, True)
+
+    def test_people_in_home_task_shown_when_not_working_in_other_childminder_home(self):
+        self.assert_people_in_home_task_shown_when_not_working_in_other_childminder_home()
+
+    def assert_people_in_home_task_shown_when_not_working_in_other_childminder_home(self):
+        """
+        Tests that the People in your home task is shown when the applicant has indicated they don't work in another
+        childminder's home
+        """
+        global selenium_task_executor
+        title_change_wait = 15
+
+        try:
+            self.login_as_arc_user()
+
+            # Set own_children to True for test application
+            application = Application.objects.get(application_id='db0efe18-eec5-4ec9-887a-e93949f6b412')
+            application.working_in_other_childminder_home = False
+            application.save()
+
+            WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(
+                expected_conditions.title_contains("Applications"))
+            selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Add from queue']").click()
+            selenium_task_executor.get_driver().find_element_by_xpath("//*[@id='request-table']/tbody/tr[1]/td[5]/a").click()
+            WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(
+                expected_conditions.title_contains("Application overview"))
+            # Pass test if People in your home task displays
+            selenium_task_executor.get_driver().find_element_by_xpath("//tr[@id='other_people']/td/a/span")
+            self.assertEqual(True, True)
+        except:
+            # Fail test if People in your home task does not display
+            self.assertEqual(True, False)
+
     def test_contact_centre_user_can_view_audit_log(self):
         self.assert_contact_centre_user_can_view_audit_log()
 

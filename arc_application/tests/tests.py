@@ -506,23 +506,44 @@ class ArcSummaryTest(TestCase):
 
         childcare_type.zero_to_five = True
         childcare_type.save()
-        application.own_children = True
+        application.own_children = False
+        application.working_in_other_childminder_home = True
         application.save()
 
         number_of_tasks = set_number_of_tasks(application, childcare_type)
-        self.assertEqual(10, number_of_tasks)
+        self.assertEqual(8, number_of_tasks)
 
         childcare_type.zero_to_five = True
         childcare_type.save()
-        application.own_children = False
+        application.own_children = True
+        application.working_in_other_childminder_home = True
         application.save()
 
         number_of_tasks = set_number_of_tasks(application, childcare_type)
         self.assertEqual(9, number_of_tasks)
 
+        childcare_type.zero_to_five = True
+        childcare_type.save()
+        application.own_children = True
+        application.working_in_other_childminder_home = False
+        application.save()
+
+        number_of_tasks = set_number_of_tasks(application, childcare_type)
+        self.assertEqual(10, number_of_tasks)
+
         childcare_type.zero_to_five = False
         childcare_type.save()
         application.own_children = False
+        application.working_in_other_childminder_home = True
+        application.save()
+
+        number_of_tasks = set_number_of_tasks(application, childcare_type)
+        self.assertEqual(7, number_of_tasks)
+
+        childcare_type.zero_to_five = False
+        childcare_type.save()
+        application.own_children = False
+        application.working_in_other_childminder_home = False
         application.save()
 
         number_of_tasks = set_number_of_tasks(application, childcare_type)
@@ -531,7 +552,26 @@ class ArcSummaryTest(TestCase):
         childcare_type.zero_to_five = False
         childcare_type.save()
         application.own_children = True
+        application.working_in_other_childminder_home = False
         application.save()
 
         number_of_tasks = set_number_of_tasks(application, childcare_type)
         self.assertEqual(9, number_of_tasks)
+
+        childcare_type.zero_to_five = True
+        childcare_type.save()
+        application.own_children = False
+        application.working_in_other_childminder_home = False
+        application.save()
+
+        number_of_tasks = set_number_of_tasks(application, childcare_type)
+        self.assertEqual(9, number_of_tasks)
+
+        childcare_type.zero_to_five = False
+        childcare_type.save()
+        application.own_children = True
+        application.working_in_other_childminder_home = True
+        application.save()
+
+        number_of_tasks = set_number_of_tasks(application, childcare_type)
+        self.assertEqual(8, number_of_tasks)

@@ -21,6 +21,7 @@ from ..decorators import group_required, user_assigned_application
 
 decorators = [login_required, group_required(settings.ARC_GROUP), user_assigned_application]
 
+
 @login_required
 @group_required(settings.ARC_GROUP)
 @user_assigned_application
@@ -98,7 +99,8 @@ def task_list(request):
             'review_count': review_count,
             'all_complete': all_complete(application_id, False),
             'number_of_tasks': number_of_tasks,
-            'own_children': application.own_children
+            'own_children': application.own_children,
+            'working_in_other_childminder_home': application.working_in_other_childminder_home
         }
 
     return render(request, 'task-list.html', application_status_context)
@@ -112,11 +114,23 @@ def set_number_of_tasks(application, childcare_type_record):
     :return: integer
     """
     # Default total number of tasks
-    number_of_tasks = 9
+    number_of_tasks = 7
 
-    if childcare_type_record.zero_to_five and application.own_children:
+    if childcare_type_record.zero_to_five and not application.own_children and application.working_in_other_childminder_home:
+        number_of_tasks = 8
+    elif childcare_type_record.zero_to_five and application.own_children and application.working_in_other_childminder_home:
+        number_of_tasks = 9
+    elif childcare_type_record.zero_to_five and application.own_children and not application.working_in_other_childminder_home:
         number_of_tasks = 10
-    elif not childcare_type_record.zero_to_five and not application.own_children:
+    elif not childcare_type_record.zero_to_five and not application.own_children and application.working_in_other_childminder_home:
+        number_of_tasks = 7
+    elif not childcare_type_record.zero_to_five and not application.own_children and not application.working_in_other_childminder_home:
+        number_of_tasks = 8
+    elif not childcare_type_record.zero_to_five and application.own_children and not application.working_in_other_childminder_home:
+        number_of_tasks = 9
+    elif childcare_type_record.zero_to_five and not application.own_children and not application.working_in_other_childminder_home:
+        number_of_tasks = 9
+    elif not childcare_type_record.zero_to_five and application.own_children and application.working_in_other_childminder_home:
         number_of_tasks = 8
 
     return number_of_tasks
@@ -216,7 +230,7 @@ def all_complete(id, flag):
     if Arc.objects.filter(application_id=id):
         arc = Arc.objects.get(application_id=id)
         tasks = [arc.login_details_review, arc.childcare_type_review, arc.personal_details_review,
-                arc.first_aid_review, arc.childcare_training_review, arc.dbs_review, arc.people_in_home_review]
+                 arc.first_aid_review, arc.childcare_training_review, arc.dbs_review, arc.people_in_home_review]
         zero_to_five = ChildcareType.objects.get(application_id=id).zero_to_five
         if zero_to_five:
             tasks.append(arc.health_review)

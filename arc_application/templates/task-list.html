@@ -183,6 +183,7 @@
                {% endif %}
             </td>
          </tr>
+         {% if working_in_other_childminder_home == False %}
          <tr id="other_people">
             <td class="task">
                {% if people_in_home_status == 'NOT_STARTED' %}
@@ -203,6 +204,7 @@
                {% endif %}
             </td>
          </tr>
+         {% endif %}
          {% if zero_to_five %}
             <tr id="references">
                <td class="task">
