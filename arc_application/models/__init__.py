@@ -25,3 +25,6 @@ from .other_person_health_check_models import *
 from .other_person_previous_registration_details import *
 from .previous_address import *
 from .previous_name import *
+from .child import *
+from .child_address import *
+from .childbase import *
