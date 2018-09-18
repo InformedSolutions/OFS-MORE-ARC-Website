@@ -24,7 +24,9 @@
     "date_updated": "2018-04-13T14:27:02.082Z",
     "date_accepted": null,
     "date_submitted": "2018-04-13T14:27:48.559Z",
-    "application_reference": "CM1000000"
+    "application_reference": "CM1000000",
+    "own_children": false,
+    "working_in_other_childminder_home": false
   }
 },
 {
