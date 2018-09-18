@@ -17,7 +17,6 @@ class ApplicantName(models.Model):
     middle_names = models.CharField(max_length=100, blank=True)
     last_name = models.CharField(max_length=100, blank=True)
 
-    # TODO Might not work - need to test
     @classmethod
     def get_id(cls, app_id):
         personal_detail_id = ApplicantPersonalDetails.get_id(app_id)
