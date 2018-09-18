@@ -168,14 +168,11 @@ def add_comments(json, app_id):
 
 
 def get_comment(pk, field):
-    if ArcComments.objects.filter(table_pk=pk, field_name=field):
+    if ArcComments.objects.filter(table_pk=pk, field_name=field).exists():
         arc = ArcComments.objects.get(table_pk=pk, field_name=field)
-        if arc.flagged:
-            return arc.comment
-        else:
-            return 'unflagged'
+        return arc.comment
     else:
-        return '    '
+        return ''
 
 
 def get_bool_as_string(bool_field):
