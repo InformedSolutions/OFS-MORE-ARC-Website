@@ -17,6 +17,49 @@ from ..decorators import group_required, user_assigned_application
 """
 
 
+name_field_dict = {
+    'Your email': 'email_address',
+    'Your mobile number': 'mobile_number',
+    'Other phone number': 'add_phone_number',
+    'Knowledge based question': 'security_question',
+    'Knowledge based answer': 'security_answer',
+    'What age groups will you be caring for?': 'childcare_age_groups',
+    'Are you providing overnight care?': 'overnight_care',
+    'Your name': 'name',
+    'Your date of birth': 'date_of_birth',
+    'Your home address': 'home_address',
+    'Childcare address': 'childcare_address',
+    'Is this another childminder\'s home?': 'working_in_other_childminder_home',
+    'Do you have children of your own under 16?': 'own_children',
+    'Training organisation': 'first_aid_training_organisation',
+    'first_aid_training_course': 'title_of_training_course',
+    'first_aid_date': 'course_date',
+    'eyfs_course_name': 'eyfs_course_name',
+    'eyfs_course_date': 'eyfs_course_date',
+    'Provide a Health Declaration Booklet?': 'health_submission_consent',
+    'DBS certificate number': 'dbs_certificate_number',
+    'Do you have any criminal cautions or convictions?': 'cautions_convictions',
+    'Health check status': 'health_check_status',
+    'Name': 'full_name',
+    'Date of birth': 'date_of_birth',
+    'Relationship': 'relationship',
+    'Email': 'email',
+    'Does anyone aged 16 or over live or work in your home?': 'adults_in_home',
+    'Do you live with any children?': 'children_in_home',
+    'Full name': 'full_name',
+    'How they know you': 'relationship',
+    'Known for': 'time_known',
+    'Address': 'address',
+    'Phone number': 'phone_number',
+    'Email address': 'email_address',
+    'What type of childcare training have you completed?': 'childcare_training',
+    'Have you lived outside of the UK in the last 5 years?': 'lived_abroad',
+    'Have you lived or worked on a British military base in the last 5 years?': 'military_base',
+    'Do you have an Ofsted DBS Check?': 'capita',
+    'Are you on the DBS update service?': 'on_update'
+}
+
+
 @login_required
 @group_required(settings.ARC_GROUP)
 @user_assigned_application
@@ -101,48 +144,27 @@ def add_comments(json, app_id):
                 if 'pk' in row:
                     id = row['pk']
                 name = row['name']
-                field = name_converter(name)
+
+                # This check is added because the following phrases appear twice in rows (not unique).
+                if name == 'Title of training course':
+                    if "Childcare training" in title:
+                        field = name_field_dict.get('eyfs_course_name', '')
+                    elif "First aid" in title:
+                        field = name_field_dict.get('first_aid_training_course', '')
+
+                elif name == 'Date you completed course':
+                    if "Childcare training" in title:
+                        field = name_field_dict.get('eyfs_course_date', '')
+                    elif "First aid" in title:
+                        field = name_field_dict.get('first_aid_date', '')
+
+                else:
+                    field = name_field_dict.get(name, '')
+
                 row['comment'] = get_comment(id, field)
-                # row['comment'] = load_comment(lookup, id, name)
                 row['link'] = reverse(label) + '?id=' + app_id
             row = row
     return json
-
-
-def name_converter(name):
-    name_field_dict = \
-        {'Your email': 'email_address', 'Your mobile number': 'mobile_number', 'Other phone number': 'add_phone_number',
-         'Knowledge based question': 'security_question', 'Knowledge based answer': 'security_answer',
-         'What age groups will you be caring for?': 'childcare_age_groups',
-         'Are you providing overnight care?': 'overnight_care', 'Your name': 'name',
-         'Your date of birth': 'date_of_birth', 'Your home address': 'home_address',
-         'Childcare address': 'childcare_address',
-         "Is this another childminder's home?": 'working_in_other_childminder_home',
-         "Do you have children of your own under 16?": 'own_children',
-         'Training organisation': 'first_aid_training_organisation',
-         'Title of training course': 'eyfs_course_name', 'Date you completed course': 'eyfs_course_date',
-         'Provide a Health Declaration Booklet?': 'health_submission_consent',
-         'DBS certificate number': 'dbs_certificate_number',
-         'Do you have any criminal cautions or convictions?': 'cautions_convictions',
-         'Health check status': 'health_check_status', 'Name': 'full_name', 'Date of birth': 'date_of_birth',
-         'Relationship': 'relationship', 'Email': 'email',
-         'Does anyone aged 16 or over live or work in your home?': 'adults_in_home',
-         'Do you live with any children?': 'children_in_home', 'Full name': 'full_name',
-         'How they know you': 'relationship', 'Known for': 'time_known', 'Address': 'address',
-         'Phone number': 'phone_number', 'Email address': 'email_address',
-         'What type of childcare training have you completed?': 'childcare_training',
-         'Have you lived outside of the UK in the last 5 years?': 'lived_abroad',
-         "Have you lived or worked on a British military base in the last 5 years?": 'military_base',
-         "Do you have an Ofsted DBS Check?": 'capita',
-         "Are you on the DBS update service?": 'on_update'
-         }
-
-    try:
-        field = name_field_dict[name]
-    except KeyError:
-        field = ''
-
-    return field
 
 
 def get_comment(pk, field):
