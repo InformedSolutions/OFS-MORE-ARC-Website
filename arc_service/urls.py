@@ -24,6 +24,7 @@ from arc_application.views.arc_summary import cc_summary
 from arc_application.views.contact_centre.change_details import UpdateEmailView, UpdatePhoneNumberView, \
     UpdateAddPhoneNumberView
 from arc_application.contact_centre import search
+from arc_application.views.your_children import your_children_summary
 from django.conf import settings
 from django.conf.urls import include, url
 from django.contrib import admin
@@ -66,6 +67,7 @@ urlpatterns = [
         name='update_add_number'),
     url(r'^personal-details/previous-registration', PreviousRegistrationDetailsView.as_view(),
         name='previous_registration_details'),
+    url(r'^your-children/summary/', your_children_summary, name='your_children_summary'),
 ]
 
 if settings.URL_PREFIX:
