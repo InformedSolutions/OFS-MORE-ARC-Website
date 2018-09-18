@@ -48,10 +48,10 @@ def populate_initial_values(self):
         if field_string[-7:] == 'declare':
             try:
                 comment_object = ArcComments.objects.get(table_pk__in=self.table_keys, field_name=field_string[:-8])
-                self.fields[field_string].initial = comment_object.flagged
-
+                self.fields[field_string].initial = True
             except ArcComments.DoesNotExist:
                 pass
+
         elif field_string[-8:] == 'comments':
             try:
                 comment_object = ArcComments.objects.get(table_pk__in=self.table_keys, field_name=field_string[:-9])
