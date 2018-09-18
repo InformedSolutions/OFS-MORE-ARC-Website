@@ -2,6 +2,7 @@ from uuid import uuid4
 from django.db import models
 from .application import Application
 
+
 class ApplicantPersonalDetails(models.Model):
     """
     Model for APPLICANT_PERSONAL_DETAILS table
