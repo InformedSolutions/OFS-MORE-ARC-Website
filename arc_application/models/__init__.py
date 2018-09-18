@@ -10,7 +10,6 @@ from .arc import *
 from .arc_comments import *
 from .child_in_home import *
 from .childcare_type import *
-from .childcare_training import *
 from .criminal_record_check import *
 from .childcare_training import *
 from .firstaid_training import *
