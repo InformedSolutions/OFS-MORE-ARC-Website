@@ -41,31 +41,9 @@ def task_list(request):
         name_record = ApplicantName.objects.get(personal_detail_id=personal_details_record.personal_detail_id)
         childcare_type_record = ChildcareType.objects.get(application_id=application_id)
 
-        review_fields_to_check = (
-            'login_details_review',
-            'personal_details_review',
-            'childcare_type_review',
-            'your_children_review',
-            'first_aid_review',
-            'dbs_review',
-            'childcare_training_review',
-            'health_review',
-            'references_review',
-            'people_in_home_review'
-        )
+        review_fields_to_check = set_review_fields_to_check(application, childcare_type_record)
 
-        flagged_fields_to_check = (
-            "childcare_type_arc_flagged",
-            "criminal_record_check_arc_flagged",
-            "childcare_training_arc_flagged",
-            "first_aid_training_arc_flagged",
-            "health_arc_flagged",
-            "login_details_arc_flagged",
-            "people_in_home_arc_flagged",
-            "personal_details_arc_flagged",
-            "references_arc_flagged",
-            'your_children_arc_flagged'
-        )
+        flagged_fields_to_check = set_flagged_fields_to_check(application, childcare_type_record)
 
         review_count = sum([1 for field in review_fields_to_check if getattr(arc_application, field) == 'COMPLETED'])
         review_count += sum([1 for field in flagged_fields_to_check if getattr(application, field)])
@@ -104,6 +82,234 @@ def task_list(request):
         }
 
     return render(request, 'task-list.html', application_status_context)
+
+
+def set_flagged_fields_to_check(application, childcare_type_record):
+    """
+    Method to set the flagged fields to check
+    :param application: an Application object
+    :param childcare_type_record: a ChildcareType object
+    :return: integer
+    """
+    # Default flagged fields to check
+    flagged_fields_to_check = (
+        "childcare_type_arc_flagged",
+        "criminal_record_check_arc_flagged",
+        "childcare_training_arc_flagged",
+        "first_aid_training_arc_flagged",
+        "login_details_arc_flagged",
+        "personal_details_arc_flagged",
+        "references_arc_flagged"
+    )
+
+    if childcare_type_record.zero_to_five and not application.own_children and application.working_in_other_childminder_home:
+        flagged_fields_to_check = (
+            "childcare_type_arc_flagged",
+            "criminal_record_check_arc_flagged",
+            "childcare_training_arc_flagged",
+            "first_aid_training_arc_flagged",
+            "health_arc_flagged",
+            "login_details_arc_flagged",
+            "personal_details_arc_flagged",
+            "references_arc_flagged"
+        )
+    elif childcare_type_record.zero_to_five and application.own_children and application.working_in_other_childminder_home:
+        flagged_fields_to_check = (
+            "childcare_type_arc_flagged",
+            "criminal_record_check_arc_flagged",
+            "childcare_training_arc_flagged",
+            "first_aid_training_arc_flagged",
+            "health_arc_flagged",
+            "login_details_arc_flagged",
+            "personal_details_arc_flagged",
+            "references_arc_flagged",
+            'your_children_arc_flagged'
+        )
+    elif childcare_type_record.zero_to_five and application.own_children and not application.working_in_other_childminder_home:
+        flagged_fields_to_check = (
+            "childcare_type_arc_flagged",
+            "criminal_record_check_arc_flagged",
+            "childcare_training_arc_flagged",
+            "first_aid_training_arc_flagged",
+            "health_arc_flagged",
+            "login_details_arc_flagged",
+            "people_in_home_arc_flagged",
+            "personal_details_arc_flagged",
+            "references_arc_flagged",
+            'your_children_arc_flagged'
+        )
+    elif not childcare_type_record.zero_to_five and not application.own_children and application.working_in_other_childminder_home:
+        flagged_fields_to_check = (
+            "childcare_type_arc_flagged",
+            "criminal_record_check_arc_flagged",
+            "childcare_training_arc_flagged",
+            "first_aid_training_arc_flagged",
+            "login_details_arc_flagged",
+            "personal_details_arc_flagged",
+            "references_arc_flagged"
+        )
+    elif not childcare_type_record.zero_to_five and not application.own_children and not application.working_in_other_childminder_home:
+        flagged_fields_to_check = (
+            "childcare_type_arc_flagged",
+            "criminal_record_check_arc_flagged",
+            "childcare_training_arc_flagged",
+            "first_aid_training_arc_flagged",
+            "login_details_arc_flagged",
+            "people_in_home_arc_flagged",
+            "personal_details_arc_flagged",
+            "references_arc_flagged"
+        )
+    elif not childcare_type_record.zero_to_five and application.own_children and not application.working_in_other_childminder_home:
+        flagged_fields_to_check = (
+            "childcare_type_arc_flagged",
+            "criminal_record_check_arc_flagged",
+            "childcare_training_arc_flagged",
+            "first_aid_training_arc_flagged",
+            "login_details_arc_flagged",
+            "people_in_home_arc_flagged",
+            "personal_details_arc_flagged",
+            "references_arc_flagged",
+            'your_children_arc_flagged'
+        )
+    elif childcare_type_record.zero_to_five and not application.own_children and not application.working_in_other_childminder_home:
+        flagged_fields_to_check = (
+            "childcare_type_arc_flagged",
+            "criminal_record_check_arc_flagged",
+            "childcare_training_arc_flagged",
+            "first_aid_training_arc_flagged",
+            "health_arc_flagged",
+            "login_details_arc_flagged",
+            "people_in_home_arc_flagged",
+            "personal_details_arc_flagged",
+            "references_arc_flagged"
+        )
+    elif not childcare_type_record.zero_to_five and application.own_children and application.working_in_other_childminder_home:
+        flagged_fields_to_check = (
+            "childcare_type_arc_flagged",
+            "criminal_record_check_arc_flagged",
+            "childcare_training_arc_flagged",
+            "first_aid_training_arc_flagged",
+            "login_details_arc_flagged",
+            "personal_details_arc_flagged",
+            "references_arc_flagged",
+            'your_children_arc_flagged'
+        )
+
+    return flagged_fields_to_check
+
+
+def set_review_fields_to_check(application, childcare_type_record):
+    """
+    Method to set the review fields to check
+    :param application: an Application object
+    :param childcare_type_record: a ChildcareType object
+    :return: integer
+    """
+    # Default review fields to check
+    review_fields_to_check = (
+        'login_details_review',
+        'personal_details_review',
+        'childcare_type_review',
+        'first_aid_review',
+        'dbs_review',
+        'childcare_training_review',
+        'references_review'
+    )
+
+    if childcare_type_record.zero_to_five and not application.own_children and application.working_in_other_childminder_home:
+        review_fields_to_check = (
+            'login_details_review',
+            'personal_details_review',
+            'childcare_type_review',
+            'first_aid_review',
+            'dbs_review',
+            'childcare_training_review',
+            'health_review',
+            'references_review'
+        )
+    elif childcare_type_record.zero_to_five and application.own_children and application.working_in_other_childminder_home:
+        review_fields_to_check = (
+            'login_details_review',
+            'personal_details_review',
+            'childcare_type_review',
+            'first_aid_review',
+            'dbs_review',
+            'childcare_training_review',
+            'health_review',
+            'references_review',
+            'your_children_review'
+        )
+    elif childcare_type_record.zero_to_five and application.own_children and not application.working_in_other_childminder_home:
+        review_fields_to_check = (
+            'login_details_review',
+            'personal_details_review',
+            'childcare_type_review',
+            'first_aid_review',
+            'dbs_review',
+            'childcare_training_review',
+            'health_review',
+            'references_review',
+            'your_children_review',
+            'people_in_home_review'
+        )
+    elif not childcare_type_record.zero_to_five and not application.own_children and application.working_in_other_childminder_home:
+        review_fields_to_check = (
+            'login_details_review',
+            'personal_details_review',
+            'childcare_type_review',
+            'first_aid_review',
+            'dbs_review',
+            'childcare_training_review',
+            'references_review'
+        )
+    elif not childcare_type_record.zero_to_five and not application.own_children and not application.working_in_other_childminder_home:
+        review_fields_to_check = (
+            'login_details_review',
+            'personal_details_review',
+            'childcare_type_review',
+            'first_aid_review',
+            'dbs_review',
+            'childcare_training_review',
+            'references_review',
+            'people_in_home_review'
+        )
+    elif not childcare_type_record.zero_to_five and application.own_children and not application.working_in_other_childminder_home:
+        review_fields_to_check = (
+            'login_details_review',
+            'personal_details_review',
+            'childcare_type_review',
+            'first_aid_review',
+            'dbs_review',
+            'childcare_training_review',
+            'references_review',
+            'your_children_review',
+            'people_in_home_review'
+        )
+    elif childcare_type_record.zero_to_five and not application.own_children and not application.working_in_other_childminder_home:
+        review_fields_to_check = (
+            'login_details_review',
+            'personal_details_review',
+            'childcare_type_review',
+            'first_aid_review',
+            'dbs_review',
+            'childcare_training_review',
+            'health_review',
+            'references_review',
+            'people_in_home_review'
+        )
+    elif not childcare_type_record.zero_to_five and application.own_children and application.working_in_other_childminder_home:
+        review_fields_to_check = (
+            'login_details_review',
+            'personal_details_review',
+            'childcare_type_review',
+            'first_aid_review',
+            'dbs_review',
+            'childcare_training_review',
+            'references_review',
+            'your_children_review'
+        )
+
+    return review_fields_to_check
 
 
 def set_number_of_tasks(application, childcare_type_record):
