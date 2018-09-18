@@ -1054,6 +1054,28 @@ class AdultInYourHomeForm(GOVUKForm):
         return dbs_certificate_number_comments
 
 
+class ChildAddressForm(GOVUKForm):
+    address_declare = forms.BooleanField(label='This information is correct',
+                                         widget=custom_field_widgets.CustomCheckboxInput, required=False)
+    address_comments = forms.CharField(label='Address', help_text='(Tip: be clear and concise)',
+                                       widget=custom_field_widgets.Textarea,
+                                       required=False, max_length=250)
+
+    instance_id = forms.CharField(widget=forms.HiddenInput, required=False)
+
+    def __init__(self, *args, **kwargs):
+        super(ChildAddressForm, self).__init__(*args, **kwargs)
+        id_value = str(uuid.uuid4())
+        self.fields['instance_id'].initial = id_value
+
+        checkboxes = [((self.fields['address_declare']), 'address' + id_value)]
+
+        for box in checkboxes:
+            box[0].widget.attrs.update({'data_target': box[1],
+                                        'aria-controls': box[1],
+                                        'aria-expanded': 'false'}, )
+
+
 class ChildForm(GOVUKForm):
     """
     Comments form for the Your children review page
@@ -1115,22 +1137,6 @@ class ChildForm(GOVUKForm):
                 raise forms.ValidationError('You must give reasons')
 
         return date_of_birth_comments
-
-    def clean_relationship_comments(self):
-        """
-        Relationship comments validation
-        :return: string
-        """
-        relationship_declare = self.cleaned_data['relationship_declare']
-        relationship_comments = self.cleaned_data['relationship_comments']
-
-        # Only check if a comment has been entered if the field has been flagged
-        if relationship_declare is True:
-            if relationship_comments == '':
-                raise forms.ValidationError('You must give reasons')
-
-        return relationship_comments
-
 
 class ChildInYourHomeForm(GOVUKForm):
     """
