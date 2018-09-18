@@ -1,10 +1,9 @@
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.forms import formset_factory
-
-from ..decorators import group_required, user_assigned_application
 from ..forms.form import ChildForm
 from ..models import Application, Child
+from ..decorators import group_required, user_assigned_application
 
 
 @login_required
