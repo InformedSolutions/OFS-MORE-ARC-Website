@@ -62,18 +62,26 @@ class AdultInHome(models.Model):
     def get_id(cls, app_id):
         return cls.objects.get(application_id=app_id)
 
-    def get_name(self):
-        return self.first_name + " " + self.middle_names + " " + self.last_name
+    def get_full_name(self):
+        """
+        Helper method for retrieving a full name from its constituent parts
+        :return: the full name for a child
+        """
+        return ' '.join([self.first_name, (self.middle_names or ''), self.last_name])
 
-    def get_birthday(self):
-        return ' '.join([str(self.birth_day), calendar.month_name[self.birth_month], str(self.birth_year)])
+    def get_dob_as_date(self):
+        """
+        Helper method for retrieving a child's date of birth as a datetime object
+        :return: the child's date of birth as a datetime object
+        """
+        return datetime.date(self.birth_year, self.birth_month, self.birth_day)
 
     def get_summary_table(self):
         return [
-                {"title": self.get_name(), "id": self.pk},
+                {"title": self.get_full_name(), "id": self.pk},
                 {"name": "Health check status", "value": self.health_check_status},
-                {"name": "Name", "value": self.get_name()},
-                {"name": "Date of birth", "value": self.get_birthday()},
+                {"name": "Name", "value": self.get_full_name()},
+                {"name": "Date of birth", "value": self.get_dob_as_date()},
                 {"name": "Relationship", "value": self.relationship},
                 {"name": "Email", "value": self.email},
                 {"name": "DBS certificate number", "value": self.dbs_certificate_number}

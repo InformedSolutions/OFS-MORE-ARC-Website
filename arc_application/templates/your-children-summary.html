@@ -5,7 +5,13 @@
 {% block inner_content %}
 {% include 'back-button.html' %}
 
-{{form.error_summary}}
+{% for form in children_form_set %}
+    {{form.error_summary}}
+{% endfor %}
+
+{% for form in children_address_form_set %}
+    {{form.error_summary}}
+{% endfor %}
 
 <form method="post" novalidate>
     <h1 class="form-title heading-large">Review: your children</h1>
@@ -13,9 +19,11 @@
         Please check the boxes if there are errors.
     </p>
     {% csrf_token %}
+    {{ formset_of_children.management_form }}
+    {{ formset_of_children_address.management_form }}
 
     <h2 class="heading-medium">Details of your children</h2>
-    {% for child, formset_of_children in children_object_and_form_lists %}
+    {% for child, test in children_object_and_form_lists %}
         <table class="check-your-answers form-group">
             <thead>
             <tr>
@@ -35,7 +43,7 @@
                     {{child.get_full_name}}
                 </td>
                 <td class="change-answer">
-                    {{ formset_of_children.full_name_declare }}
+                    {{ test.full_name_declare }}
                 </td>
             </tr>
             <tr class="js-hidden" id="full_name{{formset_of_children.instance_id.initial}}">
@@ -44,12 +52,12 @@
                         Enter your reasoning
                     </div>
                     <div>
-                        {{ formset_of_children.full_name_comments.help_text}}
+                        {{ test.full_name_comments.help_text}}
                     </div>
                 </td>
                 <td colspan="2">
                     <div>
-                        {{ formset_of_children.full_name_comments}}
+                        {{ test.full_name_comments}}
                     </div>
                 </td>
             </tr>
@@ -61,7 +69,7 @@
                     {{ child.get_dob_as_date|date:"d F Y" }}
                 </td>
                 <td class="change-answer">
-                    {{ formset_of_children.date_of_birth_declare }}
+                    {{ test.date_of_birth_declare }}
                 </td>
             </tr>
             <tr class="js-hidden" id="date_of_birth{{formset_of_children.instance_id.initial}}">
@@ -70,12 +78,12 @@
                         Enter your reasoning
                     </div>
                     <div>
-                        {{ formset_of_children.date_of_birth_comments.help_text}}
+                        {{ test.date_of_birth_comments.help_text}}
                     </div>
                 </td>
                 <td colspan="2">
                     <div>
-                        {{ formset_of_children.date_of_birth_comments}}
+                        {{ test.date_of_birth_comments}}
                     </div>
                 </td>
             </tr>
@@ -116,7 +124,7 @@
             </td>
         </tr>
 
-    {% for child, child_address, formset_of_child_address in child_addresses_and_form_list %}
+    {% for child, child_address, test2 in child_addresses_and_form_list %}
         <table class="check-your-answers form-group">
             <thead>
             <tr>
@@ -138,7 +146,7 @@
                     {{child_address.postcode}}{% if address.postcode %}<br />{% endif %}
                 </td>
                 <td class="change-answer">
-                    {{ formset_of_child_address.address_declare }}
+                    {{ test2.address_declare }}
                 </td>
             </tr>
             <tr class="js-hidden" id="address{{formset_of_child_address.instance_id.initial}}">
@@ -147,12 +155,12 @@
                         Enter your reasoning
                     </div>
                     <div>
-                        {{ formset_of_child_address.address_comments.help_text}}
+                        {{ test2.address_comments.help_text}}
                     </div>
                 </td>
                 <td colspan="2">
                     <div>
-                        {{ formset_of_child_address.address_comments}}
+                        {{ test2.address_comments}}
                     </div>
                 </td>
             </tr>

@@ -5,7 +5,7 @@ from .childbase import ChildBase
 
 class Child(ChildBase):
     """
-    Model for CHILD_OUTSIDE_HOME table
+    Model for CHILD table
     """
     lives_with_childminder = models.NullBooleanField(blank=True)
 
