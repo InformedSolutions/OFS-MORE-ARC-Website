@@ -366,7 +366,7 @@ def review(request):
             first_name = applicant_name.first_name
 
     if all_complete(application_id_local, True):
-        accepted_email(email, first_name, app_ref)
+        accepted_email(email, first_name, app_ref, application_id_local)
 
         # If successful
         release_application(request, application_id_local, 'ACCEPTED')
@@ -454,17 +454,29 @@ def all_complete(id, flag):
 
 
 # Add personalisation and create template
-def accepted_email(email, first_name, ref):
+def accepted_email(email, first_name, ref, application_id):
     """
     Method to send an email using the Notify Gateway API
     :param email: string containing the e-mail address to send the e-mail to
     :param first_name: string first name
     :param ref: string ref
+    :param application_id: application ID
     :return: HTTP response
     """
     if hasattr(settings, 'NOTIFY_URL'):
         email = str(email)
-        template_id = 'b973c5a2-cadd-46a5-baf7-beae65ab11dc'
+
+        childcare_type_record = ChildcareType.objects.get(application_id=application_id)
+
+        # Send correct ARC accept next steps depending on whether the applicant applies for the Childcare Register only
+        if childcare_type_record.zero_to_five is True:
+
+            template_id = 'b973c5a2-cadd-46a5-baf7-beae65ab11dc'
+
+        else:
+
+            template_id = 'b3ae07da-3d14-4794-b989-9a15f961e4ee'
+
         personalisation = {'first_name': first_name, 'ref': ref}
         return send_email(email, personalisation, template_id)
 
