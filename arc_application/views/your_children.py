@@ -116,6 +116,7 @@ def __your_children_summary_post__handler(request):
                     section_status = 'FLAGGED'
                     application = Application.objects.get(pk=application_id)
                     application.your_children_arc_flagged = True
+                    application.your_children_status = section_status
                     application.save()
 
                 successful = save_comments(request, record_comments)
