@@ -5,7 +5,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 
-from ..forms.form import ChildForm, ChildAddressForm
+from ..forms.form import ChildForm, ChildAddressForm, YourChildrenForm
 from ..models import Child, ChildAddress, Application, Arc
 from ..decorators import group_required, user_assigned_application
 from .review import children_initial_population, children_address_initial_population
@@ -53,10 +53,13 @@ def __your_children_summary_get__handler(request):
                                                             prefix='child-address')
     child_addresses_and_form_list = zip(children, child_addresses, formset_of_children_address)
 
+    form = YourChildrenForm()
+
     # Render page
 
     variables = {
         'application_id': application_id,
+        'form': form,
         'children': children,
         'children_living_with_childminder': children_living_with_childminder,
         'children_form_set': children_form_set,
@@ -78,17 +81,18 @@ def __your_children_summary_post__handler(request):
     children_address_form_set = formset_factory(ChildAddressForm)
 
     # Retrieve form sets from POST body
+    posted_form = YourChildrenForm(request.POST)
     posted_children_forms = children_form_set(request.POST, prefix='child')
     posted_children_address_forms = children_address_form_set(request.POST, prefix='child-address')
 
     # Validated all submitted forms
-    if all([posted_children_forms.is_valid(), posted_children_address_forms.is_valid()]):
+    if all([posted_children_forms.is_valid(), posted_children_address_forms.is_valid(), posted_form.is_valid()]):
         # These are the table names for all of the objects on the page that are being iterated. Used in the request
         # to comment function and for saving
-        table_names = ['CHILD', 'CHILD_ADDRESS']
+        table_names = ['CHILD', 'CHILD_ADDRESS', 'APPLICATION']
 
         # Unique id fields of each distinct object type. Must match order of table_names_array
-        attr_list = ['child_id', 'child_address_id']
+        attr_list = ['child_id', 'child_address_id', 'application_id']
 
         clean_child_data = posted_children_forms.cleaned_data
         clean_address_data = posted_children_address_forms.cleaned_data

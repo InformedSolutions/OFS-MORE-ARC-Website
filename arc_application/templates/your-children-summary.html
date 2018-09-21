@@ -123,6 +123,21 @@
                 {{ form.children_living_with_you_declare }}
             </td>
         </tr>
+        <tr class="js-hidden" id="children_living_with_you{{form.instance_id.initial}}">
+                <td colspan="1">
+                    <div>
+                        Enter your reasoning
+                    </div>
+                    <div>
+                        {{ form.children_living_with_you_comments.help_text }}
+                    </div>
+                </td>
+                <td colspan="2">
+                    <div>
+                        {{ form.children_living_with_you_comments }}
+                    </div>
+                </td>
+            </tr>
 
     {% for child, child_address, child_address_form in child_addresses_and_form_list %}
         <table class="check-your-answers form-group">

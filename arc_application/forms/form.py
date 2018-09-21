@@ -1054,6 +1054,26 @@ class AdultInYourHomeForm(GOVUKForm):
         return dbs_certificate_number_comments
 
 
+class YourChildrenForm(GOVUKForm):
+    children_living_with_you_declare = forms.BooleanField(label='This information is correct',
+                                         widget=custom_field_widgets.CustomCheckboxInput, required=False)
+    children_living_with_you_comments = forms.CharField(label='Which of your children live with you?', help_text='(Tip: be clear and concise)',
+                                       widget=custom_field_widgets.Textarea,
+                                       required=False, max_length=250)
+    instance_id = forms.CharField(widget=forms.HiddenInput, required=False)
+
+    def __init__(self, *args, **kwargs):
+        super(YourChildrenForm, self).__init__(*args, **kwargs)
+        id_value = str(uuid.uuid4())
+        self.fields['instance_id'].initial = id_value
+
+        checkboxes = [((self.fields['children_living_with_you_declare']), 'children_living_with_you' + id_value)]
+
+        for box in checkboxes:
+            box[0].widget.attrs.update({'data_target': box[1],
+                                        'aria-controls': box[1],
+                                        'aria-expanded': 'false'}, )
+
 class ChildAddressForm(GOVUKForm):
     address_declare = forms.BooleanField(label='This information is correct',
                                          widget=custom_field_widgets.CustomCheckboxInput, required=False)
