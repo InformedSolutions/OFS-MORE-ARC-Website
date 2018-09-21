@@ -1061,8 +1061,9 @@ class YourChildrenForm(GOVUKForm):
                                        widget=custom_field_widgets.Textarea,
                                        required=False, max_length=250)
     instance_id = forms.CharField(widget=forms.HiddenInput, required=False)
-
+    
     def __init__(self, *args, **kwargs):
+        self.table_keys = kwargs.pop('table_keys')
         super(YourChildrenForm, self).__init__(*args, **kwargs)
         id_value = str(uuid.uuid4())
         self.fields['instance_id'].initial = id_value
@@ -1073,6 +1074,8 @@ class YourChildrenForm(GOVUKForm):
             box[0].widget.attrs.update({'data_target': box[1],
                                         'aria-controls': box[1],
                                         'aria-expanded': 'false'}, )
+
+        populate_initial_values(self)
 
 class ChildAddressForm(GOVUKForm):
     address_declare = forms.BooleanField(label='This information is correct',

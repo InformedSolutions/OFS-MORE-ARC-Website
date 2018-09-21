@@ -10,7 +10,9 @@ from ..models import Child, ChildAddress, Application, Arc, ArcComments
 from ..decorators import group_required, user_assigned_application
 from .review import children_initial_population, children_address_initial_population
 
-from ..review_util import request_to_comment, save_comments, redirect_selection, build_url
+from ..review_util import request_to_comment, save_comments, redirect_selection, build_url, \
+    save_non_db_field_arc_comment, delete_non_db_field_arc_comment
+
 
 @login_required
 @group_required(settings.ARC_GROUP)
@@ -53,7 +55,7 @@ def __your_children_summary_get__handler(request):
                                                             prefix='child-address')
     child_addresses_and_form_list = zip(children, child_addresses, formset_of_children_address)
 
-    form = YourChildrenForm()
+    form = YourChildrenForm(table_keys=[application_id])
 
     # Render page
 
@@ -81,7 +83,7 @@ def __your_children_summary_post__handler(request):
     children_address_form_set = formset_factory(ChildAddressForm)
 
     # Retrieve form sets from POST body
-    posted_form = YourChildrenForm(request.POST)
+    posted_form = YourChildrenForm(request.POST, table_keys=[application_id])
     posted_children_forms = children_form_set(request.POST, prefix='child')
     posted_children_address_forms = children_address_form_set(request.POST, prefix='child-address')
 
@@ -129,26 +131,11 @@ def __your_children_summary_post__handler(request):
                     return render(request, '500.html')
 
         # Run custom code for saving dynamically calculated field
-        table_name = 'APPLICATION'
-        field_name = 'children_living_with_childminder_selection'
-        prior_dynamic_comment_exists = \
-            ArcComments.objects.filter(table_name=table_name, field_name=field_name, table_pk=application_id).exists()
-
         if clean_form_data['children_living_with_you_declare']:
-
-            if prior_dynamic_comment_exists:
-                arc_comment = ArcComments.objects.get(table_name=table_name, field_name=field_name, table_pk=application_id)
-            else:
-                arc_comment = ArcComments()
-
-            arc_comment.comment = clean_form_data['children_living_with_you_comments']
-            arc_comment.field_name = field_name
-            arc_comment.flagged = True
-            arc_comment.table_name = table_name
-            arc_comment.table_pk = application_id
-            arc_comment.save()
+            save_non_db_field_arc_comment(application_id, 'children_living_with_childminder_selection',
+                                          clean_form_data['children_living_with_you_comments'])
         else:
-            ArcComments.objects.filter(table_name=table_name, field_name=field_name, table_pk=application_id).delete()
+            delete_non_db_field_arc_comment(application_id, 'children_living_with_childminder_selection')
 
 
         # Set overall status of task
