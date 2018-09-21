@@ -89,10 +89,10 @@ def __your_children_summary_post__handler(request):
     if all([posted_children_forms.is_valid(), posted_children_address_forms.is_valid(), posted_form.is_valid()]):
         # These are the table names for all of the objects on the page that are being iterated. Used in the request
         # to comment function and for saving
-        table_names = ['CHILD', 'CHILD_ADDRESS', 'APPLICATION']
+        table_names = ['CHILD', 'CHILD_ADDRESS']
 
         # Unique id fields of each distinct object type. Must match order of table_names_array
-        attr_list = ['child_id', 'child_address_id', 'application_id']
+        attr_list = ['child_id', 'child_address_id']
 
         clean_child_data = posted_children_forms.cleaned_data
         clean_address_data = posted_children_address_forms.cleaned_data
