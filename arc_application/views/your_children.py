@@ -6,7 +6,7 @@ from django.shortcuts import render
 from django.urls import reverse
 
 from ..forms.form import ChildForm, ChildAddressForm, YourChildrenForm
-from ..models import Child, ChildAddress, Application, Arc
+from ..models import Child, ChildAddress, Application, Arc, ArcComments
 from ..decorators import group_required, user_assigned_application
 from .review import children_initial_population, children_address_initial_population
 
@@ -94,6 +94,7 @@ def __your_children_summary_post__handler(request):
         # Unique id fields of each distinct object type. Must match order of table_names_array
         attr_list = ['child_id', 'child_address_id']
 
+        clean_form_data = posted_form.cleaned_data
         clean_child_data = posted_children_forms.cleaned_data
         clean_address_data = posted_children_address_forms.cleaned_data
 
@@ -126,6 +127,29 @@ def __your_children_summary_post__handler(request):
                 successful = save_comments(request, record_comments)
                 if not successful:
                     return render(request, '500.html')
+
+        # Run custom code for saving dynamically calculated field
+        table_name = 'APPLICATION'
+        field_name = 'children_living_with_childminder_selection'
+        prior_dynamic_comment_exists = \
+            ArcComments.objects.filter(table_name=table_name, field_name=field_name, table_pk=application_id).exists()
+
+        if clean_form_data['children_living_with_you_declare']:
+
+            if prior_dynamic_comment_exists:
+                arc_comment = ArcComments.objects.get(table_name=table_name, field_name=field_name, table_pk=application_id)
+            else:
+                arc_comment = ArcComments()
+
+            arc_comment.comment = clean_form_data['children_living_with_you_comments']
+            arc_comment.field_name = field_name
+            arc_comment.flagged = True
+            arc_comment.table_name = table_name
+            arc_comment.table_pk = application_id
+            arc_comment.save()
+        else:
+            ArcComments.objects.filter(table_name=table_name, field_name=field_name, table_pk=application_id).delete()
+
 
         # Set overall status of task
         status = Arc.objects.get(pk=application_id)
