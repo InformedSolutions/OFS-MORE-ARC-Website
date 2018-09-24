@@ -1077,6 +1077,7 @@ class YourChildrenForm(GOVUKForm):
 
         populate_initial_values(self)
 
+
 class ChildAddressForm(GOVUKForm):
     address_declare = forms.BooleanField(label='This information is correct',
                                          widget=custom_field_widgets.CustomCheckboxInput, required=False)

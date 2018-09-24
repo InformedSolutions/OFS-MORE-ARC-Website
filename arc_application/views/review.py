@@ -549,6 +549,7 @@ def children_address_initial_population(address_list):
 
     return initial_data
 
+
 def children_initial_population(person_list):
     initial_data = []
 
