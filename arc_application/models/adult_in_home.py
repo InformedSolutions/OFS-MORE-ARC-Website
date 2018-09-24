@@ -1,6 +1,5 @@
-from datetime import datetime
+import datetime
 from uuid import uuid4
-import calendar
 from django.db import models
 from .application import Application
 
@@ -71,8 +70,8 @@ class AdultInHome(models.Model):
 
     def get_dob_as_date(self):
         """
-        Helper method for retrieving a child's date of birth as a datetime object
-        :return: the child's date of birth as a datetime object
+        Helper method for retrieving an adult's date of birth as a datetime object
+        :return: the adult's date of birth as a datetime object
         """
         return datetime.date(self.birth_year, self.birth_month, self.birth_day)
 
