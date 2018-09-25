@@ -18,42 +18,44 @@ from ..decorators import group_required, user_assigned_application
 @user_assigned_application
 def personal_details_previous_address(request):
     """
-    Dispatcher function to handle the different pages to be rendered
-    :param request: Standard Httprequest object
-    :return:
+    Dispatcher function to handle the different pages to be rendered.
+    :param request: HttpRequest object.
+    :return: function call for the appropriate state.
     """
+    state = getattr(request, request.method).get('state')
 
-    context = get_context(request)
+    if state == 'entry':
+        return postcode_entry(request)
 
-    if context['state'] == 'entry':
-        return postcode_entry(request, context)
+    if state == 'selection':
+        return postcode_selection(request)
 
-    if context['state'] == 'selection':
-        return postcode_selection(request, context)
+    if state == 'manual':
+        return postcode_manual(request)
 
-    if context['state'] == 'manual':
-        return postcode_manual(request, context)
+    if state == 'submission':
+        return postcode_submission(request)
 
-    if context['state'] == 'submission':
-        return postcode_submission(request, context)
-
-    if context['state'] == 'update':
-        return address_update(request, context)
+    if state == 'update':
+        return address_update(request)
 
 
-def postcode_entry(request, context):
+def postcode_entry(request):
     """
     Function to refer the user to the postcode entry page, or redirect them appropriately should it be a POST request
     :param request: Standard Httprequest object
     :param context: See get_context declaration for definition
     :return:
     """
-    current_form = OtherPersonPreviousPostcodeEntry()
-    context['form'] = current_form
+    context = dict()
 
     if request.method == 'GET':
+        context['form'] = OtherPersonPreviousPostcodeEntry()
+
         # Grabs any relative urls needed for the page (enter address manually, for example)
-        context = get_link_urls(context)
+        url_variables_data = get_response_url_data(request)
+        link_urls = get_link_urls(url_variables_data)
+        context.update(link_urls)
 
         return render(request, 'previous-address-select.html', context)
 
@@ -74,7 +76,7 @@ def postcode_entry(request, context):
         return render(request, 'previous-address-select.html', context)
 
 
-def postcode_selection(request, context):
+def postcode_selection(request, context=None):
     """
     Function to allow the user to select the postcode from the list, or redirect appropriately
     :param request: Standard Httprequest object
@@ -115,7 +117,7 @@ def postcode_selection(request, context):
     return render(request, 'previous-address-lookup.html', context)
 
 
-def postcode_manual(request, context):
+def postcode_manual(request, context=None):
     """
     Function to allow the user to manually enter an address, or be redirected appropriately
     :param request: Standard Httprequest object
@@ -161,7 +163,7 @@ def postcode_manual(request, context):
         return render(request, 'other-people-previous-address-manual.html', context)
 
 
-def postcode_submission(request, context):
+def postcode_submission(request, context=None):
     """
     Function to allow submission of data from the other views into the previous address table
     :param request: Standard Httprequest object
@@ -212,7 +214,7 @@ def postcode_submission(request, context):
             return HttpResponseRedirect(build_url('personal_details_previous_addresses', get=context))
 
 
-def address_update(request, context):
+def address_update(request, context=None):
     """
     Function to allow the user to update an entry to the address table from the other people summary page
     :param request: Standard Httprequest object
@@ -328,31 +330,23 @@ def get_response_body_data(request):
     return json.dumps(body_data_vars)
 
 
-def get_link_urls(context):
+def get_link_urls(url_variables_dict):
     """
     The previous address templates require urls for links contained within the page.
     This helper function generates them using the current context/url variables, before returning that same context dict
     :param: context: dict containing info to be passed to the render function.
     :return: context: same dict as was passed as arg, with additional url information included.
     """
-    state = context['state']
-
-    # Pop form off such that it is not included in a HUGE url later.
-    form = context.pop('form', None)
-
-    # These two urls need certain 'states' to be built, therefore state is saved then changed, and finally reset
-    context['state'] = 'manual'
-    context['manual_url'] = build_url('personal_details_previous_addresses', get=context)
-    context['state'] = 'entry'
-    context['entry_url'] = build_url('personal_details_previous_addresses', get=context)
-
-    # Reset occurs here
-    context['state'] = state
+    context = dict()
 
     # List url does not require a new state, so set after state changes, once it has been reset
-    context['list_url'] = build_url('personal_details_summary', get={'id': context['id']})
+    context['list_url'] = build_url('personal_details_summary', get={'id': url_variables_dict['id']})
 
-    # Re-insert form into context.
-    context['form'] = form if form is not None
+    # These two urls need certain 'states' to be built, therefore state is saved then changed, and finally reset
+    url_variables_dict['state'] = 'manual'
+    context['manual_url'] = build_url('personal_details_previous_addresses', get=url_variables_dict)
+
+    url_variables_dict['state'] = 'entry'
+    context['entry_url'] = build_url('personal_details_previous_addresses', get=url_variables_dict)
 
     return context
