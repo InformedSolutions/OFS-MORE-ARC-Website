@@ -66,7 +66,7 @@ name_field_dict = {
 def arc_summary(request):
     ordered_models = [UserDetails, ChildcareType, [ApplicantPersonalDetails, ApplicantName, ApplicantHomeAddress],
                       FirstAidTraining, ChildcareTraining, CriminalRecordCheck, Application,
-                      AdultInHome, ChildInHome]
+                      AdultInHome]
     if request.method == 'GET':
         application_id_local = request.GET["id"]
         zero_to_five = ChildcareType.objects.get(application_id=application_id_local).zero_to_five
