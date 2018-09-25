@@ -10,6 +10,7 @@ from django.utils.decorators import method_decorator
 from django.views import View
 
 from arc_application.models import AdultInHome
+
 from ..forms.form import PreviousRegistrationDetailsForm, OtherPersonPreviousRegistrationDetailsForm, ChildForm, \
     ChildAddressForm
 from ..forms.form import AdultInYourHomeForm, ChildInYourHomeForm, CommentsForm
