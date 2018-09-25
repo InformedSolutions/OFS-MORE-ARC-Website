@@ -130,6 +130,10 @@ def personal_details_summary(request):
                 status.personal_details_review = section_status
                 status.save()
                 default = '/first-aid/summary'
+
+                if application.own_children:
+                    default = '/your-children/summary'
+
                 redirect_link = redirect_selection(request, default)
 
                 return HttpResponseRedirect(settings.URL_PREFIX + redirect_link + '?id=' + application_id_local)

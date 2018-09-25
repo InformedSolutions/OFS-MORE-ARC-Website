@@ -7,15 +7,25 @@
 
 {{form.error_summary}}
 
+{% for form in children_form_set %}
+    {{form.error_summary}}
+{% endfor %}
+
+{% for form in children_address_form_set %}
+    {{form.error_summary}}
+{% endfor %}
+
 <form method="post" novalidate>
     <h1 class="form-title heading-large">Review: your children</h1>
     <p>
         Please check the boxes if there are errors.
     </p>
     {% csrf_token %}
+    {{ formset_of_children.management_form }}
+    {{ formset_of_children_address.management_form }}
 
     <h2 class="heading-medium">Details of your children</h2>
-    {% for child, formset_of_children in children_object_and_form_lists %}
+    {% for child, child_form in children_object_and_form_lists %}
         <table class="check-your-answers form-group">
             <thead>
             <tr>
@@ -35,21 +45,21 @@
                     {{child.get_full_name}}
                 </td>
                 <td class="change-answer">
-                    {{ formset_of_children.full_name_declare }}
+                    {{ child_form.full_name_declare }}
                 </td>
             </tr>
-            <tr class="js-hidden" id="full_name{{formset_of_children.instance_id.initial}}">
+            <tr class="js-hidden" id="full_name{{child_form.instance_id.initial}}">
                 <td colspan="1">
                     <div>
                         Enter your reasoning
                     </div>
                     <div>
-                        {{ formset_of_children.full_name_comments.help_text}}
+                        {{ child_form.full_name_comments.help_text}}
                     </div>
                 </td>
                 <td colspan="2">
                     <div>
-                        {{ formset_of_children.full_name_comments}}
+                        {{ child_form.full_name_comments}}
                     </div>
                 </td>
             </tr>
@@ -61,21 +71,21 @@
                     {{ child.get_dob_as_date|date:"d F Y" }}
                 </td>
                 <td class="change-answer">
-                    {{ formset_of_children.date_of_birth_declare }}
+                    {{ child_form.date_of_birth_declare }}
                 </td>
             </tr>
-            <tr class="js-hidden" id="date_of_birth{{formset_of_children.instance_id.initial}}">
+            <tr class="js-hidden" id="date_of_birth{{child_form.instance_id.initial}}">
                 <td colspan="1">
                     <div>
                         Enter your reasoning
                     </div>
                     <div>
-                        {{ formset_of_children.date_of_birth_comments.help_text}}
+                        {{ child_form.date_of_birth_comments.help_text}}
                     </div>
                 </td>
                 <td colspan="2">
                     <div>
-                        {{ formset_of_children.date_of_birth_comments}}
+                        {{ child_form.date_of_birth_comments}}
                     </div>
                 </td>
             </tr>
@@ -115,8 +125,23 @@
                 {{ form.children_living_with_you_declare }}
             </td>
         </tr>
+        <tr class="js-hidden" id="children_living_with_you{{form.instance_id.initial}}">
+                <td colspan="1">
+                    <div>
+                        Enter your reasoning
+                    </div>
+                    <div>
+                        {{ form.children_living_with_you_comments.help_text }}
+                    </div>
+                </td>
+                <td colspan="2">
+                    <div>
+                        {{ form.children_living_with_you_comments }}
+                    </div>
+                </td>
+            </tr>
 
-    {% for child, child_address, formset_of_child_address in child_addresses_and_form_list %}
+    {% for child, child_address, child_address_form in child_addresses_and_form_list %}
         <table class="check-your-answers form-group">
             <thead>
             <tr>
@@ -138,21 +163,21 @@
                     {{child_address.postcode}}{% if address.postcode %}<br />{% endif %}
                 </td>
                 <td class="change-answer">
-                    {{ formset_of_child_address.address_declare }}
+                    {{ child_address_form.address_declare }}
                 </td>
             </tr>
-            <tr class="js-hidden" id="address{{formset_of_child_address.instance_id.initial}}">
+            <tr class="js-hidden" id="address{{child_address_form.instance_id.initial}}">
                 <td colspan="1">
                     <div>
                         Enter your reasoning
                     </div>
                     <div>
-                        {{ formset_of_child_address.address_comments.help_text}}
+                        {{ child_address_form.address_comments.help_text}}
                     </div>
                 </td>
                 <td colspan="2">
                     <div>
-                        {{ formset_of_child_address.address_comments}}
+                        {{ child_address_form.address_comments}}
                     </div>
                 </td>
             </tr>

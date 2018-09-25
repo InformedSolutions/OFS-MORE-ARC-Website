@@ -13,12 +13,12 @@ from django.forms import ModelForm
 from govuk_forms.forms import GOVUKForm
 from govuk_forms.widgets import InlineRadioSelect, NumberInput
 
-from ..models import OtherPersonPreviousRegistrationDetails
+from ..models import OtherPersonPreviousRegistrationDetails, ArcComments
 from ..widgets.ConditionalPostChoiceWidget import ConditionalPostInlineRadioSelect
 from .. import custom_field_widgets
 from ..models import Arc as ArcReview, PreviousAddress, PreviousName
 from ..models import Arc as ArcReview, PreviousRegistrationDetails
-from ..review_util import populate_initial_values
+from ..review_util import populate_initial_values, get_non_db_field_arc_comment
 
 
 class CheckBox(GOVUKForm):
@@ -1054,7 +1054,62 @@ class AdultInYourHomeForm(GOVUKForm):
         return dbs_certificate_number_comments
 
 
+class YourChildrenForm(GOVUKForm):
+    """
+    Form for handling user responses where they have been asked which of their children reside with them
+    """
+
+    children_living_with_you_declare = forms.BooleanField(label='This information is correct',
+                                         widget=custom_field_widgets.CustomCheckboxInput, required=False)
+    children_living_with_you_comments = forms.CharField(label='Which of your children live with you?', help_text='(Tip: be clear and concise)',
+                                       widget=custom_field_widgets.Textarea,
+                                       required=False, max_length=250)
+    instance_id = forms.CharField(widget=forms.HiddenInput, required=False)
+    
+    def __init__(self, *args, **kwargs):
+        self.application_id = kwargs.pop('application_id')
+        self.table_keys = kwargs.pop('table_keys')
+        super(YourChildrenForm, self).__init__(*args, **kwargs)
+        id_value = str(uuid.uuid4())
+        self.fields['instance_id'].initial = id_value
+
+        checkboxes = [((self.fields['children_living_with_you_declare']), 'children_living_with_you' + id_value)]
+
+        for box in checkboxes:
+            box[0].widget.attrs.update({'data_target': box[1],
+                                        'aria-controls': box[1],
+                                        'aria-expanded': 'false'}, )
+
+        arc_comment = get_non_db_field_arc_comment(self.application_id, 'children_living_with_childminder_selection')
+
+        if arc_comment is not None and arc_comment.flagged:
+            self.fields['children_living_with_you_declare'].initial = True
+            try:
+                self.fields['children_living_with_you_comments'].initial = arc_comment.comment
+            except:
+                pass
+
+    def clean_children_living_with_you_comments(self):
+        """
+        Full name comments validation
+        :return: string
+        """
+        children_living_with_you_declare = self.cleaned_data['children_living_with_you_declare']
+        children_living_with_you_comments = self.cleaned_data['children_living_with_you_comments']
+
+        # Only check if a comment has been entered if the field has been flagged
+        if children_living_with_you_declare is True:
+            if children_living_with_you_comments == '':
+                raise forms.ValidationError('You must give reasons')
+
+        return children_living_with_you_comments
+
+
 class ChildAddressForm(GOVUKForm):
+    """
+    Form for handling user responses where their children address have been detailed
+    """
+
     address_declare = forms.BooleanField(label='This information is correct',
                                          widget=custom_field_widgets.CustomCheckboxInput, required=False)
     address_comments = forms.CharField(label='Address', help_text='(Tip: be clear and concise)',
@@ -1137,6 +1192,7 @@ class ChildForm(GOVUKForm):
                 raise forms.ValidationError('You must give reasons')
 
         return date_of_birth_comments
+
 
 class ChildInYourHomeForm(GOVUKForm):
     """

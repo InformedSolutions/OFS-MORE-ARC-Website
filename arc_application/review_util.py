@@ -172,3 +172,37 @@ def reset_declaration(application):
         application.declarations_status = 'NOT_STARTED'
         application.declaration_confirmation = None
         application.save()
+
+
+def get_non_db_field_arc_comment(application_id, field_name):
+    table_name = 'DYNAMIC_VALUE'
+    prior_dynamic_comment_exists = \
+        ArcComments.objects.filter(table_name=table_name, field_name=field_name, table_pk=application_id).exists()
+
+    if prior_dynamic_comment_exists:
+        return ArcComments.objects.get(table_name=table_name, field_name=field_name, table_pk=application_id)
+    else:
+        return None
+
+
+def save_non_db_field_arc_comment(application_id, field_name, comment):
+    table_name = 'DYNAMIC_VALUE'
+    prior_dynamic_comment_exists = \
+        ArcComments.objects.filter(table_name=table_name, field_name=field_name, table_pk=application_id).exists()
+
+    if prior_dynamic_comment_exists:
+        arc_comment = ArcComments.objects.get(table_name=table_name, field_name=field_name, table_pk=application_id)
+    else:
+        arc_comment = ArcComments()
+
+    arc_comment.comment = comment
+    arc_comment.field_name = field_name
+    arc_comment.flagged = True
+    arc_comment.table_name = table_name
+    arc_comment.table_pk = application_id
+    arc_comment.save()
+
+
+def delete_non_db_field_arc_comment(application_id, field_name):
+    table_name = 'DYNAMIC_VALUE'
+    ArcComments.objects.filter(table_name=table_name, field_name=field_name, table_pk=application_id).delete()

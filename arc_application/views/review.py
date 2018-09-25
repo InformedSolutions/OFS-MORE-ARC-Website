@@ -10,7 +10,9 @@ from django.utils.decorators import method_decorator
 from django.views import View
 
 from arc_application.models import AdultInHome
-from ..forms.form import PreviousRegistrationDetailsForm, OtherPersonPreviousRegistrationDetailsForm, ChildForm
+
+from ..forms.form import PreviousRegistrationDetailsForm, OtherPersonPreviousRegistrationDetailsForm, ChildForm, \
+    ChildAddressForm
 from ..forms.form import AdultInYourHomeForm, ChildInYourHomeForm, CommentsForm
 from ..magic_link import generate_magic_link
 from ..models import PreviousRegistrationDetails, OtherPersonPreviousRegistrationDetails
@@ -538,7 +540,7 @@ def children_address_initial_population(address_list):
     for address in address_list:
         temp_dict = {}
         table_id = address.child_address_id
-        form_instance = ChildForm()
+        form_instance = ChildAddressForm()
 
         for field in form_instance.fields:
             try:
@@ -559,6 +561,7 @@ def children_address_initial_population(address_list):
         initial_data.append(temp_dict)
 
     return initial_data
+
 
 def children_initial_population(person_list):
     initial_data = []
