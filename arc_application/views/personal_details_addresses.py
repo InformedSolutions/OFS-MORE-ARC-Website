@@ -24,7 +24,6 @@ def personal_details_previous_address(request):
     """
 
     context = get_context(request)
-    context = get_urls(context)
 
     if context['state'] == 'entry':
         return postcode_entry(request, context)
@@ -150,8 +149,14 @@ def postcode_manual(request, context):
             # As this is a manual entry rather than a postcode lookup, this is set to false
             context['lookup'] = False
 
+            address_json = context.pop('address')
+
             # TODO - Remove entire address being added to url variables as it exceeds nginx buffer size.
-            return HttpResponseRedirect(build_url('personal_details_previous_addresses', get=context))
+            response = HttpResponseRedirect(build_url('personal_details_previous_addresses', get=context))
+
+            response.json = address_json
+
+            return response
 
         return render(request, 'other-people-previous-address-manual.html', context)
 
@@ -179,7 +184,8 @@ def postcode_submission(request, context):
             postcode = selected_address['postcode']
         else:
             # If a manual entry, load the json into a dictionary and parse appropriately
-            selected_address = json.loads(context['address'])
+            selected_address = json.loads(request.json)
+            # selected_address = json.loads(context['address'])
             line1 = selected_address['line1']
             line2 = selected_address['line2']
             town = selected_address['townOrCity']
@@ -285,6 +291,43 @@ def get_context(request):
     return context
 
 
+def get_response_url_data(request):
+    url_vars = dict()
+    request_method = request.method
+
+    url_variables_to_check = [
+        'id',
+        'state',
+        'person_id',
+        'person_type'
+    ]
+
+    for var in url_variables_to_check:
+        url_vars[var] = getattr(request, request_method)[var]
+
+    return url_vars
+
+
+def get_response_body_data(request):
+    body_data_vars = dict()
+
+    body_variables_to_check = [
+        'postcode',
+        'address',
+        'lookup',
+        'address_id',
+        'referrer'
+    ]
+
+    for var in body_variables_to_check:
+        body_data_vars[var] = getattr(request, request.method).get(var, default=None)
+
+    url_vars = get_response_url_data(request)
+    body_data_vars['previous_addresses'] = get_stored_addresses(url_vars['person_id'], url_vars['person_type'])
+
+    return json.dumps(body_data_vars)
+
+
 def get_urls(context):
     """
     A utility method to get any extra urls needed for a page, created here to allow for different contexts
@@ -292,6 +335,9 @@ def get_urls(context):
     :return:
     """
     state = context['state']
+
+    # Pop form off such that it is not included in a HUGE url later.
+    form = context.pop('form', None)
 
     # These two urls need certain 'states' to be built, therefore state is saved then changed, and finally reset
     context['state'] = 'manual'
@@ -304,5 +350,8 @@ def get_urls(context):
 
     # List url does not require a new state, so set after state changes, once it has been reset
     context['list_url'] = build_url('personal_details_summary', get={'id': context['id']})
+
+    # Re-insert form into context.
+    context['form'] = form if form is not None
 
     return context
