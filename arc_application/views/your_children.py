@@ -35,6 +35,7 @@ def __set_your_children_task_status(application_id, section_status):
     status.your_children_review = section_status
     status.save()
 
+
 def __build_summary_form_data(application_id):
     children_form_set = formset_factory(ChildForm)
     children_address_form_set = formset_factory(ChildAddressForm)
@@ -127,6 +128,9 @@ def __your_children_summary_post__handler(request):
     posted_children_forms = children_form_set(request.POST, prefix='child')
     posted_children_address_forms = children_address_form_set(request.POST, prefix='child-address')
 
+    children = Child.objects.filter(application_id=application_id).order_by('child')
+    child_addresses = ChildAddress.objects.filter(application_id=application_id).order_by('child')
+
     # Validated all submitted forms
     if all([posted_children_forms.is_valid(), posted_children_address_forms.is_valid(), posted_form.is_valid()]):
         # These are the table names for all of the objects on the page that are being iterated. Used in the request
@@ -142,9 +146,6 @@ def __your_children_summary_post__handler(request):
 
         clean_child_data.pop()
         clean_address_data.pop()
-
-        children = Child.objects.filter(application_id=application_id).order_by('child')
-        child_addresses = ChildAddress.objects.filter(application_id=application_id).order_by('child')
 
         all_forms_data_collection = [clean_child_data, clean_address_data]
         existing_data_collections_list = [children, child_addresses]
@@ -179,10 +180,15 @@ def __your_children_summary_post__handler(request):
 
         __set_your_children_task_status(application_id, section_status)
     else:
+        children_object_and_form_lists = zip(children, posted_children_forms)
+        child_addresses_and_form_list = zip(children, child_addresses, posted_children_address_forms)
+
         variables = __build_summary_form_data(application_id)
         variables['form'] = posted_form
         variables['children_form_set'] = posted_children_forms
         variables['children_address_form_set'] = posted_children_address_forms
+        variables['children_object_and_form_lists'] = children_object_and_form_lists
+        variables['child_addresses_and_form_list'] = child_addresses_and_form_list
 
         return render(request, 'your-children-summary.html', variables)
 
