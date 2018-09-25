@@ -14,6 +14,33 @@ from ..review_util import request_to_comment, save_comments, redirect_selection,
     save_non_db_field_arc_comment, delete_non_db_field_arc_comment
 
 
+#
+# Helper methods
+#
+
+
+def __set_your_children_task_status(application_id, section_status):
+    """
+    Helper method for marking the Your Children task as flagged by ARC
+    :param application_id: the unique identifier of the application being reviewed
+    """
+
+    application = Application.objects.get(pk=application_id)
+    application.your_children_arc_flagged = True
+    application.your_children_status = section_status
+    application.save()
+
+    # Set overall status of task
+    status = Arc.objects.get(pk=application_id)
+    status.your_children_review = section_status
+    status.save()
+
+
+#
+# End helper methods
+#
+
+
 @login_required
 @group_required(settings.ARC_GROUP)
 @user_assigned_application
@@ -119,12 +146,9 @@ def __your_children_summary_post__handler(request):
                 relevant_record = relevant_object_type_collection[request_index]
                 relevant_record_pk = getattr(relevant_record, attr_list[object_index])
                 record_comments = request_to_comment(relevant_record_pk, table_names[object_index], single_object_form_data)
+
                 if record_comments:
                     section_status = 'FLAGGED'
-                    application = Application.objects.get(pk=application_id)
-                    application.your_children_arc_flagged = True
-                    application.your_children_status = section_status
-                    application.save()
 
                 successful = save_comments(request, record_comments)
                 if not successful:
@@ -134,14 +158,13 @@ def __your_children_summary_post__handler(request):
         if clean_form_data['children_living_with_you_declare']:
             save_non_db_field_arc_comment(application_id, 'children_living_with_childminder_selection',
                                           clean_form_data['children_living_with_you_comments'])
+
+            # Mark section status as flagged overall if children living with childminder question has been flagged
+            section_status = 'FLAGGED'
         else:
             delete_non_db_field_arc_comment(application_id, 'children_living_with_childminder_selection')
 
-
-        # Set overall status of task
-        status = Arc.objects.get(pk=application_id)
-        status.your_children_review = section_status
-        status.save()
+        __set_your_children_task_status(application_id, section_status)
 
     # Redirect to first aid training
     return HttpResponseRedirect(reverse('first_aid_training_summary') + '?id=' + str(application_id))
