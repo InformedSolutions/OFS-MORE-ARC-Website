@@ -58,6 +58,11 @@ def your_children_summary(request):
 
 
 def __your_children_summary_get__handler(request):
+    """
+    View handler for displaying the Your Children task summary in ARC
+    :param request: inbound HTTP request
+    """
+
     application_id = request.GET.get('id') or request.POST.get('id')
 
     children_form_set = formset_factory(ChildForm)
@@ -82,7 +87,7 @@ def __your_children_summary_get__handler(request):
                                                             prefix='child-address')
     child_addresses_and_form_list = zip(children, child_addresses, formset_of_children_address)
 
-    form = YourChildrenForm(table_keys=[application_id])
+    form = YourChildrenForm(table_keys=[application_id], application_id=application_id)
 
     # Render page
 
@@ -104,13 +109,18 @@ def __your_children_summary_get__handler(request):
 
 
 def __your_children_summary_post__handler(request):
+    """
+    View handler for saving ARC comments supplied in the Your Children task summary page in ARC
+    :param request: inbound HTTP request
+    """
+
     application_id = request.GET.get('id') or request.POST.get('id')
 
     children_form_set = formset_factory(ChildForm)
     children_address_form_set = formset_factory(ChildAddressForm)
 
     # Retrieve form sets from POST body
-    posted_form = YourChildrenForm(request.POST, table_keys=[application_id])
+    posted_form = YourChildrenForm(request.POST, table_keys=[application_id], application_id=application_id)
     posted_children_forms = children_form_set(request.POST, prefix='child')
     posted_children_address_forms = children_address_form_set(request.POST, prefix='child-address')
 

@@ -13,12 +13,12 @@ from django.forms import ModelForm
 from govuk_forms.forms import GOVUKForm
 from govuk_forms.widgets import InlineRadioSelect, NumberInput
 
-from ..models import OtherPersonPreviousRegistrationDetails
+from ..models import OtherPersonPreviousRegistrationDetails, ArcComments
 from ..widgets.ConditionalPostChoiceWidget import ConditionalPostInlineRadioSelect
 from .. import custom_field_widgets
 from ..models import Arc as ArcReview, PreviousAddress, PreviousName
 from ..models import Arc as ArcReview, PreviousRegistrationDetails
-from ..review_util import populate_initial_values
+from ..review_util import populate_initial_values, get_non_db_field_arc_comment
 
 
 class CheckBox(GOVUKForm):
@@ -1063,6 +1063,7 @@ class YourChildrenForm(GOVUKForm):
     instance_id = forms.CharField(widget=forms.HiddenInput, required=False)
     
     def __init__(self, *args, **kwargs):
+        self.application_id = kwargs.pop('application_id')
         self.table_keys = kwargs.pop('table_keys')
         super(YourChildrenForm, self).__init__(*args, **kwargs)
         id_value = str(uuid.uuid4())
@@ -1075,7 +1076,11 @@ class YourChildrenForm(GOVUKForm):
                                         'aria-controls': box[1],
                                         'aria-expanded': 'false'}, )
 
-        populate_initial_values(self)
+        arc_comment = get_non_db_field_arc_comment(self.application_id, 'children_living_with_childminder_selection')
+
+        if arc_comment is not None and arc_comment.flagged:
+            self.fields['children_living_with_you_declare'].initial = True
+            self.fields['children_living_with_you_comments'].initial = arc_comment.comment
 
 
 class ChildAddressForm(GOVUKForm):
@@ -1161,6 +1166,7 @@ class ChildForm(GOVUKForm):
                 raise forms.ValidationError('You must give reasons')
 
         return date_of_birth_comments
+
 
 class ChildInYourHomeForm(GOVUKForm):
     """
