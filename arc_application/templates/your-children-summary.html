@@ -5,6 +5,8 @@
 {% block inner_content %}
 {% include 'back-button.html' %}
 
+{{form.error_summary}}
+
 {% for form in children_form_set %}
     {{form.error_summary}}
 {% endfor %}

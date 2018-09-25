@@ -35,36 +35,7 @@ def __set_your_children_task_status(application_id, section_status):
     status.your_children_review = section_status
     status.save()
 
-
-#
-# End helper methods
-#
-
-
-@login_required
-@group_required(settings.ARC_GROUP)
-@user_assigned_application
-def your_children_summary(request):
-    """
-    Method returning the template for the Your Children (for a given application) task
-    :param request: a request object used to generate the HttpResponse
-    :return: an HttpResponse object with the rendered Your Children template
-    """
-
-    if request.method == 'GET':
-        return __your_children_summary_get__handler(request)
-    elif request.method == 'POST':
-        return __your_children_summary_post__handler(request)
-
-
-def __your_children_summary_get__handler(request):
-    """
-    View handler for displaying the Your Children task summary in ARC
-    :param request: inbound HTTP request
-    """
-
-    application_id = request.GET.get('id') or request.POST.get('id')
-
+def __build_summary_form_data(application_id):
     children_form_set = formset_factory(ChildForm)
     children_address_form_set = formset_factory(ChildAddressForm)
 
@@ -105,6 +76,38 @@ def __your_children_summary_get__handler(request):
         'formset_of_children_address': formset_of_children_address
     }
 
+    return variables
+
+
+#
+# End helper methods
+#
+
+
+@login_required
+@group_required(settings.ARC_GROUP)
+@user_assigned_application
+def your_children_summary(request):
+    """
+    Method returning the template for the Your Children (for a given application) task
+    :param request: a request object used to generate the HttpResponse
+    :return: an HttpResponse object with the rendered Your Children template
+    """
+
+    if request.method == 'GET':
+        return __your_children_summary_get__handler(request)
+    elif request.method == 'POST':
+        return __your_children_summary_post__handler(request)
+
+
+def __your_children_summary_get__handler(request):
+    """
+    View handler for displaying the Your Children task summary in ARC
+    :param request: inbound HTTP request
+    """
+
+    application_id = request.GET.get('id') or request.POST.get('id')
+    variables = __build_summary_form_data(application_id)
     return render(request, 'your-children-summary.html', variables)
 
 
@@ -175,6 +178,13 @@ def __your_children_summary_post__handler(request):
             delete_non_db_field_arc_comment(application_id, 'children_living_with_childminder_selection')
 
         __set_your_children_task_status(application_id, section_status)
+    else:
+        variables = __build_summary_form_data(application_id)
+        variables['form'] = posted_form
+        variables['children_form_set'] = posted_children_forms
+        variables['children_address_form_set'] = posted_children_address_forms
+
+        return render(request, 'your-children-summary.html', variables)
 
     # Redirect to first aid training
     return HttpResponseRedirect(reverse('first_aid_training_summary') + '?id=' + str(application_id))

@@ -1055,6 +1055,10 @@ class AdultInYourHomeForm(GOVUKForm):
 
 
 class YourChildrenForm(GOVUKForm):
+    """
+    Form for handling user responses where they have been asked which of their children reside with them
+    """
+
     children_living_with_you_declare = forms.BooleanField(label='This information is correct',
                                          widget=custom_field_widgets.CustomCheckboxInput, required=False)
     children_living_with_you_comments = forms.CharField(label='Which of your children live with you?', help_text='(Tip: be clear and concise)',
@@ -1080,10 +1084,32 @@ class YourChildrenForm(GOVUKForm):
 
         if arc_comment is not None and arc_comment.flagged:
             self.fields['children_living_with_you_declare'].initial = True
-            self.fields['children_living_with_you_comments'].initial = arc_comment.comment
+            try:
+                self.fields['children_living_with_you_comments'].initial = arc_comment.comment
+            except:
+                pass
+
+    def clean_children_living_with_you_comments(self):
+        """
+        Full name comments validation
+        :return: string
+        """
+        children_living_with_you_declare = self.cleaned_data['children_living_with_you_declare']
+        children_living_with_you_comments = self.cleaned_data['children_living_with_you_comments']
+
+        # Only check if a comment has been entered if the field has been flagged
+        if children_living_with_you_declare is True:
+            if children_living_with_you_comments == '':
+                raise forms.ValidationError('You must give reasons')
+
+        return children_living_with_you_comments
 
 
 class ChildAddressForm(GOVUKForm):
+    """
+    Form for handling user responses where their children address have been detailed
+    """
+
     address_declare = forms.BooleanField(label='This information is correct',
                                          widget=custom_field_widgets.CustomCheckboxInput, required=False)
     address_comments = forms.CharField(label='Address', help_text='(Tip: be clear and concise)',
