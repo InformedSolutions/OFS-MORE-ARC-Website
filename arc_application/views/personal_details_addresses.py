@@ -53,7 +53,7 @@ def postcode_entry(request, context):
 
     if request.method == 'GET':
         # Grabs any relative urls needed for the page (enter address manually, for example)
-        context = get_urls(context)
+        context = get_link_urls(context)
 
         return render(request, 'previous-address-select.html', context)
 
@@ -83,7 +83,7 @@ def postcode_selection(request, context):
     """
 
     if request.method == 'GET':
-        context = get_urls(context)
+        context = get_link_urls(context)
 
         # Call addressing API with entered postcode
         addresses = address_helper.AddressHelper.create_address_lookup_list(context['postcode'])
@@ -124,7 +124,7 @@ def postcode_manual(request, context):
     """
 
     if request.method == 'GET':
-        context = get_urls(context)
+        context = get_link_urls(context)
         context['form'] = OtherPeoplePreviousAddressManualForm()
 
         return render(request, 'other-people-previous-address-manual.html', context)
@@ -328,11 +328,12 @@ def get_response_body_data(request):
     return json.dumps(body_data_vars)
 
 
-def get_urls(context):
+def get_link_urls(context):
     """
-    A utility method to get any extra urls needed for a page, created here to allow for different contexts
-    :param context: The current views context
-    :return:
+    The previous address templates require urls for links contained within the page.
+    This helper function generates them using the current context/url variables, before returning that same context dict
+    :param: context: dict containing info to be passed to the render function.
+    :return: context: same dict as was passed as arg, with additional url information included.
     """
     state = context['state']
 
