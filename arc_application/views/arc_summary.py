@@ -64,7 +64,7 @@ name_field_dict = {
 @group_required(settings.ARC_GROUP)
 @user_assigned_application
 def arc_summary(request):
-    ordered_models = [UserDetails, ChildcareType, [ApplicantPersonalDetails, ApplicantName, ApplicantHomeAddress],
+    ordered_models = [UserDetails, ChildcareType, [ApplicantPersonalDetails, ApplicantName], ApplicantHomeAddress,
                       FirstAidTraining, ChildcareTraining, CriminalRecordCheck, Application,
                       AdultInHome]
     if request.method == 'GET':
@@ -220,33 +220,34 @@ def load_json(application_id_local, ordered_models, recurse):
                 home_address = get_address(home_address_street_line1, home_address_street_line2, home_address_town,
                                            home_address_postcode)
                 childcare_address = 'Same as home address'
-                table_list.append(
-                    {"name": "Your home address", "value": home_address, 'pk': home_address_record.pk, "index": 3}
-                )
-                table_list.append(
+                table_list.append([
+                    {"title": "Your home and childcare address", "id": application_id_local},
+                    {"name": "Your home address", "value": home_address, 'pk': home_address_record.pk, "index": 1},
                     {"name": "Childcare address", "value": childcare_address, 'pk': childcare_address_record.pk,
-                     "index": 4}
-                )
+                     "index": 2},
+                    {"name": "Is this another childminder's home?",
+                     "value": get_bool_as_string(working_in_other_childminder_home), 'pk': application_id_local,
+                     "index": 5},
+                    {"name": "Do you have children of your own under 16?", "value": get_bool_as_string(own_children),
+                     'pk': application_id_local, "index": 6}
+                ])
             # If the address is only a home address
             if home_address_record != childcare_address_record:
                 home_address = get_address(home_address_street_line1, home_address_street_line2, home_address_town,
                                            home_address_postcode)
                 childcare_address = get_address(childcare_address_street_line1, childcare_address_street_line2,
                                                 childcare_address_town, childcare_address_postcode)
-                table_list.append(
-                    {"name": "Your home address", "value": home_address, 'pk': home_address_record.pk, "index": 3}
-                )
-                table_list.append(
+                table_list.append([
+                    {"title": "Your home and childcare address", "id": application_id_local},
+                    {"name": "Your home address", "value": home_address, 'pk': home_address_record.pk, "index": 1},
                     {"name": "Childcare address", "value": childcare_address, 'pk': childcare_address_record.pk,
-                     "index": 4}
-                )
-
-            table_list.append({"name": "Is this another childminder's home?",
-                               "value": get_bool_as_string(working_in_other_childminder_home),
-                               'pk': application_id_local, "index": 5})
-            table_list.append({"name": "Do you have children of your own under 16?",
-                               "value": get_bool_as_string(own_children),
-                               'pk': application_id_local, "index": 6})
+                     "index": 2},
+                    {"name": "Is this another childminder's home?",
+                     "value": get_bool_as_string(working_in_other_childminder_home), 'pk': application_id_local,
+                     "index": 5},
+                    {"name": "Do you have children of your own under 16?", "value": get_bool_as_string(own_children),
+                     'pk': application_id_local, "index": 6}
+                ])
         elif model == Application:
             table_list.append(application.get_summary_table_adult())
             table_list.append(application.get_summary_table_child())
