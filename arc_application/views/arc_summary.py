@@ -140,6 +140,8 @@ def add_comments(json, app_id):
             id = title_row['id']
             title = title_row['title']
             label = link_dict[title] if title in link_dict.keys() else 'other_people_summary'
+            if id == 'Child':
+                label = 'your_children_summary'
             for row in table[1:]:
                 if 'pk' in row:
                     id = row['pk']
@@ -282,7 +284,7 @@ def load_json(application_id_local, ordered_models, recurse):
                     else:
                         child_address = 'Same as your home address'
                     table_list.append([
-                        {"title": name, "id": child.pk},
+                        {"title": name, "id": "Child"},
                         {"name": "Name", "value": name, 'pk': child.pk, "index": 1},
                         {"name": "Date of birth", "value": date_of_birth, 'pk': child.pk, "index": 2},
                         {"name": "Address", "value": child_address, 'pk': child.pk, "index": 3}
