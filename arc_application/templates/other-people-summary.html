@@ -112,7 +112,7 @@
             </tr>
             </tbody>
         </table>
-        {% for record, id , health_check_status, name, day, month, year, relationship, dbs_certificate_number, lived_abroad, military_base, formsetadult, current_illness_set, serious_illness_set, hospital_admission_set in adult_lists %}
+        {% for record, id , health_check_status, name, day, month, year, relationship, dbs_certificate_number, lived_abroad, military_base, capita, formsetadult, current_illness_set, serious_illness_set, hospital_admission_set in adult_lists %}
         <table class="check-your-answers form-group">
             <thead>
             <tr>
@@ -272,6 +272,32 @@
                 <td colspan="2">
                     <div>
                         {{ formsetadult.relationship_comments}}
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td style="word-wrap: break-word">
+                    Capita DBS
+                </td>
+                <td style="word-wrap: break-word">
+                    {{capita}}
+                </td>
+                <td class="change-answer">
+                    {{ formsetadult.capita_declare }}
+                </td>
+            </tr>
+            <tr class="js-hidden" id="capita{{formsetadult.instance_id.initial}}">
+                <td colspan="1">
+                    <div>
+                        Enter your reasoning
+                    </div>
+                    <div>
+                        {{ formsetadult.capita_comments.help_text}}
+                    </div>
+                </td>
+                <td colspan="2">
+                    <div>
+                        {{ formsetadult.capita_comments}}
                     </div>
                 </td>
             </tr>
