@@ -65,13 +65,15 @@ name_field_dict = {
 @user_assigned_application
 def arc_summary(request):
     ordered_models = [UserDetails, ChildcareType, [ApplicantPersonalDetails, ApplicantName], ApplicantHomeAddress,
-                      FirstAidTraining, ChildcareTraining, CriminalRecordCheck, Application]
+                      FirstAidTraining, ChildcareTraining, CriminalRecordCheck]
     if request.method == 'GET':
         application_id_local = request.GET["id"]
         # Only display People in your Home tables if the applicant does not work in another childminder's home
         application = Application.objects.get(application_id=application_id_local)
         if application.working_in_other_childminder_home is False:
             ordered_models.append(AdultInHome)
+            ordered_models.append(Application)
+            ordered_models.append(ChildInHome)
         zero_to_five = ChildcareType.objects.get(application_id=application_id_local).zero_to_five
         if zero_to_five:
             ordered_models.insert(6, HealthDeclarationBooklet)
@@ -96,7 +98,7 @@ def arc_summary(request):
 @login_required
 def cc_summary(request):
     ordered_models = [UserDetails, ChildcareType, [ApplicantPersonalDetails, ApplicantName], ApplicantHomeAddress,
-                      FirstAidTraining, ChildcareTraining, CriminalRecordCheck, Application]
+                      FirstAidTraining, ChildcareTraining, CriminalRecordCheck]
     cc_user = has_group(request.user, settings.CONTACT_CENTRE)
 
     if request.method == 'GET':
@@ -105,6 +107,8 @@ def cc_summary(request):
         application = Application.objects.get(application_id=application_id_local)
         if application.working_in_other_childminder_home is False:
             ordered_models.append(AdultInHome)
+            ordered_models.append(Application)
+            ordered_models.append(ChildInHome)
         zero_to_five = ChildcareType.objects.get(application_id=application_id_local).zero_to_five
         if zero_to_five:
             ordered_models.insert(6, HealthDeclarationBooklet)
@@ -302,8 +306,20 @@ def load_json(application_id_local, ordered_models, recurse):
                         {"name": "Date of birth", "value": date_of_birth, 'pk': child.pk, "index": 2},
                         {"name": "Address", "value": child_address, 'pk': child.pk, "index": 3}
                     ])
+        elif model == CriminalRecordCheck:
+            criminal_record_check = CriminalRecordCheck.objects.get(application_id=application_id_local)
+            table_list.append(criminal_record_check.get_summary_table())
+            application = Application.objects.get(application_id=application_id_local)
+            if application.adults_in_home is True:
+                adults_in_home = 'Yes'
+            else:
+                adults_in_home = 'False'
+            table_list.append([
+                {"title": "Adults in the home", "id": application_id_local},
+                {"name": "Does anyone aged 16 or over live or work in your home?",
+                 "value": adults_in_home}
+            ])
         elif model == Application:
-            table_list.append(application.get_summary_table_adult())
             table_list.append(application.get_summary_table_child())
         elif model.objects.filter(application_id=application.pk).exists():
             records = model.objects.filter(application_id=application.pk)
