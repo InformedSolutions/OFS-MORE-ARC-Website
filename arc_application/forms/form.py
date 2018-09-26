@@ -955,6 +955,20 @@ class AdultInYourHomeForm(GOVUKForm):
                                                       widget=custom_field_widgets.Textarea,
                                                       required=False, max_length=250)
 
+    lived_abroad_declare  = forms.BooleanField(label='This information is correct',
+                                               widget=custom_field_widgets.CustomCheckboxInput, required=False)
+    lived_abroad_comments = forms.CharField(label='DBS certificate number',
+                                            help_text='(Tip: be clear and concise)',
+                                            widget=custom_field_widgets.Textarea,
+                                            required=False, max_length=250)
+
+    military_base_declare  = forms.BooleanField(label='This information is correct',
+                                               widget=custom_field_widgets.CustomCheckboxInput, required=False)
+    military_base_comments = forms.CharField(label='DBS certificate number',
+                                            help_text='(Tip: be clear and concise)',
+                                            widget=custom_field_widgets.Textarea,
+                                            required=False, max_length=250)
+
     # This is the id appended to all htmls names ot make the individual form instance unique, this is given a value in
     # the init
     instance_id = forms.CharField(widget=forms.HiddenInput, required=False)
@@ -970,7 +984,9 @@ class AdultInYourHomeForm(GOVUKForm):
             ((self.fields['full_name_declare']), 'full_name' + id_value),
             ((self.fields['date_of_birth_declare']), 'date_of_birth' + id_value),
             ((self.fields['relationship_declare']), 'relationship' + id_value),
-            ((self.fields['dbs_certificate_number_declare']), 'dbs_certificate_number' + id_value)
+            ((self.fields['dbs_certificate_number_declare']), 'dbs_certificate_number' + id_value),
+            ((self.fields['lived_abroad_declare']), 'lived_abroad' + id_value),
+            ((self.fields['military_base_declare']), 'military_base' + id_value),
         ]
 
         for box in checkboxes:
@@ -1052,6 +1068,36 @@ class AdultInYourHomeForm(GOVUKForm):
                 raise forms.ValidationError('You must give reasons')
 
         return dbs_certificate_number_comments
+
+    def clean_lived_abroad_comments(self):
+        """
+        DBS certificate number comments validation
+        :return: string
+        """
+        lived_abroad_declare = self.cleaned_data['lived_abroad_declare']
+        lived_abroad_comments = self.cleaned_data['lived_abroad_comments']
+
+        # Only check if a comment has been entered if the field has been flagged
+        if lived_abroad_declare is True:
+            if lived_abroad_comments == '':
+                raise forms.ValidationError('You must give reasons')
+
+        return lived_abroad_comments
+
+    def clean_military_base_comments(self):
+        """
+        DBS certificate number comments validation
+        :return: string
+        """
+        lived_abroad_declare = self.cleaned_data['military_base_declare']
+        military_base_comments = self.cleaned_data['military_base_comments']
+
+        # Only check if a comment has been entered if the field has been flagged
+        if lived_abroad_declare is True:
+            if military_base_comments == '':
+                raise forms.ValidationError('You must give reasons')
+
+        return military_base_comments
 
 
 class YourChildrenForm(GOVUKForm):
