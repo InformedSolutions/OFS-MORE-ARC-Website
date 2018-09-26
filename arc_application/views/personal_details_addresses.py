@@ -44,29 +44,13 @@ def postcode_entry(request):
     :param request: Standard Httprequest object
     :return:
     """
-    context = dict()
+    context = get_context(request)
 
     if request.method == 'GET':
         context['form'] = OtherPersonPreviousPostcodeEntry()
-
-        # Grabs any relative urls needed for the page (enter address manually, for example)
-        url_variables_data = get_url_data(request)
-        body_variables_data = get_post_data(request)
-        link_urls = get_link_urls(url_variables_data)
-        context.update(link_urls)
-        context.update(url_variables_data)
-        context.update(body_variables_data)
-
         return render(request, 'previous-address-select.html', context)
 
     if request.method == 'POST':
-
-        url_variables_data = get_url_data(request)
-        body_variables_data = get_post_data(request)
-        link_urls = get_link_urls(url_variables_data)
-        context.update(link_urls)
-        context.update(url_variables_data)
-        context.update(body_variables_data)
 
         if 'add-another' in request.POST:
             form = OtherPersonPreviousPostcodeEntry()
@@ -75,7 +59,6 @@ def postcode_entry(request):
 
         form = OtherPersonPreviousPostcodeEntry(request.POST)
         context['form'] = form
-        context.update(get_post_data(request))
 
         if form.is_valid():
             postcode = form.cleaned_data['postcode']
@@ -92,16 +75,11 @@ def postcode_selection(request):
     :param request: Standard Httprequest object
     :return:
     """
-    context = dict()
+    context = get_context(request)
 
     if request.method == 'GET':
-        context = get_url_data(request)
-        context.update(get_link_urls(context))
-
-        body_variables = get_post_data(request)
-
         # Call addressing API with entered postcode
-        addresses = address_helper.AddressHelper.create_address_lookup_list(body_variables['postcode'])
+        addresses = address_helper.AddressHelper.create_address_lookup_list(context['postcode'])
 
         # Populate form for page with choices from this API call
         context['form'] = OtherPeoplePreviousAddressLookupForm(choices=addresses)
@@ -112,26 +90,14 @@ def postcode_selection(request):
         addresses = address_helper.AddressHelper.create_address_lookup_list(request.POST['postcode'])
 
         if 'postcode-search' in request.POST:
-            context.update(get_url_data(request))
-            context['state'] = 'selection'
-            context.update(get_link_urls(context))
-            context.update(get_post_data(request))
             context['form'] = OtherPeoplePreviousAddressLookupForm(choices=addresses)
             return render(request, 'previous-address-lookup.html', context)
 
         current_form = OtherPeoplePreviousAddressLookupForm(request.POST, choices=addresses)
         context['form'] = current_form
 
-        if current_form.is_valid() and 'save-and-continue' in request.POST:
+        if current_form.is_valid():
             return postcode_submission(request)
-
-        elif current_form.is_valid() and 'add-another' in request.POST:
-            return postcode_submission(request)
-
-        context.update(get_url_data(request))
-        context['state'] = 'selection'
-        context.update(get_link_urls(context))
-        context.update(get_post_data(request))
 
     return render(request, 'previous-address-lookup.html', context)
 
@@ -142,14 +108,9 @@ def postcode_manual(request):
     :param request: Standard Httprequest object
     :return:
     """
-    context = dict()
+    context = get_context(request)
 
     if request.method == 'GET':
-        url_data = get_url_data(request)
-        body_data = get_post_data(request)
-        context.update(get_link_urls(url_data))
-        context.update(url_data)
-        context.update(body_data)
         context['form'] = OtherPeoplePreviousAddressManualForm()
         return render(request, 'other-people-previous-address-manual.html', context)
 
@@ -210,25 +171,18 @@ def address_update(request):
     :param request: Standard Httprequest object
     :return:
     """
-    if request.method == 'GET':
-        # Populate form with entry from table, uses address primary key to do this
-        context = get_url_data(request)
-        context.update(get_link_urls(context))
-        context.update(get_post_data(request))
-        context['form'] = OtherPeoplePreviousAddressManualForm(id=request.GET['address_id'])
+    context = get_context(request)
 
+    if request.method == 'GET':
+        context['form'] = OtherPeoplePreviousAddressManualForm(id=request.GET['address_id'])
         return render(request, 'previous-address-manual-update.html', context)
 
     if request.method == 'POST':
-        context = get_url_data(request)
-        context.update(get_link_urls(context))
-        context.update(get_post_data(request))
-
         current_form = OtherPeoplePreviousAddressManualForm(request.POST)
         context['form'] = current_form
         address_record = PreviousAddress.objects.get(previous_name_id=context['address_id'])
         if current_form.is_valid():
-            # For ease of use, update saving is done here raather than in submission section, adding it would make it
+            # For ease of use, update saving is done here rather than in submission section, adding it would make it
             # harder to understand
             address_record.street_line1 = current_form.cleaned_data['street_name_and_number']
             address_record.street_line2 = current_form.cleaned_data['street_name_and_number2']
@@ -253,10 +207,28 @@ def get_stored_addresses(person_id, person_type):
     return PreviousAddress.objects.filter(person_id=person_id, person_type=person_type)
 
 
-def get_url_data(request):
-    url_vars = dict()
-    request_method = request.method
+def get_context(request):
+    """
+    Function to grab all the context required for rendering the views, by calling, in turn, the functions which grab
+    data from the HttpResponse object.
 
+    XXX: These need to be called in a particular order to avoid excessively long urls which exceed the nginx buffer size.
+
+    :param request: HttpResponse object from which to grab the data.
+    :return: context: dict containing all the information required by the views.
+    """
+    context = get_url_data(request)
+    context.update(get_link_urls(context))
+    context.update(get_post_data(request))
+    return context
+
+
+def get_url_data(request):
+    """
+    Function to grab variables required for the context and link urls from the request url.
+    :param request: HttpResponse object from which to grab the data.
+    :return: dict whose (key, value) pairs are the strings in url_variables_to_check and their respective values.
+    """
     url_variables_to_check = [
         'id',
         'state',
@@ -264,16 +236,17 @@ def get_url_data(request):
         'person_type'
     ]
 
-    for var in url_variables_to_check:
-        url_vars[var] = getattr(request, request_method)[var]
-
-    return url_vars
+    return dict((var, getattr(request, request.method).get(var, None)) for var in url_variables_to_check)
 
 
 def get_post_data(request):
-    post_data_vars = dict()
-
-    body_variables_to_check = [
+    """
+    Function to grab variables required for the context from the POST data.
+    :param request: HttpResponse object from which to grab the data.
+    :return: dict whose (key, value) pairs are the strings in url_variables_to_check and their respective values, with
+             an additional 'previous_addresses' value for the context.
+    """
+    post_vars_to_check = [
         'postcode',
         'address',
         'lookup',
@@ -281,8 +254,7 @@ def get_post_data(request):
         'referrer'
     ]
 
-    for var in body_variables_to_check:
-        post_data_vars[var] = getattr(request, request.method).get(var, default=None)
+    post_data_vars = dict((var, getattr(request, request.method).get(var, None)) for var in post_vars_to_check)
 
     url_vars = get_url_data(request)
     post_data_vars['previous_addresses'] = get_stored_addresses(url_vars['person_id'], url_vars['person_type'])
@@ -292,10 +264,10 @@ def get_post_data(request):
 
 def get_link_urls(url_variables_dict):
     """
-    The previous address templates require urls for links contained within the page.
-    This helper function generates them using the current context/url variables, before returning that same context dict
-    :param: context: dict containing info to be passed to the render function.
-    :return: context: same dict as was passed as arg, with additional url information included.
+    The 'previous address' templates require urls for links contained within the page.
+    These require the list of url variables from get_url_data.
+    :param: url_variables_dict: dict containing the required url variables.
+    :return: context: dict containing the urls to be passed as context variables.
     """
     context = dict()
 
