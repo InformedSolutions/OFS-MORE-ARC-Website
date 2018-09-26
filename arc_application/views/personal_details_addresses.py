@@ -208,7 +208,7 @@ def postcode_submission(request):
             return postcode_entry(request)
 
 
-def address_update(request, context=None):
+def address_update(request):
     """
     Function to allow the user to update an entry to the address table from the other people summary page
     :param request: Standard Httprequest object
@@ -217,11 +217,18 @@ def address_update(request, context=None):
     """
     if request.method == 'GET':
         # Populate form with entry from table, uses address primary key to do this
+        context = get_response_url_data(request)
+        context.update(get_link_urls(context))
+        context.update(get_response_body_data(request))
         context['form'] = OtherPeoplePreviousAddressManualForm(id=request.GET['address_id'])
 
         return render(request, 'previous-address-manual-update.html', context)
 
     if request.method == 'POST':
+        context = get_response_url_data(request)
+        context.update(get_link_urls(context))
+        context.update(get_response_body_data(request))
+
         current_form = OtherPeoplePreviousAddressManualForm(request.POST)
         context['form'] = current_form
         address_record = PreviousAddress.objects.get(previous_name_id=context['address_id'])
@@ -249,41 +256,6 @@ def get_stored_addresses(person_id, person_type):
     :return:
     """
     return PreviousAddress.objects.filter(person_id=person_id, person_type=person_type)
-
-
-def get_context(request):
-    """
-    A utility method to grab either the get or post context for use in the views
-    :param request: The current httprequest object
-    :return:
-    """
-    context = dict()
-    request_method = request.method
-
-    url_variables_to_check = [
-        'id',
-        'state',
-        'person_id',
-        'person_type'
-    ]
-
-    for var in url_variables_to_check:
-        context[var] = getattr(request, request_method)[var]
-
-    body_variables_to_check = [
-        'postcode',
-        'address',
-        'lookup',
-        'address_id',
-        'referrer'
-    ]
-
-    for var in body_variables_to_check:
-        context[var] = getattr(request, request_method).get(var, default=None)
-
-    context['previous_addresses'] = get_stored_addresses(context['person_id'], context['person_type'])
-
-    return context
 
 
 def get_response_url_data(request):
