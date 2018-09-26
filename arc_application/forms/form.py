@@ -969,6 +969,13 @@ class AdultInYourHomeForm(GOVUKForm):
                                             widget=custom_field_widgets.Textarea,
                                             required=False, max_length=250)
 
+    capita_declare = forms.BooleanField(label='This information is correct',
+                                        widget=custom_field_widgets.CustomCheckboxInput, required=False)
+    capita_comments = forms.CharField(label='DBS certificate number',
+                                      help_text='(Tip: be clear and concise)',
+                                      widget=custom_field_widgets.Textarea,
+                                      required=False, max_length=250)
+
     # This is the id appended to all htmls names ot make the individual form instance unique, this is given a value in
     # the init
     instance_id = forms.CharField(widget=forms.HiddenInput, required=False)
@@ -987,6 +994,7 @@ class AdultInYourHomeForm(GOVUKForm):
             ((self.fields['dbs_certificate_number_declare']), 'dbs_certificate_number' + id_value),
             ((self.fields['lived_abroad_declare']), 'lived_abroad' + id_value),
             ((self.fields['military_base_declare']), 'military_base' + id_value),
+            ((self.fields['capita_declare']), 'capita' + id_value),
         ]
 
         for box in checkboxes:
