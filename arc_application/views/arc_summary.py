@@ -65,13 +65,16 @@ name_field_dict = {
 @user_assigned_application
 def arc_summary(request):
     ordered_models = [UserDetails, ChildcareType, [ApplicantPersonalDetails, ApplicantName], ApplicantHomeAddress,
-                      FirstAidTraining, ChildcareTraining, CriminalRecordCheck, Application,
-                      AdultInHome]
+                      FirstAidTraining, ChildcareTraining, CriminalRecordCheck, Application]
     if request.method == 'GET':
         application_id_local = request.GET["id"]
+        # Only display People in your Home tables if the applicant does not work in another childminder's home
+        application = Application.objects.get(application_id=application_id_local)
+        if application.working_in_other_childminder_home is False:
+            ordered_models.append(AdultInHome)
         zero_to_five = ChildcareType.objects.get(application_id=application_id_local).zero_to_five
         if zero_to_five:
-            ordered_models.insert(5, HealthDeclarationBooklet)
+            ordered_models.insert(6, HealthDeclarationBooklet)
             ordered_models.append(Reference)
         json = load_json(application_id_local, ordered_models, False)
         json = add_comments(json, application_id_local)
@@ -92,17 +95,19 @@ def arc_summary(request):
 
 @login_required
 def cc_summary(request):
-    ordered_models = [UserDetails, ChildcareType, [ApplicantPersonalDetails, ApplicantName, ApplicantHomeAddress],
-                      FirstAidTraining, ChildcareTraining, CriminalRecordCheck, Application,
-                      AdultInHome, ChildInHome]
+    ordered_models = [UserDetails, ChildcareType, [ApplicantPersonalDetails, ApplicantName], ApplicantHomeAddress,
+                      FirstAidTraining, ChildcareTraining, CriminalRecordCheck, Application]
     cc_user = has_group(request.user, settings.CONTACT_CENTRE)
 
     if request.method == 'GET':
         application_id_local = request.GET["id"]
-        application = Application.objects.get(pk=application_id_local)
+        # Only display People in your Home tables if the applicant does not work in another childminder's home
+        application = Application.objects.get(application_id=application_id_local)
+        if application.working_in_other_childminder_home is False:
+            ordered_models.append(AdultInHome)
         zero_to_five = ChildcareType.objects.get(application_id=application_id_local).zero_to_five
         if zero_to_five:
-            ordered_models.insert(5, HealthDeclarationBooklet)
+            ordered_models.insert(6, HealthDeclarationBooklet)
             ordered_models.append(Reference)
         json = load_json(application_id_local, ordered_models, False)
         json[0][1]['link'] = (reverse('update_email') + '?id=' + str(application_id_local))
@@ -274,7 +279,15 @@ def load_json(application_id_local, ordered_models, recurse):
             all_children = Child.objects.filter(application_id=application_id_local).order_by('child')
             for child in all_children:
                     name = child.get_full_name()
-                    date_of_birth = child.get_dob_as_date()
+                    if child.birth_day < 10:
+                        birth_day = '0' + str(child.birth_day)
+                    else:
+                        birth_day = str(child.birth_day)
+                    if child.birth_month < 10:
+                        birth_month = '0' + str(child.birth_month)
+                    else:
+                        birth_month = str(child.birth_month)
+                    date_of_birth = birth_day + ' ' + birth_month + ' ' + str(child.birth_year)
                     if ChildAddress.objects.filter(application_id=application_id_local, child=child.child).exists():
                         child_address_record = ChildAddress.objects.get(application_id=application_id_local,
                                                                         child=child.child)
