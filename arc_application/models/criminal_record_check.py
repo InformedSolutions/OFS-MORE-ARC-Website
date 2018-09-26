@@ -52,7 +52,7 @@ class CriminalRecordCheck(models.Model):
                                        "value": self.get_bool_as_string(self.lived_abroad)})
 
         if self.military_base is not None:
-            summary_table_dict.append({"name": "Have you lived or worked on a British military base in the last 5 years?",
+            summary_table_dict.append({"name": "Have you lived or worked on a British military base outside of the UK in the last 5 years?",
                                        "value": self.get_bool_as_string(self.military_base)})
 
         if self.capita is not None:

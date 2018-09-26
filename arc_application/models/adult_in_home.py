@@ -76,11 +76,24 @@ class AdultInHome(models.Model):
         return datetime.date(self.birth_year, self.birth_month, self.birth_day)
 
     def get_summary_table(self):
+
+        if self.birth_day < 10:
+            birth_day = '0' + str(self.birth_day)
+        else:
+            birth_day = str(self.birth_day)
+
+        if self.birth_month < 10:
+            birth_month = '0' + str(self.birth_month)
+        else:
+            birth_month = str(self.birth_month)
+
+        date_of_birth = birth_day + ' ' + birth_month + ' ' + str(self.birth_year)
+
         return [
                 {"title": self.get_full_name(), "id": self.pk},
-                {"name": "Health check status", "value": self.health_check_status},
+                {"name": "Health questions status", "value": self.health_check_status},
                 {"name": "Name", "value": self.get_full_name()},
-                {"name": "Date of birth", "value": self.get_dob_as_date()},
+                {"name": "Date of birth", "value": date_of_birth},
                 {"name": "Relationship", "value": self.relationship},
                 {"name": "Email", "value": self.email},
                 {"name": "DBS certificate number", "value": self.dbs_certificate_number}

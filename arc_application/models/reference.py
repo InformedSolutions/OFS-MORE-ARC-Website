@@ -62,10 +62,10 @@ class Reference(models.Model):
 
     def get_time_known(self):
         months = self.months_known
-        months_str = str(months) + ' months, ' if months != 1 else str(months) + ' month, '
+        months_str = str(months) + ' Months' if months != 1 else str(months) + ' Month'
         years = self.years_known
-        years_str = str(years) + ' years' if years != 1 else str(years) + ' year'
-        return months_str + years_str
+        years_str = str(years) + ' Years, ' if years != 1 else str(years) + ' Year, '
+        return years_str + months_str
     
     def get_ref_as_string(self):
         return 'First' if self.reference == 1 else 'Second'
