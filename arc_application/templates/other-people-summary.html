@@ -112,7 +112,7 @@
             </tr>
             </tbody>
         </table>
-        {% for record, id , health_check_status, name, day, month, year, relationship, dbs_certificate_number, formsetadult, current_illness_set, serious_illness_set, hospital_admission_set in adult_lists %}
+        {% for record, id , health_check_status, name, day, month, year, relationship, dbs_certificate_number, lived_abroad, military_base, formsetadult, current_illness_set, serious_illness_set, hospital_admission_set in adult_lists %}
         <table class="check-your-answers form-group">
             <thead>
             <tr>
@@ -301,6 +301,60 @@
                     </div>
                 </td>
             </tr>
+            <tr>
+                <td style="word-wrap: break-word">
+                    Lived abroad
+                </td>
+                <td style="word-wrap: break-word">
+                    {{ lived_abroad }}
+                </td>
+                <td class="change-answer">
+                    {{ formsetadult.lived_abroad_declare }}
+                </td>
+            </tr>
+            <tr class="js-hidden" id="lived_abroad{{formsetadult.instance_id.initial}}">
+                <td colspan="1">
+                    <div>
+                        Enter your reasoning
+                    </div>
+                    <div>
+                        {{ formsetadult.lived_abroad_comments.help_text}}
+                    </div>
+                </td>
+                <td colspan="2">
+                    <div>
+                        {{ formsetadult.lived_abroad_comments}}
+                    </div>
+                </td>
+            </tr>
+
+            <tr>
+                <td style="word-wrap: break-word">
+                    British Military Base
+                </td>
+                <td style="word-wrap: break-word">
+                    {{ military_base }}
+                </td>
+                <td class="change-answer">
+                    {{ formsetadult.military_base_declare }}
+                </td>
+            </tr>
+            <tr class="js-hidden" id="military_base{{formsetadult.instance_id.initial}}">
+                <td colspan="1">
+                    <div>
+                        Enter your reasoning
+                    </div>
+                    <div>
+                        {{ formsetadult.military_base_comments.help_text}}
+                    </div>
+                </td>
+                <td colspan="2">
+                    <div>
+                        {{ formsetadult.military_base_comments}}
+                    </div>
+                </td>
+            </tr>
+
             </tbody>
             <input type="hidden" value="{{ application_id }}" name="id" />
 
