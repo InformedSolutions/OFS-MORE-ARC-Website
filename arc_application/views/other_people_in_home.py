@@ -1,4 +1,4 @@
-from uuid import uuid4, UUID
+from uuid import uuid4
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
@@ -49,6 +49,8 @@ def other_people_summary(request):
     current_illnesses = []
     serious_illnesses = []
     hospital_admissions = []
+    adult_lived_abroad = []
+    adult_military_base = []
     adult_name_querysets = []
     adult_address_querysets = []
     previous_registration_querysets = []
@@ -76,6 +78,8 @@ def other_people_summary(request):
         adult_birth_year_list.append(adult.birth_year)
         adult_relationship_list.append(adult.relationship)
         adult_dbs_list.append(adult.dbs_certificate_number)
+        adult_lived_abroad.append(adult.lived_abroad)
+        adult_military_base.append(adult.military_base)
         current_illnesses.append(HealthCheckCurrent.objects.filter(person_id=adult.pk))
         serious_illnesses.append(HealthCheckSerious.objects.filter(person_id=adult.pk))
         hospital_admissions.append(HealthCheckHospital.objects.filter(person_id=adult.pk))
@@ -114,7 +118,8 @@ def other_people_summary(request):
         # Zips the formset into the list of adults
         # Converts it to a list, there was trouble parsing the form objects when it was in a zip object
         adult_lists = list(zip(adult_record_list, adult_id_list, adult_health_check_status_list, adult_name_list, adult_birth_day_list,
-                               adult_birth_month_list, adult_birth_year_list, adult_relationship_list, adult_dbs_list,
+                               adult_birth_month_list, adult_birth_year_list, adult_relationship_list, adult_dbs_list, adult_lived_abroad,
+                               adult_military_base,
                                formset_adult, current_illnesses, serious_illnesses, hospital_admissions))
 
         initial_child_data = other_people_initial_population(False, children)
@@ -199,7 +204,7 @@ def other_people_summary(request):
             adult_lists = list(zip(adult_record_list, adult_id_list, adult_health_check_status_list, adult_name_list,
                                    adult_birth_day_list,
                                    adult_birth_month_list, adult_birth_year_list, adult_relationship_list,
-                                   adult_dbs_list,
+                                   adult_dbs_list, adult_lived_abroad, adult_military_base,
                                    adult_formset, current_illnesses, serious_illnesses, hospital_admissions))
 
             child_lists = zip(child_id_list, child_name_list, child_birth_day_list, child_birth_month_list,
