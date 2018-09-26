@@ -244,10 +244,13 @@ def load_json(application_id_local, ordered_models, recurse):
                      "index": 2},
                     {"name": "Is this another childminder's home?",
                      "value": get_bool_as_string(working_in_other_childminder_home), 'pk': application_id_local,
-                     "index": 5},
-                    {"name": "Do you have children of your own under 16?", "value": get_bool_as_string(own_children),
-                     'pk': application_id_local, "index": 6}
+                     "index": 3}
                 ])
+            table_list.append([
+                {"title": "Your children", "id": application_id_local},
+                {"name": "Do you have children of your own under 16?", "value": get_bool_as_string(own_children),
+                 'pk': application_id_local, "index": 1}
+            ])
         elif model == Application:
             table_list.append(application.get_summary_table_adult())
             table_list.append(application.get_summary_table_child())
