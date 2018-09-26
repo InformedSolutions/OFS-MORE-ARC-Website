@@ -246,11 +246,47 @@ def load_json(application_id_local, ordered_models, recurse):
                      "value": get_bool_as_string(working_in_other_childminder_home), 'pk': application_id_local,
                      "index": 3}
                 ])
+            # Create a table for Your children
             table_list.append([
                 {"title": "Your children", "id": application_id_local},
                 {"name": "Do you have children of your own under 16?", "value": get_bool_as_string(own_children),
                  'pk': application_id_local, "index": 1}
             ])
+
+            # Create a table for Your children's addresses
+            children_living_with_childminder = Child.objects.filter(application_id=application_id_local,
+                                                                    lives_with_childminder=True).order_by('child')
+            children = []
+
+            for child in children_living_with_childminder:
+                children.append(child.get_full_name())
+
+            children_string = ', '.join(children)
+
+            table_list.append([
+                {"title": "Your children's addresses", "id": application_id_local},
+                {"name": "Which of your children live with you?", "value": children_string,
+                 'pk': application_id_local, "index": 1}
+            ])
+            # Create tables for each child
+            all_children = Child.objects.filter(application_id=application_id_local).order_by('child')
+            for child in all_children:
+                    name = child.get_full_name()
+                    date_of_birth = child.get_dob_as_date()
+                    if ChildAddress.objects.filter(application_id=application_id_local, child=child.child).exists():
+                        child_address_record = ChildAddress.objects.get(application_id=application_id_local,
+                                                                        child=child.child)
+                        child_address = get_address(child_address_record.street_line1,
+                                                    child_address_record.street_line2, child_address_record.town,
+                                                    child_address_record.postcode)
+                    else:
+                        child_address = 'Same as your home address'
+                    table_list.append([
+                        {"title": name, "id": child.pk},
+                        {"name": "Name", "value": name, 'pk': child.pk, "index": 1},
+                        {"name": "Date of birth", "value": date_of_birth, 'pk': child.pk, "index": 2},
+                        {"name": "Address", "value": child_address, 'pk': child.pk, "index": 3}
+                    ])
         elif model == Application:
             table_list.append(application.get_summary_table_adult())
             table_list.append(application.get_summary_table_child())
