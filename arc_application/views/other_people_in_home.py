@@ -7,13 +7,13 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render
 
 from ..models.previous_name import PreviousName
-from ..forms.form import AdultInYourHomeForm, ChildInYourHomeForm, OtherPeopleInYourHomeForm, OtherPersonPreviousNames
-from ..models import ChildInHome, AdultInHome, Arc, Application, PreviousAddress, \
+from ..forms.form import AdultInYourHomeForm, ChildInYourHomeForm, OtherPeopleInYourHomeForm, OtherPersonPreviousNames, OwnChildNotInHomeForm
+from ..models import ChildInHome, AdultInHome, Arc, Application, PreviousAddress, ChildAddress, \
     OtherPersonPreviousRegistrationDetails, HealthCheckCurrent, HealthCheckSerious, HealthCheckHospital, ChildcareType, \
     Child
 
 from ..review_util import request_to_comment, save_comments, redirect_selection, build_url
-from ..views import other_people_initial_population
+from ..views import other_people_initial_population, own_children_not_in_home_initial_population
 from ..decorators import group_required, user_assigned_application
 
 
@@ -30,6 +30,7 @@ def other_people_summary(request):
     # Defines the formset using formset factory
     adult_form_set = formset_factory(AdultInYourHomeForm)
     child_form_set = formset_factory(ChildInYourHomeForm)
+    own_child_form_set = formset_factory(OwnChildNotInHomeForm)
     table_names = ['ADULT_IN_HOME', 'CHILD_IN_HOME']
     application_id_local = request.GET.get('id') or request.POST.get('id')
     application = Application.objects.get(pk=application_id_local)
@@ -73,6 +74,7 @@ def other_people_summary(request):
     own_child_birth_day_list = []
     own_child_birth_month_list = []
     own_child_birth_year_list = []
+    own_child_address_list = []
 
     for adult in adults:
         if adult.middle_names and adult.middle_names != '':
@@ -106,6 +108,18 @@ def other_people_summary(request):
         child_birth_month_list.append(child.birth_month)
         child_birth_year_list.append(child.birth_year)
         child_relationship_list.append(child.relationship)
+
+    for child in own_children:
+        if child.middle_names and child.middle_names != '':
+            name = child.first_name + ' ' + child.middle_names + ' ' + child.last_name
+        else:
+            name = child.first_name + ' ' + child.last_name
+        own_child_id_list.append(child.child_id)
+        own_child_name_list.append(name)
+        own_child_birth_day_list.append(child.birth_day)
+        own_child_birth_month_list.append(child.birth_month)
+        own_child_birth_year_list.append(child.birth_year)
+        own_child_address_list.append(ChildAddress.objects.get(application_id = application_id_local, child=child.child))
 
     for adult_id, adult_name in zip(adult_id_list, adult_name_list):
         adult_name_querysets.append(PreviousName.objects.filter(person_id=adult_id, other_person_type='ADULT'))
@@ -141,6 +155,20 @@ def other_people_summary(request):
                           child_birth_year_list,
                           child_relationship_list, formset_child)
 
+        initial_own_child_data = own_children_not_in_home_initial_population(own_children)
+
+        formset_own_child = own_child_form_set(initial=initial_own_child_data, prefix='child')
+
+        own_child_lists = zip(
+            own_child_id_list,
+            own_child_name_list,
+            own_child_birth_day_list,
+            own_child_birth_month_list,
+            own_child_birth_year_list,
+            own_child_address_list,
+            formset_own_child
+        )
+
         variables = {
             'form': form,
             'formset_adult': formset_adult,
@@ -151,7 +179,8 @@ def other_people_summary(request):
             'adult_lists': adult_lists,
             'child_lists': child_lists,
             'adult_ebulk_lists': adult_ebulk_lists,
-            'previous_registration_lists': previous_registration_lists
+            'previous_registration_lists': previous_registration_lists,
+            'own_child_lists': own_child_lists
         }
         return render(request, 'other-people-summary.html', variables)
 
