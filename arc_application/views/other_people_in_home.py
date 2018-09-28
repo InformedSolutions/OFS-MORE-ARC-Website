@@ -9,7 +9,8 @@ from django.shortcuts import render
 from ..models.previous_name import PreviousName
 from ..forms.form import AdultInYourHomeForm, ChildInYourHomeForm, OtherPeopleInYourHomeForm, OtherPersonPreviousNames
 from ..models import ChildInHome, AdultInHome, Arc, Application, PreviousAddress, \
-    OtherPersonPreviousRegistrationDetails, HealthCheckCurrent, HealthCheckSerious, HealthCheckHospital, ChildcareType
+    OtherPersonPreviousRegistrationDetails, HealthCheckCurrent, HealthCheckSerious, HealthCheckHospital, ChildcareType, \
+    Child
 
 from ..review_util import request_to_comment, save_comments, redirect_selection, build_url
 from ..views import other_people_initial_population
@@ -56,7 +57,7 @@ def other_people_summary(request):
     adult_address_querysets = []
     previous_registration_querysets = []
 
-    # Children data
+    # Children in the home data
     children = ChildInHome.objects.filter(application_id=application_id_local).order_by('child')
     child_id_list = []
     child_name_list = []
@@ -64,6 +65,14 @@ def other_people_summary(request):
     child_birth_month_list = []
     child_birth_year_list = []
     child_relationship_list = []
+
+    # Own children not in the home
+    own_children = Child.objects.filter(application_id=application_id_local).order_by('child')
+    own_child_id_list = []
+    own_child_name_list = []
+    own_child_birth_day_list = []
+    own_child_birth_month_list = []
+    own_child_birth_year_list = []
 
     for adult in adults:
         if adult.middle_names and adult.middle_names != '':
