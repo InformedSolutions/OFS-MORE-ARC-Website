@@ -129,6 +129,7 @@ class Migration(migrations.Migration):
                 ('publish_details', models.NullBooleanField(default=None)),
                 ('working_in_other_childminder_home', models.NullBooleanField(default=None)),
                 ('own_children', models.NullBooleanField(default=None)),
+                ('own_children_not_in_home', models.NullBooleanField(default=None))
             ],
             options={
                 'db_table': 'APPLICATION',
