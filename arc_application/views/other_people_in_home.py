@@ -28,9 +28,9 @@ def other_people_summary(request):
     :return: an HttpResponse object with the rendered People in your home: summary template
     """
     # Defines the formset using formset factory
-    adult_form_set = formset_factory(AdultInYourHomeForm)
-    child_form_set = formset_factory(ChildInYourHomeForm)
-    own_child_form_set = formset_factory(OwnChildNotInHomeForm)
+    adult_form_set = formset_factory(AdultInYourHomeForm, extra=0)
+    child_form_set = formset_factory(ChildInYourHomeForm, extra=0)
+    own_child_form_set = formset_factory(OwnChildNotInHomeForm, extra=0)
     table_names = ['ADULT_IN_HOME', 'CHILD_IN_HOME', 'CHILD']
     application_id_local = request.GET.get('id') or request.POST.get('id')
     application = Application.objects.get(pk=application_id_local)
@@ -195,10 +195,6 @@ def other_people_summary(request):
             child_data_list = child_formset.cleaned_data
             adult_data_list = adult_formset.cleaned_data
             own_child_data_list = own_child_formset.cleaned_data
-
-            child_data_list.pop()
-            adult_data_list.pop()
-            own_child_data_list.pop()
 
             request_list = [adult_data_list, child_data_list, own_child_data_list]
             object_list = [adults, children, own_children]
