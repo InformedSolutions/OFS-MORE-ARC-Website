@@ -31,7 +31,7 @@ def other_people_summary(request):
     adult_form_set = formset_factory(AdultInYourHomeForm)
     child_form_set = formset_factory(ChildInYourHomeForm)
     own_child_form_set = formset_factory(OwnChildNotInHomeForm)
-    table_names = ['ADULT_IN_HOME', 'CHILD_IN_HOME']
+    table_names = ['ADULT_IN_HOME', 'CHILD_IN_HOME', 'CHILD']
     application_id_local = request.GET.get('id') or request.POST.get('id')
     application = Application.objects.get(pk=application_id_local)
 
@@ -157,7 +157,7 @@ def other_people_summary(request):
 
         initial_own_child_data = own_children_not_in_home_initial_population(own_children)
 
-        formset_own_child = own_child_form_set(initial=initial_own_child_data, prefix='child')
+        formset_own_child = own_child_form_set(initial=initial_own_child_data, prefix='own_child_not_in_home')
 
         own_child_lists = zip(
             own_child_id_list,
@@ -173,6 +173,7 @@ def other_people_summary(request):
             'form': form,
             'formset_adult': formset_adult,
             'formset_child': formset_child,
+            'formset_own_child': formset_own_child,
             'application_id': application_id_local,
             'adults_in_home': application.adults_in_home,
             'children_in_home': application.children_in_home,
@@ -188,17 +189,20 @@ def other_people_summary(request):
     elif request.method == 'POST':
         child_formset = child_form_set(request.POST, prefix='child')
         adult_formset = adult_form_set(request.POST, prefix='adult')
+        own_child_formset = own_child_form_set(request.POST, prefix='own_child_not_in_home')
 
-        if all([form.is_valid(), child_formset.is_valid(), adult_formset.is_valid()]):
+        if all([form.is_valid(), child_formset.is_valid(), adult_formset.is_valid(), own_child_formset.is_valid()]):
             child_data_list = child_formset.cleaned_data
             adult_data_list = adult_formset.cleaned_data
+            own_child_data_list = own_child_formset.cleaned_data
 
             child_data_list.pop()
             adult_data_list.pop()
+            own_child_data_list.pop()
 
-            request_list = [adult_data_list, child_data_list]
-            object_list = [adults, children]
-            attr_list = ['adult_id', 'child_id']
+            request_list = [adult_data_list, child_data_list, own_child_data_list]
+            object_list = [adults, children, own_children]
+            attr_list = ['adult_id', 'child_id', 'child_id']
 
             section_status = 'COMPLETED'
 
@@ -252,21 +256,37 @@ def other_people_summary(request):
                               child_birth_year_list,
                               child_relationship_list, child_formset)
 
+            own_child_lists = zip(
+                own_child_id_list,
+                own_child_name_list,
+                own_child_birth_day_list,
+                own_child_birth_month_list,
+                own_child_birth_year_list,
+                own_child_address_list,
+                own_child_formset
+            )
+
             for adult_form, adult_name in zip(adult_formset, adult_name_list):
                 adult_form.error_summary_title = 'There was a problem (' + adult_name + ')'
 
             for child_form, child_name in zip(child_formset, child_name_list):
                 child_form.error_summary_title = 'There was a problem (' + child_name + ')'
 
+            for child_form, child_name in zip(own_child_formset, own_child_name_list):
+                child_form.error_summary_title = 'There was a problem (' + child_name + ')'
+
             variables = {
                 'form': form,
                 'formset_adult': adult_formset,
                 'formset_child': child_formset,
+                'formset_own_child': own_child_formset,
                 'application_id': application_id_local,
                 'adults_in_home': application.adults_in_home,
                 'children_in_home': application.children_in_home,
+                'own_children_not_in_the_home': application.own_children_not_in_home,
                 'adult_lists': adult_lists,
                 'child_lists': child_lists,
+                'own_child_lists': own_child_lists,
                 'adult_ebulk_lists': adult_ebulk_lists,
                 'previous_registration_lists': previous_registration_lists
             }
