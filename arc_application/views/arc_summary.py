@@ -16,7 +16,6 @@ from ..decorators import group_required, user_assigned_application
     determining the order of the rows in the merged table
 """
 
-
 name_field_dict = {
     'Your email': 'email_address',
     'Your mobile number': 'mobile_number',
@@ -74,6 +73,7 @@ def arc_summary(request):
             ordered_models.append(AdultInHome)
             ordered_models.append(Application)
             ordered_models.append(ChildInHome)
+            ordered_models.append(Child)
         zero_to_five = ChildcareType.objects.get(application_id=application_id_local).zero_to_five
         if zero_to_five:
             ordered_models.insert(6, HealthDeclarationBooklet)
@@ -109,6 +109,7 @@ def cc_summary(request):
             ordered_models.append(AdultInHome)
             ordered_models.append(Application)
             ordered_models.append(ChildInHome)
+            ordered_models.append(Child)
         zero_to_five = ChildcareType.objects.get(application_id=application_id_local).zero_to_five
         if zero_to_five:
             ordered_models.insert(6, HealthDeclarationBooklet)
@@ -282,30 +283,30 @@ def load_json(application_id_local, ordered_models, recurse):
             # Create tables for each child
             all_children = Child.objects.filter(application_id=application_id_local).order_by('child')
             for child in all_children:
-                    name = child.get_full_name()
-                    if child.birth_day < 10:
-                        birth_day = '0' + str(child.birth_day)
-                    else:
-                        birth_day = str(child.birth_day)
-                    if child.birth_month < 10:
-                        birth_month = '0' + str(child.birth_month)
-                    else:
-                        birth_month = str(child.birth_month)
-                    date_of_birth = birth_day + ' ' + birth_month + ' ' + str(child.birth_year)
-                    if ChildAddress.objects.filter(application_id=application_id_local, child=child.child).exists():
-                        child_address_record = ChildAddress.objects.get(application_id=application_id_local,
-                                                                        child=child.child)
-                        child_address = get_address(child_address_record.street_line1,
-                                                    child_address_record.street_line2, child_address_record.town,
-                                                    child_address_record.postcode)
-                    else:
-                        child_address = 'Same as your home address'
-                    table_list.append([
-                        {"title": name, "id": "Child"},
-                        {"name": "Name", "value": name, 'pk': child.pk, "index": 1},
-                        {"name": "Date of birth", "value": date_of_birth, 'pk': child.pk, "index": 2},
-                        {"name": "Address", "value": child_address, 'pk': child.pk, "index": 3}
-                    ])
+                name = child.get_full_name()
+                if child.birth_day < 10:
+                    birth_day = '0' + str(child.birth_day)
+                else:
+                    birth_day = str(child.birth_day)
+                if child.birth_month < 10:
+                    birth_month = '0' + str(child.birth_month)
+                else:
+                    birth_month = str(child.birth_month)
+                date_of_birth = birth_day + ' ' + birth_month + ' ' + str(child.birth_year)
+                if ChildAddress.objects.filter(application_id=application_id_local, child=child.child).exists():
+                    child_address_record = ChildAddress.objects.get(application_id=application_id_local,
+                                                                    child=child.child)
+                    child_address = get_address(child_address_record.street_line1,
+                                                child_address_record.street_line2, child_address_record.town,
+                                                child_address_record.postcode)
+                else:
+                    child_address = 'Same as your home address'
+                table_list.append([
+                    {"title": name, "id": "Child"},
+                    {"name": "Name", "value": name, 'pk': child.pk, "index": 1},
+                    {"name": "Date of birth", "value": date_of_birth, 'pk': child.pk, "index": 2},
+                    {"name": "Address", "value": child_address, 'pk': child.pk, "index": 3}
+                ])
         elif model == CriminalRecordCheck:
             criminal_record_check = CriminalRecordCheck.objects.get(application_id=application_id_local)
             table_list.append(criminal_record_check.get_summary_table())
@@ -321,6 +322,44 @@ def load_json(application_id_local, ordered_models, recurse):
             ])
         elif model == Application:
             table_list.append(application.get_summary_table_child())
+        elif model == Child:
+            application = Application.objects.get(application_id=application_id_local)
+            table_list.append([
+                {"title": "Children not in the home", "id": application_id_local},
+                {"name": "Do you have children of your own under 16 who do not live with you?",
+                 "value": application.own_children_not_in_home}
+            ])
+            children_not_in_home = Child.objects.filter(application_id=application_id_local,
+                                                        lives_with_childminder=False)
+            #if application.own_children_not_in_home is True:
+
+            for child in children_not_in_home:
+
+                if child.birth_day < 10:
+                    birth_day = '0' + str(child.birth_day)
+                else:
+                    birth_day = str(child.birth_day)
+
+                if child.birth_month < 10:
+                    birth_month = '0' + str(child.birth_month)
+                else:
+                    birth_month = str(child.birth_month)
+
+                date_of_birth = birth_day + ' ' + birth_month + ' ' + str(child.birth_year)
+
+                child_address_record = ChildAddress.objects.get(application_id=application_id_local, child=child.child)
+
+                child_address = get_address(child_address_record.street_line1,
+                                            child_address_record.street_line2, child_address_record.town,
+                                            child_address_record.postcode)
+
+                table_list.append([
+                    {"title": child.get_full_name(), "id": child.pk},
+                    {"name": "Name", "value": child.get_full_name()},
+                    {"name": "Date of birth", "value": date_of_birth},
+                    {"name": "Address", "value": child_address}
+                ])
+
         elif model.objects.filter(application_id=application.pk).exists():
             records = model.objects.filter(application_id=application.pk)
             for record in records:
