@@ -28,9 +28,9 @@ def other_people_summary(request):
     :return: an HttpResponse object with the rendered People in your home: summary template
     """
     # Defines the formset using formset factory
-    adult_form_set = formset_factory(AdultInYourHomeForm, extra=0)
-    child_form_set = formset_factory(ChildInYourHomeForm, extra=0)
-    own_child_form_set = formset_factory(OwnChildNotInHomeForm, extra=0)
+    AdultFormSet = formset_factory(AdultInYourHomeForm, extra=0)
+    ChildFormSet = formset_factory(ChildInYourHomeForm, extra=0)
+    OwnChildFormSet = formset_factory(OwnChildNotInHomeForm, extra=0)
     table_names = ['ADULT_IN_HOME', 'CHILD_IN_HOME', 'CHILD']
     application_id_local = request.GET.get('id') or request.POST.get('id')
     application = Application.objects.get(pk=application_id_local)
@@ -138,7 +138,7 @@ def other_people_summary(request):
         initial_adult_data = other_people_initial_population(True, adults)
 
         # Instantiates the formset with the management data defined above, forcing a set amount of forms
-        formset_adult = adult_form_set(initial=initial_adult_data, prefix='adult')
+        formset_adult = AdultFormSet(initial=initial_adult_data, prefix='adult')
 
         # Zips the formset into the list of adults
         # Converts it to a list, there was trouble parsing the form objects when it was in a zip object
@@ -149,7 +149,7 @@ def other_people_summary(request):
 
         initial_child_data = other_people_initial_population(False, children)
 
-        formset_child = child_form_set(initial=initial_child_data, prefix='child')
+        formset_child = ChildFormSet(initial=initial_child_data, prefix='child')
 
         child_lists = zip(child_id_list, child_name_list, child_birth_day_list, child_birth_month_list,
                           child_birth_year_list,
@@ -157,7 +157,7 @@ def other_people_summary(request):
 
         initial_own_child_data = own_children_not_in_home_initial_population(own_children)
 
-        formset_own_child = own_child_form_set(initial=initial_own_child_data, prefix='own_child_not_in_home')
+        formset_own_child = OwnChildFormSet(initial=initial_own_child_data, prefix='own_child_not_in_home')
 
         own_child_lists = zip(
             own_child_id_list,
@@ -187,9 +187,9 @@ def other_people_summary(request):
         return render(request, 'other-people-summary.html', variables)
 
     elif request.method == 'POST':
-        child_formset = child_form_set(request.POST, prefix='child')
-        adult_formset = adult_form_set(request.POST, prefix='adult')
-        own_child_formset = own_child_form_set(request.POST, prefix='own_child_not_in_home')
+        child_formset = ChildFormSet(request.POST, prefix='child')
+        adult_formset = AdultFormSet(request.POST, prefix='adult')
+        own_child_formset = OwnChildFormSet(request.POST, prefix='own_child_not_in_home')
 
         if all([form.is_valid(), child_formset.is_valid(), adult_formset.is_valid(), own_child_formset.is_valid()]):
             child_data_list = child_formset.cleaned_data
