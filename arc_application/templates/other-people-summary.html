@@ -13,6 +13,9 @@
 {% for form in formset_child %}
     {{form.error_summary}}
 {% endfor %}
+{% for form in formset_own_child %}
+    {{form.error_summary}}
+{% endfor %}
 
     <form method="post" novalidate>
         <h1 class="form-title heading-large">Review: people in the home</h1>
@@ -22,6 +25,8 @@
         {% csrf_token %}
         {{ formset_adult.management_form }}
         {{ formset_child.management_form }}
+        {{ formset_own_child.management_form }}
+
         <table class="check-your-answers form-group">
             <thead>
             <tr>
