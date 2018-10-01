@@ -7,13 +7,14 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render
 
 from ..models.previous_name import PreviousName
-from ..forms.form import AdultInYourHomeForm, ChildInYourHomeForm, OtherPeopleInYourHomeForm, OtherPersonPreviousNames, OwnChildNotInHomeForm
+from ..forms.form import AdultInYourHomeForm, ChildInYourHomeForm, OtherPeopleInYourHomeForm, OtherPersonPreviousNames, \
+    ChildForm, ChildAddressForm
 from ..models import ChildInHome, AdultInHome, Arc, Application, PreviousAddress, ChildAddress, \
     OtherPersonPreviousRegistrationDetails, HealthCheckCurrent, HealthCheckSerious, HealthCheckHospital, ChildcareType, \
     Child
 
 from ..review_util import request_to_comment, save_comments, redirect_selection, build_url
-from ..views import other_people_initial_population, own_children_not_in_home_initial_population
+from ..views import other_people_initial_population, children_initial_population, children_address_initial_population
 from ..decorators import group_required, user_assigned_application
 
 
@@ -29,9 +30,11 @@ def other_people_summary(request):
     """
     # Defines the formset using formset factory
     AdultFormSet = formset_factory(AdultInYourHomeForm, extra=0)
-    ChildFormSet = formset_factory(ChildInYourHomeForm, extra=0)
-    OwnChildFormSet = formset_factory(OwnChildNotInHomeForm, extra=0)
-    table_names = ['ADULT_IN_HOME', 'CHILD_IN_HOME', 'CHILD']
+    ChildInHomeFormSet = formset_factory(ChildInYourHomeForm, extra=0)
+    ChildNotInHomeFormSet = formset_factory(ChildForm, extra=0)
+    ChildNotInHomeAddressFormSet = formset_factory(ChildAddressForm, extra=0)
+
+    table_names = ['ADULT_IN_HOME', 'CHILD_IN_HOME', 'CHILD', 'CHILD_ADDRESS']
     application_id_local = request.GET.get('id') or request.POST.get('id')
     application = Application.objects.get(pk=application_id_local)
 
@@ -149,15 +152,17 @@ def other_people_summary(request):
 
         initial_child_data = other_people_initial_population(False, children)
 
-        formset_child = ChildFormSet(initial=initial_child_data, prefix='child')
+        formset_child = ChildInHomeFormSet(initial=initial_child_data, prefix='child')
 
         child_lists = zip(child_id_list, child_name_list, child_birth_day_list, child_birth_month_list,
                           child_birth_year_list,
                           child_relationship_list, formset_child)
 
-        initial_own_child_data = own_children_not_in_home_initial_population(own_children)
+        initial_own_child_data = children_initial_population(own_children)
 
-        formset_own_child = OwnChildFormSet(initial=initial_own_child_data, prefix='own_child_not_in_home')
+        formset_own_child = ChildNotInHomeFormSet(initial=initial_own_child_data, prefix='own_child_not_in_home')
+
+        formset_own_child_address = ChildNotInHomeAddressFormSet(initial=children_address_initial_population(own_child_address_list), prefix='own_child_not_in_home_address')
 
         own_child_lists = zip(
             own_child_id_list,
@@ -166,7 +171,8 @@ def other_people_summary(request):
             own_child_birth_month_list,
             own_child_birth_year_list,
             own_child_address_list,
-            formset_own_child
+            formset_own_child,
+            formset_own_child_address
         )
 
         variables = {
@@ -174,6 +180,7 @@ def other_people_summary(request):
             'formset_adult': formset_adult,
             'formset_child': formset_child,
             'formset_own_child': formset_own_child,
+            'formset_own_child_address': formset_own_child_address,
             'application_id': application_id_local,
             'adults_in_home': application.adults_in_home,
             'children_in_home': application.children_in_home,
@@ -187,18 +194,20 @@ def other_people_summary(request):
         return render(request, 'other-people-summary.html', variables)
 
     elif request.method == 'POST':
-        child_formset = ChildFormSet(request.POST, prefix='child')
+        child_formset = ChildInHomeFormSet(request.POST, prefix='child')
         adult_formset = AdultFormSet(request.POST, prefix='adult')
-        own_child_formset = OwnChildFormSet(request.POST, prefix='own_child_not_in_home')
+        own_child_formset = ChildNotInHomeFormSet(request.POST, prefix='own_child_not_in_home')
+        own_child_address_formset = ChildNotInHomeAddressFormSet(request.POST, prefix='own_child_not_in_home_address')
 
-        if all([form.is_valid(), child_formset.is_valid(), adult_formset.is_valid(), own_child_formset.is_valid()]):
+        if all([form.is_valid(), child_formset.is_valid(), adult_formset.is_valid(), own_child_formset.is_valid(), own_child_address_formset.is_valid()]):
             child_data_list = child_formset.cleaned_data
             adult_data_list = adult_formset.cleaned_data
             own_child_data_list = own_child_formset.cleaned_data
+            own_child_address_data_list = own_child_address_formset.cleaned_data
 
-            request_list = [adult_data_list, child_data_list, own_child_data_list]
-            object_list = [adults, children, own_children]
-            attr_list = ['adult_id', 'child_id', 'child_id']
+            request_list = [adult_data_list, child_data_list, own_child_data_list, own_child_address_data_list]
+            object_list = [adults, children, own_children, own_child_address_list]
+            attr_list = ['adult_id', 'child_id', 'child_id', 'child_address_id']
 
             section_status = 'COMPLETED'
 
@@ -259,7 +268,8 @@ def other_people_summary(request):
                 own_child_birth_month_list,
                 own_child_birth_year_list,
                 own_child_address_list,
-                own_child_formset
+                own_child_formset,
+                own_child_address_formset
             )
 
             for adult_form, adult_name in zip(adult_formset, adult_name_list):
@@ -268,14 +278,16 @@ def other_people_summary(request):
             for child_form, child_name in zip(child_formset, child_name_list):
                 child_form.error_summary_title = 'There was a problem (' + child_name + ')'
 
-            for child_form, child_name in zip(own_child_formset, own_child_name_list):
+            for child_form, child_address_form, child_name in zip(own_child_formset, own_child_address_formset, own_child_name_list):
                 child_form.error_summary_title = 'There was a problem (' + child_name + ')'
+                child_address_form.error_summary_title = 'There was a problem (' + child_name + ')'
 
             variables = {
                 'form': form,
                 'formset_adult': adult_formset,
                 'formset_child': child_formset,
                 'formset_own_child': own_child_formset,
+                'formset_own_child_address': own_child_address_formset,
                 'application_id': application_id_local,
                 'adults_in_home': application.adults_in_home,
                 'children_in_home': application.children_in_home,
