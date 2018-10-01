@@ -71,12 +71,7 @@ def other_people_summary(request):
 
     # Own children not in the home
     own_children = Child.objects.filter(application_id=application_id_local).order_by('child')
-    own_child_id_list = []
-    own_child_name_list = []
-    own_child_birth_day_list = []
-    own_child_birth_month_list = []
-    own_child_birth_year_list = []
-    own_child_address_list = []
+    own_child_address_list = [address for address in ChildAddress.objects.get(application_id=application_id_local, child=child.child)]
 
     for adult in adults:
         if adult.middle_names and adult.middle_names != '':
@@ -110,18 +105,6 @@ def other_people_summary(request):
         child_birth_month_list.append(child.birth_month)
         child_birth_year_list.append(child.birth_year)
         child_relationship_list.append(child.relationship)
-
-    for child in own_children:
-        if child.middle_names and child.middle_names != '':
-            name = child.first_name + ' ' + child.middle_names + ' ' + child.last_name
-        else:
-            name = child.first_name + ' ' + child.last_name
-        own_child_id_list.append(child.child_id)
-        own_child_name_list.append(name)
-        own_child_birth_day_list.append(child.birth_day)
-        own_child_birth_month_list.append(child.birth_month)
-        own_child_birth_year_list.append(child.birth_year)
-        own_child_address_list.append(ChildAddress.objects.get(application_id = application_id_local, child=child.child))
 
     for adult_id, adult_name in zip(adult_id_list, adult_name_list):
         adult_name_querysets.append(PreviousName.objects.filter(person_id=adult_id, other_person_type='ADULT'))
@@ -163,16 +146,7 @@ def other_people_summary(request):
 
         formset_own_child_address = ChildNotInHomeAddressFormSet(initial=children_address_initial_population(own_child_address_list), prefix='own_child_not_in_home_address')
 
-        own_child_lists = zip(
-            own_child_id_list,
-            own_child_name_list,
-            own_child_birth_day_list,
-            own_child_birth_month_list,
-            own_child_birth_year_list,
-            own_child_address_list,
-            formset_own_child,
-            formset_own_child_address
-        )
+        own_child_lists = zip(own_children, own_child_address_list, formset_own_child, formset_own_child_address)
 
         variables = {
             'form': form,
@@ -279,16 +253,7 @@ def other_people_summary(request):
                               child_birth_year_list,
                               child_relationship_list, child_formset)
 
-            own_child_lists = zip(
-                own_child_id_list,
-                own_child_name_list,
-                own_child_birth_day_list,
-                own_child_birth_month_list,
-                own_child_birth_year_list,
-                own_child_address_list,
-                own_child_formset,
-                own_child_address_formset
-            )
+            own_child_lists = zip(own_children, own_child_address_list, own_child_formset, own_child_address_formset)
 
             for adult_form, adult_name in zip(adult_formset, adult_name_list):
                 adult_form.error_summary_title = 'There was a problem (' + adult_name + ')'
