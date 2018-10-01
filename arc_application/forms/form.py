@@ -1196,6 +1196,21 @@ class ChildAddressForm(GOVUKForm):
 
     instance_id = forms.CharField(widget=forms.HiddenInput, required=False)
 
+    def clean_address_comments(self):
+        """
+        Address comments validation
+        :return: string
+        """
+        address_declare = self.cleaned_data['address_declare']
+        address_comments = self.cleaned_data['address_comments']
+
+        # Only check if a comment has been entered if the field has been flagged
+        if address_declare is True:
+            if address_comments == '':
+                raise forms.ValidationError('You must give reasons')
+
+        return address_comments
+
     def __init__(self, *args, **kwargs):
         super(ChildAddressForm, self).__init__(*args, **kwargs)
         id_value = str(uuid.uuid4())
@@ -1270,90 +1285,6 @@ class ChildForm(GOVUKForm):
                 raise forms.ValidationError('You must give reasons')
 
         return date_of_birth_comments
-
-
-class OwnChildNotInHomeForm(GOVUKForm):
-    """
-    GovUK Form for the flagging of information regarding own children not in the childminder's home.
-    """
-    full_name_declare = forms.BooleanField(label='This information is correct',
-                                           widget=custom_field_widgets.CustomCheckboxInput, required=False)
-    full_name_comments = forms.CharField(label='Name', help_text='(Tip: be clear and concise)',
-                                         widget=custom_field_widgets.Textarea(attrs={'cols': '40', 'rows': '3'}),
-                                         required=False, max_length=250)
-
-    date_of_birth_declare = forms.BooleanField(label='This information is correct',
-                                               widget=custom_field_widgets.CustomCheckboxInput, required=False)
-    date_of_birth_comments = forms.CharField(label='Date of birth', help_text='(Tip: be clear and concise)',
-                                             widget=custom_field_widgets.Textarea,
-                                             required=False, max_length=250)
-
-    address_declare = forms.BooleanField(label='This information is correct',
-                                         widget=custom_field_widgets.CustomCheckboxInput, required=False)
-    address_comments = forms.CharField(label='Address', help_text='(Tip: be clear and concise)',
-                                       widget=custom_field_widgets.Textarea,
-                                       required=False, max_length=250)
-
-    instance_id = forms.CharField(widget=forms.HiddenInput, required=False)
-
-    def clean_full_name_comments(self):
-        """
-        Full name comments validation
-        :return: string
-        """
-        full_name_declare = self.cleaned_data['full_name_declare']
-        full_name_comments = self.cleaned_data['full_name_comments']
-
-        # Only check if a comment has been entered if the field has been flagged
-        if full_name_declare is True:
-            if full_name_comments == '':
-                raise forms.ValidationError('You must give reasons')
-
-        return full_name_comments
-
-    def clean_date_of_birth_comments(self):
-        """
-        Date of birth comments validation
-        :return: string
-        """
-        date_of_birth_declare = self.cleaned_data['date_of_birth_declare']
-        date_of_birth_comments = self.cleaned_data['date_of_birth_comments']
-
-        # Only check if a comment has been entered if the field has been flagged
-        if date_of_birth_declare is True:
-            if date_of_birth_comments == '':
-                raise forms.ValidationError('You must give reasons')
-
-        return date_of_birth_comments
-
-    def clean_address_comments(self):
-        """
-        Address comments validation
-        :return: string
-        """
-        address_declare = self.cleaned_data['address_declare']
-        address_comments = self.cleaned_data['address_comments']
-
-        # Only check if a comment has been entered if the field has been flagged
-        if address_declare is True:
-            if address_comments == '':
-                raise forms.ValidationError('You must give reasons')
-
-        return address_comments
-
-    def __init__(self, *args, **kwargs):
-        super(OwnChildNotInHomeForm, self).__init__(*args, **kwargs)
-        id_value = str(uuid.uuid4())
-        self.fields['instance_id'].initial = id_value
-
-        checkboxes = [((self.fields['full_name_declare']), 'full_name' + id_value),
-                      ((self.fields['date_of_birth_declare']), 'date_of_birth' + id_value),
-                      ((self.fields['address_declare']), 'address' + id_value)]
-
-        for box in checkboxes:
-            box[0].widget.attrs.update({'data_target': box[1],
-                                        'aria-controls': box[1],
-                                        'aria-expanded': 'false'}, )
 
 
 class ChildInYourHomeForm(GOVUKForm):
