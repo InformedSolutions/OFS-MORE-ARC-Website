@@ -9,6 +9,7 @@ RUN  if [ "`echo $PROJECT_SETTINGS | rev | cut -c -3 | rev`" = "dev" ]; then \
      fi
 
 ADD requirements.txt /source/
+ADD requirements.dev.txt /source/
 WORKDIR /source
 RUN pip install -r requirements.txt
 
