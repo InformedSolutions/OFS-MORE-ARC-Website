@@ -637,31 +637,31 @@
                 <td>
                     Do you have any children under 16 who do not live in the home?
                 </td>
-                {% if own_children_not_in_home is True %}
+                {% if own_children_not_in_the_home is True %}
                 <td style="word-wrap: break-word">
                     Yes
                 </td>
-                {% elif own_children_not_in_home is False %}
+                {% elif own_children_not_in_the_home is False %}
                 <td style="word-wrap: break-word">
                     No
                 </td>
                 {% endif %}
                 <td class="change-answer">
-                    {{ form.own_children_not_in_home_declare }}
+                    {{ form.own_children_not_in_the_home_declare }}
                 </td>
             </tr>
-            <tr class="js-hidden" id="children_in_home">
+            <tr class="js-hidden" id="own_children_not_in_the_home">
                 <td colspan="1">
                     <div>
                         Enter your reasoning
                     </div>
                     <div>
-                        {{ form.own_children_not_in_home_comments.help_text}}
+                        {{ form.own_children_not_in_home_the_comments.help_text}}
                     </div>
                 </td>
                 <td colspan="2">
                     <div>
-                        {{ form.own_children_not_in_home_comments}}
+                        {{ form.own_children_not_in_the_home_comments}}
                     </div>
                 </td>
             </tr>
