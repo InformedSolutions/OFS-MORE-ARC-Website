@@ -52,12 +52,15 @@ def __build_summary_form_data(application_id):
 
     # Fetch address data and instantiate associate forms
 
+    children_not_residing_with_childminder = \
+        Child.objects.filter(application_id=application_id, lives_with_childminder=False).order_by('child')
+
     child_addresses = ChildAddress.objects.filter(application_id=application_id).order_by('child')
 
     initial_children_address_data = children_address_initial_population(child_addresses)
     formset_of_children_address = children_address_form_set(initial=initial_children_address_data,
                                                             prefix='child-address')
-    child_addresses_and_form_list = zip(children, child_addresses, formset_of_children_address)
+    child_addresses_and_form_list = zip(children_not_residing_with_childminder, child_addresses, formset_of_children_address)
 
     form = YourChildrenForm(table_keys=[application_id], application_id=application_id)
 
