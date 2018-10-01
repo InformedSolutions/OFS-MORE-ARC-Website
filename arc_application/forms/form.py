@@ -1130,21 +1130,6 @@ class ChildAddressForm(GOVUKForm):
                                         'aria-controls': box[1],
                                         'aria-expanded': 'false'}, )
 
-    def clean_address_comments(self):
-        """
-        Address comments validation
-        :return: string
-        """
-        address_declare = self.cleaned_data['address_declare']
-        address_comments = self.cleaned_data['address_comments']
-
-        # Only check if a comment has been entered if the field has been flagged
-        if address_declare is True:
-            if address_comments == '':
-                raise forms.ValidationError('You must give reasons')
-
-        return address_comments
-
 
 class ChildForm(GOVUKForm):
     """
@@ -1512,8 +1497,6 @@ class OtherPeoplePreviousAddressManualForm(GOVUKForm):
         :return: string
         """
         street_name_and_number = self.cleaned_data['street_name_and_number']
-        if not street_name_and_number:
-            raise forms.ValidationError('Please enter the first line of the address')
         if len(street_name_and_number) > 50:
             raise forms.ValidationError('The first line of your address must be under 50 characters long')
         return street_name_and_number
@@ -1524,8 +1507,6 @@ class OtherPeoplePreviousAddressManualForm(GOVUKForm):
         :return: string
         """
         street_name_and_number2 = self.cleaned_data['street_name_and_number2']
-        if not street_name_and_number2:
-            raise forms.ValidationError('Please enter the second line of the address')
         if len(street_name_and_number2) > 50:
             raise forms.ValidationError('The second line of your address must be under 50 characters long')
         return street_name_and_number2
