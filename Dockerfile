@@ -8,16 +8,16 @@ RUN  if [ "`echo $PROJECT_SETTINGS | rev | cut -c -3 | rev`" = "dev" ]; then \
        apt-get install -y build-essential graphviz vim tree git tig; \
      fi
 
-RUN mkdir /source
-RUN mkdir /source/logs
+ADD requirements.txt /source/
 WORKDIR /source
-ADD . /source/
 RUN pip install -r requirements.txt
 
 # If dev env install python depedencies specifically for dev
 RUN  if [ "`echo $PROJECT_SETTINGS | rev | cut -c -3 | rev`" = "dev" ]; then \
         pip install -r requirements.dev.txt; \
      fi
+
+ADD . /source/
 
 RUN chmod +x /source/docker-entrypoint.sh
 EXPOSE 8000
