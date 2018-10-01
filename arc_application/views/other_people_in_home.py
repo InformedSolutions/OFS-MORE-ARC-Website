@@ -34,7 +34,6 @@ def other_people_summary(request):
     ChildNotInHomeFormSet = formset_factory(ChildForm, extra=0)
     ChildNotInHomeAddressFormSet = formset_factory(ChildAddressForm, extra=0)
 
-    table_names = ['ADULT_IN_HOME', 'CHILD_IN_HOME', 'CHILD', 'CHILD_ADDRESS']
     application_id_local = request.GET.get('id') or request.POST.get('id')
     application = Application.objects.get(pk=application_id_local)
 
@@ -205,28 +204,47 @@ def other_people_summary(request):
             own_child_data_list = own_child_formset.cleaned_data
             own_child_address_data_list = own_child_address_formset.cleaned_data
 
-            request_list = [adult_data_list, child_data_list, own_child_data_list, own_child_address_data_list]
-            object_list = [adults, children, own_children, own_child_address_list]
-            attr_list = ['adult_id', 'child_id', 'child_id', 'child_address_id']
-
             section_status = 'COMPLETED'
 
-            for dictionary in request_list:
-                object_index = request_list.index(dictionary)
-                for person in dictionary:
-                    request_index = dictionary.index(person)
-                    person_object_list = object_list[object_index]
-                    person_object = person_object_list[request_index]
-                    person_id = getattr(person_object, attr_list[object_index])
-                    person_comments = request_to_comment(person_id, table_names[object_index], person)
+            # ======================================================================================================== #
+            # To explain the below:
+            # - Each section has at least one associated formset.
+            # - Each formset has a list of data from the POST request.
+            # - Each element in these lists of data is a dictionary and is associated with a single model.
+            # - The code saves the comments stored in these dictionaries in an ARC_COMMENT using the pk from the model
+            #   with which it corresponds.
+            # - The correspondence is that data for a person stored at adult_data_list[1]
+            #   maps to the model stored at adults[1]
+            #  ======================================================================================================= #
+
+            review_sections_to_process = {
+                'adults_in_home': {
+                    'POST_data': adult_data_list,
+                    'models': adults
+                },
+                'children_in_home': {
+                    'POST_data': child_data_list,
+                    'models': children
+                },
+                'own_children_not_in_home': {
+                    'POST_data': own_child_data_list,
+                    'models': own_children
+                },
+                'own_children_not_in_home_address': {
+                    'POST_data': own_child_address_data_list,
+                    'models': own_child_address_list
+                }
+            }
+
+            for section in review_sections_to_process.values():
+                for person_post_data, person_model in zip(section['POST_data'], section['models']):
+                    person_comments = request_to_comment(person_model.pk, person_model._meta.db_table, person_post_data)
+                    save_comments(request, person_comments)
                     if person_comments:
                         section_status = 'FLAGGED'
                         application = Application.objects.get(pk=application_id_local)
                         application.people_in_home_arc_flagged = True
                         application.save()
-                    successful = save_comments(request, person_comments)
-                    if not successful:
-                        return render(request, '500.html')
 
             static_form_comments = request_to_comment(application_id_local, 'APPLICATION', form.cleaned_data)
             if static_form_comments:
