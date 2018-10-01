@@ -13,7 +13,7 @@ from arc_application.models import AdultInHome
 
 from ..forms.form import PreviousRegistrationDetailsForm, OtherPersonPreviousRegistrationDetailsForm, ChildForm, \
     ChildAddressForm
-from ..forms.form import AdultInYourHomeForm, ChildInYourHomeForm, CommentsForm, OwnChildNotInHomeForm
+from ..forms.form import AdultInYourHomeForm, ChildInYourHomeForm
 from ..magic_link import generate_magic_link
 from ..models import PreviousRegistrationDetails, OtherPersonPreviousRegistrationDetails
 from ..models import ApplicantName, ApplicantPersonalDetails, Application, Arc, ArcComments, ChildcareType, UserDetails
@@ -551,39 +551,8 @@ def children_address_initial_population(address_list):
                     comment = (ArcComments.objects.filter(table_pk=table_id).get(field_name=field_name_local)).comment
                     temp_dict[field] = comment
 
-                if field[-7:] == 'declare':
-                    field_name_local = field[:-8]
-                    checkbox = (ArcComments.objects.filter(table_pk=table_id).get(field_name=field_name_local)).flagged
-                    temp_dict[field] = checkbox
-
-            except ArcComments.DoesNotExist:
-                pass
-
-        initial_data.append(temp_dict)
-
-    return initial_data
-
-
-def own_children_not_in_home_initial_population(person_list):
-    initial_data = []
-
-    for person in person_list:
-        temp_dict = {}
-        table_id = person.child_id
-        form_instance = OwnChildNotInHomeForm()
-
-        for field in form_instance.fields:
-            try:
-
-                if field[-8:] == 'comments':
-                    field_name_local = field[:-9]
-                    comment = (ArcComments.objects.filter(table_pk=table_id).get(field_name=field_name_local)).comment
-                    temp_dict[field] = comment
-
-                if field[-7:] == 'declare':
-                    field_name_local = field[:-8]
-                    checkbox = (ArcComments.objects.filter(table_pk=table_id).get(field_name=field_name_local)).flagged
-                    temp_dict[field] = checkbox
+                    # If a comment exists, set checkbox to True and show previously added comment.
+                    temp_dict[field_name_local + '_declare'] = True
 
             except ArcComments.DoesNotExist:
                 pass
@@ -609,10 +578,8 @@ def children_initial_population(person_list):
                     comment = (ArcComments.objects.filter(table_pk=table_id).get(field_name=field_name_local)).comment
                     temp_dict[field] = comment
 
-                if field[-7:] == 'declare':
-                    field_name_local = field[:-8]
-                    checkbox = (ArcComments.objects.filter(table_pk=table_id).get(field_name=field_name_local)).flagged
-                    temp_dict[field] = checkbox
+                    # If a comment exists, set checkbox to True and show previously added comment.
+                    temp_dict[field_name_local + '_declare'] = True
 
             except ArcComments.DoesNotExist:
                 pass
