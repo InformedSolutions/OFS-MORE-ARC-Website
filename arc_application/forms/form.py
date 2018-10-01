@@ -1130,6 +1130,21 @@ class ChildAddressForm(GOVUKForm):
                                         'aria-controls': box[1],
                                         'aria-expanded': 'false'}, )
 
+    def clean_address_comments(self):
+        """
+        Address comments validation
+        :return: string
+        """
+        address_declare = self.cleaned_data['address_declare']
+        address_comments = self.cleaned_data['address_comments']
+
+        # Only check if a comment has been entered if the field has been flagged
+        if address_declare is True:
+            if address_comments == '':
+                raise forms.ValidationError('You must give reasons')
+
+        return address_comments
+
 
 class ChildForm(GOVUKForm):
     """
