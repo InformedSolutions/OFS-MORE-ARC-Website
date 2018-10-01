@@ -276,9 +276,9 @@ def get_link_urls(url_variables_dict):
 
     # These two urls need certain 'states' to be built, therefore state is saved then changed, and finally reset
     url_variables_dict['state'] = 'manual'
-    context['manual_url'] = build_url('personal_details_previous_addresses', get=url_variables_dict)
+    context['manual_url'] = build_url('other-people-previous-addresses', get=url_variables_dict)
 
     url_variables_dict['state'] = 'entry'
-    context['entry_url'] = build_url('personal_details_previous_addresses', get=url_variables_dict)
+    context['entry_url'] = build_url('other-people-previous-addresses', get=url_variables_dict)
 
     return context

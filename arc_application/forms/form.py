@@ -1512,6 +1512,8 @@ class OtherPeoplePreviousAddressManualForm(GOVUKForm):
         :return: string
         """
         street_name_and_number = self.cleaned_data['street_name_and_number']
+        if not street_name_and_number:
+            raise forms.ValidationError('Please enter the first line of the address')
         if len(street_name_and_number) > 50:
             raise forms.ValidationError('The first line of your address must be under 50 characters long')
         return street_name_and_number
@@ -1522,6 +1524,8 @@ class OtherPeoplePreviousAddressManualForm(GOVUKForm):
         :return: string
         """
         street_name_and_number2 = self.cleaned_data['street_name_and_number2']
+        if not street_name_and_number2:
+            raise forms.ValidationError('Please enter the second line of the address')
         if len(street_name_and_number2) > 50:
             raise forms.ValidationError('The second line of your address must be under 50 characters long')
         return street_name_and_number2
