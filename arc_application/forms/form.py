@@ -874,8 +874,17 @@ class OtherPeopleInYourHomeForm(GOVUKForm):
                                                 widget=custom_field_widgets.Textarea,
                                                 required=False, max_length=250)
 
+    own_children_not_in_the_home_declare = forms.BooleanField(label='This information is correct',
+                                                              widget=custom_field_widgets.CustomCheckboxInput,
+                                                              required=False)
+    own_children_not_in_the_home_comments = forms.CharField(label='Do you live with any children?',
+                                                            help_text='(Tip: be clear and concise)',
+                                                            widget=custom_field_widgets.Textarea,
+                                                            required=False, max_length=250)
+
     checkboxes = [(adults_in_home_declare, 'adults_in_home'),
-                  (children_in_home_declare, 'children_in_home')]
+                  (children_in_home_declare, 'children_in_home'),
+                  (own_children_not_in_the_home_declare, 'own_children_not_in_the_home'),]
 
     for box in checkboxes:
         box[0].widget.attrs.update({'data_target': box[1],
@@ -916,6 +925,21 @@ class OtherPeopleInYourHomeForm(GOVUKForm):
                 raise forms.ValidationError('You must give reasons')
 
         return children_in_home_comments
+
+    def clean_own_children_not_in_the_home_comments(self):
+        """
+        Children in home comments validation
+        :return: string
+        """
+        own_children_not_in_the_home_declare = self.cleaned_data['own_children_not_in_the_home_declare']
+        own_children_not_in_the_home_comments = self.cleaned_data['own_children_not_in_the_home_comments']
+
+        # Only check if a comment has been entered if the field has been flagged
+        if own_children_not_in_the_home_declare is True:
+            if own_children_not_in_the_home_comments == '':
+                raise forms.ValidationError('You must give reasons')
+
+        return own_children_not_in_the_home_comments
 
 
 class AdultInYourHomeForm(GOVUKForm):
