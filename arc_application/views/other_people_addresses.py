@@ -1,15 +1,13 @@
-import json
-
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 
-from arc_application import address_helper
-from arc_application.forms.form import OtherPersonPreviousPostcodeEntry, OtherPeoplePreviousAddressLookupForm, \
+from .. import address_helper
+from ..forms.form import OtherPersonPreviousPostcodeEntry, OtherPeoplePreviousAddressLookupForm, \
     OtherPeoplePreviousAddressManualForm
-from arc_application.models import PreviousAddress
-from arc_application.review_util import build_url
+from ..models import PreviousAddress
+from ..review_util import build_url
 from ..decorators import group_required, user_assigned_application
 
 
@@ -18,74 +16,68 @@ from ..decorators import group_required, user_assigned_application
 @user_assigned_application
 def address_state_dispatcher(request):
     """
-    Dispatcher function to handle the different pages to be rendered
-    :param request: Standard Httprequest object
-    :return:
+    Dispatcher function to handle the different pages to be rendered.
+    :param request: HttpRequest object.
+    :return: function call for the appropriate state.
     """
+    state = getattr(request, request.method).get('state')
 
-    context = get_context(request)
-    context = get_urls(context)
+    if state == 'entry':
+        return postcode_entry(request)
 
-    if context['state'] == 'entry':
-        return postcode_entry(request, context)
+    if state == 'selection':
+        return postcode_selection(request)
 
-    if context['state'] == 'selection':
-        return postcode_selection(request, context)
+    if state == 'manual':
+        return postcode_manual(request)
 
-    if context['state'] == 'manual':
-        return postcode_manual(request, context)
+    if state == 'submission':
+        return postcode_submission(request)
 
-    if context['state'] == 'submission':
-        return postcode_submission(request, context)
-
-    if context['state'] == 'update':
-        return address_update(request, context)
+    if state == 'update':
+        return address_update(request)
 
 
-def postcode_entry(request, context):
+def postcode_entry(request):
     """
     Function to refer the user to the postcode entry page, or redirect them appropriately should it be a POST request
     :param request: Standard Httprequest object
-    :param context: See get_context declaration for definition
     :return:
     """
-    current_form = OtherPersonPreviousPostcodeEntry()
-    context['form'] = current_form
+    context = get_context(request)
 
     if request.method == 'GET':
-        # Grabs any relative urls needed for the page (enter address manually, for example)
-        context = get_urls(context)
-
+        context['form'] = OtherPersonPreviousPostcodeEntry()
         return render(request, 'previous-address-select.html', context)
 
     if request.method == 'POST':
-        current_form = OtherPersonPreviousPostcodeEntry(request.POST)
-        context['form'] = current_form
 
-        # Add the fully finished form to the context, so it can be submitted to the next page or saved
-        if current_form.is_valid():
-            context = get_context(request)
-            postcode = current_form.cleaned_data['postcode']
-            context['postcode'] = postcode
+        if 'add-another' in request.POST:
+            form = OtherPersonPreviousPostcodeEntry()
+            context['form'] = form
+            return render(request, 'previous-address-select.html', context)
 
-            # Define next sate to perform get request on
-            context['state'] = 'selection'
-            return HttpResponseRedirect(build_url('other-people-previous-addresses', get=context))
+        form = OtherPersonPreviousPostcodeEntry(request.POST)
+        context['form'] = form
+
+        if form.is_valid():
+            postcode = form.cleaned_data['postcode']
+
+            if 'postcode-search' in request.POST:
+                return postcode_selection(request)
 
         return render(request, 'previous-address-select.html', context)
 
 
-def postcode_selection(request, context):
+def postcode_selection(request):
     """
     Function to allow the user to select the postcode from the list, or redirect appropriately
     :param request: Standard Httprequest object
-    :param context: See get_context declaration for definition
     :return:
     """
+    context = get_context(request)
 
     if request.method == 'GET':
-        context = get_urls(context)
-
         # Call addressing API with entered postcode
         addresses = address_helper.AddressHelper.create_address_lookup_list(context['postcode'])
 
@@ -95,124 +87,94 @@ def postcode_selection(request, context):
         return render(request, 'previous-address-lookup.html', context)
 
     if request.method == 'POST':
-        addresses = address_helper.AddressHelper.create_address_lookup_list(context['postcode'])
+        addresses = address_helper.AddressHelper.create_address_lookup_list(request.POST['postcode'])
+
+        if 'postcode-search' in request.POST:
+            context['form'] = OtherPeoplePreviousAddressLookupForm(choices=addresses)
+            return render(request, 'previous-address-lookup.html', context)
+
         current_form = OtherPeoplePreviousAddressLookupForm(request.POST, choices=addresses)
         context['form'] = current_form
+
         if current_form.is_valid():
-            context = get_context(request)
-            address = current_form.cleaned_data['address']
-            context['address'] = address
-            context['state'] = 'submission'
-
-            if 'save-and-continue' in request.POST.keys():
-                context['referrer'] = 'save-and-continue'
-            elif "add-another" in request.POST.keys():
-                context['referrer'] = "add-another"
-
-            # Different things must be done for submission if it is manual or a postcode lookup, this variable
-            # differentiates the two functions
-            context['lookup'] = True
-
-            return HttpResponseRedirect(build_url('other-people-previous-addresses', get=context))
+            return postcode_submission(request)
 
     return render(request, 'previous-address-lookup.html', context)
 
 
-def postcode_manual(request, context):
+def postcode_manual(request):
     """
     Function to allow the user to manually enter an address, or be redirected appropriately
     :param request: Standard Httprequest object
-    :param context: See get_context declaration for definition
     :return:
     """
+    context = get_context(request)
 
     if request.method == 'GET':
-        context = get_urls(context)
         context['form'] = OtherPeoplePreviousAddressManualForm()
-
         return render(request, 'other-people-previous-address-manual.html', context)
 
     if request.method == 'POST':
         current_form = OtherPeoplePreviousAddressManualForm(request.POST)
+        context['postcode'] = request.POST['postcode2']
         context['form'] = current_form
+
         if current_form.is_valid():
-            # Store entered address as json to be sent to to the submission view to be saved
-            context['address'] = json.dumps({'line1': current_form.cleaned_data['street_name_and_number'],
-                                             'line2': current_form.cleaned_data['street_name_and_number2'],
-                                             'townOrCity': current_form.cleaned_data['town'],
-                                             'county': current_form.cleaned_data['county'],
-                                             'postcode': current_form.cleaned_data['postcode']})
-            context['state'] = 'submission'
-
-            # As this is a manual entry rather than a postcode lookup, this is set to false
-            context['lookup'] = False
-
-            return HttpResponseRedirect(build_url('other-people-previous-addresses', get=context))
+            return postcode_submission(request)
 
         return render(request, 'other-people-previous-address-manual.html', context)
 
 
-def postcode_submission(request, context):
+def postcode_submission(request):
     """
     Function to allow submission of data from the other views into the previous address table
     :param request: Standard Httprequest object
-    :param context: See get_context declaration for definition
     :return:
     """
+    if request.method == 'POST':
+        if request.POST['state'] == 'manual':
+            line1 = request.POST['street_name_and_number']
+            line2 = request.POST['street_name_and_number2']
+            town = request.POST['town']
+            county = request.POST['county']
+            postcode = request.POST['postcode']
 
-    if request.method == 'GET':
-
-        # If this is a postcode lookup
-        if context['lookup'] == 'True':
-            # The original postcode selection returns an index, which when called again the addressing API, returns
-            # the real value
-            selected_address_index = int(context["address"])
-            selected_address = address_helper.AddressHelper.get_posted_address(
-                selected_address_index, context["postcode"])
-            line1 = selected_address['line1']
-            line2 = selected_address['line2']
-            town = selected_address['townOrCity']
-            postcode = selected_address['postcode']
         else:
-            # If a manual entry, load the json into a dictionary and parse appropriately
-            selected_address = json.loads(context['address'])
+            selected_address_index = int(request.POST['address'])
+            selected_address = address_helper.AddressHelper.get_posted_address(selected_address_index, request.POST['postcode'])
             line1 = selected_address['line1']
             line2 = selected_address['line2']
             town = selected_address['townOrCity']
+            county = ''
             postcode = selected_address['postcode']
 
         # Actual saving is the same regardless of lookup, so done beneath
-        previous_address_record = PreviousAddress(person_id=context['person_id'],
-                                                  person_type=context['person_type'],
+        previous_address_record = PreviousAddress(person_id=request.POST['person_id'],
+                                                  person_type=request.POST['person_type'],
                                                   street_line1=line1,
                                                   street_line2=line2,
                                                   town=town,
-                                                  county='',
+                                                  county=county,
                                                   country='United Kingdom',
                                                   postcode=postcode)
         previous_address_record.save()
 
-        # Next state is set to entry, so that they may enter a new address or continue
-        context['state'] = 'entry'
-        if context['referrer'] == 'add-another':
-            return HttpResponseRedirect(build_url('other-people-previous-addresses', get=context))
-        elif context['referrer'] == 'save-and-continue':
-            return HttpResponseRedirect(build_url('other_people_summary', get=context))
-        else:
-            return HttpResponseRedirect(build_url('other_people_summary', get=context))
+        if 'save-and-continue' in request.POST:
+            return HttpResponseRedirect(build_url('other_people_summary', get={'id': request.POST['id']}))
+        elif 'add-another' in request.POST:
+            return postcode_entry(request)
 
 
-def address_update(request, context):
+def address_update(request):
     """
     Function to allow the user to update an entry to the address table from the other people summary page
     :param request: Standard Httprequest object
-    :param context: See get_context declaration for definition
     :return:
     """
-    if request.method == 'GET':
-        # Populate form with entry from table, uses address primary key to do this
-        context['form'] = OtherPeoplePreviousAddressManualForm(id=request.GET['address_id'])
+    context = get_context(request)
 
+    if request.method == 'GET':
+        context['form'] = OtherPeoplePreviousAddressManualForm(id=request.GET['address_id'])
         return render(request, 'previous-address-manual-update.html', context)
 
     if request.method == 'POST':
@@ -220,7 +182,7 @@ def address_update(request, context):
         context['form'] = current_form
         address_record = PreviousAddress.objects.get(previous_name_id=context['address_id'])
         if current_form.is_valid():
-            # For ease of use, update saving is done here raather than in submission section, adding it would make it
+            # For ease of use, update saving is done here rather than in submission section, adding it would make it
             # harder to understand
             address_record.street_line1 = current_form.cleaned_data['street_name_and_number']
             address_record.street_line2 = current_form.cleaned_data['street_name_and_number2']
@@ -242,111 +204,81 @@ def get_stored_addresses(person_id, person_type):
     :param person_type: Whether the person is an adult or child
     :return:
     """
-    address_queryset = PreviousAddress.objects.filter(person_id=person_id, person_type=person_type)
-    return address_queryset
+    return PreviousAddress.objects.filter(person_id=person_id, person_type=person_type)
 
 
 def get_context(request):
     """
-    A utility method to grab either the get or post context for use in the views
-    :param request: The current httprequest object
-    :return:
+    Function to grab all the context required for rendering the views, by calling, in turn, the functions which grab
+    data from the HttpResponse object.
+
+    XXX: These need to be called in a particular order to avoid excessively long urls which exceed the nginx buffer size.
+
+    :param request: HttpResponse object from which to grab the data.
+    :return: context: dict containing all the information required by the views.
     """
-
-    if request.method == 'GET':
-        app_id = request.GET['id']
-        state = request.GET['state']
-        person_id = request.GET['person_id']
-        person_type = request.GET['person_type']
-
-        # These variables may not exist (depends on view). In order to keep generic, caught in try catch
-        try:
-            postcode = request.GET['postcode']
-        except:
-            postcode = None
-
-        try:
-            address = request.GET['address']
-        except:
-            address = None
-
-        try:
-            lookup = request.GET['lookup']
-        except:
-            lookup = None
-        try:
-            address_id = request.GET['address_id']
-        except:
-            address_id = None
-        try:
-            referrer = request.GET['referrer']
-        except:
-            referrer = None
-
-    if request.method == 'POST':
-        app_id = request.POST['id']
-        state = request.POST['state']
-        person_id = request.POST['person_id']
-        person_type = request.POST['person_type']
-
-        # These variables may not exist (depends on view). In order to keep generic, caught in try catch
-        try:
-            postcode = request.POST['postcode']
-        except:
-            postcode = None
-        try:
-            address = request.POST['address']
-        except:
-            address = None
-        try:
-            lookup = request.GET['lookup']
-        except:
-            lookup = None
-        try:
-            address_id = request.POST['address_id']
-        except:
-            address_id = None
-        try:
-            referrer = request.POST['referrer']
-        except:
-            referrer = None
-
-    # Actual context definition after variable assignment
-    context = {
-        'application_id': app_id,
-        'id': app_id,
-        'state': state,
-        'person_id': person_id,
-        'person_type': person_type,
-        'postcode': postcode,
-        'address': address,
-        'previous_addresses': get_stored_addresses(person_id, person_type),
-        'lookup': lookup,
-        'address_id': address_id,
-        'referrer': referrer
-    }
-
+    context = get_url_data(request)
+    context.update(get_link_urls(context))
+    context.update(get_post_data(request))
     return context
 
 
-def get_urls(context):
+def get_url_data(request):
     """
-    A utility method to get any extra urls needed for a page, created here to allow for different contexts
-    :param context: The current views context
-    :return:
+    Function to grab variables required for the context and link urls from the request url.
+    :param request: HttpResponse object from which to grab the data.
+    :return: dict whose (key, value) pairs are the strings in url_variables_to_check and their respective values.
     """
-    state = context['state']
+    url_variables_to_check = [
+        'id',
+        'state',
+        'person_id',
+        'person_type'
+    ]
 
-    # These two urls need certain 'states' to be built, therefore state is saved then changed, and finally reset
-    context['state'] = 'manual'
-    context['manual_url'] = build_url('other-people-previous-addresses', get=context)
-    context['state'] = 'entry'
-    context['entry_url'] = build_url('other-people-previous-addresses', get=context)
+    return dict((var, getattr(request, request.method).get(var, None)) for var in url_variables_to_check)
 
-    # Reset occurs here
-    context['state'] = state
+
+def get_post_data(request):
+    """
+    Function to grab variables required for the context from the POST data.
+    :param request: HttpResponse object from which to grab the data.
+    :return: dict whose (key, value) pairs are the strings in url_variables_to_check and their respective values, with
+             an additional 'previous_addresses' value for the context.
+    """
+    post_vars_to_check = [
+        'postcode',
+        'address',
+        'lookup',
+        'address_id',
+        'referrer'
+    ]
+
+    post_data_vars = dict((var, getattr(request, request.method).get(var, None)) for var in post_vars_to_check)
+
+    url_vars = get_url_data(request)
+    post_data_vars['previous_addresses'] = get_stored_addresses(url_vars['person_id'], url_vars['person_type'])
+
+    return post_data_vars
+
+
+def get_link_urls(url_variables_dict):
+    """
+    The 'previous address' templates require urls for links contained within the page.
+    These require the list of url variables from get_url_data.
+    :param: url_variables_dict: dict containing the required url variables.
+    :return: context: dict containing the urls to be passed as context variables.
+    """
+    context = dict()
 
     # List url does not require a new state, so set after state changes, once it has been reset
-    context['list_url'] = build_url('other_people_summary', get={'id': context['id']})
+    context['list_url'] = build_url('other_people_summary', get={'id': url_variables_dict['id']})
+
+    # These two urls need certain 'states' to be built, therefore state is saved then changed, and finally reset
+    url_variables_dict['state'] = 'manual'
+    context['manual_url'] = build_url('personal_details_previous_addresses', get=url_variables_dict)
+
+    url_variables_dict['state'] = 'entry'
+    context['entry_url'] = build_url('personal_details_previous_addresses', get=url_variables_dict)
 
     return context
