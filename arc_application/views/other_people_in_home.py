@@ -71,7 +71,9 @@ def other_people_summary(request):
 
     # Own children not in the home
     own_children = Child.objects.filter(application_id=application_id_local).order_by('child')
-    own_child_address_list = [address for address in ChildAddress.objects.get(application_id=application_id_local, child=child.child)]
+    own_child_address_list = [
+        ChildAddress.objects.get(application_id=application_id_local, child=child.child) for child in own_children
+    ]
 
     for adult in adults:
         if adult.middle_names and adult.middle_names != '':
