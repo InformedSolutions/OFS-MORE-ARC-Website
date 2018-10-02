@@ -11,7 +11,7 @@ from ..forms.form import AdultInYourHomeForm, ChildInYourHomeForm, OtherPeopleIn
     ChildForm, ChildAddressForm
 from ..models import ChildInHome, AdultInHome, Arc, Application, PreviousAddress, ChildAddress, \
     OtherPersonPreviousRegistrationDetails, HealthCheckCurrent, HealthCheckSerious, HealthCheckHospital, ChildcareType, \
-    Child
+    Child, ApplicantHomeAddress
 
 from ..review_util import request_to_comment, save_comments, redirect_selection, build_url
 from ..views import other_people_initial_population, children_initial_population, children_address_initial_population
@@ -69,8 +69,16 @@ def other_people_summary(request):
     child_birth_year_list = []
     child_relationship_list = []
 
+    # Only show 'Own children not in the home' if applicant is providing care in their own home.
+    # Both applicant home address and applicant childcare address are stored in the APPLICANT_HOME_ADDRESS table.
+    # If the current_address is also the childcare_address, we know they are providing care in their own home.
+
+    home_address = ApplicantHomeAddress.objects.get(application_id=application_id_local, current_address=True)
+    providing_care_in_own_home = home_address.childcare_address
+
     # Own children not in the home
     own_children = Child.objects.filter(application_id=application_id_local).order_by('child')
+    own_child_name_list = []
     own_child_address_list = [
         ChildAddress.objects.get(application_id=application_id_local, child=child.child) for child in own_children
     ]
@@ -107,6 +115,13 @@ def other_people_summary(request):
         child_birth_month_list.append(child.birth_month)
         child_birth_year_list.append(child.birth_year)
         child_relationship_list.append(child.relationship)
+
+    for child in own_children:
+        if child.middle_names and child.middle_names != '':
+            name = child.first_name + ' ' + child.middle_names + ' ' + child.last_name
+        else:
+            name = child.first_name + ' ' + child.last_name
+        own_child_name_list.append(name)
 
     for adult_id, adult_name in zip(adult_id_list, adult_name_list):
         adult_name_querysets.append(PreviousName.objects.filter(person_id=adult_id, other_person_type='ADULT'))
@@ -165,6 +180,7 @@ def other_people_summary(request):
             'own_child_lists': own_child_lists,
             'adult_ebulk_lists': adult_ebulk_lists,
             'previous_registration_lists': previous_registration_lists,
+            'providing_care_in_own_home': providing_care_in_own_home
         }
         return render(request, 'other-people-summary.html', variables)
 
@@ -281,7 +297,8 @@ def other_people_summary(request):
                 'child_lists': child_lists,
                 'own_child_lists': own_child_lists,
                 'adult_ebulk_lists': adult_ebulk_lists,
-                'previous_registration_lists': previous_registration_lists
+                'previous_registration_lists': previous_registration_lists,
+                'providing_care_in_own_home': providing_care_in_own_home
             }
             return render(request, 'other-people-summary.html', variables)
 

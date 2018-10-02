@@ -631,6 +631,8 @@
 
         {% endfor %}
 
+        {% if providing_care_in_own_home %}
+
         <table class="check-your-answers form-group">
             <thead>
             <tr>
@@ -834,6 +836,7 @@
         </table>
 
         {% endfor %}
+        {% endif %}
 
         {% for id, name, previous_names, previous_addresses in adult_ebulk_lists %}
         <table class="check-your-answers form-group">
