@@ -72,12 +72,21 @@ class ChildcareTraining(models.Model):
 
         else:
 
+            if self.eyfs_course_date_day < 10:
+                course_day = '0' + str(self.eyfs_course_date_day)
+            else:
+                course_day = str(self.eyfs_course_date_day)
+
+            if self.eyfs_course_date_month < 10:
+                course_month = '0' + str(self.eyfs_course_date_month)
+            else:
+                course_month = str(self.eyfs_course_date_month)
+
             return [
                 {"title": "Childcare training", "id": self.pk},
                 {"name": "Title of training course", "value": self.eyfs_course_name},
                 {"name": "Date you completed course",
-                 "value": str(self.eyfs_course_date_day) + '/' + str(self.eyfs_course_date_month) + '/' + str(
-                     self.eyfs_course_date_year)}
+                 "value": str(course_day) + '/' + str(course_month) + '/' + str(self.eyfs_course_date_year)}
             ]
 
     class Meta:

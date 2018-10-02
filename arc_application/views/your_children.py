@@ -6,7 +6,7 @@ from django.shortcuts import render
 from django.urls import reverse
 
 from ..forms.form import ChildForm, ChildAddressForm, YourChildrenForm
-from ..models import Child, ChildAddress, Application, Arc
+from ..models import Child, ChildAddress, Application, Arc, ApplicantHomeAddress, ApplicantPersonalDetails
 from ..decorators import group_required, user_assigned_application
 from .review import children_initial_population, children_address_initial_population
 
@@ -53,11 +53,39 @@ def __build_summary_form_data(application_id):
     # Fetch address data and instantiate associate forms
 
     child_addresses = ChildAddress.objects.filter(application_id=application_id).order_by('child')
+    child_addresses_for_display = []
+
+    application = Application.objects.get(application_id=application_id)
+
+    applicant = ApplicantPersonalDetails.get_id(app_id=application_id)
+    applicant_personal_address = \
+        ApplicantHomeAddress.objects.get(personal_detail_id=applicant,
+                                                                       current_address=True)
+
+    # Create address tables
+    for child in children:
+        child_address = child_addresses.filter(child=child.child)
+        if len(child_address) == 0:
+            address = ChildAddress(
+                child=child.child,
+                application_id=application,
+                street_line1=applicant_personal_address.street_line1,
+                street_line2=applicant_personal_address.street_line2,
+                town=applicant_personal_address.town,
+                county=applicant_personal_address.county,
+                country=applicant_personal_address.country,
+                postcode=applicant_personal_address.postcode
+            )
+
+            child_addresses_for_display.append(address)
+        else:
+            child_address = child_addresses.get(child=child.child)
+            child_addresses_for_display.append(child_address)
 
     initial_children_address_data = children_address_initial_population(child_addresses)
     formset_of_children_address = children_address_form_set(initial=initial_children_address_data,
                                                             prefix='child-address')
-    child_addresses_and_form_list = zip(children, child_addresses, formset_of_children_address)
+    child_addresses_and_form_list = zip(children, child_addresses_for_display, formset_of_children_address)
 
     form = YourChildrenForm(table_keys=[application_id], application_id=application_id)
 

@@ -46,13 +46,23 @@ class FirstAidTraining(models.Model):
         return cls.objects.get(application_id=app_id)
 
     def get_summary_table(self):
+
+        if self.course_day < 10:
+            course_day = '0' + str(self.course_day)
+        else:
+            course_day = str(self.course_day)
+
+        if self.course_month < 10:
+            course_month = '0' + str(self.course_month)
+        else:
+            course_month = str(self.course_month)
+
         return [
             {"title": "First aid training", "id": self.pk},
             {"name": "Training organisation", "value": self.training_organisation},
             {"name": "Title of training course", "value": self.course_title},
             {"name": "Date you completed course",
-             "value": str(self.course_day) + '/' + str(self.course_month) + '/' + str(
-                 self.course_year)}
+             "value": str(course_day) + '/' + str(course_month) + '/' + str(self.course_year)}
         ]
 
     class Meta:

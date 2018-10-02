@@ -133,7 +133,7 @@ class Migration(migrations.Migration):
                 ('publish_details', models.NullBooleanField(default=None)),
                 ('working_in_other_childminder_home', models.NullBooleanField(default=None)),
                 ('own_children', models.NullBooleanField(default=None)),
-                ('own_children_not_in_home', models.NullBooleanField(default=None)),
+                ('own_children_not_in_home', models.NullBooleanField(default=None))
             ],
             options={
                 'db_table': 'APPLICATION',
@@ -325,9 +325,9 @@ class Migration(migrations.Migration):
                 ('person_id', models.ForeignKey(blank=True, on_delete=django.db.models.deletion.CASCADE, to='arc_application.AdultInHome')),
             ],
             options={
-                'abstract': False,
                 'db_table': 'HOSPITAL_ADMISSION',
                 'ordering': ['start_date'],
+                'abstract': False,
             },
         ),
         migrations.CreateModel(
@@ -340,9 +340,9 @@ class Migration(migrations.Migration):
                 ('person_id', models.ForeignKey(blank=True, on_delete=django.db.models.deletion.CASCADE, to='arc_application.AdultInHome')),
             ],
             options={
-                'abstract': False,
                 'db_table': 'SERIOUS_ILLNESS',
                 'ordering': ['start_date'],
+                'abstract': False,
             },
         ),
         migrations.CreateModel(
