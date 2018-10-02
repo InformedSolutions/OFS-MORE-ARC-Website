@@ -1476,11 +1476,23 @@ class OtherPeoplePreviousAddressManualForm(GOVUKForm):
     auto_replace_widgets = True
     error_summary_title = "There was a problem on this page"
 
-    street_name_and_number = forms.CharField(label='Address line 1', required=False)
+    street_name_and_number = forms.CharField(
+        label='Address line 1',
+        required=True,
+        error_messages={'required': 'Please enter the first line of the address'}
+    )
     street_name_and_number2 = forms.CharField(label='Address line 2', required=False)
-    town = forms.CharField(label='Town or city', required=False)
+    town = forms.CharField(
+        label='Town or city',
+        required=True,
+        error_messages={'required': 'Please enter the name of the town or city'}
+    )
     county = forms.CharField(label='County (optional)', required=False)
-    postcode = forms.CharField(label='Postcode', required=False)
+    postcode = forms.CharField(
+        label='Postcode',
+        required=True,
+        error_messages={'required': 'Please enter a valid postcode'}
+    )
 
     def __init__(self, *args, **kwargs):
         """
@@ -1639,11 +1651,23 @@ class PersonalDetailsPreviousAddressManualForm(GOVUKForm):
     auto_replace_widgets = True
     error_summary_title = "There was a problem on this page"
 
-    street_name_and_number = forms.CharField(label='Address line 1', required=False)
+    street_name_and_number = forms.CharField(
+        label='Address line 1',
+        required=True,
+        error_messages={'required': 'Please enter the first line of the address'}
+    )
     street_name_and_number2 = forms.CharField(label='Address line 2', required=False)
-    town = forms.CharField(label='Town or city', required=False)
+    town = forms.CharField(
+        label='Town or city',
+        required=True,
+        error_messages={'required': 'Please enter the name of the town or city'}
+    )
     county = forms.CharField(label='County (optional)', required=False)
-    postcode = forms.CharField(label='Postcode', required=False)
+    postcode = forms.CharField(
+        label='Postcode',
+        required=True,
+        error_messages={'required': 'Please enter a valid postcode'}
+    )
 
     def __init__(self, *args, **kwargs):
         """
