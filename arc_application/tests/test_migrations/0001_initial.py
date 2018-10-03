@@ -130,7 +130,6 @@ class Migration(migrations.Migration):
                 ('date_last_accessed', models.DateTimeField(blank=True, null=True)),
                 ('application_reference', models.CharField(blank=True, max_length=9, null=True, validators=[django.core.validators.RegexValidator('(\\w{2})([0-9]{7})')])),
                 ('ofsted_visit_email_sent', models.DateTimeField(blank=True, null=True)),
-                ('publish_details', models.NullBooleanField(default=None)),
                 ('working_in_other_childminder_home', models.NullBooleanField(default=None)),
                 ('own_children', models.NullBooleanField(default=None)),
                 ('own_children_not_in_home', models.NullBooleanField(default=None))
