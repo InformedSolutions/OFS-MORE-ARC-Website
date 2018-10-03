@@ -42,13 +42,14 @@ name_field_dict = {
     'Name': 'full_name',
     'Date of birth': 'date_of_birth',
     'Relationship': 'relationship',
-    'Email': 'email_address',
+    'Email': 'email',
     'Does anyone aged 16 or over live or work in your home?': 'adults_in_home',
-    'Do you live with any children?': 'children_in_home',
+    'Do children under 16 live in the home?': 'children_in_home',
+    'Do you have children of your own under 16 who do not live with you?': 'own_children_not_in_home',
     'Full name': 'full_name',
     'How they know you': 'relationship',
     'Known for': 'time_known',
-    'Address': 'address',
+    'address': 'address',
     'Phone number': 'phone_number',
     'Email address': 'email_address',
     'What type of childcare training have you completed?': 'childcare_training',
@@ -174,6 +175,12 @@ def add_comments(json, app_id):
                         field = name_field_dict.get('eyfs_course_date', '')
                     elif "First aid" in title:
                         field = name_field_dict.get('first_aid_date', '')
+
+                elif name == 'Address':
+                    if "reference" in title:
+                        field = name_field_dict.get('address', '')
+                    else:
+                        field = 'address' + str(id)
 
                 else:
                     field = name_field_dict.get(name, '')
