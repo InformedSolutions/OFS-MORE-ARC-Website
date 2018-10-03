@@ -242,6 +242,7 @@ def other_people_summary(request):
                     if person_comments:
                         section_status = 'FLAGGED'
                         application = Application.objects.get(pk=application_id_local)
+                        application.people_in_home_status = section_status
                         application.people_in_home_arc_flagged = True
                         application.save()
 
@@ -250,6 +251,7 @@ def other_people_summary(request):
                 section_status = 'FLAGGED'
                 application = Application.objects.get(pk=application_id_local)
                 application.people_in_home_arc_flagged = True
+                application.people_in_home_status = section_status
                 application.save()
             successful = save_comments(request, static_form_comments)
             if not successful:
