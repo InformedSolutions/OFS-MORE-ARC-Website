@@ -57,7 +57,7 @@ name_field_dict = {
     'Have you lived or worked on a British military base outside of the UK in the last 5 years?': 'military_base',
     'Do you have an Ofsted DBS Check?': 'capita',
     'Are you on the DBS update service?': 'on_update',
-    'Which of your children live with you?': 'children_living_with_you'
+    'Which of your children live with you?': 'children_living_with_childminder_selection'
 }
 
 
