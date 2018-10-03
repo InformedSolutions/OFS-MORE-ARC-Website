@@ -204,8 +204,8 @@ def load_json(application_id_local, ordered_models, recurse):
     :param application_id_local: the id of the application being handled
     :param ordered_models: the models to be built for the summary page
     :param recurse: flag to indicate whether the method is currently recursing
-    :return:
     """
+
     application = Application.objects.get(application_id=application_id_local)
     table_list = []
 
@@ -216,6 +216,12 @@ def load_json(application_id_local, ordered_models, recurse):
             table_list.append(load_json(application_id_local, model, True))
 
         elif model == ApplicantHomeAddress:
+
+            # If personal address has not yet been supplied by the applicant, continue loop to avoid exception being
+            # raised when fetching record
+            if not ApplicantHomeAddress.objects.filter(application_id=application_id_local,
+                                                                   current_address=True).exists():
+                continue
 
             home_address_record = ApplicantHomeAddress.objects.get(application_id=application_id_local,
                                                                    current_address=True)
@@ -314,6 +320,11 @@ def load_json(application_id_local, ordered_models, recurse):
                     ])
 
         elif model == CriminalRecordCheck:
+
+            # If criminal record details have not yet been supplied by the applicant, continue loop to avoid exception
+            # being raised when fetching record
+            if not CriminalRecordCheck.objects.filter(application_id=application_id_local).exists():
+                continue
 
             criminal_record_check = CriminalRecordCheck.objects.get(application_id=application_id_local)
             table_list.append(criminal_record_check.get_summary_table())
