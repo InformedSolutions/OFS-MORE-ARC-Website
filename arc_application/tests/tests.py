@@ -406,56 +406,6 @@ class ArcSummaryTest(TestCase):
         reloaded_application = Application.objects.get(pk=application.application_id)
         self.assertTrue(reloaded_application.criminal_record_check_arc_flagged)
 
-    # def test_task_flagged_with_comment_people_in_your_home(self):
-    #     # Assemble
-    #     create_application()
-    #
-    #     post_dictionary = {
-    #         'adult-TOTAL_FORMS': 1,
-    #         'adult-INITIAL_FORMS': 0,
-    #         'adult-MIN_NUM_FORMS': 0,
-    #         'adult-MAX_NUM_FORMS': 1000,
-    #         'child-TOTAL_FORMS': 1,
-    #         'child-INITIAL_FORMS': 0,
-    #         'child-MIN_NUM_FORMS': 0,
-    #         'child-MAX_NUM_FORMS': 1000,
-    #         'id': application.application_id,
-    #         'static-children_in_home_declare': True,
-    #         'static-children_in_home_comments': 'There was a test issue with this field'
-    #     }
-    #
-    #     # Act
-    #     self.client.login(username='arc_test', password='my_secret')
-    #     response = self.client.post(reverse('other_people_summary') + '?id=' + application.application_id,
-    #                                 post_dictionary)
-    #
-    #     # Assert
-    #
-    #     # 1. Check HTTP status code correct
-    #     self.assertEqual(response.status_code, 302)
-    #
-    #     # 2. Ensure overall task status marked as FLAGGED in ARC view
-    #     reloaded_arc_record = Arc.objects.get(pk=application.application_id)
-    #     self.assertEqual(reloaded_arc_record.people_in_home_review, flagged_status)
-    #
-    #     # 3. Check that comment has been correctly appended to application
-    #     try:
-    #         arc_comments = ArcComments.objects.get(
-    #             table_pk='da2265c2-2d65-4214-bfef-abcfe59b75aa',
-    #             table_name='APPLICATION',
-    #             field_name='children_in_home',
-    #             comment='There was a test issue with this field',
-    #             flagged=True,
-    #         )
-    #     except:
-    #         self.fail('ARC comment could not be retrieved for flagged field')
-    #
-    #     self.assertIsNotNone(arc_comments)
-    #
-    #     # 4. Check flagged boolean indicator is set on the application record
-    #     reloaded_application = Application.objects.get(pk=application.application_id)
-    #     self.assertTrue(reloaded_application.people_in_home_arc_flagged)
-
     def test_task_flagged_with_comment_references(self):
         # Assemble
         create_application()
