@@ -77,7 +77,8 @@ def other_people_summary(request):
     providing_care_in_own_home = home_address.childcare_address
 
     # Own children not in the home
-    own_children = Child.objects.filter(application_id=application_id_local).order_by('child')
+    own_children = Child.objects.filter(application_id=application_id_local, lives_with_childminder=False).order_by(
+        'child')
     own_child_name_list = []
     own_child_address_list = [
         ChildAddress.objects.get(application_id=application_id_local, child=child.child) for child in own_children
@@ -144,10 +145,12 @@ def other_people_summary(request):
 
         # Zips the formset into the list of adults
         # Converts it to a list, there was trouble parsing the form objects when it was in a zip object
-        adult_lists = list(zip(adult_record_list, adult_id_list, adult_health_check_status_list, adult_name_list, adult_birth_day_list,
-                               adult_birth_month_list, adult_birth_year_list, adult_relationship_list, adult_dbs_list, adult_lived_abroad,
-                               adult_military_base, adult_capita_dbs,
-                               formset_adult, current_illnesses, serious_illnesses, hospital_admissions))
+        adult_lists = list(
+            zip(adult_record_list, adult_id_list, adult_health_check_status_list, adult_name_list, adult_birth_day_list,
+                adult_birth_month_list, adult_birth_year_list, adult_relationship_list, adult_dbs_list,
+                adult_lived_abroad,
+                adult_military_base, adult_capita_dbs,
+                formset_adult, current_illnesses, serious_illnesses, hospital_admissions))
 
         initial_child_data = other_people_initial_population(False, children)
 
@@ -161,7 +164,8 @@ def other_people_summary(request):
 
         formset_own_child = ChildNotInHomeFormSet(initial=initial_own_child_data, prefix='own_child_not_in_home')
 
-        formset_own_child_address = ChildNotInHomeAddressFormSet(initial=children_address_initial_population(own_child_address_list), prefix='own_child_not_in_home_address')
+        formset_own_child_address = ChildNotInHomeAddressFormSet(
+            initial=children_address_initial_population(own_child_address_list), prefix='own_child_not_in_home_address')
 
         own_child_lists = zip(own_children, own_child_address_list, formset_own_child, formset_own_child_address)
 
@@ -190,7 +194,8 @@ def other_people_summary(request):
         own_child_formset = ChildNotInHomeFormSet(request.POST, prefix='own_child_not_in_home')
         own_child_address_formset = ChildNotInHomeAddressFormSet(request.POST, prefix='own_child_not_in_home_address')
 
-        if all([form.is_valid(), child_formset.is_valid(), adult_formset.is_valid(), own_child_formset.is_valid(), own_child_address_formset.is_valid()]):
+        if all([form.is_valid(), child_formset.is_valid(), adult_formset.is_valid(), own_child_formset.is_valid(),
+                own_child_address_formset.is_valid()]):
             child_data_list = child_formset.cleaned_data
             adult_data_list = adult_formset.cleaned_data
             own_child_data_list = own_child_formset.cleaned_data
@@ -223,7 +228,7 @@ def other_people_summary(request):
             # Only add comments for own_children_not_in_home if questions are applicable.
             if providing_care_in_own_home:
                 review_sections_to_process.update(
-                        {
+                    {
                         'own_children_not_in_home': {
                             'POST_data': own_child_data_list,
                             'models': own_children
@@ -288,7 +293,8 @@ def other_people_summary(request):
             for child_form, child_name in zip(child_formset, child_name_list):
                 child_form.error_summary_title = 'There was a problem (' + child_name + ')'
 
-            for child_form, child_address_form, child_name in zip(own_child_formset, own_child_address_formset, own_child_name_list):
+            for child_form, child_address_form, child_name in zip(own_child_formset, own_child_address_formset,
+                                                                  own_child_name_list):
                 child_form.error_summary_title = 'There was a problem (' + child_name + ')'
                 child_address_form.error_summary_title = 'There was a problem (' + child_name + ')'
 

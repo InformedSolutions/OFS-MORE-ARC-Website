@@ -38,11 +38,11 @@ name_field_dict = {
     'Provide a Health Declaration Booklet?': 'health_submission_consent',
     'DBS certificate number': 'dbs_certificate_number',
     'Do you have any criminal cautions or convictions?': 'cautions_convictions',
-    'Health check status': 'health_check_status',
+    'Health questions status': 'health_check_status',
     'Name': 'full_name',
     'Date of birth': 'date_of_birth',
     'Relationship': 'relationship',
-    'Email': 'email',
+    'Email': 'email_address',
     'Does anyone aged 16 or over live or work in your home?': 'adults_in_home',
     'Do you live with any children?': 'children_in_home',
     'Full name': 'full_name',
@@ -53,9 +53,10 @@ name_field_dict = {
     'Email address': 'email_address',
     'What type of childcare training have you completed?': 'childcare_training',
     'Have you lived outside of the UK in the last 5 years?': 'lived_abroad',
-    'Have you lived or worked on a British military base in the last 5 years?': 'military_base',
+    'Have you lived or worked on a British military base outside of the UK in the last 5 years?': 'military_base',
     'Do you have an Ofsted DBS Check?': 'capita',
-    'Are you on the DBS update service?': 'on_update'
+    'Are you on the DBS update service?': 'on_update',
+    'Which of your children live with you?': 'children_living_with_you'
 }
 
 
