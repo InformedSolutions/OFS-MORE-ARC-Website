@@ -218,15 +218,22 @@ def other_people_summary(request):
                     'POST_data': child_data_list,
                     'models': children
                 },
-                'own_children_not_in_home': {
-                    'POST_data': own_child_data_list,
-                    'models': own_children
-                },
-                'own_children_not_in_home_address': {
-                    'POST_data': own_child_address_data_list,
-                    'models': own_child_address_list
-                }
             }
+
+            # Only add comments for own_children_not_in_home if questions are applicable.
+            if providing_care_in_own_home:
+                review_sections_to_process.update(
+                        {
+                        'own_children_not_in_home': {
+                            'POST_data': own_child_data_list,
+                            'models': own_children
+                        },
+                        'own_children_not_in_home_address': {
+                            'POST_data': own_child_address_data_list,
+                            'models': own_child_address_list
+                        }
+                    }
+                )
 
             for section in review_sections_to_process.values():
                 for person_post_data, person_model in zip(section['POST_data'], section['models']):
