@@ -1188,55 +1188,55 @@ class ChildAddressForm(GOVUKForm):
     Form for handling user responses where their children address have been detailed
     """
 
-    address_declare = forms.BooleanField(label='This information is correct',
+    child_address_declare = forms.BooleanField(label='This information is correct',
                                          widget=custom_field_widgets.CustomCheckboxInput, required=False)
-    address_comments = forms.CharField(label='Address', help_text='(Tip: be clear and concise)',
+    child_address_comments = forms.CharField(label='Address', help_text='(Tip: be clear and concise)',
                                        widget=custom_field_widgets.Textarea,
                                        required=False, max_length=250)
 
     instance_id = forms.CharField(widget=forms.HiddenInput, required=False)
 
-    def clean_address_comments(self):
+    def clean_child_address_comments(self):
         """
         Address comments validation
         :return: string
         """
-        address_declare = self.cleaned_data['address_declare']
-        address_comments = self.cleaned_data['address_comments']
+        child_address_declare = self.cleaned_data['child_address_declare']
+        child_address_comments = self.cleaned_data['child_address_comments']
 
         # Only check if a comment has been entered if the field has been flagged
-        if address_declare is True:
-            if address_comments == '':
+        if child_address_declare is True:
+            if child_address_comments == '':
                 raise forms.ValidationError('You must give reasons')
 
-        return address_comments
+        return child_address_comments
 
     def __init__(self, *args, **kwargs):
         super(ChildAddressForm, self).__init__(*args, **kwargs)
         id_value = str(uuid.uuid4())
         self.fields['instance_id'].initial = id_value
 
-        checkboxes = [((self.fields['address_declare']), 'address' + id_value)]
+        checkboxes = [((self.fields['child_address_declare']), 'child_address' + id_value)]
 
         for box in checkboxes:
             box[0].widget.attrs.update({'data_target': box[1],
                                         'aria-controls': box[1],
                                         'aria-expanded': 'false'}, )
 
-    def clean_address_comments(self):
+    def clean_child_address_comments(self):
         """
         Address comments validation
         :return: string
         """
-        address_declare = self.cleaned_data['address_declare']
-        address_comments = self.cleaned_data['address_comments']
+        child_address_declare = self.cleaned_data['child_address_declare']
+        child_address_comments = self.cleaned_data['child_address_comments']
 
         # Only check if a comment has been entered if the field has been flagged
-        if address_declare is True:
-            if address_comments == '':
+        if child_address_declare is True:
+            if child_address_comments == '':
                 raise forms.ValidationError('You must give reasons')
 
-        return address_comments
+        return child_address_comments
 
 
 class ChildForm(GOVUKForm):

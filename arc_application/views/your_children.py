@@ -59,8 +59,7 @@ def __build_summary_form_data(application_id):
 
     applicant = ApplicantPersonalDetails.get_id(app_id=application_id)
     applicant_personal_address = \
-        ApplicantHomeAddress.objects.get(personal_detail_id=applicant,
-                                                                       current_address=True)
+        ApplicantHomeAddress.objects.get(personal_detail_id=applicant, current_address=True)
 
     # Create address tables
     for child in children:

@@ -163,21 +163,21 @@
                     {{child_address.postcode}}{% if address.postcode %}<br />{% endif %}
                 </td>
                 <td class="change-answer">
-                    {{ child_address_form.address_declare }}
+                    {{ child_address_form.child_address_declare }}
                 </td>
             </tr>
-            <tr class="js-hidden" id="address{{child_address_form.instance_id.initial}}">
+            <tr class="js-hidden" id="child_address{{child_address_form.instance_id.initial}}">
                 <td colspan="1">
                     <div>
                         Enter your reasoning
                     </div>
                     <div>
-                        {{ child_address_form.address_comments.help_text}}
+                        {{ child_address_form.child_address_comments.help_text}}
                     </div>
                 </td>
                 <td colspan="2">
                     <div>
-                        {{ child_address_form.address_comments}}
+                        {{ child_address_form.child_address_comments}}
                     </div>
                 </td>
             </tr>
