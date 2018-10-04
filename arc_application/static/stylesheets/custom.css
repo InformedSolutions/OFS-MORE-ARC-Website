@@ -5,12 +5,12 @@
 }
 
 .task-flagged {
-  background-color: #B10E1E;
+  background-color: #B10E1E !important;
   color: #FFFFFF;
 }
 
 .task-to-do {
-  background-color: #FFFFFF;
+  background-color: #FFFFFF !important;
   color: #0B0C0C;
   outline: 3px;
   outline-color: #0B0C0C;
