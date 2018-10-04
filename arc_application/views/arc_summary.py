@@ -46,7 +46,6 @@ name_field_dict = {
     'Does anyone aged 16 or over live or work in your home?': 'adults_in_home',
     'Do children under 16 live in the home?': 'children_in_home',
     'Do you have children of your own under 16 who do not live with you?': 'own_children_not_in_home',
-    'child_address': 'child_address',
     'Full name': 'full_name',
     'How they know you': 'relationship',
     'Known for': 'time_known',
