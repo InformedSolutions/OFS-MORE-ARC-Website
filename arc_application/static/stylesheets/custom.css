@@ -1,16 +1,16 @@
 /** Task list entries **/
 .task-in-progress {
-  background-color: #0B0C0C;
+  background-color: #0B0C0C !important;
   color: #FFFFFF;
 }
 
 .task-flagged {
-  background-color: #B10E1E;
-  color: #FFFFFF !important;
+  background-color: #B10E1E !important;
+  color: #FFFFFF;
 }
 
 .task-to-do {
-  background-color: #FFFFFF;
+  background-color: #FFFFFF !important;
   color: #0B0C0C !important;
   outline: 3px;
   outline-color: #0B0C0C;
