@@ -13,7 +13,7 @@ import requests
 from django.conf import settings
 
 
-def send_email(email, personalisation, template_id):
+def send_email(email, personalisation, template_id, nanny_email=False):
     """
     Method to send an email using the Notify Gateway API
     :param email: string containing the e-mail address to send the e-mail to
@@ -35,6 +35,10 @@ def send_email(email, personalisation, template_id):
         'personalisation': personalisation,
         'templateId': template_id
     }
+
+    if nanny_email:
+        notification_request['service_name'] = 'Nannies'
+
     r = requests.post(base_request_url + '/api/v1/notifications/email/',
                       json.dumps(notification_request),
                       headers=header)

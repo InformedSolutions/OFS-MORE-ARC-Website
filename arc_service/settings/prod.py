@@ -32,20 +32,28 @@ LOGGING = {
         },
         },
   'handlers': {
-    'django.server': {
+    'file': {
         'level': 'INFO',
-        'class': 'logging.handlers.RotatingFileHandler',
-        'maxBytes': 1 * 1024 * 1024,
+        'class': 'logging.handlers.TimedRotatingFileHandler',
         'filename': 'logs/output.log',
         'formatter': 'console',
-        'maxBytes': 1 * 1024 * 1024,
-        'backupCount': 30
+        'when': 'midnight',
+        'backupCount': 10
+    },
+    'console': {
+        'level': 'INFO',
+        'class': 'logging.StreamHandler'
     },
    },
    'loggers': {
-     'django.server': {
-       'handlers': ['django.server'],
-         'level': 'INFO',
+     '': {
+       'handlers': ['file', 'console'],
+         'level': 'ERROR',
+           'propagate': True,
+      },
+      'django.server': {
+       'handlers': ['file', 'console'],
+         'level': 'ERROR',
            'propagate': True,
       },
     },
