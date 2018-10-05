@@ -8,7 +8,6 @@ import re
 
 from arc_application.views.base import  custom_login, error_403, error_404, error_500, release, AuditlogListView
 from arc_application.views.arc_user_summary import ARCUserSummaryView
-from arc_application.contact_centre import search
 
 # Childminder Views
 

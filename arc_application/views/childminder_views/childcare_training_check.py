@@ -5,10 +5,10 @@ from django.shortcuts import render
 from django.utils.decorators import method_decorator
 from django.views import View
 
-from ..forms.form import EYFSTrainingCheckForm, TypeOfChildcareTrainingCheckForm
-from ..models import Application, Arc, ChildcareTraining, ChildcareType
-from ..review_util import redirect_selection, request_to_comment, save_comments
-from ..decorators import group_required, user_assigned_application
+from arc_application.forms.childminder_forms.form import EYFSTrainingCheckForm, TypeOfChildcareTrainingCheckForm
+from arc_application.models import Application, Arc, ChildcareTraining, ChildcareType
+from arc_application.review_util import redirect_selection, request_to_comment, save_comments
+from arc_application.decorators import group_required, user_assigned_application
 
 
 decorators = [login_required, group_required(settings.ARC_GROUP), user_assigned_application]

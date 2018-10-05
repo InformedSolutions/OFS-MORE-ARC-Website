@@ -5,10 +5,10 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 
-from ..forms.form import ChildForm, ChildAddressForm, YourChildrenForm
-from ..models import Child, ChildAddress, Application, Arc, ApplicantHomeAddress, ApplicantPersonalDetails
-from ..decorators import group_required, user_assigned_application
-from .review import children_initial_population, children_address_initial_population
+from arc_application.forms.childminder_forms.form import ChildForm, ChildAddressForm, YourChildrenForm
+from arc_application.models import Child, ChildAddress, Application, Arc, ApplicantHomeAddress, ApplicantPersonalDetails
+from arc_application.decorators import group_required, user_assigned_application
+from arc_application.views.childminder_views.review import children_initial_population, children_address_initial_population
 
 from ..review_util import request_to_comment, save_comments, \
     save_non_db_field_arc_comment, delete_non_db_field_arc_comment

@@ -10,7 +10,7 @@ from django.utils.decorators import method_decorator
 from django.views import View
 
 from arc_application.models import AdultInHome
-from arc_application.forms.childminder_forms.form import PreviousRegistrationDetailsForm, OtherPersonPreviousRegistrationDetailsFormChildForm, ChildForm, \
+from arc_application.forms.childminder_forms.form import PreviousRegistrationDetailsForm, ChildForm, \
     ChildAddressForm
 from arc_application.forms.childminder_forms.form import AdultInYourHomeForm, ChildInYourHomeForm
 from arc_application.magic_link import generate_magic_link
