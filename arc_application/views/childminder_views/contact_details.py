@@ -34,7 +34,7 @@ def contact_summary(request):
             'login_details_status': application.login_details_status,
             'childcare_type_status': application.childcare_type_status
         }
-        return render(request, 'contact-summary.html', variables)
+        return render(request, 'childminder_templates/contact-summary.html', variables)
 
     elif request.method == 'POST':
         # As there is no actual flagging to be done for this section, the status is just set to completed on POST

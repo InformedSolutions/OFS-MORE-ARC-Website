@@ -112,8 +112,6 @@ def postcode_manual(request):
 
     if request.method == 'GET':
         context['form'] = OtherPeoplePreviousAddressManualForm()
-        return render(request, 'other-people-previous-address-manual.html', context)
-
         return render(request, 'childminder_templates/other-people-previous-address-manual.html', context)
 
     if request.method == 'POST':
@@ -177,8 +175,6 @@ def address_update(request):
 
     if request.method == 'GET':
         context['form'] = OtherPeoplePreviousAddressManualForm(id=request.GET['address_id'])
-        return render(request, 'previous-address-manual-update.html', context)
-
         return render(request, 'childminder_templates/previous-address-manual-update.html', context)
 
     if request.method == 'POST':

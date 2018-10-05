@@ -187,7 +187,7 @@ def other_people_summary(request):
             'previous_registration_lists': previous_registration_lists,
             'providing_care_in_own_home': providing_care_in_own_home
         }
-        return render(request, 'other-people-summary.html', variables)
+        return render(request, 'childminder_templates/other-people-summary.html', variables)
 
     elif request.method == 'POST':
         child_formset = ChildInHomeFormSet(request.POST, prefix='child')
@@ -316,7 +316,7 @@ def other_people_summary(request):
                 'previous_registration_lists': previous_registration_lists,
                 'providing_care_in_own_home': providing_care_in_own_home
             }
-            return render(request, 'other-people-summary.html', variables)
+            return render(request, 'childminder_templates/other-people-summary.html', variables)
 
 
 @group_required(settings.ARC_GROUP)

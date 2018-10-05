@@ -383,7 +383,7 @@ def review(request):
             'application_id': application_id_local,
         }
 
-        return render(request, 'review-confirmation.html', variables)
+        return render(request, 'childminder_templates/review-confirmation.html', variables)
 
     else:
         release_application(request, application_id_local, 'FURTHER_INFORMATION')
@@ -414,9 +414,7 @@ def review(request):
             'application_id': application_id_local,
         }
 
-        return render(request, 'review-sent-back.html', variables)
-
-    return render(request, 'review-sent-back.html', variables)
+        return render(request, 'childminder_templates/review-sent-back.html', variables)
 
 
 def has_group(user, group_name):

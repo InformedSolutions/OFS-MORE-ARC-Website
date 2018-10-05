@@ -55,7 +55,7 @@ def postcode_entry(request):
         if 'add-another' in request.POST:
             form = OtherPersonPreviousPostcodeEntry()
             context['form'] = form
-            return render(request, 'previous-address-select.html', context)
+            return render(request, 'childminder_templates/previous-address-select.html', context)
 
         form = OtherPersonPreviousPostcodeEntry(request.POST)
         context['form'] = form
@@ -91,7 +91,7 @@ def postcode_selection(request):
 
         if 'postcode-search' in request.POST:
             context['form'] = OtherPeoplePreviousAddressLookupForm(choices=addresses)
-            return render(request, 'previous-address-lookup.html', context)
+            return render(request, 'childminder_templates/previous-address-lookup.html', context)
 
         current_form = OtherPeoplePreviousAddressLookupForm(request.POST, choices=addresses)
         context['form'] = current_form
