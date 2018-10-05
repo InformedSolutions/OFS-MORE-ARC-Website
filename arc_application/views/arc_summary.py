@@ -177,7 +177,7 @@ def add_comments(json, app_id):
                         field = name_field_dict.get('first_aid_date', '')
 
                 elif name == 'Address':
-                    if "reference" in title:
+                    if "reference" in title or title_row['id'] == 'Child':
                         field = name_field_dict.get('address', '')
                     else:
                         field = 'address' + str(id)
@@ -316,19 +316,18 @@ def load_json(application_id_local, ordered_models, recurse):
                     else:
                         birth_month = str(child.birth_month)
                     date_of_birth = birth_day + ' ' + birth_month + ' ' + str(child.birth_year)
-                    if ChildAddress.objects.filter(application_id=application_id_local, child=child.child).exists():
-                        child_address_record = ChildAddress.objects.get(application_id=application_id_local,
-                                                                        child=child.child)
-                        child_address = get_address(child_address_record.street_line1,
-                                                    child_address_record.street_line2, child_address_record.town,
-                                                    child_address_record.postcode)
-                    else:
-                        child_address = 'Same as your home address'
+
+                    child_address_record = ChildAddress.objects.get(application_id=application_id_local,
+                                                                    child=child.child)
+                    child_address = get_address(child_address_record.street_line1,
+                                                child_address_record.street_line2, child_address_record.town,
+                                                child_address_record.postcode)
+
                     table_list.append([
                         {"title": name, "id": "Child"},
                         {"name": "Name", "value": name, 'pk': child.pk, "index": 1},
                         {"name": "Date of birth", "value": date_of_birth, 'pk': child.pk, "index": 2},
-                        {"name": "Address", "value": child_address, 'pk': child.pk, "index": 3}
+                        {"name": "Address", "value": child_address, 'pk': child_address_record.pk, "index": 3}
                     ])
 
         elif model == CriminalRecordCheck:
