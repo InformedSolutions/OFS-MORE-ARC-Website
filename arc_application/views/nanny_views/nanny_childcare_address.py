@@ -52,14 +52,21 @@ class NannyChildcareAddressSummary(View):
         nanny_application = nanny_actions.read('application',
                                                params={'application_id': application_id}).record
         home_address_info = nanny_actions.read('applicant-home-address',
-                                               params={'application_id': application_id}).record
+                                               params={'application_id': application_id,
+                                                       'current_address': True}).record
+        childcare_address_info = nanny_actions.read('applicant-home-address',
+                                               params={'application_id': application_id,
+                                                       'childcare_address': True}).record
 
         work_location_bool = nanny_application['address_to_be_provided']
-        work_at_home_bool = home_address_info['childcare_address']
+        if home_address_info == childcare_address_info:
+            work_at_home_bool = 'Yes'
+        else:
+            work_at_home_bool = 'No'
 
         if work_location_bool:
             home_address_locations = nanny_actions.list('childcare-address',
-                                                    params={'application_id': application_id}).record
+                                                        params={'application_id': application_id}).record
         else:
             home_address_locations = {}
 
