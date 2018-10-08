@@ -23,6 +23,8 @@ class NannyFirstAidTrainingSummary(NannyARCFormView):
         training_organisation = first_aid_dict['training_organisation']
         training_course_title = first_aid_dict['course_title']
         date_course_completed = first_aid_dict['course_date']
+        date_course_completed_list = date_course_completed.split('-')
+        date_course_completed_formatted = date_course_completed_list[2] + '/' + date_course_completed_list[1] + '/' + date_course_completed_list[0]
 
         form = self.get_form()
 
@@ -48,8 +50,8 @@ class NannyFirstAidTrainingSummary(NannyARCFormView):
                 },
                 {
                     'id': 'course_date',
-                    'name': 'Date you completed the course',
-                    'info': date_course_completed,
+                    'name': 'Date you completed course',
+                    'info': date_course_completed_formatted,
                     'declare': form['course_date_declare'] if hasattr(self, 'request') else '',
                     'comments': form['course_date_comments']
                 }

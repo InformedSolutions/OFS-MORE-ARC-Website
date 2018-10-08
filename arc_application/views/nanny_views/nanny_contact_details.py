@@ -63,12 +63,12 @@ class NannyContactDetailsSummary(View):
             'rows': [
                 {
                     'id': 'email',
-                    'name': 'Email',
+                    'name': 'Your email',
                     'info': email
                 },
                 {
                     'id': 'mobile_phone_number',
-                    'name': 'Mobile phone number',
+                    'name': 'Your mobile number',
                     'info': mobile_phone_number
                 },
                 {

@@ -20,18 +20,18 @@ class NannyPersonalDetailsSummary(NannyARCFormView):
 
         # TODO: This could be done more simply with a DateTime object
 
-        month_list = ["January",
-                      "Februrary",
-                      "March",
-                      "April",
+        month_list = ["Jan",
+                      "Feb",
+                      "Mar",
+                      "Apr",
                       "May",
-                      "June",
-                      "July",
-                      "August",
-                      "September",
-                      "October",
-                      "November",
-                      "December"]
+                      "Jun",
+                      "Jul",
+                      "Aug",
+                      "Sep",
+                      "Oct",
+                      "Nov",
+                      "Dec"]
 
         birth_year, birth_month, birth_day = parse_date_of_birth(dob_string)
 
@@ -86,14 +86,14 @@ class NannyPersonalDetailsSummary(NannyARCFormView):
                 },
                 {
                     'id': 'date_of_birth',
-                    'name': 'Your date of birth',
+                    'name': 'Date of birth',
                     'info': dob_string_with_month,
                     'declare': personal_details_form['date_of_birth_declare'] if hasattr(self, 'request') else '',
                     'comments': personal_details_form['date_of_birth_comments'],
                 },
                 {
                     'id': 'home_address',
-                    'name': 'Home address',
+                    'name': 'Your home address',
                     'declare': home_address_form['home_address_declare'] if hasattr(self, 'request') else '',
                     'comments': home_address_form['home_address_comments'],
                     'info': {

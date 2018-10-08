@@ -71,12 +71,12 @@ class NannyChildcareAddressSummary(View):
             'rows': [
                 {
                     'id': 'work_location_bool',
-                    'name': 'Do you know where you will be working?',
+                    'name': "Do you know where you'll be working?",
                     'info': work_location_bool
                 },
                 {
                     'id': 'work_at_home_bool',
-                    'name': 'Do you work and live at the same address?',
+                    'name': 'Will you work and live at the same address?',
                     'info': work_at_home_bool
                 },
                 {
