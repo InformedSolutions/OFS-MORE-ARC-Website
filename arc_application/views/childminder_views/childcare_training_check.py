@@ -101,5 +101,5 @@ class ChildcareTrainingCheckSummaryView(View):
             context['eyfs_course_date_month'] = eyfs_check.eyfs_course_date_month
             context['eyfs_course_date_year'] = eyfs_check.eyfs_course_date_year
 
-        return render(request, 'childminder_templates/childcare-training-summary.html', context=context)
+        return render(request, 'childcare-training-summary.html', context=context)
 

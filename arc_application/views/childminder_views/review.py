@@ -414,7 +414,7 @@ def review(request):
             'application_id': application_id_local,
         }
 
-        return render(request, 'childminder_templates/review-sent-back.html', variables)
+        return render(request, 'review-sent-back.html', variables)
 
 
 def has_group(user, group_name):
