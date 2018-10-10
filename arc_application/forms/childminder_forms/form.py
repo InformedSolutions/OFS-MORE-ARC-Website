@@ -11,7 +11,7 @@ from django.conf import settings
 from django import forms
 from django.forms import ModelForm
 from govuk_forms.forms import GOVUKForm
-from govuk_forms.widgets import InlineRadioSelect, NumberInput
+from govuk_forms.widgets import InlineRadioSelect, NumberInput, Select
 
 from arc_application.models import OtherPersonPreviousRegistrationDetails, ArcComments
 from ...widgets.ConditionalPostChoiceWidget import ConditionalPostInlineRadioSelect
@@ -1453,11 +1453,21 @@ class SearchForm(GOVUKForm):
     auto_replace_widgets = True
     error_summary_title = "There was a problem on this page"
 
+    choices = (
+        ('All', 'All'),
+        ('Childminder', 'Childminder'),
+        ('Nanny', 'Nanny'),
+    )
+
     reference_search_field = forms.CharField(label='Application number', required=False)
     name_search_field = forms.CharField(label='Name', required=False)
     dob_search_field = forms.CharField(label='Date of birth', required=False, help_text='e.g. 31 03 1980')
     home_postcode_search_field = forms.CharField(label='Home postcode', required=False)
     care_location_postcode_search_field = forms.CharField(label='Work postcode', required=False)
+    application_type_dropdown_search_field = forms.ChoiceField(label='Application type',
+                                                               choices=choices,
+                                                               required=False,
+                                                               widget=Select)
 
     def __init__(self, *args, **kwargs):
         """

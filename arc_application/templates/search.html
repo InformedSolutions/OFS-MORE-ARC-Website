@@ -74,25 +74,25 @@
             </td>
             <td>
                 <b>
-                    {{ app.type }}
+                    {{ app.application_type }}
                 </b>
             </td>
-            <td>{{ app.name }}</td>
+            <td>{{ app.applicant_name }}</td>
             <td>
                 <b>
-                    {{ app.submitted }}
+                    {{ app.date_submitted }}
                 </b>
             </td>
             <td>
-                {{ app.accessed }}
+                {{ app.date_accessed }}
             </td>
             <td>
                 <b>
-                    {{ app.sub_type }}
+                    {{ app.submission_type }}
                 </b>
             </td>
             <td>
-                <a href="{{ app.link }}">Application Summary</a>
+                <a href="{{ app.summary_link }}">Application Summary</a>
             </td>
             <td>
                 <a href="{{ app.audit_link }}">Audit Log</a>
