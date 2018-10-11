@@ -18,9 +18,9 @@ def audit_log_dispatcher(request):
     :return: Function call to either the Childminder or Nanny audit log view.
     """
     if request.GET['app_type']  == 'Childminder':
-        return ChildminderAuditlog().dispatch(request)
+        return ChildminderAuditlog.as_view()(request)
     elif request.GET['app_type'] == 'Nanny':
-        return ChildminderAuditlog().dispatch(request)
+        return NannyAuditLog.as_view()(request)
     else:
         raise ValueError('The "app_type" request.GET QueryDict does not equal either "Childminder" nor "Nanny".')
 
@@ -63,7 +63,7 @@ class NannyAuditLog(View):
     def get_context_data(self):
         context = dict()
         application_id = self.request.GET.get('id')
-        context['application_reference'] = NannyGatewayActions().read('application', params={'application_id': application_id}).record['application_id']
+        context['application_reference'] = NannyGatewayActions().read('application', params={'application_id': application_id}).record['application_reference']
 
         if has_group(self.request.user, settings.CONTACT_CENTRE):
             context['back'] = reverse('search')
