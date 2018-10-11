@@ -10,7 +10,7 @@ from .base import has_group
 
 
 class AuditlogListView(ListView):
-    template_name = "childminder_templates/auditlog_list.html"
+    template_name = "auditlog_list.html"
     paginate_by = settings.TIMELINE_PAGINATE_BY
 
     def get_queryset(self, **kwargs):
