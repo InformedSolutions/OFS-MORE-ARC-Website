@@ -110,6 +110,13 @@ class NannyPersonalDetailsSummary(NannyARCFormView):
                     'info': lived_abroad,
                     'declare': personal_details_form['lived_abroad_declare'] if hasattr(self, 'request') else '',
                     'comments': personal_details_form['lived_abroad_comments'],
+                },
+                {
+                    'id': 'your_children',
+                    'name': 'Do you have any children of your own under 16?',
+                    'declare': personal_details_form['children_under16'] if hasattr(self, 'request') else '',
+                    'comments': personal_details_form['children_under16_comments'],
+
                 }
             ]
         }
