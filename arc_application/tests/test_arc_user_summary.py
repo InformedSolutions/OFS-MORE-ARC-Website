@@ -118,7 +118,7 @@ class ArcUserSummaryPageTests(TestCase):
         #
         # self.assertContains(response, '<table class="table table-hover" id="request-table">', html=True)
 
-        pass
+        self.skipTest('NotImplemented')
 
     @tag('http')
     def test_page_renders_without_table_if_user_has_no_assigned_apps(self):
@@ -158,7 +158,7 @@ class ArcUserSummaryPageTests(TestCase):
 
     @tag('http')
     def test_assigns_childminder_app_if_one_available(self):
-        pass
+        self.skipTest('NotImplemented')
 
     @tag('http')
     def test_assigns_nanny_app_if_one_available(self):
@@ -178,7 +178,7 @@ class ArcUserSummaryPageTests(TestCase):
 
     @tag('http')
     def test_cannot_assign_more_than_five_applications(self):
-        pass
+        self.skipTest('NotImplemented')
 
         # with mock.patch('django.db.models.query.QuerySet.count') as mock_count:
         #     mock_count.return_value = 5
@@ -197,48 +197,48 @@ class ArcUserSummaryPageTests(TestCase):
 
     @tag('unit')
     def test_count_assigned_apps(self):
-        pass
+        self.skipTest('NotImplemented')
 
     @tag('unit')
     def test_get_oldest_nanny_app_id(self):
-        pass
+        self.skipTest('NotImplemented')
 
     @tag('unit')
     def test_get_oldest_childminder_app_id(self):
-        pass
+        self.skipTest('NotImplemented')
 
     @tag('unit')
     def test_sort_applications_by_date_submitted(self):
-        pass
+        self.skipTest('NotImplemented')
 
     @tag('unit')
     def test_assign_nanny_app_to_user(self):
-        pass
+        self.skipTest('NotImplemented')
 
     @tag('unit')
     def test_assign_childminder_app_to_user(self):
-        pass
+        self.skipTest('NotImplemented')
 
     @tag('unit')
     def test_list_childminder_tasks_to_review(self):
-        pass
+        self.skipTest('NotImplemented')
 
     @tag('unit')
     def test_release_nanny_app_to_pool(self):
-        pass
+        self.skipTest('NotImplemented')
 
     @tag('unit')
     def test_release_childminder_app_to_pool(self):
-        pass
+        self.skipTest('NotImplemented')
 
     @tag('unit')
     def test_get_all_table_data(self):
-        pass
+        self.skipTest('NotImplemented')
 
     @tag('unit')
     def test_get_nanny_row_data(self):
-        pass
+        self.skipTest('NotImplemented')
 
     @tag('unit')
     def test_get_childminder_row_data(self):
-        pass
+        self.skipTest('NotImplemented')
