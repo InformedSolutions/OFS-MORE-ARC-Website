@@ -6,7 +6,8 @@ OFS-MORE-CCN3: Apply to be a Childminder Beta
 """
 import re
 
-from arc_application.views.base import  custom_login, error_403, error_404, error_500, release, AuditlogListView
+from arc_application.views.base import  custom_login, error_403, error_404, error_500, release
+from arc_application.views.audit_log import AuditlogListView
 from arc_application.views.arc_user_summary import ARCUserSummaryView
 
 # Childminder Views

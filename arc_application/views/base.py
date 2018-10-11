@@ -4,13 +4,10 @@ from django.contrib.auth import authenticate, login as auth_login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserModel
 from django.contrib.auth.models import Group
-from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
-from django.views.generic import ListView
 from django.utils.http import urlsafe_base64_decode
 from django.utils.text import capfirst
-from django.urls import reverse
 from govuk_forms.forms import GOVUKForm
 from timeline_logger.models import TimelineLog
 from arc_application.review_util import reset_declaration
@@ -141,34 +138,6 @@ def release_application(request, application_id, status):
         )
 
         return HttpResponseRedirect('/arc/summary')
-
-
-class AuditlogListView(ListView):
-    template_name = "childminder_templates/auditlog_list.html"
-    paginate_by = settings.TIMELINE_PAGINATE_BY
-
-    def get_queryset(self, **kwargs):
-        app_id = self.request.GET.get('id')
-        queryset = TimelineLog.objects.filter(object_id=app_id).order_by('-timestamp')
-        return queryset
-
-    def get_context_data(self, **kwargs):
-        context = super(AuditlogListView, self).get_context_data(**kwargs)
-        app_id = self.request.GET.get('id')
-        try:
-            context['application_reference'] = Application.objects.get(application_id=app_id).application_reference
-        except ObjectDoesNotExist:
-            context['application_reference'] = None
-
-        if has_group(self.request.user, settings.CONTACT_CENTRE):
-            context['back'] = reverse('search')
-            context['cc_user'] = True
-
-        if has_group(self.request.user, settings.ARC_GROUP):
-            context['arc_user'] = True
-            context['back'] = reverse('task_list') + '?id=' + self.request.GET.get('id')
-
-        return context
 
 
 ######################################################################################################
