@@ -95,6 +95,7 @@ mock_declaration_record = {
     'change_declare': True,
 }
 
+mock_timeline_log_record = {}
 
 nanny_application_response = HttpResponse()
 nanny_application_response.status_code = 200
@@ -139,6 +140,11 @@ identity_response.record = mock_identity_record
 arc_comments_response = HttpResponse()
 arc_comments_response.status_code = 404
 
+timeline_log_response = HttpResponse()
+timeline_log_response.status_code = 200
+timeline_log_response.record = mock_timeline_log_record
+
+
 mock_endpoint_return_values = {
     'application': nanny_application_response,
     'applicant-personal-details': personal_details_response,
@@ -151,6 +157,7 @@ mock_endpoint_return_values = {
     'declaration': declaration_response,
     'user': identity_response,
     'arc-comments': arc_comments_response,
+    'timline-log': timeline_log_response
 }
 
 
