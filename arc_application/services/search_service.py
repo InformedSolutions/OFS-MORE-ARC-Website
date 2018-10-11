@@ -1,3 +1,4 @@
+import datetime
 import re
 
 from django.db.models import Q
@@ -9,62 +10,77 @@ from arc_application.services.db_gateways import NannyGatewayActions
 class SearchService:
 
     @staticmethod
-    def search(name, dob, home_postcode, care_location_postcode, reference, application_type):
+    def search(name: str, dob: str, home_postcode: str, care_location_postcode: str, reference: str,
+               application_type: str) -> dict:
+        """
+        Exposed method to allow searching, given the following parameters:
+        :param name: A string contained within the first_name OR last_name of an Applicant
+        :param dob: A string contained within the DOB of an Applicant
+        :param home_postcode: A string contained within the home address postcode field for an Applicant
+        :param care_location_postcode: A string contained within the care address(es) postcode field(s) for an Applicant
+        :param reference: A string contained within the Application's reference number, only existing if submitted.
+        :param application_type: A string of 'Childminder', 'Nanny' or 'All' that determines what records to fetch.
+        :return: A dictionary containing the ordered search results, prepared for displaying on the arc search view.
+        """
         search_args = (name, dob, home_postcode, care_location_postcode, reference)
 
         # Search both Childminder and Nanny applications
         if application_type == 'All':
-            search_results = SearchService.__search_childminders_and_nannies(*search_args)
+            search_results = SearchService._search_childminders_and_nannies(*search_args)
 
         # Search Childminder applications only
         elif application_type == 'Childminder':
-            search_results = SearchService.__search_childminders(*search_args)
+            search_results = SearchService._search_childminders(*search_args)
 
         # Search Nanny applications only
         elif application_type == 'Nanny':
-            search_results =  SearchService.__search_nannies(*search_args)
+            search_results = SearchService._search_nannies(*search_args)
 
         else:
             raise ValueError('application_type was set to {0}, an unexpected value.')
 
-        formatted_results = SearchService.__format_search_results(search_results)
-        ordered_results = SearchService.__order_search_results(formatted_results)
+        formatted_results = SearchService._format_search_results(search_results)
+        ordered_results = SearchService._order_search_results(formatted_results)
 
         return ordered_results
-        
 
     @staticmethod
-    def __search_childminders_and_nannies(name, dob, home_postcode, care_location_postcode, reference):
+    def _search_childminders_and_nannies(name, dob, home_postcode, care_location_postcode, reference):
         search_args = (name, dob, home_postcode, care_location_postcode, reference)
 
-        cm_search_results = SearchService.__search_childminders(*search_args)
-        nanny_search_results = SearchService.__search_nannies(*search_args)
+        cm_search_results = SearchService._search_childminders(*search_args)
+        nanny_search_results = SearchService._search_nannies(*search_args)
 
         combined_results = SearchService.__combine_search_results(cm_search_results, nanny_search_results)
 
         return combined_results
 
     @staticmethod
-    def __search_nannies(name, date_of_birth, home_postcode, care_location_postcode, reference):
+    def _search_nannies(name, date_of_birth, home_postcode, care_location_postcode, application_reference):
+        """
+        Function for handling
+        :return:
+        """
         nanny_actions = NannyGatewayActions()
 
-        params_list = [name, date_of_birth, home_postcode, care_location_postcode, reference]
-        params = {param: param for param in params_list if param}
+        params_list = [('name', name),
+                       ('date_of_birth', date_of_birth),
+                       ('home_postcode', home_postcode),
+                       ('care_location_postcode', care_location_postcode),
+                       ('application_reference', application_reference)]
+        params = {key: val for key, val in params_list if val}
 
         search_results_response = nanny_actions.list('arc-search', params=params)
 
-        if search_results_response.status_code == 200:
-            return search_results_response.record
-        else:
-            # TODO Make Exception less generic
-            raise Exception()
+        return search_results_response.record
 
     @staticmethod
-    def __search_childminders(name, dob, home_postcode, care_location_postcode, reference):
+    def _search_childminders(name, dob, home_postcode, care_location_postcode, reference):
         """
         Function for handling childminder searches.
-        :param query: Either a search for DoB, Name, or Application Id
-        :return: QuerySet containing filtered results.
+        First generates a queryset containing the childminder search results, then converts those search results to a
+         standard dictionary format.
+        :return: List of dictionaries containing filtered results.
         """
         query = Q()
 
@@ -184,7 +200,7 @@ class SearchService:
         """
         Converts a Childminder queryset to the same response formatting as a nanny search result record.
         The returned dictionary contains the minimum amount of information required to generate the search table.
-        Note that date_submitted and date_accessed are also formatted to strings inside this function.
+        Note: date_submitted and date_accessed are also formatted to strings inside this function.
         :param queryset:
         :return:
         """
@@ -214,21 +230,44 @@ class SearchService:
 
     @staticmethod
     def __combine_search_results(search_list1, search_list2):
+        """
+        Combines two search_lists into a single list.
+        :return:
+        """
         combined_list = search_list1.copy()
         combined_list += search_list2
 
         return combined_list
 
     @staticmethod
-    def __order_search_results(search_list):
-        return sorted(search_list, key=lambda search_dict: (search_dict['date_accessed'] is None, search_dict['date_accessed']))
+    def _order_search_results(search_list):
+        """
+        Orders search_list by it's date_accessed field.
+        The key used will also append all blank values (None or "") for date_accessed to the end of the ordered list.
+        :param search_list:
+        :return: A sorted search_list
+        """
+        return sorted(search_list,
+                      key=SearchService._order_dict,
+                      reverse=True)
 
     @staticmethod
-    def __sort_results(search_dict):
-        return search_dict['date_accessed']
+    def _order_dict(search_dict):
+        """
+        Converts the passed search_dict's date_submitted parameter to a datetime for comparison.
+        If the date_submitted is invalid, returns the minimum value date.
+        :param search_dict: Formatted dictionary, expecting date_submitted to be in format DD/MM/YYYY (aka %d/%m/%Y)
+        :return: Datetime
+        """
+        return datetime.datetime.strptime(search_dict['date_submitted'], '%d/%m/%Y') if search_dict['date_submitted'] else datetime.datetime.min
 
     @staticmethod
-    def __format_search_results(search_list):
+    def _format_search_results(search_list):
+        """
+        Converts search results (in the form of a list of relevant dictionaries) to a dictionary the same information in a displayable format.
+        :param search_list: A list of dictionaries to be displayed.
+        :return: A list of dictionaries (of equal length to search_list) with appended and formatted information.
+        """
         formatted_search_results = [
             {'application_id': search_dict['application_id'],
              'application_reference': search_dict['application_reference'],
@@ -238,13 +277,19 @@ class SearchService:
              'date_accessed': search_dict['date_accessed'],
              'submission_type': SearchService.__format_submission_type(search_dict['submission_type']),
              'summary_link': '/arc/search-summary?id=' + str(search_dict['application_id']),
-             'audit_link': '/arc/auditlog?id={0}&app_type={1}'.format(str(search_dict['application_id']), search_dict['application_type'])}
+             'audit_link': '/arc/auditlog?id={0}&app_type={1}'.format(str(search_dict['application_id']),
+                                                                      search_dict['application_type'])}
             for search_dict in search_list]
-        
+
         return formatted_search_results
 
     @staticmethod
-    def __format_submission_type(submission_type : str) -> str:
+    def __format_submission_type(submission_type: str) -> str:
+        """
+        Converts a submission_type to a displayable label string.
+        :param submission_type: String of application's status, e.g 'DRAFTING'.
+        :return: String containing a relevant label.
+        """
         if submission_type == 'DRAFTING':
             return 'Draft'
         elif submission_type == 'ACCEPTED':

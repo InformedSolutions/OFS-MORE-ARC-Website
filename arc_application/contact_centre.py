@@ -1,15 +1,12 @@
-import re
-
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.db.models import Q
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 
 from arc_application.services.search_service import SearchService
+from arc_application.views import has_group
 from .forms.childminder_forms.form import SearchForm
 from .models import ApplicantName, ApplicantPersonalDetails, Application
-from arc_application.views import has_group
 
 
 @login_required()
@@ -25,10 +22,10 @@ def search(request):
     cc_user = has_group(request.user, settings.CONTACT_CENTRE)
     arc_user = has_group(request.user, settings.ARC_GROUP)
     context = {
-                'cc_user': cc_user,
-                'arc_user': arc_user,
-                'empty': True
-            }
+        'cc_user': cc_user,
+        'arc_user': arc_user,
+        'empty': True
+    }
 
     if (cc_user or arc_user) and request.user.is_authenticated():
 
@@ -62,7 +59,8 @@ def search(request):
                     context['error_text'] = 'Please use at least one filter'
                     return render(request, SEARCH_TEMPLATE_PATH, context)
 
-                search_results = SearchService.search(name, dob, home_postcode, care_location_postcode, reference, application_type)
+                search_results = SearchService.search(name, dob, home_postcode, care_location_postcode, reference,
+                                                      application_type)
 
                 if search_results is not None and len(search_results) > 0:
                     context['app'] = search_results

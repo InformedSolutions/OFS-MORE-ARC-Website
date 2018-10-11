@@ -80,11 +80,19 @@
             <td>{{ app.applicant_name }}</td>
             <td>
                 <b>
-                    {{ app.date_submitted }}
+                    {% if app.date_submitted %}
+                        {{ app.date_submitted }}
+                    {% else %}
+                        None
+                    {% endif %}
                 </b>
             </td>
             <td>
-                {{ app.date_accessed }}
+                {% if app.date_accessed %}
+                    {{ app.date_accessed }}
+                {% else %}
+                    None
+                {% endif %}
             </td>
             <td>
                 <b>
