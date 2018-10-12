@@ -58,8 +58,9 @@ class SearchService:
     @staticmethod
     def _search_nannies(name, date_of_birth, home_postcode, care_location_postcode, application_reference):
         """
-        Function for handling
-        :return:
+        Function for handling the searching of nanny applications.
+        Gets nanny applications by use of the gateway_actions API by formulating a request (params) with the passed parameters.
+        :return: API response record
         """
         nanny_actions = NannyGatewayActions()
 
@@ -202,22 +203,27 @@ class SearchService:
         The returned dictionary contains the minimum amount of information required to generate the search table.
         Note: date_submitted and date_accessed are also formatted to strings inside this function.
         :param queryset:
-        :return:
+        :return: A search_list (List of search dictionaries)
         """
-        search_dict = [
+        search_list = [
             {'application_id': query.application_id,
              'application_reference': query.application_reference,
              'application_type': 'Childminder',
-             'applicant_name': SearchService.__cm_get_full_name(query.application_id),
+             'applicant_name': SearchService.__cm_get_name(query.application_id),
              'date_submitted': query.date_submitted.strftime('%d/%m/%Y'),
              'date_accessed': query.date_updated.strftime('%d/%m/%Y'),
              'submission_type': query.application_status}
             for query in queryset]
 
-        return search_dict
+        return search_list
 
     @staticmethod
-    def __cm_get_full_name(app_id):
+    def __cm_get_name(app_id):
+        """
+        Gets the applicant's first_name and last_name.
+        :param app_id: Applicant's id
+        :return: String of first_name, last_name
+        """
         if ApplicantName.objects.filter(application_id=app_id).exists():
             applicant_name_record = ApplicantName.objects.get(application_id=app_id)
 
