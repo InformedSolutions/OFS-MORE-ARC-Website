@@ -68,6 +68,8 @@ class NannyPersonalDetailsSummary(NannyARCFormView):
 
         lived_abroad = personal_details['lived_abroad']
 
+        your_children = personal_details['your_children']
+
         forms = self.get_forms()
         personal_details_form = forms[0]
         home_address_form = forms[1]
@@ -114,8 +116,9 @@ class NannyPersonalDetailsSummary(NannyARCFormView):
                 {
                     'id': 'your_children',
                     'name': 'Do you have any children of your own under 16?',
-                    'declare': personal_details_form['children_under16'] if hasattr(self, 'request') else '',
-                    'comments': personal_details_form['children_under16_comments'],
+                    'info': your_children,
+                    'declare': personal_details_form['your_children'] if hasattr(self, 'request') else '',
+                    'comments': personal_details_form['your_children_comments'],
 
                 }
             ]
