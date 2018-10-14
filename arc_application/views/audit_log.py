@@ -1,6 +1,9 @@
+from datetime import datetime
+
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import render
+from django.template.loader import render_to_string
 from django.views.generic import ListView, View
 from django.urls import reverse
 
@@ -58,7 +61,7 @@ class NannyAuditLog(View):
 
     def get_object_list(self):
         api_response = NannyGatewayActions().list('timeline-log', params={'object_id': self.request.GET['id']})
-        return api_response.record
+        return [MockTimelineLog(**log) for log in api_response.record]
 
     def get_context_data(self):
         context = dict()
@@ -79,3 +82,21 @@ class NannyAuditLog(View):
 
     def get(self, request):
         return render(request, self.template_name, context=self.get_context_data())
+
+
+class MockTimelineLog:
+    """
+    The template used for the Childminder audit log, application_action.txt, usually requires a TimelineLog object.
+    This has a method get_message() that returns the message to be rendered.
+    Given that the Nanny Gateway returns dict objects, we need to create from this an object with the properties of the
+    TimelineLog object.
+    MockTimelineLog is an adapter class for the template and the Nanny Gateway's returned dicts.
+    """
+    def __init__(self, **kwargs):
+        self.timestamp = datetime.strptime(kwargs.pop('timestamp'), '%Y-%m-%dT%H:%M:%S.%fZ')
+        for key, value in kwargs.items():
+            setattr(self, key, value)
+
+    def get_message(self):
+        message_context = {'log': self}
+        return render_to_string(self.template, message_context)
