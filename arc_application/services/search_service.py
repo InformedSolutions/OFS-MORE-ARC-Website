@@ -210,8 +210,8 @@ class SearchService:
              'application_reference': query.application_reference,
              'application_type': 'Childminder',
              'applicant_name': SearchService.__cm_get_name(query.application_id),
-             'date_submitted': query.date_submitted.strftime('%d/%m/%Y'),
-             'date_accessed': query.date_updated.strftime('%d/%m/%Y'),
+             'date_submitted': query.date_submitted.strftime('%d/%m/%Y') if query.date_submitted else "",
+             'date_accessed': query.date_updated.strftime('%d/%m/%Y') if query.date_updated else "",
              'submission_type': query.application_status}
             for query in queryset]
 
