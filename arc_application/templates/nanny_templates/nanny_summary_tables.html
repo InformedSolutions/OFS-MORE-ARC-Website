@@ -1,0 +1,29 @@
+<div class = "two-thirds">
+    <table class="check-your-answers form-group">
+        <thead>
+            <tr>
+                <th colspan="{{ col }}">
+                    <div class="heading-medium">
+                        {{context.title}}
+                    </div>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+
+        {% for row in context.rows %}
+        {% if row.id == 'home_address_locations' %}
+            {% for home_address in row.info %}
+                {% include 'nanny_childcare_address_template.html' %}
+            {% endfor %}
+
+        {% else %}
+
+        {% include 'nanny_general_table_template.html' %}
+
+        {% endif %}
+        {% endfor %}
+
+        </tbody>
+    </table>
+</div>

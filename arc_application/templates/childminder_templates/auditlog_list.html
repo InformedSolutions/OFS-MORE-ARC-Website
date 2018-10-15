@@ -1,0 +1,30 @@
+{% extends 'govuk_template.html' %}
+{% block page_title %}Audit log{% endblock %}
+{% load static %}
+{% load govuk_template_base %}
+{% block inner_content %}
+
+<main>
+    {% include 'back-button.html' %}
+    <h1 class="form-title heading-large">
+        Audit log
+    </h1>
+    <p class="bold">
+        Application number: {{ application_reference | default_if_none:"N/A" }}
+    </p>
+    <table>
+        <thead>
+        <tr>
+            <th scope="col">Date</th>
+            <th scope="col">User type</th>
+            <th scope="col">Status</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for log in object_list %}
+        {{ log.get_message }}
+        {% endfor %}
+        </tbody>
+    </table>
+</main>
+{% endblock %}
