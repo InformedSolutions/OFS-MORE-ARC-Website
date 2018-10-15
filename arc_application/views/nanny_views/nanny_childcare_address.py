@@ -90,7 +90,7 @@ class NannyChildcareAddressSummary(View):
                     'id': 'home_address_locations',
                     'name': 'Childcare address',
                     'info': home_address_locations
-                }
+                },
             ]
 
         }

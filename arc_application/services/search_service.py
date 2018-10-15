@@ -265,7 +265,8 @@ class SearchService:
         :param search_dict: Formatted dictionary, expecting date_submitted to be in format DD/MM/YYYY (aka %d/%m/%Y)
         :return: Datetime
         """
-        return datetime.datetime.strptime(search_dict['date_submitted'], '%d/%m/%Y') if search_dict['date_submitted'] else datetime.datetime.min
+        return datetime.datetime.strptime(search_dict['date_submitted'], '%d/%m/%Y') if search_dict[
+            'date_submitted'] else datetime.datetime.min
 
     @staticmethod
     def _format_search_results(search_list):
@@ -282,7 +283,8 @@ class SearchService:
              'date_submitted': search_dict['date_submitted'],
              'date_accessed': search_dict['date_accessed'],
              'submission_type': SearchService.__format_submission_type(search_dict['submission_type']),
-             'summary_link': '/arc/search-summary?id=' + str(search_dict['application_id']),
+             'summary_link': '/arc/search-summary?id={0}&app_type={1}'.format(str(search_dict['application_id']),
+                                                                              search_dict['application_type']),
              'audit_link': '/arc/auditlog?id={0}&app_type={1}'.format(str(search_dict['application_id']),
                                                                       search_dict['application_type'])}
             for search_dict in search_list]
