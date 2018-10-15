@@ -1,3 +1,5 @@
+import json
+
 from django import forms
 from django.conf import settings
 from django.contrib.auth import authenticate, login as auth_login
@@ -112,32 +114,50 @@ def release_application(request, application_id, status):
     # If application_id doesn't correspond to a Childminder application, it must be a Nanny one.
     else:
         nanny_api_response = NannyGatewayActions().read('application', params={'application_id': application_id})
-        record = nanny_api_response.record
-        record['application_status'] = 'SUBMITTED'
-        NannyGatewayActions().put('application', params=record)
+        app = nanny_api_response.record
+        app['application_status'] = status
+        NannyGatewayActions().put('application', params=app)
 
     if Arc.objects.filter(application_id=application_id).exists():
         arc = Arc.objects.get(pk=application_id)
         arc.user_id = ''
         arc.save()
+        __log_applcation_release(request, arc, app, status)
+        return HttpResponseRedirect('/arc/summary')
 
-        log_action = {
-            'COMPLETED': 'completed by',
-            'FURTHER_INFORMATION': 'returned by',
-            'ACCEPTED': 'accepted by',
-            'SUBMITTED': 'released by',
-            'ASSIGN': 'assigned to',
-        }
 
-        # trigger_audit_log(application_id, status, request.user)
+def __log_applcation_release(request, arc_object, app, status):
+    log_action = {
+        'COMPLETED': 'completed by',
+        'FURTHER_INFORMATION': 'returned by',
+        'ACCEPTED': 'accepted by',
+        'SUBMITTED': 'released by',
+        'ASSIGN': 'assigned to',
+    }
+
+    if isinstance(app, Application):  # If handling a Childminder application.
         TimelineLog.objects.create(
-            content_object=arc,
+            content_object=arc_object,
             user=request.user,
             template='timeline_logger/application_action.txt',
             extra_data={'user_type': 'reviewer', 'action': log_action[status], 'entity': 'application'}
         )
 
-        return HttpResponseRedirect('/arc/summary')
+    elif isinstance(app, dict):  # If handling a Nanny application.
+        extra_data = {
+                'user_type': 'reviewer',
+                'action': log_action[status],
+                'entity': 'application'
+            }
+
+        log_data = {
+            'object_id': app['application_id'],
+            'template': 'timeline_logger/application_action.txt',
+            'user': request.user.username,
+            'extra_data': json.dumps(extra_data)
+        }
+
+        NannyGatewayActions().create('timeline-log', params=log_data)
 
 
 ######################################################################################################
