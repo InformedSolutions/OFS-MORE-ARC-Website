@@ -157,7 +157,7 @@ mock_endpoint_return_values = {
     'declaration': declaration_response,
     'user': identity_response,
     'arc-comments': arc_comments_response,
-    'timline-log': timeline_log_response
+    'timeline-log': timeline_log_response
 }
 
 
