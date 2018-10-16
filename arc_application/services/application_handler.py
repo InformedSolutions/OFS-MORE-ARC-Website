@@ -1,4 +1,5 @@
 from datetime import datetime
+import json
 
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
@@ -120,12 +121,12 @@ class ChildminderApplicationHandler(GenericApplicationHandler):
             arc_user.user_id = self.arc_user.id
             arc_user.save()
 
-            TimelineLog.objects.create(
-                content_object=self.arc_user,
-                user=self.arc_user,
-                template='timeline_logger/application_action.txt',
-                extra_data={'user_type': 'reviewer', 'action': 'assigned to', 'entity': 'application'}
-            )
+        TimelineLog.objects.create(
+            content_object=self.arc_user,
+            user=self.arc_user,
+            template='timeline_logger/application_action.txt',
+            extra_data={'user_type': 'reviewer', 'action': 'assigned to', 'entity': 'application'}
+        )
 
     def _list_tasks_for_review(self):
         example_application = Application.objects.all()[0]
@@ -166,6 +167,22 @@ class NannyApplicationHandler(GenericApplicationHandler):
             arc_user.last_accessed = app_record['date_updated']
             arc_user.user_id = self.arc_user.id
             arc_user.save()
+
+        # Log assigning application to ARC user.
+        extra_data = {
+                'user_type': 'reviewer',
+                'action': 'assigned to',
+                'entity': 'application'
+            }
+
+        log_data = {
+            'object_id': app_record['application_id'],
+            'template': 'timeline_logger/application_action.txt',
+            'user': self.arc_user.username,
+            'extra_data': json.dumps(extra_data)
+        }
+
+        NannyGatewayActions().create('timeline-log', params=log_data)
 
     def _list_tasks_for_review(self):
         example_application = NannyGatewayActions().list('application', params={}).record[0]
