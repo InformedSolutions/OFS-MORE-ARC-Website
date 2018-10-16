@@ -1,5 +1,8 @@
+import json
+
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
+from django.conf import settings
 from django.utils.decorators import method_decorator
 from django.views import View
 
@@ -11,6 +14,7 @@ from .nanny_first_aid import NannyFirstAidTrainingSummary
 from .nanny_insurance_cover import NannyInsuranceCoverSummary
 from .nanny_personal_details import NannyPersonalDetailsSummary
 from ...services.db_gateways import NannyGatewayActions
+from ..base import has_group
 
 
 @method_decorator(login_required, name='get')
@@ -24,6 +28,7 @@ class NannySearchSummary(View):
     def get(self, request):
         application_id = request.GET["id"]
         context = self.create_context(application_id)
+        log_user_opened_application(request, application_id)
         return render(request, self.TEMPLATE_NAME, context=context)
 
     def create_context(self, application_id):
@@ -100,3 +105,28 @@ class NannySearchSummary(View):
             return get_context_data_func(app_id)
         except AttributeError:
             return None
+
+
+def log_user_opened_application(request, application_id):
+    extra_data = {
+        'action': 'opened by',
+        'entity': 'application'
+    }
+
+    if has_group(request.user, settings.CONTACT_CENTRE):
+        extra_data['user_type'] = 'contact centre'
+    elif has_group(request.user, settings.ARC_GROUP):
+        extra_data['user_type'] = 'reviewer'
+    else:
+        return
+
+    log_data = {
+        'object_id': application_id,
+        'template': 'timeline_logger/application_action.txt',
+        'user': request.user.username,
+        'extra_data': json.dumps(extra_data)
+    }
+
+    NannyGatewayActions().create('timeline-log', params=log_data)
+
+    return None

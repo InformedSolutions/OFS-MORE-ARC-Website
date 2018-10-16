@@ -1,5 +1,4 @@
 from datetime import datetime
-import json
 
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
@@ -72,7 +71,6 @@ class NannyAuditLog(View):
         if has_group(self.request.user, settings.CONTACT_CENTRE):
             context['back'] = reverse('search')
             context['cc_user'] = True
-            log_cc_user_opened_application(self.request, application_id)
 
         if has_group(self.request.user, settings.ARC_GROUP):
             context['arc_user'] = True
@@ -84,25 +82,6 @@ class NannyAuditLog(View):
 
     def get(self, request):
         return render(request, self.template_name, context=self.get_context_data())
-
-
-def log_cc_user_opened_application(request, application_id):
-    extra_data = {
-        'user_type': 'contact centre user',
-        'action': 'opened by',
-        'entity': 'application'
-    }
-
-    log_data = {
-        'object_id': application_id,
-        'template': 'timeline_logger/application_action.txt',
-        'user': request.user.username,
-        'extra_data': json.dumps(extra_data)
-    }
-
-    NannyGatewayActions().create('timeline-log', params=log_data)
-
-    return None
 
 
 class MockTimelineLog:
