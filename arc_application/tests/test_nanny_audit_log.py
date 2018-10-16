@@ -140,3 +140,6 @@ class NannyAuditLogTests(TestCase):
         #
         # self.assertTrue(mock_create.called_with('timeline-log', params={}))
         self.skipTest('NotImplemented')
+
+    def test_duplicate_log_not_added_if_preexisting_arc_comment(self):
+        self.skipTest('NotImplemented')
