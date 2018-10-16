@@ -11,7 +11,7 @@ from django.conf import settings
 from django import forms
 from django.forms import ModelForm
 from govuk_forms.forms import GOVUKForm
-from govuk_forms.widgets import InlineRadioSelect, NumberInput
+from govuk_forms.widgets import InlineRadioSelect, NumberInput, Select
 
 from arc_application.models import OtherPersonPreviousRegistrationDetails, ArcComments
 from ...widgets.ConditionalPostChoiceWidget import ConditionalPostInlineRadioSelect
@@ -1453,11 +1453,21 @@ class SearchForm(GOVUKForm):
     auto_replace_widgets = True
     error_summary_title = "There was a problem on this page"
 
+    choices = (
+        ('All', 'All'),
+        ('Childminder', 'Childminder'),
+        ('Nanny', 'Nanny'),
+    )
+
     reference_search_field = forms.CharField(label='Application number', required=False)
     name_search_field = forms.CharField(label='Name', required=False)
     dob_search_field = forms.CharField(label='Date of birth', required=False, help_text='e.g. 31 03 1980')
     home_postcode_search_field = forms.CharField(label='Home postcode', required=False)
     care_location_postcode_search_field = forms.CharField(label='Work postcode', required=False)
+    application_type_dropdown_search_field = forms.ChoiceField(label='Application type',
+                                                               choices=choices,
+                                                               required=False,
+                                                               widget=Select)
 
     def __init__(self, *args, **kwargs):
         """
@@ -1480,16 +1490,16 @@ class SearchForm(GOVUKForm):
         reference = self.cleaned_data['reference_search_field']
 
         length_error_text = 'Please enter more than 2 characters'
-        name_length_error_text = 'Please enter more than one character'
+        less_than_two_text_error = 'Please enter more than one character'
 
         if len(reference) != 0 and len(reference) < 3:
             self.add_error('reference_search_field', length_error_text)
 
         if len(name) != 0 and len(name) < 2:
-            self.add_error('name_search_field', name_length_error_text)
+            self.add_error('name_search_field', less_than_two_text_error)
 
-        if len(dob) != 0 and len(dob) < 3:
-            self.add_error('dob_search_field', length_error_text)
+        if len(dob) != 0 and len(dob) < 2:
+            self.add_error('dob_search_field', less_than_two_text_error)
 
         if len(home_postcode) != 0 and len(home_postcode) < 3:
             self.add_error('home_postcode_search_field', length_error_text)

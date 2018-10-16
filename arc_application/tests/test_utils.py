@@ -30,7 +30,8 @@ mock_personal_details_record = {
     'middle_names': '',
     'last_name': 'Selenium',
     'date_of_birth': '2000-01-01',
-    'lived_abroad': True
+    'lived_abroad': True,
+    'your_children': True
 }
 
 mock_childcare_training_record = {

@@ -80,6 +80,7 @@ personal_details_fields = [
     'name',
     'date_of_birth',
     'lived_abroad',
+    'your_children',
 ]
 
 home_address_fields = [

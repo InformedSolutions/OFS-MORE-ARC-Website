@@ -88,7 +88,8 @@ class ArcUserSummaryPageTests(TestCase):
             'criminal_record_check',
             'dbs',
             'first_aid',
-            'insurance_cover'
+            'insurance_cover',
+            'your_children'
         ]
 
         for task in tasks_list:
