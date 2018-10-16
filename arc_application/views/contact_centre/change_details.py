@@ -51,7 +51,7 @@ class ChangeDetails(View):
         initial_data_filler(output_form, UserDetails, contact_record.pk)
         if output_form.is_valid():
             data_saver(output_form, UserDetails, contact_record.pk)
-            return HttpResponseRedirect(self.build_url('search_summary', get={'id': app_id}))
+            return HttpResponseRedirect(self.build_url('search_summary', get={'id': app_id, 'app_type': 'Childminder'}))
         else:
             return render(request, 'update_details/update_field.html', context)
 
@@ -76,3 +76,4 @@ class UpdatePhoneNumberView(ChangeDetails):
 class UpdateAddPhoneNumberView(ChangeDetails):
     form = UpdateAddPhoneNumber
     page_title = "Update the applicant's alternative phone number"
+

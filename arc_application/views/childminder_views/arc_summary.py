@@ -100,7 +100,6 @@ def arc_summary(request):
         status.save()
         return review(request)
 
-
 @login_required
 def cc_summary(request):
     ordered_models = [UserDetails, ChildcareType, [ApplicantPersonalDetails, ApplicantName], ApplicantHomeAddress,
