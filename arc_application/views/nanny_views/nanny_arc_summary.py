@@ -19,6 +19,7 @@ from .nanny_insurance_cover import NannyInsuranceCoverSummary
 from arc_application.services.arc_comments_handler import update_returned_application_statuses
 from arc_application.services.nanny_view_helpers import nanny_all_completed
 from arc_application.services.nanny_email_helpers import send_accepted_email, send_returned_email
+from arc_application.views.base import log_applcation_release
 
 
 @method_decorator(login_required, name='get')
@@ -62,6 +63,7 @@ class NannyArcSummary(View):
             raise BrokenPipeError('Failed to update nanny_application status')
 
         update_returned_application_statuses(application_id)
+        log_applcation_release(request, arc_application, nanny_application, nanny_application['application_status'])
         arc_application.delete()
 
         return HttpResponseRedirect(redirect_address)
