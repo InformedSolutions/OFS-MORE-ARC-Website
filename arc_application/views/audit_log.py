@@ -6,6 +6,7 @@ from django.shortcuts import render
 from django.template.loader import render_to_string
 from django.views.generic import ListView, View
 from django.urls import reverse
+from django.shortcuts import HttpResponseRedirect
 
 from timeline_logger.models import TimelineLog
 
@@ -23,7 +24,8 @@ def audit_log_dispatcher(request):
     if request.GET['app_type']  == 'Childminder':
         return ChildminderAuditlog.as_view()(request)
     elif request.GET['app_type'] == 'Nanny':
-        return NannyAuditLog.as_view()(request)
+        return HttpResponseRedirect(reverse('nanny-auditlog') + '?id=' + request.GET['id'])
+        # return NannyAuditLog.as_view()(request)
     else:
         raise ValueError('The "app_type" request.GET QueryDict does not equal either "Childminder" nor "Nanny".')
 
