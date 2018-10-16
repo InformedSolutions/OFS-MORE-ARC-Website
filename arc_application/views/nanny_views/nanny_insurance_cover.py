@@ -7,6 +7,7 @@ class NannyInsuranceCoverSummary(NannyARCFormView):
     template_name = 'nanny_general_template.html'
     success_url = 'nanny_task_list'
     task_for_review = 'insurance_cover_review'
+    verbose_task_name = 'Insurance cover'
     form_class = InsuranceCoverForm
 
     def get_context_data(self, application_id):
@@ -26,7 +27,7 @@ class NannyInsuranceCoverSummary(NannyARCFormView):
 
         context = {
             'application_id': application_id,
-            'title': 'Review: Insurance cover',
+            'title': 'Review: ' + self.verbose_task_name,
             'form': form,
             'rows': [
                 {

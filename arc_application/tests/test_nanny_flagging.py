@@ -54,11 +54,11 @@ class TestNannyFlagging(TestCase):  # , metaclass=MockedGatewayTests):
 
     @tag('integration')
     def test_if_field_flagged_then_task_status_is_flagged(self, *args):
-        pass
+        self.skipTest('NotImplemented')
 
     @tag('integration')
     def test_if_nothing_flagged_then_task_status_is_done(self, *args):
-        pass
+        self.skipTest('NotImplemented')
 
     # ---------- #
     # HTTP tests #
@@ -132,7 +132,7 @@ class TestNannyFlagging(TestCase):  # , metaclass=MockedGatewayTests):
         Test to ensure that the 'Complete Review' button is only present if all tasks are either 'Reviewed'
         or 'Flagged'.
         """
-        pass
+        self.skipTest('NotImplemented')
 
     def test_sign_in_details_redirects_to_personal_details(self, *args):
         """
@@ -236,38 +236,38 @@ class TestNannyFlagging(TestCase):  # , metaclass=MockedGatewayTests):
 
         # for field in fields_to_flag:
         #     self.assertTrue(create_mock.called_with('arc-comments'))
-        pass
+        self.skipTest('NotImplemented')
 
     def test_can_flag_childcare_address_details(self, *args):
         """
         Test to ensure that childcare address details can be flagged.
         """
         # TODO - Write test once work commences on flagging Childcare Address details.
-        pass
+        self.skipTest('NotImplemented')
 
     def test_can_flag_first_aid_details(self, *args):
         """
         Test to ensure that first aid details can be flagged.
         """
-        pass
+        self.skipTest('NotImplemented')
 
     def test_can_flag_childcare_training_details(self, *args):
         """
         Test to ensure that childcare training details can be flagged.
         """
-        pass
+        self.skipTest('NotImplemented')
 
     def test_can_flag_criminal_record_details(self, *args):
         """
         Test to ensure that dbs certificate details can be flagged.
         """
-        pass
+        self.skipTest('NotImplemented')
 
     def test_insurance_cover_details_can_be_flagged(self, *args):
         """
         Test to ensure that insurance cover details can be flagged.
         """
-        pass
+        self.skipTest('NotImplemented')
 
     def test_can_render_arc_summary_page(self, *args):
         """

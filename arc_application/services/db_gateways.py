@@ -30,7 +30,8 @@ class DBGatewayActions:
         'payment': 'application_id',
         'summary': 'application_id',
         'user': 'application_id',
-        'arc-search': 'application_id'
+        'arc-search': 'application_id',
+        'timeline-log': 'object_id'
     }
 
     def __init__(self):

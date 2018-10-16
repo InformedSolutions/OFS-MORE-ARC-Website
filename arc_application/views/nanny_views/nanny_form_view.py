@@ -20,6 +20,7 @@ class NannyARCFormView(FormView):
     success_url = None
     task_for_review = None
     application_id = None
+    verbose_task_name = None
 
     def get(self, request, *args, **kwargs):
         self.application_id = request.GET['id']
@@ -41,7 +42,12 @@ class NannyARCFormView(FormView):
         # Write ArcComments to db from form.
         endpoint = form.api_endpoint_name
         table_pk = form.pk_field_name
-        flagged_fields = save_arc_comments_from_request(request=self.request, endpoint=endpoint, table_pk=table_pk)
+        flagged_fields = save_arc_comments_from_request(
+            request=self.request,
+            endpoint=endpoint,
+            table_pk=table_pk,
+            verbose_task_name=self.verbose_task_name
+        )
 
         # Update {{task}}_review status for ARC user.
         reviewed_task = self.get_task_for_review()

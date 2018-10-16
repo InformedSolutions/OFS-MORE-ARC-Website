@@ -1,16 +1,15 @@
+import json
+
 from django import forms
 from django.conf import settings
 from django.contrib.auth import authenticate, login as auth_login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserModel
 from django.contrib.auth.models import Group
-from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
-from django.views.generic import ListView
 from django.utils.http import urlsafe_base64_decode
 from django.utils.text import capfirst
-from django.urls import reverse
 from govuk_forms.forms import GOVUKForm
 from timeline_logger.models import TimelineLog
 from arc_application.review_util import reset_declaration
@@ -115,60 +114,50 @@ def release_application(request, application_id, status):
     # If application_id doesn't correspond to a Childminder application, it must be a Nanny one.
     else:
         nanny_api_response = NannyGatewayActions().read('application', params={'application_id': application_id})
-        record = nanny_api_response.record
-        record['application_status'] = 'SUBMITTED'
-        NannyGatewayActions().put('application', params=record)
+        app = nanny_api_response.record
+        app['application_status'] = status
+        NannyGatewayActions().put('application', params=app)
 
     if Arc.objects.filter(application_id=application_id).exists():
         arc = Arc.objects.get(pk=application_id)
         arc.user_id = ''
         arc.save()
+        log_applcation_release(request, arc, app, status)
+        return HttpResponseRedirect('/arc/summary')
 
-        log_action = {
-            'COMPLETED': 'completed by',
-            'FURTHER_INFORMATION': 'returned by',
-            'ACCEPTED': 'accepted by',
-            'SUBMITTED': 'released by',
-            'ASSIGN': 'assigned to',
-        }
 
-        # trigger_audit_log(application_id, status, request.user)
+def log_applcation_release(request, arc_object, app, status):
+    log_action = {
+        'COMPLETED': 'completed by',
+        'FURTHER_INFORMATION': 'returned by',
+        'ACCEPTED': 'accepted by',
+        'SUBMITTED': 'released by',
+        'ASSIGN': 'assigned to',
+    }
+
+    if isinstance(app, Application):  # If handling a Childminder application.
         TimelineLog.objects.create(
-            content_object=arc,
+            content_object=arc_object,
             user=request.user,
             template='timeline_logger/application_action.txt',
             extra_data={'user_type': 'reviewer', 'action': log_action[status], 'entity': 'application'}
         )
 
-        return HttpResponseRedirect('/arc/summary')
+    elif isinstance(app, dict):  # If handling a Nanny application.
+        extra_data = {
+                'user_type': 'reviewer',
+                'action': log_action[status],
+                'entity': 'application'
+            }
 
+        log_data = {
+            'object_id': app['application_id'],
+            'template': 'timeline_logger/application_action.txt',
+            'user': request.user.username,
+            'extra_data': json.dumps(extra_data)
+        }
 
-class AuditlogListView(ListView):
-    template_name = "childminder_templates/auditlog_list.html"
-    paginate_by = settings.TIMELINE_PAGINATE_BY
-
-    def get_queryset(self, **kwargs):
-        app_id = self.request.GET.get('id')
-        queryset = TimelineLog.objects.filter(object_id=app_id).order_by('-timestamp')
-        return queryset
-
-    def get_context_data(self, **kwargs):
-        context = super(AuditlogListView, self).get_context_data(**kwargs)
-        app_id = self.request.GET.get('id')
-        try:
-            context['application_reference'] = Application.objects.get(application_id=app_id).application_reference
-        except ObjectDoesNotExist:
-            context['application_reference'] = None
-
-        if has_group(self.request.user, settings.CONTACT_CENTRE):
-            context['back'] = reverse('search')
-            context['cc_user'] = True
-
-        if has_group(self.request.user, settings.ARC_GROUP):
-            context['arc_user'] = True
-            context['back'] = reverse('task_list') + '?id=' + self.request.GET.get('id')
-
-        return context
+        NannyGatewayActions().create('timeline-log', params=log_data)
 
 
 ######################################################################################################

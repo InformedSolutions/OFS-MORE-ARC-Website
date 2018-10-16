@@ -6,7 +6,8 @@ OFS-MORE-CCN3: Apply to be a Childminder Beta
 """
 import re
 
-from arc_application.views.base import  custom_login, error_403, error_404, error_500, release, AuditlogListView
+from arc_application.views.base import  custom_login, error_403, error_404, error_500, release
+from arc_application.views.audit_log import audit_log_dispatcher
 from arc_application.views.arc_user_summary import ARCUserSummaryView
 
 # Childminder Views
@@ -76,7 +77,7 @@ urlpatterns = [
     url(r'^health/check-answers/', health_check_answers, name='health_check_answers'),
     url(r'^confirmation/', review, name='review'),
     url(r'^arc-summary/', arc_summary, name='arc-summary'),
-    url(r'^auditlog/', login_required(AuditlogListView.as_view()), name='auditlog'),
+    url(r'^auditlog/', login_required(audit_log_dispatcher), name='auditlog'),
     url(r'^search/', search, name='search'),
     url(r'^search-summary/', SearchRouter.as_view(), name='search_summary'),
     url(r'^contact-centre/contact-details/email-address', UpdateEmailView.as_view(), name='update_email'),

@@ -7,6 +7,7 @@ class NannyFirstAidTrainingSummary(NannyARCFormView):
     template_name = 'nanny_general_template.html'
     success_url = 'nanny_childcare_training_summary'
     task_for_review = 'first_aid_review'
+    verbose_task_name = 'First aid training'
     form_class = FirstAidForm
 
     def get_context_data(self, application_id):
@@ -30,7 +31,7 @@ class NannyFirstAidTrainingSummary(NannyARCFormView):
 
         context = {
             'application_id': application_id,
-            'title': 'Review: First aid training',
+            'title': 'Review: ' + self.verbose_task_name,
             'form': form,
             'rows': [
                 {
