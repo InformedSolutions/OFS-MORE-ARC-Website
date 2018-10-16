@@ -1,15 +1,17 @@
+import json
 from uuid import uuid4
 
 from arc_application.models import Arc
 from .db_gateways import NannyGatewayActions
 
 
-def save_arc_comments_from_request(request, endpoint, table_pk):
+def save_arc_comments_from_request(request, endpoint, table_pk, verbose_task_name):
     """
     Function to save comments made by an ARC reviewer from a given request.
     :param request: request to check for comments.
     :param endpoint:
     :param table_pk: pk of the entry for which comments are being made.
+    :param verbose_task_name: The name of the task to be recorded in the audit log.
     :return: True if comments were made, else False.
     """
     application_id = request.GET['id']
@@ -41,6 +43,8 @@ def save_arc_comments_from_request(request, endpoint, table_pk):
             }
         )
 
+        log_arc_flag_action(application_id, request.user.username, field_name, verbose_task_name)
+
     return False if len(comments) == 0 else True
 
 
@@ -68,6 +72,26 @@ def update_application_arc_flagged_status(flagged_fields, application_id, review
         NannyGatewayActions().patch('application', {'application_id': application_id, task_name: True})
     else:
         NannyGatewayActions().patch('application', {'application_id': application_id, task_name: False})
+
+
+def log_arc_flag_action(application_id, arc_user, flagged_field, verbose_task_name):
+    extra_data = {
+        'user_type': 'reviewer',
+        'formatted_field': flagged_field.replace("_", " "),
+        'action': 'flagged by',
+        'entity': 'application',
+        'task_name': verbose_task_name
+    }
+
+    NannyGatewayActions().create('timeline-log',
+                                 params={
+                                     'object_id': application_id,
+                                     'user': arc_user,
+                                     'template': 'timeline_logger/application_field_flagged.txt',
+                                     'extra_data': json.dumps(extra_data)
+                                 })
+
+    return None
 
 
 def get_form_initial_values(form, application_id):
