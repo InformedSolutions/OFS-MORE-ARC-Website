@@ -26,6 +26,8 @@ from arc_application.views.childminder_views.arc_summary import arc_summary
 from arc_application.views.contact_centre.change_details import UpdateEmailView, UpdatePhoneNumberView, \
     UpdateAddPhoneNumberView
 from arc_application.contact_centre import search
+from arc_application.views.contact_centre.nanny_change_details import NannyUpdateEmailView, \
+    NannyUpdateAddPhoneNumberView, NannyUpdatePhoneNumberView
 from arc_application.views.search_router import SearchRouter
 from arc_application.views.your_children import your_children_summary
 
@@ -81,6 +83,12 @@ urlpatterns = [
     url(r'^contact-centre/contact-details/phone-number', UpdatePhoneNumberView.as_view(), name='update_phone_number'),
     url(r'^contact-centre/contact-details/add-phone-number', UpdateAddPhoneNumberView.as_view(),
         name='update_add_number'),
+    url(r'^contact-centre/nanny/contact-details/email-address', NannyUpdateEmailView.as_view(),
+        name='nanny_update_email_address'),
+    url(r'^contact-centre/nanny/contact-details/phone-number', NannyUpdatePhoneNumberView.as_view(),
+        name='nanny_update_phone_number'),
+    url(r'^contact-centre/nanny/contact-details/add-phone-number', NannyUpdateAddPhoneNumberView.as_view(),
+        name='nanny_update_add_number'),
     url(r'^personal-details/previous-registration', PreviousRegistrationDetailsView.as_view(),
         name='previous_registration_details'),
     url(r'^your-children/summary/', your_children_summary, name='your_children_summary'),

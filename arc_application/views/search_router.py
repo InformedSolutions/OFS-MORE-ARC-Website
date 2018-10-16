@@ -1,8 +1,13 @@
 from django.views import View
+
 from arc_application.views import cc_summary
 from arc_application.views.nanny_views.nanny_search_summary import NannySearchSummary
 
+
 class SearchRouter(View):
+    """
+    View to route Search Application Summaries
+    """
     cc_summary_view = staticmethod(cc_summary)
     NannySearchSummary_view = staticmethod(NannySearchSummary.as_view())
 

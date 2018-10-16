@@ -15,6 +15,10 @@ from ...services.db_gateways import NannyGatewayActions
 
 @method_decorator(login_required, name='get')
 class NannySearchSummary(View):
+    """
+    View to render the Search Application Summary
+    Shares many similarities with the NannyArcSummary View
+    """
     TEMPLATE_NAME = 'nanny_search_summary.html'
 
     def get(self, request):
@@ -25,6 +29,9 @@ class NannySearchSummary(View):
     def create_context(self, application_id):
         """
         Creates the context dictionary for this view.
+
+        Major changes with the Search view include the try_get_context_data method calls.
+        The general strategy of this view is the same, gather all context_dicts and generate the view.
         :param application_id: Reviewed application's id.
         :return: Context dictionary.
         """
@@ -35,29 +42,25 @@ class NannySearchSummary(View):
         application_reference = nanny_application_dict['application_reference']
 
         contact_details_context = self.try_get_context_data(NannyContactDetailsSummary().create_context, application_id)
-        personal_details_context = self.try_get_context_data(NannyPersonalDetailsSummary().get_context_data, application_id)
-        childcare_address_context = self.try_get_context_data(NannyChildcareAddressSummary().create_context, application_id)
-        first_aid_training_context = self.try_get_context_data(NannyFirstAidTrainingSummary().get_context_data, application_id)
-        childcare_training_context = self.try_get_context_data(NannyChildcareTrainingSummary().get_context_data, application_id)
+        personal_details_context = self.try_get_context_data(NannyPersonalDetailsSummary().get_context_data,
+                                                             application_id)
+        childcare_address_context = self.try_get_context_data(NannyChildcareAddressSummary().create_context,
+                                                              application_id)
+        first_aid_training_context = self.try_get_context_data(NannyFirstAidTrainingSummary().get_context_data,
+                                                               application_id)
+        childcare_training_context = self.try_get_context_data(NannyChildcareTrainingSummary().get_context_data,
+                                                               application_id)
         dbs_check_context = self.try_get_context_data(NannyDbsCheckSummary().get_context_data, application_id)
-        insurance_cover_context = self.try_get_context_data(NannyInsuranceCoverSummary().get_context_data, application_id)
+        insurance_cover_context = self.try_get_context_data(NannyInsuranceCoverSummary().get_context_data,
+                                                            application_id)
 
-        # contact_details_context['change_link'] = 'nanny_contact_summary'
-        # personal_details_context['change_link'] = 'nanny_personal_details_summary'
-        # childcare_address_context['change_link'] = 'nanny_childcare_address_summary'
-        # first_aid_training_context['change_link'] = 'nanny_first_aid_training_summary'
-        # childcare_training_context['change_link'] = 'nanny_childcare_training_summary'
-        # dbs_check_context['change_link'] = 'nanny_dbs_summary'
-        # insurance_cover_context['change_link'] = 'nanny_insurance_cover_summary'
+        # Custom change_links for each individual field within the context_dict.
+        contact_details_context['search_table'] = True
+        contact_details_context['rows'][0]['change_link'] = 'nanny_update_email_address'
+        contact_details_context['rows'][1]['change_link'] = 'nanny_update_phone_number'
+        contact_details_context['rows'][2]['change_link'] = 'nanny_update_add_number'
 
-        self.set_change_link(contact_details_context, 'nanny_contact_summary')
-        self.set_change_link(personal_details_context, 'nanny_personal_details_summary')
-        self.set_change_link(childcare_address_context, 'nanny_childcare_address_summary')
-        self.set_change_link(first_aid_training_context, 'nanny_first_aid_training_summary')
-        self.set_change_link(childcare_training_context, 'nanny_childcare_training_summary')
-        self.set_change_link(dbs_check_context, 'nanny_dbs_summary')
-        self.set_change_link(insurance_cover_context, 'nanny_insurance_cover_summary')
-
+        # Some values in this context_list may be None
         context_list = [
             contact_details_context,
             personal_details_context,
@@ -78,7 +81,7 @@ class NannySearchSummary(View):
             'application_id': application_id,
             'application_reference': application_reference,
             'context_list': valid_context_list,
-            'summary_page': True
+            'summary_page': False
         }
 
         return context
@@ -97,8 +100,3 @@ class NannySearchSummary(View):
             return get_context_data_func(app_id)
         except AttributeError:
             return None
-
-    @staticmethod
-    def set_change_link(context_dict, change_link):
-        if context_dict:
-            context_dict['change_link'] = change_link
