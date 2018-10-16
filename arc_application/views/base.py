@@ -122,11 +122,11 @@ def release_application(request, application_id, status):
         arc = Arc.objects.get(pk=application_id)
         arc.user_id = ''
         arc.save()
-        __log_applcation_release(request, arc, app, status)
+        log_applcation_release(request, arc, app, status)
         return HttpResponseRedirect('/arc/summary')
 
 
-def __log_applcation_release(request, arc_object, app, status):
+def log_applcation_release(request, arc_object, app, status):
     log_action = {
         'COMPLETED': 'completed by',
         'FURTHER_INFORMATION': 'returned by',
