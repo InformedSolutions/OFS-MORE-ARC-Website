@@ -20,11 +20,14 @@ def save_arc_comments_from_request(request, endpoint, table_pk, verbose_task_nam
 
     # Delete existing ArcComments
     if existing_comments.status_code == 200:
+        # Create list of existing arc_comments with 'flagged' field as True.
+        fields_with_existing_comments = [arc_comments_record['field_name'] for arc_comments_record in existing_comments.record if arc_comments_record['flagged']]
+
         for arc_comments_record in existing_comments.record:
             record_id = arc_comments_record['review_id']
             NannyGatewayActions().delete('arc-comments', params={'review_id': str(record_id)})
     else:
-        pass
+        fields_with_existing_comments = []
 
     # Generate dict with (key, value) pair of (field_name, comment) if field was flagged.
     comments = dict((key[:-8], request.POST[key[:-8] + '_comments']) for key in request.POST.keys() if request.POST[key] == 'on')
@@ -43,7 +46,9 @@ def save_arc_comments_from_request(request, endpoint, table_pk, verbose_task_nam
             }
         )
 
-        log_arc_flag_action(application_id, request.user.username, field_name, verbose_task_name)
+        # Prevent duplicate logs for fields which are already flagged.
+        if field_name not in fields_with_existing_comments:
+            log_arc_flag_action(application_id, request.user.username, field_name, verbose_task_name)
 
     return False if len(comments) == 0 else True
 
