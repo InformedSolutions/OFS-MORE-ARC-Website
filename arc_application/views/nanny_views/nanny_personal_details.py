@@ -9,6 +9,7 @@ class NannyPersonalDetailsSummary(NannyARCFormView):
     template_name = 'nanny_general_template.html'
     success_url = 'nanny_childcare_address_summary'
     task_for_review = 'personal_details_review'
+    verbose_task_name = 'Your personal details'
     form_class = [PersonalDetailsForm, HomeAddressForm]
 
     def month_converter(self, dob_string):
@@ -74,7 +75,7 @@ class NannyPersonalDetailsSummary(NannyARCFormView):
 
         context = {
             'application_id': application_id,
-            'title': 'Review: Your personal details',
+            'title': 'Review: ' + self.verbose_task_name,
             'rows': [
                 {
                     'id': 'name',
