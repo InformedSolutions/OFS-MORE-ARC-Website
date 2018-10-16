@@ -139,7 +139,7 @@ class SearchServiceTests(TestCase):
 
         expected_formatted_search_list = [{
             'audit_link': '/arc/auditlog?id=4c004204-84e1-4f47-b118-c91fbb47a0bf&app_type=Nanny',
-            'summary_link': '/arc/search-summary?id=4c004204-84e1-4f47-b118-c91fbb47a0bf',
+            'summary_link': '/arc/search-summary?id=4c004204-84e1-4f47-b118-c91fbb47a0bf&app_type=Nanny',
             'submission_type': 'Pending checks',
             'date_submitted': '03/06/2017',
             'application_type': 'Nanny',
