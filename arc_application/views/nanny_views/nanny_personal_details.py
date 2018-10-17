@@ -115,7 +115,7 @@ class NannyPersonalDetailsSummary(NannyARCFormView):
                 },
                 {
                     'id': 'your_children',
-                    'name': 'Do you have any children of your own under 16?',
+                    'name': 'Do you have children of your own under 16?',
                     'info': your_children,
                     'declare': personal_details_form['your_children_declare'] if hasattr(self, 'request') else '',
                     'comments': personal_details_form['your_children_comments'],
