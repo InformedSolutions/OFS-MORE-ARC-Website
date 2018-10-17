@@ -12,8 +12,8 @@ from arc_application.forms.nanny_forms.nanny_form_builder import NannyFormBuilde
 from arc_application.services.application_handler import NannyApplicationHandler
 from arc_application.services.db_gateways import NannyGatewayActions
 from arc_application.views import NannyDbsCheckSummary, NannyArcSummary, NannyContactDetailsSummary, \
-    NannyPersonalDetailsSummary, NannyChildcareAddressSummary, NannyFirstAidTrainingSummary,\
-    NannyChildcareTrainingSummary, NannyInsuranceCoverSummary, NannyTaskList
+    NannyPersonalDetailsSummary, NannyChildcareAddressSummary, NannyFirstAidTrainingSummary, \
+    NannyChildcareTrainingSummary, NannyInsuranceCoverSummary, NannyTaskList, NannyYourChildrenSummary
 
 from .test_utils import side_effect
 
@@ -147,11 +147,21 @@ class TestNannyFlagging(TestCase):  # , metaclass=MockedGatewayTests):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(found.func.view_class.__name__, NannyPersonalDetailsSummary.as_view().__name__)
 
-    def test_personal_details_redirects_to_the_childcare_address_page(self, *args):
+    def test_personal_details_redirects_to_the_your_children_page(self, *args):
         """
         Test that a POST request to the personal details page redirects to the childcare address details page.
         """
         response = self.client.post(reverse('nanny_personal_details_summary') + '?id=' + test_app_id)
+        found = resolve(response.url)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(found.func.view_class.__name__, NannyYourChildrenSummary.as_view().__name__,)
+
+    def test_your_children_redirects_to_the_childcare_address_page(self, *args):
+        """
+        Test that a POST request to the personal details page redirects to the childcare address details page.
+        """
+        response = self.client.post(reverse('nanny_your_children_summary') + '?id=' + test_app_id)
         found = resolve(response.url)
 
         self.assertEqual(response.status_code, 302)
