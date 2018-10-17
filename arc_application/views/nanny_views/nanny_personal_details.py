@@ -7,7 +7,7 @@ from arc_application.services.nanny_view_helpers import parse_date_of_birth
 
 class NannyPersonalDetailsSummary(NannyARCFormView):
     template_name = 'nanny_general_template.html'
-    success_url = 'nanny_childcare_address_summary'
+    success_url = 'nanny_your_children_summary'
     task_for_review = 'personal_details_review'
     verbose_task_name = 'Your personal details'
     form_class = [PersonalDetailsForm, HomeAddressForm]

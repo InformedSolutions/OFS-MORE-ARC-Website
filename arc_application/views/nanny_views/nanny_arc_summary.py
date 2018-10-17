@@ -1,25 +1,24 @@
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
-from django.views import View
 from django.utils.decorators import method_decorator
-
-from ...services.db_gateways import NannyGatewayActions, IdentityGatewayActions
-from ...models import Arc
-from ...review_util import build_url
-
-from .nanny_contact_details import NannyContactDetailsSummary
-from .nanny_personal_details import NannyPersonalDetailsSummary
-from .nanny_childcare_address import NannyChildcareAddressSummary
-from .nanny_first_aid import NannyFirstAidTrainingSummary
-from .nanny_childcare_training import NannyChildcareTrainingSummary
-from .nanny_dbs_check import NannyDbsCheckSummary
-from .nanny_insurance_cover import NannyInsuranceCoverSummary
+from django.views import View
 
 from arc_application.services.arc_comments_handler import update_returned_application_statuses
-from arc_application.services.nanny_view_helpers import nanny_all_completed
 from arc_application.services.nanny_email_helpers import send_accepted_email, send_returned_email
+from arc_application.services.nanny_view_helpers import nanny_all_completed
 from arc_application.views.base import log_applcation_release
+from arc_application.views.nanny_views.nanny_your_children import NannyYourChildrenSummary
+from .nanny_childcare_address import NannyChildcareAddressSummary
+from .nanny_childcare_training import NannyChildcareTrainingSummary
+from .nanny_contact_details import NannyContactDetailsSummary
+from .nanny_dbs_check import NannyDbsCheckSummary
+from .nanny_first_aid import NannyFirstAidTrainingSummary
+from .nanny_insurance_cover import NannyInsuranceCoverSummary
+from .nanny_personal_details import NannyPersonalDetailsSummary
+from ...models import Arc
+from ...review_util import build_url
+from ...services.db_gateways import NannyGatewayActions, IdentityGatewayActions
 
 
 @method_decorator(login_required, name='get')
@@ -82,6 +81,7 @@ class NannyArcSummary(View):
 
         contact_details_context = NannyContactDetailsSummary().create_context(application_id)
         personal_details_context = NannyPersonalDetailsSummary().get_context_data(application_id)
+        your_children_context = NannyYourChildrenSummary().get_context_data(application_id)
         childcare_address_context = NannyChildcareAddressSummary().create_context(application_id)
         first_aid_training_context = NannyFirstAidTrainingSummary().get_context_data(application_id)
         childcare_training_context = NannyChildcareTrainingSummary().get_context_data(application_id)
@@ -99,6 +99,7 @@ class NannyArcSummary(View):
         context_list = [
             contact_details_context,
             personal_details_context,
+            your_children_context,
             childcare_address_context,
             first_aid_training_context,
             childcare_training_context,

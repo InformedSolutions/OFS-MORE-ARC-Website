@@ -6,6 +6,7 @@ from django.conf import settings
 from django.utils.decorators import method_decorator
 from django.views import View
 
+from arc_application.views.nanny_views.nanny_your_children import NannyYourChildrenSummary
 from .nanny_childcare_address import NannyChildcareAddressSummary
 from .nanny_childcare_training import NannyChildcareTrainingSummary
 from .nanny_contact_details import NannyContactDetailsSummary
@@ -49,6 +50,8 @@ class NannySearchSummary(View):
         contact_details_context = self.try_get_context_data(NannyContactDetailsSummary().create_context, application_id)
         personal_details_context = self.try_get_context_data(NannyPersonalDetailsSummary().get_context_data,
                                                              application_id)
+        your_children_context = self.try_get_context_data(NannyYourChildrenSummary().get_context_data,
+                                                          application_id)
         childcare_address_context = self.try_get_context_data(NannyChildcareAddressSummary().create_context,
                                                               application_id)
         first_aid_training_context = self.try_get_context_data(NannyFirstAidTrainingSummary().get_context_data,
@@ -69,6 +72,7 @@ class NannySearchSummary(View):
         context_list = [
             contact_details_context,
             personal_details_context,
+            your_children_context,
             childcare_address_context,
             first_aid_training_context,
             childcare_training_context,

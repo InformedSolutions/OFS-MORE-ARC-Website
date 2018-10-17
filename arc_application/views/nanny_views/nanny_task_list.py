@@ -48,6 +48,8 @@ class NannyTaskList(View):
         dob_str = personal_details_dict['date_of_birth']
         birth_list = parse_date_of_birth(dob_str)
 
+        show_your_children = personal_details_dict['your_children']
+
         # Set up context
         context = {
             # 'form':'',
@@ -67,7 +69,8 @@ class NannyTaskList(View):
             'birth_day': int(birth_list[2]),
             'birth_month': int(birth_list[1]),
             'birth_year': int(birth_list[0]),
-            'all_complete': nanny_all_reviewed(arc_application)
+            'all_complete': nanny_all_reviewed(arc_application),
+            'show_your_children': show_your_children
         }
 
         return context
