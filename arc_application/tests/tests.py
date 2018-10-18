@@ -17,7 +17,8 @@ from arc_application.models import (ApplicantHomeAddress,
                       Reference,
                       UserDetails,
                       ChildcareType)
-from ..views import set_number_of_tasks
+from ..views.childminder_views.type_of_childcare import get_register_name
+from ..views.childminder_views.review import set_number_of_tasks
 
 application = None
 personal_details = None
@@ -525,3 +526,65 @@ class ArcSummaryTest(TestCase):
 
         number_of_tasks = set_number_of_tasks(application, childcare_type)
         self.assertEqual(8, number_of_tasks)
+
+    def test_get_register_name(self):
+        """
+        Tests the get_register_name function
+        """
+        create_application()
+
+        childcare_type.zero_to_five = True
+        childcare_type.five_to_eight = True
+        childcare_type.eight_plus = True
+        childcare_type.save()
+
+        register = get_register_name(childcare_type)
+        self.assertEqual('Early Years Register and Childcare Register (both parts)', register)
+
+        childcare_type.zero_to_five = False
+        childcare_type.five_to_eight = True
+        childcare_type.eight_plus = True
+        childcare_type.save()
+
+        register = get_register_name(childcare_type)
+        self.assertEqual('Childcare Register (both parts)', register)
+
+        childcare_type.zero_to_five = True
+        childcare_type.five_to_eight = False
+        childcare_type.eight_plus = False
+        childcare_type.save()
+
+        register = get_register_name(childcare_type)
+        self.assertEqual('Early Years Register', register)
+
+        childcare_type.zero_to_five = True
+        childcare_type.five_to_eight = True
+        childcare_type.eight_plus = False
+        childcare_type.save()
+
+        register = get_register_name(childcare_type)
+        self.assertEqual('Early Years Register and Childcare Register (compulsory part)', register)
+
+        childcare_type.zero_to_five = True
+        childcare_type.five_to_eight = False
+        childcare_type.eight_plus = True
+        childcare_type.save()
+
+        register = get_register_name(childcare_type)
+        self.assertEqual('Early Years Register and Childcare Register (voluntary part)', register)
+
+        childcare_type.zero_to_five = False
+        childcare_type.five_to_eight = True
+        childcare_type.eight_plus = False
+        childcare_type.save()
+
+        register = get_register_name(childcare_type)
+        self.assertEqual('Childcare Register (compulsory part)', register)
+
+        childcare_type.zero_to_five = False
+        childcare_type.five_to_eight = False
+        childcare_type.eight_plus = True
+        childcare_type.save()
+
+        register = get_register_name(childcare_type)
+        self.assertEqual('Childcare Register (voluntary part)', register)

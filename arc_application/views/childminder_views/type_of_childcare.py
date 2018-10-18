@@ -32,12 +32,42 @@ def type_of_childcare_age_groups(request):
         return HttpResponseRedirect(settings.URL_PREFIX + redirect_link + '?id=' + application_id_local)
 
     application_id_local = request.GET["id"]
-    application = ChildcareType.objects.get(application_id=application_id_local)
+    childcare_type = ChildcareType.objects.get(application_id=application_id_local)
+    register_name = get_register_name(childcare_type)
     variables = {
         'application_id': str(application_id_local),
-        'zero': application.zero_to_five,
-        'five': application.five_to_eight,
-        'eight': application.eight_plus,
+        'zero': childcare_type.zero_to_five,
+        'five': childcare_type.five_to_eight,
+        'eight': childcare_type.eight_plus,
+        'register': register_name,
+        'overnight_care': childcare_type.overnight_care
     }
 
     return render(request, 'childminder_templates/childcare-age-groups.html', variables)
+
+
+def get_register_name(childcare_type):
+    """
+    Method to get the names of the registers to which the applicant is applying
+    :param childcare_type: ChildcareType record
+    :return: string
+    """
+    zero_to_five = childcare_type.zero_to_five
+    five_to_eight = childcare_type.five_to_eight
+    eight_plus = childcare_type.eight_plus
+    register = ''
+    if zero_to_five and five_to_eight and eight_plus:
+        register = 'Early Years Register and Childcare Register (both parts)'
+    if not zero_to_five and five_to_eight and eight_plus:
+        register = 'Childcare Register (both parts)'
+    if zero_to_five and not five_to_eight and not eight_plus:
+        register = 'Early Years Register'
+    if zero_to_five and five_to_eight and not eight_plus:
+        register = 'Early Years Register and Childcare Register (compulsory part)'
+    if zero_to_five and not five_to_eight and eight_plus:
+        register = 'Early Years Register and Childcare Register (voluntary part)'
+    if not zero_to_five and five_to_eight and not eight_plus:
+        register = 'Childcare Register (compulsory part)'
+    if not zero_to_five and not five_to_eight and eight_plus:
+        register = 'Childcare Register (voluntary part)'
+    return register
