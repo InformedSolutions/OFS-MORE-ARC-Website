@@ -383,7 +383,7 @@ def review(request):
             'application_id': application_id_local,
         }
 
-        return render(request, 'childminder_templates/review-confirmation.html', variables)
+        return render(request, 'review-confirmation.html', variables)
 
     else:
         release_application(request, application_id_local, 'FURTHER_INFORMATION')
