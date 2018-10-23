@@ -127,15 +127,6 @@ class NannyPersonalDetailsSummary(NannyARCFormView):
 
         return context
 
-    def post(self, request, *args, **kwargs):
-        self.application_id = request.GET['id']
-
-        if isinstance(self.form_class, list):
-            for form in self.form_class:
-                self.handle_post_data(form)
-        else:
-            self.handle_post_data(self.form_class)
-
     def get_success_url(self):
         self.application_id = self.request.GET['id']
 
@@ -145,8 +136,8 @@ class NannyPersonalDetailsSummary(NannyARCFormView):
 
         # If there is a record of a child within the model, link to the 'your children' task
         if show_your_children:
-            return build_url('nanny_your_children_summary', get={'id': self.application_id})
+            return 'nanny_your_children_summary'
 
         # If there are no children, link to the childcare address feature
         else:
-            return build_url('nanny_childcare_address_summary', get={'id': self.application_id})
+            return 'nanny_childcare_address_summary'
