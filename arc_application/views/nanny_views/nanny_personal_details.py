@@ -1,3 +1,4 @@
+from arc_application.review_util import build_url
 from ...forms.nanny_forms.nanny_form_builder import HomeAddressForm, PersonalDetailsForm
 from ...services.db_gateways import NannyGatewayActions
 from .nanny_form_view import NannyARCFormView
@@ -7,7 +8,6 @@ from arc_application.services.nanny_view_helpers import parse_date_of_birth
 
 class NannyPersonalDetailsSummary(NannyARCFormView):
     template_name = 'nanny_general_template.html'
-    success_url = 'nanny_your_children_summary'
     task_for_review = 'personal_details_review'
     verbose_task_name = 'Your personal details'
     form_class = [PersonalDetailsForm, HomeAddressForm]
@@ -126,3 +126,27 @@ class NannyPersonalDetailsSummary(NannyARCFormView):
         }
 
         return context
+
+    def post(self, request, *args, **kwargs):
+        self.application_id = request.GET['id']
+
+        if isinstance(self.form_class, list):
+            for form in self.form_class:
+                self.handle_post_data(form)
+        else:
+            self.handle_post_data(self.form_class)
+
+    def get_success_url(self):
+        self.application_id = self.request.GET['id']
+
+        nanny_actions = NannyGatewayActions().read('applicant-personal-details',
+                                                   params={'application_id': self.application_id}).record
+        show_your_children = nanny_actions['your_children']
+
+        # If there is a record of a child within the model, link to the 'your children' task
+        if show_your_children:
+            return build_url('nanny_your_children_summary', get={'id': self.application_id})
+
+        # If there are no children, link to the childcare address feature
+        else:
+            return build_url('nanny_childcare_address_summary', get={'id': self.application_id})
