@@ -20,12 +20,12 @@ test_app_id = side_effect('application').record['application_id']
 
 
 @mock.patch.object(IdentityGatewayActions, 'read',   side_effect=side_effect)
-@mock.patch.object(NannyGatewayActions,    'create', side_effect=side_effect)
-@mock.patch.object(NannyGatewayActions,    'read',   side_effect=side_effect)
-@mock.patch.object(NannyGatewayActions,    'list',   side_effect=side_effect)
-@mock.patch.object(NannyGatewayActions,    'patch',  side_effect=side_effect)
-@mock.patch.object(NannyGatewayActions,    'put',    side_effect=side_effect)
-@mock.patch.object(NannyGatewayActions,    'delete', side_effect=side_effect)
+@mock.patch.object(NannyGatewayActions, 'create', side_effect=side_effect)
+@mock.patch.object(NannyGatewayActions, 'read',   side_effect=side_effect)
+@mock.patch.object(NannyGatewayActions, 'list',   side_effect=side_effect)
+@mock.patch.object(NannyGatewayActions, 'patch',  side_effect=side_effect)
+@mock.patch.object(NannyGatewayActions, 'put',    side_effect=side_effect)
+@mock.patch.object(NannyGatewayActions, 'delete', side_effect=side_effect)
 class TestNannyFlagging(TestCase):
     """
     Test suite for the functionality to flag fields as an ARC user.
@@ -47,6 +47,19 @@ class TestNannyFlagging(TestCase):
         Arc.objects.create(application_id=test_app_id)
 
         super(TestNannyFlagging, self).setUp()
+
+    # -------------- #
+    # Helper methods #
+    # -------------- #
+
+    @staticmethod
+    def _create_post_data(fields_to_flag):
+        post_data = dict((field + '_declare', 'on') for field in fields_to_flag)
+
+        for field in fields_to_flag:
+            post_data[field + '_comments'] = 'Flagged'
+
+        return post_data
 
     # ---------- #
     # HTTP tests #
@@ -239,27 +252,45 @@ class TestNannyFlagging(TestCase):
             'date_of_birth',
             'lived_abroad',
             'home_address',
+            'your_children',
         ]
 
-        post_data = dict((field + '_declare', 'on') for field in fields_to_flag)
-        for field in fields_to_flag:
-            post_data[field + '_comments'] = 'Flagged'
+        post_data = self._create_post_data(fields_to_flag)
 
         self.client.post(reverse('nanny_personal_details_summary') + '?id=' + test_app_id, data=post_data)
 
-        create_mock = args[1]
-
-        # FIXME
-        # The below fails because nanny_form_view calls arc_comments_handler.save_arc_comments_from_request() once per
-        # form, not once per request. It doesn't distinguish the fields which need to be called with each form.
-        # self.assertEqual(create_mock.call_count, len(fields_to_flag))
+        create_mock = args[5]
 
         # for field in fields_to_flag:
-        #     self.assertTrue(create_mock.called_with('arc-comments'))
+        #     create_mock.assert_called_with(
+        #         'arc-comments',
+        #         params={
+        #         'review_id': str(uuid4()),
+        #         'table_pk': table_pk,
+        #         'application_id': application_id,
+        #         'table_name': '',
+        #         'field_name': field_name,
+        #         'comment': comment,
+        #         'flagged': True,
+        #         }
+        #     )
+
         self.skipTest('NotImplemented')
 
     def test_flagging_personal_details_sets_status_to_flagged(self, *args):
-        self.skipTest('NotImplemented')
+        fields_to_flag = [
+            'name',
+            'date_of_birth',
+            'lived_abroad',
+            'home_address',
+            'your_children',
+        ]
+
+        post_data = self._create_post_data(fields_to_flag)
+
+        self.client.post(reverse('nanny_personal_details_summary') + '?id=' + test_app_id, data=post_data)
+
+        self.assertEqual(Arc.objects.get(pk=test_app_id).personal_details_review, 'FLAGGED')
 
     def test_flagging_home_address_only_sets_personal_details_status_to_flagged(self, *args):
         self.skipTest('NotImplemented')
@@ -268,7 +299,12 @@ class TestNannyFlagging(TestCase):
         self.skipTest('NotImplemented')
 
     def test_not_flagging_personal_details_sets_status_to_reviewed(self, *args):
-        self.skipTest('NotImplemented')
+        self.client.post(reverse('nanny_personal_details_summary') + '?id=' + test_app_id,
+                         data={
+                             'id': test_app_id,
+                         })
+
+        self.assertEqual(Arc.objects.get(pk=test_app_id).personal_details_review, 'COMPLETED')
 
     def test_flagging_your_children_details_sets_status_to_flagged(self, *args):
         self.skipTest('NotImplemented')
@@ -276,8 +312,13 @@ class TestNannyFlagging(TestCase):
     def test_flagging_you_children_details_creates_arc_comments(self, *args):
         self.skipTest('NotImplemented')
 
-    def test_not_flagging_your_children_details_sets_status_to_revied(self, *args):
-        self.skipTest('NotImplemented')
+    def test_not_flagging_your_children_details_sets_status_to_reviewed(self, *args):
+        self.client.post(reverse('nanny_your_children_summary') + '?id=' + test_app_id,
+                         data={
+                             'id': test_app_id,
+                         })
+
+        self.assertEqual(Arc.objects.get(pk=test_app_id).your_children_review, 'COMPLETED')
 
     def test_flagging_childcare_address_details_creates_arc_comments(self, *args):
         self.skipTest('NotImplemented')
@@ -286,7 +327,12 @@ class TestNannyFlagging(TestCase):
         self.skipTest('NotImplemented')
 
     def test_not_flagging_childcare_address_details_sets_status_to_reviewed(self, *args):
-        self.skipTest('NotImplemented')
+        self.client.post(reverse('nanny_childcare_address_summary') + '?id=' + test_app_id,
+                         data={
+                             'id': test_app_id,
+                         })
+
+        self.assertEqual(Arc.objects.get(pk=test_app_id).childcare_address_review, 'COMPLETED')
 
     def test_flagging_first_aid_details_sets_status_to_flagged(self, *args):
         self.skipTest('NotImplemented')
@@ -295,7 +341,12 @@ class TestNannyFlagging(TestCase):
         self.skipTest('NotImplemented')
 
     def test_not_flagging_first_aid_details_sets_status_to_reviewed(self, *args):
-        self.skipTest('NotImplemented')
+        self.client.post(reverse('nanny_first_aid_training_summary') + '?id=' + test_app_id,
+                         data={
+                             'id': test_app_id,
+                         })
+
+        self.assertEqual(Arc.objects.get(pk=test_app_id).first_aid_review, 'COMPLETED')
 
     def test_flagging_childcare_training_details_sets_status_to_flagged(self, *args):
         self.skipTest('NotImplemented')
@@ -304,7 +355,12 @@ class TestNannyFlagging(TestCase):
         self.skipTest('NotImplemented')
 
     def test_not_flagging_childcare_training_details_sets_status_to_reviewed(self, *args):
-        self.skipTest('NotImplemented')
+        self.client.post(reverse('nanny_childcare_training_summary') + '?id=' + test_app_id,
+                         data={
+                             'id': test_app_id,
+                         })
+
+        self.assertEqual(Arc.objects.get(pk=test_app_id).childcare_training_review, 'COMPLETED')
 
     def test_flagging_criminal_record_checks_details_sets_status_to_flagged(self, *args):
         self.skipTest('NotImplemented')
@@ -313,7 +369,12 @@ class TestNannyFlagging(TestCase):
         self.skipTest('NotImplemented')
 
     def test_not_flagging_criminal_record_checks_details_sets_status_to_reviewed(self, *args):
-        self.skipTest('NotImplemented')
+        self.client.post(reverse('nanny_dbs_summary') + '?id=' + test_app_id,
+                         data={
+                             'id': test_app_id,
+                         })
+
+        self.assertEqual(Arc.objects.get(pk=test_app_id).dbs_review, 'COMPLETED')
 
     def test_flagging_insurance_cover_details_sets_status_to_flagged(self, *args):
         self.skipTest('NotImplemented')
@@ -322,7 +383,12 @@ class TestNannyFlagging(TestCase):
         self.skipTest('NotImplemented')
 
     def test_not_flagging_insurance_cover_details_sets_status_to_reviewed(self, *args):
-        self.skipTest('NotImplemented')
+        self.client.post(reverse('nanny_insurance_cover_summary') + '?id=' + test_app_id,
+                         data={
+                             'id': test_app_id,
+                         })
+
+        self.assertEqual(Arc.objects.get(pk=test_app_id).insurance_cover_review, 'COMPLETED')
 
     def test_can_render_arc_summary_page(self, *args):
         """
