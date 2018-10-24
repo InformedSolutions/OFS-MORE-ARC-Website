@@ -61,6 +61,41 @@ class TestNannyFlagging(TestCase):
 
         return post_data
 
+    @staticmethod
+    def _assert_create_call_with_params(create_mock, endpoint, params):
+        """
+        Use to assert that a 'create' method was called with a given endpoint and parameters.
+        """
+        # TODO: Refactor the nested loops below.
+
+        # Get all calls made to a given endpoint.
+        endpoint_calls = [call for call in create_mock.call_args_list if call[0][0] == endpoint]
+
+        if len(endpoint_calls) == 0:
+            raise AssertionError('The "create" method was not called with the endpoint "{}".'.format(endpoint))
+
+        # Iterate through list of calls to endpoint.
+        # If all the params appear in the call to the create method with the expected value, append True.
+        # Else, append False.
+        kwargs_satisfied = []
+
+        for call in endpoint_calls:
+            _true = []
+            for key, value in params.items():
+                try:
+                    _true.append(call[1]['params'][key] == value)
+                except KeyError:
+                    _true.append(False)
+
+            kwargs_satisfied.append(all(_true))
+
+        # If any of the calls to the gateway contained the required parameters, pass.
+        # Else, raise AssertionError.
+        if any(kwargs_satisfied):
+            pass
+        else:
+            raise AssertionError('The "create" method was called using the "{}" endpoint, but not with the specified parameters.'.format(endpoint))
+
     # ---------- #
     # HTTP tests #
     # ---------- #
@@ -261,21 +296,15 @@ class TestNannyFlagging(TestCase):
 
         create_mock = args[5]
 
-        # for field in fields_to_flag:
-        #     create_mock.assert_called_with(
-        #         'arc-comments',
-        #         params={
-        #         'review_id': str(uuid4()),
-        #         'table_pk': table_pk,
-        #         'application_id': application_id,
-        #         'table_name': '',
-        #         'field_name': field_name,
-        #         'comment': comment,
-        #         'flagged': True,
-        #         }
-        #     )
-
-        self.skipTest('NotImplemented')
+        for field in fields_to_flag:
+            self._assert_create_call_with_params(create_mock, 'arc-comments',  params={
+                # 'table_pk': table_pk,
+                'application_id': test_app_id,
+                'table_name': '',
+                'field_name': field,
+                'comment': 'Flagged',
+                'flagged': True,
+                })
 
     def test_flagging_personal_details_sets_status_to_flagged(self, *args):
         fields_to_flag = [
