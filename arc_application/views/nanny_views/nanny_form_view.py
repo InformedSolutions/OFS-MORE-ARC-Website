@@ -28,6 +28,7 @@ class NannyARCFormView(FormView):
         return render(request, self.template_name, context=context)
 
     def post(self, request, *args, **kwargs):
+        self.application_id = request.GET['id']
         self.__handle_post_data()
         return HttpResponseRedirect(build_url(self.success_url, get={'id': request.GET['id']}))
 
