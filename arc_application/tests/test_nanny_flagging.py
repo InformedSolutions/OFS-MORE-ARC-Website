@@ -3,13 +3,11 @@ from unittest import mock
 from django.conf import settings
 from django.forms import Form
 from django.contrib.auth.models import Group, User
-from django.http import HttpResponse
 from django.test import tag, TestCase
 from django.urls import reverse, resolve
 
 from arc_application.models import Arc
 from arc_application.forms.nanny_forms.nanny_form_builder import NannyFormBuilder
-from arc_application.services.application_handler import NannyApplicationHandler
 from arc_application.services.db_gateways import NannyGatewayActions
 from arc_application.views import NannyDbsCheckSummary, NannyArcSummary, NannyContactDetailsSummary, \
     NannyPersonalDetailsSummary, NannyChildcareAddressSummary, NannyFirstAidTrainingSummary, \
@@ -21,44 +19,34 @@ from .test_utils import side_effect
 test_app_id = side_effect('application').record['application_id']
 
 
-@mock.patch('arc_application.services.db_gateways.NannyGatewayActions.read', side_effect=side_effect)
-@mock.patch('arc_application.services.db_gateways.NannyGatewayActions.list', side_effect=side_effect)
-@mock.patch('arc_application.services.db_gateways.NannyGatewayActions.patch', side_effect=side_effect)
-@mock.patch('arc_application.services.db_gateways.NannyGatewayActions.create', side_effect=side_effect)
-@mock.patch('arc_application.services.db_gateways.IdentityGatewayActions.read', side_effect=side_effect)
-class TestNannyFlagging(TestCase):  # , metaclass=MockedGatewayTests):
+@mock.patch.object(NannyGatewayActions, 'create', side_effect=side_effect)
+@mock.patch.object(NannyGatewayActions, 'read',   side_effect=side_effect)
+@mock.patch.object(NannyGatewayActions, 'list',   side_effect=side_effect)
+@mock.patch.object(NannyGatewayActions, 'patch',  side_effect=side_effect)
+@mock.patch.object(NannyGatewayActions, 'put',    side_effect=side_effect)
+@mock.patch.object(NannyGatewayActions, 'delete', side_effect=side_effect)
+class TestNannyFlagging(TestCase):
     """
-    Test suite for the functionality within the ARC summary page.
+    Test suite for the functionality to flag fields as an ARC user.
     """
-    def setUp(self):
-        self.user = User.objects.create_user(
+    @classmethod
+    def setUpTestData(cls):
+        super(TestNannyFlagging, cls).setUp()
+
+        cls.user = User.objects.create_user(
             username='governor_tARCin',
             email='test@test.com',
             password='my_secret'
         )
         g = Group.objects.create(name=settings.ARC_GROUP)
-        g.user_set.add(self.user)
+        g.user_set.add(cls.user)
 
         global arc_test_user
-        arc_test_user = self.user
+        arc_test_user = cls.user
 
-        self.client.login(username='governor_tARCin', password='my_secret')
+        cls.client.login(username='governor_tARCin', password='my_secret')
 
-    @classmethod
-    def setUpTestData(cls):
         Arc.objects.create(application_id=test_app_id)
-
-    # ----------------- #
-    # Integration tests #
-    # ----------------- #
-
-    @tag('integration')
-    def test_if_field_flagged_then_task_status_is_flagged(self, *args):
-        self.skipTest('NotImplemented')
-
-    @tag('integration')
-    def test_if_nothing_flagged_then_task_status_is_done(self, *args):
-        self.skipTest('NotImplemented')
 
     # ---------- #
     # HTTP tests #
@@ -81,6 +69,16 @@ class TestNannyFlagging(TestCase):  # , metaclass=MockedGatewayTests):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.resolver_match.func.__name__, NannyPersonalDetailsSummary.as_view().__name__)
+
+    def test_can_render_your_children_details_page(self, *args):
+        """
+        Test to ensure that the page for flagging your children details can be rendered.
+        """
+        # response = self.client.get(reverse('your_children_details_summary') + '?id=' + test_app_id)
+        #
+        # self.assertEqual(response.status_code, 200)
+        # self.assertEqual(response.resolver_match.func.__name__, NannyPersonalDetailsSummary.as_view().__name__)
+        self.skipTest('NotImplemented')
 
     def test_can_render_childcare_address_details_page(self, *args):
         """
@@ -147,15 +145,21 @@ class TestNannyFlagging(TestCase):  # , metaclass=MockedGatewayTests):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(found.func.view_class.__name__, NannyPersonalDetailsSummary.as_view().__name__)
 
-    def test_personal_details_redirects_to_the_your_children_page(self, *args):
+    def test_personal_details_redirects_to_the_your_children_page_if_your_children_is_true(self, *args):
         """
-        Test that a POST request to the personal details page redirects to the childcare address details page.
+        Test that a POST request to the personal details page redirects to the your children details page.
         """
         response = self.client.post(reverse('nanny_personal_details_summary') + '?id=' + test_app_id)
         found = resolve(response.url)
 
         self.assertEqual(response.status_code, 302)
         self.assertEqual(found.func.view_class.__name__, NannyYourChildrenSummary.as_view().__name__,)
+
+    def test_personal_details_redirects_to_the_childcare_address_page_if_your_children_is_false(self, *args):
+        """
+        Test that a POST request to the personal details page redirects to the childcare address details page.
+        """
+        self.skipTest('NotImplemented')
 
     def test_your_children_redirects_to_the_childcare_address_page(self, *args):
         """
@@ -220,7 +224,7 @@ class TestNannyFlagging(TestCase):  # , metaclass=MockedGatewayTests):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(found.func.view_class.__name__, NannyTaskList.as_view().__name__)
 
-    def test_can_flag_personal_details(self, *args):
+    def test_flagging_personal_details_creates_arc_comments(self, *args):
         """
         Test to ensure that personal details can be flagged.
         """
@@ -248,35 +252,70 @@ class TestNannyFlagging(TestCase):  # , metaclass=MockedGatewayTests):
         #     self.assertTrue(create_mock.called_with('arc-comments'))
         self.skipTest('NotImplemented')
 
-    def test_can_flag_childcare_address_details(self, *args):
-        """
-        Test to ensure that childcare address details can be flagged.
-        """
-        # TODO - Write test once work commences on flagging Childcare Address details.
+    def test_flagging_personal_details_sets_status_to_flagged(self, *args):
         self.skipTest('NotImplemented')
 
-    def test_can_flag_first_aid_details(self, *args):
-        """
-        Test to ensure that first aid details can be flagged.
-        """
+    def test_flagging_home_address_only_sets_personal_details_status_to_flagged(self, *args):
         self.skipTest('NotImplemented')
 
-    def test_can_flag_childcare_training_details(self, *args):
-        """
-        Test to ensure that childcare training details can be flagged.
-        """
+    def test_flagging_name_only_sets_personal_details_status_to_flagged(self, *args):
         self.skipTest('NotImplemented')
 
-    def test_can_flag_criminal_record_details(self, *args):
-        """
-        Test to ensure that dbs certificate details can be flagged.
-        """
+    def test_not_flagging_personal_details_sets_status_to_reviewed(self, *args):
         self.skipTest('NotImplemented')
 
-    def test_insurance_cover_details_can_be_flagged(self, *args):
-        """
-        Test to ensure that insurance cover details can be flagged.
-        """
+    def test_flagging_your_children_details_sets_status_to_flagged(self, *args):
+        self.skipTest('NotImplemented')
+
+    def test_flagging_you_children_details_creates_arc_comments(self, *args):
+        self.skipTest('NotImplemented')
+
+    def test_not_flagging_your_children_details_sets_status_to_revied(self, *args):
+        self.skipTest('NotImplemented')
+
+    def test_flagging_childcare_address_details_creates_arc_comments(self, *args):
+        self.skipTest('NotImplemented')
+
+    def test_flagging_childcare_address_details_sets_status_to_flagged(self, *args):
+        self.skipTest('NotImplemented')
+
+    def test_not_flagging_childcare_address_details_sets_status_to_reviewed(self, *args):
+        self.skipTest('NotImplemented')
+
+    def test_flagging_first_aid_details_sets_status_to_flagged(self, *args):
+        self.skipTest('NotImplemented')
+
+    def test_flagging_first_aid_details_creates_arc_comments(self, *args):
+        self.skipTest('NotImplemented')
+
+    def test_not_flagging_first_aid_details_sets_status_to_reviewed(self, *args):
+        self.skipTest('NotImplemented')
+
+    def test_flagging_childcare_training_details_sets_status_to_flagged(self, *args):
+        self.skipTest('NotImplemented')
+
+    def test_flagging_childcare_training_details_creates_arc_comments(self, *args):
+        self.skipTest('NotImplemented')
+
+    def test_not_flagging_childcare_training_details_sets_status_to_reviewed(self, *args):
+        self.skipTest('NotImplemented')
+
+    def test_flagging_criminal_record_checks_details_sets_status_to_flagged(self, *args):
+        self.skipTest('NotImplemented')
+
+    def test_flagging_criminal_record_checks_details_creates_arc_comments(self, *args):
+        self.skipTest('NotImplemented')
+
+    def test_not_flagging_criminal_record_checks_details_sets_status_to_reviewed(self, *args):
+        self.skipTest('NotImplemented')
+
+    def test_flagging_insurance_cover_details_sets_status_to_flagged(self, *args):
+        self.skipTest('NotImplemented')
+
+    def test_flagging_insurance_cover_details_creates_arc_comments(self, *args):
+        self.skipTest('NotImplemented')
+
+    def test_not_flagging_insurance_cover_details_sets_status_to_reviewed(self, *args):
         self.skipTest('NotImplemented')
 
     def test_can_render_arc_summary_page(self, *args):
@@ -288,55 +327,8 @@ class TestNannyFlagging(TestCase):  # , metaclass=MockedGatewayTests):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.resolver_match.func.__name__, NannyArcSummary.as_view().__name__)
 
-    # @tag('integration')
-    # def test_can_remove_previously_added_dbs_task_arc_comment(self, *args):
-    #     """
-    #     Test to ensure that an ARC user who had previously flagged and commented on a field in the dbs task
-    #     can later remove that comment. Test then that this then does not appear in the view.
-    #     """
-    #     # TODO - figure out precisely how to test this. End-to-end selenium test more applicable?
-    #     # with mock.patch('arc_application.services.db_gateways.NannyGatewayActions.read') as nanny_gateway_read:
-    #     #     nanny_gateway_read.side_effect = side_effect
-    #
-    #     self.client.post(
-    #         reverse('nanny_dbs_summary') + '?id=' + '998fd8ec-b96b-4a71-a1a1-a7a3ae186729',
-    #         data={
-    #             'dbs_number_declare': 'on',
-    #             'dbs_number_comments': 'Test this will be removed.'
-    #         }
-    #     )
-    #
-    #     # self.assertEqual(TASK_STATUS, 'FLAGGED')
-    #
-    #     self.client.post(
-    #         reverse('nanny_dbs_summary') + '?id=' + test_app_id,
-    #         data={}
-    #     )
-    #
-    #     api_query = NannyGatewayActions().list('arc-comments', params={''})
-    #
-    #     self.assertEqual(api_query.status_code, 404)
-    #     # self.assertEqual(TASK_STATUS, 'REVIEWED')
-    #
-    #     self.client.get(reverse('nanny_dbs_summary') + '?id=' + test_app_id)
-    #     # assert that the boxes are unchecked and the comments box not appearing.
-    #
-    # @tag('integration')
-    # def test_that_flagged_dbs_task_field_renders_with_get_request(self, *args):
-    #     """
-    #     Test that a field which has been flagged in the dbs task will then render in the template with the box checked
-    #     and the comments box visible.
-    #     """
-    #     self.client.post(
-    #         reverse('nanny_dbs_summary') + '?id=' + test_app_id,
-    #         data={
-    #             'dbs_number_declare': 'on',
-    #             'dbs_number_comments': 'Test this will appear.'
-    #         }
-    #     )
-    #
-    #     response = self.client.get(reverse('nanny_dbs_summary') + '?id=' + test_app_id)
-    #     # self.assertContains(BOX_CHECKED)
+    def test_get_form_initial_values_populates_with_existing_arc_comments(self, *args):
+        self.skipTest('NotImplemented')
 
     # ---------- #
     # UNIT tests #
@@ -359,3 +351,7 @@ class TestNannyFlagging(TestCase):  # , metaclass=MockedGatewayTests):
         for field in example_fields:
             self.assertIn(field + '_declare', form().fields)
             self.assertIn(field + '_comments', form().fields)
+
+    @tag('unit')
+    def test_formset_builder(self, *args):
+        self.skipTest('NotImplemented')
