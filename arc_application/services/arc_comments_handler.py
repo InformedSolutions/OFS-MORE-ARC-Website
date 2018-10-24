@@ -5,18 +5,25 @@ from arc_application.models import Arc
 from .db_gateways import NannyGatewayActions
 
 
-def save_arc_comments_from_request(request, endpoint, table_pk, verbose_task_name):
+def save_arc_comments_from_request(request, form_class, verbose_task_name):
     """
-    Function to save comments made by an ARC reviewer from a given request.
+    Function to save comments made by an ARC reviewer from a given form.
     :param request: request to check for comments.
-    :param endpoint:
-    :param table_pk: pk of the entry for which comments are being made.
+    :param form_class:
     :param verbose_task_name: The name of the task to be recorded in the audit log.
     :return: True if comments were made, else False.
     """
     application_id = request.GET['id']
-    table_pk = NannyGatewayActions().read(endpoint, params={'application_id': application_id}).record[table_pk]
+    endpoint = form_class.api_endpoint_name
+    table_pk = NannyGatewayActions().read(endpoint, params={'application_id': application_id}).record[form_class.pk_field_name]
     existing_comments = NannyGatewayActions().list('arc-comments', params={'table_pk': table_pk})
+
+    comments = dict()
+
+    # Generate dict with (key, value) pair of (field_name, comment) if field was flagged.
+    for field in form_class.field_names:
+        if field + '_declare' in request.POST and request.POST[field + '_declare'] == 'on':
+            comments[field] = request.POST[field + '_comments']
 
     # Delete existing ArcComments
     if existing_comments.status_code == 200:
@@ -28,9 +35,6 @@ def save_arc_comments_from_request(request, endpoint, table_pk, verbose_task_nam
             NannyGatewayActions().delete('arc-comments', params={'review_id': str(record_id)})
     else:
         fields_with_existing_comments = []
-
-    # Generate dict with (key, value) pair of (field_name, comment) if field was flagged.
-    comments = dict((key[:-8], request.POST[key[:-8] + '_comments']) for key in request.POST.keys() if request.POST[key] == 'on')
 
     for field_name, comment in comments.items():
         NannyGatewayActions().create(
@@ -101,13 +105,13 @@ def log_arc_flag_action(application_id, arc_user, flagged_field, verbose_task_na
 
 def get_form_initial_values(form, application_id):
     endpoint = form.api_endpoint_name
-    table_pk = form.pk_field_name
+    table_pk_name = form.pk_field_name
 
-    table_pk = NannyGatewayActions().read(endpoint, params={'application_id': application_id}).record[table_pk]
+    table_pk_value = NannyGatewayActions().read(endpoint, params={'application_id': application_id}).record[table_pk_name]
     form_fields = form.field_names
 
     for field_name in form_fields:
-        api_response = NannyGatewayActions().list('arc-comments', params={'table_pk': table_pk, 'field_name': field_name})
+        api_response = NannyGatewayActions().list('arc-comments', params={'table_pk': table_pk_value, 'field_name': field_name})
         if api_response.status_code == 200:
             arc_comments_record = api_response.record[0]
             form[field_name + '_declare'].initial = True
