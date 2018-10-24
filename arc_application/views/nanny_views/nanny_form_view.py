@@ -28,30 +28,27 @@ class NannyARCFormView(FormView):
         return render(request, self.template_name, context=context)
 
     def post(self, request, *args, **kwargs):
-        self.application_id = request.GET['id']
+        self.__handle_post_data()
+        return HttpResponseRedirect(build_url(self.success_url, get={'id': request.GET['id']}))
 
+    def __handle_post_data(self):
         if isinstance(self.form_class, list):
-            for form in self.form_class:
-                self.handle_post_data(form)
+            flagged_fields = [save_arc_comments_from_request(
+                request=self.request,
+                form_class=_class,
+                verbose_task_name=self.verbose_task_name,
+            ) for _class in self.form_class]
+
         else:
-            self.handle_post_data(self.form_class)
-
-        return HttpResponseRedirect(build_url(self.success_url, get={'id': self.application_id}))
-
-    def handle_post_data(self, form):
-        # Write ArcComments to db from form.
-        endpoint = form.api_endpoint_name
-        table_pk = form.pk_field_name
-        flagged_fields = save_arc_comments_from_request(
-            request=self.request,
-            endpoint=endpoint,
-            table_pk=table_pk,
-            verbose_task_name=self.verbose_task_name
-        )
+            flagged_fields = [save_arc_comments_from_request(
+                request=self.request,
+                form_class=self.form_class,
+                verbose_task_name=self.verbose_task_name,
+            )]
 
         # Update {{task}}_review status for ARC user.
         reviewed_task = self.get_task_for_review()
-        update_arc_review_status(self.application_id, flagged_fields, reviewed_task=reviewed_task)
+        update_arc_review_status(self.application_id, any(flagged_fields), reviewed_task=reviewed_task)
 
         # Update {{task}}_arc_flagged status for NannyApplication table.
         update_application_arc_flagged_status(flagged_fields, self.application_id, reviewed_task)
