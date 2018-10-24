@@ -8,7 +8,7 @@ from django.urls import reverse, resolve
 
 from arc_application.models import Arc
 from arc_application.forms.nanny_forms.nanny_form_builder import NannyFormBuilder
-from arc_application.services.db_gateways import NannyGatewayActions
+from arc_application.services.db_gateways import NannyGatewayActions, IdentityGatewayActions
 from arc_application.views import NannyDbsCheckSummary, NannyArcSummary, NannyContactDetailsSummary, \
     NannyPersonalDetailsSummary, NannyChildcareAddressSummary, NannyFirstAidTrainingSummary, \
     NannyChildcareTrainingSummary, NannyInsuranceCoverSummary, NannyTaskList, NannyYourChildrenSummary
@@ -19,20 +19,19 @@ from .test_utils import side_effect
 test_app_id = side_effect('application').record['application_id']
 
 
-@mock.patch.object(NannyGatewayActions, 'create', side_effect=side_effect)
-@mock.patch.object(NannyGatewayActions, 'read',   side_effect=side_effect)
-@mock.patch.object(NannyGatewayActions, 'list',   side_effect=side_effect)
-@mock.patch.object(NannyGatewayActions, 'patch',  side_effect=side_effect)
-@mock.patch.object(NannyGatewayActions, 'put',    side_effect=side_effect)
-@mock.patch.object(NannyGatewayActions, 'delete', side_effect=side_effect)
+@mock.patch.object(IdentityGatewayActions, 'read',   side_effect=side_effect)
+@mock.patch.object(NannyGatewayActions,    'create', side_effect=side_effect)
+@mock.patch.object(NannyGatewayActions,    'read',   side_effect=side_effect)
+@mock.patch.object(NannyGatewayActions,    'list',   side_effect=side_effect)
+@mock.patch.object(NannyGatewayActions,    'patch',  side_effect=side_effect)
+@mock.patch.object(NannyGatewayActions,    'put',    side_effect=side_effect)
+@mock.patch.object(NannyGatewayActions,    'delete', side_effect=side_effect)
 class TestNannyFlagging(TestCase):
     """
     Test suite for the functionality to flag fields as an ARC user.
     """
     @classmethod
     def setUpTestData(cls):
-        super(TestNannyFlagging, cls).setUp()
-
         cls.user = User.objects.create_user(
             username='governor_tARCin',
             email='test@test.com',
@@ -41,12 +40,13 @@ class TestNannyFlagging(TestCase):
         g = Group.objects.create(name=settings.ARC_GROUP)
         g.user_set.add(cls.user)
 
-        global arc_test_user
-        arc_test_user = cls.user
+        super(TestNannyFlagging, cls).setUpTestData()
 
-        cls.client.login(username='governor_tARCin', password='my_secret')
-
+    def setUp(self):
+        self.client.login(username='governor_tARCin', password='my_secret')
         Arc.objects.create(application_id=test_app_id)
+
+        super(TestNannyFlagging, self).setUp()
 
     # ---------- #
     # HTTP tests #
@@ -125,11 +125,17 @@ class TestNannyFlagging(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.resolver_match.func.__name__, NannyInsuranceCoverSummary.as_view().__name__)
 
-    def test_continue_complete_review_button_appears_only_if_all_tasks_reviewed(self, *args):
+    def test_complete_review_button_appears_if_all_tasks_reviewed(self, *args):
         """
         Test to ensure that the 'Complete Review' button is only present if all tasks are either 'Reviewed'
         or 'Flagged'.
         """
+        self.skipTest('NotImplemented')
+
+    def test_complete_review_button_appears_if_all_tasks_flagged(self, *args):
+        self.skipTest('NotImplemented')
+
+    def test_complete_review_button_does_not_appear_if_not_all_tasks_flagged_or_reviewed(self, *args):
         self.skipTest('NotImplemented')
 
     def test_sign_in_details_redirects_to_personal_details(self, *args):
