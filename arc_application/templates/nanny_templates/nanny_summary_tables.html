@@ -12,16 +12,18 @@
         <tbody>
 
         {% for row in context.rows %}
-        {% if row.id == 'home_address_locations' %}
-            {% for home_address in row.info %}
-                {% include 'nanny_childcare_address_template.html' %}
-            {% endfor %}
+            {% if not row.hidden %}
+                {% if row.id == 'home_address_locations' %}
+                    {% for home_address in row.info %}
+                        {% include 'nanny_childcare_address_template.html' %}
+                    {% endfor %}
 
-        {% else %}
+                {% else %}
 
-        {% include 'nanny_general_table_template.html' %}
+                {% include 'nanny_general_table_template.html' %}
 
-        {% endif %}
+                {% endif %}
+            {% endif %}
         {% endfor %}
 
         </tbody>
