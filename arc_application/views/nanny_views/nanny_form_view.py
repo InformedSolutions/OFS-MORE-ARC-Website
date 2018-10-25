@@ -7,7 +7,9 @@ from django.views.decorators.cache import never_cache
 
 from ...review_util import build_url
 from ...services.arc_comments_handler import save_arc_comments_from_request, \
-    update_arc_review_status, get_form_initial_values, update_application_arc_flagged_status
+    update_arc_review_status, \
+    get_form_initial_values, \
+    update_application_arc_flagged_status
 
 
 @method_decorator(never_cache, name='dispatch')
@@ -16,10 +18,10 @@ class NannyARCFormView(FormView):
     """
     Parent FormView class from which all subsequent FormViews will inherit.
     """
-    template_name = None
-    success_url = None
-    task_for_review = None
-    application_id = None
+    template_name     = None
+    success_url       = None
+    task_for_review   = None
+    application_id    = None
     verbose_task_name = None
 
     def get(self, request, *args, **kwargs):
@@ -33,19 +35,14 @@ class NannyARCFormView(FormView):
         return HttpResponseRedirect(build_url(self.success_url, get={'id': request.GET['id']}))
 
     def __handle_post_data(self):
-        if isinstance(self.form_class, list):
-            flagged_fields = [save_arc_comments_from_request(
-                request=self.request,
-                form_class=_class,
-                verbose_task_name=self.verbose_task_name,
-            ) for _class in self.form_class]
+        # Cast self.form_class to a list if not already a list. Then iterate over list.
+        _form_classes = list(self.form_class) if not isinstance(self.form_class, list) else self.form_class
 
-        else:
-            flagged_fields = [save_arc_comments_from_request(
-                request=self.request,
-                form_class=self.form_class,
-                verbose_task_name=self.verbose_task_name,
-            )]
+        flagged_fields = [save_arc_comments_from_request(
+            request=self.request,
+            form_class=_class,
+            verbose_task_name=self.verbose_task_name,
+        ) for _class in _form_classes]
 
         # Update {{task}}_review status for ARC user.
         reviewed_task = self.get_task_for_review()
