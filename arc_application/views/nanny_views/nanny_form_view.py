@@ -36,7 +36,7 @@ class NannyARCFormView(FormView):
 
     def __handle_post_data(self):
         # Cast self.form_class to a list if not already a list. Then iterate over list.
-        _form_classes = list(self.form_class) if not isinstance(self.form_class, list) else self.form_class
+        _form_classes = [self.form_class] if not isinstance(self.form_class, list) else self.form_class
 
         flagged_fields = [save_arc_comments_from_request(
             request=self.request,
