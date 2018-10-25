@@ -62,39 +62,31 @@ class TestNannyFlagging(TestCase):
         return post_data
 
     @staticmethod
-    def _assert_create_call_with_params(create_mock, endpoint, params):
+    def _assert_create_call_made_with_given_params(create_mock, endpoint, params):
         """
-        Use to assert that a 'create' method was called with a given endpoint and parameters.
+        Use to assert that a 'create' method was called with a given endpoint and parameters at least once.
+        Custom method easier than accessing table pk for a given form and using bulit-in mock.assert_any_call()
         """
-        # TODO: Refactor the nested loops below.
-
-        # Get all calls made to a given endpoint.
+        # Get all calls made to the given endpoint.
         endpoint_calls = [call for call in create_mock.call_args_list if call[0][0] == endpoint]
 
         if len(endpoint_calls) == 0:
             raise AssertionError('The "create" method was not called with the endpoint "{}".'.format(endpoint))
 
         # Iterate through list of calls to endpoint.
-        # If all the params appear in the call to the create method with the expected value, append True.
-        # Else, append False.
-        kwargs_satisfied = []
+        # Iterate through the expected parameter values.
+        # If any value in call != expected value, break, then move to next call.
+        # If all values match that call, return None; a match for the expected parameters values was found. Test passes.
+        # If any no calls match, raise AssertionError.
 
         for call in endpoint_calls:
-            _true = []
-            for key, value in params.items():
-                try:
-                    _true.append(call[1]['params'][key] == value)
-                except KeyError:
-                    _true.append(False)
+            for param_name, exp_param_val in params.items():
+                if not call[1]['params'][param_name] == exp_param_val:
+                    break
+            else:
+                return None
 
-            kwargs_satisfied.append(all(_true))
-
-        # If any of the calls to the gateway contained the required parameters, pass.
-        # Else, raise AssertionError.
-        if any(kwargs_satisfied):
-            pass
-        else:
-            raise AssertionError('The "create" method was called using the "{}" endpoint, but not with the specified parameters.'.format(endpoint))
+        raise AssertionError('The "create" method was called using the "{}" endpoint, but not with the specified parameters.'.format(endpoint))
 
     # ---------- #
     # HTTP tests #
@@ -297,8 +289,7 @@ class TestNannyFlagging(TestCase):
         create_mock = args[5]
 
         for field in fields_to_flag:
-            self._assert_create_call_with_params(create_mock, 'arc-comments',  params={
-                # 'table_pk': table_pk,
+            self._assert_create_call_made_with_given_params(create_mock, 'arc-comments',  params={
                 'application_id': test_app_id,
                 'table_name': '',
                 'field_name': field,
@@ -367,7 +358,26 @@ class TestNannyFlagging(TestCase):
         self.skipTest('NotImplemented')
 
     def test_flagging_first_aid_details_creates_arc_comments(self, *args):
-        self.skipTest('NotImplemented')
+        fields_to_flag = [
+            'training_organisation',
+            'course_title',
+            'course_date',
+        ]
+
+        post_data = self._create_post_data(fields_to_flag)
+
+        self.client.post(reverse('nanny_first_aid_training_summary') + '?id=' + test_app_id, post_data)
+
+        create_mock = args[5]
+
+        for field in fields_to_flag:
+            self._assert_create_call_made_with_given_params(create_mock, 'arc-comments',  params={
+                'application_id': test_app_id,
+                'table_name': '',
+                'field_name': field,
+                'comment': 'Flagged',
+                'flagged': True,
+                })
 
     def test_not_flagging_first_aid_details_sets_status_to_reviewed(self, *args):
         self.client.post(reverse('nanny_first_aid_training_summary') + '?id=' + test_app_id,
@@ -381,7 +391,24 @@ class TestNannyFlagging(TestCase):
         self.skipTest('NotImplemented')
 
     def test_flagging_childcare_training_details_creates_arc_comments(self, *args):
-        self.skipTest('NotImplemented')
+        fields_to_flag = [
+            'childcare_training',
+        ]
+
+        post_data = self._create_post_data(fields_to_flag)
+
+        self.client.post(reverse('nanny_childcare_training_summary') + '?id=' + test_app_id, post_data)
+
+        create_mock = args[5]
+
+        for field in fields_to_flag:
+            self._assert_create_call_made_with_given_params(create_mock, 'arc-comments',  params={
+                'application_id': test_app_id,
+                'table_name': '',
+                'field_name': field,
+                'comment': 'Flagged',
+                'flagged': True,
+                })
 
     def test_not_flagging_childcare_training_details_sets_status_to_reviewed(self, *args):
         self.client.post(reverse('nanny_childcare_training_summary') + '?id=' + test_app_id,
@@ -395,7 +422,25 @@ class TestNannyFlagging(TestCase):
         self.skipTest('NotImplemented')
 
     def test_flagging_criminal_record_checks_details_creates_arc_comments(self, *args):
-        self.skipTest('NotImplemented')
+        fields_to_flag = [
+            'dbs_number',
+            'convictions',
+        ]
+
+        post_data = self._create_post_data(fields_to_flag)
+
+        self.client.post(reverse('nanny_dbs_summary') + '?id=' + test_app_id, post_data)
+
+        create_mock = args[5]
+
+        for field in fields_to_flag:
+            self._assert_create_call_made_with_given_params(create_mock, 'arc-comments',  params={
+                'application_id': test_app_id,
+                'table_name': '',
+                'field_name': field,
+                'comment': 'Flagged',
+                'flagged': True,
+                })
 
     def test_not_flagging_criminal_record_checks_details_sets_status_to_reviewed(self, *args):
         self.client.post(reverse('nanny_dbs_summary') + '?id=' + test_app_id,
@@ -409,7 +454,24 @@ class TestNannyFlagging(TestCase):
         self.skipTest('NotImplemented')
 
     def test_flagging_insurance_cover_details_creates_arc_comments(self, *args):
-        self.skipTest('NotImplemented')
+        fields_to_flag = [
+            'public_liability',
+        ]
+
+        post_data = self._create_post_data(fields_to_flag)
+
+        self.client.post(reverse('nanny_insurance_cover_summary') + '?id=' + test_app_id, post_data)
+
+        create_mock = args[5]
+
+        for field in fields_to_flag:
+            self._assert_create_call_made_with_given_params(create_mock, 'arc-comments',  params={
+                'application_id': test_app_id,
+                'table_name': '',
+                'field_name': field,
+                'comment': 'Flagged',
+                'flagged': True,
+                })
 
     def test_not_flagging_insurance_cover_details_sets_status_to_reviewed(self, *args):
         self.client.post(reverse('nanny_insurance_cover_summary') + '?id=' + test_app_id,
