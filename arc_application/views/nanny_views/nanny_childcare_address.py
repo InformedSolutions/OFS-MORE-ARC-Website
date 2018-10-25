@@ -1,4 +1,4 @@
-from arc_application.forms.nanny_forms.nanny_form_builder import ChildcareAddressForm, WhereYouWillWorkForm
+from arc_application.forms.nanny_forms.nanny_form_builder import ChildcareAddressFormset, WhereYouWillWorkForm
 from arc_application.services.db_gateways import NannyGatewayActions
 
 from .nanny_form_view import NannyARCFormView
@@ -9,7 +9,7 @@ class NannyChildcareAddressSummary(NannyARCFormView):
     success_url = 'nanny_first_aid_training_summary'
     task_for_review = 'childcare_address_review'
     verbose_task_name = 'Childcare address'
-    form_class = [WhereYouWillWorkForm,]
+    form_class = [WhereYouWillWorkForm, ChildcareAddressFormset]
 
     def get_context_data(self, application_id):
         nanny_actions = NannyGatewayActions()
@@ -36,27 +36,14 @@ class NannyChildcareAddressSummary(NannyARCFormView):
 
         where_you_will_work_form = WhereYouWillWorkForm()
 
-        from django.forms import formset_factory
-
-        ChildcareAddressFormset = formset_factory(ChildcareAddressForm, extra=0)
+        n_forms = str(len(home_address_locations))
         childcare_address_formset = ChildcareAddressFormset(
             data={
-                'form-TOTAL_FORMS': str(len(home_address_locations)),
-                'form-INITIAL_FORMS': str(len(home_address_locations)),
-                'form-MAX_NUM_FORMS': str(len(home_address_locations)),
+                'form-TOTAL_FORMS': n_forms,
+                'form-INITIAL_FORMS': n_forms,
+                'form-MAX_NUM_FORMS': n_forms,
             }
         )
-
-        for index, form in enumerate(childcare_address_formset):
-            form.fields['childcare_address_declare'].widget.attrs.update(
-                {
-                    'data_target': 'childcare_address_' + str(index + 1),
-                    'aria-controls': 'childcare_address_' + str(index + 1),
-                    'aria-expanded': 'false'
-                }
-            )
-
-        print('Break')
 
         context = {
             'application_id': application_id,
