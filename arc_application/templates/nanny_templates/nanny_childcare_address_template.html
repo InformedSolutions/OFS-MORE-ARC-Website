@@ -1,7 +1,7 @@
 <tr>
 
     <td>
-        Childcare address {{forloop.counter}}
+        Childcare address {{ forloop.counter }}
     </td>
         <td style="word-wrap: break-word">
 
@@ -31,21 +31,20 @@
 
         </td>
         <td>
-            <!-- Blank column to get hrule of correct width. -->
+            {{ form.childcare_address_declare }}
         </td>
 </tr>
-<tr class="js-hidden" id="childcare_address">
+<tr class="js-hidden" id="childcare_address_{{ forloop.counter }}">
+
     <td colspan="1">
         <div>
-            {{ form.add_phone_number_comments.label}}
+            {{ form.childcare_address_comments.label }}
         </div>
         <div>
-            {{ form.add_phone_number_comments.help_text}}
+            {{ form.childcare_address_comments.help_text }}
         </div>
     </td>
     <td colspan="2">
-        <div>
-            {{ form.add_phone_number_comments}}
-        </div>
+        {{ form.childcare_address_comments }}
     </td>
 </tr>
