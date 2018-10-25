@@ -32,6 +32,7 @@ class NannyFormBuilder:
         self.update_checkbox_field_widgets()
 
         class NannyARCForm(forms.Form):
+            __name__ = 'NannyARCForm'
             auto_replace_widgets = True
             field_names = self.field_names
             pk_field_name = self.get_pk_field_name()
@@ -87,11 +88,12 @@ home_address_fields = [
     'home_address',
 ]
 
+where_you_will_work_fields = [
+    'address_to_be_provided'
+]
+
 childcare_address_fields = [
-    'address_1',
-    'address_2',
-    'address_3',
-    'address_4',
+    'childcare_address'
 ]
 
 first_aid_training_fields = [
@@ -116,7 +118,8 @@ insurance_cover_fields = [
 
 PersonalDetailsForm     = NannyFormBuilder(personal_details_fields, pk_field_name='personal_detail_id', api_endpoint_name='applicant-personal-details').create_form()
 HomeAddressForm         = NannyFormBuilder(home_address_fields, pk_field_name='home_address_id', api_endpoint_name='applicant-home-address').create_form()
-childcare_address_form  = None
+WhereYouWillWorkForm    = NannyFormBuilder(where_you_will_work_fields, pk_field_name='application_id', api_endpoint_name='application').create_form()
+ChildcareAddressForm    = NannyFormBuilder(childcare_address_fields, pk_field_name='childcare_address_id', api_endpoint_name='childcare-address').create_form()
 FirstAidForm            = NannyFormBuilder(first_aid_training_fields, pk_field_name='first_aid_id', api_endpoint_name='first-aid').create_form()
 ChildcareTrainingForm   = NannyFormBuilder(childcare_training_fields, pk_field_name='childcare_training_id', api_endpoint_name='childcare-training').create_form()
 DBSForm                 = NannyFormBuilder(dbs_check_fields, pk_field_name='dbs_id', api_endpoint_name='dbs-check').create_form()
