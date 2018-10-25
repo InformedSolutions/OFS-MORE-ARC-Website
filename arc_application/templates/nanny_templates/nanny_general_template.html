@@ -2,6 +2,7 @@
 {% block page_title %}{{title}}{% endblock %}
 {% load static %}
 {% load govuk_template_base %}
+{% load general_table_extras %}
 {% block inner_content %}
 {% include 'back-button.html' %}
 
@@ -9,7 +10,7 @@
     {% csrf_token %}
 
     <h1 class="form-title heading-large">
-        {{title}}
+        {{ title }}
     </h1>
     <p>
         Please check the boxes if there are errors.
@@ -19,9 +20,16 @@
         <tbody>
 
         {% for row in rows %}
+
         {% if row.id == 'home_address_locations' %}
+            {{ row.formset.management_form }}
+
             {% for home_address in row.info %}
-                {% include 'nanny_childcare_address_template.html' %}
+
+                {% with form=row.formset|return_item_by_index:forloop.counter0 %}
+                    {% include 'nanny_childcare_address_template.html' %}
+                {% endwith %}
+
             {% endfor %}
 
         {% else %}
