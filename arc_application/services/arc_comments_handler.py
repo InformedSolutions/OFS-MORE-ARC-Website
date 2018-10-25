@@ -1,5 +1,4 @@
 import json
-from uuid import uuid4
 
 from arc_application.models import Arc
 from .db_gateways import NannyGatewayActions
@@ -40,7 +39,7 @@ def save_arc_comments_from_request(request, form_class, verbose_task_name):
         NannyGatewayActions().create(
             'arc-comments',
             params={
-                'review_id': str(uuid4()),
+                # 'review_id': str(uuid4()),
                 'table_pk': table_pk,
                 'application_id': application_id,
                 'table_name': '',
