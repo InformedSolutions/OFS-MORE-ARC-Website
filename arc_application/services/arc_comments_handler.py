@@ -12,16 +12,21 @@ def save_arc_comments_from_request(request, form_class, verbose_task_name):
     :param verbose_task_name: The name of the task to be recorded in the audit log.
     :return: True if comments were made, else False.
     """
+    if callable(form_class) and hasattr(form_class(), 'management_form'):  # If it is a FormSet instance.
+        for form in form_class(request.POST).forms:
+            save_arc_comments_from_request(request, form, verbose_task_name)
+
     application_id = request.GET['id']
     endpoint = form_class.api_endpoint_name
-    table_pk = NannyGatewayActions().read(endpoint, params={'application_id': application_id}).record[form_class.pk_field_name]
+    pk_field_name = NannyGatewayActions.endpoint_pk_dict[endpoint]
+    table_pk = NannyGatewayActions().read(endpoint, params={'application_id': application_id}).record[pk_field_name]
     existing_comments = NannyGatewayActions().list('arc-comments', params={'table_pk': table_pk})
 
     comments = dict()
 
     # Generate dict with (key, value) pair of (field_name, comment) if field was flagged.
     for field in form_class.field_names:
-        if field + '_declare' in request.POST and request.POST[field + '_declare'] == 'on':
+        if request.POST.get(field + '_declare') == 'on':
             comments[field] = request.POST[field + '_comments']
 
     # Delete existing ArcComments
@@ -104,8 +109,8 @@ def log_arc_flag_action(application_id, arc_user, flagged_field, verbose_task_na
 
 def get_form_initial_values(form, application_id):
     endpoint = form.api_endpoint_name
-    table_pk_name = form.pk_field_name
 
+    table_pk_name =     NannyGatewayActions.endpoint_pk_dict[endpoint]
     table_pk_value = NannyGatewayActions().read(endpoint, params={'application_id': application_id}).record[table_pk_name]
     form_fields = form.field_names
 

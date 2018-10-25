@@ -25,6 +25,7 @@ mock_nanny_application = {
 }
 
 mock_personal_details_record = {
+    'application_id': '998fd8ec-b96b-4a71-a1a1-a7a3ae186729',
     'personal_detail_id': '9835bf4b-9ba9-4162-a25b-4c56e7d33d67',
     'first_name': 'The Dark Lord',
     'middle_names': '',
@@ -35,6 +36,7 @@ mock_personal_details_record = {
 }
 
 mock_childcare_training_record = {
+    'application_id': '998fd8ec-b96b-4a71-a1a1-a7a3ae186729',
     'childcare_training_id': '9835bf3b-8ba9-4162-a25b-4c55e7d33d69',
     'level_2_training': False,
     'common_core_training': False,
@@ -42,12 +44,14 @@ mock_childcare_training_record = {
 }
 
 mock_dbs_record = {
+    'application_id': '998fd8ec-b96b-4a71-a1a1-a7a3ae186729',
     'dbs_id': '9835bf3b-8ba9-4162-a25b-4c55e7d33d77',
     'dbs_number': '000000000012',
     'convictions': False,
 }
 
 mock_home_address = {
+    'application_id': '998fd8ec-b96b-4a71-a1a1-a7a3ae186729',
     'home_address_id': '9935bf3b-8ba9-4162-a25b-4c55e7d33d67',
     'street_line1': 'Test',
     'street_line2': None,
@@ -58,16 +62,17 @@ mock_home_address = {
 }
 
 mock_childcare_address_record = {
+    'application_id': '998fd8ec-b96b-4a71-a1a1-a7a3ae186729',
     'childcare_address_id': '9835bf3b-8aa9-4162-a25b-4c55e7d33d67',
     'street_line1': 'Test',
     'street_line2': None,
     'town': 'New New York',
     'county': None,
     'postcode': 'WA14 4PA',
-    'application_id': '998fd8ec-b96b-4a71-a1a1-a7a3ae186729',
 }
 
 mock_first_aid_record = {
+    'application_id': '998fd8ec-b96b-4a71-a1a1-a7a3ae186729',
     'first_aid_id': '9835bf3b-8ba9-4162-a25b-4c56e7d33d67',
     'training_organisation': 'St Johns Ambulance',
     'course_title': 'Pediatric First Aid',
@@ -75,6 +80,7 @@ mock_first_aid_record = {
 }
 
 mock_insurance_cover_record = {
+    'application_id': '998fd8ec-b96b-4a71-a1a1-a7a3ae186729',
     'insurance_cover_id': '9835bf3b-9ba9-4162-a25b-4c56e7d33d67',
     'public_liability': True
 }
@@ -90,6 +96,7 @@ mock_identity_record = {
 }
 
 mock_declaration_record = {
+    'application_id': '998fd8ec-b96b-4a71-a1a1-a7a3ae186729',
     'follow_rules': True,
     'share_info_declare': True,
     'information_correct_declare': True,

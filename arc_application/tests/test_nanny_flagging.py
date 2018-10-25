@@ -507,7 +507,7 @@ class TestNannyFlagging(TestCase):
             'field_2',
         ]
 
-        form = NannyFormBuilder(example_fields, api_endpoint_name='fake-endpoint', pk_field_name='fake-pk').create_form()
+        form = NannyFormBuilder(example_fields, api_endpoint_name='fake-endpoint').create_form()
 
         self.assertIsInstance(form(), Form)
 
