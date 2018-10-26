@@ -77,7 +77,7 @@ class TestNannyFlagging(TestCase):
         # Iterate through the expected parameter values.
         # If any value in call != expected value, break, then move to next call.
         # If all values match that call, return None; a match for the expected parameters values was found. Test passes.
-        # If any no calls match, raise AssertionError.
+        # If any no calls match, raise AssertionError. Test fails.
 
         for call in endpoint_calls:
             for param_name, exp_param_val in params.items():
@@ -114,11 +114,10 @@ class TestNannyFlagging(TestCase):
         """
         Test to ensure that the page for flagging your children details can be rendered.
         """
-        # response = self.client.get(reverse('your_children_details_summary') + '?id=' + test_app_id)
-        #
-        # self.assertEqual(response.status_code, 200)
-        # self.assertEqual(response.resolver_match.func.__name__, NannyPersonalDetailsSummary.as_view().__name__)
-        self.skipTest('NotImplemented')
+        response = self.client.get(reverse('nanny_your_children_summary') + '?id=' + test_app_id)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.resolver_match.func.__name__, NannyYourChildrenSummary.as_view().__name__)
 
     def test_can_render_childcare_address_details_page(self, *args):
         """
