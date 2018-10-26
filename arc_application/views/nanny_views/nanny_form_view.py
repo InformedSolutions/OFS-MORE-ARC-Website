@@ -6,10 +6,10 @@ from django.views.generic import FormView
 from django.views.decorators.cache import never_cache
 
 from ...review_util import build_url
-from ...services.arc_comments_handler import save_arc_comments_from_request, \
-    update_arc_review_status, \
+from ...services.arc_comments_handler import update_arc_review_status, \
     get_form_initial_values, \
-    update_application_arc_flagged_status
+    update_application_arc_flagged_status, \
+    ARCCommentsProcessor
 
 
 @method_decorator(never_cache, name='dispatch')
@@ -38,15 +38,15 @@ class NannyARCFormView(FormView):
         # Cast self.form_class to a list if not already a list. Then iterate over list.
         _form_classes = [self.form_class] if not isinstance(self.form_class, list) else self.form_class
 
-        flagged_fields = [save_arc_comments_from_request(
+        flagged_fields = any([ARCCommentsProcessor.process_comments(
             request=self.request,
             form_class=_class,
-            verbose_task_name=self.verbose_task_name,
-        ) for _class in _form_classes]
+            verbose_task_name=self.verbose_task_name
+        ) for _class in _form_classes])
 
         # Update {{task}}_review status for ARC user.
         reviewed_task = self.get_task_for_review()
-        update_arc_review_status(self.application_id, any(flagged_fields), reviewed_task=reviewed_task)
+        update_arc_review_status(self.application_id, flagged_fields, reviewed_task=reviewed_task)
 
         # Update {{task}}_arc_flagged status for NannyApplication table.
         update_application_arc_flagged_status(flagged_fields, self.application_id, reviewed_task)
