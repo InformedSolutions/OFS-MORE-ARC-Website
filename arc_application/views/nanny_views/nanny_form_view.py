@@ -36,7 +36,7 @@ class NannyARCFormView(FormView):
         else:
             self.handle_post_data(self.form_class)
 
-        return HttpResponseRedirect(build_url(self.success_url, get={'id': self.application_id}))
+        return HttpResponseRedirect(build_url(self.get_success_url(), get={'id': self.application_id}))
 
     def handle_post_data(self, form):
         # Write ArcComments to db from form.

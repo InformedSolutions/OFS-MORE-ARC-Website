@@ -43,8 +43,11 @@ mock_childcare_training_record = {
 
 mock_dbs_record = {
     'dbs_id': '9835bf3b-8ba9-4162-a25b-4c55e7d33d77',
+    'lived_abroad': True,
+    'is_ofsted_dbs': True,
+    'on_dbs_update_service': True,
     'dbs_number': '000000000012',
-    'convictions': False,
+    'has_convictions': None,
 }
 
 mock_home_address = {
