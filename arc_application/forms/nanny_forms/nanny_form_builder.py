@@ -14,7 +14,6 @@ class NannyFormBuilder:
     def __init__(self, field_names, api_endpoint_name=None):
         self.field_names = field_names
         self.form_fields = dict()
-        # self._pk_field_name = pk_field_name
         self._api_endpoint_name = api_endpoint_name
 
     def get_api_endpoint_name(self):
