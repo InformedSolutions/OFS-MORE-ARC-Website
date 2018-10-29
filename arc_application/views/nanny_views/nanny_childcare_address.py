@@ -1,4 +1,4 @@
-from arc_application.forms.nanny_forms.nanny_form_builder import ChildcareAddressFormset, WhereYouWillWorkForm
+from arc_application.forms.nanny_forms.nanny_form_builder import ChildcareAddressFormset, WhereYouWillWorkForm, WorkAtHomeForm
 from arc_application.services.arc_comments_handler import get_form_initial_values
 from arc_application.services.db_gateways import NannyGatewayActions
 
@@ -10,7 +10,7 @@ class NannyChildcareAddressSummary(NannyARCFormView):
     success_url = 'nanny_first_aid_training_summary'
     task_for_review = 'childcare_address_review'
     verbose_task_name = 'Childcare address'
-    form_class = [WhereYouWillWorkForm, ChildcareAddressFormset]
+    form_class = [WhereYouWillWorkForm, WorkAtHomeForm, ChildcareAddressFormset]
 
     def get_context_data(self, application_id):
         nanny_actions = NannyGatewayActions()
@@ -36,6 +36,8 @@ class NannyChildcareAddressSummary(NannyARCFormView):
             home_address_locations = {}
 
         where_you_will_work_form = WhereYouWillWorkForm()  # TODO: call get initial on this
+
+        work_at_home_form = WorkAtHomeForm()
 
         n_forms = str(len(home_address_locations))
 
@@ -63,9 +65,11 @@ class NannyChildcareAddressSummary(NannyARCFormView):
                     'comments': where_you_will_work_form['address_to_be_provided_comments']
                 },
                 {
-                    'id': 'work_at_home_bool',
+                    'id': 'childcare_address',
                     'name': 'Will you work and live at the same address?',
-                    'info': work_at_home_bool
+                    'info': work_at_home_bool,
+                    'declare': work_at_home_form['childcare_address_declare'],
+                    'comments': work_at_home_form['childcare_address_comments']
                 },
                 {
                     'id': 'home_address_locations',
