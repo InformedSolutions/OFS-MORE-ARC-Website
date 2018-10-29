@@ -218,6 +218,35 @@ def log_arc_flag_action(application_id, arc_user, flagged_field, verbose_task_na
 
 
 def get_form_initial_values(form, application_id):
+    if hasattr(form, 'management_form'):  # If it is a FormSet instance.
+        endpoint = form.form.api_endpoint_name
+        table_pk_name = NannyGatewayActions.endpoint_pk_dict[endpoint]
+        form_fields = form.form.field_names
+        records = NannyGatewayActions().list(endpoint, params={'application_id': application_id}).record
+
+        initial = []
+
+        for index, record in enumerate(records):
+            table_pk_value = record[table_pk_name]
+
+            for field_name in form_fields:
+                api_response = NannyGatewayActions().list('arc-comments',
+                                                          params={'table_pk': table_pk_value, 'field_name': field_name})
+
+                initial_vals = dict()
+
+                if api_response.status_code == 200:
+                    arc_comments_record = api_response.record[0]
+                    initial_vals[field_name + '_declare'] = True
+                    initial_vals[field_name + '_comments']= arc_comments_record['comment']
+                else:
+                    initial_vals[field_name + '_declare'] = False
+                    initial_vals[field_name + '_comments'] = ''
+
+                initial.append(initial_vals)
+
+        return initial
+
     endpoint = form.api_endpoint_name
 
     table_pk_name =     NannyGatewayActions.endpoint_pk_dict[endpoint]

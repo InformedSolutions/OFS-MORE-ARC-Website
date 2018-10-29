@@ -1,4 +1,5 @@
 from arc_application.forms.nanny_forms.nanny_form_builder import ChildcareAddressFormset, WhereYouWillWorkForm
+from arc_application.services.arc_comments_handler import get_form_initial_values
 from arc_application.services.db_gateways import NannyGatewayActions
 
 from .nanny_form_view import NannyARCFormView
@@ -34,9 +35,10 @@ class NannyChildcareAddressSummary(NannyARCFormView):
         else:
             home_address_locations = {}
 
-        where_you_will_work_form = WhereYouWillWorkForm()
+        where_you_will_work_form = WhereYouWillWorkForm()  # TODO: call get initial on this
 
         n_forms = str(len(home_address_locations))
+
         childcare_address_formset = ChildcareAddressFormset(
             data={
                 'form-TOTAL_FORMS': n_forms,
@@ -44,6 +46,10 @@ class NannyChildcareAddressSummary(NannyARCFormView):
                 'form-MAX_NUM_FORMS': n_forms,
             }
         )
+
+        initial_vals = get_form_initial_values(childcare_address_formset, application_id)
+
+        childcare_address_formset = ChildcareAddressFormset(initial=initial_vals)
 
         context = {
             'application_id': application_id,
