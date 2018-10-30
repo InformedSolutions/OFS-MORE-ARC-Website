@@ -54,8 +54,8 @@ class NannyARCFormView(FormView):
     def get_form(self, form_class=None):
         if form_class is None:
             form_class = self.get_form_class()
-        form = form_class()
-        return get_form_initial_values(form, application_id=self.application_id)
+        initial = get_form_initial_values(form_class, application_id=self.application_id)
+        return form_class(initial=initial)
 
     def get_forms(self):
         return [self.get_form(form_class=form_class) for form_class in self.form_class]
