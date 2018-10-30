@@ -106,15 +106,12 @@ home_address_fields = [
 ]
 
 where_you_will_work_fields = [
-    'address_to_be_provided'
+    'address_to_be_provided',
+    'both_work_and_home_address'
 ]
 
 childcare_address_fields = [
     'childcare_address'
-]
-
-work_at_home_fields = [
-    'childcare_address',
 ]
 
 first_aid_training_fields = [
@@ -140,7 +137,6 @@ insurance_cover_fields = [
 PersonalDetailsForm     = NannyFormBuilder(personal_details_fields, api_endpoint_name='applicant-personal-details').create_form()
 HomeAddressForm         = NannyFormBuilder(home_address_fields, api_endpoint_name='applicant-home-address').create_form()
 WhereYouWillWorkForm    = NannyFormBuilder(where_you_will_work_fields, api_endpoint_name='application').create_form()
-WorkAtHomeForm          = NannyFormBuilder(work_at_home_fields, api_endpoint_name='applicant-home-address').create_form()
 ChildcareAddressFormset = NannyFormBuilder(childcare_address_fields, api_endpoint_name='childcare-address').create_formset()
 FirstAidForm            = NannyFormBuilder(first_aid_training_fields, api_endpoint_name='first-aid').create_form()
 ChildcareTrainingForm   = NannyFormBuilder(childcare_training_fields, api_endpoint_name='childcare-training').create_form()
