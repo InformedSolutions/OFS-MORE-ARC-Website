@@ -1,3 +1,5 @@
+{% load general_table_extras %}
+
 <div class = "two-thirds">
     <table class="check-your-answers form-group">
         <thead>
@@ -13,8 +15,14 @@
 
         {% for row in context.rows %}
         {% if row.id == 'home_address_locations' %}
-            {% for home_address in row.info %}
-                {% include 'nanny_childcare_address_template.html' %}
+            {{ row.formset.management_form }}
+
+                {% for home_address in row.info %}
+
+                {% with form=row.formset|return_item_by_index:forloop.counter0 %}
+                    {% include 'nanny_childcare_address_template.html' %}
+                {% endwith %}
+
             {% endfor %}
 
         {% else %}
