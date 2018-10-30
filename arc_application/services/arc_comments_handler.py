@@ -253,17 +253,19 @@ def get_form_initial_values(form, application_id):
     table_pk_value = NannyGatewayActions().read(endpoint, params={'application_id': application_id}).record[table_pk_name]
     form_fields = form.field_names
 
+    initial = dict()
+
     for field_name in form_fields:
         api_response = NannyGatewayActions().list('arc-comments', params={'table_pk': table_pk_value, 'field_name': field_name})
         if api_response.status_code == 200:
             arc_comments_record = api_response.record[0]
-            form[field_name + '_declare'].initial = True
-            form[field_name + '_comments'].initial = arc_comments_record['comment']
+            initial[field_name + '_declare'] = True
+            initial[field_name + '_comments'] = arc_comments_record['comment']
         else:
-            form[field_name + '_declare'].initial = False
-            form[field_name + '_comments'].initial = ''
+            initial[field_name + '_declare'] = False
+            initial[field_name + '_comments'] = ''
 
-    return form
+    return initial
 
 
 def update_returned_application_statuses(application_id):
