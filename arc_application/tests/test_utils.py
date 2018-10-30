@@ -47,7 +47,7 @@ mock_dbs_record = {
     'is_ofsted_dbs': True,
     'on_dbs_update_service': True,
     'dbs_number': '000000000012',
-    'has_convictions': None,
+    'convictions': None,
 }
 
 mock_home_address = {

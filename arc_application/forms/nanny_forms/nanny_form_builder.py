@@ -109,7 +109,7 @@ dbs_check_fields = [
     'is_ofsted_dbs',
     'on_dbs_update_service',
     'dbs_number',
-    'has_convictions',
+    'convictions',
 ]
 
 insurance_cover_fields = [

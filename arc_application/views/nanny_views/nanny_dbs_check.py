@@ -32,7 +32,7 @@ class NannyDbsCheckSummary(NannyARCFormView):
         is_ofsted_dbs = dbs_record['is_ofsted_dbs']
         on_dbs_update_service = dbs_record['on_dbs_update_service']
         dbs_number = dbs_record['dbs_number']
-        has_convictions = dbs_record['has_convictions']
+        convictions = dbs_record['convictions']
 
         form = self.get_form()
 
@@ -74,12 +74,12 @@ class NannyDbsCheckSummary(NannyARCFormView):
                     'comments': form['dbs_number_comments']
                 },
                 {
-                    'id': 'has_convictions',
+                    'id': 'convictions',
                     'name': 'Do you have any criminal cautions or convictions?',
-                    'info': has_convictions,
+                    'info': convictions,
                     # Prevent checkbox appearing if summary page is calling get_context_data.
-                    'declare': form['has_convictions_declare'] if hasattr(self, 'request') else '',
-                    'comments': form['has_convictions_comments'],
+                    'declare': form['convictions_declare'] if hasattr(self, 'request') else '',
+                    'comments': form['convictions_comments'],
                     'hidden': not bool(is_ofsted_dbs)
                 }
             ]
