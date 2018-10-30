@@ -1,5 +1,4 @@
-from arc_application.forms.nanny_forms.nanny_form_builder import ChildcareAddressFormset, WhereYouWillWorkForm, WorkAtHomeForm
-from arc_application.services.arc_comments_handler import get_form_initial_values
+from arc_application.forms.nanny_forms.nanny_form_builder import ChildcareAddressFormset, WhereYouWillWorkForm
 from arc_application.services.db_gateways import NannyGatewayActions
 
 from .nanny_form_view import NannyARCFormView
@@ -10,9 +9,11 @@ class NannyChildcareAddressSummary(NannyARCFormView):
     success_url = 'nanny_first_aid_training_summary'
     task_for_review = 'childcare_address_review'
     verbose_task_name = 'Childcare address'
-    form_class = [WhereYouWillWorkForm, WorkAtHomeForm, ChildcareAddressFormset]
+    form_class = [WhereYouWillWorkForm, ChildcareAddressFormset]
 
     def get_context_data(self, application_id):
+        self.application_id = application_id
+
         nanny_actions = NannyGatewayActions()
         nanny_application = nanny_actions.read('application',
                                                params={'application_id': application_id}).record
@@ -35,23 +36,7 @@ class NannyChildcareAddressSummary(NannyARCFormView):
         else:
             home_address_locations = {}
 
-        where_you_will_work_form = WhereYouWillWorkForm()  # TODO: call get initial on this
-
-        work_at_home_form = WorkAtHomeForm()
-
-        n_forms = str(len(home_address_locations))
-
-        childcare_address_formset = ChildcareAddressFormset(
-            data={
-                'form-TOTAL_FORMS': n_forms,
-                'form-INITIAL_FORMS': n_forms,
-                'form-MAX_NUM_FORMS': n_forms,
-            }
-        )
-
-        initial_vals = get_form_initial_values(childcare_address_formset, application_id)
-
-        childcare_address_formset = ChildcareAddressFormset(initial=initial_vals)
+        where_you_will_work_form, childcare_address_formset = self.get_forms()
 
         context = {
             'application_id': application_id,
@@ -61,21 +46,21 @@ class NannyChildcareAddressSummary(NannyARCFormView):
                     'id': 'address_to_be_provided',
                     'name': "Do you know where you'll be working?",
                     'info': work_location_bool,
-                    'declare': where_you_will_work_form['address_to_be_provided_declare'],
+                    'declare': where_you_will_work_form['address_to_be_provided_declare'] if hasattr(self, 'request') else '',
                     'comments': where_you_will_work_form['address_to_be_provided_comments']
                 },
                 {
-                    'id': 'childcare_address',
+                    'id': 'both_work_and_home_address',
                     'name': 'Will you work and live at the same address?',
                     'info': work_at_home_bool,
-                    'declare': work_at_home_form['childcare_address_declare'],
-                    'comments': work_at_home_form['childcare_address_comments']
+                    'declare': where_you_will_work_form['both_work_and_home_address_declare'] if hasattr(self, 'request') else '',
+                    'comments': where_you_will_work_form['both_work_and_home_address_comments']
                 },
                 {
                     'id': 'home_address_locations',
                     'name': 'Childcare address',
                     'info': home_address_locations,
-                    'formset': childcare_address_formset
+                    'formset': childcare_address_formset# if hasattr(self, 'request') else '',
                 },
             ]
         }
