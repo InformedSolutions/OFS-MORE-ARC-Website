@@ -41,7 +41,6 @@ class FormSetARCCommentsHandler(ARCCommentsHandler):
     def handle_comments(self, request, form_class, verbose_task_name):
         if hasattr(form_class(), 'management_form'):  # If it is a FormSet instance.
             for form in form_class(request.POST).forms:
-                # TODO: Create mapping of request.POST values to the given form.
                 return any([self._successor.handle_comments(request, form, verbose_task_name)])
         else:
             return self._successor.handle_comments(request, form_class, verbose_task_name)
