@@ -111,7 +111,7 @@
          <tr id="nanny_dbs">
             <td class="task">
                <a href="{% url 'nanny_dbs_summary' %}?id={{application_id}}">
-                  <span class="task-name">Criminal record (DBS) check</span>
+                  <span class="task-name">Criminal record checks</span>
                   {% if dbs_status == 'NOT_STARTED' %}
                   <strong class="task-finished task-to-do">To do</strong>
                   {% elif dbs_status == 'FLAGGED' %}
