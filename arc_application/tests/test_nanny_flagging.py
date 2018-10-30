@@ -342,11 +342,86 @@ class TestNannyFlagging(TestCase):
 
         self.assertEqual(Arc.objects.get(pk=test_app_id).your_children_review, 'COMPLETED')
 
+    def test_flagging_first_two_childcare_address_questions_creates_arc_comments(self, *args):
+        fields_to_flag = [
+            'address_to_be_provided',
+            'both_work_and_home_address'
+        ]
+
+        post_data = self._create_post_data(fields_to_flag)
+
+        post_data.update(
+            {
+                'form-TOTAL_FORMS': '2',
+                'form-INITIAL_FORMS': '2',
+                'form-MAX_NUM_FORMS': '2',
+            }
+        )
+
+        self.client.post(reverse('nanny_childcare_address_summary') + '?id=' + test_app_id, post_data)
+
+        create_mock = args[5]
+
+        for field in fields_to_flag:
+            self._assert_create_call_made_with_given_params(create_mock, 'arc-comments',  params={
+                'application_id': test_app_id,
+                'table_name': '',
+                'field_name': field,
+                'comment': 'Flagged',
+                'flagged': True,
+                })
+
     def test_flagging_childcare_address_details_creates_arc_comments(self, *args):
-        self.skipTest('NotImplemented')
+        fields_to_flag = [
+            'form-0-childcare_address',
+            'form-1-childcare_address',
+        ]
+
+        post_data = self._create_post_data(fields_to_flag)
+
+        post_data.update(
+            {
+                'form-TOTAL_FORMS': '2',
+                'form-INITIAL_FORMS': '2',
+                'form-MAX_NUM_FORMS': '2',
+            }
+        )
+
+        self.client.post(reverse('nanny_childcare_address_summary') + '?id=' + test_app_id, post_data)
+
+        create_mock = args[5]
+
+        childcare_address_mock_responses = NannyGatewayActions().list('childcare-address', params={'application_id': test_app_id}).record
+
+        for index, field in enumerate(fields_to_flag):
+            self._assert_create_call_made_with_given_params(create_mock, 'arc-comments',  params={
+                'application_id': test_app_id,
+                'table_pk': childcare_address_mock_responses[index]['childcare_address_id'],
+                'table_name': '',
+                'field_name': field[7:],
+                'comment': 'Flagged',
+                'flagged': True,
+                })
 
     def test_flagging_childcare_address_details_sets_status_to_flagged(self, *args):
-        self.skipTest('NotImplemented')
+        fields_to_flag = [
+            'address_to_be_provided',
+            'both_work_and_home_address'
+        ]
+
+        post_data = self._create_post_data(fields_to_flag)
+
+        post_data.update(
+            {
+                'form-TOTAL_FORMS': '2',
+                'form-INITIAL_FORMS': '2',
+                'form-MAX_NUM_FORMS': '2',
+            }
+        )
+
+        self.client.post(reverse('nanny_childcare_address_summary') + '?id=' + test_app_id, post_data)
+
+        self.assertEqual(Arc.objects.get(pk=test_app_id).childcare_address_review, 'FLAGGED')
 
     def test_not_flagging_childcare_address_details_sets_status_to_reviewed(self, *args):
         self.client.post(reverse('nanny_childcare_address_summary') + '?id=' + test_app_id,
