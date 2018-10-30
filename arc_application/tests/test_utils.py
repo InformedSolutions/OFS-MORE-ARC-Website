@@ -61,15 +61,26 @@ mock_home_address = {
     'childcare_address': False,
 }
 
-mock_childcare_address_record = {
-    'application_id': '998fd8ec-b96b-4a71-a1a1-a7a3ae186729',
-    'childcare_address_id': '9835bf3b-8aa9-4162-a25b-4c55e7d33d67',
-    'street_line1': 'Test',
-    'street_line2': None,
-    'town': 'New New York',
-    'county': None,
-    'postcode': 'WA14 4PA',
-}
+mock_childcare_address_record = [
+    {
+        'application_id': '998fd8ec-b96b-4a71-a1a1-a7a3ae186729',
+        'childcare_address_id': '9835bf3b-8aa9-4162-a25b-4c55e7d33d67',
+        'street_line1': 'Test',
+        'street_line2': None,
+        'town': 'New New York',
+        'county': None,
+        'postcode': 'WA14 4PA',
+    },
+    {
+        'application_id': '998fd8ec-b96b-4a71-a1a1-a7a3ae186729',
+        'childcare_address_id': '9835bf3b-8aa9-4162-a25b-4c55e7d33d68',
+        'street_line1': 'Buckingham Palace',
+        'street_line2': None,
+        'town': 'London',
+        'county': None,
+        'postcode': 'SW1 1AA',
+    }
+]
 
 mock_first_aid_record = {
     'application_id': '998fd8ec-b96b-4a71-a1a1-a7a3ae186729',
@@ -135,7 +146,7 @@ insurance_cover_response.record = mock_insurance_cover_record
 
 childcare_address_response = HttpResponse()
 childcare_address_response.status_code = 200
-childcare_address_response.record = [mock_childcare_address_record]  # Return list for NannyGatewayActions list() method.
+childcare_address_response.record = mock_childcare_address_record
 
 declaration_response = HttpResponse()
 declaration_response.status_code = 200
