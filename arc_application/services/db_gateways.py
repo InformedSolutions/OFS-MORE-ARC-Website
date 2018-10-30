@@ -111,7 +111,8 @@ class DBGatewayActions:
         return response
 
     def patch(self, endpoint, params):
-        response = requests.patch(self.target_url_prefix + endpoint + '/' + params['application_id'] + '/', data=params)
+        endpoint_lookup_field = self.endpoint_pk_dict[endpoint]
+        response = requests.patch(self.target_url_prefix + endpoint + '/' + params[endpoint_lookup_field] + '/', data=params)
 
         if response.status_code == 200:
             response.record = json.loads(response.text)
