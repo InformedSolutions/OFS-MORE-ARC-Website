@@ -7,7 +7,7 @@ class NannyDbsCheckSummary(NannyARCFormView):
     template_name = 'nanny_general_template.html'
     success_url = 'nanny_insurance_cover_summary'
     task_for_review = 'dbs_review'
-    verbose_task_name = 'Criminal record (DBS) check'
+    verbose_task_name = 'Criminal record checks'
     form_class = DBSForm
 
     def get_context_data(self, application_id):
