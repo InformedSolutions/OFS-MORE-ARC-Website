@@ -222,8 +222,11 @@ class TestNannyFlagging(TestCase):
         """
         response = self.client.post(reverse('nanny_childcare_address_summary') + '?id=' + test_app_id,
                                     data={
-                                        'id': test_app_id
-                                    })
+                                         'id': test_app_id,
+                                         'form-TOTAL_FORMS': '2',
+                                         'form-INITIAL_FORMS': '2',
+                                         'form-MAX_NUM_FORMS': '2',
+                                     })
         found = resolve(response.url)
 
         self.assertEqual(response.status_code, 302)
@@ -349,6 +352,9 @@ class TestNannyFlagging(TestCase):
         self.client.post(reverse('nanny_childcare_address_summary') + '?id=' + test_app_id,
                          data={
                              'id': test_app_id,
+                             'form-TOTAL_FORMS': '2',
+                             'form-INITIAL_FORMS': '2',
+                             'form-MAX_NUM_FORMS': '2',
                          })
 
         self.assertEqual(Arc.objects.get(pk=test_app_id).childcare_address_review, 'COMPLETED')
