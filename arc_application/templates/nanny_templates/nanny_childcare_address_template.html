@@ -1,6 +1,22 @@
-<tr>
+{% if form.childcare_address_comments and form.childcare_address_comments.initial != '' and summary_page %} <!-- If there is an existing ARC Comment -->
+<tr class="error-row">
+    <td colspan="3" class="error-container notice">
+        <i class="icon icon-important">
+           <span class="visually-hidden">Warning</span>
+         </i>
+         <strong class="bold-small">
+            {{ form.childcare_address_comments.initial }}
+          </strong>
+    </td>
+</tr>
 
+<!-- If error, ensure row with data also has appropriate css classes - else just <tr> and <td> -->
+<tr class="error-row">
+    <td class="error-field-label">
+{% else %}
+<tr>
     <td>
+{% endif %}
         Childcare address {{ forloop.counter }}
     </td>
         <td style="word-wrap: break-word">
@@ -31,6 +47,7 @@
 
         </td>
         <td>
+        {% if not summary_page %}
             {{ form.childcare_address_declare }}
         </td>
 </tr>
@@ -48,3 +65,7 @@
         {{ form.childcare_address_comments }}
     </td>
 </tr>
+
+    {% else %}
+</td>
+    {% endif %}
