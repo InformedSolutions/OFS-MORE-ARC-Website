@@ -136,6 +136,12 @@ insurance_cover_fields = [
     'public_liability',
 ]
 
+your_children_fields = [
+    'name',
+    'date_of_birth',
+    'address'
+]
+
 
 PersonalDetailsForm     = NannyFormBuilder(personal_details_fields, api_endpoint_name='applicant-personal-details').create_form()
 HomeAddressForm         = NannyFormBuilder(home_address_fields, api_endpoint_name='applicant-home-address').create_form()
@@ -145,3 +151,4 @@ FirstAidForm            = NannyFormBuilder(first_aid_training_fields, api_endpoi
 ChildcareTrainingForm   = NannyFormBuilder(childcare_training_fields, api_endpoint_name='childcare-training').create_form()
 DBSForm                 = NannyFormBuilder(dbs_check_fields, api_endpoint_name='dbs-check').create_form()
 InsuranceCoverForm      = NannyFormBuilder(insurance_cover_fields, api_endpoint_name='insurance-cover').create_form()
+YourChildrenFormset     = NannyFormBuilder(your_children_fields, api_endpoint_name='your-children').create_formset()
