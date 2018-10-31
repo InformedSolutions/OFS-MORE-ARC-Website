@@ -79,5 +79,33 @@
                 </div>
             </td>
         </tr>
+        <tr>
+            <td>
+                Address
+            </td>
+            <td>
+                {% with row=child_record|format_child_record_for_address_template %}
+                    {% include 'nanny_general_address_template.html' %}
+                {% endwith %}
+            </td>
+            <td class="change-answer">
+                {{ form.address_declare }}
+            </td>
+        </tr>
+        <tr class="js-hidden" id="address_{{ forloop.counter }}">
+            <td colspan="1">
+                <div>
+                    Enter your reasoning
+                </div>
+                <div>
+                    {{ form.address_comments.help_text}}
+                </div>
+            </td>
+            <td colspan="2">
+                <div>
+                    {{ form.address_comments}}
+                </div>
+            </td>
+        </tr>
     </tbody>
 </table>
