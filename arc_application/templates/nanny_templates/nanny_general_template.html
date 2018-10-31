@@ -34,14 +34,14 @@
 
                 {% endfor %}
 
+            {% else %}
+
+                {% include 'nanny_general_table_template.html' %}
+
             {% endif %}
 
-        {% else %}
-
-            {% include 'nanny_general_table_template.html' %}
-
-
         {% endif %}
+
         {% endfor %}
 
         </tbody>
