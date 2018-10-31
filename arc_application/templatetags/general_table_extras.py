@@ -34,3 +34,11 @@ def format_child_birth_date(child_record):
     year  = child_record['birth_year']
 
     return datetime.strftime(datetime(year, month, day), '%d %b %Y')
+
+
+@register.filter
+def format_child_record_for_address_template(child_record):
+    """
+    Format a child record such that it can use the 'nanny_general_address_template.html' template.
+    """
+    return {'info': child_record}
