@@ -1,3 +1,4 @@
+from datetime import datetime
 from django import template
 from pydoc import locate
 
@@ -24,3 +25,12 @@ def template_string_in_list(value, arg):
 @register.filter
 def return_item_by_index(_list, index):
     return _list[index]
+
+
+@register.filter
+def format_child_birth_date(child_record):
+    day   = child_record['birth_day']
+    month = child_record['birth_month']
+    year  = child_record['birth_year']
+
+    return datetime.strftime(datetime(year, month, day), '%d %b %Y')
