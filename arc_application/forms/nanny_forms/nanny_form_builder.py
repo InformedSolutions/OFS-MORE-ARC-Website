@@ -136,6 +136,10 @@ insurance_cover_fields = [
     'public_liability',
 ]
 
+children_living_with_you_fields = [
+    'children_living_with_applicant_selection',
+]
+
 your_children_fields = [
     'name',
     'date_of_birth',
@@ -143,12 +147,13 @@ your_children_fields = [
 ]
 
 
-PersonalDetailsForm     = NannyFormBuilder(personal_details_fields, api_endpoint_name='applicant-personal-details').create_form()
-HomeAddressForm         = NannyFormBuilder(home_address_fields, api_endpoint_name='applicant-home-address').create_form()
-WhereYouWillWorkForm    = NannyFormBuilder(where_you_will_work_fields, api_endpoint_name='application').create_form()
-ChildcareAddressFormset = NannyFormBuilder(childcare_address_fields, api_endpoint_name='childcare-address').create_formset()
-FirstAidForm            = NannyFormBuilder(first_aid_training_fields, api_endpoint_name='first-aid').create_form()
-ChildcareTrainingForm   = NannyFormBuilder(childcare_training_fields, api_endpoint_name='childcare-training').create_form()
-DBSForm                 = NannyFormBuilder(dbs_check_fields, api_endpoint_name='dbs-check').create_form()
-InsuranceCoverForm      = NannyFormBuilder(insurance_cover_fields, api_endpoint_name='insurance-cover').create_form()
-YourChildrenFormset     = NannyFormBuilder(your_children_fields, api_endpoint_name='your-children').create_formset()
+PersonalDetailsForm       = NannyFormBuilder(personal_details_fields, api_endpoint_name='applicant-personal-details').create_form()
+HomeAddressForm           = NannyFormBuilder(home_address_fields, api_endpoint_name='applicant-home-address').create_form()
+WhereYouWillWorkForm      = NannyFormBuilder(where_you_will_work_fields, api_endpoint_name='application').create_form()
+ChildcareAddressFormset   = NannyFormBuilder(childcare_address_fields, api_endpoint_name='childcare-address').create_formset()
+FirstAidForm              = NannyFormBuilder(first_aid_training_fields, api_endpoint_name='first-aid').create_form()
+ChildcareTrainingForm     = NannyFormBuilder(childcare_training_fields, api_endpoint_name='childcare-training').create_form()
+DBSForm                   = NannyFormBuilder(dbs_check_fields, api_endpoint_name='dbs-check').create_form()
+InsuranceCoverForm        = NannyFormBuilder(insurance_cover_fields, api_endpoint_name='insurance-cover').create_form()
+YourChildrenFormset       = NannyFormBuilder(your_children_fields, api_endpoint_name='your-children').create_formset()
+ChildrenLivingWithYouForm = NannyFormBuilder(children_living_with_you_fields, api_endpoint_name='application').create_form()
