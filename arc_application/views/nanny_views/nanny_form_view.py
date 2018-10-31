@@ -32,7 +32,7 @@ class NannyARCFormView(FormView):
     def post(self, request, *args, **kwargs):
         self.application_id = request.GET['id']
         self.__handle_post_data()
-        return HttpResponseRedirect(build_url(self.success_url, get={'id': request.GET['id']}))
+        return HttpResponseRedirect(build_url(self.get_success_url(), get={'id': request.GET['id']}))
 
     def __handle_post_data(self):
         # Cast self.form_class to a list if not already a list. Then iterate over list.

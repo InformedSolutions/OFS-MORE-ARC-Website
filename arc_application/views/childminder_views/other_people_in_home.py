@@ -54,6 +54,7 @@ def other_people_summary(request):
     current_illnesses = []
     serious_illnesses = []
     hospital_admissions = []
+    local_authorities = []
     adult_lived_abroad = []
     adult_military_base = []
     adult_capita_dbs = []
@@ -105,6 +106,7 @@ def other_people_summary(request):
         current_illnesses.append(HealthCheckCurrent.objects.filter(person_id=adult.pk))
         serious_illnesses.append(HealthCheckSerious.objects.filter(person_id=adult.pk))
         hospital_admissions.append(HealthCheckHospital.objects.filter(person_id=adult.pk))
+        local_authorities.append(adult.children_details)
 
     for child in children:
         if child.middle_names and child.middle_names != '':
@@ -151,7 +153,7 @@ def other_people_summary(request):
                 adult_birth_month_list, adult_birth_year_list, adult_relationship_list, adult_dbs_list,
                 adult_lived_abroad,
                 adult_military_base, adult_capita_dbs,
-                formset_adult, current_illnesses, serious_illnesses, hospital_admissions))
+                formset_adult, current_illnesses, serious_illnesses, hospital_admissions, local_authorities))
 
         initial_child_data = other_people_initial_population(False, children)
 
@@ -280,7 +282,7 @@ def other_people_summary(request):
                                    adult_birth_day_list,
                                    adult_birth_month_list, adult_birth_year_list, adult_relationship_list,
                                    adult_dbs_list, adult_lived_abroad, adult_military_base, adult_capita_dbs,
-                                   adult_formset, current_illnesses, serious_illnesses, hospital_admissions))
+                                   adult_formset, current_illnesses, serious_illnesses, hospital_admissions, local_authorities))
 
             child_lists = zip(child_id_list, child_name_list, child_birth_day_list, child_birth_month_list,
                               child_birth_year_list,

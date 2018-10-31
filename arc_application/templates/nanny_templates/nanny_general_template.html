@@ -21,20 +21,25 @@
 
         {% for row in rows %}
 
-        {% if row.id == 'home_address_locations' %}
-            {{ row.formset.management_form }}
+        {% if not row.hidden %}
 
-            {% for home_address in row.info %}
+            {% if row.id == 'home_address_locations' %}
+                {{ row.formset.management_form }}
 
-                {% with form=row.formset|return_item_by_index:forloop.counter0 %}
-                    {% include 'nanny_childcare_address_template.html' %}
-                {% endwith %}
+                {% for home_address in row.info %}
 
-            {% endfor %}
+                    {% with form=row.formset|return_item_by_index:forloop.counter0 %}
+                        {% include 'nanny_childcare_address_template.html' %}
+                    {% endwith %}
+
+                {% endfor %}
+
+            {% endif %}
 
         {% else %}
 
-        {% include 'nanny_general_table_template.html' %}
+            {% include 'nanny_general_table_template.html' %}
+
 
         {% endif %}
         {% endfor %}

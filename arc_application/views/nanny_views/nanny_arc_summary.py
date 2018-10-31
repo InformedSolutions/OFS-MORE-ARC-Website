@@ -53,7 +53,7 @@ class NannyArcSummary(View):
             send_accepted_email(**email_personalisation)
             nanny_application['application_status'] = 'ACCEPTED'
         else:
-            send_returned_email(**email_personalisation)
+            send_returned_email(application_id, **email_personalisation)
             nanny_application['application_status'] = 'FURTHER_INFORMATION'
 
         update_response = NannyGatewayActions().put('application', params=nanny_application)

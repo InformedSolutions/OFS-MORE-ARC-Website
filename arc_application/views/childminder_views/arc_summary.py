@@ -37,6 +37,7 @@ name_field_dict = {
     'eyfs_course_date': 'eyfs_course_date',
     'Provide a Health Declaration Booklet?': 'health_submission_consent',
     'DBS certificate number': 'dbs_certificate_number',
+    'Details of children': 'children_details',
     'Do you have any criminal cautions or convictions?': 'cautions_convictions',
     'Health questions status': 'health_check_status',
     'Name': 'full_name',
