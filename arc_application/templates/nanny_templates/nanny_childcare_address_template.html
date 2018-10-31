@@ -1,7 +1,23 @@
-<tr>
+{% if form.childcare_address_comments and form.childcare_address_comments.initial != '' and summary_page %} <!-- If there is an existing ARC Comment -->
+<tr class="error-row">
+    <td colspan="3" class="error-container notice">
+        <i class="icon icon-important">
+           <span class="visually-hidden">Warning</span>
+         </i>
+         <strong class="bold-small">
+            {{ form.childcare_address_comments.initial }}
+          </strong>
+    </td>
+</tr>
 
+<!-- If error, ensure row with data also has appropriate css classes - else just <tr> and <td> -->
+<tr class="error-row">
+    <td class="error-field-label">
+{% else %}
+<tr>
     <td>
-        Childcare address {{forloop.counter}}
+{% endif %}
+        Childcare address {{ forloop.counter }}
     </td>
         <td style="word-wrap: break-word">
 
@@ -31,21 +47,25 @@
 
         </td>
         <td>
-            <!-- Blank column to get hrule of correct width. -->
+        {% if not summary_page %}
+            {{ form.childcare_address_declare }}
         </td>
 </tr>
-<tr class="js-hidden" id="childcare_address">
+<tr class="js-hidden" id="childcare_address_{{ forloop.counter }}">
+
     <td colspan="1">
         <div>
-            {{ form.add_phone_number_comments.label}}
+            {{ form.childcare_address_comments.label }}
         </div>
         <div>
-            {{ form.add_phone_number_comments.help_text}}
+            {{ form.childcare_address_comments.help_text }}
         </div>
     </td>
     <td colspan="2">
-        <div>
-            {{ form.add_phone_number_comments}}
-        </div>
+        {{ form.childcare_address_comments }}
     </td>
 </tr>
+
+    {% else %}
+</td>
+    {% endif %}

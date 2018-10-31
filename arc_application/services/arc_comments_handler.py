@@ -1,42 +1,156 @@
+import abc
 import json
-from uuid import uuid4
 
 from arc_application.models import Arc
 from .db_gateways import NannyGatewayActions
 
 
-def save_arc_comments_from_request(request, endpoint, table_pk, verbose_task_name):
+class ARCCommentsProcessor:
     """
-    Function to save comments made by an ARC reviewer from a given request.
-    :param request: request to check for comments.
-    :param endpoint:
-    :param table_pk: pk of the entry for which comments are being made.
-    :param verbose_task_name: The name of the task to be recorded in the audit log.
-    :return: True if comments were made, else False.
+    'Chain of responsibility' class for handling ARC comments.
     """
-    application_id = request.GET['id']
-    table_pk = NannyGatewayActions().read(endpoint, params={'application_id': application_id}).record[table_pk]
-    existing_comments = NannyGatewayActions().list('arc-comments', params={'table_pk': table_pk})
+    @staticmethod
+    def process_comments(request, form_class, verbose_task_name):
+        """
+        Entrance to processing pipeline.
+        Acts as interface to ARCCommentsHandler for clients.
+        :return Bool: True if ARC comments were saved, else False.
+        """
+        one_to_one_handler = OneToOneARCCommentsHandler()
+        many_to_one_handler = ManyToOneARCCommentsHandler(one_to_one_handler)
+        formset_handler = FormSetARCCommentsHandler(many_to_one_handler)
+        return formset_handler.handle_comments(request, form_class, verbose_task_name)
 
-    # Delete existing ArcComments
+
+class ARCCommentsHandler(metaclass=abc.ABCMeta):
+    """
+    Abstract Base Class which all ARC Comments Handler classes must implement
+    """
+    def __init__(self, successor=None):
+        self._successor = successor
+
+    @abc.abstractmethod
+    def handle_comments(self, request, form_class, verbose_task_name):
+        pass
+
+
+class FormSetARCCommentsHandler(ARCCommentsHandler):
+    """
+    ARC Comments Handler for a Formset instance.
+    """
+    def handle_comments(self, request, form_class, verbose_task_name):
+        if hasattr(form_class(), 'management_form'):  # If it is a FormSet instance.
+            for form in form_class(request.POST).forms:
+                return any([self._successor.handle_comments(request, form, verbose_task_name)])
+        else:
+            return self._successor.handle_comments(request, form_class, verbose_task_name)
+
+
+class ManyToOneARCCommentsHandler(ARCCommentsHandler):
+    """
+    ARC Comments Handler for endpoints with a Many-To-One relationship to the APPLICATION table.
+    """
+    def handle_comments(self, request, form_class, verbose_task_name):
+        endpoint = form_class.api_endpoint_name
+        pk_field_name = NannyGatewayActions.endpoint_pk_dict[endpoint]
+
+        # If application_id is the primary key for the db_table, then that table forms a one-to-one relation with the
+        # Application table.
+        # If so, then ManyToOneARCCommentsHandler defers to its successor.
+
+        if pk_field_name == 'application_id':
+            return self._successor.handle_comments(request, form_class, verbose_task_name)
+        else:
+            application_id = request.GET['id']
+            endpoint = form_class.api_endpoint_name
+            pk_field_name = NannyGatewayActions.endpoint_pk_dict[endpoint]
+
+            records = NannyGatewayActions().list(endpoint, params={'application_id': application_id}).record
+
+            flagged_fields = False
+
+            for index, record in enumerate(records):
+                relevant_data = dict((key[7:], value) for key, value in request.POST.items() if key[:6] == 'form-' + str(index))
+
+                new_comments = dict()
+
+                for field in form_class.field_names:
+                    if relevant_data.get(field + '_declare') == 'on':
+                        new_comments[field] = relevant_data[field + '_comments']
+
+                table_pk = record[pk_field_name]
+
+                existing_comments = NannyGatewayActions().list('arc-comments', params={'table_pk': table_pk})
+
+                fields_with_existing_comments = get_fields_with_existing_comments(existing_comments)
+                delete_existing_comments(existing_comments)
+                create_new_arc_comments(new_comments, table_pk, application_id)
+                log_arc_comment_creation(request, verbose_task_name, new_comments, fields_with_existing_comments)
+
+                if len(new_comments) > 0:
+                    flagged_fields = True
+
+            return flagged_fields
+
+
+class OneToOneARCCommentsHandler(ARCCommentsHandler):
+    """
+    ARC Comments Handler for endpoints with a One-To-One relationship to the APPLICATION table.
+    """
+    def handle_comments(self, request, form_class, verbose_task_name):
+        application_id = request.GET['id']
+        endpoint = form_class.api_endpoint_name
+        pk_field_name = NannyGatewayActions.endpoint_pk_dict[endpoint]
+        table_pk = NannyGatewayActions().read(endpoint, params={'application_id': application_id}).record[pk_field_name]
+
+        existing_comments = NannyGatewayActions().list('arc-comments', params={'table_pk': table_pk})
+
+        new_comments = dict()
+
+        # Generate dict with (key, value) pair of (field_name, comment) if field was flagged.
+        for field in form_class.field_names:
+            if request.POST.get(field + '_declare') == 'on':
+                new_comments[field] = request.POST[field + '_comments']
+
+        fields_with_existing_comments = get_fields_with_existing_comments(existing_comments)
+        delete_existing_comments(existing_comments)
+        create_new_arc_comments(new_comments, table_pk, application_id)
+        log_arc_comment_creation(request, verbose_task_name, new_comments, fields_with_existing_comments)
+
+        return False if len(new_comments) == 0 else True
+
+
+def get_fields_with_existing_comments(existing_comments):
     if existing_comments.status_code == 200:
         # Create list of existing arc_comments with 'flagged' field as True.
-        fields_with_existing_comments = [arc_comments_record['field_name'] for arc_comments_record in existing_comments.record if arc_comments_record['flagged']]
-
-        for arc_comments_record in existing_comments.record:
-            record_id = arc_comments_record['review_id']
-            NannyGatewayActions().delete('arc-comments', params={'review_id': str(record_id)})
+        fields_with_existing_comments = [arc_comments_record['field_name'] for arc_comments_record in
+                                         existing_comments.record if arc_comments_record['flagged']]
     else:
         fields_with_existing_comments = []
 
-    # Generate dict with (key, value) pair of (field_name, comment) if field was flagged.
-    comments = dict((key[:-8], request.POST[key[:-8] + '_comments']) for key in request.POST.keys() if request.POST[key] == 'on')
+    return fields_with_existing_comments
 
-    for field_name, comment in comments.items():
+
+def delete_existing_comments(existing_comments):
+    if existing_comments.status_code == 200:
+        for arc_comments_record in existing_comments.record:
+            record_id = arc_comments_record['review_id']
+            NannyGatewayActions().delete('arc-comments', params={'review_id': str(record_id)})
+
+
+def create_new_arc_comments(new_comments, table_pk, application_id):
+    """
+    Function to create an ARC comment for a dictionary of new comments for a database entry with some table pk.
+    :param new_comments: dict of comments to create.
+    :param table_pk: primary key of record for which comment is being created.
+    :param application_id: primary key of the application
+    :return: None
+    """
+    for field_name, comment in new_comments.items():
         NannyGatewayActions().create(
             'arc-comments',
             params={
-                'review_id': str(uuid4()),
+                # 'review_id': str(uuid4()),
                 'table_pk': table_pk,
                 'application_id': application_id,
                 'table_name': '',
@@ -46,11 +160,12 @@ def save_arc_comments_from_request(request, endpoint, table_pk, verbose_task_nam
             }
         )
 
+
+def log_arc_comment_creation(request, verbose_task_name, new_comments, fields_with_existing_comments):
+    for field_name in list(new_comments.keys()):
         # Prevent duplicate logs for fields which are already flagged.
         if field_name not in fields_with_existing_comments:
-            log_arc_flag_action(application_id, request.user.username, field_name, verbose_task_name)
-
-    return False if len(comments) == 0 else True
+            log_arc_flag_action(request.GET['id'], request.user.username, field_name, verbose_task_name)
 
 
 def update_arc_review_status(application_id, flagged_fields, reviewed_task):
@@ -100,23 +215,54 @@ def log_arc_flag_action(application_id, arc_user, flagged_field, verbose_task_na
 
 
 def get_form_initial_values(form, application_id):
-    endpoint = form.api_endpoint_name
-    table_pk = form.pk_field_name
+    if hasattr(form, 'management_form'):  # If it is a FormSet instance.
+        endpoint = form.form.api_endpoint_name
+        table_pk_name = NannyGatewayActions.endpoint_pk_dict[endpoint]
+        form_fields = form.form.field_names
+        records = NannyGatewayActions().list(endpoint, params={'application_id': application_id}).record
 
-    table_pk = NannyGatewayActions().read(endpoint, params={'application_id': application_id}).record[table_pk]
+        initial = []
+
+        for index, record in enumerate(records):
+            table_pk_value = record[table_pk_name]
+
+            for field_name in form_fields:
+                api_response = NannyGatewayActions().list('arc-comments',
+                                                          params={'table_pk': table_pk_value, 'field_name': field_name})
+
+                initial_vals = dict()
+
+                if api_response.status_code == 200:
+                    arc_comments_record = api_response.record[0]
+                    initial_vals[field_name + '_declare'] = True
+                    initial_vals[field_name + '_comments']= arc_comments_record['comment']
+                else:
+                    initial_vals[field_name + '_declare'] = False
+                    initial_vals[field_name + '_comments'] = ''
+
+                initial.append(initial_vals)
+
+        return initial
+
+    endpoint = form.api_endpoint_name
+
+    table_pk_name =     NannyGatewayActions.endpoint_pk_dict[endpoint]
+    table_pk_value = NannyGatewayActions().read(endpoint, params={'application_id': application_id}).record[table_pk_name]
     form_fields = form.field_names
 
+    initial = dict()
+
     for field_name in form_fields:
-        api_response = NannyGatewayActions().list('arc-comments', params={'table_pk': table_pk, 'field_name': field_name})
+        api_response = NannyGatewayActions().list('arc-comments', params={'table_pk': table_pk_value, 'field_name': field_name})
         if api_response.status_code == 200:
             arc_comments_record = api_response.record[0]
-            form[field_name + '_declare'].initial = True
-            form[field_name + '_comments'].initial = arc_comments_record['comment']
+            initial[field_name + '_declare'] = True
+            initial[field_name + '_comments'] = arc_comments_record['comment']
         else:
-            form[field_name + '_declare'].initial = False
-            form[field_name + '_comments'].initial = ''
+            initial[field_name + '_declare'] = False
+            initial[field_name + '_comments'] = ''
 
-    return form
+    return initial
 
 
 def update_returned_application_statuses(application_id):
