@@ -19,6 +19,7 @@ class DBGatewayActions:
     endpoint_pk_dict = {
         'childcare-address': 'childcare_address_id',
         'arc-comments': 'review_id',
+        'your-children': 'child_id',
         'applicant-home-address': 'application_id',
         'applicant-personal-details': 'application_id',
         'application': 'application_id',
