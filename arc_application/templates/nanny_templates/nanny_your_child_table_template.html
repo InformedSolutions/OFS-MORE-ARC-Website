@@ -19,8 +19,25 @@
         </tr>
     </thead>
     <tbody>
+    {% if form.name_comments.initial != '' and summary_page %} <!-- If there is an existing ARC Comment -->
+        <tr class="error-row">
+            <td colspan="3" class="error-container notice">
+                <i class="icon icon-important">
+                   <span class="visually-hidden">Warning</span>
+                 </i>
+                 <strong class="bold-small">
+                    {{ form.name_comments.initial }}
+                  </strong>
+            </td>
+        </tr>
+
+        <!-- If error, ensure row with data also has appropriate css classes - else just <tr> and <td> -->
+        <tr class="error-row">
+            <td class="error-field-label">
+        {% else %}
         <tr>
             <td>
+        {% endif %}
                 Name
             </td>
             <td>
@@ -35,7 +52,9 @@
                 {{ child_record.last_name }}
             </td>
             <td class="change-answer">
-                {{ form.name_declare }}
+                {% if not summary_page %}
+                    {{ form.name_declare }}
+                {% endif %}
             </td>
         </tr>
         <tr class="js-hidden" id="name_{{ forloop.counter }}">
@@ -53,15 +72,34 @@
                 </div>
             </td>
         </tr>
+        {% if form.date_of_birth_comments != '' and summary_page %} <!-- If there is an existing ARC Comment -->
+        <tr class="error-row">
+            <td colspan="3" class="error-container notice">
+                <i class="icon icon-important">
+                   <span class="visually-hidden">Warning</span>
+                 </i>
+                 <strong class="bold-small">
+                    {{ form.date_of_birth_comments.initial }}
+                  </strong>
+            </td>
+        </tr>
+
+        <!-- If error, ensure row with data also has appropriate css classes - else just <tr> and <td> -->
+        <tr class="error-row">
+            <td class="error-field-label">
+        {% else %}
         <tr>
             <td>
+        {% endif %}
                 Date of birth
             </td>
             <td>
                 {{ child_record|format_child_birth_date }}
             </td>
             <td class="change-answer">
-                {{ form.date_of_birth_declare }}
+                {% if not summary_page %}
+                    {{ form.date_of_birth_declare }}
+                {% endif %}
             </td>
         </tr>
         <tr class="js-hidden" id="date_of_birth_{{ forloop.counter }}">
@@ -70,17 +108,34 @@
                     Enter your reasoning
                 </div>
                 <div>
-                    {{ form.date_of_birth_comments.help_text}}
+                    {{ form.date_of_birth_comments.help_text }}
                 </div>
             </td>
             <td colspan="2">
                 <div>
-                    {{ form.date_of_birth_comments}}
+                    {{ form.date_of_birth_comments }}
                 </div>
             </td>
         </tr>
+        {% if form.address_comments.initial != '' and summary_page %} <!-- If there is an existing ARC Comment -->
+        <tr class="error-row">
+            <td colspan="3" class="error-container notice">
+                <i class="icon icon-important">
+                   <span class="visually-hidden">Warning</span>
+                 </i>
+                 <strong class="bold-small">
+                    {{ form.address_comments.initial }}
+                  </strong>
+            </td>
+        </tr>
+
+        <!-- If error, ensure row with data also has appropriate css classes - else just <tr> and <td> -->
+        <tr class="error-row">
+            <td class="error-field-label">
+        {% else %}
         <tr>
             <td>
+        {% endif %}
                 Address
             </td>
             <td>
@@ -89,7 +144,9 @@
                 {% endwith %}
             </td>
             <td class="change-answer">
-                {{ form.address_declare }}
+                {% if not summary_page %}
+                    {{ form.address_declare }}
+                {% endif %}
             </td>
         </tr>
         <tr class="js-hidden" id="address_{{ forloop.counter }}">
