@@ -1,5 +1,5 @@
 from .nanny_form_view import NannyARCFormView
-from ...forms.nanny_forms.nanny_form_builder import ChildrenLivingWithYouForm, YourChildrenFormset
+from ...forms.nanny_forms.nanny_form_builder import FirstAidForm
 from ...services.db_gateways import NannyGatewayActions
 
 
@@ -8,7 +8,7 @@ class NannyYourChildrenSummary(NannyARCFormView):
     success_url = 'nanny_childcare_address_summary'
     task_for_review = 'your_children_review'
     verbose_task_name = 'Your children'
-    form_class = [ChildrenLivingWithYouForm, YourChildrenFormset]
+    form_class = FirstAidForm
 
     def get_context_data(self, application_id):
         """
@@ -18,30 +18,26 @@ class NannyYourChildrenSummary(NannyARCFormView):
         """
         self.application_id = application_id
         nanny_actions = NannyGatewayActions()
+        # TODO Get dict when nanny_gateway has your-children endpoint
+        # your_children_dict = nanny_actions.read('your-children',
+        #                                         params={'application_id': application_id}).record
 
-        children_records = nanny_actions.list('your-children', params={'application_id': application_id}).record
-
-        children_living_wth_applicant = 'TEMPORARY CHILD NAME'  # TODO: Add logic for setting row value.
-
-        children_living_with_you_form, children_formset = self.get_forms()
+        form = self.get_form()
 
         context = {
             'application_id': application_id,
             'title': 'Review: ' + self.verbose_task_name,
+            'form': form,
             'rows': [
-                {
-                    'id': 'children_living_with_applicant_selection',
-                    'name': 'Your children\'s addresses',
-                    'info': children_living_wth_applicant,
-                    # Prevent checkbox appearing if summary page is calling get_context_data.
-                    'declare': children_living_with_you_form['children_living_with_applicant_selection_declare'] if hasattr(self, 'request') else '',
-                    'comments': children_living_with_you_form['children_living_with_applicant_selection_comments']
-                },
-                {
-                    'id': 'your_children_details',
-                    'info': children_records,
-                    'formset': children_formset
-                }
+                # TODO Add rows when your children task is complete
+                # {
+                #     'id': 'training_organisation',
+                #     'name': 'Training organisation',
+                #     'info': training_organisation,
+                #     # Prevent checkbox appearing if summary page is calling get_context_data.
+                #     'declare': form['training_organisation_declare'] if hasattr(self, 'request') else '',
+                #     'comments': form['training_organisation_comments']
+                # }
             ]
         }
 

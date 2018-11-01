@@ -43,7 +43,7 @@ class NannyTaskList(View):
         first_name = personal_details_dict['first_name']
         middle_names = personal_details_dict['middle_names']
         last_name = personal_details_dict['last_name']
-        review_count = self.get_review_count(nanny_application_dict, arc_application, show_your_children=personal_details_dict['your_children'])
+        review_count = self.get_review_count(nanny_application_dict, arc_application)
 
         dob_str = personal_details_dict['date_of_birth']
         birth_list = parse_date_of_birth(dob_str)
@@ -59,10 +59,8 @@ class NannyTaskList(View):
             'middle_names': middle_names,
             'last_name': last_name,
             'review_count': review_count,
-            'number_of_tasks': self.number_of_tasks(show_your_children=personal_details_dict['your_children']),
             'login_details_status': arc_application.login_details_review,
             'personal_details_status': arc_application.personal_details_review,
-            'your_children_status': arc_application.your_children_review,
             'childcare_address_status': arc_application.childcare_address_review,
             'first_aid_status': arc_application.first_aid_review,
             'childcare_training_status': arc_application.childcare_training_review,
@@ -77,15 +75,14 @@ class NannyTaskList(View):
 
         return context
 
-    @staticmethod
-    def get_review_count(nanny_application, arc_application, show_your_children):
+    def get_review_count(self, nanny_application, arc_application):
         """
         :param nanny_application: The nanny_application record
         :param arc_application: The arc_application record
         :return: The number of reviewed tasks
         """
 
-        review_fields_to_check = [
+        review_fields_to_check = (
             'login_details_review',
             'personal_details_review',
             'childcare_address_review',
@@ -93,9 +90,9 @@ class NannyTaskList(View):
             'childcare_training_review',
             'dbs_review',
             'insurance_cover_review'
-        ]
+        )
 
-        flagged_fields_to_check = [
+        flagged_fields_to_check = (
             'login_details_arc_flagged',
             'personal_details_arc_flagged',
             'childcare_address_arc_flagged',
@@ -103,20 +100,9 @@ class NannyTaskList(View):
             'childcare_training_arc_flagged',
             'dbs_arc_flagged',
             'insurance_cover_arc_flagged'
-        ]
-
-        if show_your_children:
-            review_fields_to_check.append('your_children_review')
-            flagged_fields_to_check.append('your_children_arc_flagged')
+        )
 
         review_count = sum([1 for field in review_fields_to_check if getattr(arc_application, field) == 'COMPLETED'])
         review_count += sum([1 for field in flagged_fields_to_check if nanny_application[field]])
 
         return review_count
-
-    @staticmethod
-    def number_of_tasks(show_your_children):
-        if show_your_children:
-            return 8
-        else:
-            return 7
