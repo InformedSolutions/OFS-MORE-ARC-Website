@@ -52,7 +52,7 @@ class ManyToOneARCCommentsHandler(ARCCommentsHandler):
     """
     def handle_comments(self, request, form_class, verbose_task_name):
         endpoint = form_class.api_endpoint_name
-        pk_field_name = NannyGatewayActions.endpoint_pk_dict[endpoint]
+        pk_field_name = NannyGatewayActions().get_endpoint_pk(endpoint)
 
         # If application_id is the primary key for the db_table, then that table forms a one-to-one relation with the
         # Application table.
@@ -63,7 +63,7 @@ class ManyToOneARCCommentsHandler(ARCCommentsHandler):
         else:
             application_id = request.GET['id']
             endpoint = form_class.api_endpoint_name
-            pk_field_name = NannyGatewayActions.endpoint_pk_dict[endpoint]
+            pk_field_name = NannyGatewayActions().get_endpoint_pk(endpoint)
 
             records = NannyGatewayActions().list(endpoint, params={'application_id': application_id}).record
 
@@ -100,7 +100,7 @@ class OneToOneARCCommentsHandler(ARCCommentsHandler):
     def handle_comments(self, request, form_class, verbose_task_name):
         application_id = request.GET['id']
         endpoint = form_class.api_endpoint_name
-        pk_field_name = NannyGatewayActions.endpoint_pk_dict[endpoint]
+        pk_field_name = NannyGatewayActions().get_endpoint_pk(endpoint)
         table_pk = NannyGatewayActions().read(endpoint, params={'application_id': application_id}).record[pk_field_name]
 
         existing_comments = NannyGatewayActions().list('arc-comments', params={'table_pk': table_pk})
@@ -217,7 +217,7 @@ def log_arc_flag_action(application_id, arc_user, flagged_field, verbose_task_na
 def get_form_initial_values(form, application_id):
     if hasattr(form, 'management_form'):  # If it is a FormSet instance.
         endpoint = form.form.api_endpoint_name
-        table_pk_name = NannyGatewayActions.endpoint_pk_dict[endpoint]
+        table_pk_name = NannyGatewayActions().get_endpoint_pk(endpoint)
         form_fields = form.form.field_names
         records = NannyGatewayActions().list(endpoint, params={'application_id': application_id}).record
 
@@ -246,7 +246,7 @@ def get_form_initial_values(form, application_id):
 
     endpoint = form.api_endpoint_name
 
-    table_pk_name =     NannyGatewayActions.endpoint_pk_dict[endpoint]
+    table_pk_name =     NannyGatewayActions().get_endpoint_pk(endpoint)
     table_pk_value = NannyGatewayActions().read(endpoint, params={'application_id': application_id}).record[table_pk_name]
     form_fields = form.field_names
 
