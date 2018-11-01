@@ -90,6 +90,7 @@ class NannyArcSummary(View):
 
         contact_details_context['change_link'] = 'nanny_contact_summary'
         personal_details_context['change_link'] = 'nanny_personal_details_summary'
+        your_children_context['change_link'] = 'nanny_your_children_summary'
         childcare_address_context['change_link'] = 'nanny_childcare_address_summary'
         first_aid_training_context['change_link'] = 'nanny_first_aid_training_summary'
         childcare_training_context['change_link'] = 'nanny_childcare_training_summary'

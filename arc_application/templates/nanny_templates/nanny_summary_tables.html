@@ -26,6 +26,17 @@
 
                 {% endfor %}
 
+            {% elif row.id == 'your_children_details' %}
+                {{ row.formset.management_form }}
+
+                {% for child_record in row.info %}
+
+                    {% with form=row.formset|return_item_by_index:forloop.counter0 %}
+                        {% include 'nanny_your_child_table_template.html' %}
+                    {% endwith %}
+
+                {% endfor %}
+
             {% else %}
 
                 {% include 'nanny_general_table_template.html' %}

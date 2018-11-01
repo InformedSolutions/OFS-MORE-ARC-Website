@@ -226,11 +226,11 @@ def get_form_initial_values(form, application_id):
         for index, record in enumerate(records):
             table_pk_value = record[table_pk_name]
 
+            initial_vals = dict()
+
             for field_name in form_fields:
                 api_response = NannyGatewayActions().list('arc-comments',
                                                           params={'table_pk': table_pk_value, 'field_name': field_name})
-
-                initial_vals = dict()
 
                 if api_response.status_code == 200:
                     arc_comments_record = api_response.record[0]
@@ -240,7 +240,7 @@ def get_form_initial_values(form, application_id):
                     initial_vals[field_name + '_declare'] = False
                     initial_vals[field_name + '_comments'] = ''
 
-                initial.append(initial_vals)
+            initial.append(initial_vals)
 
         return initial
 
