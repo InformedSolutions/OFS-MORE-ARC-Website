@@ -84,7 +84,7 @@ class ManyToOneARCCommentsHandler(ARCCommentsHandler):
 
                 fields_with_existing_comments = get_fields_with_existing_comments(existing_comments)
                 delete_existing_comments(existing_comments)
-                create_new_arc_comments(new_comments, table_pk, application_id)
+                create_new_arc_comments(new_comments, table_pk, application_id, endpoint=endpoint)
                 log_arc_comment_creation(request, verbose_task_name, new_comments, fields_with_existing_comments)
 
                 if len(new_comments) > 0:
@@ -114,7 +114,7 @@ class OneToOneARCCommentsHandler(ARCCommentsHandler):
 
         fields_with_existing_comments = get_fields_with_existing_comments(existing_comments)
         delete_existing_comments(existing_comments)
-        create_new_arc_comments(new_comments, table_pk, application_id)
+        create_new_arc_comments(new_comments, table_pk, application_id, endpoint=endpoint)
         log_arc_comment_creation(request, verbose_task_name, new_comments, fields_with_existing_comments)
 
         return False if len(new_comments) == 0 else True
@@ -138,7 +138,7 @@ def delete_existing_comments(existing_comments):
             NannyGatewayActions().delete('arc-comments', params={'review_id': str(record_id)})
 
 
-def create_new_arc_comments(new_comments, table_pk, application_id):
+def create_new_arc_comments(new_comments, table_pk, application_id, endpoint=''):
     """
     Function to create an ARC comment for a dictionary of new comments for a database entry with some table pk.
     :param new_comments: dict of comments to create.
@@ -153,7 +153,7 @@ def create_new_arc_comments(new_comments, table_pk, application_id):
                 # 'review_id': str(uuid4()),
                 'table_pk': table_pk,
                 'application_id': application_id,
-                'table_name': '',
+                'endpoint_name': endpoint,
                 'field_name': field_name,
                 'comment': comment,
                 'flagged': True,
