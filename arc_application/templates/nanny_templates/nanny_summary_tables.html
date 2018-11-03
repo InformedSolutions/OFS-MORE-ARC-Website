@@ -2,16 +2,19 @@
 
 <div class = "two-thirds">
     <table class="check-your-answers form-group">
-        <thead>
-            <tr>
-                <th colspan="{{ col }}">
-                    <div class="heading-medium">
-                        {{context.title}}
-                    </div>
-                </th>
-            </tr>
-        </thead>
-        <tbody>
+        {% if not context.skip_summary_page_title %}
+            <thead>
+                <tr>
+                    <th colspan="{{ col }}">
+                        <div class="heading-medium">
+                            {{context.title}}
+                        </div>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+
+        {% endif %}
 
         {% for row in context.rows %}
         {% if not row.hidden %}
@@ -28,6 +31,8 @@
 
             {% elif row.id == 'your_children_details' %}
                 {{ row.formset.management_form }}
+
+                {% include 'your-children-living-with-you.html' %}
 
                 {% for child_record in row.info %}
 

@@ -118,7 +118,8 @@ class NannyArcSummary(View):
             'title': 'Check and confirm all your details',
             'html_title': 'Application summary',
             'context_list': context_list,
-            'summary_page': True
+            'summary_page': True,
+            'your_children_context_index': 2
         }
 
         return context

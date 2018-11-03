@@ -215,6 +215,9 @@ def log_arc_flag_action(application_id, arc_user, flagged_field, verbose_task_na
 
 
 def get_form_initial_values(form, application_id):
+
+    # TODO: Turn the below into a recursive function.
+
     if hasattr(form, 'management_form'):  # If it is a FormSet instance.
         endpoint = form.form.api_endpoint_name
         table_pk_name = NannyGatewayActions.endpoint_pk_dict[endpoint]
