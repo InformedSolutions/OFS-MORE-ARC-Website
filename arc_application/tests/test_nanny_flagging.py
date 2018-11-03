@@ -210,7 +210,13 @@ class TestNannyFlagging(TestCase):
         """
         Test that a POST request to the personal details page redirects to the childcare address details page.
         """
-        response = self.client.post(reverse('nanny_your_children_summary') + '?id=' + test_app_id)
+        response = self.client.post(reverse('nanny_your_children_summary') + '?id=' + test_app_id,
+                                    data={
+                                        'id': test_app_id,
+                                        'form-TOTAL_FORMS': '2',
+                                        'form-INITIAL_FORMS': '2',
+                                        'form-MAX_NUM_FORMS': '2',
+                                    })
         found = resolve(response.url)
 
         self.assertEqual(response.status_code, 302)
@@ -331,14 +337,17 @@ class TestNannyFlagging(TestCase):
     def test_flagging_your_children_details_sets_status_to_flagged(self, *args):
         self.skipTest('NotImplemented')
 
-    def test_flagging_you_children_details_creates_arc_comments(self, *args):
+    def test_flagging_your_children_details_creates_arc_comments(self, *args):
         self.skipTest('NotImplemented')
 
     def test_not_flagging_your_children_details_sets_status_to_reviewed(self, *args):
         self.client.post(reverse('nanny_your_children_summary') + '?id=' + test_app_id,
-                         data={
-                             'id': test_app_id,
-                         })
+                                    data={
+                                        'id': test_app_id,
+                                        'form-TOTAL_FORMS': '2',
+                                        'form-INITIAL_FORMS': '2',
+                                        'form-MAX_NUM_FORMS': '2',
+                                    })
 
         self.assertEqual(Arc.objects.get(pk=test_app_id).your_children_review, 'COMPLETED')
 
