@@ -153,11 +153,12 @@ class TestNannyFlagging(TestCase):
 
         mocked_return_values = {
             'application': application_mock_response,
-            'childcare-address': childcare_address_mock_response
+            'childcare-address': childcare_address_mock_response,
+            'arc-comments': childcare_address_mock_response,
         }
 
-        read_mock.side_effect = lambda endpoint, params: mocked_return_values[endpoint]
-        list_mock.side_effect = lambda endpoint, params: mocked_return_values[endpoint]
+        read_mock.return_value.side_effect = lambda endpoint, params: mocked_return_values[endpoint]
+        list_mock.return_value.side_effect = lambda endpoint, params: mocked_return_values[endpoint]
 
         response = self.client.get(reverse('nanny_childcare_address_summary') + '?id=' + test_app_id)
 
