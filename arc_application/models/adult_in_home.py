@@ -25,8 +25,8 @@ class AdultInHome(models.Model):
     validated = models.BooleanField(default=False)
     current_treatment = models.NullBooleanField(null=True)
     serious_illness = models.NullBooleanField(null=True)
-    known_to_council=models.NullBooleanField(null=True)
-    children_details=models.TextField(default='', null=True)
+    known_to_council = models.NullBooleanField(null=True)
+    children_details = models.TextField(default='', null=True)
     hospital_admission = models.NullBooleanField(null=True)
     health_check_status = models.CharField(max_length=50, default='To do')
     email_resent = models.IntegerField(default=0)
@@ -94,18 +94,22 @@ class AdultInHome(models.Model):
             birth_month = str(self.birth_month)
 
         date_of_birth = birth_day + ' ' + birth_month + ' ' + str(self.birth_year)
+        print(self.known_to_council)
+        summary_table = [
+            {"title": self.get_full_name(), "id": self.pk},
+            {"name": "Health questions status", "value": self.health_check_status},
+            {"name": "Name", "value": self.get_full_name()},
+            {"name": "Date of birth", "value": date_of_birth},
+            {"name": "Relationship", "value": self.relationship},
+            {"name": "Email", "value": self.email},
+            {"name": "DBS certificate number", "value": self.dbs_certificate_number},
+            {"name": "Known to council", "value": ("Yes" if self.known_to_council == True else "No")}
+        ]
+        if self.known_to_council == True:
+            summary_table.append({"name": "Details of children", "value": self.children_details})
 
-        return [
-                {"title": self.get_full_name(), "id": self.pk},
-                {"name": "Health questions status", "value": self.health_check_status},
-                {"name": "Name", "value": self.get_full_name()},
-                {"name": "Date of birth", "value": date_of_birth},
-                {"name": "Relationship", "value": self.relationship},
-                {"name": "Email", "value": self.email},
-                {"name": "DBS certificate number", "value": self.dbs_certificate_number},
-                {"name": "Details of children", "value": self.children_details}
-            ]
-      
+        return summary_table
+
     # Date of birth property created to keep DRY
     @property
     def date_of_birth(self):
