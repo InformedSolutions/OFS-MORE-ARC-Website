@@ -20,7 +20,7 @@ class NannyChildcareAddressSummary(NannyARCFormView):
 
         work_location_bool = nanny_application['address_to_be_provided']
 
-        where_you_will_work_form, childcare_address_formset = self.get_forms()
+        where_you_will_work_form = self.get_form(form_class=self.form_class[0])
 
         # If applicant has opted to provide addresses at a later time, skip remainder of summary page - load only this.
         if not work_location_bool:
@@ -57,6 +57,8 @@ class NannyChildcareAddressSummary(NannyARCFormView):
                                                         params={'application_id': application_id}).record
         else:
             home_address_locations = {}
+
+        where_you_will_work_form, childcare_address_formset = self.get_forms()
 
         context = {
             'application_id': application_id,
