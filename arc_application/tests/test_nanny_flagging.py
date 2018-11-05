@@ -3,6 +3,7 @@ from unittest import mock
 from django.conf import settings
 from django.contrib.auth.models import Group, User
 from django.forms import Form
+from django.http import HttpResponse
 from django.test import tag, TestCase
 from django.urls import reverse, resolve
 
@@ -125,6 +126,39 @@ class TestNannyFlagging(TestCase):
         """
         Test to ensure that the page for flagging childcare address details can be rendered.
         """
+        response = self.client.get(reverse('nanny_childcare_address_summary') + '?id=' + test_app_id)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.resolver_match.func.__name__, NannyChildcareAddressSummary.as_view().__name__)
+
+    def test_can_render_childcare_address_page_if_no_addresses_provided(self, *args):
+        """
+        Test to ensure that the page for flagging childcare details can be rendered, even if the applicant has specified
+        that addresses will be provided at a later time.
+        """
+        mock_nanny_application = {
+            'application_id': '998fd8ec-b96b-4a71-a1a1-a7a3ae186729',
+            'address_to_be_provided': False
+        }
+
+        read_mock = args[5]
+        list_mock = args[3]
+
+        application_mock_response = HttpResponse()
+        application_mock_response.status_code = 200
+        application_mock_response.record = mock_nanny_application
+
+        childcare_address_mock_response = HttpResponse()
+        childcare_address_mock_response.status_code = 404
+
+        mocked_return_values = {
+            'application': application_mock_response,
+            'childcare-address': childcare_address_mock_response
+        }
+
+        read_mock.side_effect = lambda endpoint, params: mocked_return_values[endpoint]
+        list_mock.side_effect = lambda endpoint, params: mocked_return_values[endpoint]
+
         response = self.client.get(reverse('nanny_childcare_address_summary') + '?id=' + test_app_id)
 
         self.assertEqual(response.status_code, 200)
