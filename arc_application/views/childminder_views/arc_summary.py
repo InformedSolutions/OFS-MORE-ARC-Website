@@ -350,7 +350,7 @@ def load_json(application_id_local, ordered_models, recurse):
 
                 else:
 
-                    adults_in_home = 'False'
+                    adults_in_home = 'No'
 
                 table_list.append([
                     {"title": "Adults in the home", "id": application_id_local},
