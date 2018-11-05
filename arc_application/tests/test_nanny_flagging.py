@@ -81,7 +81,7 @@ class TestNannyFlagging(TestCase):
 
         for call in endpoint_calls:
             for param_name, exp_param_val in params.items():
-                if not call[1]['params'][param_name] == exp_param_val or (type(exp_param_val) == str and not call[1]['params'][param_name] in exp_param_val):
+                if not call[1]['params'][param_name] == exp_param_val:
                     break
             else:
                 return None
