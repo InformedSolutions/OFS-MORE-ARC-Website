@@ -109,6 +109,47 @@ mock_identity_record = {
     'add_phone_number': '',
 }
 
+mock_your_children_record = [
+  {
+    "child_id": "ea55fae9-5f9f-421b-8adc-19aaad37016d",
+    "child": 1,
+    "lives_with_applicant": True,
+    "first_name": "Mr",
+    "middle_names": "",
+    "last_name": "Bump",
+    "birth_day": 1,
+    "birth_month": 1,
+    "birth_year": 2008,
+    "date_created": "2018-10-31T13:44:58.948231Z",
+    "street_line1": "FORTIS DEVELOPMENTS LTD, BANK HOUSE",
+    "street_line2": "OLD MARKET PLACE",
+    "town": "ALTRINCHAM",
+    "county": "",
+    "country": None,
+    "postcode": "WA14 4PA",
+    'application_id': '998fd8ec-b96b-4a71-a1a1-a7a3ae186729',
+  },
+  {
+    "child_id": "d02691ff-4050-4e42-bae8-c17c12ff0f27",
+    "child": 2,
+    "lives_with_applicant": False,
+    "first_name": "Mr",
+    "middle_names": "MIDDLE",
+    "last_name": "Happy",
+    "birth_day": 1,
+    "birth_month": 1,
+    "birth_year": 2010,
+    "date_created": "2018-10-31T13:45:16.802325Z",
+    "street_line1": "Palace",
+    "street_line2": "",
+    "town": "London",
+    "county": "",
+    "country": None,
+    "postcode": "SW1 1AA",
+    'application_id': '998fd8ec-b96b-4a71-a1a1-a7a3ae186729',
+  }
+]
+
 mock_declaration_record = {
     'application_id': '998fd8ec-b96b-4a71-a1a1-a7a3ae186729',
     'follow_rules': True,
@@ -166,6 +207,10 @@ timeline_log_response = HttpResponse()
 timeline_log_response.status_code = 200
 timeline_log_response.record = mock_timeline_log_record
 
+your_children_response = HttpResponse()
+your_children_response.status_code = 200
+your_children_response.record = mock_your_children_record
+
 
 mock_endpoint_return_values = {
     'application': nanny_application_response,
@@ -179,7 +224,8 @@ mock_endpoint_return_values = {
     'declaration': declaration_response,
     'user': identity_response,
     'arc-comments': arc_comments_response,
-    'timeline-log': timeline_log_response
+    'timeline-log': timeline_log_response,
+    'your-children': your_children_response,
 }
 
 

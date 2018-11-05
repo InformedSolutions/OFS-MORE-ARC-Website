@@ -155,6 +155,7 @@ class NannyGatewayActions(DBGatewayActions):
         'arc-comments': 'review_id',
         'applicant-home-address': 'application_id',
         'applicant-personal-details': 'application_id',
+        'your-children': 'child_id',
         'application': 'application_id',
         'childcare-training': 'application_id',
         'dbs-check': 'application_id',
@@ -163,7 +164,8 @@ class NannyGatewayActions(DBGatewayActions):
         'insurance-cover': 'application_id',
         'payment': 'application_id',
         'summary': 'application_id',
-        'arc-search': 'application_id'
+        'arc-search': 'application_id',
+        'timeline-log': 'object_id'
     }
 
     target_url_prefix = os.environ.get('APP_NANNY_GATEWAY_URL') + '/api/v1/'

@@ -1,5 +1,5 @@
 from .nanny_form_view import NannyARCFormView
-from ...forms.nanny_forms.nanny_form_builder import FirstAidForm
+from ...forms.nanny_forms.nanny_form_builder import ChildrenLivingWithYouForm, YourChildrenFormset
 from ...services.db_gateways import NannyGatewayActions
 
 
@@ -8,7 +8,7 @@ class NannyYourChildrenSummary(NannyARCFormView):
     success_url = 'nanny_childcare_address_summary'
     task_for_review = 'your_children_review'
     verbose_task_name = 'Your children'
-    form_class = FirstAidForm
+    form_class = [ChildrenLivingWithYouForm, YourChildrenFormset]
 
     def get_context_data(self, application_id):
         """
@@ -18,26 +18,44 @@ class NannyYourChildrenSummary(NannyARCFormView):
         """
         self.application_id = application_id
         nanny_actions = NannyGatewayActions()
-        # TODO Get dict when nanny_gateway has your-children endpoint
-        # your_children_dict = nanny_actions.read('your-children',
-        #                                         params={'application_id': application_id}).record
 
-        form = self.get_form()
+        children_records = nanny_actions.list('your-children', params={'application_id': application_id}).record
+
+        children_living_with_applicant = [child for child in children_records if child['lives_with_applicant']]
+        children_living_with_applicant_temp_store = []
+
+        # Create a list of names of children that live with the applicant
+        for child in children_living_with_applicant:
+            child_name = str(child['first_name']) + " " + str(child['last_name'])
+            children_living_with_applicant_temp_store.append(child_name)
+
+        # Create list of names for the table row
+        if len(children_living_with_applicant_temp_store) == 0:
+            children_living_with_you_response_string = 'None'
+        else:
+            children_living_with_you_response_string = ", ".join(children_living_with_applicant_temp_store)
+
+        children_living_with_you_form, children_formset = self.get_forms()
 
         context = {
             'application_id': application_id,
             'title': 'Review: ' + self.verbose_task_name,
-            'form': form,
+
+            # The "Which of your children live with you?" lives under a separate table - the "Your children's
+            # addresses table". The general_table_template does not currently support multiple tables per task.
+            'children_living_with_applicant': children_living_with_you_response_string,
+            'children_living_with_you_form': children_living_with_you_form,
+
+            # Summary page will attempt to render a single table to then be populated with rows.
+            # This needs to be overridden and the custom 'your-children' templates used.
+            'skip_summary_page_title': True,
+
             'rows': [
-                # TODO Add rows when your children task is complete
-                # {
-                #     'id': 'training_organisation',
-                #     'name': 'Training organisation',
-                #     'info': training_organisation,
-                #     # Prevent checkbox appearing if summary page is calling get_context_data.
-                #     'declare': form['training_organisation_declare'] if hasattr(self, 'request') else '',
-                #     'comments': form['training_organisation_comments']
-                # }
+                {
+                    'id': 'your_children_details',
+                    'info': children_records,
+                    'formset': children_formset
+                }
             ]
         }
 
