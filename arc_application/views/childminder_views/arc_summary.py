@@ -350,12 +350,12 @@ def load_json(application_id_local, ordered_models, recurse):
 
                 else:
 
-                    adults_in_home = 'False'
+                    adults_in_home = 'No'
 
                 table_list.append([
                     {"title": "Adults in the home", "id": application_id_local},
                     {"name": "Does anyone aged 16 or over live or work in your home?",
-                     "value": get_bool_as_string(adults_in_home)}
+                     "value": adults_in_home}
                 ])
 
         elif model == Application:
