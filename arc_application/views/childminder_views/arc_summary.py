@@ -350,7 +350,7 @@ def load_json(application_id_local, ordered_models, recurse):
 
                 else:
 
-                    adults_in_home = 'False'
+                    adults_in_home = 'No'
 
                 table_list.append([
                     {"title": "Adults in the home", "id": application_id_local},
@@ -375,7 +375,7 @@ def load_json(application_id_local, ordered_models, recurse):
                     table_list.append([
                         {"title": "Children not in the home", "id": application_id_local},
                         {"name": "Do you have children of your own under 16 who do not live with you?",
-                         "value": application.own_children_not_in_home}
+                         "value": get_bool_as_string(application.own_children_not_in_home)}
                     ])
 
                     children_not_in_home = Child.objects.filter(application_id=application_id_local,

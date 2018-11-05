@@ -6,8 +6,10 @@ from django.views.generic import FormView
 from django.views.decorators.cache import never_cache
 
 from ...review_util import build_url
-from ...services.arc_comments_handler import save_arc_comments_from_request, \
-    update_arc_review_status, get_form_initial_values, update_application_arc_flagged_status
+from ...services.arc_comments_handler import update_arc_review_status, \
+    get_form_initial_values, \
+    update_application_arc_flagged_status, \
+    ARCCommentsProcessor
 
 
 @method_decorator(never_cache, name='dispatch')
@@ -16,10 +18,10 @@ class NannyARCFormView(FormView):
     """
     Parent FormView class from which all subsequent FormViews will inherit.
     """
-    template_name = None
-    success_url = None
-    task_for_review = None
-    application_id = None
+    template_name     = None
+    success_url       = None
+    task_for_review   = None
+    application_id    = None
     verbose_task_name = None
 
     def get(self, request, *args, **kwargs):
@@ -29,25 +31,18 @@ class NannyARCFormView(FormView):
 
     def post(self, request, *args, **kwargs):
         self.application_id = request.GET['id']
+        self.__handle_post_data()
+        return HttpResponseRedirect(build_url(self.get_success_url(), get={'id': request.GET['id']}))
 
-        if isinstance(self.form_class, list):
-            for form in self.form_class:
-                self.handle_post_data(form)
-        else:
-            self.handle_post_data(self.form_class)
+    def __handle_post_data(self):
+        # Cast self.form_class to a list if not already a list. Then iterate over list.
+        _form_classes = [self.form_class] if not isinstance(self.form_class, list) else self.form_class
 
-        return HttpResponseRedirect(build_url(self.get_success_url(), get={'id': self.application_id}))
-
-    def handle_post_data(self, form):
-        # Write ArcComments to db from form.
-        endpoint = form.api_endpoint_name
-        table_pk = form.pk_field_name
-        flagged_fields = save_arc_comments_from_request(
+        flagged_fields = any([ARCCommentsProcessor.process_comments(
             request=self.request,
-            endpoint=endpoint,
-            table_pk=table_pk,
+            form_class=_class,
             verbose_task_name=self.verbose_task_name
-        )
+        ) for _class in _form_classes])
 
         # Update {{task}}_review status for ARC user.
         reviewed_task = self.get_task_for_review()
@@ -59,8 +54,8 @@ class NannyARCFormView(FormView):
     def get_form(self, form_class=None):
         if form_class is None:
             form_class = self.get_form_class()
-        form = form_class()
-        return get_form_initial_values(form, application_id=self.application_id)
+        initial = get_form_initial_values(form_class, application_id=self.application_id)
+        return form_class(initial=initial)
 
     def get_forms(self):
         return [self.get_form(form_class=form_class) for form_class in self.form_class]

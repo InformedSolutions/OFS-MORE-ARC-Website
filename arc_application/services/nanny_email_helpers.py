@@ -29,9 +29,10 @@ def send_accepted_email(email, first_name, ref):
         raise EnvironmentError('No settings attribute for APP_NOTIFY_URL found')
 
 
-def send_returned_email(email, first_name, ref):
+def send_returned_email(application_id, email, first_name, ref):
     """
     Method to send a nanny application returned email using the Notify Gateway API
+    :param application_id:
     :param email: string containing the e-mail address to send the e-mail to
     :param first_name: string first name
     :param ref: string ref
@@ -42,7 +43,7 @@ def send_returned_email(email, first_name, ref):
         template_id = 'ea2bb1f9-246c-4d42-9dbf-2411cd34aa5f'
 
         full_link, magic_link, sent_time = __generate_magic_link()
-        __update_nanny_magic_link(email, magic_link, sent_time)
+        __update_nanny_magic_link(application_id, email, magic_link, sent_time)
 
         if settings.DEBUG:
             print('send_returned_email was sent')
@@ -54,11 +55,12 @@ def send_returned_email(email, first_name, ref):
         raise EnvironmentError('No settings attribute for APP_NOTIFY_URL found')
 
 
-def __update_nanny_magic_link(email, magic_link, expiry_date):
+def __update_nanny_magic_link(application_id, email, magic_link, expiry_date):
     identity_actions = IdentityGatewayActions()
 
     # Create an update record with the magic_link information
     magic_link_patch_record = {
+        'application_id': application_id,
         'email': email,
         'magic_link_email': magic_link,
         'email_expiry_date': expiry_date

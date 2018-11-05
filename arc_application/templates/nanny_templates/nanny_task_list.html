@@ -51,11 +51,11 @@
                <td class="task">
                   <a href="{% url 'nanny_your_children_summary' %}?id={{application_id}}">
                      <span class="task-name">Your children</span>
-                     {% if personal_details_status == 'NOT_STARTED' %}
+                     {% if your_children_status == 'NOT_STARTED' %}
                      <strong class="task-finished task-to-do">To do</strong>
-                     {% elif personal_details_status == 'FLAGGED' %}
+                     {% elif your_children_status == 'FLAGGED' %}
                      <strong class="task-finished task-flagged">Flagged</strong>
-                     {% elif personal_details_status == 'COMPLETED' %}
+                     {% elif your_children_status == 'COMPLETED' %}
                      <strong class="task-finished">Reviewed</strong>
                      {% endif %}
                   </a>
@@ -111,7 +111,7 @@
          <tr id="nanny_dbs">
             <td class="task">
                <a href="{% url 'nanny_dbs_summary' %}?id={{application_id}}">
-                  <span class="task-name">Criminal record (DBS) check</span>
+                  <span class="task-name">Criminal record checks</span>
                   {% if dbs_status == 'NOT_STARTED' %}
                   <strong class="task-finished task-to-do">To do</strong>
                   {% elif dbs_status == 'FLAGGED' %}
@@ -150,7 +150,7 @@
 <div class="column-third information-panel">
     <p>
         <b class="bold">Progress:</b>
-        {{review_count}} of 7 sections complete
+        {{ review_count }} of {{ number_of_tasks }} sections complete
     </p>
 
     <p>
