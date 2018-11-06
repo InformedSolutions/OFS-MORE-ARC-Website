@@ -12,7 +12,7 @@ from django.views import View
 from arc_application.models import AdultInHome
 from arc_application.forms.childminder_forms.form import PreviousRegistrationDetailsForm, ChildForm, \
     ChildAddressForm
-from arc_application.forms.childminder_forms.form import AdultInYourHomeForm, ChildInYourHomeForm
+from arc_application.forms.childminder_forms.form import AdultInYourHomeForm, ChildInYourHomeForm, OtherPersonPreviousRegistrationDetailsForm
 from arc_application.magic_link import generate_magic_link
 from arc_application.models import PreviousRegistrationDetails, OtherPersonPreviousRegistrationDetails
 from arc_application.models import ApplicantName, ApplicantPersonalDetails, Application, Arc, ArcComments, ChildcareType, UserDetails
