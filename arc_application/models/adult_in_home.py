@@ -94,7 +94,6 @@ class AdultInHome(models.Model):
             birth_month = str(self.birth_month)
 
         date_of_birth = birth_day + ' ' + birth_month + ' ' + str(self.birth_year)
-        print(self.known_to_council)
         summary_table = [
             {"title": self.get_full_name(), "id": self.pk},
             {"name": "Health questions status", "value": self.health_check_status},
