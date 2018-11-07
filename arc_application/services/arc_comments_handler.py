@@ -40,10 +40,23 @@ class FormSetARCCommentsHandler(ARCCommentsHandler):
     """
     def handle_comments(self, request, form_class, verbose_task_name):
         if hasattr(form_class(), 'management_form'):  # If it is a FormSet instance.
-            for form in form_class(request.POST).forms:
-                return any([self._successor.handle_comments(request, form, verbose_task_name)])
+            if self.has_management_form_data(request):  # If management form data absent, do nothing.
+                for form in form_class(request.POST).forms:
+                    return any([self._successor.handle_comments(request, form, verbose_task_name)])
+            else:
+                pass
         else:
             return self._successor.handle_comments(request, form_class, verbose_task_name)
+
+    @staticmethod
+    def has_management_form_data(request):
+        management_form_data_fields = (
+            'form-TOTAL_FORMS',
+            'form-INITIAL_FORMS',
+            'form-MIN_NUM_FORMS',
+        )
+
+        return all([field in request.POST for field in management_form_data_fields])
 
 
 class ManyToOneARCCommentsHandler(ARCCommentsHandler):
