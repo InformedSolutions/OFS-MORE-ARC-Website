@@ -914,7 +914,7 @@ class OtherPeopleInYourHomeForm(GOVUKForm):
 
     checkboxes = [(adults_in_home_declare, 'adults_in_home'),
                   (children_in_home_declare, 'children_in_home'),
-                  (own_children_not_in_the_home_declare, 'own_children_not_in_the_home'),]
+                  (own_children_not_in_the_home_declare, 'own_children_not_in_the_home'), ]
 
     for box in checkboxes:
         box[0].widget.attrs.update({'data_target': box[1],
@@ -1009,19 +1009,19 @@ class AdultInYourHomeForm(GOVUKForm):
                                                       widget=custom_field_widgets.Textarea,
                                                       required=False, max_length=250)
 
-    lived_abroad_declare  = forms.BooleanField(label='This information is correct',
-                                               widget=custom_field_widgets.CustomCheckboxInput, required=False)
+    lived_abroad_declare = forms.BooleanField(label='This information is correct',
+                                              widget=custom_field_widgets.CustomCheckboxInput, required=False)
     lived_abroad_comments = forms.CharField(label='DBS certificate number',
                                             help_text='(Tip: be clear and concise)',
                                             widget=custom_field_widgets.Textarea,
                                             required=False, max_length=250)
 
-    military_base_declare  = forms.BooleanField(label='This information is correct',
+    military_base_declare = forms.BooleanField(label='This information is correct',
                                                widget=custom_field_widgets.CustomCheckboxInput, required=False)
     military_base_comments = forms.CharField(label='DBS certificate number',
-                                            help_text='(Tip: be clear and concise)',
-                                            widget=custom_field_widgets.Textarea,
-                                            required=False, max_length=250)
+                                             help_text='(Tip: be clear and concise)',
+                                             widget=custom_field_widgets.Textarea,
+                                             required=False, max_length=250)
 
     capita_declare = forms.BooleanField(label='This information is correct',
                                         widget=custom_field_widgets.CustomCheckboxInput, required=False)
@@ -1168,10 +1168,12 @@ class YourChildrenForm(GOVUKForm):
     """
 
     children_living_with_you_declare = forms.BooleanField(label='This information is correct',
-                                         widget=custom_field_widgets.CustomCheckboxInput, required=False)
-    children_living_with_you_comments = forms.CharField(label='Which of your children live with you?', help_text='(Tip: be clear and concise)',
-                                       widget=custom_field_widgets.Textarea,
-                                       required=False, max_length=250)
+                                                          widget=custom_field_widgets.CustomCheckboxInput,
+                                                          required=False)
+    children_living_with_you_comments = forms.CharField(label='Which of your children live with you?',
+                                                        help_text='(Tip: be clear and concise)',
+                                                        widget=custom_field_widgets.Textarea,
+                                                        required=False, max_length=250)
     instance_id = forms.CharField(widget=forms.HiddenInput, required=False)
 
     def __init__(self, *args, **kwargs):
