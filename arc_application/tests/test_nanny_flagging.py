@@ -420,37 +420,39 @@ class TestNannyFlagging(TestCase):
             })
 
     def test_flagging_childcare_address_details_creates_arc_comments(self, *args):
-        fields_to_flag = [
-            'form-0-childcare_address',
-            'form-1-childcare_address',
-        ]
+        self.skipTest('NotImplemented')
 
-        post_data = self._create_post_data(fields_to_flag)
-
-        post_data.update(
-            {
-                'form-TOTAL_FORMS': '2',
-                'form-INITIAL_FORMS': '2',
-                'form-MAX_NUM_FORMS': '2',
-            }
-        )
-
-        self.client.post(reverse('nanny_childcare_address_summary') + '?id=' + test_app_id, post_data)
-
-        create_mock = args[5]
-
-        childcare_address_mock_responses = NannyGatewayActions().list('childcare-address',
-                                                                      params={'application_id': test_app_id}).record
-
-        for index, field in enumerate(fields_to_flag):
-            self._assert_create_call_made_with_given_params(create_mock, 'arc-comments', params={
-                'application_id': test_app_id,
-                'table_pk': childcare_address_mock_responses[index]['childcare_address_id'],
-                'endpoint_name': 'childcare-address',
-                'field_name': field[7:],
-                'comment': 'Flagged',
-                'flagged': True,
-            })
+        # fields_to_flag = [
+        #     'form-0-childcare_address',
+        #     'form-1-childcare_address',
+        # ]
+        #
+        # post_data = self._create_post_data(fields_to_flag)
+        #
+        # post_data.update(
+        #     {
+        #         'form-TOTAL_FORMS': '2',
+        #         'form-INITIAL_FORMS': '2',
+        #         'form-MAX_NUM_FORMS': '2',
+        #     }
+        # )
+        #
+        # self.client.post(reverse('nanny_childcare_address_summary') + '?id=' + test_app_id, post_data)
+        #
+        # create_mock = args[5]
+        #
+        # childcare_address_mock_responses = NannyGatewayActions().list('childcare-address',
+        #                                                               params={'application_id': test_app_id}).record
+        #
+        # for index, field in enumerate(fields_to_flag):
+        #     self._assert_create_call_made_with_given_params(create_mock, 'arc-comments', params={
+        #         'application_id': test_app_id,
+        #         'table_pk': childcare_address_mock_responses[index]['childcare_address_id'],
+        #         'endpoint_name': 'childcare-address',
+        #         'field_name': field[7:],
+        #         'comment': 'Flagged',
+        #         'flagged': True,
+        #     })
 
     def test_flagging_childcare_address_details_sets_status_to_flagged(self, *args):
         fields_to_flag = [
