@@ -1,21 +1,14 @@
 import json
 
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
-from django.conf import settings
 from django.utils.decorators import method_decorator
 from django.views import View
 
-from arc_application.views.nanny_views.nanny_your_children import NannyYourChildrenSummary
-from .nanny_childcare_address import NannyChildcareAddressSummary
-from .nanny_childcare_training import NannyChildcareTrainingSummary
-from .nanny_contact_details import NannyContactDetailsSummary
-from .nanny_dbs_check import NannyDbsCheckSummary
-from .nanny_first_aid import NannyFirstAidTrainingSummary
-from .nanny_insurance_cover import NannyInsuranceCoverSummary
-from .nanny_personal_details import NannyPersonalDetailsSummary
-from ...services.db_gateways import NannyGatewayActions
+from arc_application.views import NannyArcSummary
 from ..base import has_group
+from ...services.db_gateways import NannyGatewayActions
 
 
 @method_decorator(login_required, name='get')
@@ -47,38 +40,17 @@ class NannySearchSummary(View):
 
         application_reference = nanny_application_dict['application_reference']
 
-        contact_details_context = self.try_get_context_data(NannyContactDetailsSummary().create_context, application_id)
-        personal_details_context = self.try_get_context_data(NannyPersonalDetailsSummary().get_context_data,
-                                                             application_id)
-        your_children_context = self.try_get_context_data(NannyYourChildrenSummary().get_context_data,
-                                                          application_id)
-        childcare_address_context = self.try_get_context_data(NannyChildcareAddressSummary().create_context,
-                                                              application_id)
-        first_aid_training_context = self.try_get_context_data(NannyFirstAidTrainingSummary().get_context_data,
-                                                               application_id)
-        childcare_training_context = self.try_get_context_data(NannyChildcareTrainingSummary().get_context_data,
-                                                               application_id)
-        dbs_check_context = self.try_get_context_data(NannyDbsCheckSummary().get_context_data, application_id)
-        insurance_cover_context = self.try_get_context_data(NannyInsuranceCoverSummary().get_context_data,
-                                                            application_id)
+        context_function_list = NannyArcSummary.get_context_function_list(application_id)
 
-        # Custom change_links for each individual field within the context_dict.
-        contact_details_context['search_table'] = True
-        contact_details_context['rows'][0]['change_link'] = 'nanny_update_email_address'
-        contact_details_context['rows'][1]['change_link'] = 'nanny_update_phone_number'
-        contact_details_context['rows'][2]['change_link'] = 'nanny_update_add_number'
+        context_list = [self.try_get_context_data(context_func, application_id) for context_func in
+                        context_function_list if
+                        context_func]
 
-        # Some values in this context_list may be None
-        context_list = [
-            contact_details_context,
-            personal_details_context,
-            your_children_context,
-            childcare_address_context,
-            first_aid_training_context,
-            childcare_training_context,
-            dbs_check_context,
-            insurance_cover_context
-        ]
+        # Custom change_links for each individual field within the contact_details_context, which is assumed to be at index 0.
+        context_list[0]['search_table'] = True
+        context_list[0]['rows'][0]['change_link'] = 'nanny_update_email_address'
+        context_list[0]['rows'][1]['change_link'] = 'nanny_update_phone_number'
+        context_list[0]['rows'][2]['change_link'] = 'nanny_update_add_number'
 
         valid_context_list = [context for context in context_list if context]
 

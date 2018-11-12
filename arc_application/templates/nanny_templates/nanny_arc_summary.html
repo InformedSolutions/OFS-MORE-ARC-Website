@@ -16,11 +16,15 @@
 {% include 'nanny_templates/nanny_summary_tables.html' %}
 {% endfor %}
 {% endwith %}
+
+{% include 'publishing_details_opt_out_table.html' %}
+
 <form method="post">
     {% csrf_token %}
     <input type="submit" class="button" value="Confirm and continue"/>
     <input type="hidden" value="{{application_id}}" name="id"/>
 </form>
+
 {% include 'nanny_templates/nanny_return_to_list.html' %}
 
 {% endblock %}

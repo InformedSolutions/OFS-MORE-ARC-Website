@@ -63,6 +63,7 @@ class NannyChildcareAddressSummary(NannyARCFormView):
         context = {
             'application_id': application_id,
             'title': 'Review: Childcare address',
+            'change_link': 'nanny_childcare_address_summary',
             'rows': [
                 {
                     'id': 'address_to_be_provided',

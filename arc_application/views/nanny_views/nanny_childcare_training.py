@@ -37,6 +37,7 @@ class NannyChildcareTrainingSummary(NannyARCFormView):
             'application_id': application_id,
             'title': 'Review: ' + self.verbose_task_name,
             'form': form,
+            'change_link': 'nanny_childcare_training_summary',
             'rows': [
                 {
                     'id': 'childcare_training',
