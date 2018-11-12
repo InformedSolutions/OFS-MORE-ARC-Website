@@ -17,7 +17,9 @@
 {% endfor %}
 {% endwith %}
 
-{% include 'publishing_details_opt_out_table.html' %}
+{% if publish_details is not None %}
+    {% include 'publishing_details_opt_out_table.html' %}
+{% endif %}
 
 <form method="post">
     {% csrf_token %}

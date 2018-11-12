@@ -34,11 +34,8 @@ class NannySearchSummary(View):
         :param application_id: Reviewed application's id.
         :return: Context dictionary.
         """
-        nanny_actions = NannyGatewayActions()
-        nanny_application_dict = nanny_actions.read('application',
-                                                    params={'application_id': application_id}).record
-
-        application_reference = nanny_application_dict['application_reference']
+        application_reference = NannyArcSummary.get_application_reference(application_id)
+        publish_details = NannyArcSummary.get_publish_details(application_id)
 
         context_function_list = NannyArcSummary.get_context_function_list(application_id)
 
@@ -46,7 +43,8 @@ class NannySearchSummary(View):
                         context_function_list if
                         context_func]
 
-        # Custom change_links for each individual field within the contact_details_context, which is assumed to be at index 0.
+        # Custom change_links for each individual field within the contact_details_context
+        # This context is assumed to be at context_list[0].
         context_list[0]['search_table'] = True
         context_list[0]['rows'][0]['change_link'] = 'nanny_update_email_address'
         context_list[0]['rows'][1]['change_link'] = 'nanny_update_phone_number'
@@ -62,7 +60,8 @@ class NannySearchSummary(View):
             'application_id': application_id,
             'application_reference': application_reference,
             'context_list': valid_context_list,
-            'summary_page': False
+            'summary_page': False,
+            'publish_details': publish_details
         }
 
         return context

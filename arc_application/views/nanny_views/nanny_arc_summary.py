@@ -73,11 +73,10 @@ class NannyArcSummary(View):
         :param application_id: Reviewed application's id.
         :return: Context dictionary.
         """
-        nanny_actions = NannyGatewayActions()
-        nanny_application_dict = nanny_actions.read('application',
-                                                    params={'application_id': application_id}).record
 
-        application_reference = nanny_application_dict['application_reference']
+        application_reference = self.get_application_reference(application_id)
+        publish_details = self.get_publish_details(application_id)
+
         context_function_list = self.get_context_function_list()
 
         context_list = [context_func(application_id) for context_func in context_function_list if context_func]
@@ -86,8 +85,6 @@ class NannyArcSummary(View):
         # FIXME Change each view to use verbose_task_name property instead.
         for context in context_list:
             context['title'] = context['title'][7:]
-
-        publish_details = nanny_application_dict['share_info_declare']
 
         context = {
             'application_id': application_id,
@@ -131,3 +128,17 @@ class NannyArcSummary(View):
         nanny_personal_details_dict = NannyGatewayActions().read('applicant-personal-details',
                                                                  params={'application_id': application_id}).record
         return nanny_personal_details_dict['your_children']
+
+    @staticmethod
+    def get_publish_details(application_id):
+        nanny_actions = NannyGatewayActions()
+        nanny_application_dict = nanny_actions.read('application',
+                                                    params={'application_id': application_id}).record
+        return nanny_application_dict['share_info_declare']
+
+    @staticmethod
+    def get_application_reference(application_id):
+        nanny_actions = NannyGatewayActions()
+        nanny_application_dict = nanny_actions.read('application',
+                                                    params={'application_id': application_id}).record
+        return nanny_application_dict['application_reference']
