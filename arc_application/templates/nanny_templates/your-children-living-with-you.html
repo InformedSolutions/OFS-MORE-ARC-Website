@@ -11,26 +11,31 @@
         </tr>
     </thead>
     <tbody>
-        {% if children_living_with_you_form.children_living_with_applicant_selection_comments != '' and summary_page %} <!-- If there is an existing ARC Comment -->
-        <tr class="error-row">
-            <td colspan="3" class="error-container notice">
-                <i class="icon icon-important">
-                   <span class="visually-hidden">Warning</span>
-                </i>
-                <strong class="bold-small">
-                    {% with children_living_with_you_context=context_list|return_item_by_index:your_children_context_index %}
-                        {{ children_living_with_you_context.children_living_with_you_form.children_living_with_applicant_selection_comments.initial }}
-                    {% endwith %}
-                </strong>
-            </td>
-        </tr>
+        {% if summary_page %}
+            {% with children_living_with_you_context=context_list|return_item_by_index:your_children_context_index %}
+                {% if children_living_with_you_context.children_living_with_you_form.children_living_with_applicant_selection_comments.initial != '' %} <!-- If there is an existing ARC Comment -->
+                    <tr class="error-row">
+                        <td colspan="3" class="error-container notice">
+                            <i class="icon icon-important">
+                               <span class="visually-hidden">Warning</span>
+                            </i>
+                            <strong class="bold-small">
+                                {{ children_living_with_you_context.children_living_with_you_form.children_living_with_applicant_selection_comments.initial }}
+                            </strong>
+                        </td>
+                    </tr>
 
-        <!-- If error, ensure row with data also has appropriate css classes - else just <tr> and <td> -->
-        <tr class="error-row">
-            <td class="error-field-label">
+                    <!-- If error, ensure row with data also has appropriate css classes - else just <tr> and <td> -->
+                    <tr class="error-row">
+                        <td class="error-field-label">
+                {% else %}
+                    <tr>
+                        <td>
+                {% endif %}
+            {% endwith %}
         {% else %}
-        <tr>
-            <td>
+            <tr>
+                <td>
         {% endif %}
                 Which of your children live with you?
             </td>
