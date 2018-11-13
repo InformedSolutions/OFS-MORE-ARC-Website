@@ -76,7 +76,7 @@
                 </div>
             </td>
         </tr>
-        {% if form.date_of_birth_comments != '' and summary_page %} <!-- If there is an existing ARC Comment -->
+        {% if form.date_of_birth_comments.initial != '' and summary_page %} <!-- If there is an existing ARC Comment -->
         <tr class="error-row">
             <td colspan="3" class="error-container notice">
                 <i class="icon icon-important">
