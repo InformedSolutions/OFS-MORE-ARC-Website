@@ -1626,7 +1626,7 @@ class OtherPeoplePreviousAddressManualForm(GOVUKForm):
     postcode = forms.CharField(
         label='Postcode',
         required=True,
-        error_messages={'required': 'Please enter a valid postcode'}
+        error_messages={'required': 'Please enter a postcode'}
     )
 
     def __init__(self, *args, **kwargs):
@@ -1697,18 +1697,6 @@ class OtherPeoplePreviousAddressManualForm(GOVUKForm):
             if len(county) > 50:
                 raise forms.ValidationError('The name of the county must be under 50 characters long')
         return county
-
-    def clean_postcode(self):
-        """
-        Postcode validation
-        :return: string
-        """
-        postcode = self.cleaned_data['postcode']
-        postcode_no_space = postcode.replace(" ", "")
-        postcode_uppercase = postcode_no_space.upper()
-        if re.match(settings.REGEX['POSTCODE_UPPERCASE'], postcode_uppercase) is None:
-            raise forms.ValidationError('Please enter a valid postcode')
-        return postcode
 
 
 class PersonalDetailsPreviousNames(GOVUKForm, ModelForm):
@@ -1801,7 +1789,7 @@ class PersonalDetailsPreviousAddressManualForm(GOVUKForm):
     postcode = forms.CharField(
         label='Postcode',
         required=True,
-        error_messages={'required': 'Please enter a valid postcode'}
+        error_messages={'required': 'Please enter a postcode'}
     )
 
     def __init__(self, *args, **kwargs):
@@ -1872,18 +1860,6 @@ class PersonalDetailsPreviousAddressManualForm(GOVUKForm):
             if len(county) > 50:
                 raise forms.ValidationError('The name of the county must be under 50 characters long')
         return county
-
-    def clean_postcode(self):
-        """
-        Postcode validation
-        :return: string
-        """
-        postcode = self.cleaned_data['postcode']
-        postcode_no_space = postcode.replace(" ", "")
-        postcode_uppercase = postcode_no_space.upper()
-        if re.match(settings.REGEX['POSTCODE_UPPERCASE'], postcode_uppercase) is None:
-            raise forms.ValidationError('Please enter a valid postcode')
-        return postcode
 
 
 class OtherPersonPreviousRegistrationDetailsForm(GOVUKForm):
