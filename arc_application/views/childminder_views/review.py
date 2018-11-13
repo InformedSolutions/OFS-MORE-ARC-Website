@@ -522,7 +522,7 @@ def other_people_initial_population(adult, person_list):
                 if field[-7:] == 'declare':
                     field_name_local = field[:-8]
                     checkbox = (ArcComments.objects.filter(table_pk=table_id).get(field_name=field_name_local)).flagged
-                    temp_dict[field] = checkbox
+                    temp_dict[field] = True
 
             except ArcComments.DoesNotExist:
                 pass

@@ -38,7 +38,7 @@ def other_people_summary(request):
     application_id_local = request.GET.get('id') or request.POST.get('id')
     application = Application.objects.get(pk=application_id_local)
 
-    form = OtherPeopleInYourHomeForm(request.POST, table_keys=[application_id_local], prefix='static')
+    form = OtherPeopleInYourHomeForm(table_keys=[application_id_local], prefix='static')
 
     # Adult data
     adults = AdultInHome.objects.filter(application_id=application_id_local).order_by('adult')
@@ -192,6 +192,7 @@ def other_people_summary(request):
         return render(request, 'childminder_templates/other-people-summary.html', variables)
 
     elif request.method == 'POST':
+        form = OtherPeopleInYourHomeForm(request.POST, table_keys=[application_id_local], prefix='static')
         child_formset = ChildInHomeFormSet(request.POST, prefix='child')
         adult_formset = AdultFormSet(request.POST, prefix='adult')
         own_child_formset = ChildNotInHomeFormSet(request.POST, prefix='own_child_not_in_home')

@@ -1417,7 +1417,6 @@ class ChildInYourHomeForm(GOVUKForm):
 
         return relationship_comments
 
-
 class CommentsForm(GOVUKForm):
     """
     Form for Comments page
