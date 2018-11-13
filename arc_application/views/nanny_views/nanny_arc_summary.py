@@ -77,7 +77,7 @@ class NannyArcSummary(View):
         application_reference = self.get_application_reference(application_id)
         publish_details = self.get_publish_details(application_id)
 
-        context_function_list = self.get_context_function_list()
+        context_function_list = self.get_context_function_list(application_id)
 
         context_list = [context_func(application_id) for context_func in context_function_list if context_func]
 
