@@ -1697,6 +1697,16 @@ class OtherPeoplePreviousAddressManualForm(GOVUKForm):
                 raise forms.ValidationError('The name of the county must be under 50 characters long')
         return county
 
+    def clean_postcode(self):
+        """
+        Town validation
+        :return: string
+        """
+        postcode = self.cleaned_data['postcode']
+        if len(postcode) > 50:
+            raise forms.ValidationError('The name of the town or city must be under 50 characters long')
+        return postcode
+
 
 class PersonalDetailsPreviousNames(GOVUKForm, ModelForm):
     """
@@ -1859,6 +1869,16 @@ class PersonalDetailsPreviousAddressManualForm(GOVUKForm):
             if len(county) > 50:
                 raise forms.ValidationError('The name of the county must be under 50 characters long')
         return county
+
+    def clean_postcode(self):
+        """
+        Town validation
+        :return: string
+        """
+        postcode = self.cleaned_data['postcode']
+        if len(postcode) > 50:
+            raise forms.ValidationError('The postcode must be under 50 characters long')
+        return postcode
 
 
 class OtherPersonPreviousRegistrationDetailsForm(GOVUKForm):
