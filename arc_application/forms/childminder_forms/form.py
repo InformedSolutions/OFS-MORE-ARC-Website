@@ -1704,7 +1704,7 @@ class OtherPeoplePreviousAddressManualForm(GOVUKForm):
         """
         postcode = self.cleaned_data['postcode']
         if len(postcode) > 50:
-            raise forms.ValidationError('The name of the town or city must be under 50 characters long')
+            raise forms.ValidationError('The postcode must be under 50 characters long')
         return postcode
 
 
