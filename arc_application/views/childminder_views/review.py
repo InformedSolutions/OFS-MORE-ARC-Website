@@ -50,7 +50,9 @@ def review(request):
             first_name = applicant_name.first_name
 
     if all_complete(application_id_local, True):
+        personalisation = {'first_name': first_name, 'ref': app_ref}
         accepted_email(email, first_name, app_ref, application_id_local)
+        send_survey_email(email, personalisation, application)
 
         # If successful
         release_application(request, application_id_local, 'ACCEPTED')
@@ -107,6 +109,18 @@ def has_group(user, group_name):
     group = Group.objects.get(name=group_name)
 
     return True if group in user.groups.all() else False
+
+
+def send_survey_email(email, personalisation, application):
+    """
+    Sends an email if
+    :param email: Applicant's email string
+    :param personalisation: Applicant's details dictionary, presumed firstName and ref
+    :param application: Application model instance
+    :return: Void
+    """
+    survey_template_id = '90580388-f10d-440a-b900-4d5f948112a5'
+    send_email(email, personalisation, survey_template_id)
 
 
 # Add personalisation and create template
