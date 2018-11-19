@@ -26,7 +26,7 @@ def __set_your_children_task_status(application_id, section_status):
     """
 
     application = Application.objects.get(pk=application_id)
-    application.your_children_arc_flagged = True
+    application.your_children_arc_flagged = section_status == 'FLAGGED'
     application.your_children_status = section_status
     application.save()
 
