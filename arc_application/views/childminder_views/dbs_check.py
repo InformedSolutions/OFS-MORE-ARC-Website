@@ -4,7 +4,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.views.generic import FormView
 
-from arc_application.childminder_task_util import get_show_people_in_the_home
+from arc_application.childminder_task_util import get_show_people_in_the_home, get_show_references
 from ...forms.childminder_forms.form import DBSCheckForm
 from arc_application.models import Application, Arc, CriminalRecordCheck
 from arc_application.review_util import redirect_selection, request_to_comment, save_comments
@@ -53,7 +53,15 @@ def dbs_check_summary(request):
                 status.save()
 
                 show_people_in_the_home = get_show_people_in_the_home(application_id_local)
-                default = '/people/summary' if show_people_in_the_home else '/references/summary'
+                show_references = get_show_references(application_id_local)
+
+                if show_people_in_the_home:
+                    default = '/people/summary'
+                elif show_references:
+                    default = '/references/summary'
+                else:
+                    default = '/review'
+
                 redirect_link = redirect_selection(request, default)
 
                 return HttpResponseRedirect(settings.URL_PREFIX + redirect_link + '?id=' + application_id_local)

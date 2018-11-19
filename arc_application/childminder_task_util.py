@@ -19,9 +19,24 @@ def get_show_people_in_the_home(app_id):
 
 
 def __get_show_people_in_the_home_no_db(application, childcare_type_record):
+    return __find_in_flagged_fields('people_in_home_arc_flagged', application, childcare_type_record)
+
+
+def get_show_references(app_id):
+    application = get_application(app_id)
+    ctr = get_childcare_type_record(app_id)
+
+    return __get_show_references_no_db(application, ctr)
+
+
+def __get_show_references_no_db(application, childcare_type_record):
+    return __find_in_flagged_fields("references_arc_flagged", application, childcare_type_record)
+
+
+def __find_in_flagged_fields(arc_flagged_str, application, childcare_type_record):
     flagged_fields_to_check = __get_flagged_fields_to_check_no_db(application, childcare_type_record)
 
-    return "people_in_home_arc_flagged" in flagged_fields_to_check
+    return arc_flagged_str in flagged_fields_to_check
 
 
 def get_flagged_fields_to_check(app_id):
@@ -93,7 +108,6 @@ def __get_flagged_fields_to_check_no_db(application, childcare_type_record):
             "first_aid_training_arc_flagged",
             "login_details_arc_flagged",
             "personal_details_arc_flagged",
-            "references_arc_flagged"
         )
     elif not childcare_type_record.zero_to_five and not application.own_children and not application.working_in_other_childminder_home:
         flagged_fields_to_check = (
@@ -104,7 +118,6 @@ def __get_flagged_fields_to_check_no_db(application, childcare_type_record):
             "login_details_arc_flagged",
             "people_in_home_arc_flagged",
             "personal_details_arc_flagged",
-            "references_arc_flagged"
         )
     elif not childcare_type_record.zero_to_five and application.own_children and not application.working_in_other_childminder_home:
         flagged_fields_to_check = (
@@ -115,7 +128,6 @@ def __get_flagged_fields_to_check_no_db(application, childcare_type_record):
             "login_details_arc_flagged",
             "people_in_home_arc_flagged",
             "personal_details_arc_flagged",
-            "references_arc_flagged",
             'your_children_arc_flagged'
         )
     elif childcare_type_record.zero_to_five and not application.own_children and not application.working_in_other_childminder_home:
@@ -138,7 +150,6 @@ def __get_flagged_fields_to_check_no_db(application, childcare_type_record):
             "first_aid_training_arc_flagged",
             "login_details_arc_flagged",
             "personal_details_arc_flagged",
-            "references_arc_flagged",
             'your_children_arc_flagged'
         )
 
@@ -214,7 +225,6 @@ def __get_review_fields_to_check_no_db(application, childcare_type_record):
             'first_aid_review',
             'dbs_review',
             'childcare_training_review',
-            'references_review'
         )
     elif not childcare_type_record.zero_to_five and not application.own_children and not application.working_in_other_childminder_home:
         review_fields_to_check = (
@@ -235,7 +245,6 @@ def __get_review_fields_to_check_no_db(application, childcare_type_record):
             'first_aid_review',
             'dbs_review',
             'childcare_training_review',
-            'references_review',
             'your_children_review',
             'people_in_home_review'
         )
@@ -259,7 +268,6 @@ def __get_review_fields_to_check_no_db(application, childcare_type_record):
             'first_aid_review',
             'dbs_review',
             'childcare_training_review',
-            'references_review',
             'your_children_review'
         )
 
