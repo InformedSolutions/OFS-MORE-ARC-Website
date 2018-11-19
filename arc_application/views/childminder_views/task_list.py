@@ -40,6 +40,7 @@ def task_list(request):
         number_of_tasks = get_number_of_tasks(application, childcare_type_record)
 
         show_people_in_the_home = get_show_people_in_the_home(application_id)
+        show_references = get_show_references(application_id)
 
         # Load review status
         application_status_context = {
@@ -70,7 +71,8 @@ def task_list(request):
             'own_children': application.own_children,
             'working_in_other_childminder_home': application.working_in_other_childminder_home,
             'show_your_children': application.own_children,
-            'show_people_in_the_home': show_people_in_the_home
+            'show_people_in_the_home': show_people_in_the_home,
+            'show_references': show_references
         }
 
     return render(request, 'childminder_templates/task-list.html', application_status_context)
