@@ -6,7 +6,7 @@ from django.forms import formset_factory, modelformset_factory
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 
-
+from arc_application.childminder_task_util import get_show_references
 from ...models.previous_name import PreviousName
 from ...forms.childminder_forms.form import AdultInYourHomeForm, ChildInYourHomeForm, OtherPeopleInYourHomeForm, OtherPersonPreviousNames, \
     ChildForm, ChildAddressForm
@@ -270,7 +270,10 @@ def other_people_summary(request):
             status.people_in_home_review = section_status
             status.save()
             childcare_type = ChildcareType.objects.get(application_id=application_id_local)
-            default = '/references/summary' if childcare_type.zero_to_five else '/review'
+
+            show_references = get_show_references(application_id_local)
+
+            default = '/references/summary' if show_references else '/review'
             redirect_link = redirect_selection(request, default)
 
             return HttpResponseRedirect(settings.URL_PREFIX + redirect_link + '?id=' + application_id_local)
