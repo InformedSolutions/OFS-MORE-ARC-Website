@@ -167,6 +167,8 @@ def personal_details_summary(request):
     childcare_county = applicant_childcare_address_record.county
     childcare_postcode = applicant_childcare_address_record.postcode
 
+    working_in_other_childminder_home = Application.objects.get(pk=application_id_local).working_in_other_childminder_home
+
     application = Application.objects.get(pk=application_id_local)
 
     previous_names = PreviousName.objects.filter(other_person_type=PERSON_TYPE, person_id=application_id_local)
@@ -197,7 +199,8 @@ def personal_details_summary(request):
         'personal_details_status': application.personal_details_status,
         'previous_names': previous_names,
         'previous_addresses': previous_addresses,
-        'own_children': application.own_children
+        'own_children': application.own_children,
+        'working_in_other_childminder_home': working_in_other_childminder_home
     }
 
     try:
