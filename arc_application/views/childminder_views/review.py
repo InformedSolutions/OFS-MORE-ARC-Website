@@ -9,6 +9,7 @@ from django.shortcuts import render
 from django.utils.decorators import method_decorator
 from django.views import View
 
+from arc_application.childminder_task_util import all_complete
 from arc_application.decorators import group_required, user_assigned_application
 from arc_application.forms.childminder_forms.form import AdultInYourHomeForm, ChildInYourHomeForm, \
     OtherPersonPreviousRegistrationDetailsForm

@@ -5,6 +5,7 @@ from django.contrib.auth.models import Group, User
 from django.test import TestCase, RequestFactory
 from django.urls import reverse
 
+from arc_application.childminder_task_util import get_number_of_tasks
 from arc_application.models import (ApplicantHomeAddress,
                       ApplicantName,
                       ApplicantPersonalDetails,
@@ -18,7 +19,6 @@ from arc_application.models import (ApplicantHomeAddress,
                       UserDetails,
                       ChildcareType)
 from ..views.childminder_views.type_of_childcare import get_register_name
-from ..views.childminder_views.review import set_number_of_tasks
 
 application = None
 personal_details = None
@@ -449,9 +449,9 @@ class ArcSummaryTest(TestCase):
         reloaded_application = Application.objects.get(pk=application.application_id)
         self.assertTrue(reloaded_application.references_arc_flagged)
 
-    def test_set_number_of_tasks(self):
+    def test_get_number_of_tasks(self):
         """
-        Tests the set_number_of_tasks function
+        Tests the get_number_of_tasks function
         """
         create_application()
 
@@ -461,7 +461,7 @@ class ArcSummaryTest(TestCase):
         application.working_in_other_childminder_home = True
         application.save()
 
-        number_of_tasks = set_number_of_tasks(application, childcare_type)
+        number_of_tasks = get_number_of_tasks(application, childcare_type)
         self.assertEqual(8, number_of_tasks)
 
         childcare_type.zero_to_five = True
@@ -470,7 +470,7 @@ class ArcSummaryTest(TestCase):
         application.working_in_other_childminder_home = True
         application.save()
 
-        number_of_tasks = set_number_of_tasks(application, childcare_type)
+        number_of_tasks = get_number_of_tasks(application, childcare_type)
         self.assertEqual(9, number_of_tasks)
 
         childcare_type.zero_to_five = True
@@ -479,7 +479,7 @@ class ArcSummaryTest(TestCase):
         application.working_in_other_childminder_home = False
         application.save()
 
-        number_of_tasks = set_number_of_tasks(application, childcare_type)
+        number_of_tasks = get_number_of_tasks(application, childcare_type)
         self.assertEqual(10, number_of_tasks)
 
         childcare_type.zero_to_five = False
@@ -488,7 +488,7 @@ class ArcSummaryTest(TestCase):
         application.working_in_other_childminder_home = True
         application.save()
 
-        number_of_tasks = set_number_of_tasks(application, childcare_type)
+        number_of_tasks = get_number_of_tasks(application, childcare_type)
         self.assertEqual(7, number_of_tasks)
 
         childcare_type.zero_to_five = False
@@ -497,7 +497,7 @@ class ArcSummaryTest(TestCase):
         application.working_in_other_childminder_home = False
         application.save()
 
-        number_of_tasks = set_number_of_tasks(application, childcare_type)
+        number_of_tasks = get_number_of_tasks(application, childcare_type)
         self.assertEqual(8, number_of_tasks)
 
         childcare_type.zero_to_five = False
@@ -506,7 +506,7 @@ class ArcSummaryTest(TestCase):
         application.working_in_other_childminder_home = False
         application.save()
 
-        number_of_tasks = set_number_of_tasks(application, childcare_type)
+        number_of_tasks = get_number_of_tasks(application, childcare_type)
         self.assertEqual(9, number_of_tasks)
 
         childcare_type.zero_to_five = True
@@ -515,7 +515,7 @@ class ArcSummaryTest(TestCase):
         application.working_in_other_childminder_home = False
         application.save()
 
-        number_of_tasks = set_number_of_tasks(application, childcare_type)
+        number_of_tasks = get_number_of_tasks(application, childcare_type)
         self.assertEqual(9, number_of_tasks)
 
         childcare_type.zero_to_five = False
@@ -524,7 +524,7 @@ class ArcSummaryTest(TestCase):
         application.working_in_other_childminder_home = True
         application.save()
 
-        number_of_tasks = set_number_of_tasks(application, childcare_type)
+        number_of_tasks = get_number_of_tasks(application, childcare_type)
         self.assertEqual(8, number_of_tasks)
 
     def test_get_register_name(self):

@@ -295,29 +295,3 @@ def all_complete(app_id, flag):
             return False
 
     return True
-
-
-def all_complete(id, flag):
-    """
-    Check the status of all sections
-    :param id: Application Id
-    :return: True or False depending on whether all sections have been reviewed
-    """
-    if Arc.objects.filter(application_id=id):
-        arc = Arc.objects.get(application_id=id)
-        tasks = [arc.login_details_review, arc.childcare_type_review, arc.personal_details_review,
-                 arc.first_aid_review, arc.childcare_training_review, arc.dbs_review, arc.people_in_home_review]
-        zero_to_five = ChildcareType.objects.get(application_id=id).zero_to_five
-        if zero_to_five:
-            tasks.append(arc.health_review)
-            tasks.append(arc.references_review)
-        application = Application.objects.get(application_id=id)
-        if application.own_children is True:
-            tasks.append(arc.your_children_review)
-
-        for i in tasks:
-
-            if (i == 'NOT_STARTED' and not flag) or (i != 'COMPLETED' and flag):
-                return False
-
-        return True
