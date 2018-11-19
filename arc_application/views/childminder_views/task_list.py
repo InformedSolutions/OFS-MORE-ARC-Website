@@ -69,7 +69,7 @@ def task_list(request):
             'number_of_tasks': number_of_tasks,
             'own_children': application.own_children,
             'working_in_other_childminder_home': application.working_in_other_childminder_home,
-            'show_own_children': application.own_children,
+            'show_your_children': application.own_children,
             'show_people_in_the_home': show_people_in_the_home
         }
 
