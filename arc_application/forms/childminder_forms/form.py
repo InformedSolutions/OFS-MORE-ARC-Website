@@ -1465,10 +1465,10 @@ class SearchForm(GOVUKForm):
     dob_search_field = forms.CharField(label='Date of birth', required=False, help_text='e.g. 31 03 1980')
     home_postcode_search_field = forms.CharField(label='Home postcode', required=False)
     care_location_postcode_search_field = forms.CharField(label='Work postcode', required=False)
-    application_type_dropdown_search_field = forms.ChoiceField(label='Application type',
-                                                               choices=choices,
-                                                               required=False,
-                                                               widget=Select)
+    # application_type_dropdown_search_field = forms.ChoiceField(label='Application type',
+    #                                                            choices=choices,
+    #                                                            required=False,
+    #                                                            widget=Select)
 
     def __init__(self, *args, **kwargs):
         """
