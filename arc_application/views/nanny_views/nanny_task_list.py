@@ -71,7 +71,7 @@ class NannyTaskList(View):
             'birth_day': int(birth_list[2]),
             'birth_month': int(birth_list[1]),
             'birth_year': int(birth_list[0]),
-            'all_complete': nanny_all_reviewed(arc_application, request),
+            'all_complete': nanny_all_reviewed(arc_application, application_id),
             'show_your_children': show_your_children
         }
 
