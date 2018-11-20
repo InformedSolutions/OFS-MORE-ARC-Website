@@ -39,7 +39,7 @@ def get_your_children_status(application_id):
                                                     params={'application_id': application_id}).record['your_children']
         return your_children_record
 
-    except:
+    except AttributeError:
         return False
 
 
