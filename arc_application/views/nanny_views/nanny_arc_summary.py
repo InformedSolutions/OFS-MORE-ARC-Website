@@ -47,7 +47,7 @@ class NannyArcSummary(View):
                                  'first_name': nanny_personal_details['first_name'],
                                  'ref': nanny_application['application_reference']}
 
-        no_flags_exist = nanny_all_completed(arc_application)
+        no_flags_exist = nanny_all_completed(arc_application, request)
 
         if no_flags_exist:
             send_accepted_email(**email_personalisation)
