@@ -28,6 +28,7 @@ class NannyHelperTests(TestCase):
             'childcare_training_review': 'COMPLETED',
             'dbs_review': 'FLAGGED',
             'insurance_cover_review': 'COMPLETED',
+            'your_children_review': 'FLAGGED',
         }
 
         self.mock_arc_application_all_flagged = {
@@ -42,6 +43,7 @@ class NannyHelperTests(TestCase):
             'childcare_training_review': 'FLAGGED',
             'dbs_review': 'FLAGGED',
             'insurance_cover_review': 'FLAGGED',
+            'your_children_review': 'FLAGGED'
         }
 
         self.mock_arc_application_all_completed = {
@@ -56,6 +58,7 @@ class NannyHelperTests(TestCase):
             'childcare_training_review': 'COMPLETED',
             'dbs_review': 'COMPLETED',
             'insurance_cover_review': 'COMPLETED',
+            'your_children_review': 'COMPLETED'
         }
 
     @tag('unit')
