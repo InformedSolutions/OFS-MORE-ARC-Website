@@ -11,36 +11,39 @@ def parse_date_of_birth(dob_str):
     return dob_str.split('-')
 
 
-def nanny_all_completed(arc_application):
+def nanny_all_completed(arc_application, application_id):
     """
     Returns a boolean representing if all tasks have been reviewed AND marked as 'COMPLETED'.
     :param arc_application: A direct reference to an arc_application.
     :return: Boolean only.
     """
-    return check_all_task_statuses(arc_application, ['COMPLETED'])
+    return check_all_task_statuses(arc_application, application_id, ['COMPLETED'])
 
 
-def nanny_all_reviewed(arc_application):
+def nanny_all_reviewed(arc_application, application_id):
     """
     Returns a boolean representing if all tasks have been reviewed AND marked as 'COMPLETED'.
     :param arc_application: A direct reference to an arc_application.
     :return: Boolean only.
     """
-    return check_all_task_statuses(arc_application, ['FLAGGED', 'COMPLETED'])
+    return check_all_task_statuses(arc_application, application_id, ['FLAGGED', 'COMPLETED'])
 
 
-def get_your_children_status(arc_application):
+def get_your_children_status(application_id):
     """
     Helper function to check if the application contains the 'Your children' task
     :return: True or False depending on if the task is activated
     """
-    # use arc application to get children status
-    if arc_application.your_children_review == 'True':
-        return True
-    return False
+    try:
+        your_children_record = NannyGatewayActions().read('applicant-personal-details',
+                                                    params={'application_id': application_id}).record['your_children']
+        return your_children_record
+
+    except:
+        return False
 
 
-def check_all_task_statuses(arc_application, status_list):
+def check_all_task_statuses(arc_application, application_id, status_list):
     """
     Iterates through the arc_application task's statuses and compares each task status to a given status.
     :param arc_application: A direct reference to an arc_application.
@@ -57,12 +60,11 @@ def check_all_task_statuses(arc_application, status_list):
                   arc_application.insurance_cover_review,
                   ]
 
-    if get_your_children_status(arc_application):
-        field_list.append(arc_application.your_children_review,)
-    
+    if get_your_children_status(application_id):
+        field_list.append(arc_application.your_children_review, )
+
     for i in field_list:
         if i not in status_list:
             return False
-    
-    return True
 
+    return True
