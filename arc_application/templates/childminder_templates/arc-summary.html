@@ -16,6 +16,12 @@
 {% include 'childminder_templates/summary_tables.html' %}
 {% endfor %}
 {% endwith %}
+
+{% if publish_details is not None %}
+    {% include 'publishing_details_opt_out_table.html' %}
+{% endif %}
+
+
 <form method="post">
     {% csrf_token %}
     <input type="submit" class="button" value="Confirm and continue"/>

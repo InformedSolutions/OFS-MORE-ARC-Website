@@ -381,12 +381,12 @@ class TestNannyFlagging(TestCase):
 
     def test_not_flagging_your_children_details_sets_status_to_reviewed(self, *args):
         self.client.post(reverse('nanny_your_children_summary') + '?id=' + test_app_id,
-                                    data={
-                                        'id': test_app_id,
-                                        'form-TOTAL_FORMS': '2',
-                                        'form-INITIAL_FORMS': '2',
-                                        'form-MAX_NUM_FORMS': '2',
-                                    })
+                         data={
+                             'id': test_app_id,
+                             'form-TOTAL_FORMS': '2',
+                             'form-INITIAL_FORMS': '2',
+                             'form-MAX_NUM_FORMS': '2',
+                         })
 
         self.assertEqual(Arc.objects.get(pk=test_app_id).your_children_review, 'COMPLETED')
 

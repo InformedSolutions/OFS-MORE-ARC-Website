@@ -1,12 +1,12 @@
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
-from django.views import View
 from django.utils.decorators import method_decorator
+from django.views import View
 
-from arc_application.services.db_gateways import IdentityGatewayActions
 from arc_application.models import Arc
 from arc_application.review_util import build_url
+from arc_application.services.db_gateways import IdentityGatewayActions
 
 
 @method_decorator(login_required, name='get')
@@ -17,7 +17,6 @@ class NannyContactDetailsSummary(View):
     REDIRECT_NAME = 'nanny_personal_details_summary'
 
     def get(self, request):
-
         # Get application ID
         application_id = request.GET["id"]
 
@@ -26,7 +25,6 @@ class NannyContactDetailsSummary(View):
         return render(request, self.TEMPLATE_NAME, context=context)
 
     def post(self, request):
-
         # Get application ID
         application_id = request.POST["id"]
 
@@ -39,7 +37,8 @@ class NannyContactDetailsSummary(View):
 
         return HttpResponseRedirect(redirect_address)
 
-    def create_context(self, application_id):
+    @staticmethod
+    def create_context(application_id):
         """
         Creates the context dictionary for this view.
         :param application_id: Reviewed application's id.
@@ -59,7 +58,7 @@ class NannyContactDetailsSummary(View):
         context = {
             'application_id': application_id,
             'title': 'Review: Your sign in details',
-            # 'form': '',
+            'change_link': 'nanny_contact_summary',
             'rows': [
                 {
                     'id': 'email',

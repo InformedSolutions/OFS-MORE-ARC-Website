@@ -1,9 +1,8 @@
-from arc_application.review_util import build_url
+import datetime
+
+from .nanny_form_view import NannyARCFormView
 from ...forms.nanny_forms.nanny_form_builder import HomeAddressForm, PersonalDetailsForm
 from ...services.db_gateways import NannyGatewayActions
-from .nanny_form_view import NannyARCFormView
-
-from arc_application.services.nanny_view_helpers import parse_date_of_birth
 
 
 class NannyPersonalDetailsSummary(NannyARCFormView):
@@ -12,33 +11,16 @@ class NannyPersonalDetailsSummary(NannyARCFormView):
     verbose_task_name = 'Your personal details'
     form_class = [PersonalDetailsForm, HomeAddressForm]
 
-    def month_converter(self, dob_string):
+    @staticmethod
+    def month_converter(dob_string):
         """
         Converts a numerical month into the related string month.
-        :param dob_string: a Date Of Birth string in the format 'DD-MM-YYYY'
+        :param dob_string: a Date Of Birth string in the format 'YYYY-MM-DD'
         :return: a DOB string in format 'DD-Month-YYYY'
         """
+        birth_datetime = datetime.datetime.strptime(dob_string, '%Y-%m-%d')
 
-        # TODO: This could be done more simply with a DateTime object
-
-        month_list = ["Jan",
-                      "Feb",
-                      "Mar",
-                      "Apr",
-                      "May",
-                      "Jun",
-                      "Jul",
-                      "Aug",
-                      "Sep",
-                      "Oct",
-                      "Nov",
-                      "Dec"]
-
-        birth_year, birth_month, birth_day = parse_date_of_birth(dob_string)
-
-        month = month_list[int(birth_month) - 1]
-
-        return "{0} {1} {2}".format(birth_day, month, birth_year)
+        return birth_datetime.strftime('%d %b %Y')
 
     def get_context_data(self, application_id):
         """
@@ -78,6 +60,7 @@ class NannyPersonalDetailsSummary(NannyARCFormView):
         context = {
             'application_id': application_id,
             'title': 'Review: ' + self.verbose_task_name,
+            'change_link': 'nanny_personal_details_summary',
             'rows': [
                 {
                     'id': 'name',

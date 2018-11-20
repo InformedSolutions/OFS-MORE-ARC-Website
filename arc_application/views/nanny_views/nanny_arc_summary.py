@@ -47,7 +47,7 @@ class NannyArcSummary(View):
                                  'first_name': nanny_personal_details['first_name'],
                                  'ref': nanny_application['application_reference']}
 
-        no_flags_exist = nanny_all_completed(arc_application)
+        no_flags_exist = nanny_all_completed(arc_application, request)
 
         if no_flags_exist:
             send_accepted_email(**email_personalisation)
@@ -73,42 +73,16 @@ class NannyArcSummary(View):
         :param application_id: Reviewed application's id.
         :return: Context dictionary.
         """
-        nanny_actions = NannyGatewayActions()
-        nanny_application_dict = nanny_actions.read('application',
-                                                    params={'application_id': application_id}).record
 
-        application_reference = nanny_application_dict['application_reference']
+        application_reference = self.get_application_reference(application_id)
+        publish_details = self.get_publish_details(application_id)
 
-        contact_details_context = NannyContactDetailsSummary().create_context(application_id)
-        personal_details_context = NannyPersonalDetailsSummary().get_context_data(application_id)
-        your_children_context = NannyYourChildrenSummary().get_context_data(application_id)
-        childcare_address_context = NannyChildcareAddressSummary().get_context_data(application_id)
-        first_aid_training_context = NannyFirstAidTrainingSummary().get_context_data(application_id)
-        childcare_training_context = NannyChildcareTrainingSummary().get_context_data(application_id)
-        dbs_check_context = NannyDbsCheckSummary().get_context_data(application_id)
-        insurance_cover_context = NannyInsuranceCoverSummary().get_context_data(application_id)
+        context_function_list = self.get_context_function_list(application_id)
 
-        contact_details_context['change_link'] = 'nanny_contact_summary'
-        personal_details_context['change_link'] = 'nanny_personal_details_summary'
-        your_children_context['change_link'] = 'nanny_your_children_summary'
-        childcare_address_context['change_link'] = 'nanny_childcare_address_summary'
-        first_aid_training_context['change_link'] = 'nanny_first_aid_training_summary'
-        childcare_training_context['change_link'] = 'nanny_childcare_training_summary'
-        dbs_check_context['change_link'] = 'nanny_dbs_summary'
-        insurance_cover_context['change_link'] = 'nanny_insurance_cover_summary'
-
-        context_list = [
-            contact_details_context,
-            personal_details_context,
-            your_children_context,
-            childcare_address_context,
-            first_aid_training_context,
-            childcare_training_context,
-            dbs_check_context,
-            insurance_cover_context
-        ]
+        context_list = [context_func(application_id) for context_func in context_function_list if context_func]
 
         # Remove 'Review: ' from page titles.
+        # FIXME Change each view to use verbose_task_name property instead.
         for context in context_list:
             context['title'] = context['title'][7:]
 
@@ -119,7 +93,52 @@ class NannyArcSummary(View):
             'html_title': 'Application summary',
             'context_list': context_list,
             'summary_page': True,
-            'your_children_context_index': 2
+            'your_children_context_index': 2,
+            'publish_details': publish_details
         }
 
         return context
+
+    @staticmethod
+    def get_context_function_list(application_id):
+        """
+        A method to return the contexts to be rendered on the master summary page.
+        :return: A list of functions that can be called with application_id to return a context dictionary.
+        """
+        show_your_children = NannyArcSummary.get_show_your_children(application_id)
+
+        return [
+            NannyContactDetailsSummary.create_context,
+            NannyPersonalDetailsSummary().get_context_data,
+            NannyYourChildrenSummary().get_context_data if show_your_children else None,
+            NannyChildcareAddressSummary().get_context_data,
+            NannyFirstAidTrainingSummary().get_context_data,
+            NannyChildcareTrainingSummary().get_context_data,
+            NannyDbsCheckSummary().get_context_data,
+            NannyInsuranceCoverSummary().get_context_data
+        ]
+
+    @staticmethod
+    def get_show_your_children(application_id):
+        """
+        A method to return the condition on which to show the your_children task as part of the summary.
+        :return: A boolean True if the your_children summary should be shown.
+        Optional TODO: Relocate this function to a routing helper file.
+        """
+        nanny_personal_details_dict = NannyGatewayActions().read('applicant-personal-details',
+                                                                 params={'application_id': application_id}).record
+        return nanny_personal_details_dict['your_children']
+
+    @staticmethod
+    def get_publish_details(application_id):
+        nanny_actions = NannyGatewayActions()
+        nanny_application_dict = nanny_actions.read('application',
+                                                    params={'application_id': application_id}).record
+        return nanny_application_dict['share_info_declare']
+
+    @staticmethod
+    def get_application_reference(application_id):
+        nanny_actions = NannyGatewayActions()
+        nanny_application_dict = nanny_actions.read('application',
+                                                    params={'application_id': application_id}).record
+        return nanny_application_dict['application_reference']

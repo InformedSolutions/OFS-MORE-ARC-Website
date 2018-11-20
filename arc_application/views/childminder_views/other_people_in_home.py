@@ -6,7 +6,7 @@ from django.forms import formset_factory, modelformset_factory
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 
-
+from arc_application.childminder_task_util import get_show_references
 from ...models.previous_name import PreviousName
 from ...forms.childminder_forms.form import AdultInYourHomeForm, ChildInYourHomeForm, OtherPeopleInYourHomeForm, OtherPersonPreviousNames, \
     ChildForm, ChildAddressForm
@@ -38,7 +38,7 @@ def other_people_summary(request):
     application_id_local = request.GET.get('id') or request.POST.get('id')
     application = Application.objects.get(pk=application_id_local)
 
-    form = OtherPeopleInYourHomeForm(request.POST, table_keys=[application_id_local], prefix='static')
+    form = OtherPeopleInYourHomeForm(table_keys=[application_id_local], prefix='static')
 
     # Adult data
     adults = AdultInHome.objects.filter(application_id=application_id_local).order_by('adult')
@@ -192,6 +192,7 @@ def other_people_summary(request):
         return render(request, 'childminder_templates/other-people-summary.html', variables)
 
     elif request.method == 'POST':
+        form = OtherPeopleInYourHomeForm(request.POST, table_keys=[application_id_local], prefix='static')
         child_formset = ChildInHomeFormSet(request.POST, prefix='child')
         adult_formset = AdultFormSet(request.POST, prefix='adult')
         own_child_formset = ChildNotInHomeFormSet(request.POST, prefix='own_child_not_in_home')
@@ -269,7 +270,10 @@ def other_people_summary(request):
             status.people_in_home_review = section_status
             status.save()
             childcare_type = ChildcareType.objects.get(application_id=application_id_local)
-            default = '/references/summary' if childcare_type.zero_to_five else '/review'
+
+            show_references = get_show_references(application_id_local)
+
+            default = '/references/summary' if show_references else '/review'
             redirect_link = redirect_selection(request, default)
 
             return HttpResponseRedirect(settings.URL_PREFIX + redirect_link + '?id=' + application_id_local)

@@ -30,6 +30,10 @@
 {% endfor %}
 {% endwith %}
 
+{% if publish_details is not None %}
+    {% include 'publishing_details_opt_out_table.html' %}
+{% endif %}
+
  <form method="get" action="/arc/search">
      <input type="submit" class="button" value="Continue"/>
  </form>

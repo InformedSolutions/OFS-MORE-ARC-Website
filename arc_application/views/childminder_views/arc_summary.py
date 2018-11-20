@@ -5,10 +5,10 @@ from django.shortcuts import render
 from django.urls import reverse
 from timeline_logger.models import TimelineLog
 
-from arc_application.summary_page_data import link_dict
-from arc_application.models import *
-from .review import review, has_group
 from arc_application.decorators import group_required, user_assigned_application
+from arc_application.models import *
+from arc_application.summary_page_data import link_dict
+from .review import review, has_group
 
 """
     to merge multiple models inside a table, represent them as a list within the ordered_models list.
@@ -86,11 +86,15 @@ def arc_summary(request):
             ordered_models.append(Reference)
         json = load_json(application_id_local, ordered_models, False)
         json = add_comments(json, application_id_local)
-        application_reference = Application.objects.get(pk=application_id_local).application_reference
+
+        application_reference = application.application_reference
+        publish_details = application.publish_details
+
         variables = {
             'json': json,
             'application_id': application_id_local,
-            'application_reference': application_reference
+            'application_reference': application_reference,
+            'publish_details': publish_details
         }
         return render(request, 'childminder_templates/arc-summary.html', variables)
 
@@ -100,6 +104,7 @@ def arc_summary(request):
         status.declaration_review = 'COMPLETED'
         status.save()
         return review(request)
+
 
 @login_required
 def cc_summary(request):
@@ -132,11 +137,14 @@ def cc_summary(request):
             extra_data={'user_type': user_type, 'entity': 'application', 'action': "viewed"}
         )
 
+        publish_details = application.publish_details
+
         variables = {
             'json': json,
             'application_id': application_id_local,
             'application_reference': application.application_reference or None,
-            'cc_user': cc_user
+            'cc_user': cc_user,
+            'publish_details': publish_details
         }
         return render(request, 'childminder_templates/search-summary.html', variables)
 
@@ -233,7 +241,7 @@ def load_json(application_id_local, ordered_models, recurse):
             # If personal address has not yet been supplied by the applicant, continue loop to avoid exception being
             # raised when fetching record
             if not ApplicantHomeAddress.objects.filter(application_id=application_id_local,
-                                                                   current_address=True).exists():
+                                                       current_address=True).exists():
                 continue
 
             home_address_record = ApplicantHomeAddress.objects.get(application_id=application_id_local,
@@ -289,47 +297,49 @@ def load_json(application_id_local, ordered_models, recurse):
                      'pk': application_id_local, "index": 1}
                 ])
 
-                # Create a table for Your children's addresses
-                children_living_with_childminder = Child.objects.filter(application_id=application_id_local,
-                                                                        lives_with_childminder=True).order_by('child')
-                children = []
+                if own_children:
 
-                for child in children_living_with_childminder:
-                    children.append(child.get_full_name())
+                    # Create a table for Your children's addresses
+                    children_living_with_childminder = Child.objects.filter(application_id=application_id_local,
+                                                                            lives_with_childminder=True).order_by('child')
+                    children = []
 
-                children_string = ', '.join(children)
+                    for child in children_living_with_childminder:
+                        children.append(child.get_full_name())
 
-                table_list.append([
-                    {"title": "Your children's addresses", "id": application_id_local},
-                    {"name": "Which of your children live with you?", "value": children_string,
-                     'pk': application_id_local, "index": 1}
-                ])
-                # Create tables for each child
-                all_children = Child.objects.filter(application_id=application_id_local).order_by('child')
-                for child in all_children:
-                    name = child.get_full_name()
-                    if child.birth_day < 10:
-                        birth_day = '0' + str(child.birth_day)
-                    else:
-                        birth_day = str(child.birth_day)
-                    if child.birth_month < 10:
-                        birth_month = '0' + str(child.birth_month)
-                    else:
-                        birth_month = str(child.birth_month)
-                    date_of_birth = birth_day + ' ' + birth_month + ' ' + str(child.birth_year)
-
-                    child_address_record = ChildAddress.objects.get(application_id=application_id_local,
-                                                                    child=child.child)
-                    child_address = get_address(child_address_record.street_line1,
-                                                child_address_record.street_line2, child_address_record.town,
-                                                child_address_record.postcode)
+                    children_string = ', '.join(children)
 
                     table_list.append([
-                        {"title": name, "id": "Child"},
-                        {"name": "Name", "value": name, 'pk': child.pk, "index": 1},
-                        {"name": "Date of birth", "value": date_of_birth, 'pk': child.pk, "index": 2},
-                        {"name": "Address", "value": child_address, 'pk': child_address_record.pk, "index": 3}
+                        {"title": "Your children's addresses", "id": application_id_local},
+                        {"name": "Which of your children live with you?", "value": children_string,
+                         'pk': application_id_local, "index": 1}
                     ])
+                    # Create tables for each child
+                    all_children = Child.objects.filter(application_id=application_id_local).order_by('child')
+                    for child in all_children:
+                        name = child.get_full_name()
+                        if child.birth_day < 10:
+                            birth_day = '0' + str(child.birth_day)
+                        else:
+                            birth_day = str(child.birth_day)
+                        if child.birth_month < 10:
+                            birth_month = '0' + str(child.birth_month)
+                        else:
+                            birth_month = str(child.birth_month)
+                        date_of_birth = birth_day + ' ' + birth_month + ' ' + str(child.birth_year)
+
+                        child_address_record = ChildAddress.objects.get(application_id=application_id_local,
+                                                                        child=child.child)
+                        child_address = get_address(child_address_record.street_line1,
+                                                    child_address_record.street_line2, child_address_record.town,
+                                                    child_address_record.postcode)
+
+                        table_list.append([
+                            {"title": name, "id": "Child"},
+                            {"name": "Name", "value": name, 'pk': child.pk, "index": 1},
+                            {"name": "Date of birth", "value": date_of_birth, 'pk': child.pk, "index": 2},
+                            {"name": "Address", "value": child_address, 'pk': child_address_record.pk, "index": 3}
+                        ])
 
         elif model == CriminalRecordCheck:
 
@@ -362,7 +372,6 @@ def load_json(application_id_local, ordered_models, recurse):
 
             # Only show People in the home tables when applicant is not working in another childminder's home
             if application.working_in_other_childminder_home is False:
-
                 table_list.append(application.get_summary_table_child())
 
         elif model == Child:

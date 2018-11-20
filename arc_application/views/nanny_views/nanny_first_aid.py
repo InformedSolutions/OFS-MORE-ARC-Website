@@ -32,6 +32,7 @@ class NannyFirstAidTrainingSummary(NannyARCFormView):
         context = {
             'application_id': application_id,
             'title': 'Review: ' + self.verbose_task_name,
+            'change_link': 'nanny_first_aid_training_summary',
             'form': form,
             'rows': [
                 {

@@ -29,6 +29,7 @@ class NannyInsuranceCoverSummary(NannyARCFormView):
             'application_id': application_id,
             'title': 'Review: ' + self.verbose_task_name,
             'form': form,
+            'change_link': 'nanny_insurance_cover_summary',
             'rows': [
                 {
                     'id': 'public_liability',

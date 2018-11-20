@@ -40,6 +40,7 @@ class NannyDbsCheckSummary(NannyARCFormView):
             'application_id': application_id,
             'title': 'Review: ' + self.verbose_task_name,
             'form': form,
+            'change_link': 'nanny_dbs_summary',
             'rows': [
                 {
                     'id': 'lived_abroad',

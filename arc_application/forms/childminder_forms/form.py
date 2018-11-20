@@ -1417,7 +1417,6 @@ class ChildInYourHomeForm(GOVUKForm):
 
         return relationship_comments
 
-
 class CommentsForm(GOVUKForm):
     """
     Form for Comments page
@@ -1626,7 +1625,7 @@ class OtherPeoplePreviousAddressManualForm(GOVUKForm):
     postcode = forms.CharField(
         label='Postcode',
         required=True,
-        error_messages={'required': 'Please enter a valid postcode'}
+        error_messages={'required': 'Please enter a postcode'}
     )
 
     def __init__(self, *args, **kwargs):
@@ -1700,14 +1699,12 @@ class OtherPeoplePreviousAddressManualForm(GOVUKForm):
 
     def clean_postcode(self):
         """
-        Postcode validation
+        Town validation
         :return: string
         """
         postcode = self.cleaned_data['postcode']
-        postcode_no_space = postcode.replace(" ", "")
-        postcode_uppercase = postcode_no_space.upper()
-        if re.match(settings.REGEX['POSTCODE_UPPERCASE'], postcode_uppercase) is None:
-            raise forms.ValidationError('Please enter a valid postcode')
+        if len(postcode) > 50:
+            raise forms.ValidationError('The postcode must be under 50 characters long')
         return postcode
 
 
@@ -1801,7 +1798,7 @@ class PersonalDetailsPreviousAddressManualForm(GOVUKForm):
     postcode = forms.CharField(
         label='Postcode',
         required=True,
-        error_messages={'required': 'Please enter a valid postcode'}
+        error_messages={'required': 'Please enter a postcode'}
     )
 
     def __init__(self, *args, **kwargs):
@@ -1875,14 +1872,12 @@ class PersonalDetailsPreviousAddressManualForm(GOVUKForm):
 
     def clean_postcode(self):
         """
-        Postcode validation
+        Town validation
         :return: string
         """
         postcode = self.cleaned_data['postcode']
-        postcode_no_space = postcode.replace(" ", "")
-        postcode_uppercase = postcode_no_space.upper()
-        if re.match(settings.REGEX['POSTCODE_UPPERCASE'], postcode_uppercase) is None:
-            raise forms.ValidationError('Please enter a valid postcode')
+        if len(postcode) > 50:
+            raise forms.ValidationError('The postcode must be under 50 characters long')
         return postcode
 
 

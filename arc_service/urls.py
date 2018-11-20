@@ -21,7 +21,8 @@ from arc_application.views.childminder_views.other_people_addresses import addre
 from arc_application.views.childminder_views.other_people_in_home import other_people_summary, add_previous_name
 from arc_application.views.childminder_views.personal_details import personal_details_summary, add_applicant_previous_name
 from arc_application.views.childminder_views.references import references_summary
-from arc_application.views.childminder_views import review, task_list, PreviousRegistrationDetailsView, OtherPersonPreviousRegistrationDetailsView
+from arc_application.views.childminder_views import review, PreviousRegistrationDetailsView, OtherPersonPreviousRegistrationDetailsView
+from arc_application.views.childminder_views.task_list import task_list
 from arc_application.views.childminder_views.type_of_childcare import type_of_childcare_age_groups
 from arc_application.views.childminder_views.arc_summary import arc_summary
 from arc_application.views.contact_centre.change_details import UpdateEmailView, UpdatePhoneNumberView, \

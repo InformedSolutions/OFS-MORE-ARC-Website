@@ -77,7 +77,7 @@
                {% endif %}
             </td>
          </tr>
-         {% if own_children == True %}
+         {% if show_your_children %}
          <tr id="your_children">
             <td class="task">
                {% if your_children_status == 'NOT_STARTED' %}
@@ -183,29 +183,29 @@
                {% endif %}
             </td>
          </tr>
-         {% if working_in_other_childminder_home == False %}
+         {% if show_people_in_the_home %}
          <tr id="other_people">
             <td class="task">
                {% if people_in_home_status == 'NOT_STARTED' %}
                <a href="{% url 'other_people_summary' %}?id={{application_id}}">
-               <span class="task-name">People in your home</span>
+               <span class="task-name">People in the home</span>
                <strong class="task-finished task-to-do">To do</strong>
                </a>
                {% elif people_in_home_status == 'FLAGGED' %}
                <a href="{% url 'other_people_summary' %}?id={{application_id}}">
-               <span class="task-name">People in your home</span>
+               <span class="task-name">People in the home</span>
                <strong class="task-finished task-flagged">Flagged</strong>
                </a>
                {% elif people_in_home_status == 'COMPLETED' %}
                <a href="{% url 'other_people_summary' %}?id={{application_id}}">
-               <span class="task-name">People in your home</span>
+               <span class="task-name">People in the home</span>
                <strong class="task-finished">Reviewed</strong>
                </a>
                {% endif %}
             </td>
          </tr>
          {% endif %}
-         {% if zero_to_five %}
+         {% if show_references %}
             <tr id="references">
                <td class="task">
                   {% if reference_status == 'NOT_STARTED' %}

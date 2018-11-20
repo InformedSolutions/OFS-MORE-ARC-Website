@@ -13,9 +13,9 @@
     <div class="column-two-thirds">
         <div class="grid-row">
             <h1 class="heading-large">Application summary</h1>
-           <h2 class="heading-medium">
-              Application number: {{ application_reference | default_if_none:"N/A" }}
-           </h2>
+            <h2 class="heading-medium">
+                Application number: {{ application_reference | default_if_none:"N/A" }}
+            </h2>
         </div>
     </div>
 
@@ -33,9 +33,13 @@
 {% endfor %}
 {% endwith %}
 
- <form method="get" action="/arc/search">
-        <input type="submit" class="button" value="Continue"/>
-    </form>
+{% if publish_details is not None %}
+    {% include 'publishing_details_opt_out_table.html' %}
+{% endif %}
+
+<form method="get" action="/arc/search">
+    <input type="submit" class="button" value="Continue"/>
+</form>
 
 {% endblock %}
 

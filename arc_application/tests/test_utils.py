@@ -21,7 +21,8 @@ mock_nanny_application = {
     'criminal_record_check_arc_flagged': False,
     'insurance_cover_status': 'COMPLETED',
     'insurance_cover_arc_flagged': False,
-    'application_reference': 'NA'
+    'application_reference': 'NA',
+    'share_info_declare': True
 }
 
 mock_personal_details_record = {
