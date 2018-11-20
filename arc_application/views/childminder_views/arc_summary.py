@@ -297,47 +297,49 @@ def load_json(application_id_local, ordered_models, recurse):
                      'pk': application_id_local, "index": 1}
                 ])
 
-                # Create a table for Your children's addresses
-                children_living_with_childminder = Child.objects.filter(application_id=application_id_local,
-                                                                        lives_with_childminder=True).order_by('child')
-                children = []
+                if own_children:
 
-                for child in children_living_with_childminder:
-                    children.append(child.get_full_name())
+                    # Create a table for Your children's addresses
+                    children_living_with_childminder = Child.objects.filter(application_id=application_id_local,
+                                                                            lives_with_childminder=True).order_by('child')
+                    children = []
 
-                children_string = ', '.join(children)
+                    for child in children_living_with_childminder:
+                        children.append(child.get_full_name())
 
-                table_list.append([
-                    {"title": "Your children's addresses", "id": application_id_local},
-                    {"name": "Which of your children live with you?", "value": children_string,
-                     'pk': application_id_local, "index": 1}
-                ])
-                # Create tables for each child
-                all_children = Child.objects.filter(application_id=application_id_local).order_by('child')
-                for child in all_children:
-                    name = child.get_full_name()
-                    if child.birth_day < 10:
-                        birth_day = '0' + str(child.birth_day)
-                    else:
-                        birth_day = str(child.birth_day)
-                    if child.birth_month < 10:
-                        birth_month = '0' + str(child.birth_month)
-                    else:
-                        birth_month = str(child.birth_month)
-                    date_of_birth = birth_day + ' ' + birth_month + ' ' + str(child.birth_year)
-
-                    child_address_record = ChildAddress.objects.get(application_id=application_id_local,
-                                                                    child=child.child)
-                    child_address = get_address(child_address_record.street_line1,
-                                                child_address_record.street_line2, child_address_record.town,
-                                                child_address_record.postcode)
+                    children_string = ', '.join(children)
 
                     table_list.append([
-                        {"title": name, "id": "Child"},
-                        {"name": "Name", "value": name, 'pk': child.pk, "index": 1},
-                        {"name": "Date of birth", "value": date_of_birth, 'pk': child.pk, "index": 2},
-                        {"name": "Address", "value": child_address, 'pk': child_address_record.pk, "index": 3}
+                        {"title": "Your children's addresses", "id": application_id_local},
+                        {"name": "Which of your children live with you?", "value": children_string,
+                         'pk': application_id_local, "index": 1}
                     ])
+                    # Create tables for each child
+                    all_children = Child.objects.filter(application_id=application_id_local).order_by('child')
+                    for child in all_children:
+                        name = child.get_full_name()
+                        if child.birth_day < 10:
+                            birth_day = '0' + str(child.birth_day)
+                        else:
+                            birth_day = str(child.birth_day)
+                        if child.birth_month < 10:
+                            birth_month = '0' + str(child.birth_month)
+                        else:
+                            birth_month = str(child.birth_month)
+                        date_of_birth = birth_day + ' ' + birth_month + ' ' + str(child.birth_year)
+
+                        child_address_record = ChildAddress.objects.get(application_id=application_id_local,
+                                                                        child=child.child)
+                        child_address = get_address(child_address_record.street_line1,
+                                                    child_address_record.street_line2, child_address_record.town,
+                                                    child_address_record.postcode)
+
+                        table_list.append([
+                            {"title": name, "id": "Child"},
+                            {"name": "Name", "value": name, 'pk': child.pk, "index": 1},
+                            {"name": "Date of birth", "value": date_of_birth, 'pk': child.pk, "index": 2},
+                            {"name": "Address", "value": child_address, 'pk': child_address_record.pk, "index": 3}
+                        ])
 
         elif model == CriminalRecordCheck:
 
