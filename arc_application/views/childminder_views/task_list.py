@@ -42,6 +42,8 @@ def task_list(request):
         show_people_in_the_home = get_show_people_in_the_home(application_id)
         show_references = get_show_references(application_id)
 
+        all_complete_val = all_complete(application_id, False)
+
         # Load review status
         application_status_context = {
             'application_id': application_id,
@@ -66,7 +68,7 @@ def task_list(request):
             'five_to_eight': childcare_type_record.five_to_eight,
             'eight_plus': childcare_type_record.eight_plus,
             'review_count': review_count,
-            'all_complete': all_complete(application_id, False),
+            'all_complete': all_complete_val,
             'number_of_tasks': number_of_tasks,
             'own_children': application.own_children,
             'working_in_other_childminder_home': application.working_in_other_childminder_home,
