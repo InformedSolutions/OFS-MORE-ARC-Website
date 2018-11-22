@@ -234,7 +234,6 @@ def __get_review_fields_to_check_no_db(application, childcare_type_record):
             'first_aid_review',
             'dbs_review',
             'childcare_training_review',
-            'references_review',
             'people_in_home_review'
         )
     elif not childcare_type_record.zero_to_five and application.own_children and not application.working_in_other_childminder_home:
