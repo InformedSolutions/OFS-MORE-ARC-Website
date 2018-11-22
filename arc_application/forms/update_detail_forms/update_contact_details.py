@@ -6,17 +6,18 @@ OFS-MORE-CCN3: ARC Review Service
 """
 import re
 
+from django import forms
 from django.conf import settings
 from govuk_forms.forms import GOVUKForm
-from django import forms
-from ...models import UserDetails, Application
-from ..form_helper import initial_data_filler
+
+from arc_application.models import UserDetails
+from ..childminder_forms.form_helper import initial_data_filler
 
 
 class UpdateEmail(GOVUKForm):
     field_label_classes = 'form-label-bold'
     auto_replace_widgets = True
-    error_summary_template_name = 'error-summary.html'
+    error_summary_template_name = 'childminder_templates/error-summary.html'
 
     email = forms.EmailField()
 
@@ -43,7 +44,7 @@ class UpdateEmail(GOVUKForm):
 class UpdatePhoneNumber(GOVUKForm):
     field_label_classes = 'form-label-bold'
     auto_replace_widgets = True
-    error_summary_template_name = 'error-summary.html'
+    error_summary_template_name = 'childminder_templates/error-summary.html'
 
     mobile_number = forms.CharField(label='Mobile phone number')
 
@@ -66,10 +67,11 @@ class UpdatePhoneNumber(GOVUKForm):
             raise forms.ValidationError('TBC')
         return mobile_number
 
+
 class UpdateAddPhoneNumber(GOVUKForm):
     field_label_classes = 'form-label-bold'
     auto_replace_widgets = True
-    error_summary_template_name = 'error-summary.html'
+    error_summary_template_name = 'childminder_templates/error-summary.html'
 
     add_phone_number = forms.CharField(label='Additional phone number')
 
@@ -97,3 +99,18 @@ class UpdateAddPhoneNumber(GOVUKForm):
 class UpdateSecurtiyQuestion(GOVUKForm):
     field_label_classes = 'form-label-bold'
     auto_replace_widgets = True
+
+
+class NannyUpdateEmail(UpdateEmail):
+    def __init__(self, *args, **kwargs):
+        super(UpdateEmail, self).__init__(*args, **kwargs)
+
+
+class NannyUpdatePhoneNumber(UpdatePhoneNumber):
+    def __init__(self, *args, **kwargs):
+        super(UpdatePhoneNumber, self).__init__(*args, **kwargs)
+
+
+class NannyUpdateAddPhoneNumber(UpdateAddPhoneNumber):
+    def __init__(self, *args, **kwargs):
+        super(UpdateAddPhoneNumber, self).__init__(*args, **kwargs)

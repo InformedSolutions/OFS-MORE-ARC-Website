@@ -1,0 +1,32 @@
+{% extends 'govuk_template.html' %}
+{% block page_title %}Application summary{% endblock %}
+{% load static %}
+{% load govuk_template_base %}
+{% block inner_content %}
+{% include 'back-button.html' %}
+
+<h1 class="form-title heading-large">
+    Check and confirm all your details
+</h1>
+<h2 class="heading-medium">
+    Application number: {{ application_reference }}
+</h2>
+{% with "4" as col %}
+{% for section in json %}
+{% include 'childminder_templates/summary_tables.html' %}
+{% endfor %}
+{% endwith %}
+
+{% if publish_details is not None %}
+    {% include 'publishing_details_opt_out_table.html' %}
+{% endif %}
+
+
+<form method="post">
+    {% csrf_token %}
+    <input type="submit" class="button" value="Confirm and continue"/>
+    <input type="hidden" value="{{application_id}}" name="id"/>
+</form>
+{% include 'childminder_templates/return-to-list.html' %}
+
+{% endblock %}

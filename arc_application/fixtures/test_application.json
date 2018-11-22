@@ -10,7 +10,7 @@
     "personal_details_status": "COMPLETED",
     "childcare_type_status": "COMPLETED",
     "first_aid_training_status": "COMPLETED",
-    "eyfs_training_status": "COMPLETED",
+    "childcare_training_status": "COMPLETED",
     "criminal_record_check_status": "COMPLETED",
     "health_status": "COMPLETED",
     "references_status": "COMPLETED",
@@ -19,14 +19,14 @@
     "children_in_home": false,
     "children_turning_16": false,
     "declarations_status": "COMPLETED",
-    "share_info_declare": true,
-    "information_correct_declare": true,
-    "change_declare": null,
+    "declaration_confirmation": true,
     "date_created": "2018-04-13T14:24:26.689Z",
     "date_updated": "2018-04-13T14:27:02.082Z",
     "date_accepted": null,
     "date_submitted": "2018-04-13T14:27:48.559Z",
-    "application_reference": "CM1000000"
+    "application_reference": "CM1000000",
+    "own_children": false,
+    "working_in_other_childminder_home": false
   }
 },
 {
@@ -86,11 +86,15 @@
   "fields": {
     "application_id": "db0efe18-eec5-4ec9-887a-e93949f6b412",
     "dbs_certificate_number": "121212121212",
-    "cautions_convictions": false
+    "cautions_convictions": false,
+    "lived_abroad": true,
+    "military_base": true,
+    "capita": true,
+    "on_update": null
   }
 },
 {
-  "model": "arc_application.eyfs",
+  "model": "arc_application.childcaretraining",
   "pk": "4c95433c-302a-4b6d-815f-f6ded72c07d8",
   "fields": {
     "application_id": "db0efe18-eec5-4ec9-887a-e93949f6b412",
@@ -140,7 +144,7 @@
     "country": "United Kingdom",
     "postcode": "WA14 4PA",
     "phone_number": "07791618129",
-    "email": "test@informed.com"
+    "email": "test2@informed.com"
   }
 },
 {
@@ -161,7 +165,7 @@
     "country": "United Kingdom",
     "postcode": "WA14 4PA",
     "phone_number": "07791618129",
-    "email": "test@informed.com"
+    "email": "test3@informed.com"
   }
 },
 {

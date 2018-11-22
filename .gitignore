@@ -1,5 +1,5 @@
 xmlrunner/
-logs/
+logs/*
 selenium/
 
 addressing_service/settings.py
@@ -24,3 +24,4 @@ geckodriver.log
 *.swp
 *.swo
 
+.hypothesis/

@@ -5,10 +5,10 @@ from django.views import View
 from django.shortcuts import render
 from django.utils.http import urlencode
 
-from arc_application.forms.form_helper import initial_data_filler, data_saver
+from arc_application.forms.childminder_forms.form_helper import initial_data_filler, data_saver
 from ...forms.update_detail_forms.update_contact_details import UpdateEmail, UpdatePhoneNumber, UpdateAddPhoneNumber
-from ...models import UserDetails, Application
-from ...views import has_group
+from arc_application.models import UserDetails, Application
+from arc_application.views import has_group
 
 
 class ChangeDetails(View):
@@ -51,7 +51,7 @@ class ChangeDetails(View):
         initial_data_filler(output_form, UserDetails, contact_record.pk)
         if output_form.is_valid():
             data_saver(output_form, UserDetails, contact_record.pk)
-            return HttpResponseRedirect(self.build_url('search_summary', get={'id': app_id}))
+            return HttpResponseRedirect(self.build_url('search_summary', get={'id': app_id, 'app_type': 'Childminder'}))
         else:
             return render(request, 'update_details/update_field.html', context)
 
@@ -77,10 +77,3 @@ class UpdateAddPhoneNumberView(ChangeDetails):
     form = UpdateAddPhoneNumber
     page_title = "Update the applicant's alternative phone number"
 
-
-class UpdateSecurityQuestionView(ChangeDetails):
-    pass
-
-
-class UpdateSecurityAnswerView(ChangeDetails):
-    pass

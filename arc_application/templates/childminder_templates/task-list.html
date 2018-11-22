@@ -1,0 +1,317 @@
+{% extends 'govuk_template.html' %}
+{% block page_title %}Application overview{% endblock %}
+{% load static %}
+{% load govuk_template_base %}
+{% block inner_content %}
+
+<div class="column-two-thirds">
+   {% include "back-button.html" %}
+   <h1 class="heading-xlarge">
+      Application overview
+   </h1>
+   <h2 class="heading-medium">
+      Application number: {{ application_reference }}
+   </h2>
+</div>
+
+<div class="column-two-thirds">
+   <table id="your-details">
+      <tbody>
+         <tr id="account_details">
+            <td class="task">
+               {% if login_details_status == 'NOT_STARTED' %}
+               <a href="{% url 'contact_summary' %}?id={{application_id}}">
+               <span class="task-name">Your sign in details</span>
+               <strong class="task-finished task-to-do">To do</strong>
+               </a>
+               {% elif login_details_status == 'FLAGGED' %}
+               <a href="{% url 'contact_summary' %}?id={{application_id}}">
+               <span class="task-name">Your sign in details</span>
+               <strong class="task-finished task-flagged">Flagged</strong>
+               </a>
+               {% elif login_details_status == 'COMPLETED' %}
+               <a href="{% url 'contact_summary' %}?id={{application_id}}">
+               <span class="task-name">Your sign in details</span>
+               <strong class="task-finished">Reviewed</strong>
+               </a>
+               {% endif %}
+            </td>
+         </tr>
+         <tr id="children">
+            <td class="task">
+               {% if childcare_type_status == 'NOT_STARTED' %}
+               <a href="{% url 'type_of_childcare_age_groups' %}?id={{application_id}}">
+               <span class="task-name">Type of childcare</span>
+               <strong class="task-finished task-to-do">To do</strong>
+               </a>
+               {% elif childcare_type_status == 'FLAGGED' %}
+               <a href="{% url 'type_of_childcare_age_groups' %}?id={{application_id}}">
+               <span class="task-name">Type of childcare</span>
+               <strong class="task-finished task-flagged">Flagged</strong>
+               </a>
+               {% elif childcare_type_status == 'COMPLETED' %}
+               <a href="{% url 'type_of_childcare_age_groups' %}?id={{application_id}}">
+               <span class="task-name">Type of childcare</span>
+               <strong class="task-finished">Reviewed</strong>
+               </a>
+               {% endif %}
+            </td>
+         </tr>
+         <tr id="personal_details">
+            <td class="task">
+               {% if personal_details_status == 'NOT_STARTED' %}
+               <a href="{% url 'personal_details_summary' %}?id={{application_id}}">
+               <span class="task-name">Your personal details</span>
+               <strong class="task-finished task-to-do">To do</strong>
+               </a>
+               {% elif personal_details_status == 'FLAGGED' %}
+               <a href="{% url 'personal_details_summary' %}?id={{application_id}}">
+               <span class="task-name">Your personal details</span>
+               <strong class="task-finished task-flagged">Flagged</strong>
+               </a>
+               {% elif personal_details_status == 'COMPLETED' %}
+               <a href="{% url 'personal_details_summary' %}?id={{application_id}}">
+               <span class="task-name">Your personal details</span>
+               <strong class="task-finished">Reviewed</strong>
+               </a>
+               {% endif %}
+            </td>
+         </tr>
+         {% if show_your_children %}
+         <tr id="your_children">
+            <td class="task">
+               {% if your_children_status == 'NOT_STARTED' %}
+               <a href="{% url 'your_children_summary' %}?id={{application_id}}">
+               <span class="task-name">Your children</span>
+               <strong class="task-finished task-to-do">To do</strong>
+               </a>
+               {% elif your_children_status == 'FLAGGED' %}
+               <a href="{% url 'your_children_summary' %}?id={{application_id}}">
+               <span class="task-name">Your children</span>
+               <strong class="task-finished task-flagged">Flagged</strong>
+               </a>
+               {% elif your_children_status == 'COMPLETED' %}
+               <a href="{% url 'your_children_summary' %}?id={{application_id}}">
+               <span class="task-name">Your children</span>
+               <strong class="task-finished">Reviewed</strong>
+               </a>
+               {% endif %}
+            </td>
+         </tr>
+         {% endif %}
+         <tr id="first_aid">
+            <td class="task">
+               {% if first_aid_training_status == 'NOT_STARTED' %}
+               <a href="{% url 'first_aid_training_summary' %}?id={{application_id}}">
+               <span class="task-name">First aid training</span>
+               <strong class="task-finished task-to-do">To do</strong>
+               </a>
+               {% elif first_aid_training_status == 'FLAGGED' %}
+               <a href="{% url 'first_aid_training_summary' %}?id={{application_id}}">
+               <span class="task-name">First aid training</span>
+               <strong class="task-finished task-flagged">Flagged</strong>
+               </a>
+               {% elif first_aid_training_status == 'COMPLETED' %}
+               <a href="{% url 'first_aid_training_summary' %}?id={{application_id}}">
+               <span class="task-name">First aid training</span>
+               <strong class="task-finished">Reviewed</strong>
+               </a>
+               {% endif %}
+            </td>
+         </tr>
+         {% if childcare_training_status != '' %}
+         <tr id="childcare_training">
+            <td class="task">
+               {% if childcare_training_status == 'NOT_STARTED' %}
+               <a href="{% url 'childcare_training_check_summary' %}?id={{application_id}}">
+               <span class="task-name">Childcare training</span>
+               <strong class="task-finished task-to-do">To do</strong>
+               </a>
+               {% elif childcare_training_status == 'FLAGGED' %}
+               <a href="{% url 'childcare_training_check_summary' %}?id={{application_id}}">
+               <span class="task-name">Childcare training</span>
+               <strong class="task-finished task-flagged">Flagged</strong>
+               </a>
+               {% elif childcare_training_status == 'COMPLETED' %}
+               <a href="{% url 'childcare_training_check_summary' %}?id={{application_id}}">
+               <span class="task-name">Childcare training</span>
+               <strong class="task-finished">Reviewed</strong>
+               </a>
+               {% endif %}
+            </td>
+         </tr>
+         {% endif %}
+         {% if zero_to_five %}
+            <tr id="health">
+               <td class="task">
+                  {% if health_status == 'NOT_STARTED' %}
+                  <a href="{% url 'health_check_answers' %}?id={{application_id}}">
+                  <span class="task-name">Health declaration booklet</span>
+                  <strong class="task-finished task-to-do">To do</strong>
+                  </a>
+                  {% elif health_status == 'FLAGGED' %}
+                  <a href="{% url 'health_check_answers' %}?id={{application_id}}">
+                  <span class="task-name">Health declaration booklet</span>
+                  <strong class="task-finished task-flagged">Flagged</strong>
+                  </a>
+                  {% elif health_status == 'COMPLETED' %}
+                  <a href="{% url 'health_check_answers' %}?id={{application_id}}">
+                  <span class="task-name">Health declaration booklet</span>
+                  <strong class="task-finished">Reviewed</strong>
+                  </a>
+                  {% endif %}
+               </td>
+            </tr>
+         {% endif %}
+         <tr id="dbs">
+            <td class="task">
+               {% if criminal_record_check_status == 'NOT_STARTED' %}
+               <a href="{% url 'dbs_check_summary' %}?id={{application_id}}">
+               <span class="task-name">Criminal record checks</span>
+               <strong class="task-finished task-to-do">To do</strong>
+               </a>
+               {% elif criminal_record_check_status == 'FLAGGED' %}
+               <a href="{% url 'dbs_check_summary' %}?id={{application_id}}">
+               <span class="task-name">Criminal record checks</span>
+               <strong class="task-finished task-flagged">Flagged</strong>
+               </a>
+               {% elif criminal_record_check_status == 'COMPLETED' %}
+               <a href="{% url 'dbs_check_summary' %}?id={{application_id}}">
+               <span class="task-name">Criminal record checks</span>
+               <strong class="task-finished">Reviewed</strong>
+               </a>
+               {% endif %}
+            </td>
+         </tr>
+         {% if show_people_in_the_home %}
+         <tr id="other_people">
+            <td class="task">
+               {% if people_in_home_status == 'NOT_STARTED' %}
+               <a href="{% url 'other_people_summary' %}?id={{application_id}}">
+               <span class="task-name">People in the home</span>
+               <strong class="task-finished task-to-do">To do</strong>
+               </a>
+               {% elif people_in_home_status == 'FLAGGED' %}
+               <a href="{% url 'other_people_summary' %}?id={{application_id}}">
+               <span class="task-name">People in the home</span>
+               <strong class="task-finished task-flagged">Flagged</strong>
+               </a>
+               {% elif people_in_home_status == 'COMPLETED' %}
+               <a href="{% url 'other_people_summary' %}?id={{application_id}}">
+               <span class="task-name">People in the home</span>
+               <strong class="task-finished">Reviewed</strong>
+               </a>
+               {% endif %}
+            </td>
+         </tr>
+         {% endif %}
+         {% if show_references %}
+            <tr id="references">
+               <td class="task">
+                  {% if reference_status == 'NOT_STARTED' %}
+                  <a href="{% url 'references_summary' %}?id={{application_id}}">
+                  <span class="task-name">References</span>
+                  <strong class="task-finished task-to-do">To do</strong>
+                  </a>
+                  {% elif reference_status == 'FLAGGED' %}
+                  <a href="{% url 'references_summary' %}?id={{application_id}}">
+                  <span class="task-name">References</span>
+                  <strong class="task-finished task-flagged">Flagged</strong>
+                  </a>
+                  {% elif reference_status == 'COMPLETED' %}
+                  <a href="{% url 'references_summary' %}?id={{application_id}}">
+                  <span class="task-name">References</span>
+                  <strong class="task-finished">Reviewed</strong>
+                  </a>
+                  {% endif %}
+               </td>
+            </tr>
+         {% endif %}
+         </tr>
+      </tbody>
+   </table>
+   {% if all_complete == True %}
+      <div class="top-padded">
+         <a href="{% url 'arc-summary' %}?id={{application_id}}" class="button">Complete review</a>
+      </div>
+   {% endif %}
+</div>
+
+<div class="column-third information-panel">
+    <p>
+        <b class="bold">Progress:</b>
+        {{review_count}} of {{number_of_tasks}} sections complete
+    </p>
+
+    <p>
+        <b class="bold">Name:</b>
+        <b style="text-transform: capitalize;">{{first_name}} {{ middle_names|default_if_none:"" }} {{last_name}}</b>
+    </p>
+
+    <p>
+        <b class="bold">D.O.B.:</b>
+       {% if birth_day < 10 and birth_month < 10 %}
+            0{{birth_day}}/0{{birth_month}}/{{birth_year}}
+       {% elif birth_day < 10 and birth_month >= 10 %}
+            0{{birth_day}}/{{birth_month}}/{{birth_year}}
+       {% elif birth_day >= 10 and birth_month < 10 %}
+           {{birth_day}}/0{{birth_month}}/{{birth_year}}
+       {% elif birth_day >= 10 and birth_month >= 10 %}
+            {{birth_day}}/{{birth_month}}/{{birth_year}}
+       {% endif %}
+    </p>
+
+    <p>
+        <b class="bold">Ages:</b>
+        <br/>
+       {% if zero_to_five is True %}
+           Birth up to 5 years old
+           <br/>
+       {% endif %}
+
+       {% if five_to_eight is True %}
+           5 to 8 years old
+           <br/>
+       {% endif %}
+
+       {% if eight_plus is True %}
+           8 years and older
+           <br/>
+        {% endif %}
+    </p>
+
+    <p>
+        <b class="bold">Register type(s):</b>
+        <br/>
+
+        {% if zero_to_five is True and five_to_eight is True and eight_plus is True %}
+           Early Years
+           <br/>
+           Childcare (both parts)
+        {% elif zero_to_five is True and five_to_eight is True and eight_plus is False %}
+           Early Years
+           <br/>
+           Childcare (compulsory part)
+        {% elif zero_to_five is True and five_to_eight is False and eight_plus is True %}
+           Early Years
+           <br/>
+           Childcare (voluntary part)
+        {% elif zero_to_five is False and five_to_eight is True and eight_plus is True %}
+           Childcare (both parts)
+        {% elif zero_to_five is True and five_to_eight is False and eight_plus is False %}
+               Early Years
+        {% elif zero_to_five is False and five_to_eight is True and eight_plus is False %}
+            Childcare (compulsory part)
+        {% elif zero_to_five is False and five_to_eight is False and eight_plus is True %}
+            Childcare (voluntary part)
+        {% endif %}
+    </p>
+</div>
+
+<div class="column-third information-panel">
+   <b style="font-weight: bold;">Application history:</b>
+   <br>
+   <a href="{% url 'auditlog' %}?id={{application_id}}&app_type=Childminder">Audit log</a>
+</div>
+</div>
+{% endblock %}

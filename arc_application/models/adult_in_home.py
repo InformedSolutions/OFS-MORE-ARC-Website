@@ -1,6 +1,5 @@
-from datetime import datetime
+import datetime
 from uuid import uuid4
-import calendar
 from django.db import models
 from .application import Application
 
@@ -26,10 +25,16 @@ class AdultInHome(models.Model):
     validated = models.BooleanField(default=False)
     current_treatment = models.NullBooleanField(null=True)
     serious_illness = models.NullBooleanField(null=True)
+    known_to_council = models.NullBooleanField(null=True)
+    children_details = models.TextField(default='', null=True)
     hospital_admission = models.NullBooleanField(null=True)
     health_check_status = models.CharField(max_length=50, default='To do')
     email_resent = models.IntegerField(default=0)
     email_resent_timestamp = models.DateTimeField(null=True, blank=True)
+    lived_abroad = models.NullBooleanField(blank=True)
+    military_base = models.NullBooleanField(blank=True)
+    capita = models.NullBooleanField(blank=True)
+    on_update = models.NullBooleanField(blank=True)
 
     @property
     def timelog_fields(self):
@@ -62,23 +67,48 @@ class AdultInHome(models.Model):
     def get_id(cls, app_id):
         return cls.objects.get(application_id=app_id)
 
-    def get_name(self):
-        return self.first_name + " " + self.middle_names + " " + self.last_name
+    def get_full_name(self):
+        """
+        Helper method for retrieving a full name from its constituent parts
+        :return: the full name for a child
+        """
+        return ' '.join([self.first_name, (self.middle_names or ''), self.last_name])
 
-    def get_birthday(self):
-        return ' '.join([str(self.birth_day), calendar.month_name[self.birth_month], str(self.birth_year)])
+    def get_dob_as_date(self):
+        """
+        Helper method for retrieving an adult's date of birth as a datetime object
+        :return: the adult's date of birth as a datetime object
+        """
+        return datetime.date(self.birth_year, self.birth_month, self.birth_day)
 
     def get_summary_table(self):
-        return [
-                {"title": self.get_name(), "id": self.pk},
-                {"name": "Health check status", "value": self.health_check_status},
-                {"name": "Name", "value": self.get_name()},
-                {"name": "Date of birth", "value": self.get_birthday()},
-                {"name": "Relationship", "value": self.relationship},
-                {"name": "Email", "value": self.email},
-                {"name": "DBS certificate number", "value": self.dbs_certificate_number}
-            ]
-      
+
+        if self.birth_day < 10:
+            birth_day = '0' + str(self.birth_day)
+        else:
+            birth_day = str(self.birth_day)
+
+        if self.birth_month < 10:
+            birth_month = '0' + str(self.birth_month)
+        else:
+            birth_month = str(self.birth_month)
+
+        date_of_birth = birth_day + ' ' + birth_month + ' ' + str(self.birth_year)
+        summary_table = [
+            {"title": self.get_full_name(), "id": self.pk},
+            {"name": "Health questions status", "value": self.health_check_status},
+            {"name": "Name", "value": self.get_full_name()},
+            {"name": "Date of birth", "value": date_of_birth},
+            {"name": "Relationship", "value": self.relationship},
+            {"name": "Email", "value": self.email},
+            {"name": "DBS certificate number", "value": self.dbs_certificate_number},
+            {"name": "Known to council", "value": ("Yes" if self.known_to_council == True else "No")}
+        ]
+        if self.known_to_council == True:
+            summary_table.append({"name": "Details of children", "value": self.children_details})
+
+        return summary_table
+
     # Date of birth property created to keep DRY
     @property
     def date_of_birth(self):

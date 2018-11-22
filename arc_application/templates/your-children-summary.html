@@ -1,0 +1,200 @@
+{% extends 'govuk_template.html' %}
+{% block page_title %}Review: your children{% endblock %}
+{% load static %}
+{% load govuk_template_base %}
+{% block inner_content %}
+{% include 'back-button.html' %}
+
+{{form.error_summary}}
+
+{% for form in children_form_set %}
+    {{form.error_summary}}
+{% endfor %}
+
+{% for form in children_address_form_set %}
+    {{form.error_summary}}
+{% endfor %}
+
+<form method="post" novalidate>
+    <h1 class="form-title heading-large">Review: your children</h1>
+    <p>
+        Please check the boxes if there are errors.
+    </p>
+    {% csrf_token %}
+    {{ formset_of_children.management_form }}
+    {{ formset_of_children_address.management_form }}
+
+    <h2 class="heading-medium">Details of your children</h2>
+    {% for child, child_form in children_object_and_form_lists %}
+        <table class="check-your-answers form-group">
+            <thead>
+            <tr>
+                <th colspan="3">
+                    <div class="heading-medium">
+                        {{child.get_full_name}}
+                    </div>
+                </th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td style="word-wrap: break-word">
+                    Name
+                </td>
+                <td style="word-wrap: break-word">
+                    {{child.get_full_name}}
+                </td>
+                <td class="change-answer">
+                    {{ child_form.full_name_declare }}
+                </td>
+            </tr>
+            <tr class="js-hidden" id="full_name{{child_form.instance_id.initial}}">
+                <td colspan="1">
+                    <div>
+                        Enter your reasoning
+                    </div>
+                    <div>
+                        {{ child_form.full_name_comments.help_text}}
+                    </div>
+                </td>
+                <td colspan="2">
+                    <div>
+                        {{ child_form.full_name_comments}}
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td style="word-wrap: break-word">
+                    Date of birth
+                </td>
+                <td style="word-wrap: break-word">
+                    {{ child.get_dob_as_date|date:"d F Y" }}
+                </td>
+                <td class="change-answer">
+                    {{ child_form.date_of_birth_declare }}
+                </td>
+            </tr>
+            <tr class="js-hidden" id="date_of_birth{{child_form.instance_id.initial}}">
+                <td colspan="1">
+                    <div>
+                        Enter your reasoning
+                    </div>
+                    <div>
+                        {{ child_form.date_of_birth_comments.help_text}}
+                    </div>
+                </td>
+                <td colspan="2">
+                    <div>
+                        {{ child_form.date_of_birth_comments}}
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+        {% endfor %}
+
+    <table class="check-your-answers form-group" style="table-layout: fixed; width: 100%">
+        <colgroup>
+            <col class="summary-column">
+            <col class="summary-column">
+            <col class="change-answer">
+        </colgroup>
+        <thead>
+        <tr>
+            <th colspan="3">
+                <div class="heading-medium">
+                    Your children's addresses
+                </div>
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td style="word-wrap: break-word">
+                Which of your children live with you?
+            </td>
+            <td style="word-wrap: break-word">
+                {% for child in children_living_with_childminder %}
+                    {{ child.get_full_name }}
+                {% empty %}
+                    None
+                {% endfor %}
+            </td>
+             <td class="change-answer">
+                {{ form.children_living_with_you_declare }}
+            </td>
+        </tr>
+        <tr class="js-hidden" id="children_living_with_you{{form.instance_id.initial}}">
+                <td colspan="1">
+                    <div>
+                        Enter your reasoning
+                    </div>
+                    <div>
+                        {{ form.children_living_with_you_comments.help_text }}
+                    </div>
+                </td>
+                <td colspan="2">
+                    <div>
+                        {{ form.children_living_with_you_comments }}
+                    </div>
+                </td>
+            </tr>
+
+    {% for child, child_address, child_address_form in child_addresses_and_form_list %}
+        <table class="check-your-answers form-group">
+            <thead>
+            <tr>
+                <th colspan="3">
+                    <div class="heading-medium">
+                        {{child.get_full_name}}'s address
+                    </div>
+                </th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td style="word-wrap: break-word">
+                    {{child_address.street_line1}}{% if address.street_line1 %}<br />{% endif %}
+                    {{child_address.street_line2}}{% if address.street_line2 %}<br />{% endif %}
+                    {{child_address.town}}{% if address.town %}<br />{% endif %}
+                    {{child_address.county}}{% if address.county %}<br />{% endif %}
+                    {{child_address.country}}{% if address.country %}<br />{% endif %}
+                    {{child_address.postcode}}{% if address.postcode %}<br />{% endif %}
+                </td>
+                <td class="change-answer">
+                    {{ child_address_form.address_declare }}
+                </td>
+            </tr>
+            <tr class="js-hidden" id="address{{child_address_form.instance_id.initial}}">
+                <td colspan="1">
+                    <div>
+                        Enter your reasoning
+                    </div>
+                    <div>
+                        {{ child_address_form.address_comments.help_text}}
+                    </div>
+                </td>
+                <td colspan="2">
+                    <div>
+                        {{ child_address_form.address_comments}}
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+        {% endfor %}
+
+
+        </tbody>
+    </table>
+
+    <input type="submit" class="button" value="Confirm and continue"/>
+    <input type="hidden" value="{{application_id}}" name="id"/>
+
+{% include 'return-to-list.html' %}
+
+</form>
+
+{% endblock %}
