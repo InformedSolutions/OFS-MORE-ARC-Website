@@ -56,7 +56,7 @@ name_field_dict = {
     'What type of childcare training have you completed?': 'childcare_training',
     'Have you lived outside of the UK in the last 5 years?': 'lived_abroad',
     'Have you lived or worked on a British military base outside of the UK in the last 5 years?': 'military_base',
-    'Do you have an Ofsted DBS Check?': 'capita',
+    'Did you get a DBS certificate from the Ofsted DBS application website in the last 3 months?': 'capita',
     'Are you on the DBS update service?': 'on_update',
     'Which of your children live with you?': 'children_living_with_childminder_selection'
 }
