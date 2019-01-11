@@ -41,8 +41,8 @@ class GenericApplicationHandler:
         for assigned_application in assigned_applications:
             if assigned_application.app_type == 'Childminder':
                 table_data.append(self.__get_childminder_table_data(assigned_application.application_id))
-            # elif assigned_application.app_type == 'Nanny':
-            #     table_data.append(self.__get_nanny_table_data(assigned_application.application_id))
+            elif assigned_application.app_type == 'Nanny':
+                table_data.append(self.__get_nanny_table_data(assigned_application.application_id))
 
         return table_data
 
