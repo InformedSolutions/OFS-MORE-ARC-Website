@@ -56,7 +56,7 @@ class CriminalRecordCheck(models.Model):
                                        "value": self.get_bool_as_string(self.military_base)})
 
         if self.capita is not None:
-            summary_table_dict.append({"name": "Do you have an Ofsted DBS Check?",
+            summary_table_dict.append({"name": "Did you get a DBS certificate from the Ofsted DBS application website in the last 3 months?",
                                        "value": self.get_bool_as_string(self.capita)})
 
         if self.on_update is not None:

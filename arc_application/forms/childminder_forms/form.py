@@ -433,7 +433,7 @@ class DBSCheckForm(GOVUKForm):
         max_length=250)
     capita_declare = forms.BooleanField(label='This information is correct',
                                         widget=custom_field_widgets.CustomCheckboxInput, required=False)
-    capita_comments = forms.CharField(label='Do you have an Ofsted DBS Check?',
+    capita_comments = forms.CharField(label='Did you get a DBS certificate from the Ofsted DBS application website in the last 3 months?',
                                       help_text='(Tip: be clear and concise)',
                                       widget=custom_field_widgets.Textarea, required=False,
                                       max_length=250)
