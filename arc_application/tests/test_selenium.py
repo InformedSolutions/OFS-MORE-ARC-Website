@@ -10,6 +10,7 @@ from django.test import LiveServerTestCase, override_settings, tag
 from selenium import webdriver
 from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.support.wait import WebDriverWait
+from selenium.webdriver.chrome.options import Options
 
 from .selenium_task_executor import SeleniumTaskExecutor
 from arc_application.models import Application
@@ -48,16 +49,25 @@ class TestArcFunctions(LiveServerTestCase):
         if os.environ.get('LOCAL_SELENIUM_DRIVER') == 'True':
             # If running on a windows host, make sure to drop the
             # geckodriver.exe into your Python/Scripts installation folder
-            selenium_driver = webdriver.Firefox()
+            if os.environ.get('HEADLESS_CHROME') == 'True':
+                # To install chromedriver on an ubuntu machine:
+                # https://tecadmin.net/setup-selenium-chromedriver-on-ubuntu/
+                # For the latest version:
+                # https://github.com/joyzoursky/docker-python-chromedriver/blob/master/py3/py3.6-selenium/Dockerfile
+                path_to_chromedriver = os.popen("which chromedriver").read().rstrip()
+                chrome_options = Options()
+                chrome_options.add_argument("--headless")
+                chrome_options.add_argument("--disable-gpu")
+                selenium_driver = webdriver.Chrome(path_to_chromedriver, chrome_options=chrome_options)
+            else:
+                selenium_driver = webdriver.Firefox()
+            selenium_driver.maximize_window()
         else:
             # If not using local driver, default requests to a selenium grid server
             selenium_driver = webdriver.Remote(
                 command_executor=os.environ['SELENIUM_HOST'],
                 desired_capabilities={'platform': 'ANY', 'browserName': 'firefox', 'version': ''}
             )
-
-        selenium_driver.maximize_window()
-        selenium_driver.implicitly_wait(20)
 
         self.verification_errors = []
         self.accept_next_alert = True
@@ -115,7 +125,7 @@ class TestArcFunctions(LiveServerTestCase):
         try:
             Application.objects.all().delete()
             self.login_as_arc_user()
-            selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Add from queue']").click()
+            selenium_task_executor.get_driver().find_element_by_name("add_childminder_application").click()
             self.assertTrue(
                 selenium_task_executor.get_driver().find_element_by_class_name('error-summary').is_displayed()
             )
@@ -134,7 +144,7 @@ class TestArcFunctions(LiveServerTestCase):
 
         try:
             self.login_as_arc_user()
-            selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Add from queue']").click()
+            selenium_task_executor.get_driver().find_element_by_name("add_childminder_application").click()
             selenium_task_executor.get_driver().find_element_by_xpath("//*[@id='request-table']/tbody/tr[1]/td[5]/a").click()
             self.assertEqual("Application overview", selenium_task_executor.get_driver().title)
             self.release_arc_application()
@@ -153,7 +163,7 @@ class TestArcFunctions(LiveServerTestCase):
 
         try:
             self.login_as_arc_user()
-            selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Add from queue']").click()
+            selenium_task_executor.get_driver().find_element_by_name("add_childminder_application").click()
             selenium_task_executor.get_driver().find_element_by_xpath("//*[@id='request-table']/tbody/tr[1]/td[5]/a").click()
             selenium_task_executor.get_driver().find_element_by_link_text("Audit log").click()
             self.assertEqual("Audit log", selenium_task_executor.get_driver().title)
@@ -172,7 +182,7 @@ class TestArcFunctions(LiveServerTestCase):
 
         try:
             self.login_as_arc_user()
-            selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Add from queue']").click()
+            selenium_task_executor.get_driver().find_element_by_name("add_childminder_application").click()
             selenium_task_executor.get_driver().find_element_by_xpath("//*[@id='request-table']/tbody/tr[1]/td[5]/a").click()
             selenium_task_executor.get_driver().find_element_by_link_text("Audit log").click()
             self.assertEqual("Audit log", selenium_task_executor.get_driver().title)
@@ -232,28 +242,28 @@ class TestArcFunctions(LiveServerTestCase):
         Tests that an ARC user can complete a review without flagging any questions
         """
         global selenium_task_executor
-        title_change_wait = 15
+        title_change_wait = 30
 
         try:
             self.login_as_arc_user()
-            selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Add from queue']").click()
+            selenium_task_executor.get_driver().find_element_by_name("add_childminder_application").click()
             selenium_task_executor.get_driver().find_element_by_xpath("//*[@id='request-table']/tbody/tr[1]/td[5]/a").click()
             selenium_task_executor.get_driver().find_element_by_xpath("//tr[@id='account_details']/td/a/span").click()
             WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("Review: your sign in details"))
             selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Confirm and continue']").click()
             WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("Review: type of childcare"))
             selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Confirm and continue']").click()
-            WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("Personal details"))
+            WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("Review: your personal details"))
             selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Confirm and continue']").click()
             WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("Review: first aid training"))
             selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Confirm and continue']").click()
-            WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("Review: early years training"))
+            WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("Review: childcare training"))
             selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Confirm and continue']").click()
             WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("Review: health declaration booklet"))
             selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Confirm and continue']").click()
             WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("Review: criminal record (DBS) check"))
             selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Confirm and continue']").click()
-            WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("People in your home"))
+            WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("Review: people in your home"))
             selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Confirm and continue']").click()
             WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("Review: references"))
             selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Confirm and continue']").click()
@@ -261,6 +271,7 @@ class TestArcFunctions(LiveServerTestCase):
             selenium_task_executor.get_driver().find_element_by_link_text("Complete review").click()
             WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("Application summary"))
             selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Confirm and continue']").click()
+            WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("Review approved"))
             self.assertEqual("Review approved", selenium_task_executor.get_driver().title)
         except Exception as e:
             self.capture_screenshot()
@@ -279,7 +290,7 @@ class TestArcFunctions(LiveServerTestCase):
         try:
             self.login_as_arc_user()
 
-            selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Add from queue']").click()
+            selenium_task_executor.get_driver().find_element_by_name("add_childminder_application").click()
             selenium_task_executor.get_driver().find_element_by_xpath("//*[@id='request-table']/tbody/tr[1]/td[5]/a").click()
             selenium_task_executor.get_driver().find_element_by_xpath("//tr[@id='account_details']/td/a/span").click()
             WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("Review: your sign in details"))
@@ -308,8 +319,12 @@ class TestArcFunctions(LiveServerTestCase):
             selenium_task_executor.get_driver().find_element_by_id("id_date_of_birth_comments").send_keys("Test")
             selenium_task_executor.get_driver().find_element_by_id("id_home_address_declare").click()
             selenium_task_executor.get_driver().find_element_by_id("id_home_address_comments").send_keys("Test")
-            selenium_task_executor.get_driver().find_element_by_id("id_childcare_location_declare").click()
-            selenium_task_executor.get_driver().find_element_by_id("id_childcare_location_comments").send_keys("Test")
+            selenium_task_executor.get_driver().find_element_by_id("id_childcare_address_declare").click()
+            selenium_task_executor.get_driver().find_element_by_id("id_childcare_address_comments").send_keys("Test")
+            selenium_task_executor.get_driver().find_element_by_id("id_working_in_other_childminder_home_declare").click()
+            selenium_task_executor.get_driver().find_element_by_id("id_working_in_other_childminder_home_comments").send_keys("Test")
+            selenium_task_executor.get_driver().find_element_by_id("id_own_children_declare").click()
+            selenium_task_executor.get_driver().find_element_by_id("id_own_children_comments").send_keys("Test")
             selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Confirm and continue']").click()
             WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("Review: first aid training"))
 
@@ -320,7 +335,7 @@ class TestArcFunctions(LiveServerTestCase):
             selenium_task_executor.get_driver().find_element_by_id("id_course_date_declare").click()
             selenium_task_executor.get_driver().find_element_by_id("id_course_date_comments").send_keys("Test")
             selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Confirm and continue']").click()
-            WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("Review: early years training"))
+            WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(expected_conditions.title_contains("Review: childcare training"))
 
             selenium_task_executor.get_driver().find_element_by_id("id_eyfs_course_name_declare").click()
             selenium_task_executor.get_driver().find_element_by_id(
@@ -389,6 +404,132 @@ class TestArcFunctions(LiveServerTestCase):
             self.capture_screenshot()
             raise e
 
+    def test_your_children_task_hidden_when_no_own_children(self):
+        self.assert_your_children_task_hidden_when_no_own_children()
+
+    def assert_your_children_task_hidden_when_no_own_children(self):
+        """
+        Tests that the Your children task is hidden when the applicant has indicated they have no own children
+        """
+        global selenium_task_executor
+        title_change_wait = 15
+
+        try:
+            self.login_as_arc_user()
+
+            # Set own_children to True for test application
+            application = Application.objects.get(application_id='db0efe18-eec5-4ec9-887a-e93949f6b412')
+            application.own_children = False
+            application.save()
+
+            WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(
+                expected_conditions.title_contains("Applications"))
+            selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Add from queue']").click()
+            selenium_task_executor.get_driver().find_element_by_xpath("//*[@id='request-table']/tbody/tr[1]/td[5]/a").click()
+            WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(
+                expected_conditions.title_contains("Application overview"))
+            # Fail test if Your children task displays
+            selenium_task_executor.get_driver().find_element_by_xpath("//tr[@id='your_children']/td/a/span")
+            self.assertEqual(True, False)
+        except:
+            # Pass test if Your children task does not display
+            self.assertEqual(True, True)
+
+    def test_your_children_task_shown_when_own_children(self):
+        self.assert_your_children_task_hidden_when_own_children()
+
+    def assert_your_children_task_shown_when_own_children(self):
+        """
+        Tests that the Your children task is shown when the applicant has indicated they have own children
+        """
+        global selenium_task_executor
+        title_change_wait = 15
+
+        try:
+            self.login_as_arc_user()
+
+            # Set own_children to True for test application
+            application = Application.objects.get(application_id='db0efe18-eec5-4ec9-887a-e93949f6b412')
+            application.own_children = True
+            application.save()
+
+            WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(
+                expected_conditions.title_contains("Applications"))
+            selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Add from queue']").click()
+            selenium_task_executor.get_driver().find_element_by_xpath("//*[@id='request-table']/tbody/tr[1]/td[5]/a").click()
+            WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(
+                expected_conditions.title_contains("Application overview"))
+            # Pass test if Your children task displays
+            selenium_task_executor.get_driver().find_element_by_xpath("//tr[@id='your_children']/td/a/span")
+            self.assertEqual(True, True)
+        except:
+            # Fail test if Your children task does not display
+            self.assertEqual(True, False)
+
+    def test_people_in_home_task_hidden_when_not_working_in_other_childminder_home(self):
+        self.assert_people_in_home_task_hidden_when_not_working_in_other_childminder_home()
+
+    def assert_people_in_home_task_hidden_when_not_working_in_other_childminder_home(self):
+        """
+        Tests that the People in your home task is hidden when the applicant has indicated they work in another
+        childminder's home
+        """
+        global selenium_task_executor
+        title_change_wait = 15
+
+        try:
+            self.login_as_arc_user()
+
+            # Set own_children to True for test application
+            application = Application.objects.get(application_id='db0efe18-eec5-4ec9-887a-e93949f6b412')
+            application.working_in_other_childminder_home = True
+            application.save()
+
+            WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(
+                expected_conditions.title_contains("Applications"))
+            selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Add from queue']").click()
+            selenium_task_executor.get_driver().find_element_by_xpath("//*[@id='request-table']/tbody/tr[1]/td[5]/a").click()
+            WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(
+                expected_conditions.title_contains("Application overview"))
+            # Fail test if People in your home task displays
+            selenium_task_executor.get_driver().find_element_by_xpath("//tr[@id='other_people']/td/a/span")
+            self.assertEqual(True, False)
+        except:
+            # Pass test if People in your home task does not display
+            self.assertEqual(True, True)
+
+    def test_people_in_home_task_shown_when_not_working_in_other_childminder_home(self):
+        self.assert_people_in_home_task_shown_when_not_working_in_other_childminder_home()
+
+    def assert_people_in_home_task_shown_when_not_working_in_other_childminder_home(self):
+        """
+        Tests that the People in your home task is shown when the applicant has indicated they don't work in another
+        childminder's home
+        """
+        global selenium_task_executor
+        title_change_wait = 15
+
+        try:
+            self.login_as_arc_user()
+
+            # Set own_children to True for test application
+            application = Application.objects.get(application_id='db0efe18-eec5-4ec9-887a-e93949f6b412')
+            application.working_in_other_childminder_home = False
+            application.save()
+
+            WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(
+                expected_conditions.title_contains("Applications"))
+            selenium_task_executor.get_driver().find_element_by_xpath("//input[@value='Add from queue']").click()
+            selenium_task_executor.get_driver().find_element_by_xpath("//*[@id='request-table']/tbody/tr[1]/td[5]/a").click()
+            WebDriverWait(selenium_task_executor.get_driver(), title_change_wait).until(
+                expected_conditions.title_contains("Application overview"))
+            # Pass test if People in your home task displays
+            selenium_task_executor.get_driver().find_element_by_xpath("//tr[@id='other_people']/td/a/span")
+            self.assertEqual(True, True)
+        except:
+            # Fail test if People in your home task does not display
+            self.assertEqual(True, False)
+
     def test_contact_centre_user_can_view_audit_log(self):
         self.assert_contact_centre_user_can_view_audit_log()
 
@@ -442,7 +583,7 @@ class TestArcFunctions(LiveServerTestCase):
 
         try:
             selenium_task_executor.get_driver().find_element_by_id("proposition-name").click()
-            selenium_task_executor.get_driver().find_element_by_link_text("Release to queue").click()
+            selenium_task_executor.get_driver().find_element_by_name("add_childminder_application").click()
         except Exception as e:
             self.capture_screenshot()
             raise e
@@ -480,7 +621,7 @@ class TestArcFunctions(LiveServerTestCase):
     def capture_screenshot(self):
         now = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
         scr = selenium_driver.find_element_by_tag_name('html')
-        scr.screenshot('selenium/screenshot-%s-%s.png' % (self.__class__.__name__, now))
+        #scr.screenshot('selenium/screenshot-%s-%s.png' % (self.__class__.__name__, now))
 
     def tearDown(self):
         global selenium_driver

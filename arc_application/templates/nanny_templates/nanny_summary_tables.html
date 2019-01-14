@@ -1,0 +1,57 @@
+{% load general_table_extras %}
+
+<div class = "two-thirds">
+    <table class="check-your-answers form-group">
+        {% if not context.skip_summary_page_title %}
+            <thead>
+                <tr>
+                    <th colspan="{{ col }}">
+                        <div class="heading-medium">
+                            {{context.title}}
+                        </div>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+
+        {% endif %}
+
+        {% for row in context.rows %}
+        {% if not row.hidden %}
+            {% if row.id == 'home_address_locations' %}
+                {{ row.formset.management_form }}
+
+                    {% for home_address in row.info %}
+
+                    {% with form=row.formset|return_item_by_index:forloop.counter0 %}
+                        {% include 'nanny_childcare_address_template.html' %}
+                    {% endwith %}
+
+                {% endfor %}
+
+            {% elif row.id == 'your_children_details' %}
+                {{ row.formset.management_form }}
+
+                {% include 'your-children-living-with-you.html' %}
+
+                {% for child_record in row.info %}
+
+                    {% with form=row.formset|return_item_by_index:forloop.counter0 %}
+                        {% include 'nanny_your_child_table_template.html' %}
+                    {% endwith %}
+
+                {% endfor %}
+
+            {% else %}
+
+                {% include 'nanny_general_table_template.html' %}
+
+            {% endif %}
+
+        {% endif %}
+
+        {% endfor %}
+
+        </tbody>
+    </table>
+</div>

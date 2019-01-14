@@ -1,0 +1,25 @@
+<div class="two-thirds">
+    <table class="check-your-answers form-group">
+        <thead>
+        <tr>
+            <th colspan="3">
+                <div class="heading-medium">
+                    Publishing your details
+                </div>
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>
+                {% if publish_details %}
+                I want my name, address and phone number published
+                {% else %}
+                I do not want my name, address and phone number published
+                {% endif %}
+            </td>
+            <td></td>
+        </tr>
+        </tbody>
+    </table>
+</div>

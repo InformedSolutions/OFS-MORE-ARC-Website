@@ -2,6 +2,7 @@ from uuid import uuid4
 from django.db import models
 from .application import Application
 
+
 class ApplicantPersonalDetails(models.Model):
     """
     Model for APPLICANT_PERSONAL_DETAILS table
@@ -32,11 +33,41 @@ class ApplicantPersonalDetails(models.Model):
         return cls.objects.get(application_id=app_id)
 
     def get_summary_table(self):
+
+        if self.birth_day < 10:
+            birth_day = '0' + str(self.birth_day)
+        else:
+            birth_day = str(self.birth_day)
+
+        if self.birth_month == 1:
+            birth_month = 'Jan'
+        elif self.birth_month == 2:
+            birth_month = 'Feb'
+        elif self.birth_month == 3:
+            birth_month = 'Mar'
+        elif self.birth_month == 4:
+            birth_month = 'Apr'
+        elif self.birth_month == 5:
+            birth_month = 'May'
+        elif self.birth_month == 6:
+            birth_month = 'Jun'
+        elif self.birth_month == 7:
+            birth_month = 'Jul'
+        elif self.birth_month == 8:
+            birth_month = 'Aug'
+        elif self.birth_month == 9:
+            birth_month = 'Sep'
+        elif self.birth_month == 10:
+            birth_month = 'Oct'
+        elif self.birth_month == 11:
+            birth_month = 'Nov'
+        elif self.birth_month == 12:
+            birth_month = 'Dec'
+
         return [
-                {"title": "Your personal details", "id": self.personal_detail_id, "index": 0},
+                {"title": "Your name and date of birth", "id": self.personal_detail_id, "index": 0},
                 {"name": "Date of birth",
-                 "value": str(self.birth_day) + '/' + str(self.birth_month) + '/' + str(
-                     self.birth_year), 'pk': self.pk, "index": 2}
+                 "value": birth_day + ' ' + birth_month + ' ' + str(self.birth_year), 'pk': self.pk, "index": 2}
             ]
 
     class Meta:

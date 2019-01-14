@@ -48,10 +48,10 @@ def populate_initial_values(self):
         if field_string[-7:] == 'declare':
             try:
                 comment_object = ArcComments.objects.get(table_pk__in=self.table_keys, field_name=field_string[:-8])
-                self.fields[field_string].initial = comment_object.flagged
-
+                self.fields[field_string].initial = True
             except ArcComments.DoesNotExist:
                 pass
+
         elif field_string[-8:] == 'comments':
             try:
                 comment_object = ArcComments.objects.get(table_pk__in=self.table_keys, field_name=field_string[:-9])
@@ -62,51 +62,48 @@ def populate_initial_values(self):
 
 def save_comments(request, comment_list):
     """
-    Generic funciton for saving comments to database, once formatted by request_to_comments
-    :param comment_list:
-    :return:
+    Generic function for saving comments to database, once formatted by request_to_comments
+    :param comment_list: List of comments as returned by request_to_comments
+    :return: True: If function body executes without raising an error, return True to indicate this.
     """
-    try:
-        for single_comment in comment_list:
-            defaults = {"table_pk": single_comment[0], "table_name": single_comment[1],
-                        "field_name": single_comment[2], "comment": single_comment[3],
-                        "flagged": single_comment[4]
-                        }
-
-            existing_comment_present = ArcComments.objects.filter(table_pk=single_comment[0],
-                                                                           field_name=single_comment[2]).count() > 0
-
-            if single_comment[2] == 'health_check_status':
-                adult = AdultInHome.objects.get(adult_id=single_comment[0])
-                adult.health_check_status = 'Started'
-                adult.email_resent = 0
-                adult.save()
-
-            # If a field already has a comment, this will update it, otherwise it will use the 'default' dictionary
-            ArcComments.objects.update_or_create(table_pk=single_comment[0],
-                                                                           field_name=single_comment[2],
-                                                                           defaults=defaults)
-
-            # Audit field level change if not already tracked
-            if not existing_comment_present:
-                application_id = request.POST['id']
-                application = Application.objects.get(application_id=application_id)
-                TimelineLog.objects.create(
-                    content_object=application,
-                    user=request.user,
-                    template='timeline_logger/application_field_flagged.txt',
-                    extra_data={
-                        'user_type': 'reviewer',
-                        'formatted_field': single_comment[2].replace("_", " "),
-                        'action': 'flagged by',
-                        'entity': 'application',
-                        'task_name': get_task_name(single_comment[1], single_comment[2])
+    for single_comment in comment_list:
+        defaults = {"table_pk": single_comment[0], "table_name": single_comment[1],
+                    "field_name": single_comment[2], "comment": single_comment[3],
+                    "flagged": single_comment[4]
                     }
-                )
 
-        return True
-    except:
-        return False
+        existing_comment_present = ArcComments.objects.filter(table_pk=single_comment[0],
+                                                                       field_name=single_comment[2]).count() > 0
+
+        if single_comment[2] == 'health_check_status':
+            adult = AdultInHome.objects.get(adult_id=single_comment[0])
+            adult.health_check_status = 'Started'
+            adult.email_resent = 0
+            adult.save()
+
+        # If a field already has a comment, this will update it, otherwise it will use the 'default' dictionary
+        ArcComments.objects.update_or_create(table_pk=single_comment[0],
+                                                                       field_name=single_comment[2],
+                                                                       defaults=defaults)
+
+        # Audit field level change if not already tracked
+        if not existing_comment_present:
+            application_id = request.POST['id']
+            application = Application.objects.get(application_id=application_id)
+            TimelineLog.objects.create(
+                content_object=application,
+                user=request.user,
+                template='timeline_logger/application_field_flagged.txt',
+                extra_data={
+                    'user_type': 'reviewer',
+                    'formatted_field': single_comment[2].replace("_", " "),
+                    'action': 'flagged by',
+                    'entity': 'application',
+                    'task_name': get_task_name(single_comment[1], single_comment[2])
+                }
+            )
+
+    return True
 
 
 def redirect_selection(request, default):
@@ -159,7 +156,7 @@ def get_task_name(table_name, field_name):
     if table_name == "REFERENCE":
         return 'References'
 
-    if table_name == "EYFS":
+    if table_name == "ChildcareTraining":
         return 'Early years training'
 
 
@@ -170,9 +167,39 @@ def reset_declaration(application):
     """
     if application.declarations_status == 'COMPLETED':
         application.declarations_status = 'NOT_STARTED'
-        application.share_info_declare = None
-        application.display_contact_details_on_web = None
-        application.suitable_declare = None
-        application.information_correct_declare = None
-        application.change_declare = None
+        application.declaration_confirmation = None
         application.save()
+
+
+def get_non_db_field_arc_comment(application_id, field_name):
+    table_name = 'DYNAMIC_VALUE'
+    prior_dynamic_comment_exists = \
+        ArcComments.objects.filter(table_name=table_name, field_name=field_name, table_pk=application_id).exists()
+
+    if prior_dynamic_comment_exists:
+        return ArcComments.objects.get(table_name=table_name, field_name=field_name, table_pk=application_id)
+    else:
+        return None
+
+
+def save_non_db_field_arc_comment(application_id, field_name, comment):
+    table_name = 'DYNAMIC_VALUE'
+    prior_dynamic_comment_exists = \
+        ArcComments.objects.filter(table_name=table_name, field_name=field_name, table_pk=application_id).exists()
+
+    if prior_dynamic_comment_exists:
+        arc_comment = ArcComments.objects.get(table_name=table_name, field_name=field_name, table_pk=application_id)
+    else:
+        arc_comment = ArcComments()
+
+    arc_comment.comment = comment
+    arc_comment.field_name = field_name
+    arc_comment.flagged = True
+    arc_comment.table_name = table_name
+    arc_comment.table_pk = application_id
+    arc_comment.save()
+
+
+def delete_non_db_field_arc_comment(application_id, field_name):
+    table_name = 'DYNAMIC_VALUE'
+    ArcComments.objects.filter(table_name=table_name, field_name=field_name, table_pk=application_id).delete()

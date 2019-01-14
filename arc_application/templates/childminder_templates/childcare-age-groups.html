@@ -1,0 +1,82 @@
+{% extends 'govuk_template.html' %}
+{% block page_title %}Review: type of childcare{% endblock %}
+{% load static %}
+{% load govuk_template_base %}
+{% block inner_content %}
+{% include 'back-button.html' %}
+
+    <form method="post" novalidate>
+        {% csrf_token %}
+        <h1 class="form-title heading-large">
+            Review: type of childcare
+        </h1>
+        <table class="check-your-answers form-group">
+            <thead>
+            <tr>
+                <th colspan="3">
+                    <div class="heading-medium">
+                        Ages of the children
+                    </div>
+                </th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td colspan="1">Looking after 0 to 5 year olds?</td>
+                {% if zero == True %}
+                <td colspan="2">Yes</td>
+                {% else %}
+                <td colspan="2">No</td>
+                {% endif %}
+            </tr>
+            <tr>
+                <td colspan="1">Looking after 5 to 7 year olds?</td>
+                {% if five == True %}
+                <td colspan="2">Yes</td>
+                {% else %}
+                <td colspan="2">No</td>
+                {% endif %}
+            </tr>
+            <tr>
+                <td colspan="1">Looking after 8 year olds and older?</td>
+                {% if eight == True %}
+                <td colspan="2">Yes</td>
+                {% else %}
+                <td colspan="2">No</td>
+                {% endif %}
+            </tr>
+            <tr>
+                <td colspan="1">Registers</td>
+                <td colspan="2">{{ register }}</td>
+            </tr>
+            </tbody>
+        </table>
+        <table class="check-your-answers form-group">
+            <thead>
+            <tr>
+                <th colspan="3">
+                    <div class="heading-medium">
+                        Overnight care
+                    </div>
+                </th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td colspan="1">Looking after children overnight?</td>
+                {% if overnight_care == True %}
+                <td colspan="2">Yes</td>
+                {% else %}
+                <td colspan="2">No</td>
+                {% endif %}
+            </tr>
+            </tbody>
+        </table>
+
+        <input type="submit" class="button" value="Confirm and continue" alt='Confirm and continue'>
+        <input type="hidden" id="id" name="id" value="{{application_id}}"/>
+
+        {% include 'childminder_templates/return-to-list.html' %}
+    </form>
+
+{% endblock %}

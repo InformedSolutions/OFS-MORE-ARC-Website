@@ -1,0 +1,64 @@
+{% if row.comments and row.comments.initial != '' and summary_page %} <!-- If there is an existing ARC Comment -->
+<tr class="error-row">
+    <td colspan="3" class="error-container notice">
+        <i class="icon icon-important">
+           <span class="visually-hidden">Warning</span>
+         </i>
+         <strong class="bold-small">
+            {{ row.comments.initial }}
+          </strong>
+    </td>
+</tr>
+
+<!-- If error, ensure row with data also has appropriate css classes - else just <tr> and <td> -->
+<tr class="error-row">
+    <td class="error-field-label">
+{% else %}
+<tr>
+    <td>
+{% endif %}
+        {{row.name}}
+    </td>
+    <td style="word-wrap: break-word">
+        {% load general_table_extras %}
+
+        {% if row.info|template_is_instance:'str' %}
+            {{row.info}}
+
+        {% elif row.info|template_is_instance:'bool' %}
+            {% if row.info %}
+                Yes
+            {% else %}
+                No
+            {% endif %}
+
+        {% elif row.info|template_is_instance:'dict' %}
+            {% include 'nanny_general_address_template.html' %}
+
+        {% endif %}
+    </td>
+    <td class="change-answer">
+        <!-- If row contains declare checkbox, render that.
+             If it is the final summary page, a 'Change' link is instead required. -->
+        {% if row.declare %}
+            {{ row.declare }}
+        {% elif context.search_table %}
+            <a class="change-answer" href="{% url row.change_link %}?id={{ application_id }}">Change</a>
+        {% elif context.change_link %}
+            <a class="change-answer" href="{% url context.change_link %}?id={{ application_id }}">Change</a>
+        {% endif %}
+    </td>
+</tr>
+<tr class="js-hidden" id="{{row.id}}">
+    <td colspan="1">
+        <div>
+            {{ row.comments.label }}
+        </div>
+        <div>
+            {{ row.comments.help_text }}
+        </div>
+    </td>
+    <td colspan="2">
+        {{ row.comments }}
+    </td>
+</tr>

@@ -1,0 +1,68 @@
+{% extends 'govuk_template.html' %}
+{% block page_title %}Review: Personal details{% endblock %}
+{% load static %}
+{% load govuk_template_base %}
+{% load alt_text_extras %}
+
+{% block inner_content %}
+{% include 'back-button.html' %}
+
+<form method="post" novalidate>
+
+    <h1 class="form-title heading-large">Review: Your personal details</h1>
+    <p>
+        Please check the boxes if there are errors.
+    </p>
+
+    <table class="check-your-answers form-group">
+        <thead>
+        <tr>
+            <th colspan="3">
+                <div class="heading-medium">
+                    Name and date of birth
+                </div>
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+        {% load general_table_extras %}
+        {% for row in rows %}
+        {% if row.id|template_string_in_list:'name date_of_birth' %}
+        {% include 'nanny_general_table_template.html' %}
+        {% endif %}
+        {% endfor %}
+
+        </tbody>
+    </table>
+
+    <table class="check-your-answers form-group">
+        <thead>
+        <tr>
+            <th colspan="3">
+                <div class="heading-medium">
+                    Your home address
+                </div>
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+
+        {% for row in rows %}
+        {% if row.id|template_string_in_list:'home_address lived_abroad' %}
+        {% include 'nanny_general_table_template.html' %}
+        {% endif %}
+        {% endfor %}
+
+        </tbody>
+    </table>
+
+    {% csrf_token %}
+
+    <input type="submit" class="button" value="Confirm and continue"/>
+    <input type="hidden" value="{{application_id}}" name="id"/>
+
+    {% include 'nanny_templates/nanny_return_to_list.html' %}
+
+</form>
+
+{% endblock %}
