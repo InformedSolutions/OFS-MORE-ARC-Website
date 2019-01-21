@@ -55,8 +55,11 @@ name_field_dict = {
     'Email address': 'email_address',
     'What type of childcare training have you completed?': 'childcare_training',
     'Have you lived outside of the UK in the last 5 years?': 'lived_abroad',
+    'Lived abroad': 'lived_abroad',
     'Have you lived or worked on a British military base outside of the UK in the last 5 years?': 'military_base',
+    'British Military Base': 'military_base',
     'Did you get a DBS certificate from the Ofsted DBS application website in the last 3 months?': 'capita',
+    'Ofsted DBS': 'capita',
     'Are you on the DBS update service?': 'on_update',
     'Which of your children live with you?': 'children_living_with_childminder_selection'
 }
@@ -364,6 +367,9 @@ def load_json(application_id_local, ordered_models, recurse):
                     {"title": "Adults in the home", "id": application_id_local},
                     {"name": "Does anyone aged 16 or over live or work in your home?",
                      "value": adults_in_home}
+
+
+
                 ])
 
         elif model == Application:

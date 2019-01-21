@@ -101,7 +101,10 @@ class AdultInHome(models.Model):
             {"name": "Date of birth", "value": date_of_birth},
             {"name": "Relationship", "value": self.relationship},
             {"name": "Email", "value": self.email},
+            {"name": "Ofsted DBS", "value": ("Yes" if self.known_to_council == True else "No")},
             {"name": "DBS certificate number", "value": self.dbs_certificate_number},
+            {"name": "Lived abroad", "value": ("Yes" if self.known_to_council == True else "No")},
+            {"name": "British Military Base", "value": self.military_base},
             {"name": "Known to council", "value": ("Yes" if self.known_to_council == True else "No")}
         ]
         if self.known_to_council == True:
