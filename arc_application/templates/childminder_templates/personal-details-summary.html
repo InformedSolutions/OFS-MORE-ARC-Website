@@ -333,7 +333,7 @@
         <tbody>
         <tr>
             <td>
-                Do you have children of your own under 16?
+                Known to council social services?
             </td>
             {% if own_children %}
             <td style="word-wrap: break-word">
@@ -360,6 +360,29 @@
             <td colspan="2">
                 <div>
                     {{ form.own_children_comments}}
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Tell us why
+            </td>
+            <td class="change-answer">
+                {{ form.reasons_known_to_social_services_declare }}
+            </td>
+        </tr>
+        <tr class="js-hidden" id="reasons_known_to_social_services">
+            <td colspan="1">
+                <div>
+                    Enter your reasoning
+                </div>
+                <div>
+                    {{ form.reasons_known_to_social_services_comments.help_text}}
+                </div>
+            </td>
+            <td colspan="2">
+                <div>
+                    {{ form.reasons_known_to_social_services_comments}}
                 </div>
             </td>
         </tr>

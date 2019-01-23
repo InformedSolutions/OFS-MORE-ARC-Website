@@ -66,7 +66,14 @@ class PersonalDetailsForm(GOVUKForm):
     own_children_declare = forms.BooleanField(label='This information is correct',
                                               widget=custom_field_widgets.CustomCheckboxInput,
                                               required=False)
-    own_children_comments = forms.CharField(label="Is this another childminder's home?",
+    own_children_comments = forms.CharField(label="Known to council social services?",
+                                            help_text='(Tip: be clear and concise)',
+                                            widget=custom_field_widgets.Textarea, required=False,
+                                            max_length=250)
+    reasons_known_to_social_services_declare = forms.BooleanField(label='This information is correct',
+                                              widget=custom_field_widgets.CustomCheckboxInput,
+                                              required=False)
+    reasons_known_to_social_services_comments = forms.CharField(label="Tell us why",
                                             help_text='(Tip: be clear and concise)',
                                             widget=custom_field_widgets.Textarea, required=False,
                                             max_length=250)
