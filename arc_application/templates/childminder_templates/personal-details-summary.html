@@ -363,9 +363,14 @@
                 </div>
             </td>
         </tr>
+         {% if own_children %}
         <tr>
+
             <td>
                 Tell us why
+            </td>
+            <td style="word-wrap: break-word">
+                {{reasons_known_to_social_services}}
             </td>
             <td class="change-answer">
                 {{ form.reasons_known_to_social_services_declare }}
@@ -385,8 +390,9 @@
                     {{ form.reasons_known_to_social_services_comments}}
                 </div>
             </td>
-        </tr>
 
+        </tr>
+        {% endif %}
         </tbody>
     </table>
 
