@@ -22,7 +22,7 @@ class GenericApplicationHandler:
         return Arc.objects.filter(user_id=self.arc_user.id)
 
     def add_application_from_pool(self):
-        if self.__get_assigned_applications().count() <= settings.APPLICATION_LIMIT:
+        if self.__get_assigned_applications().count() <= (settings.APPLICATION_LIMIT-1):
 
             app_id = self._get_oldest_app_id()
             self._assign_app_to_user(app_id)
@@ -93,7 +93,7 @@ class ChildminderApplicationHandler(GenericApplicationHandler):
         childminder_apps_for_review = Application.objects.filter(application_status='SUBMITTED')
 
         if childminder_apps_for_review.exists():
-            childminder_apps_for_review.order_by('date_updated')
+            childminder_apps_for_review = childminder_apps_for_review.order_by('date_updated')
             return childminder_apps_for_review[0].application_id
 
         else:
