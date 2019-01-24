@@ -42,7 +42,8 @@ def personal_details_summary(request):
     CHILDCARE_ADDRESS_FIELDS = ['childcare_address_declare', 'childcare_address_comments']
     WORKING_IN_OTHER_CHILDMINDER_HOME_FIELDS = ['working_in_other_childminder_home_declare',
                                                 'working_in_other_childminder_home_comments']
-    OWN_CHILDREN_FIELDS = ['own_children_declare', 'own_children_comments']
+    OWN_CHILDREN_FIELDS = ['own_children_declare', 'own_children_comments', 'reasons_known_to_social_services_declare', 'reasons_known_to_social_services_comments']
+    REASONS_KNOWN_TO_SOCIAL_SERVICES_FIELDS = ['reasons_known_to_social_services_declare', 'reasons_known_to_social_services_comments']
     PERSON_TYPE = 'APPLICANT'
 
     if request.method == 'GET':
@@ -66,6 +67,7 @@ def personal_details_summary(request):
         childcare_address_dict = {}
         working_in_other_childminder_home_dict = {}
         own_children_dict = {}
+        reasons_known_to_social_services_dict = {}
 
         form = PersonalDetailsForm(request.POST,
                                    table_keys=[personal_detail_id, applicant_name_id, applicant_home_address_id,
@@ -94,6 +96,8 @@ def personal_details_summary(request):
                     working_in_other_childminder_home_dict[field] = form.cleaned_data[field]
                 if field in OWN_CHILDREN_FIELDS:
                     own_children_dict[field] = form.cleaned_data[field]
+                if field in REASONS_KNOWN_TO_SOCIAL_SERVICES_FIELDS:
+                    reasons_known_to_social_services_dict[field] = form.cleaned_data[field]
 
             # Populate below lists with comments by table
             birthdate_comments = request_to_comment(personal_detail_id, TABLE_NAMES[0], birthdate_dict)
@@ -104,6 +108,7 @@ def personal_details_summary(request):
             working_in_other_childminder_home_comments = request_to_comment(application_id_local, TABLE_NAMES[3],
                                                                             working_in_other_childminder_home_dict)
             own_children_comments = request_to_comment(application_id_local, TABLE_NAMES[3], own_children_dict)
+            reasons_known_to_social_services_comments = request_to_comment(application_id_local, TABLE_NAMES[3], own_children_dict)
 
             birthdate_save_successful = save_comments(request, birthdate_comments)
             name_save_successful = save_comments(request, name_comments)
@@ -112,10 +117,11 @@ def personal_details_summary(request):
             working_in_other_childminder_home_save_successful = save_comments(request,
                                                                               working_in_other_childminder_home_comments)
             own_children_save_successful = save_comments(request, own_children_comments)
+            reasons_known_to_social_services_save_successful = save_comments(request, reasons_known_to_social_services_comments)
 
             application = Application.objects.get(pk=application_id_local)
 
-            if not birthdate_comments and not name_comments and not home_address_comments and not childcare_address_comments and not working_in_other_childminder_home_comments and not own_children_comments:
+            if not birthdate_comments and not name_comments and not home_address_comments and not childcare_address_comments and not working_in_other_childminder_home_comments and not own_children_comments and not reasons_known_to_social_services_comments:
                 section_status = 'COMPLETED'
                 application.personal_details_arc_flagged = False
             else:
@@ -124,7 +130,7 @@ def personal_details_summary(request):
 
             application.save()
 
-            if birthdate_save_successful and name_save_successful and home_address_save_successful and childcare_address_save_successful and working_in_other_childminder_home_save_successful and own_children_save_successful:
+            if birthdate_save_successful and name_save_successful and home_address_save_successful and childcare_address_save_successful and working_in_other_childminder_home_save_successful and own_children_save_successful and reasons_known_to_social_services_save_successful:
 
                 status = Arc.objects.get(pk=application_id_local)
                 status.personal_details_review = section_status
@@ -173,6 +179,7 @@ def personal_details_summary(request):
     previous_names = PreviousName.objects.filter(other_person_type=PERSON_TYPE, person_id=application_id_local)
     previous_addresses = get_stored_addresses(application_id_local, PERSON_TYPE)
 
+
     form.error_summary_title = 'There was a problem'
 
     variables = {
@@ -199,6 +206,7 @@ def personal_details_summary(request):
         'previous_names': previous_names,
         'previous_addresses': previous_addresses,
         'own_children': application.own_children,
+        'reasons_known_to_social_services' : application.reasons_known_to_social_services,
         'working_in_other_childminder_home': working_in_other_childminder_home
     }
 

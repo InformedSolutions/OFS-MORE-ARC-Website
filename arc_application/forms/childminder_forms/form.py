@@ -81,7 +81,8 @@ class PersonalDetailsForm(GOVUKForm):
     checkboxes = [(name_declare, 'name'), (date_of_birth_declare, 'date_of_birth'),
                   (home_address_declare, 'home_address'), (childcare_address_declare, 'childcare_address'),
                   (working_in_other_childminder_home_declare, 'working_in_other_childminder_home'),
-                  (own_children_declare, 'own_children')]
+                  (own_children_declare, 'own_children'),
+                  (reasons_known_to_social_services_declare, 'reasons_known_to_social_services')]
 
     for box in checkboxes:
         box[0].widget.attrs.update({'data_target': box[1],
