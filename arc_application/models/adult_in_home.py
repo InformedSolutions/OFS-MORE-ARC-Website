@@ -2,7 +2,7 @@ import datetime
 from uuid import uuid4
 from django.db import models
 from .application import Application
-
+#from .childcare_type import ChildcareType
 
 class AdultInHome(models.Model):
     """
@@ -104,11 +104,16 @@ class AdultInHome(models.Model):
             {"name": "Ofsted DBS", "value": ("Yes" if self.known_to_council == True else "No")},
             {"name": "DBS certificate number", "value": self.dbs_certificate_number},
             {"name": "Lived abroad", "value": ("Yes" if self.known_to_council == True else "No")},
-            {"name": "British Military Base", "value": self.military_base},
             {"name": "Known to council", "value": ("Yes" if self.known_to_council == True else "No")}
         ]
+
         if self.known_to_council == True:
             summary_table.append({"name": "Details of children", "value": self.children_details})
+
+        from .childcare_type import ChildcareType
+
+        if ChildcareType.objects.get(application_id=self.application_id).zero_to_five:
+           summary_table.insert(-1, {"name": "British Military Base", "value": self.military_base})
 
         return summary_table
 
