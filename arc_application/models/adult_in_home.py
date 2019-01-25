@@ -104,8 +104,6 @@ class AdultInHome(models.Model):
             {"name": "Ofsted DBS", "value": ("Yes" if self.known_to_council == True else "No")},
             {"name": "DBS certificate number", "value": self.dbs_certificate_number},
             {"name": "Lived abroad", "value": ("Yes" if self.known_to_council == True else "No")},
-            {"name": "Lived abroad", "value": ("Yes" if self.known_to_council == True else "No")},
-            {"name": "British Military Base", "value": self.military_base},
             {"name": "Known to council", "value": ("Yes" if self.known_to_council == True else "No")}
         ]
 
