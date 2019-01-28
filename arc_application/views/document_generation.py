@@ -5,7 +5,11 @@ from ..models import *
 from .childminder_views.arc_summary import load_json, add_comments
 
 
-def get_document_summary(request):
+def get_full_application_summary(request):
+
+    """
+    Renders a full application summary in a PDF format
+    """
 
     resp = HttpResponse(content_type='application/pdf')
 
