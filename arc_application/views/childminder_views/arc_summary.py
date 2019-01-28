@@ -5,9 +5,9 @@ from django.shortcuts import render
 from django.urls import reverse
 from timeline_logger.models import TimelineLog
 
-from arc_application.decorators import group_required, user_assigned_application
-from arc_application.models import *
-from arc_application.summary_page_data import link_dict
+from ...decorators import group_required, user_assigned_application
+from ...models import *
+from ...summary_page_data import link_dict
 from .review import review, has_group
 
 """
