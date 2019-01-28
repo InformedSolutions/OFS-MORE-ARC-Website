@@ -11,13 +11,14 @@ class NannyHelperTests(TestCase):
 
     def setUp(self):
 
+        self.application_id = 'e54bd2a9-8e8c-419a-9691-64e432713626'
         self.dob_test_list_correct = [
             ('2013-12-14', ['2013', '12', '14']),
             ('2015-02-15', ['2015', '02', '15'])
         ]
 
         self.mock_arc_application_mixed = {
-            'application_id': 'e54bd2a9-8e8c-419a-9691-64e432713626',
+            'application_id': self.application_id,
             'user_id': '1',
             'last_accessed': '2018-08-13T15:06:57.014581Z',
             'app_type': 'Nanny',
@@ -28,10 +29,11 @@ class NannyHelperTests(TestCase):
             'childcare_training_review': 'COMPLETED',
             'dbs_review': 'FLAGGED',
             'insurance_cover_review': 'COMPLETED',
+            'your_children_review': 'FLAGGED',
         }
 
         self.mock_arc_application_all_flagged = {
-            'application_id': 'e54bd2a9-8e8c-419a-9691-64e432713626',
+            'application_id': self.application_id,
             'user_id': '1',
             'last_accessed': '2018-08-13T15:06:57.014581Z',
             'app_type': 'Nanny',
@@ -42,10 +44,11 @@ class NannyHelperTests(TestCase):
             'childcare_training_review': 'FLAGGED',
             'dbs_review': 'FLAGGED',
             'insurance_cover_review': 'FLAGGED',
+            'your_children_review': 'FLAGGED'
         }
 
         self.mock_arc_application_all_completed = {
-            'application_id': 'e54bd2a9-8e8c-419a-9691-64e432713626',
+            'application_id': self.application_id,
             'user_id': '1',
             'last_accessed': '2018-08-13T15:06:57.014581Z',
             'app_type': 'Nanny',
@@ -56,6 +59,7 @@ class NannyHelperTests(TestCase):
             'childcare_training_review': 'COMPLETED',
             'dbs_review': 'COMPLETED',
             'insurance_cover_review': 'COMPLETED',
+            'your_children_review': 'COMPLETED'
         }
 
     @tag('unit')
@@ -67,31 +71,32 @@ class NannyHelperTests(TestCase):
     def test_check_all_task_statuses(self):
         mock_app = self.mock_arc_application_all_flagged
 
-        self.assertTrue(testing_check_all_task_statuses(mock_app, ['FLAGGED']))
+        self.assertTrue(testing_check_all_task_statuses(mock_app, self.application_id,
+                                                        ['FLAGGED']))
 
     @tag('unit')
     def test_nanny_all_completed(self):
 
         # Test all_completed with a MIXED dictionary asserts FALSE
-        self.assertFalse(testing_all_completed(self.mock_arc_application_mixed))
+        self.assertFalse(testing_all_completed(self.mock_arc_application_mixed, self.application_id))
 
         # Test all_completed with a COMPLETED dictionary asserts TRUE
-        self.assertTrue(testing_all_completed(self.mock_arc_application_all_completed))
+        self.assertTrue(testing_all_completed(self.mock_arc_application_all_completed, self.application_id))
 
         # Test all_completed with a FLAGGED dictionary asserts FALSE
-        self.assertFalse(testing_all_completed(self.mock_arc_application_all_flagged))
+        self.assertFalse(testing_all_completed(self.mock_arc_application_all_flagged, self.application_id))
 
     @tag('unit')
     def test_nanny_all_reviewed(self):
 
         # Test all_reviewed with a MIXED dictionary asserts TRUE
-        self.assertTrue(testing_all_reviewed(self.mock_arc_application_mixed))
+        self.assertTrue(testing_all_reviewed(self.mock_arc_application_mixed, self.application_id))
 
         # Test all_reviewed with a COMPLETED dictionary asserts TRUE
-        self.assertTrue(testing_all_reviewed(self.mock_arc_application_all_completed))
+        self.assertTrue(testing_all_reviewed(self.mock_arc_application_all_completed, self.application_id))
 
         # Test all_reviewed with a FLAGGED dictionary asserts TRUE
-        self.assertTrue(testing_all_reviewed(self.mock_arc_application_all_flagged))
+        self.assertTrue(testing_all_reviewed(self.mock_arc_application_all_flagged, self.application_id))
 
 
 def testing_parse_date_of_birth(test_case):
@@ -99,19 +104,19 @@ def testing_parse_date_of_birth(test_case):
     return parse_date_of_birth(test_input) == expected_output
 
 
-def testing_check_all_task_statuses(mock_arc, status_list):
+def testing_check_all_task_statuses(mock_arc, application_id, status_list):
     arc_app = Arc.objects.create(**mock_arc)
-    return check_all_task_statuses(arc_app, status_list)
+    return check_all_task_statuses(arc_app, application_id, status_list)
 
 
-def testing_all_completed(mock_arc_data):
+def testing_all_completed(mock_arc_data, application_id):
     mock_app = MockApplication(mock_arc_data)
-    return nanny_all_completed(mock_app)
+    return nanny_all_completed(mock_app, application_id)
 
 
-def testing_all_reviewed(mock_arc_data):
+def testing_all_reviewed(mock_arc_data, application_id):
     mock_app = MockApplication(mock_arc_data)
-    return nanny_all_reviewed(mock_app)
+    return nanny_all_reviewed(mock_app, application_id)
 
 
 def delete_mock_application(app_id):

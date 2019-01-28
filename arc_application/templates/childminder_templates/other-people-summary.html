@@ -330,14 +330,21 @@
                     </div>
                 </td>
             </tr>
-
+        {% if childcare_type_zero_to_five.zero_to_five is True %}
             <tr>
                 <td style="word-wrap: break-word">
                     British Military Base
                 </td>
-                <td style="word-wrap: break-word">
-                    {{ military_base }}
                 </td>
+                {% if military_base is True %}
+                <td style="word-wrap: break-word">
+                    Yes
+                </td>
+                {% elif military_base is False %}
+                <td style="word-wrap: break-word">
+                    No
+                </td>
+                {% endif %}
                 <td class="change-answer">
                     {{ formsetadult.military_base_declare }}
                 </td>
@@ -357,7 +364,7 @@
                     </div>
                 </td>
             </tr>
-
+        {% endif %}
             </tbody>
             <input type="hidden" value="{{ application_id }}" name="id" />
 
