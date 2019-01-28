@@ -6,7 +6,7 @@ link_dict = {
     'Type of childcare': 'type_of_childcare_age_groups',
     'Your name and date of birth': 'personal_details_summary',
     'Your home and childcare address': 'personal_details_summary',
-    'Your children': 'your_children_summary',
+    'Your children': 'personal_details_summary',
     "Your children's addresses": 'your_children_summary',
     'First aid training': 'first_aid_training_summary',
     'Childcare training': 'childcare_training_check_summary',
