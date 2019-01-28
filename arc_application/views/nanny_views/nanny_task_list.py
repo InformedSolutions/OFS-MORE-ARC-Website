@@ -19,11 +19,11 @@ class NannyTaskList(View):
         # Get application ID
         application_id = request.GET["id"]
 
-        context = self.create_context(application_id)
+        context = self.create_context(application_id, request)
 
         return render(request, self.TEMPLATE_NAME, context=context)
 
-    def create_context(self, application_id):
+    def create_context(self, application_id, request):
         """
         Creates the context dictionary for this view.
         :param application_id: Reviewed application's id.
@@ -71,7 +71,7 @@ class NannyTaskList(View):
             'birth_day': int(birth_list[2]),
             'birth_month': int(birth_list[1]),
             'birth_year': int(birth_list[0]),
-            'all_complete': nanny_all_reviewed(arc_application),
+            'all_complete': nanny_all_reviewed(arc_application, application_id),
             'show_your_children': show_your_children
         }
 
