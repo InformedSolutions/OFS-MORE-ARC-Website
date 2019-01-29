@@ -113,7 +113,7 @@ class AdultInHome(models.Model):
         from .childcare_type import ChildcareType
 
         if ChildcareType.objects.get(application_id=self.application_id).zero_to_five:
-           summary_table.insert(-1, {"name": "British Military Base", "value": self.military_base})
+           summary_table.insert(-1, {"name": "British Military Base", "value":  ("Yes" if self.military_base == True else "No")})
 
         return summary_table
 
