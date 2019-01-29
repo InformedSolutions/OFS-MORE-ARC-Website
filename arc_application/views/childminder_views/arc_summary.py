@@ -276,10 +276,24 @@ def load_json(application_id_local, ordered_models, recurse):
                      "index": 2},
                     {"name": "Is this another childminder's home?",
                      "value": get_bool_as_string(working_in_other_childminder_home), 'pk': application_id_local,
-                     "index": 5},
-                    {"name": "Do you have children of your own under 16?", "value": get_bool_as_string(own_children),
-                     'pk': application_id_local, "index": 6}
+                     "index": 5}
                 ])
+
+            if own_children:
+                table_list.append([
+                    {"title": "Your children", "id": application_id_local},
+                    {"name": "Known to council social services?", "value": get_bool_as_string(own_children),
+                     'pk': application_id_local, "index": 1},
+                    {"name": "Tell us why", "value": reasons_known_to_social_services,
+                     'pk': application_id_local, "index": 2}
+                ])
+            else:
+                table_list.append([
+                    {"title": "Your children", "id": application_id_local},
+                    {"name": "Known to council social services?", "value": get_bool_as_string(own_children),
+                     'pk': application_id_local, "index": 1},
+                ])
+
             # If the address is only a home address
             if home_address_record != childcare_address_record:
                 home_address = get_address(home_address_street_line1, home_address_street_line2, home_address_town,
@@ -296,20 +310,6 @@ def load_json(application_id_local, ordered_models, recurse):
                      "index": 3}
                 ])
 
-                if own_children:
-                    table_list.append([
-                        {"title": "Your children", "id": application_id_local},
-                        {"name": "Known to council social services?", "value": get_bool_as_string(own_children),
-                         'pk': application_id_local, "index": 1},
-                        {"name": "Tell us why", "value": reasons_known_to_social_services,
-                         'pk': application_id_local, "index": 2}
-                    ])
-                else:
-                    table_list.append([
-                        {"title": "Your children", "id": application_id_local},
-                        {"name": "Known to council social services?", "value": get_bool_as_string(own_children),
-                         'pk': application_id_local, "index": 1},
-                    ])
 
                 if own_children:
 
