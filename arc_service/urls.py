@@ -95,7 +95,6 @@ urlpatterns = [
         name='nanny_update_add_number'),
     url(r'^personal-details/previous-registration', PreviousRegistrationDetailsView.as_view(),
         name='previous_registration_details'),
-    url(r'^your-children/summary/', your_children_summary, name='your_children_summary'),
     url(r'^nanny/review/', NannyTaskList.as_view(), name='nanny_task_list'),
     url(r'^nanny/contact-details/', NannyContactDetailsSummary.as_view(), name='nanny_contact_summary'),
     url(r'^nanny/personal-details/', NannyPersonalDetailsSummary.as_view(), name='nanny_personal_details_summary'),

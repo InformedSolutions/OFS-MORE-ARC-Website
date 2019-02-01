@@ -138,7 +138,7 @@ def personal_details_summary(request):
                 default = '/first-aid/summary'
 
                 if application.own_children:
-                    default = '/your-children/summary'
+                    default = '/first-aid/summary'
 
                 redirect_link = redirect_selection(request, default)
 

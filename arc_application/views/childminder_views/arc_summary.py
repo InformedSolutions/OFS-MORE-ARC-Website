@@ -29,7 +29,7 @@ name_field_dict = {
     'Your home address': 'home_address',
     'Childcare address': 'childcare_address',
     'Is this another childminder\'s home?': 'working_in_other_childminder_home',
-    'Do you have children of your own under 16?': 'own_children',
+    'Known to council social services?': 'own_children',
     'Training organisation': 'first_aid_training_organisation',
     'first_aid_training_course': 'title_of_training_course',
     'first_aid_date': 'course_date',
@@ -61,7 +61,6 @@ name_field_dict = {
     'Did you get a DBS certificate from the Ofsted DBS application website in the last 3 months?': 'capita',
     'Ofsted DBS': 'capita',
     'Are you on the DBS update service?': 'on_update',
-    'Which of your children live with you?': 'children_living_with_childminder_selection'
 }
 
 
@@ -168,8 +167,6 @@ def add_comments(json, app_id):
             id = title_row['id']
             title = title_row['title']
             label = link_dict[title] if title in link_dict.keys() else 'other_people_summary'
-            if id == 'Child':
-                label = 'your_children_summary'
             for row in table[1:]:
                 if 'pk' in row:
                     id = row['pk']
@@ -279,20 +276,7 @@ def load_json(application_id_local, ordered_models, recurse):
                      "index": 5}
                 ])
 
-            if own_children:
-                table_list.append([
-                    {"title": "Your children", "id": application_id_local},
-                    {"name": "Known to council social services?", "value": get_bool_as_string(own_children),
-                     'pk': application_id_local, "index": 1},
-                    {"name": "Tell us why", "value": reasons_known_to_social_services,
-                     'pk': application_id_local, "index": 2}
-                ])
-            else:
-                table_list.append([
-                    {"title": "Your children", "id": application_id_local},
-                    {"name": "Known to council social services?", "value": get_bool_as_string(own_children),
-                     'pk': application_id_local, "index": 1},
-                ])
+
 
             # If the address is only a home address
             if home_address_record != childcare_address_record:
@@ -310,50 +294,20 @@ def load_json(application_id_local, ordered_models, recurse):
                      "index": 3}
                 ])
 
-
                 if own_children:
-
-                    # Create a table for Your children's addresses
-                    children_living_with_childminder = Child.objects.filter(application_id=application_id_local,
-                                                                            lives_with_childminder=True).order_by('child')
-                    children = []
-
-                    for child in children_living_with_childminder:
-                        children.append(child.get_full_name())
-
-                    children_string = ', '.join(children)
-
                     table_list.append([
-                        {"title": "Your children's addresses", "id": application_id_local},
-                        {"name": "Which of your children live with you?", "value": children_string,
-                         'pk': application_id_local, "index": 1}
+                        {"title": "Your children", "id": application_id_local},
+                        {"name": "Known to council social services?", "value": get_bool_as_string(own_children),
+                         'pk': application_id_local, "index": 1},
+                        {"name": "Tell us why", "value": reasons_known_to_social_services,
+                         'pk': application_id_local, "index": 2}
                     ])
-                    # Create tables for each child
-                    all_children = Child.objects.filter(application_id=application_id_local).order_by('child')
-                    for child in all_children:
-                        name = child.get_full_name()
-                        if child.birth_day < 10:
-                            birth_day = '0' + str(child.birth_day)
-                        else:
-                            birth_day = str(child.birth_day)
-                        if child.birth_month < 10:
-                            birth_month = '0' + str(child.birth_month)
-                        else:
-                            birth_month = str(child.birth_month)
-                        date_of_birth = birth_day + ' ' + birth_month + ' ' + str(child.birth_year)
-
-                        child_address_record = ChildAddress.objects.get(application_id=application_id_local,
-                                                                        child=child.child)
-                        child_address = get_address(child_address_record.street_line1,
-                                                    child_address_record.street_line2, child_address_record.town,
-                                                    child_address_record.postcode)
-
-                        table_list.append([
-                            {"title": name, "id": "Child"},
-                            {"name": "Name", "value": name, 'pk': child.pk, "index": 1},
-                            {"name": "Date of birth", "value": date_of_birth, 'pk': child.pk, "index": 2},
-                            {"name": "Address", "value": child_address, 'pk': child_address_record.pk, "index": 3}
-                        ])
+                else:
+                    table_list.append([
+                        {"title": "Your children", "id": application_id_local},
+                        {"name": "Known to council social services?", "value": get_bool_as_string(own_children),
+                         'pk': application_id_local, "index": 1},
+                    ])
 
         elif model == CriminalRecordCheck:
 
