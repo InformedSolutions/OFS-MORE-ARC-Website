@@ -10,6 +10,7 @@ from arc_application.childminder_task_util import get_show_references
 from ...models.previous_name import PreviousName
 from ...forms.childminder_forms.form import AdultInYourHomeForm, ChildInYourHomeForm, OtherPeopleInYourHomeForm, OtherPersonPreviousNames, \
     ChildForm, ChildAddressForm
+from ...forms.childminder_forms import CygnumRelationshipType
 from ...models import ChildInHome, AdultInHome, Arc, Application, PreviousAddress, ChildAddress, \
     OtherPersonPreviousRegistrationDetails, HealthCheckCurrent, HealthCheckSerious, HealthCheckHospital, ChildcareType, \
     Child, ApplicantHomeAddress
@@ -31,6 +32,7 @@ def other_people_summary(request):
     """
     # Defines the formset using formset factory
     AdultFormSet = formset_factory(AdultInYourHomeForm, extra=0)
+    RelationshipTypeFormset = formset_factory(CygnumRelationshipType, extra=0)
     ChildInHomeFormSet = formset_factory(ChildInYourHomeForm, extra=0)
     ChildNotInHomeFormSet = formset_factory(ChildForm, extra=0)
     ChildNotInHomeAddressFormSet = formset_factory(ChildAddressForm, extra=0)
@@ -146,6 +148,16 @@ def other_people_summary(request):
         # Instantiates the formset with the management data defined above, forcing a set amount of forms
         formset_adult = AdultFormSet(initial=initial_adult_data, prefix='adult')
 
+        n_adults = len(initial_adult_data)
+        formset_relationship_type = RelationshipTypeFormset(
+            prefix='adult-relationship',
+            initial={
+                'adult-relationship-TOTAL_FORMS': n_adults,
+                'adult-relationship-INITIAL_FORMS': n_adults,
+                'adult-relationship-MAX_NUM_FORMS': n_adults,
+            }
+        )
+
         # Zips the formset into the list of adults
         # Converts it to a list, there was trouble parsing the form objects when it was in a zip object
         adult_lists = list(
@@ -153,7 +165,7 @@ def other_people_summary(request):
                 adult_birth_month_list, adult_birth_year_list, adult_relationship_list, adult_dbs_list,
                 adult_lived_abroad,
                 adult_military_base, adult_capita_dbs,
-                formset_adult, current_illnesses, serious_illnesses, hospital_admissions, local_authorities))
+                formset_adult, formset_relationship_type, current_illnesses, serious_illnesses, hospital_admissions, local_authorities))
 
         initial_child_data = other_people_initial_population(False, children)
 
@@ -175,6 +187,7 @@ def other_people_summary(request):
         variables = {
             'form': form,
             'formset_adult': formset_adult,
+            'formset_relationship_type': formset_relationship_type,
             'formset_child': formset_child,
             'formset_own_child': formset_own_child,
             'formset_own_child_address': formset_own_child_address,
