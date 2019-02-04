@@ -1030,6 +1030,68 @@ class AdultInYourHomeForm(GOVUKForm):
                                       widget=custom_field_widgets.Textarea,
                                       required=False, max_length=250)
 
+    cygnum_relationship_choices = (
+        (None, ''),
+        ('Acting manager', 'Acting manager'),
+        ('Boyfriend', 'Boyfriend'),
+        ('Brother', 'Brother'),
+        ('Brother in law', 'Brother in law'),
+        ('Chairperson', 'Chairperson'),
+        ('Childminding Assistant', 'Childminding Assistant'),
+        ('CIO Member', 'CIO Member'),
+        ('Co-Childminder', 'Co-Childminder'),
+        ('Committee Member', 'Committee Member'),
+        ('Co-Ordinator', 'Co-Ordinator'),
+        ('Cousin', 'Cousin'),
+        ('Daughter', 'Daughter'),
+        ('Deputy Manager', 'Deputy Manager'),
+        ('Director', 'Director'),
+        ('Father', 'Father'),
+        ('Father in Law', 'Father in Law'),
+        ('Fiancé', 'Fiancé'),
+        ('Foster Child', 'Foster Child'),
+        ('Friend', 'Friend'),
+        ('Governor', 'Governor'),
+        ('Granddaughter', 'Granddaughter'),
+        ('Grandson', 'Grandson'),
+        ('Head Teacher', 'Head Teacher'),
+        ('Home Childcarer', 'Home Childcarer'),
+        ('Husband', 'Husband'),
+        ('Job Share', 'Job Share'),
+        ('Joint Manager', 'Joint Manager'),
+        ('Lodger', 'Lodger'),
+        ('Manager', 'Manager'),
+        ('Managing Director', 'Managing Director'),
+        ('Mother', 'Mother'),
+        ('Mother in Law', 'Mother in Law'),
+        ('Named Contact', 'Named Contact'),
+        ('Nephew', 'Nephew'),
+        ('Niece', 'Niece'),
+        ('Owner', 'Owner'),
+        ('Partner', 'Partner'),
+        ('Person in Charge', 'Person in Charge'),
+        ('Secretary', 'Secretary'),
+        ('Sister', 'Sister'),
+        ('Son', 'Son'),
+        ('Son in Law', 'Son in Law'),
+        ('Step-Daughter', 'Step-Daughter'),
+        ('Step-Son', 'Step-Son'),
+        ('Supervisor', 'Supervisor'),
+        ('Tenant', 'Tenant'),
+        ('Treasurer', 'Treasurer'),
+        ('Trustee', 'Trustee'),
+        ('Vice Chair', 'Vice Chair'),
+        ('Wife', 'Wife'),
+    )
+
+    cygnum_relationship = forms.ChoiceField(
+        label='Select (Cygnum) relationship type',
+        error_messages={
+            'required': 'You must select a relationship type for this person'
+        },
+        choices=cygnum_relationship_choices,
+    )
+
     # This is the id appended to all htmls names ot make the individual form instance unique, this is given a value in
     # the init
     instance_id = forms.CharField(widget=forms.HiddenInput, required=False)

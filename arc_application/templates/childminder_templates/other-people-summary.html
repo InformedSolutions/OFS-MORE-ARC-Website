@@ -30,7 +30,6 @@
         </p>
         {% csrf_token %}
         {{ formset_adult.management_form }}
-        {{ formset_relationship_type.management_form }}
         {{ formset_child.management_form }}
         {{ formset_own_child.management_form }}
         {{ formset_own_child_address.management_form }}
@@ -81,7 +80,7 @@
             </tbody>
         </table>
 
-        {% for record, id , health_check_status, name, day, month, year, relationship, dbs_certificate_number, lived_abroad, military_base, capita, formsetadult, formset_relationship_type, current_illness_set, serious_illness_set, hospital_admission_set, children_details in adult_lists %}
+        {% for record, id , health_check_status, name, day, month, year, relationship, dbs_certificate_number, lived_abroad, military_base, capita, formsetadult, current_illness_set, serious_illness_set, hospital_admission_set, children_details in adult_lists %}
         <table class="check-your-answers form-group">
             <thead>
             <tr>
@@ -373,7 +372,7 @@
                     Select relationship type
                 </td>
                 <td colspan="2">
-                    {{ formset_relationship_type.relationship_type }}
+                    {{ formsetadult.cygnum_relationship }}
                 </td>
             </tbody>
         </table>
