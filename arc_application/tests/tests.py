@@ -5,20 +5,25 @@ from django.contrib.auth.models import Group, User
 from django.test import TestCase, RequestFactory
 from django.urls import reverse
 
-from arc_application.childminder_task_util import get_number_of_tasks
-from arc_application.models import (ApplicantHomeAddress,
+from unittest import mock
+
+from ..models import (AdultInHome,
+                      ApplicantHomeAddress,
                       ApplicantName,
                       ApplicantPersonalDetails,
                       Application,
                       Arc,
                       ArcComments,
+                      ChildcareType,
                       ChildInHome,
                       CriminalRecordCheck,
+                      EYFS,
                       FirstAidTraining,
                       Reference,
-                      UserDetails,
-                      ChildcareType)
-from ..views.childminder_views.type_of_childcare import get_register_name
+                      HealthCheckHospital,
+                      HealthCheckSerious,
+                      HealthCheckCurrent,
+                      UserDetails)
 
 application = None
 personal_details = None
@@ -36,7 +41,6 @@ def create_application():
     global name
     global user_details
     global arc_records
-    global childcare_type
 
     application = Application.objects.create(
         application_type='CHILDMINDER',
@@ -51,8 +55,8 @@ def create_application():
         childcare_type_arc_flagged=False,
         first_aid_training_status='NOT_STARTED',
         first_aid_training_arc_flagged=False,
-        childcare_training_status='COMPLETED',
-        childcare_training_arc_flagged=False,
+        eyfs_training_status='COMPLETED',
+        eyfs_training_arc_flagged=False,
         criminal_record_check_status='NOT_STARTED',
         criminal_record_check_arc_flagged=False,
         health_status='NOT_STARTED',
@@ -67,6 +71,16 @@ def create_application():
         date_created=datetime.datetime.today(),
         date_updated=datetime.datetime.today(),
         date_accepted=None,
+        application_reference='2734739'
+    )
+
+    childcare_type = ChildcareType.objects.create(
+        childcare_id='2bc1fa3c-5b19-4198-9bca-fb3761dc172e',
+        zero_to_five=True,
+        five_to_eight=False,
+        eight_plus=False,
+        overnight_care=True,
+        application_id=application
     )
 
     details = ApplicantPersonalDetails.objects.create(
@@ -75,14 +89,6 @@ def create_application():
         birth_day='01',
         birth_month='01',
         birth_year='2001'
-    )
-
-    childcare_type = ChildcareType.objects.create(
-        application_id=application,
-        zero_to_five=True,
-        five_to_eight=True,
-        eight_plus=True,
-        overnight_care=True
     )
 
     personal_details = details
@@ -113,6 +119,79 @@ def create_application():
         last_name='Odense'
     )
 
+    adult1 = AdultInHome.objects.create(
+        adult=1,
+        first_name='First',
+        middle_names='Middle',
+        last_name='Last',
+        birth_day=1,
+        birth_month=1,
+        birth_year=1980,
+        relationship='Partner',
+        dbs_certificate_number='123456789123',
+        application_id=application,
+        email='tester@informed.com',
+        validated=True,
+        serious_illness=False,
+        hospital_admission=False,
+        current_treatment=False,
+        health_check_status='COMPLETED',
+        email_resent=0
+    )
+
+    adult2 = AdultInHome.objects.create(
+        adult=2,
+        first_name='Second',
+        middle_names='Middle',
+        last_name='Last',
+        birth_day=2,
+        birth_month=2,
+        birth_year=1980,
+        relationship='Friend',
+        dbs_certificate_number='123456789122',
+        application_id=application,
+        email='tester2@informed.com',
+        validated=True,
+        serious_illness=True,
+        hospital_admission=True,
+        current_treatment=True,
+        health_check_status='COMPLETED',
+        email_resent=0
+    )
+
+    serious_illness = HealthCheckSerious.objects.create(
+        description='influenza',
+        start_date='2017-01-01',
+        end_date='2018-01-01',
+        person_id_id=adult2.pk
+    )
+
+    serious_illness = HealthCheckSerious.objects.create(
+        description='gangrene',
+        start_date='2016-12-01',
+        end_date='2017-01-01',
+        person_id_id=adult2.pk
+    )
+
+    hospital_admissions = HealthCheckHospital.objects.create(
+        description='surgery',
+        start_date='2017-01-01',
+        end_date='2017-01-02',
+        person_id_id=adult2.pk
+    )
+
+    hospital_admissions = HealthCheckHospital.objects.create(
+        description='appendix removal',
+        start_date='2018-01-01',
+        end_date='2018-02-02',
+        person_id_id=adult2.pk
+    )
+
+    current_illness = HealthCheckCurrent.objects.create(
+        description='plague',
+        person_id_id=adult2.pk
+    )
+
     user_details = UserDetails.objects.create(
         login_id='8362d470-ecc9-4069-876b-9b3ddc2cae07',
         application_id=application,
@@ -129,6 +208,15 @@ def create_application():
         course_year='2018',
         show_certificate=True,
         renew_certificate=True
+    )
+
+    eyfs = EYFS.objects.create(
+        eyfs_id='e220f870-df41-4bd8-872d-6e69e0680c0b',
+        application_id=application,
+        eyfs_course_date_day='01',
+        eyfs_course_date_month='01',
+        eyfs_course_date_year='2018',
+        eyfs_course_name='Test EYFS'
     )
 
     criminal_record_check = CriminalRecordCheck.objects.create(
@@ -254,12 +342,14 @@ class ArcSummaryTest(TestCase):
         self.assertEqual(resp.url, '/arc/summary')
         self.assertEqual(resp.status_code, 302)
 
-    def test_task_login_details(self):
+    def test_task_flagged_with_comment_login_details(self):
         # Assemble
         create_application()
 
         post_dictionary = {
             'id': application.application_id,
+            'mobile_number_declare': True,
+            'mobile_number_comments': 'There was a test issue with this field'
         }
 
         # Act
@@ -274,11 +364,25 @@ class ArcSummaryTest(TestCase):
 
         # 2. Ensure overall task status marked as FLAGGED in ARC view
         reloaded_arc_record = Arc.objects.get(pk=application.application_id)
-        self.assertEqual(reloaded_arc_record.login_details_review, 'COMPLETED')
+        self.assertEqual(reloaded_arc_record.login_details_review, flagged_status)
 
-        # 2. Check flagged boolean indicator is set on the application record
+        # 3. Check that comment has been correctly appended to application
+        try:
+            arc_comments = ArcComments.objects.get(
+                table_pk='8362d470-ecc9-4069-876b-9b3ddc2cae07',
+                table_name='USER_DETAILS',
+                field_name='mobile_number',
+                comment='There was a test issue with this field',
+                flagged=True,
+            )
+        except:
+            self.fail('ARC comment could not be retrieved for flagged field')
+
+        self.assertIsNotNone(arc_comments)
+
+        # 4. Check flagged boolean indicator is set on the application record
         reloaded_application = Application.objects.get(pk=application.application_id)
-        self.assertTrue(not reloaded_application.login_details_arc_flagged)
+        self.assertTrue(reloaded_application.login_details_arc_flagged)
 
     def test_task_flagged_with_comment_personal_details(self):
         # Assemble
@@ -407,6 +511,56 @@ class ArcSummaryTest(TestCase):
         reloaded_application = Application.objects.get(pk=application.application_id)
         self.assertTrue(reloaded_application.criminal_record_check_arc_flagged)
 
+    def test_task_flagged_with_comment_people_in_your_home(self):
+        # Assemble
+        create_application()
+
+        post_dictionary = {
+            'adult-TOTAL_FORMS': 1,
+            'adult-INITIAL_FORMS': 0,
+            'adult-MIN_NUM_FORMS': 0,
+            'adult-MAX_NUM_FORMS': 1000,
+            'child-TOTAL_FORMS': 1,
+            'child-INITIAL_FORMS': 0,
+            'child-MIN_NUM_FORMS': 0,
+            'child-MAX_NUM_FORMS': 1000,
+            'id': application.application_id,
+            'static-children_in_home_declare': True,
+            'static-children_in_home_comments': 'There was a test issue with this field'
+        }
+
+        # Act
+        self.client.login(username='arc_test', password='my_secret')
+        response = self.client.post(reverse('other_people_summary') + '?id=' + application.application_id,
+                                    post_dictionary)
+
+        # Assert
+
+        # 1. Check HTTP status code correct
+        self.assertEqual(response.status_code, 302)
+
+        # 2. Ensure overall task status marked as FLAGGED in ARC view
+        reloaded_arc_record = Arc.objects.get(pk=application.application_id)
+        self.assertEqual(reloaded_arc_record.people_in_home_review, flagged_status)
+
+        # 3. Check that comment has been correctly appended to application
+        try:
+            arc_comments = ArcComments.objects.get(
+                table_pk='da2265c2-2d65-4214-bfef-abcfe59b75aa',
+                table_name='APPLICATION',
+                field_name='children_in_home',
+                comment='There was a test issue with this field',
+                flagged=True,
+            )
+        except:
+            self.fail('ARC comment could not be retrieved for flagged field')
+
+        self.assertIsNotNone(arc_comments)
+
+        # 4. Check flagged boolean indicator is set on the application record
+        reloaded_application = Application.objects.get(pk=application.application_id)
+        self.assertTrue(reloaded_application.people_in_home_arc_flagged)
+
     def test_task_flagged_with_comment_references(self):
         # Assemble
         create_application()
@@ -449,142 +603,40 @@ class ArcSummaryTest(TestCase):
         reloaded_application = Application.objects.get(pk=application.application_id)
         self.assertTrue(reloaded_application.references_arc_flagged)
 
-    def test_get_number_of_tasks(self):
+    def test_can_accept_application(self):
         """
-        Tests the get_number_of_tasks function
+        HTTP request emulation test to check that an application can be accepted by an ARC reviewer.
         """
+
+        # Assemble
         create_application()
+        app_id = application.application_id
+        arc = Arc.objects.get(pk=app_id)
+        arc.login_details_review = 'COMPLETED'
+        arc.childcare_type_review = 'COMPLETED'
+        arc.personal_details_review = 'COMPLETED'
+        arc.first_aid_review = 'COMPLETED'
+        arc.eyfs_review = 'COMPLETED'
+        arc.dbs_review = 'COMPLETED'
+        arc.health_review = 'COMPLETED'
+        arc.references_review = 'COMPLETED'
+        arc.people_in_home_review = 'COMPLETED'
+        arc.save()
 
-        childcare_type.zero_to_five = True
-        childcare_type.save()
-        application.own_children = False
-        application.working_in_other_childminder_home = True
-        application.save()
+        post_dictionary = {
+            'id': app_id
+        }
 
-        number_of_tasks = get_number_of_tasks(application, childcare_type)
-        self.assertEqual(8, number_of_tasks)
+        # Act
+        self.client.login(username='arc_test', password='my_secret')
+        response = self.client.post(reverse('arc-summary') + '?id=' + app_id,
+                                    post_dictionary)
 
-        childcare_type.zero_to_five = True
-        childcare_type.save()
-        application.own_children = True
-        application.working_in_other_childminder_home = True
-        application.save()
+        # Assert
 
-        number_of_tasks = get_number_of_tasks(application, childcare_type)
-        self.assertEqual(9, number_of_tasks)
+        # 1. Check HTTP status code correct
+        self.assertEqual(response.status_code, 200)
 
-        childcare_type.zero_to_five = True
-        childcare_type.save()
-        application.own_children = True
-        application.working_in_other_childminder_home = False
-        application.save()
-
-        number_of_tasks = get_number_of_tasks(application, childcare_type)
-        self.assertEqual(10, number_of_tasks)
-
-        childcare_type.zero_to_five = False
-        childcare_type.save()
-        application.own_children = False
-        application.working_in_other_childminder_home = True
-        application.save()
-
-        number_of_tasks = get_number_of_tasks(application, childcare_type)
-        self.assertEqual(6, number_of_tasks)
-
-        childcare_type.zero_to_five = False
-        childcare_type.save()
-        application.own_children = False
-        application.working_in_other_childminder_home = False
-        application.save()
-
-        number_of_tasks = get_number_of_tasks(application, childcare_type)
-        self.assertEqual(7, number_of_tasks)
-
-        childcare_type.zero_to_five = False
-        childcare_type.save()
-        application.own_children = True
-        application.working_in_other_childminder_home = False
-        application.save()
-
-        number_of_tasks = get_number_of_tasks(application, childcare_type)
-        self.assertEqual(8, number_of_tasks)
-
-        childcare_type.zero_to_five = True
-        childcare_type.save()
-        application.own_children = False
-        application.working_in_other_childminder_home = False
-        application.save()
-
-        number_of_tasks = get_number_of_tasks(application, childcare_type)
-        self.assertEqual(9, number_of_tasks)
-
-        childcare_type.zero_to_five = False
-        childcare_type.save()
-        application.own_children = True
-        application.working_in_other_childminder_home = True
-        application.save()
-
-        number_of_tasks = get_number_of_tasks(application, childcare_type)
-        self.assertEqual(7, number_of_tasks)
-
-    def test_get_register_name(self):
-        """
-        Tests the get_register_name function
-        """
-        create_application()
-
-        childcare_type.zero_to_five = True
-        childcare_type.five_to_eight = True
-        childcare_type.eight_plus = True
-        childcare_type.save()
-
-        register = get_register_name(childcare_type)
-        self.assertEqual('Early Years Register and Childcare Register (both parts)', register)
-
-        childcare_type.zero_to_five = False
-        childcare_type.five_to_eight = True
-        childcare_type.eight_plus = True
-        childcare_type.save()
-
-        register = get_register_name(childcare_type)
-        self.assertEqual('Childcare Register (both parts)', register)
-
-        childcare_type.zero_to_five = True
-        childcare_type.five_to_eight = False
-        childcare_type.eight_plus = False
-        childcare_type.save()
-
-        register = get_register_name(childcare_type)
-        self.assertEqual('Early Years Register', register)
-
-        childcare_type.zero_to_five = True
-        childcare_type.five_to_eight = True
-        childcare_type.eight_plus = False
-        childcare_type.save()
-
-        register = get_register_name(childcare_type)
-        self.assertEqual('Early Years Register and Childcare Register (compulsory part)', register)
-
-        childcare_type.zero_to_five = True
-        childcare_type.five_to_eight = False
-        childcare_type.eight_plus = True
-        childcare_type.save()
-
-        register = get_register_name(childcare_type)
-        self.assertEqual('Early Years Register and Childcare Register (voluntary part)', register)
-
-        childcare_type.zero_to_five = False
-        childcare_type.five_to_eight = True
-        childcare_type.eight_plus = False
-        childcare_type.save()
-
-        register = get_register_name(childcare_type)
-        self.assertEqual('Childcare Register (compulsory part)', register)
-
-        childcare_type.zero_to_five = False
-        childcare_type.five_to_eight = False
-        childcare_type.eight_plus = True
-        childcare_type.save()
-
-        register = get_register_name(childcare_type)
-        self.assertEqual('Childcare Register (voluntary part)', register)
+        # 2. Check the application status is set to accepted.
+        reloaded_app = Application.objects.get(pk=app_id)
+        self.assertEqual(reloaded_app.application_status, 'ACCEPTED')
