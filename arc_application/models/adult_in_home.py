@@ -26,7 +26,7 @@ class AdultInHome(models.Model):
     current_treatment = models.NullBooleanField(null=True)
     serious_illness = models.NullBooleanField(null=True)
     known_to_council = models.NullBooleanField(null=True)
-    children_details = models.TextField(default='', null=True)
+    reasons_known_to_council_health_check = models.TextField(default='', null=True)
     hospital_admission = models.NullBooleanField(null=True)
     health_check_status = models.CharField(max_length=50, default='To do')
     email_resent = models.IntegerField(default=0)
@@ -101,14 +101,15 @@ class AdultInHome(models.Model):
             {"name": "Date of birth", "value": date_of_birth},
             {"name": "Relationship", "value": self.relationship},
             {"name": "Email", "value": self.email},
-            {"name": "Ofsted DBS", "value": ("Yes" if self.known_to_council == True else "No")},
+            {"name": "Ofsted DBS", "value": ("Yes" if self.capita == True else "No")},
             {"name": "DBS certificate number", "value": self.dbs_certificate_number},
-            {"name": "Lived abroad", "value": ("Yes" if self.known_to_council == True else "No")},
-            {"name": "Known to council", "value": ("Yes" if self.known_to_council == True else "No")}
+            {"name": "Lived abroad", "value": ("Yes" if self.lived_abroad == True else "No")},
+            {"name": "Known to council", "value": ("Yes" if self.known_to_council == True else "No")},
+            {"name": "Tell us why", "value": self.reasons_known_to_council_health_check}
         ]
 
         if self.known_to_council == True:
-            summary_table.append({"name": "Details of children", "value": self.children_details})
+            summary_table.append({"name": "Tell us why", "value": self.reasons_known_to_council_health_check})
 
         from .childcare_type import ChildcareType
 
