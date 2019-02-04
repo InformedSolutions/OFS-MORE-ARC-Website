@@ -1,0 +1,1 @@
+from .cygnum_relationship_type import CygnumRelationshipType
