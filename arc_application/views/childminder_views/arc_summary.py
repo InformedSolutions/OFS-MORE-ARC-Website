@@ -37,7 +37,7 @@ name_field_dict = {
     'eyfs_course_date': 'eyfs_course_date',
     'Provide a Health Declaration Booklet?': 'health_submission_consent',
     'DBS certificate number': 'dbs_certificate_number',
-    'Details of children': 'children_details',
+    #'Details of children': 'reasons_known_to_council_health_check',
     'Do you have any criminal cautions or convictions?': 'cautions_convictions',
     'Health questions status': 'health_check_status',
     'Name': 'full_name',
@@ -46,7 +46,8 @@ name_field_dict = {
     'Email': 'email',
     'Does anyone aged 16 or over live or work in your home?': 'adults_in_home',
     'Do children under 16 live in the home?': 'children_in_home',
-    'Do you have children of your own under 16 who do not live with you?': 'own_children_not_in_home',
+    'Known to council social services in regards to your own children?': 'own_children_not_in_the_home',
+    'Tell us why': 'reasons_known_to_social_services_pith',
     'Full name': 'full_name',
     'How they know you': 'relationship',
     'Known for': 'time_known',
@@ -261,6 +262,7 @@ def load_json(application_id_local, ordered_models, recurse):
             own_children = Application.objects.get(application_id=application_id_local).own_children
             reasons_known_to_social_services = Application.objects.get(
                 application_id=application_id_local).reasons_known_to_social_services
+
             # If the home address is the same as the childcare address
             if home_address_record == childcare_address_record:
                 home_address = get_address(home_address_street_line1, home_address_street_line2, home_address_town,
@@ -349,14 +351,25 @@ def load_json(application_id_local, ordered_models, recurse):
 
             # Only show People in the home tables when applicant is not working in another childminder's home
             if application.working_in_other_childminder_home is False:
-
+                reasons_known_to_social_services_pith = Application.objects.get(
+                    application_id=application_id_local).reasons_known_to_social_services_pith
+                own_children_not_in_home = Application.objects.get(
+                    application_id=application_id_local).own_children_not_in_home
                 if application.own_children is False:
-
-                    table_list.append([
-                        {"title": "Children not in the home", "id": application_id_local},
-                        {"name": "Do you have children of your own under 16 who do not live with you?",
-                         "value": get_bool_as_string(application.own_children_not_in_home)}
-                    ])
+                    if own_children_not_in_home is True:
+                        table_list.append([
+                            {"title": "Your own children", "id": application_id_local},
+                            {"name": "Known to council social services in regards to your own children?",
+                             "value": get_bool_as_string(own_children_not_in_home), "index": 1},
+                            {"name": "Tell us why", "value": reasons_known_to_social_services_pith,
+                             'pk': application_id_local, "index": 2}
+                        ])
+                    else:
+                        table_list.append([
+                            {"title": "Your own children", "id": application_id_local},
+                            {"name": "Known to council social services in regards to your own children?",
+                             "value": get_bool_as_string(own_children_not_in_home)}
+                        ])
 
                     children_not_in_home = Child.objects.filter(application_id=application_id_local,
                                                                 lives_with_childminder=False)

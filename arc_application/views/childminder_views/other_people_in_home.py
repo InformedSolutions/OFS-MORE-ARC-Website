@@ -106,7 +106,7 @@ def other_people_summary(request):
         current_illnesses.append(HealthCheckCurrent.objects.filter(person_id=adult.pk))
         serious_illnesses.append(HealthCheckSerious.objects.filter(person_id=adult.pk))
         hospital_admissions.append(HealthCheckHospital.objects.filter(person_id=adult.pk))
-        local_authorities.append(adult.children_details)
+        local_authorities.append(adult.reasons_known_to_council_health_check)
 
     for child in children:
         if child.middle_names and child.middle_names != '':

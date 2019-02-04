@@ -915,14 +915,24 @@ class OtherPeopleInYourHomeForm(GOVUKForm):
     own_children_not_in_the_home_declare = forms.BooleanField(label='This information is correct',
                                                               widget=custom_field_widgets.CustomCheckboxInput,
                                                               required=False)
-    own_children_not_in_the_home_comments = forms.CharField(label='Do you live with any children?',
+    own_children_not_in_the_home_comments = forms.CharField(label='Are you known to council social services '
+                                                                  'in regards to your own children?',
+                                                            help_text='(Tip: be clear and concise)',
+                                                            widget=custom_field_widgets.Textarea,
+                                                            required=False, max_length=250)
+
+    reasons_known_to_social_services_pith_declare = forms.BooleanField(label='This information is correct',
+                                                              widget=custom_field_widgets.CustomCheckboxInput,
+                                                              required=False)
+    reasons_known_to_social_services_pith_comments = forms.CharField(label='Tell us why',
                                                             help_text='(Tip: be clear and concise)',
                                                             widget=custom_field_widgets.Textarea,
                                                             required=False, max_length=250)
 
     checkboxes = [(adults_in_home_declare, 'adults_in_home'),
                   (children_in_home_declare, 'children_in_home'),
-                  (own_children_not_in_the_home_declare, 'own_children_not_in_the_home'), ]
+                  (own_children_not_in_the_home_declare, 'own_children_not_in_the_home'),
+                  (reasons_known_to_social_services_pith_declare, 'reasons_known_to_social_services_pith')]
 
     for box in checkboxes:
         box[0].widget.attrs.update({'data_target': box[1],
