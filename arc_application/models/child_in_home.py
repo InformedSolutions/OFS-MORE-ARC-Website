@@ -8,6 +8,7 @@ class ChildInHome(ChildBase):
     Model for CHILD_IN_HOME table
     """
     relationship = models.CharField(max_length=100, blank=True)
+    cygnum_relationship_to_childminder = models.CharField(max_length=100, blank=True)
 
     @classmethod
     def get_id(cls, app_id):
