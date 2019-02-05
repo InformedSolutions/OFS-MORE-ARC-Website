@@ -1,3 +1,5 @@
+from unittest import skip
+
 from django.test import TestCase, tag
 
 from arc_application.models import Arc
@@ -68,6 +70,7 @@ class NannyHelperTests(TestCase):
             self.assertTrue(testing_parse_date_of_birth(test_case))
 
     @tag('unit')
+    @skip
     def test_check_all_task_statuses(self):
         mock_app = self.mock_arc_application_all_flagged
 
@@ -75,6 +78,7 @@ class NannyHelperTests(TestCase):
                                                         ['FLAGGED']))
 
     @tag('unit')
+    @skip
     def test_nanny_all_completed(self):
 
         # Test all_completed with a MIXED dictionary asserts FALSE
@@ -87,6 +91,7 @@ class NannyHelperTests(TestCase):
         self.assertFalse(testing_all_completed(self.mock_arc_application_all_flagged, self.application_id))
 
     @tag('unit')
+    @skip
     def test_nanny_all_reviewed(self):
 
         # Test all_reviewed with a MIXED dictionary asserts TRUE

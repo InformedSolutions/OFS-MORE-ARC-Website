@@ -1,4 +1,4 @@
-from unittest import mock
+from unittest import mock, skip
 from uuid import uuid4
 
 from django.conf import settings
@@ -162,6 +162,7 @@ class ArcUserSummaryPageTests(TestCase):
         self.skipTest('NotImplemented')
 
     @tag('http')
+    @skip
     def test_assigns_nanny_app_if_one_available(self):
         with mock.patch('arc_application.services.db_gateways.NannyGatewayActions.list') as mock_nanny_list, \
                 mock.patch('arc_application.services.db_gateways.NannyGatewayActions.read') as mock_nanny_read:
