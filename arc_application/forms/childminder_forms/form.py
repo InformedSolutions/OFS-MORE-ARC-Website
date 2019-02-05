@@ -1048,6 +1048,21 @@ class AdultInYourHomeForm(GOVUKForm):
                                       widget=custom_field_widgets.Textarea,
                                       required=False, max_length=250)
 
+    known_to_council_declare = forms.BooleanField(label='This information is correct',
+                                        widget=custom_field_widgets.CustomCheckboxInput, required=False)
+    known_to_council_comments = forms.CharField(label='Known to council '
+                                                              'social services in regards to their own children?',
+                                      help_text='(Tip: be clear and concise)',
+                                      widget=custom_field_widgets.Textarea,
+                                      required=False, max_length=250)
+    reasons_known_to_council_health_check_declare = forms.BooleanField(label='This information is correct',
+                                                          widget=custom_field_widgets.CustomCheckboxInput,
+                                                          required=False)
+    reasons_known_to_council_health_check_comments = forms.CharField(label='Tell us why',
+                                                        help_text='(Tip: be clear and concise)',
+                                                        widget=custom_field_widgets.Textarea,
+                                                        required=False, max_length=250)
+
     # This is the id appended to all htmls names ot make the individual form instance unique, this is given a value in
     # the init
     instance_id = forms.CharField(widget=forms.HiddenInput, required=False)
@@ -1067,6 +1082,8 @@ class AdultInYourHomeForm(GOVUKForm):
             ((self.fields['lived_abroad_declare']), 'lived_abroad' + id_value),
             ((self.fields['military_base_declare']), 'military_base' + id_value),
             ((self.fields['capita_declare']), 'capita' + id_value),
+            ((self.fields['known_to_council_declare']), 'known_to_council' + id_value),
+            ((self.fields['reasons_known_to_council_health_check_declare']), 'reasons_known_to_council_health_check' + id_value)
         ]
 
         for box in checkboxes:

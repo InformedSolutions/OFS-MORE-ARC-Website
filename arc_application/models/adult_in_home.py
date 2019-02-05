@@ -105,7 +105,6 @@ class AdultInHome(models.Model):
             {"name": "DBS certificate number", "value": self.dbs_certificate_number},
             {"name": "Lived abroad", "value": ("Yes" if self.lived_abroad == True else "No")},
             {"name": "Known to council", "value": ("Yes" if self.known_to_council == True else "No")},
-            {"name": "Tell us why", "value": self.reasons_known_to_council_health_check}
         ]
 
         if self.known_to_council == True:
