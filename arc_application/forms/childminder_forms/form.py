@@ -976,6 +976,7 @@ class AdultInYourHomeForm(GOVUKForm):
     """
     Comments form for the People in your home review page: adults in home
     """
+    auto_replace_widgets = True
 
     health_check_status_declare = forms.BooleanField(label='This information is correct',
                                                      widget=custom_field_widgets.CustomCheckboxInput, required=False)
@@ -1086,6 +1087,7 @@ class AdultInYourHomeForm(GOVUKForm):
 
     cygnum_relationship = forms.ChoiceField(
         label='Select (Cygnum) relationship type',
+        required=True,
         error_messages={
             'required': 'You must select a relationship type for this person'
         },

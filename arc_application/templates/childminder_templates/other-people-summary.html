@@ -366,9 +366,14 @@
             </thead>
             <tbody>
                 <td colspan="1">
-                    Select relationship type
+                    <label id="{{ formsetadult.cygnum_relationship.auto_id }}-label">
+                        {{ formsetadult.cygnum_relationship.label }}
+                    </label>
                 </td>
                 <td colspan="2">
+                    {% for error in formsetadult.cygnum_relationship.errors %}
+                      <span class="error-message">{{ error }}</span>
+                    {% endfor %}
                     {{ formsetadult.cygnum_relationship }}
                 </td>
             </tbody>
