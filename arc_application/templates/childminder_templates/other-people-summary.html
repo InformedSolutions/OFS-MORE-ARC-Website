@@ -738,7 +738,7 @@
                 </td>
                 {% endif %}
                 <td class="change-answer">
-                    {{ form.own_children_not_in_the_home_declare }}
+                    {{ form.known_to_social_services_pith_declare }}
                 </td>
             </tr>
             <tr class="js-hidden" id="known_to_social_services_pith">
@@ -747,21 +747,22 @@
                         Enter your reasoning
                     </div>
                     <div>
-                        {{ form.own_children_not_in_home_the_comments.help_text}}
+                        {{ form.known_to_social_services_pith_comments.help_text}}
                     </div>
                 </td>
                 <td colspan="2">
                     <div>
-                        {{ form.own_children_not_in_the_home_comments}}
+                        {{ form.known_to_social_services_pith_comments}}
                     </div>
                 </td>
             </tr>
+            {% if known_to_social_services_pith == True %}
              <tr>
                 <td>
                     Tell us why
                 </td>
                 <td style="word-wrap: break-word">
-                    YES
+                    {{reasons_known_to_social_services_pith}}
                 </td>
                 <td class="change-answer">
                     {{ form.reasons_known_to_social_services_pith_declare }}
@@ -782,6 +783,7 @@
                     </div>
                 </td>
             </tr>
+            {% endif %}
             </tbody>
         </table>
 

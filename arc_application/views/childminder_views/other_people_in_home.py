@@ -185,6 +185,7 @@ def other_people_summary(request):
             'adults_in_home': application.adults_in_home,
             'children_in_home': application.children_in_home,
             'known_to_social_services_pith': application.known_to_social_services_pith,
+            'reasons_known_to_social_services_pith': application.reasons_known_to_social_services_pith,
             'adult_lists': adult_lists,
             'child_lists': child_lists,
             'own_child_lists': own_child_lists,

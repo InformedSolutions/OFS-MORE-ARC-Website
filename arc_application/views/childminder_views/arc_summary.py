@@ -38,7 +38,7 @@ name_field_dict = {
     'Provide a Health Declaration Booklet?': 'health_submission_consent',
     'DBS certificate number': 'dbs_certificate_number',
     'Known to council social services in regards to their own children?': 'known_to_council',
-    'Tell us why': 'reasons_known_to_council_health_check',
+    'reasons_known_health_check': 'reasons_known_to_council_health_check',
     'Do you have any criminal cautions or convictions?': 'cautions_convictions',
     'Health questions status': 'health_check_status',
     'Name': 'full_name',
@@ -47,10 +47,10 @@ name_field_dict = {
     'Email': 'email',
     'Does anyone aged 16 or over live or work in your home?': 'adults_in_home',
     'Do children under 16 live in the home?': 'children_in_home',
-    'Known to council social services in regards to your own children?': 'known_to_social_services_pith',
-    'Tell us why': 'reasons_known_to_social_services_pith',
-    'Known to council social services in regards to your own children?': 'known_to_social_services',
-    'Tell us why': 'reasons_known_to_social_services',
+    'known_pith': 'known_to_social_services_pith',
+    'reasons_known_pith': 'reasons_known_to_social_services_pith',
+    'known_personal_details': 'known_to_social_services',
+    'reasons_known_personal_details': 'reasons_known_to_social_services',
     'Full name': 'full_name',
     'How they know you': 'relationship',
     'Known for': 'time_known',
@@ -195,8 +195,24 @@ def add_comments(json, app_id):
                     else:
                         field = 'address' + str(id)
 
+                elif name == 'Known to council social services in regards to your own children?':
+                    if 'Your children' in title:
+                        field = name_field_dict.get('known_personal_details', '')
+                    elif "Your own children" in title:
+                        field = name_field_dict.get('known_pith', '')
+
+                elif name == 'Tell us why':
+                    if 'Your children' in title:
+                        field = name_field_dict.get('reasons_known_personal_details', '')
+                    elif "Your own children" in title:
+                        field = name_field_dict.get('reasons_known_pith', '')
+                    else:
+                        field = name_field_dict.get('reasons_known_health_check', '')
+
                 else:
                     field = name_field_dict.get(name, '')
+
+
 
                 row['comment'] = get_comment(id, field)
                 row['link'] = reverse(label) + '?id=' + app_id
@@ -350,7 +366,6 @@ def load_json(application_id_local, ordered_models, recurse):
             if application.working_in_other_childminder_home is False:
                 table_list.append(application.get_summary_table_child())
 
-        elif model == Child:
 
             # Only show People in the home tables when applicant is not working in another childminder's home
             if application.working_in_other_childminder_home is False:
@@ -374,36 +389,6 @@ def load_json(application_id_local, ordered_models, recurse):
                              "value": get_bool_as_string(known_to_social_services_pith)}
                         ])
 
-                    children_not_in_home = Child.objects.filter(application_id=application_id_local,
-                                                                lives_with_childminder=False)
-
-                    for child in children_not_in_home:
-
-                        if child.birth_day < 10:
-                            birth_day = '0' + str(child.birth_day)
-                        else:
-                            birth_day = str(child.birth_day)
-
-                        if child.birth_month < 10:
-                            birth_month = '0' + str(child.birth_month)
-                        else:
-                            birth_month = str(child.birth_month)
-
-                        date_of_birth = birth_day + ' ' + birth_month + ' ' + str(child.birth_year)
-
-                        child_address_record = ChildAddress.objects.get(application_id=application_id_local,
-                                                                        child=child.child)
-
-                        child_address = get_address(child_address_record.street_line1,
-                                                    child_address_record.street_line2, child_address_record.town,
-                                                    child_address_record.postcode)
-
-                        table_list.append([
-                            {"title": child.get_full_name(), "id": child.pk},
-                            {"name": "Name", "value": child.get_full_name()},
-                            {"name": "Date of birth", "value": date_of_birth},
-                            {"name": "Address", "value": child_address}
-                        ])
 
         elif model.objects.filter(application_id=application.pk).exists():
             records = model.objects.filter(application_id=application.pk)

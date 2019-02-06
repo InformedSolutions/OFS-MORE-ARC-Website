@@ -912,10 +912,10 @@ class OtherPeopleInYourHomeForm(GOVUKForm):
                                                 widget=custom_field_widgets.Textarea,
                                                 required=False, max_length=250)
 
-    own_children_not_in_the_home_declare = forms.BooleanField(label='This information is correct',
+    known_to_social_services_pith_declare = forms.BooleanField(label='This information is correct',
                                                               widget=custom_field_widgets.CustomCheckboxInput,
                                                               required=False)
-    own_children_not_in_the_home_comments = forms.CharField(label='Are you known to council social services '
+    known_to_social_services_pith_comments = forms.CharField(label='Are you known to council social services '
                                                                   'in regards to your own children?',
                                                             help_text='(Tip: be clear and concise)',
                                                             widget=custom_field_widgets.Textarea,
@@ -931,7 +931,7 @@ class OtherPeopleInYourHomeForm(GOVUKForm):
 
     checkboxes = [(adults_in_home_declare, 'adults_in_home'),
                   (children_in_home_declare, 'children_in_home'),
-                  (own_children_not_in_the_home_declare, 'known_to_social_services_pith'),
+                  (known_to_social_services_pith_declare, 'known_to_social_services_pith'),
                   (reasons_known_to_social_services_pith_declare, 'reasons_known_to_social_services_pith')]
 
     for box in checkboxes:
