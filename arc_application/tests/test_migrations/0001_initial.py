@@ -35,7 +35,7 @@ class Migration(migrations.Migration):
                 ('current_treatment', models.NullBooleanField()),
                 ('serious_illness', models.NullBooleanField()),
                 ('known_to_council', models.NullBooleanField()),
-                ('children_details', models.TextField(default='', null=True)),
+                ('reasons_known_to_council_health_check', models.TextField(default='', null=True)),
                 ('hospital_admission', models.NullBooleanField()),
                 ('health_check_status', models.CharField(default='To do', max_length=50)),
                 ('email_resent', models.IntegerField(default=0)),
@@ -135,7 +135,9 @@ class Migration(migrations.Migration):
                 ('publish_details', models.NullBooleanField(default=None)),
                 ('working_in_other_childminder_home', models.NullBooleanField(default=None)),
                 ('own_children', models.NullBooleanField(default=None)),
-                ('own_children_not_in_home', models.NullBooleanField(default=None)),
+                ('known_to_social_services_pith', models.NullBooleanField(default=None)),
+                ('reasons_known_to_social_services', models.TextField(null=True, default="")),
+                ('reasons_known_to_social_services_pith', models.TextField(null=True, default=""))
             ],
             options={
                 'db_table': 'APPLICATION',
