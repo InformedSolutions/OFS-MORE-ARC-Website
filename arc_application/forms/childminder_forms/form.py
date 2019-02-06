@@ -931,7 +931,7 @@ class OtherPeopleInYourHomeForm(GOVUKForm):
 
     checkboxes = [(adults_in_home_declare, 'adults_in_home'),
                   (children_in_home_declare, 'children_in_home'),
-                  (own_children_not_in_the_home_declare, 'own_children_not_in_the_home'),
+                  (own_children_not_in_the_home_declare, 'known_to_social_services_pith'),
                   (reasons_known_to_social_services_pith_declare, 'reasons_known_to_social_services_pith')]
 
     for box in checkboxes:

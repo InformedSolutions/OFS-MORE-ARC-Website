@@ -184,7 +184,7 @@ def other_people_summary(request):
             'application_id': application_id_local,
             'adults_in_home': application.adults_in_home,
             'children_in_home': application.children_in_home,
-            'own_children_not_in_the_home': application.own_children_not_in_home,
+            'known_to_social_services_pith': application.known_to_social_services_pith,
             'adult_lists': adult_lists,
             'child_lists': child_lists,
             'own_child_lists': own_child_lists,
@@ -233,11 +233,11 @@ def other_people_summary(request):
                 },
             }
 
-            # Only add comments for own_children_not_in_home if questions are applicable.
+            # Only add comments for known_to_social_services_pith if questions are applicable.
             if providing_care_in_own_home:
                 review_sections_to_process.update(
                     {
-                        'own_children_not_in_home': {
+                        'known_to_social_services_pith': {
                             'POST_data': own_child_data_list,
                             'models': own_children
                         },
@@ -320,7 +320,7 @@ def other_people_summary(request):
                 'application_id': application_id_local,
                 'adults_in_home': application.adults_in_home,
                 'children_in_home': application.children_in_home,
-                'own_children_not_in_the_home': application.own_children_not_in_home,
+                'known_to_social_services_pith': application.known_to_social_services_pith,
                 'adult_lists': adult_lists,
                 'child_lists': child_lists,
                 'own_child_lists': own_child_lists,

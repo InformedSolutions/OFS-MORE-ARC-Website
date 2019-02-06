@@ -47,8 +47,10 @@ name_field_dict = {
     'Email': 'email',
     'Does anyone aged 16 or over live or work in your home?': 'adults_in_home',
     'Do children under 16 live in the home?': 'children_in_home',
-    'Known to council social services in regards to your own children?': 'own_children_not_in_the_home',
+    'Known to council social services in regards to your own children?': 'known_to_social_services_pith',
     'Tell us why': 'reasons_known_to_social_services_pith',
+    'Known to council social services in regards to your own children?': 'known_to_social_services',
+    'Tell us why': 'reasons_known_to_social_services',
     'Full name': 'full_name',
     'How they know you': 'relationship',
     'Known for': 'time_known',
@@ -354,14 +356,14 @@ def load_json(application_id_local, ordered_models, recurse):
             if application.working_in_other_childminder_home is False:
                 reasons_known_to_social_services_pith = Application.objects.get(
                     application_id=application_id_local).reasons_known_to_social_services_pith
-                own_children_not_in_home = Application.objects.get(
-                    application_id=application_id_local).own_children_not_in_home
+                known_to_social_services_pith = Application.objects.get(
+                    application_id=application_id_local).known_to_social_services_pith
                 if application.own_children is False:
-                    if own_children_not_in_home is True:
+                    if known_to_social_services_pith is True:
                         table_list.append([
                             {"title": "Your own children", "id": application_id_local},
                             {"name": "Known to council social services in regards to your own children?",
-                             "value": get_bool_as_string(own_children_not_in_home), "index": 1},
+                             "value": get_bool_as_string(known_to_social_services_pith), "index": 1},
                             {"name": "Tell us why", "value": reasons_known_to_social_services_pith,
                              'pk': application_id_local, "index": 2}
                         ])
@@ -369,7 +371,7 @@ def load_json(application_id_local, ordered_models, recurse):
                         table_list.append([
                             {"title": "Your own children", "id": application_id_local},
                             {"name": "Known to council social services in regards to your own children?",
-                             "value": get_bool_as_string(own_children_not_in_home)}
+                             "value": get_bool_as_string(known_to_social_services_pith)}
                         ])
 
                     children_not_in_home = Child.objects.filter(application_id=application_id_local,
