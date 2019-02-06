@@ -104,8 +104,6 @@ class AdultInHome(models.Model):
             {"name": "DBS certificate number", "value": self.dbs_certificate_number},
             {"name": "Known to council", "value": ("Yes" if self.known_to_council == True else "No")}
         ]
-        if self.known_to_council == True:
-            summary_table.append({"name": "Details of children", "value": self.children_details})
 
         return summary_table
 

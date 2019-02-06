@@ -106,7 +106,7 @@ def other_people_summary(request):
         current_illnesses.append(HealthCheckCurrent.objects.filter(person_id=adult.pk))
         serious_illnesses.append(HealthCheckSerious.objects.filter(person_id=adult.pk))
         hospital_admissions.append(HealthCheckHospital.objects.filter(person_id=adult.pk))
-        local_authorities.append(adult.children_details)
+        # local_authorities.append(adult.children_details)
 
     for child in children:
         if child.middle_names and child.middle_names != '':
@@ -153,7 +153,7 @@ def other_people_summary(request):
                 adult_birth_month_list, adult_birth_year_list, adult_relationship_list, adult_dbs_list,
                 adult_lived_abroad,
                 adult_military_base, adult_capita_dbs,
-                formset_adult, current_illnesses, serious_illnesses, hospital_admissions, local_authorities))
+                formset_adult, current_illnesses, serious_illnesses, hospital_admissions))
 
         initial_child_data = other_people_initial_population(False, children)
 
@@ -249,9 +249,8 @@ def other_people_summary(request):
                     save_comments(request, person_comments)
 
                     # Save cygnum relationship type equivalent to person object being iterated
-                    if type(person_model) is AdultInHome:
-                        person_model.cygnum_relationship_to_childminder = person_post_data['cygnum_relationship']
-                        person_model.save()
+                    person_model.cygnum_relationship_to_childminder = person_post_data['cygnum_relationship']
+                    person_model.save()
 
                     if person_comments:
                         section_status = 'FLAGGED'
