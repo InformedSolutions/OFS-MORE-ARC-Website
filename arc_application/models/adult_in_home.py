@@ -103,8 +103,8 @@ class AdultInHome(models.Model):
             {"name": "Email", "value": self.email},
             {"name": "Ofsted DBS", "value": ("Yes" if self.capita == True else "No")},
             {"name": "DBS certificate number", "value": self.dbs_certificate_number},
-            {"name": "Lived abroad", "value": ("Yes" if self.lived_abroad == True else "No")},
-            {"name": "Known to council", "value": ("Yes" if self.known_to_council == True else "No")},
+            {"name": "Lived abroad", "value": ("Yes" if self.known_to_council == True else "No")},
+            {"name": "Known to council", "value": ("Yes" if self.known_to_council == True else "No")}
         ]
 
         if self.known_to_council == True:
@@ -113,7 +113,7 @@ class AdultInHome(models.Model):
         from .childcare_type import ChildcareType
 
         if ChildcareType.objects.get(application_id=self.application_id).zero_to_five:
-           summary_table.insert(-1, {"name": "British Military Base", "value": self.military_base})
+           summary_table.insert(-1, {"name": "British Military Base", "value":  ("Yes" if self.military_base == True else "No")})
 
         return summary_table
 
