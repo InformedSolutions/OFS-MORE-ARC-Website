@@ -3,6 +3,7 @@ from uuid import uuid4
 from django.db import models
 from .application import Application
 
+from .childcare_type import ChildcareType
 
 class AdultInHome(models.Model):
     """
@@ -19,7 +20,6 @@ class AdultInHome(models.Model):
     birth_month = models.IntegerField(blank=True)
     birth_year = models.IntegerField(blank=True)
     relationship = models.CharField(max_length=100, blank=True)
-    cygnum_relationship_to_childminder = models.CharField(max_length=100, blank=True)
     email = models.CharField(max_length=100, blank=True, null=True)
     dbs_certificate_number = models.CharField(max_length=50, blank=True)
     token = models.CharField(max_length=100, blank=True, null=True)
@@ -27,6 +27,7 @@ class AdultInHome(models.Model):
     current_treatment = models.NullBooleanField(null=True)
     serious_illness = models.NullBooleanField(null=True)
     known_to_council = models.NullBooleanField(null=True)
+    children_details = models.TextField(default='', null=True)
     hospital_admission = models.NullBooleanField(null=True)
     health_check_status = models.CharField(max_length=50, default='To do')
     email_resent = models.IntegerField(default=0)
@@ -35,6 +36,8 @@ class AdultInHome(models.Model):
     military_base = models.NullBooleanField(blank=True)
     capita = models.NullBooleanField(blank=True)
     on_update = models.NullBooleanField(blank=True)
+
+    cygnum_relationship_to_childminder = models.CharField(max_length=100, blank=True)
 
     @property
     def timelog_fields(self):
@@ -101,9 +104,14 @@ class AdultInHome(models.Model):
             {"name": "Date of birth", "value": date_of_birth},
             {"name": "Relationship", "value": self.relationship},
             {"name": "Email", "value": self.email},
+            {"name": "Ofsted DBS", "value": ("Yes" if self.known_to_council == True else "No")},
             {"name": "DBS certificate number", "value": self.dbs_certificate_number},
+            {"name": "Lived abroad", "value": ("Yes" if self.known_to_council == True else "No")},
             {"name": "Known to council", "value": ("Yes" if self.known_to_council == True else "No")}
         ]
+
+        if ChildcareType.objects.get(application_id=self.application_id).zero_to_five:
+            summary_table.insert(-1, {"name": "British Military Base", "value": ("Yes" if self.military_base == True else "No")})
 
         return summary_table
 
