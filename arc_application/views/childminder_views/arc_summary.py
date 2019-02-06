@@ -46,7 +46,6 @@ name_field_dict = {
     'Email': 'email',
     'Does anyone aged 16 or over live or work in your home?': 'adults_in_home',
     'Do children under 16 live in the home?': 'children_in_home',
-    'Do you have children of your own under 16 who do not live with you?': 'own_children_not_in_home',
     'Full name': 'full_name',
     'How they know you': 'relationship',
     'Known for': 'time_known',
@@ -380,12 +379,6 @@ def load_json(application_id_local, ordered_models, recurse):
             if application.working_in_other_childminder_home is False:
 
                 if application.own_children is False:
-
-                    table_list.append([
-                        {"title": "Children not in the home", "id": application_id_local},
-                        {"name": "Do you have children of your own under 16 who do not live with you?",
-                         "value": get_bool_as_string(application.own_children_not_in_home)}
-                    ])
 
                     children_not_in_home = Child.objects.filter(application_id=application_id_local,
                                                                 lives_with_childminder=False)

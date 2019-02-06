@@ -203,7 +203,7 @@ def other_people_initial_population(adult, person_list):
                     checkbox = (ArcComments.objects.filter(table_pk=table_id).get(field_name=field_name_local)).flagged
                     temp_dict[field] = True
 
-                if field == 'cygnum_relationship':
+                if adult and field == 'cygnum_relationship':
                     temp_dict[field] = person.cygnum_relationship_to_childminder
 
             except ArcComments.DoesNotExist:

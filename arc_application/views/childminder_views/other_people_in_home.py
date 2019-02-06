@@ -181,7 +181,6 @@ def other_people_summary(request):
             'application_id': application_id_local,
             'adults_in_home': application.adults_in_home,
             'children_in_home': application.children_in_home,
-            'own_children_not_in_the_home': application.own_children_not_in_home,
             'adult_lists': adult_lists,
             'child_lists': child_lists,
             'own_child_lists': own_child_lists,
@@ -250,8 +249,9 @@ def other_people_summary(request):
                     save_comments(request, person_comments)
 
                     # Save cygnum relationship type equivalent to person object being iterated
-                    person_model.cygnum_relationship_to_childminder = person_post_data['cygnum_relationship']
-                    person_model.save()
+                    if type(person_model) is AdultInHome:
+                        person_model.cygnum_relationship_to_childminder = person_post_data['cygnum_relationship']
+                        person_model.save()
 
                     if person_comments:
                         section_status = 'FLAGGED'
@@ -319,7 +319,6 @@ def other_people_summary(request):
                 'application_id': application_id_local,
                 'adults_in_home': application.adults_in_home,
                 'children_in_home': application.children_in_home,
-                'own_children_not_in_the_home': application.own_children_not_in_home,
                 'adult_lists': adult_lists,
                 'child_lists': child_lists,
                 'own_child_lists': own_child_lists,
