@@ -172,6 +172,9 @@ def other_people_summary(request):
 
         own_child_lists = zip(own_children, own_child_address_list, formset_own_child, formset_own_child_address)
 
+        zero_to_five_list = ChildcareType.objects.get(application_id=application_id_local)
+
+
         variables = {
             'form': form,
             'formset_adult': formset_adult,
@@ -187,7 +190,8 @@ def other_people_summary(request):
             'own_child_lists': own_child_lists,
             'adult_ebulk_lists': adult_ebulk_lists,
             'previous_registration_lists': previous_registration_lists,
-            'providing_care_in_own_home': providing_care_in_own_home
+            'providing_care_in_own_home': providing_care_in_own_home,
+            'childcare_type_zero_to_five': zero_to_five_list
         }
         return render(request, 'childminder_templates/other-people-summary.html', variables)
 
@@ -305,6 +309,8 @@ def other_people_summary(request):
                 child_form.error_summary_title = 'There was a problem (' + child_name + ')'
                 child_address_form.error_summary_title = 'There was a problem (' + child_name + ')'
 
+            zero_to_five_list = ChildcareType.objects.get(application_id=application_id_local)
+
             variables = {
                 'form': form,
                 'formset_adult': adult_formset,
@@ -320,7 +326,8 @@ def other_people_summary(request):
                 'own_child_lists': own_child_lists,
                 'adult_ebulk_lists': adult_ebulk_lists,
                 'previous_registration_lists': previous_registration_lists,
-                'providing_care_in_own_home': providing_care_in_own_home
+                'providing_care_in_own_home': providing_care_in_own_home,
+                'childcare_type_zero_to_five': zero_to_five_list
             }
             return render(request, 'childminder_templates/other-people-summary.html', variables)
 
