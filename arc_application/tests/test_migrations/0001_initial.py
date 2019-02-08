@@ -184,7 +184,7 @@ class Migration(migrations.Migration):
                 ('table_pk', models.UUIDField(blank=True)),
                 ('table_name', models.CharField(blank=True, max_length=30)),
                 ('field_name', models.CharField(blank=True, max_length=60)),
-                ('comment', models.CharField(blank=True, max_length=250)),
+                ('comment', models.CharField(blank=True, max_length=500)),
                 ('flagged', models.BooleanField()),
             ],
             options={
