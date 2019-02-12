@@ -18,7 +18,7 @@ class UploadCapitaDBSForm(GOVUKForm):
         if capita_list_file is None:
             raise ValidationError('No file chosen')
 
-        if not any([capita_list_file.endswith(ext) for ext in self.valid_extensions]):
+        if not any([capita_list_file.lower().endswith(ext) for ext in self.valid_extensions]):
             raise ValidationError('The file must be .csv or .xlxs')
 
         return capita_list_file
