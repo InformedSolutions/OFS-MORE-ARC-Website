@@ -80,7 +80,7 @@ TEMPLATES = [
                 'govuk_template_base.context_processors.govuk_template_base',
                 "arc_application.middleware.globalise_url_prefix",
                 "arc_application.middleware.globalise_server_name",
-                "arc_application.middleware.set_review_tab_visibility",
+                "arc_application.middleware.set_tab_visibility",
             ],
         },
     },
