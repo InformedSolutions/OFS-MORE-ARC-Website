@@ -7,7 +7,7 @@ from django.test import SimpleTestCase, TestCase
 from django.urls import reverse
 
 
-class UploadCapitaDBSFunctionalTests(TestCase):
+class UploadCapitaDBSRoutingTests(TestCase):
     def setUp(self):
         # Create ARC user and login.
         self.arc_user = User.objects.create_user(
@@ -30,9 +30,6 @@ class UploadCapitaDBSFunctionalTests(TestCase):
     def test_page_loads_with_date_and_filename_of_previous_upload(self):
         self.skipTest('FunctionalityNotImplemented')
 
-    def test_formatting_of_previous_upload_information(self):
-        self.skipTest('FunctionalityNotImplemented')
-
     def test_can_post_valid_csv_file(self):
         self.skipTest('FunctionalityNotImplemented')
 
@@ -46,15 +43,30 @@ class UploadCapitaDBSFunctionalTests(TestCase):
         self.skipTest('FunctionalityNotImplemented')
 
 
-class CapitaDBSListUploadFormTests(SimpleTestCase):
+class UploadCapitaDBSHelperFunctionTests(SimpleTestCase):
+    def test_formatting_of_previous_upload_information(self):
+        self.skipTest('FunctionalityNotImplemented')
+
+
+class UploadCapitaDBSFormTests(SimpleTestCase):
     def test_no_file_selected_raises_error(self):
-        form = UploadCapitaDBSForm(data={'capita_list_file': ''})
+        form = UploadCapitaDBSForm(data={'capita_list_file': None})
 
         with self.assertRaisesMessage(ValidationError, 'No file chosen'):
-            form.fields['capita_list_file'].clean('')
+            form.clean_capita_list_file()
 
-    def test_invalid_file_upload_raises_error(self):
-        self.skipTest('FunctionalityNotImplemented')
+    def test_invalid_file_extension_raises_error(self):
+        form = UploadCapitaDBSForm(data={'capita_list_file': 'myfile.png'})
 
-    def test_valid_file_upload_passes_validation(self):
-        self.skipTest('FunctionalityNotImplemented')
+        with self.assertRaisesMessage(ValidationError, 'The file must be .csv or .xlxs'):
+            form.clean_capita_list_file()
+
+    def test_xlxs_file_passes_validation(self):
+        form = UploadCapitaDBSForm(data={'capita_list_file': 'myfile.xlxs'})
+
+        self.assertTrue(form.is_valid())
+
+    def test_csv_file_passes_validation(self):
+        form = UploadCapitaDBSForm(data={'capita_list_file': 'myfile.csv'})
+
+        self.assertTrue(form.is_valid())
