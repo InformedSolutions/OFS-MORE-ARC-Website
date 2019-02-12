@@ -10,4 +10,16 @@
     Capita DBS Upload
 </h1>
 
+<p>Choose the file you wish to update the DBS Capita list with below.</p>
+
+<form method="post">
+    {% csrf_token %}
+
+    {{ form.as_div }}
+    <input type="submit" class="button" value="Save and continue">
+</form>
+
+<br>
+<b class="bold">Last upload:</b> {{ formatted_last_upload }}
+
 {% endblock %}
