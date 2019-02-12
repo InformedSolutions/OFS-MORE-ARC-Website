@@ -15,7 +15,7 @@ class UploadCapitaDBSForm(GOVUKForm):
     def clean_capita_list_file(self):
         capita_list_file = self.data['capita_list_file']
 
-        if capita_list_file is None:
+        if capita_list_file is None or capita_list_file == '':
             raise ValidationError('No file chosen')
 
         if not any([capita_list_file.lower().endswith(ext) for ext in self.valid_extensions]):
