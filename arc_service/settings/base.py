@@ -12,6 +12,8 @@ NOTIFY_URL = os.environ.get('APP_NOTIFY_URL')
 # Base URL of addressing-service gateway
 ADDRESSING_URL = os.environ.get('APP_ADDRESSING_URL')
 
+DBS_URL = os.environ.get('APP_DBS_URL')
+
 # Address of Childminder application
 CHILDMINDER_EMAIL_VALIDATION_URL = os.environ.get('CHILDMINDER_EMAIL_VALIDATION_URL')
 
