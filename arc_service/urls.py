@@ -61,6 +61,7 @@ urlpatterns = [
     url(r'^login/', custom_login, name='login'),
     url(r'^logout/', logout, {'next_page': settings.URL_PREFIX + '/login/'}),
     url(r'^summary/', ARCUserSummaryView.as_view(), name='summary'),
+    url(r'^upload-capita-dbs/$', upload_capita_dbs, name='Upload-Capita-DBS'),
     url(r'^review/$', task_list, name='task_list'),
     url(r'^account/summary/', contact_summary, name='contact_summary'),
     url(r'^childcare/age-groups/', type_of_childcare_age_groups, name='type_of_childcare_age_groups'),
