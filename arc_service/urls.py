@@ -59,8 +59,8 @@ from arc_application.views.childminder_views.personal_details_addresses import p
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^release/(?P<application_id>[\w\- ]+)', release, name='release'),
-    url(r'^login/', custom_login, name='login'),
-    url(r'^logout/', logout, {'next_page': settings.URL_PREFIX + '/login/'}),
+    url(r'^login', custom_login, name='login'),
+    url(r'^logout/', logout, {'next_page': settings.URL_PREFIX + '/login'}),
     url(r'^summary/', ARCUserSummaryView.as_view(), name='summary'),
     url(r'^upload-capita-dbs/$', upload_capita_dbs, name='Upload-Capita-DBS'),
     url(r'^review/$', task_list, name='task_list'),
