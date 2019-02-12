@@ -29,8 +29,12 @@ def globalise_server_name(request):
         return {'SERVER_LABEL': None}
 
 
-def set_review_tab_visibility(request):
+def set_tab_visibility(request):
     """
-    Middleware function for exposing ARC group name setting to templates
+    Middleware function for determining tabs to show depending on the user Group
+    :return: dict, (key, value) :
+        (SHOW_REVIEW_TAB, True if user belongs to the ARC Group else False)
+        (SHOW_UPLOAD_DBS_TAB, True if user belongs to the ARC Group else False)
     """
-    return {'SHOW_REVIEW_TAB': request.user.groups.filter(name=settings.ARC_GROUP).exists()}
+    is_arc_reviewer = request.user.groups.filter(name=settings.ARC_GROUP).exists()
+    return {'SHOW_REVIEW_TAB': is_arc_reviewer, 'SHOW_DBS_UPLOAD_TAB': is_arc_reviewer}
