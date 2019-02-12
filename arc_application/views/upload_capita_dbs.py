@@ -1,2 +1,5 @@
+from django.shortcuts import render
+
+
 def upload_capita_dbs(request):
-    pass
+    return render(request, template_name='upload-capita-dbs.html')
