@@ -33,6 +33,7 @@ from arc_application.views.contact_centre.nanny_change_details import NannyUpdat
 from arc_application.views.nanny_views.nanny_your_children import NannyYourChildrenSummary
 from arc_application.views.search_router import SearchRouter
 from arc_application.views.your_children import your_children_summary
+from arc_application.views import upload_capita_dbs
 
 # Nanny Views
 
