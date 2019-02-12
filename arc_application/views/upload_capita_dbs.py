@@ -1,6 +1,9 @@
+from arc_application.decorators import group_required
 from arc_application.services import dbs_api
 from arc_application.forms import UploadCapitaDBSForm
 
+from django.conf import settings
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 
 
@@ -9,9 +12,13 @@ def __format_last_upload():
 
 
 def __handle_file_upload(f):
-    pass
+
+    with open(f) as capita_dbs_list:
+        print (capita_dbs_list)
 
 
+@login_required
+@group_required(settings.ARC_GROUP)
 def upload_capita_dbs(request):
 
     if request.method == 'GET':
