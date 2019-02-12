@@ -1,10 +1,11 @@
+from arc_application.views.base import custom_login
 from arc_application.forms import UploadCapitaDBSForm
 
 from django.conf import settings
 from django.contrib.auth.models import Group, User
 from django.forms import ValidationError
 from django.test import SimpleTestCase, TestCase
-from django.urls import reverse
+from django.urls import resolve, reverse
 
 
 class UploadCapitaDBSRoutingTests(TestCase):
@@ -41,6 +42,14 @@ class UploadCapitaDBSRoutingTests(TestCase):
 
     def test_cc_user_accessing_capita_dbs_list_upload_page_raises_access_denied(self):
         self.skipTest('FunctionalityNotImplemented')
+
+    def test_unauthenticated_user_cannot_access_capita_dbs_upload_page(self):
+        self.client.logout()
+
+        response = self.client.get(reverse('Upload-Capita-DBS'))
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(resolve(response.url).func, custom_login)
 
 
 class UploadCapitaDBSHelperFunctionTests(SimpleTestCase):
