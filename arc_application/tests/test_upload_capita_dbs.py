@@ -1,7 +1,7 @@
 from django.test import SimpleTestCase, TestCase
 
 
-class CapitaDBSListUploadFunctionalTests(TestCase):
+class UploadCapitaDBSFunctionalTests(TestCase):
     def test_can_render_capita_dbs_list_upload_page(self):
         self.skipTest('FunctionalityNotImplemented')
 
