@@ -6,7 +6,7 @@ class UploadCapitaDBSForm(GOVUKForm):
     error_summary_title = 'There was a problem'
 
     valid_extensions = (
-        '.xlxs',
+        '.csvx',
         '.csv'
     )
 
@@ -19,6 +19,6 @@ class UploadCapitaDBSForm(GOVUKForm):
             raise ValidationError('No file chosen')
 
         if not any([capita_list_file.lower().endswith(ext) for ext in self.valid_extensions]):
-            raise ValidationError('The file must be .csv or .xlxs')
+            raise ValidationError('The file must be .csv or .csvx')
 
         return capita_list_file
