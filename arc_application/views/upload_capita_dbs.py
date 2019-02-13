@@ -1,3 +1,6 @@
+import csv
+import json
+
 from arc_application.decorators import group_required
 from arc_application.services import dbs_api
 from arc_application.forms import UploadCapitaDBSForm
@@ -13,8 +16,15 @@ def __format_last_upload():
 
 def __handle_file_upload(f):
 
-    with open(f) as capita_dbs_list:
-        print (capita_dbs_list)
+    if f.lower().endswith('.csv'):
+        with open(f, 'r') as csvfile:
+            reader = csv.DictReader(csvfile, fieldnames=('date_of_birth', 'certificate_number', 'certificate_information', 'date_of_issue'))
+
+            next(reader)  # Skip first line of csv file.
+
+            # data = json.dumps([row for row in reader])
+            data = json.dumps([next(reader) for row in range(10)])
+            print (data)
 
 
 @login_required
