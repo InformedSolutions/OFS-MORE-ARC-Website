@@ -4,21 +4,21 @@ OFS-MORE-CCN3: Apply to be a Childminder Beta
 @author: Informed Solutions
 """
 
+import re
 import uuid
 
-import re
-from django.conf import settings
 from django import forms
+from django.conf import settings
 from django.forms import ModelForm
 from govuk_forms.forms import GOVUKForm
-from govuk_forms.widgets import InlineRadioSelect, NumberInput, Select
+from govuk_forms.widgets import InlineRadioSelect, NumberInput
 
-from arc_application.models import OtherPersonPreviousRegistrationDetails, ArcComments
-from ...widgets.ConditionalPostChoiceWidget import ConditionalPostInlineRadioSelect
-from ... import custom_field_widgets
-from arc_application.models import Arc as ArcReview, PreviousAddress, PreviousName
 from arc_application.models import Arc as ArcReview, PreviousRegistrationDetails
+from arc_application.models import OtherPersonPreviousRegistrationDetails
+from arc_application.models import PreviousAddress, PreviousName
+from ... import custom_field_widgets
 from ...review_util import populate_initial_values, get_non_db_field_arc_comment
+from ...widgets.ConditionalPostChoiceWidget import ConditionalPostInlineRadioSelect
 
 
 class CheckBox(GOVUKForm):
@@ -71,12 +71,12 @@ class PersonalDetailsForm(GOVUKForm):
                                             widget=custom_field_widgets.Textarea, required=False,
                                             max_length=500)
     reasons_known_to_social_services_declare = forms.BooleanField(label='This information is correct',
-                                              widget=custom_field_widgets.CustomCheckboxInput,
-                                              required=False)
+                                                                  widget=custom_field_widgets.CustomCheckboxInput,
+                                                                  required=False)
     reasons_known_to_social_services_comments = forms.CharField(label="Tell us why",
-                                            help_text='(Tip: be clear and concise)',
-                                            widget=custom_field_widgets.Textarea, required=False,
-                                            max_length=500)
+                                                                help_text='(Tip: be clear and concise)',
+                                                                widget=custom_field_widgets.Textarea, required=False,
+                                                                max_length=500)
 
     checkboxes = [(name_declare, 'name'), (date_of_birth_declare, 'date_of_birth'),
                   (home_address_declare, 'home_address'), (childcare_address_declare, 'childcare_address'),
@@ -413,25 +413,13 @@ class DBSCheckForm(GOVUKForm):
     # customisations:
     auto_replace_widgets = True
 
-    dbs_certificate_number_declare = forms.BooleanField(label='This information is correct',
-                                                        widget=custom_field_widgets.CustomCheckboxInput, required=False)
-    dbs_certificate_number_comments = forms.CharField(label='DBS certificate number',
-                                                      help_text='(Tip: be clear and concise)',
-                                                      widget=custom_field_widgets.Textarea, required=False,
-                                                      max_length=500)
-    cautions_convictions_declare = forms.BooleanField(label='This information is correct',
-                                                      widget=custom_field_widgets.CustomCheckboxInput,
-                                                      required=False)
-    cautions_convictions_comments = forms.CharField(label='Do you have any cautions or convictions?',
-                                                    help_text='(Tip: be clear and concise)',
-                                                    widget=custom_field_widgets.Textarea, required=False,
-                                                    max_length=500)
     lived_abroad_declare = forms.BooleanField(label='This information is correct',
                                               widget=custom_field_widgets.CustomCheckboxInput, required=False)
     lived_abroad_comments = forms.CharField(label='Have you lived outside of the UK in the last 5 years?',
                                             help_text='(Tip: be clear and concise)',
                                             widget=custom_field_widgets.Textarea, required=False,
                                             max_length=500)
+
     military_base_declare = forms.BooleanField(label='This information is correct',
                                                widget=custom_field_widgets.CustomCheckboxInput, required=False)
     military_base_comments = forms.CharField(
@@ -439,12 +427,31 @@ class DBSCheckForm(GOVUKForm):
         help_text='(Tip: be clear and concise)',
         widget=custom_field_widgets.Textarea, required=False,
         max_length=500)
-    capita_declare = forms.BooleanField(label='This information is correct',
-                                        widget=custom_field_widgets.CustomCheckboxInput, required=False)
-    capita_comments = forms.CharField(label='Did you get a DBS certificate from the Ofsted DBS application website in the last 3 months?',
+
+    capita_comments = forms.CharField(label='Did they get their DBS check from the Ofsted DBS application website?',
                                       help_text='(Tip: be clear and concise)',
                                       widget=custom_field_widgets.Textarea, required=False,
                                       max_length=500)
+
+    within_three_months_comments = forms.CharField(label='Is it dated within the last 3 months?',
+                                                   help_text='(Tip: be clear and concise)',
+                                                   widget=custom_field_widgets.Textarea, required=False,
+                                                   max_length=500)
+
+    dbs_certificate_number_declare = forms.BooleanField(label='This information is correct',
+                                                        widget=custom_field_widgets.CustomCheckboxInput, required=False)
+    dbs_certificate_number_comments = forms.CharField(label='DBS certificate number',
+                                                      help_text='(Tip: be clear and concise)',
+                                                      widget=custom_field_widgets.Textarea, required=False,
+                                                      max_length=500)
+
+    enhanced_check_declare = forms.BooleanField(label='This information is correct',
+                                                widget=custom_field_widgets.CustomCheckboxInput, required=False)
+    enhanced_check_comments = forms.CharField(label='Is it an enhanced DBS check for home-based childcare?',
+                                              help_text='(Tip: be clear and concise)',
+                                              widget=custom_field_widgets.Textarea, required=False,
+                                              max_length=500)
+
     on_update_declare = forms.BooleanField(label='This information is correct',
                                            widget=custom_field_widgets.CustomCheckboxInput, required=False)
     on_update_comments = forms.CharField(label='Are you on the DBS update service?',
@@ -452,12 +459,12 @@ class DBSCheckForm(GOVUKForm):
                                          widget=custom_field_widgets.Textarea, required=False,
                                          max_length=500)
 
-    checkboxes = [(dbs_certificate_number_declare, 'dbs_certificate_number'),
-                  (cautions_convictions_declare, 'cautions_convictions'),
-                  (lived_abroad_declare, 'lived_abroad'),
-                  (military_base_declare, 'military_base'),
-                  (capita_declare, 'capita'),
-                  (on_update_declare, 'on_update')]
+    checkboxes = [
+        (lived_abroad_declare, 'lived_abroad'),
+        (military_base_declare, 'military_base'),
+        (dbs_certificate_number_declare, 'dbs_certificate_number'),
+        (enhanced_check_declare, 'enhanced_check'),
+        (on_update_declare, 'on_update')]
 
     for box in checkboxes:
         box[0].widget.attrs.update({'data_target': box[1],
@@ -913,21 +920,21 @@ class OtherPeopleInYourHomeForm(GOVUKForm):
                                                 required=False, max_length=500)
 
     known_to_social_services_pith_declare = forms.BooleanField(label='This information is correct',
-                                                              widget=custom_field_widgets.CustomCheckboxInput,
-                                                              required=False)
+                                                               widget=custom_field_widgets.CustomCheckboxInput,
+                                                               required=False)
     known_to_social_services_pith_comments = forms.CharField(label='Are you known to council social services '
-                                                                  'in regards to your own children?',
-                                                            help_text='(Tip: be clear and concise)',
-                                                            widget=custom_field_widgets.Textarea,
-                                                            required=False, max_length=500)
+                                                                   'in regards to your own children?',
+                                                             help_text='(Tip: be clear and concise)',
+                                                             widget=custom_field_widgets.Textarea,
+                                                             required=False, max_length=500)
 
     reasons_known_to_social_services_pith_declare = forms.BooleanField(label='This information is correct',
-                                                              widget=custom_field_widgets.CustomCheckboxInput,
-                                                              required=False)
+                                                                       widget=custom_field_widgets.CustomCheckboxInput,
+                                                                       required=False)
     reasons_known_to_social_services_pith_comments = forms.CharField(label='Tell us why',
-                                                            help_text='(Tip: be clear and concise)',
-                                                            widget=custom_field_widgets.Textarea,
-                                                            required=False, max_length=500)
+                                                                     help_text='(Tip: be clear and concise)',
+                                                                     widget=custom_field_widgets.Textarea,
+                                                                     required=False, max_length=500)
 
     checkboxes = [(adults_in_home_declare, 'adults_in_home'),
                   (children_in_home_declare, 'children_in_home'),
@@ -1049,19 +1056,19 @@ class AdultInYourHomeForm(GOVUKForm):
                                       required=False, max_length=500)
 
     known_to_council_declare = forms.BooleanField(label='This information is correct',
-                                        widget=custom_field_widgets.CustomCheckboxInput, required=False)
+                                                  widget=custom_field_widgets.CustomCheckboxInput, required=False)
     known_to_council_comments = forms.CharField(label='Known to council '
-                                                              'social services in regards to their own children?',
-                                      help_text='(Tip: be clear and concise)',
-                                      widget=custom_field_widgets.Textarea,
-                                      required=False, max_length=500)
+                                                      'social services in regards to their own children?',
+                                                help_text='(Tip: be clear and concise)',
+                                                widget=custom_field_widgets.Textarea,
+                                                required=False, max_length=500)
     reasons_known_to_council_health_check_declare = forms.BooleanField(label='This information is correct',
-                                                          widget=custom_field_widgets.CustomCheckboxInput,
-                                                          required=False)
+                                                                       widget=custom_field_widgets.CustomCheckboxInput,
+                                                                       required=False)
     reasons_known_to_council_health_check_comments = forms.CharField(label='Tell us why',
-                                                        help_text='(Tip: be clear and concise)',
-                                                        widget=custom_field_widgets.Textarea,
-                                                        required=False, max_length=500)
+                                                                     help_text='(Tip: be clear and concise)',
+                                                                     widget=custom_field_widgets.Textarea,
+                                                                     required=False, max_length=500)
 
     # This is the id appended to all htmls names ot make the individual form instance unique, this is given a value in
     # the init
@@ -1083,7 +1090,8 @@ class AdultInYourHomeForm(GOVUKForm):
             ((self.fields['military_base_declare']), 'military_base' + id_value),
             ((self.fields['capita_declare']), 'capita' + id_value),
             ((self.fields['known_to_council_declare']), 'known_to_council' + id_value),
-            ((self.fields['reasons_known_to_council_health_check_declare']), 'reasons_known_to_council_health_check' + id_value)
+            ((self.fields['reasons_known_to_council_health_check_declare']),
+             'reasons_known_to_council_health_check' + id_value)
         ]
 
         for box in checkboxes:
@@ -1452,6 +1460,7 @@ class ChildInYourHomeForm(GOVUKForm):
 
         return relationship_comments
 
+
 class CommentsForm(GOVUKForm):
     """
     Form for Comments page
@@ -1500,6 +1509,7 @@ class SearchForm(GOVUKForm):
     dob_search_field = forms.CharField(label='Date of birth', required=False, help_text='e.g. 31 03 1980')
     home_postcode_search_field = forms.CharField(label='Home postcode', required=False)
     care_location_postcode_search_field = forms.CharField(label='Work postcode', required=False)
+
     # application_type_dropdown_search_field = forms.ChoiceField(label='Application type',
     #                                                            choices=choices,
     #                                                            required=False,
