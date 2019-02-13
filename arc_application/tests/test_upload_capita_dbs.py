@@ -67,11 +67,11 @@ class UploadCapitaDBSFormTests(SimpleTestCase):
     def test_invalid_file_extension_raises_error(self):
         form = UploadCapitaDBSForm(data={'capita_list_file': 'myfile.png'})
 
-        with self.assertRaisesMessage(ValidationError, 'The file must be .csv or .xlxs'):
+        with self.assertRaisesMessage(ValidationError, 'The file must be .csv or .csvx'):
             form.clean_capita_list_file()
 
-    def test_xlxs_file_passes_validation(self):
-        form = UploadCapitaDBSForm(data={'capita_list_file': 'myfile.xlxs'})
+    def test_csvx_file_passes_validation(self):
+        form = UploadCapitaDBSForm(data={'capita_list_file': 'myfile.csvx'})
 
         self.assertTrue(form.is_valid())
 
