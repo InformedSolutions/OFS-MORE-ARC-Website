@@ -136,7 +136,7 @@ class Migration(migrations.Migration):
                 ('working_in_other_childminder_home', models.NullBooleanField(default=None)),
                 ('own_children', models.NullBooleanField(default=None)),
                 ('known_to_social_services_pith', models.NullBooleanField(default=None)),
-                ('reasons_known_to_social_services', models.TextField(null=True, default="")),
+                ('reasons_known_to_social_services', models.TextField(blank=True, null=True, default=None)),
                 ('reasons_known_to_social_services_pith', models.TextField(null=True, default=""))
             ],
             options={
@@ -286,6 +286,9 @@ class Migration(migrations.Migration):
                 ('capita', models.NullBooleanField()),
                 ('on_update', models.NullBooleanField()),
                 ('application_id', models.ForeignKey(db_column='application_id', on_delete=django.db.models.deletion.CASCADE, to='arc_application.Application')),
+                ('enhanced_check', models.NullBooleanField(blank=True)),
+                ('certificate_information', models.TextField(blank=True)),
+                ('within_three_months', models.NullBooleanField(blank=True))
             ],
             options={
                 'db_table': 'CRIMINAL_RECORD_CHECK',

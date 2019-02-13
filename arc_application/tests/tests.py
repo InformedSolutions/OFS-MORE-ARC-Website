@@ -7,17 +7,17 @@ from django.urls import reverse
 
 from arc_application.childminder_task_util import get_number_of_tasks
 from arc_application.models import (ApplicantHomeAddress,
-                      ApplicantName,
-                      ApplicantPersonalDetails,
-                      Application,
-                      Arc,
-                      ArcComments,
-                      ChildInHome,
-                      CriminalRecordCheck,
-                      FirstAidTraining,
-                      Reference,
-                      UserDetails,
-                      ChildcareType)
+                                    ApplicantName,
+                                    ApplicantPersonalDetails,
+                                    Application,
+                                    Arc,
+                                    ArcComments,
+                                    ChildInHome,
+                                    CriminalRecordCheck,
+                                    FirstAidTraining,
+                                    Reference,
+                                    UserDetails,
+                                    ChildcareType)
 from ..views.childminder_views.type_of_childcare import get_register_name
 
 application = None
@@ -67,6 +67,9 @@ def create_application():
         date_created=datetime.datetime.today(),
         date_updated=datetime.datetime.today(),
         date_accepted=None,
+        reasons_known_to_social_services=None,
+        known_to_social_services_pith=None,
+        reasons_known_to_social_services_pith=None
     )
 
     details = ApplicantPersonalDetails.objects.create(
