@@ -1,13 +1,19 @@
-from arc_application.views.base import custom_login
+from unittest import mock
+
 from arc_application.forms import UploadCapitaDBSForm
+from arc_application.models import CapitaDBSFile
+from arc_application.services import dbs_api
+from arc_application.views.base import custom_login
 
 from django.conf import settings
 from django.contrib.auth.models import Group, User
 from django.forms import ValidationError
+from django.http import HttpResponse
 from django.test import SimpleTestCase, TestCase
 from django.urls import resolve, reverse
 
 
+@mock.patch.object(dbs_api, 'batch_overwrite', return_value=HttpResponse(status=201))
 class UploadCapitaDBSRoutingTests(TestCase):
     def setUp(self):
         # Create ARC user and login.
@@ -22,28 +28,36 @@ class UploadCapitaDBSRoutingTests(TestCase):
 
         self.client.login(username='governor_tARCin', password='my_secret')
 
-    def test_can_render_capita_dbs_list_upload_page(self):
+        CapitaDBSFile.objects.create(filename='initial-filename.csv', date_uploaded='2019-01-01')
+
+    def test_can_render_capita_dbs_list_upload_page(self, dbs_api_mock):
         response = self.client.get(reverse('Upload-Capita-DBS'))
 
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, template_name='upload-capita-dbs.html')
 
-    def test_page_loads_with_date_and_filename_of_previous_upload(self):
-        self.skipTest('FunctionalityNotImplemented')
+    def test_page_loads_with_date_and_filename_of_previous_upload(self, dbs_api_mock):
+        response = self.client.get(reverse('Upload-Capita-DBS'))
 
-    def test_can_post_valid_csv_file(self):
-        self.skipTest('FunctionalityNotImplemented')
+        self.assertContains(response, 'initial-filename.csv (01/01/2019)')
 
-    def test_post_request_to_dbs_api_made_for_valid_csv_upload(self):
-        self.skipTest('FunctionalityNotImplemented')
+    def test_post_request_to_dbs_api_made_for_valid_csv_upload(self, dbs_api_mock):
+        self.client.post(reverse('Upload-Capita-DBS'), data={'capita_list_file': 'arc_application/tests/resources/test_csv.csv'})
 
-    def test_cc_user_cannot_see_nav_bar_link(self):
+        self.assertTrue(dbs_api_mock.called)
+
+    def test_post_request_to_dbs_api_made_for_valid_csvx_upload(self, dbs_api_mock):
+        self.client.post(reverse('Upload-Capita-DBS'), data={'capita_list_file': 'arc_application/tests/resources/test_csvx.csvx'})
+
+        self.assertTrue(dbs_api_mock.called)
+
+    def test_cc_user_cannot_see_nav_bar_link(self, dbs_api_mock):
         self.skipTest('testNotImplemented')
 
-    def test_cc_user_accessing_capita_dbs_list_upload_page_raises_access_denied(self):
+    def test_cc_user_accessing_capita_dbs_list_upload_page_raises_access_denied(self, dbs_api_mock):
         self.skipTest('FunctionalityNotImplemented')
 
-    def test_unauthenticated_user_cannot_access_capita_dbs_upload_page(self):
+    def test_unauthenticated_user_cannot_access_capita_dbs_upload_page(self, dbs_api_mock):
         self.client.logout()
 
         response = self.client.get(reverse('Upload-Capita-DBS'))
@@ -51,10 +65,23 @@ class UploadCapitaDBSRoutingTests(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(resolve(response.url).func, custom_login)
 
+    def test_error_added_to_form_if_not_201_or_400_status_code_from_dbs_api(self, dba_api_mock):
+        self.skipTest('testNotImplemented')
 
-class UploadCapitaDBSHelperFunctionTests(SimpleTestCase):
+
+@mock.patch.object(dbs_api, 'batch_overwrite', return_value=HttpResponse(status=201))
+class UploadCapitaDBSHelperFunctionTests(TestCase):
     def test_formatting_of_previous_upload_information(self):
         self.skipTest('FunctionalityNotImplemented')
+
+    def test_validation_error_raised_if_400_status_code_from_dbs_api(self, dba_api_mock):
+        self.skipTest('testNotImplemented')
+
+    def test_internal_error_raised_if_not_201_or_400_status_code_from_dbs_api(self, dba_api_mock):
+        self.skipTest('testNotImplemented')
+
+    def test_no_error_raised_if_201_status_code_from_dbs_api(self, dba_api_mock):
+        self.skipTest('testNotImplemented')
 
 
 class UploadCapitaDBSFormTests(SimpleTestCase):
