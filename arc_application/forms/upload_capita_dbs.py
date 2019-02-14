@@ -10,7 +10,7 @@ class UploadCapitaDBSForm(GOVUKForm):
         '.csv'
     )
 
-    capita_list_file = FileField(allow_empty_file=True, required=False, label='Upload a file')
+    capita_list_file = FileField(allow_empty_file=True, required=False, label='')
 
     def clean_capita_list_file(self):
         capita_list_file = self.data['capita_list_file']
