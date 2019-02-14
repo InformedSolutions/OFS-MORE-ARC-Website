@@ -474,7 +474,7 @@ class ArcSummaryTest(TestCase):
         application.save()
 
         number_of_tasks = get_number_of_tasks(application, childcare_type)
-        self.assertEqual(9, number_of_tasks)
+        self.assertEqual(8, number_of_tasks)
 
         childcare_type.zero_to_five = True
         childcare_type.save()
@@ -483,7 +483,7 @@ class ArcSummaryTest(TestCase):
         application.save()
 
         number_of_tasks = get_number_of_tasks(application, childcare_type)
-        self.assertEqual(10, number_of_tasks)
+        self.assertEqual(9, number_of_tasks)
 
         childcare_type.zero_to_five = False
         childcare_type.save()
@@ -510,7 +510,7 @@ class ArcSummaryTest(TestCase):
         application.save()
 
         number_of_tasks = get_number_of_tasks(application, childcare_type)
-        self.assertEqual(8, number_of_tasks)
+        self.assertEqual(7, number_of_tasks)
 
         childcare_type.zero_to_five = True
         childcare_type.save()
@@ -528,7 +528,7 @@ class ArcSummaryTest(TestCase):
         application.save()
 
         number_of_tasks = get_number_of_tasks(application, childcare_type)
-        self.assertEqual(7, number_of_tasks)
+        self.assertEqual(6, number_of_tasks)
 
     def test_get_register_name(self):
         """
