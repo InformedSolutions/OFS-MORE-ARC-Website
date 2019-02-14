@@ -36,6 +36,7 @@ class AdultInHome(models.Model):
     capita = models.NullBooleanField(blank=True)
     on_update = models.NullBooleanField(blank=True)
 
+
     @property
     def timelog_fields(self):
         """
