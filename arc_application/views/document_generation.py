@@ -54,7 +54,7 @@ def get_adult_details_summary(request):
 
     resp = HttpResponse(content_type='application/pdf')
 
-    if request.method == 'GET'
+    if request.method == 'GET':
         application_id_local = request.GET["id"]
         application = Application.objects.get(application_id=application_id_local)
         application_reference = application.application_reference
