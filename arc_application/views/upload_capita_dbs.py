@@ -16,7 +16,7 @@ from django.shortcuts import render
 
 def __format_last_upload():
     try:
-        capita_dbs_file = CapitaDBSFile.objects.get(id=1)
+        capita_dbs_file = CapitaDBSFile.objects.get(pk=1)
         return '%s (%s)' % (capita_dbs_file.filename, capita_dbs_file.date_uploaded.strftime('%d/%m/%Y'))
 
     except CapitaDBSFile.DoesNotExist:
@@ -25,12 +25,16 @@ def __format_last_upload():
 
 def __update_last_upload(filename):
     date = datetime.now().date()
-    queryset = CapitaDBSFile.objects.all()
 
-    if queryset.exists():
-        queryset.delete()
+    try:
+        capita_dbs_file = CapitaDBSFile.objects.get(pk=1)
+        capita_dbs_file.filename = filename
+        capita_dbs_file.date_uploaded = date
+        capita_dbs_file.save()
 
-    CapitaDBSFile.objects.create(filename=filename, date_uploaded=date)
+    except CapitaDBSFile.DoesNotExist:
+        CapitaDBSFile.objects.create(filename=filename, date_uploaded=date)
+
     return None
 
 
