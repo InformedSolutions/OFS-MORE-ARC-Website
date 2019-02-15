@@ -1,11 +1,11 @@
-from arc_application.views.base import custom_login
-from arc_application.forms import UploadCapitaDBSForm
-
 from django.conf import settings
 from django.contrib.auth.models import Group, User
 from django.forms import ValidationError
 from django.test import SimpleTestCase, TestCase
 from django.urls import resolve, reverse
+
+from arc_application.forms import UploadCapitaDBSForm
+from arc_application.views.base import custom_login
 
 
 class UploadCapitaDBSRoutingTests(TestCase):
@@ -51,10 +51,23 @@ class UploadCapitaDBSRoutingTests(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(resolve(response.url).func, custom_login)
 
+    def test_error_added_to_form_if_not_201_or_400_status_code_from_dbs_api(self, dbs_api_mock):
+        self.skipTest('testNotImplemented')
 
-class UploadCapitaDBSHelperFunctionTests(SimpleTestCase):
-    def test_formatting_of_previous_upload_information(self):
-        self.skipTest('FunctionalityNotImplemented')
+
+@mock.patch.object(dbs_api, 'batch_overwrite', return_value=HttpResponse(status=201))
+class UploadCapitaDBSHelperFunctionTests(TestCase):
+    def test_formatting_of_previous_upload_information(self, dbs_api_mock):
+        self.skipTest('testNotImplemented')
+
+    def test_validation_error_raised_if_400_status_code_from_dbs_api(self, dbs_api_mock):
+        self.skipTest('testNotImplemented')
+
+    def test_internal_error_raised_if_not_201_or_400_status_code_from_dbs_api(self, dbs_api_mock):
+        self.skipTest('testNotImplemented')
+
+    def test_no_error_raised_if_201_status_code_from_dbs_api(self, dbs_api_mock):
+        self.skipTest('testNotImplemented')
 
 
 class UploadCapitaDBSFormTests(SimpleTestCase):
