@@ -1,6 +1,12 @@
 import json
 from unittest import mock
 
+from arc_application.forms import UploadCapitaDBSForm
+from arc_application.models import CapitaDBSFile
+from arc_application.services import dbs_api
+from arc_application.views.base import custom_login
+from arc_application.views import upload_capita_dbs, __handle_file_upload
+
 from django.conf import settings
 from django.contrib.auth.models import Group, User
 from django.db import InternalError
@@ -9,11 +15,6 @@ from django.http import HttpResponse
 from django.test import SimpleTestCase, TestCase
 from django.urls import resolve, reverse
 
-from arc_application.forms import UploadCapitaDBSForm
-from arc_application.models import CapitaDBSFile
-from arc_application.services import dbs_api
-from arc_application.views import __handle_file_upload
-from arc_application.views.base import custom_login
 
 handle_file_upload = __handle_file_upload
 
@@ -32,6 +33,7 @@ class UploadCapitaDBSRoutingTests(TestCase):
         g.user_set.add(self.arc_user)
 
         self.client.login(username='governor_tARCin', password='my_secret')
+
         CapitaDBSFile.objects.create(id=1, filename='initial-filename.csv', date_uploaded='2019-01-01')
 
     def test_can_render_capita_dbs_list_upload_page(self, dbs_api_mock):
@@ -40,22 +42,28 @@ class UploadCapitaDBSRoutingTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, template_name='upload-capita-dbs.html')
 
-    def test_page_loads_with_date_and_filename_of_previous_upload(self):
-        self.skipTest('FunctionalityNotImplemented')
+    def test_page_loads_with_date_and_filename_of_previous_upload(self, dbs_api_mock):
+        response = self.client.get(reverse('Upload-Capita-DBS'))
 
-    def test_can_post_valid_csv_file(self):
-        self.skipTest('FunctionalityNotImplemented')
+        self.assertContains(response, 'initial-filename.csv (01/01/2019)')
 
-    def test_post_request_to_dbs_api_made_for_valid_csv_upload(self):
-        self.skipTest('FunctionalityNotImplemented')
+    def test_post_request_to_dbs_api_made_for_valid_csv_upload(self, dbs_api_mock):
+        self.client.post(reverse('Upload-Capita-DBS'), data={'capita_list_file': 'arc_application/tests/resources/test_csv.csv'})
 
-    def test_cc_user_cannot_see_nav_bar_link(self):
+        self.assertTrue(dbs_api_mock.called)
+
+    def test_post_request_to_dbs_api_made_for_valid_csvx_upload(self, dbs_api_mock):
+        self.client.post(reverse('Upload-Capita-DBS'), data={'capita_list_file': 'arc_application/tests/resources/test_csvx.csvx'})
+
+        self.assertTrue(dbs_api_mock.called)
+
+    def test_cc_user_cannot_see_nav_bar_link(self, dbs_api_mock):
         self.skipTest('testNotImplemented')
 
-    def test_cc_user_accessing_capita_dbs_list_upload_page_raises_access_denied(self):
+    def test_cc_user_accessing_capita_dbs_list_upload_page_raises_access_denied(self, dbs_api_mock):
         self.skipTest('FunctionalityNotImplemented')
 
-    def test_unauthenticated_user_cannot_access_capita_dbs_upload_page(self):
+    def test_unauthenticated_user_cannot_access_capita_dbs_upload_page(self, dbs_api_mock):
         self.client.logout()
 
         response = self.client.get(reverse('Upload-Capita-DBS'))
@@ -67,23 +75,19 @@ class UploadCapitaDBSRoutingTests(TestCase):
         dbs_api_mock.return_value.status_code = 400
         dbs_api_mock.return_value.text = json.dumps('Test error message')
 
-        response = self.client.post(reverse('Upload-Capita-DBS'),
-                                    data={'capita_list_file': 'arc_application/tests/resources/test_csv.csv'})
+        response = self.client.post(reverse('Upload-Capita-DBS'), data={'capita_list_file': 'arc_application/tests/resources/test_csv.csv'})
 
         self.assertEqual(response.status_code, 200)
-        self.assertFormError(response, 'form', field='capita_list_file',
-                             errors='There was an error with the file you tried to upload. Check the file and try again')
+        self.assertFormError(response, 'form', field='capita_list_file', errors='There was an error with the file you tried to upload. Check the file and try again')
 
     def test_error_added_to_form_if_not_400_or_201_status_code_from_dbs_api(self, dbs_api_mock):
         dbs_api_mock.return_value.status_code = 500
         dbs_api_mock.return_value.text = json.dumps('Test error message')
 
-        response = self.client.post(reverse('Upload-Capita-DBS'),
-                                    data={'capita_list_file': 'arc_application/tests/resources/test_csv.csv'})
+        response = self.client.post(reverse('Upload-Capita-DBS'), data={'capita_list_file': 'arc_application/tests/resources/test_csv.csv'})
 
         self.assertEqual(response.status_code, 200)
-        self.assertFormError(response, 'form', field='capita_list_file',
-                             errors='We couldn\'t upload your new list. Try again')
+        self.assertFormError(response, 'form', field='capita_list_file', errors='We couldn\'t upload your new list. Try again')
 
 
 @mock.patch.object(dbs_api, 'batch_overwrite', return_value=HttpResponse(status=201))
@@ -102,8 +106,7 @@ class UploadCapitaDBSHelperFunctionTests(TestCase):
         dbs_api_mock.return_value.status_code = 500
         dbs_api_mock.return_value.text = json.dumps('Test error message')
 
-        with self.assertRaisesMessage(InternalError,
-                                      'The DBS API returned a 500 status code. Response text: Test error message'):
+        with self.assertRaisesMessage(InternalError, 'The DBS API returned a 500 status code. Response text: Test error message'):
             handle_file_upload('arc_application/tests/resources/test_csv.csv')
 
     def test_no_error_raised_if_201_status_code_from_dbs_api(self, dbs_api_mock):
