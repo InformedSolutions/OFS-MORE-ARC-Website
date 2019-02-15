@@ -46,3 +46,45 @@ def get_full_application_summary(request):
 
         result = generate_pdf('pdf-summary.html', file_object=resp, context=variables)
         return result
+
+# Need a method here for creating a PDF for the information entered by an adult on their health questionnaires
+# e.g. Illnesses, Hospital admissions etc
+
+def get_adult_details_summary(request):
+
+    resp = HttpResponse(content_type='application/pdf')
+
+    if request.method == 'GET'
+        application_id_local = request.GET["id"]
+        application = Application.objects.get(application_id=application_id_local)
+        application_reference = application.application_reference
+        adult_id_local = request.GET["adult_id"]
+        adult= AdultInHome.objects.get(adult_id=adult_id_local)
+
+        summary_table = [adult.get_summary_table()]
+        health_details = []
+        health_details.append(HealthCheckCurrent.objects.filter(person_id=adult_id_local))
+        health_details.append(HealthCheckSerious.objects.filter(person_id=adult_id_local))
+        health_details.append(HealthCheckHospital.objects.filter(person_id=adult_id_local))
+        for record in health_details:
+            summary_table.append({"name": "Description", "value": record.description})
+            if record.model != HealthCheckCurrent:
+                summary_table.append({"name": "Start Date", "value": record.start_date})
+                summary_table.append({"name": "End Date", "value": record.end_date})
+
+        json = summary_table
+
+        variables = {
+            'json': json,
+            'adult_id': adult_id_local,
+            'application_id': application_id_local,
+            'application_reference': application_reference,
+        }
+
+        result = generate_pdf('pdf-summary.html', file_object=resp, context=variables)
+        return result
+
+
+# Steps are effectively to build up data object including all the bits from the questionnaire
+# Push them into PDF using same approach as above
+
