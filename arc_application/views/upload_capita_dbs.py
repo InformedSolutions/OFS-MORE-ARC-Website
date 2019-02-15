@@ -62,7 +62,7 @@ def __handle_file_upload(filename):
 
     else:
         response_text = json.loads(response.text)
-        raise InternalError('The DBS API returned a %i status code. Response text: %s' % response.status_code, response_text)
+        raise InternalError('The DBS API returned a %i status code. Response text: %s' % (response.status_code, response_text))
 
 
 @login_required
