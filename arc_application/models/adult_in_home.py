@@ -85,7 +85,12 @@ class AdultInHome(models.Model):
         """
         return datetime.date(self.birth_year, self.birth_month, self.birth_day)
 
+    @staticmethod
+    def bool_to_string(bool):
+        return "Yes" if bool else "No"
+
     def get_summary_table(self):
+        from .childcare_type import ChildcareType
 
         if self.birth_day < 10:
             birth_day = '0' + str(self.birth_day)
@@ -105,21 +110,29 @@ class AdultInHome(models.Model):
             {"name": "Date of birth", "value": date_of_birth},
             {"name": "Relationship", "value": self.relationship},
             {"name": "Email", "value": self.email},
-            {"name": "Ofsted DBS", "value": ("Yes" if self.capita == True else "No")},
+            {"name": "Lived abroad in the last 5 years?", "value": self.bool_to_string(self.lived_abroad)},
+            {"name": "Did they get their DBS check from the Ofsted DBS application website?", "value": self.bool_to_string(self.capita)},
             {"name": "DBS certificate number", "value": self.dbs_certificate_number},
-            {"name": "Lived abroad", "value": ("Yes" if self.known_to_council == True else "No")},
-            {"name": "Known to council", "value": ("Yes" if self.known_to_council == True else "No")}
+            {"name": "Known to council social Services in regards to their own children?", "value": self.bool_to_string(self.known_to_council)},
         ]
 
-        if self.known_to_council == True:
+        if ChildcareType.objects.get(application_id=self.application_id).zero_to_five:
+           summary_table.insert(-5, {"name": "Lived or worked in British military base in the last 5 years?", "value": self.bool_to_string(self.military_base)})
+
+        if self.capita:
+            summary_table.insert(-2, {"name": "Is it dated within the last 3 months?", "value": self.bool_to_string(self.within_three_months)})
+
+        if self.show_on_update():
+            summary_table.insert(-1, {"name": "Enhanced DBS check for home-based childcare?", "value": self.bool_to_string(self.enhanced_check)})
+            summary_table.insert(-1, {"name": "On the update service?", "value": self.bool_to_string(self.on_update)})
+
+        if self.known_to_council:
             summary_table.append({"name": "Tell us why", "value": self.reasons_known_to_council_health_check})
 
-        from .childcare_type import ChildcareType
-
-        if ChildcareType.objects.get(application_id=self.application_id).zero_to_five:
-           summary_table.insert(-1, {"name": "British Military Base", "value":  ("Yes" if self.military_base == True else "No")})
-
         return summary_table
+
+    def show_on_update(self):
+        return (self.capita and not self.within_three_months) or not self.capita
 
     # Date of birth property created to keep DRY
     @property
