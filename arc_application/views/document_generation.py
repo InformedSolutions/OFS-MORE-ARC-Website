@@ -15,7 +15,7 @@ def get_full_application_summary(request):
 
     if request.method == 'GET':
         application_id_local = request.GET["id"]
-        variables = get_application_summary_variables(application_id_local)
+        variables = get_application_summary_variables(application_id_local, apply_filtering_for_eyc=True)
         result = generate_pdf('pdf-summary.html', file_object=resp, context=variables)
         return result
 

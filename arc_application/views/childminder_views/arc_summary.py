@@ -68,7 +68,7 @@ name_field_dict = {
 }
 
 
-def get_application_summary_variables(application_id):
+def get_application_summary_variables(application_id, apply_filtering_for_eyc=False):
     """
     A function for generating the summary page contents in the ARC view. Note that this is re-used by the
     document generation function so changes will be applied in both the UI and PDF exports.
@@ -88,13 +88,12 @@ def get_application_summary_variables(application_id):
         ordered_models.append(AdultInHome)
         ordered_models.append(Application)
         ordered_models.append(ChildInHome)
-        ordered_models.append(Child)
     zero_to_five = ChildcareType.objects.get(application_id=application_id).zero_to_five
 
     if zero_to_five:
-        ordered_models.insert(6, HealthDeclarationBooklet)
+        ordered_models.insert(7, HealthDeclarationBooklet)
         ordered_models.append(Reference)
-    json = load_json(application_id, ordered_models, False)
+    json = load_json(application_id, ordered_models, False, apply_filtering_for_eyc=apply_filtering_for_eyc)
     json = add_comments(json, application_id)
 
     application_reference = application.application_reference
@@ -254,7 +253,7 @@ def get_address(street_line1, street_line2, town, postcode):
     return street_line1 + ', ' + street_line2 + ', ' + town + ', ' + postcode
 
 
-def load_json(application_id_local, ordered_models, recurse):
+def load_json(application_id_local, ordered_models, recurse, apply_filtering_for_eyc=False):
     """
     Dynamically builds a JSON to be consumed by the HTML summary page
     :param application_id_local: the id of the application being handled
@@ -404,47 +403,6 @@ def load_json(application_id_local, ordered_models, recurse):
                              "value": get_bool_as_string(known_to_social_services_pith)}
                         ])
 
-        elif model == Child:
-
-            # Only show People in the home tables when applicant is not working in another childminder's home
-            if application.working_in_other_childminder_home is False:
-
-                if application.own_children is False:
-
-                    table_list.append([
-                        {"title": "Children not in the home", "id": application_id_local},
-                    ])
-
-                    children_not_in_home = Child.objects.filter(application_id=application_id_local,
-                                                                lives_with_childminder=False)
-
-                    for child in children_not_in_home:
-
-                        if child.birth_day < 10:
-                            birth_day = '0' + str(child.birth_day)
-                        else:
-                            birth_day = str(child.birth_day)
-
-                        if child.birth_month < 10:
-                            birth_month = '0' + str(child.birth_month)
-                        else:
-                            birth_month = str(child.birth_month)
-
-                        date_of_birth = birth_day + ' ' + birth_month + ' ' + str(child.birth_year)
-
-                        child_address_record = ChildAddress.objects.get(application_id=application_id_local,
-                                                                        child=child.child)
-
-                        child_address = get_address(child_address_record.street_line1,
-                                                    child_address_record.street_line2, child_address_record.town,
-                                                    child_address_record.postcode)
-
-                        table_list.append([
-                            {"title": child.get_full_name(), "id": child.pk},
-                            {"name": "Name", "value": child.get_full_name()},
-                            {"name": "Date of birth", "value": date_of_birth},
-                            {"name": "Address", "value": child_address}
-                        ])
 
         elif model == PreviousName:
             records = model.objects.filter(person_id=application.pk)
@@ -462,6 +420,15 @@ def load_json(application_id_local, ordered_models, recurse):
                                                     record.postcode)
                 previous_names.append({"name": "Previous Address", "value": address})
             table_list.append(previous_names)
+
+        elif model == AdultInHome:
+            records = model.objects.filter(application_id=application.pk)
+            for record in records:
+                table = record.get_summary_table(apply_filtering_for_eyc=apply_filtering_for_eyc)
+                if recurse:
+                    table_list = table_list + table
+                else:
+                    table_list.append(table)
 
         elif model.objects.filter(application_id=application.pk).exists():
             records = model.objects.filter(application_id=application.pk)

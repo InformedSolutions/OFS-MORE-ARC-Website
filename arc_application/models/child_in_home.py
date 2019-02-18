@@ -51,7 +51,7 @@ class ChildInHome(ChildBase):
         """
         return datetime.date(self.birth_year, self.birth_month, self.birth_day)
 
-    def get_summary_table(self):
+    def get_summary_table(self, ):
 
         if self.birth_day < 10:
             birth_day = '0' + str(self.birth_day)
