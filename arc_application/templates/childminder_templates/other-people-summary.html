@@ -1,5 +1,5 @@
 {% extends 'govuk_template.html' %}
-{% block page_title %}People in your home{% endblock %}
+{% block page_title %}Review: people in the home{% endblock %}
 {% load static %}
 {% load govuk_template_base %}
 
@@ -44,7 +44,7 @@
             <tbody>
             <tr>
                 <td>
-                    Does anyone aged 16 or over work in the home?
+                    Does anyone aged 16 or over live or work in the home?
                 </td>
                 <td style="word-wrap: break-word">
                     {{ adults_in_home|yesno:"Yes,No" }}

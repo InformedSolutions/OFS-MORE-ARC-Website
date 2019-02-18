@@ -1121,148 +1121,85 @@ class AdultInYourHomeForm(GOVUKForm):
         Health check status comments validation
         :return: string
         """
-        health_check_status_declare = self.cleaned_data['health_check_status_declare']
-        health_check_status_comments = self.cleaned_data['health_check_status_comments']
-
-        # Only check if a comment has been entered if the field has been flagged
-        if health_check_status_declare is True:
-            if health_check_status_comments == '':
-                raise forms.ValidationError('You must give reasons')
-
-        return health_check_status_comments
+        return self.helper_clean('health_check_status')
 
     def clean_full_name_comments(self):
         """
         Full name comments validation
         :return: string
         """
-        full_name_declare = self.cleaned_data['full_name_declare']
-        full_name_comments = self.cleaned_data['full_name_comments']
-
-        # Only check if a comment has been entered if the field has been flagged
-        if full_name_declare is True:
-            if full_name_comments == '':
-                raise forms.ValidationError('You must give reasons')
-
-        return full_name_comments
+        return self.helper_clean('full_name')
 
     def clean_date_of_birth_comments(self):
         """
         Date of birth comments validation
         :return: string
         """
-        date_of_birth_declare = self.cleaned_data['date_of_birth_declare']
-        date_of_birth_comments = self.cleaned_data['date_of_birth_comments']
-
-        # Only check if a comment has been entered if the field has been flagged
-        if date_of_birth_declare is True:
-            if date_of_birth_comments == '':
-                raise forms.ValidationError('You must give reasons')
-
-        return date_of_birth_comments
+        return self.helper_clean('date_of_birth')
 
     def clean_relationship_comments(self):
         """
         Relationship comments validation
         :return: string
         """
-        relationship_declare = self.cleaned_data['relationship_declare']
-        relationship_comments = self.cleaned_data['relationship_comments']
-
-        # Only check if a comment has been entered if the field has been flagged
-        if relationship_declare is True:
-            if relationship_comments == '':
-                raise forms.ValidationError('You must give reasons')
-
-        return relationship_comments
+        return self.helper_clean('relationship')
 
     def clean_email_comments(self):
         """
         Email comment validation
         :return: string
         """
-        email_declare = self.cleaned_data['email_declare']
-        email_comments = self.cleaned_data['email_comments']
-
-        # Only check if a comment has been entered if the field has been flagged
-        if email_declare is True:
-            if email_comments == '':
-                raise forms.ValidationError('You must give reasons')
+        return self.helper_clean('email')
 
     def clean_dbs_certificate_number_comments(self):
         """
         DBS certificate number comments validation
         :return: string
         """
-        dbs_cert_number_declare = self.cleaned_data['dbs_certificate_number_declare']
-        dbs_cert_number_comments = self.cleaned_data['dbs_certificate_number_comments']
-
-        # Only check if a comment has been entered if the field has been flagged
-        if dbs_cert_number_declare is True:
-            if dbs_cert_number_comments == '':
-                raise forms.ValidationError('You must give reasons')
-
-        return dbs_cert_number_comments
-
-    def clean_capita_comments(self):
-        """
-        DBS is-enhanced-check-(capita) comments validation
-        :return: string
-        """
-        capita_declare = self.cleaned_data['capita_declare']
-        capita_comments = self.cleaned_data['capita_comments']
-
-        # Only check if a comment has been entered if the field has been flagged
-        if capita_declare is True:
-            if capita_comments == '':
-                raise forms.ValidationError('You must give reasons')
-
-        return capita_comments
+        return self.helper_clean('dbs_certificate_number')
 
     def clean_on_update_comments(self):
         """
         DBS holder-on-update-service comments validation
         :return: string
         """
-        on_update_declare = self.cleaned_data['on_update_declare']
-        on_update_comments = self.cleaned_data['on_update_comments']
-
-        # Only check if a comment has been entered if the field has been flagged
-        if on_update_declare is True:
-            if on_update_comments == '':
-                raise forms.ValidationError('You must give reasons')
-
-        return on_update_comments
+        return self.helper_clean('on_update')
 
     def clean_lived_abroad_comments(self):
         """
         DBS certificate number comments validation
         :return: string
         """
-        lived_abroad_declare = self.cleaned_data['lived_abroad_declare']
-        lived_abroad_comments = self.cleaned_data['lived_abroad_comments']
-
-        # Only check if a comment has been entered if the field has been flagged
-        if lived_abroad_declare is True:
-            if lived_abroad_comments == '':
-                raise forms.ValidationError('You must give reasons')
-
-        return lived_abroad_comments
+        return self.helper_clean('lived_abroad')
 
     def clean_military_base_comments(self):
         """
         DBS certificate number comments validation
         :return: string
         """
-        lived_abroad_declare = self.cleaned_data['military_base_declare']
-        military_base_comments = self.cleaned_data['military_base_comments']
+        return self.helper_clean('military_base')
+
+    def clean_enhanced_check_comments(self):
+        """
+        PITH enhanced_check comments validation
+        :return: string
+        """
+        return self.helper_clean('enhanced_check')
+
+    def helper_clean(self, field):
+        """
+        Validation helper method
+        :return: string
+        """
+        field_declare = self.cleaned_data['{0}_declare'.format(field)]
+        field_comments = self.cleaned_data['{0}_comments'.format(field)]
 
         # Only check if a comment has been entered if the field has been flagged
-        if lived_abroad_declare is True:
-            if military_base_comments == '':
+        if field_declare is True:
+            if field_comments == '':
                 raise forms.ValidationError('You must give reasons')
 
-        return military_base_comments
+        return field_comments
 
 
 class YourChildrenForm(GOVUKForm):
