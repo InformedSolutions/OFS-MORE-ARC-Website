@@ -105,18 +105,6 @@ class UploadCapitaDBSRoutingTests(TestCase):
 @mock.patch.object(dbs_api, 'batch_overwrite', return_value=HttpResponse(status=201))
 class UploadCapitaDBSHelperFunctionTests(TestCase):
     def setUp(self):
-        # Create ARC user and login.
-        self.arc_user = User.objects.create_user(
-            username='governor_tARCin',
-            email='test@test.com',
-            password='my_secret'
-        )
-
-        g = Group.objects.create(name=settings.ARC_GROUP)
-        g.user_set.add(self.arc_user)
-
-        self.client.login(username='governor_tARCin', password='my_secret')
-
         self.factory = RequestFactory()
 
     def test_formatting_of_previous_upload_information(self, dbs_api_mock):
