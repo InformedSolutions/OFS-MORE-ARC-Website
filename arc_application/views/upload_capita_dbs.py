@@ -1,5 +1,6 @@
 import csv
 from datetime import datetime
+import io
 import json
 
 from arc_application.decorators import group_required
@@ -28,7 +29,7 @@ def __update_last_upload(csvfile):
 
     try:
         capita_dbs_file = CapitaDBSFile.objects.get(pk=1)
-        capita_dbs_file.filename = csvfile.name
+        capita_dbs_file.filename = csvfile
         capita_dbs_file.date_uploaded = date
         capita_dbs_file.save()
 
@@ -47,9 +48,11 @@ def __format_csv_data(csvfile):
 
 
 def __handle_file_upload(csvfile):
-    data = __format_csv_data(csvfile)
+    # data = __format_csv_data(csvfile)
 
-    response = dbs_api.batch_overwrite(data)
+    # csvfile.FILES['capita_list_file'].file
+
+    response = dbs_api.batch_overwrite({'capita_list_file': csvfile['capita_list_file'].file})
 
     if response.status_code == 201:
         return
@@ -75,11 +78,11 @@ def upload_capita_dbs(request):
 
         if form.is_valid():
             try:
-                in_memory_uploaded_file = request.FILES['capita_list_file']
-                csvfile = in_memory_uploaded_file.file
-                utf_8_csvfile = csvfile.read().decode('UTF-8')
-                __handle_file_upload(utf_8_csvfile)
-                __update_last_upload(in_memory_uploaded_file)
+                # in_memory_uploaded_file = request.FILES['capita_list_file']
+                # csvfile = in_memory_uploaded_file.file
+                # utf_8_csvfile = csvfile.read().decode('UTF-8')
+                __handle_file_upload(request.FILES)
+                __update_last_upload(request.FILES['capita_list_file'].name)
             except ValidationError:
                 form.add_error('capita_list_file', 'There was an error with the file you tried to upload. Check the file and try again')
             except InternalError:
