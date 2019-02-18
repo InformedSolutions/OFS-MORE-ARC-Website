@@ -23,33 +23,31 @@ def __format_last_upload():
         return 'File yet to be uploaded.'
 
 
-def __update_last_upload(filename):
+def __update_last_upload(csvfile):
     date = datetime.now().date()
 
     try:
         capita_dbs_file = CapitaDBSFile.objects.get(pk=1)
-        capita_dbs_file.filename = filename
+        capita_dbs_file.filename = csvfile.name
         capita_dbs_file.date_uploaded = date
         capita_dbs_file.save()
 
     except CapitaDBSFile.DoesNotExist:
-        CapitaDBSFile.objects.create(filename=filename, date_uploaded=date)
+        CapitaDBSFile.objects.create(filename=csvfile.name, date_uploaded=date)
 
     return None
 
 
-def __format_csv_data(filename):
-    with open(filename, 'r') as csvfile:
-        reader = csv.DictReader(csvfile, fieldnames=('date_of_birth', 'certificate_number', 'certificate_information', 'date_of_issue'))
-        next(reader)  # Skip header line of csv file.
-        data = [row for row in reader]
+def __format_csv_data(csvfile):
+    reader = csv.DictReader(csvfile, fieldnames=('date_of_birth', 'certificate_number', 'certificate_information', 'date_of_issue'))
+    next(reader)  # Skip header line of csv file.
+    data = [row for row in reader]
 
-    csvfile.close()
     return data
 
 
-def __handle_file_upload(filename):
-    data = __format_csv_data(filename=filename)
+def __handle_file_upload(csvfile):
+    data = __format_csv_data(csvfile)
 
     response = dbs_api.batch_overwrite(data)
 
@@ -73,12 +71,15 @@ def upload_capita_dbs(request):
         form = UploadCapitaDBSForm()
 
     elif request.method == 'POST':
-        form = UploadCapitaDBSForm(request.POST)
+        form = UploadCapitaDBSForm(request.POST, request.FILES)
 
         if form.is_valid():
             try:
-                __handle_file_upload(request.POST['capita_list_file'])
-                __update_last_upload(request.POST['capita_list_file'])
+                in_memory_uploaded_file = request.FILES['capita_list_file']
+                csvfile = in_memory_uploaded_file.file
+                utf_8_csvfile = csvfile.read().decode('UTF-8')
+                __handle_file_upload(utf_8_csvfile)
+                __update_last_upload(in_memory_uploaded_file)
             except ValidationError:
                 form.add_error('capita_list_file', 'There was an error with the file you tried to upload. Check the file and try again')
             except InternalError:
