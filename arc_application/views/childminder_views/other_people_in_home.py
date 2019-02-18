@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta
 from uuid import uuid4
 
 from django.conf import settings
@@ -50,14 +51,18 @@ def other_people_summary(request):
     adult_birth_month_list = []
     adult_birth_year_list = []
     adult_relationship_list = []
-    adult_dbs_list = []
+    adult_email_list = []
+    adult_dbs_cert_numbers = []
+    adult_dbs_on_capitas = []
+    adult_dbs_is_recents = []
+    adult_dbs_is_capitas = []
+    adult_dbs_on_updates = []
     current_illnesses = []
     serious_illnesses = []
     hospital_admissions = []
     local_authorities = []
     adult_lived_abroad = []
     adult_military_base = []
-    adult_capita_dbs = []
     adult_name_querysets = []
     adult_address_querysets = []
     previous_registration_querysets = []
@@ -87,10 +92,21 @@ def other_people_summary(request):
     ]
 
     for adult in adults:
+
+        # TODO replace dbs lookup with references to stored results in database, when implemented
+        dbs_record = None #getattr(dbs.read(adult.dbs_certificate_number), 'record', None)
+
+        dbs_on_capita = dbs_record is not None
+        dbs_is_recent = dbs_record is not None \
+                and datetime.strptime(dbs_record['date_of_issue'], '%Y-%m-%d') > datetime.now()-timedelta(days=365/12)
+        asked_capita = not dbs_on_capita
+        asked_on_update = (dbs_on_capita and not dbs_is_recent) or (not dbs_on_capita and adult.capita)
+
         if adult.middle_names and adult.middle_names != '':
             name = adult.first_name + ' ' + adult.middle_names + ' ' + adult.last_name
         else:
             name = adult.first_name + ' ' + adult.last_name
+
         adult_record_list.append(adult)
         adult_id_list.append(adult.adult_id)
         adult_health_check_status_list.append(adult.health_check_status)
@@ -99,10 +115,15 @@ def other_people_summary(request):
         adult_birth_month_list.append(adult.birth_month)
         adult_birth_year_list.append(adult.birth_year)
         adult_relationship_list.append(adult.relationship)
-        adult_dbs_list.append(adult.dbs_certificate_number)
+        adult_email_list.append(adult.email)
+        adult_dbs_cert_numbers.append(adult.dbs_certificate_number)
+        adult_dbs_on_capitas.append(dbs_on_capita)
+        adult_dbs_is_recents.append(dbs_is_recent)
+        adult_dbs_is_capitas.append(adult.capita if asked_capita else None)
+        adult_dbs_on_updates.append(adult.on_update if asked_on_update else None)
+        #
         adult_lived_abroad.append(adult.lived_abroad)
         adult_military_base.append(adult.military_base)
-        adult_capita_dbs.append(adult.capita)
         current_illnesses.append(HealthCheckCurrent.objects.filter(person_id=adult.pk))
         serious_illnesses.append(HealthCheckSerious.objects.filter(person_id=adult.pk))
         hospital_admissions.append(HealthCheckHospital.objects.filter(person_id=adult.pk))
@@ -150,10 +171,10 @@ def other_people_summary(request):
         # Converts it to a list, there was trouble parsing the form objects when it was in a zip object
         adult_lists = list(
             zip(adult_record_list, adult_id_list, adult_health_check_status_list, adult_name_list, adult_birth_day_list,
-                adult_birth_month_list, adult_birth_year_list, adult_relationship_list, adult_dbs_list,
-                adult_lived_abroad,
-                adult_military_base, adult_capita_dbs,
-                formset_adult, current_illnesses, serious_illnesses, hospital_admissions, local_authorities))
+                adult_birth_month_list, adult_birth_year_list, adult_relationship_list, adult_email_list,
+                adult_dbs_cert_numbers, adult_dbs_on_capitas, adult_dbs_is_recents, adult_dbs_is_capitas,
+                adult_dbs_on_updates, adult_lived_abroad, adult_military_base, formset_adult, current_illnesses,
+                serious_illnesses, hospital_admissions, local_authorities))
 
         initial_child_data = other_people_initial_population(False, children)
 
@@ -288,10 +309,11 @@ def other_people_summary(request):
             # Zips the formset into the list of adults
             # Converts it to a list, there was trouble parsing the form objects when it was in a zip object
             adult_lists = list(zip(adult_record_list, adult_id_list, adult_health_check_status_list, adult_name_list,
-                                   adult_birth_day_list,
-                                   adult_birth_month_list, adult_birth_year_list, adult_relationship_list,
-                                   adult_dbs_list, adult_lived_abroad, adult_military_base, adult_capita_dbs,
-                                   adult_formset, current_illnesses, serious_illnesses, hospital_admissions, local_authorities))
+                                   adult_birth_day_list, adult_birth_month_list, adult_birth_year_list,
+                                   adult_relationship_list, adult_email_list, adult_dbs_cert_numbers,
+                                   adult_dbs_on_capitas, adult_dbs_is_recents, adult_dbs_is_capitas,
+                                   adult_dbs_on_updates, adult_lived_abroad, adult_military_base, adult_formset,
+                                   current_illnesses, serious_illnesses, hospital_admissions, local_authorities))
 
             child_lists = zip(child_id_list, child_name_list, child_birth_day_list, child_birth_month_list,
                               child_birth_year_list,
@@ -473,3 +495,4 @@ def add_previous_name(request):
     }
 
     return render(request, 'childminder_templates/add-previous-names.html', context)
+

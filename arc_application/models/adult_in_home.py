@@ -61,7 +61,7 @@ class AdultInHome(models.Model):
             'relationship',
             'email',
             'dbs_certificate_number',
-            'health_check_status'
+            'health_check_status',
         )
 
     @classmethod

@@ -1027,6 +1027,12 @@ class AdultInYourHomeForm(GOVUKForm):
                                             widget=custom_field_widgets.Textarea,
                                             required=False, max_length=500)
 
+    email_declare = forms.BooleanField(label='This information is correct',
+                                       widget=custom_field_widgets.CustomCheckboxInput, required=False)
+    email_comments = forms.CharField(label='Email', help_text='(Tip: be clear and concise)',
+                                     widget=custom_field_widgets.Textarea,
+                                     required=False, max_length=250)
+
     dbs_certificate_number_declare = forms.BooleanField(label='This information is correct',
                                                         widget=custom_field_widgets.CustomCheckboxInput, required=False)
     dbs_certificate_number_comments = forms.CharField(label='DBS certificate number',
@@ -1034,41 +1040,33 @@ class AdultInYourHomeForm(GOVUKForm):
                                                       widget=custom_field_widgets.Textarea,
                                                       required=False, max_length=500)
 
+    capita_declare = forms.BooleanField(label='This information is correct',
+                                        widget=custom_field_widgets.CustomCheckboxInput, required=False)
+    capita_comments = forms.CharField(label='Enhanced DBS check for home-based childcare?',
+                                      help_text='(Tip: be clear and concise)',
+                                      widget=custom_field_widgets.Textarea,
+                                      required=False, max_length=500)
+
+    on_update_declare = forms.BooleanField(label='This information is correct',
+                                           widget=custom_field_widgets.CustomCheckboxInput, required=False)
+    on_update_comments = forms.CharField(label='On the update service?',
+                                         help_text='(Tip: be clear and concise)',
+                                         widget=custom_field_widgets.Textarea,
+                                         required=False, max_length=500)
+
     lived_abroad_declare = forms.BooleanField(label='This information is correct',
                                               widget=custom_field_widgets.CustomCheckboxInput, required=False)
-    lived_abroad_comments = forms.CharField(label='DBS certificate number',
+    lived_abroad_comments = forms.CharField(label='Lived abroad in last 5 years?',
                                             help_text='(Tip: be clear and concise)',
                                             widget=custom_field_widgets.Textarea,
                                             required=False, max_length=500)
 
     military_base_declare = forms.BooleanField(label='This information is correct',
                                                widget=custom_field_widgets.CustomCheckboxInput, required=False)
-    military_base_comments = forms.CharField(label='DBS certificate number',
+    military_base_comments = forms.CharField(label='Lived or worked on military base?',
                                              help_text='(Tip: be clear and concise)',
                                              widget=custom_field_widgets.Textarea,
                                              required=False, max_length=500)
-
-    capita_declare = forms.BooleanField(label='This information is correct',
-                                        widget=custom_field_widgets.CustomCheckboxInput, required=False)
-    capita_comments = forms.CharField(label='DBS certificate number',
-                                      help_text='(Tip: be clear and concise)',
-                                      widget=custom_field_widgets.Textarea,
-                                      required=False, max_length=500)
-
-    known_to_council_declare = forms.BooleanField(label='This information is correct',
-                                                  widget=custom_field_widgets.CustomCheckboxInput, required=False)
-    known_to_council_comments = forms.CharField(label='Known to council '
-                                                      'social services in regards to their own children?',
-                                                help_text='(Tip: be clear and concise)',
-                                                widget=custom_field_widgets.Textarea,
-                                                required=False, max_length=500)
-    reasons_known_to_council_health_check_declare = forms.BooleanField(label='This information is correct',
-                                                                       widget=custom_field_widgets.CustomCheckboxInput,
-                                                                       required=False)
-    reasons_known_to_council_health_check_comments = forms.CharField(label='Tell us why',
-                                                                     help_text='(Tip: be clear and concise)',
-                                                                     widget=custom_field_widgets.Textarea,
-                                                                     required=False, max_length=500)
 
     # This is the id appended to all htmls names ot make the individual form instance unique, this is given a value in
     # the init
@@ -1085,10 +1083,12 @@ class AdultInYourHomeForm(GOVUKForm):
             ((self.fields['full_name_declare']), 'full_name' + id_value),
             ((self.fields['date_of_birth_declare']), 'date_of_birth' + id_value),
             ((self.fields['relationship_declare']), 'relationship' + id_value),
+            ((self.fields['email_declare']), 'email' + id_value),
             ((self.fields['dbs_certificate_number_declare']), 'dbs_certificate_number' + id_value),
+            ((self.fields['capita_declare']), 'capita' + id_value),
+            ((self.fields['on_update_declare']), 'on_update' + id_value),
             ((self.fields['lived_abroad_declare']), 'lived_abroad' + id_value),
             ((self.fields['military_base_declare']), 'military_base' + id_value),
-            ((self.fields['capita_declare']), 'capita' + id_value),
             ((self.fields['known_to_council_declare']), 'known_to_council' + id_value),
             ((self.fields['reasons_known_to_council_health_check_declare']),
              'reasons_known_to_council_health_check' + id_value)
@@ -1159,20 +1159,63 @@ class AdultInYourHomeForm(GOVUKForm):
 
         return relationship_comments
 
+    def clean_email_comments(self):
+        """
+        Email comment validation
+        :return: string
+        """
+        email_declare = self.cleaned_data['email_declare']
+        email_comments = self.cleaned_data['email_comments']
+
+        # Only check if a comment has been entered if the field has been flagged
+        if email_declare is True:
+            if email_comments == '':
+                raise forms.ValidationError('You must give reasons')
+
     def clean_dbs_certificate_number_comments(self):
         """
         DBS certificate number comments validation
         :return: string
         """
-        dbs_certificate_number_declare = self.cleaned_data['dbs_certificate_number_declare']
-        dbs_certificate_number_comments = self.cleaned_data['dbs_certificate_number_comments']
+        dbs_cert_number_declare = self.cleaned_data['dbs_certificate_number_declare']
+        dbs_cert_number_comments = self.cleaned_data['dbs_certificate_number_comments']
 
         # Only check if a comment has been entered if the field has been flagged
-        if dbs_certificate_number_declare is True:
-            if dbs_certificate_number_comments == '':
+        if dbs_cert_number_declare is True:
+            if dbs_cert_number_comments == '':
                 raise forms.ValidationError('You must give reasons')
 
-        return dbs_certificate_number_comments
+        return dbs_cert_number_comments
+
+    def clean_capita_comments(self):
+        """
+        DBS is-enhanced-check-(capita) comments validation
+        :return: string
+        """
+        capita_declare = self.cleaned_data['capita_declare']
+        capita_comments = self.cleaned_data['capita_comments']
+
+        # Only check if a comment has been entered if the field has been flagged
+        if capita_declare is True:
+            if capita_comments == '':
+                raise forms.ValidationError('You must give reasons')
+
+        return capita_comments
+
+    def clean_on_update_comments(self):
+        """
+        DBS holder-on-update-service comments validation
+        :return: string
+        """
+        on_update_declare = self.cleaned_data['on_update_declare']
+        on_update_comments = self.cleaned_data['on_update_comments']
+
+        # Only check if a comment has been entered if the field has been flagged
+        if on_update_declare is True:
+            if on_update_comments == '':
+                raise forms.ValidationError('You must give reasons')
+
+        return on_update_comments
 
     def clean_lived_abroad_comments(self):
         """
