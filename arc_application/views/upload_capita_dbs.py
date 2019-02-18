@@ -1,6 +1,5 @@
 import csv
 from datetime import datetime
-import io
 import json
 
 from arc_application.decorators import group_required
