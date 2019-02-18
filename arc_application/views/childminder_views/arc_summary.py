@@ -406,20 +406,22 @@ def load_json(application_id_local, ordered_models, recurse, apply_filtering_for
 
         elif model == PreviousName:
             records = model.objects.filter(person_id=application.pk)
-            previous_names = [{"title": "Previous Names", "id": application_id_local}]
-            for record in records:
-                previous_names.append({"name": "Previous Name", "value":record.get_name()})
-            table_list.append(previous_names)
+            if len(records)>0:
+                previous_names = [{"title": "Previous Names", "id": application_id_local}]
+                for record in records:
+                    previous_names.append({"name": "Previous Name", "value":record.get_name()})
+                table_list.append(previous_names)
         
         elif model == PreviousAddress:
             records = model.objects.filter(person_id=application.pk)
-            previous_names = [{"title": "Previous Addresses", "id": application_id_local}]
-            for record in records:
-                address = get_address(record.street_line1,
-                                                    record.street_line2, record.town,
-                                                    record.postcode)
-                previous_names.append({"name": "Previous Address", "value": address})
-            table_list.append(previous_names)
+            if len(records) > 0:
+                previous_addresses = [{"title": "Previous Addresses", "id": application_id_local}]
+                for record in records:
+                    address = get_address(record.street_line1,
+                                                        record.street_line2, record.town,
+                                                        record.postcode)
+                previous_addresses.append({"name": "Previous Address", "value": address})
+                table_list.append(previous_addresses)
 
         elif model == AdultInHome:
             records = model.objects.filter(application_id=application.pk)
