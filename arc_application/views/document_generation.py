@@ -6,9 +6,8 @@ from .childminder_views.arc_summary import get_application_summary_variables
 
 
 def get_full_application_summary(request):
-
     """
-    Renders a full application summary in a PDF format
+    Renders a full application summary in a PDF format (for EYC portions of a document submission to NOO)
     """
 
     resp = HttpResponse(content_type='application/pdf')
@@ -21,6 +20,9 @@ def get_full_application_summary(request):
 
 
 def get_adult_details_summary(request):
+    """
+    Renders a summary of household member details (for EY2 portions of a document submission to NOO)
+    """
 
     resp = HttpResponse(content_type='application/pdf')
 
@@ -29,7 +31,7 @@ def get_adult_details_summary(request):
         application = Application.objects.get(application_id=application_id_local)
         application_reference = application.application_reference
         adult_id_local = request.GET["adult_id"]
-        adult= AdultInHome.objects.get(adult_id=adult_id_local)
+        adult = AdultInHome.objects.get(adult_id=adult_id_local)
 
         summary_table = [adult.get_summary_table()]
         current_illnesses = HealthCheckCurrent.objects.filter(person_id=adult_id_local)
@@ -37,13 +39,15 @@ def get_adult_details_summary(request):
         hospital_admissions = HealthCheckHospital.objects.filter(person_id=adult_id_local)
 
         current_illnesses_list = [{"title": "Current Treatment", "id": adult_id_local},
-                                  {"name":"Current Treatment", "value":("Yes" if adult.current_treatment == True else "No")}]
+                                  {"name": "Current Treatment",
+                                   "value": ("Yes" if adult.current_treatment == True else "No")}]
         for record in current_illnesses:
             current_illnesses_list.append({"name": "Description", "value": record.description})
         summary_table.append(current_illnesses_list)
 
         serious_illnesses_list = [{"title": "Serious Illnesses", "id": adult_id_local},
-                                  {"name":"Serious Illness", "value":("Yes" if adult.serious_illness == True else "No")}]
+                                  {"name": "Serious Illness",
+                                   "value": ("Yes" if adult.serious_illness == True else "No")}]
         for record in serious_illnesses:
             serious_illnesses_list.append({"name": "Description", "value": record.description})
             serious_illnesses_list.append({"name": "Start Date", "value": record.start_date})
@@ -61,7 +65,7 @@ def get_adult_details_summary(request):
         summary_table.append(hospital_admissions_list)
 
         variables = {
-            'json':  summary_table,
+            'json': summary_table,
             'adult_id': adult_id_local,
             'application_id': application_id_local,
             'application_reference': application_reference,
@@ -69,8 +73,3 @@ def get_adult_details_summary(request):
 
         result = generate_pdf('pdf-summary.html', file_object=resp, context=variables)
         return result
-
-
-# Steps are effectively to build up data object including all the bits from the questionnaire
-# Push them into PDF using same approach as above
-
