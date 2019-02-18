@@ -13,12 +13,12 @@ class UploadCapitaDBSForm(GOVUKForm):
     capita_list_file = FileField(allow_empty_file=True, required=False, label='')
 
     def clean_capita_list_file(self):
-        capita_list_file = self.data['capita_list_file']
+        capita_list_file = self.cleaned_data['capita_list_file']
 
         if capita_list_file is None or capita_list_file == '':
             raise ValidationError('No file chosen')
 
-        if not any([capita_list_file.lower().endswith(ext) for ext in self.valid_extensions]):
+        if not any([capita_list_file.name.lower().endswith(ext) for ext in self.valid_extensions]):
             raise ValidationError('The file must be .csv or .csvx')
 
         return capita_list_file
