@@ -71,7 +71,7 @@
             </tbody>
         </table>
 
-        {% for record, id , health_check_status, name, day, month, year, relationship, email, dbs_certificate_number, dbs_on_capita, dbs_is_recent, capita, on_update, lived_abroad, military_base, formsetadult, current_illness_set, serious_illness_set, hospital_admission_set, reasons_known_to_council_health_check in adult_lists %}
+        {% for record, id, health_check_status, name, day, month, year, relationship, email, dbs_certificate_number, dbs_on_capita, dbs_is_recent, capita, on_update, lived_abroad, military_base, formsetadult, current_illness_set, serious_illness_set, hospital_admission_set, reasons_known_to_council_health_check, enhanced_check in adult_lists %}
         <table class="check-your-answers form-group">
             <thead>
             <tr>
@@ -268,17 +268,11 @@
             {# ================================== #}
             <tr>
                 <td style="word-wrap: break-word">
-                    Lived abroad
+                    {{ formsetadult.lived_abroad_comments.label }}
                 </td>
-                {% if lived_abroad is True %}
                 <td style="word-wrap: break-word">
-                    Yes
+                    {{ lived_abroad|yesno:"Yes,No"}}
                 </td>
-                {% elif lived_abroad is False %}
-                <td style="word-wrap: break-word">
-                    No
-                </td>
-                {% endif %}
                 <td class="change-answer">
                     {{ formsetadult.lived_abroad_declare }}
                 </td>
@@ -299,10 +293,9 @@
                 </td>
             </tr>
             {# ================================== #}
-        {% if childcare_type_zero_to_five.zero_to_five is True %}
             <tr>
                 <td style="word-wrap: break-word">
-                    Lived or worked in British military base in the last 5 years?
+                    {{ formsetadult.military_base_comments.label }}
                 </td>
                 </td>
                 <td style="word-wrap: break-word">
@@ -327,11 +320,10 @@
                     </div>
                 </td>
             </tr>
-        {% endif %}
             {# ================================== #}
             <tr>
                 <td style="word-wrap: break-word">
-                    Did they get their DBS check from the Ofstead DBS application website?
+                    {{ formsetadult.capita_comments.label }}
                 </td>
                 <td style="word-wrap: break-word">
                     {{ dbs_on_capita|yesno:"Yes,No" }}
@@ -340,7 +332,7 @@
                 </td>
             </tr>
             {# ================================== #}
-            {% if not dbs_on_capita %}
+            {% if dbs_on_capita %}
             <tr>
                 <td style="word-wrap: break-word">
                     Is it dated within the last 3 months?
@@ -380,13 +372,13 @@
                 </td>
             </tr>
             {# ================================== #}
-            {% if capita is not None %}
+            {% if on_update is not None %}
             <tr>
                 <td style="word-wrap: break-word">
                     Enhanced DBS check for home-based childcare?
                 </td>
                 <td style="word-wrap: break-word">
-                    {{ capita|yesno:"Yes,No" }}
+                    {{ enhanced_check|yesno:"Yes,No" }}
                 </td>
                 <td class="change-answer">
                     {{ formsetadult.capita_declare }}
@@ -408,7 +400,7 @@
                 </td>
             </tr>
             {% endif %}
-            {# ================================== #}
+
             {% if on_update is not None %}
             <tr>
                 <td style="word-wrap: break-word">
@@ -436,24 +428,24 @@
                     </div>
                 </td>
             </tr>
-            {% if record.known_to_council is True %}
+            {% endif %}
+
+            {# ================================== #}
+            {% if record.known_to_council is not None %}
             <tr>
                 <td style="word-wrap: break-word">
-                    Known to council social services in regards to their own children?
+                    Known to council social Services in regards to their own children?
                 </td>
-                 {% if record.known_to_council is True %}
                 <td style="word-wrap: break-word">
-                    Yes
+                    {{ record.known_to_council|yesno:"Yes,No" }}
                 </td>
-                {% elif record.known_to_council is False %}
-                <td style="word-wrap: break-word">
-                    No
-                </td>
-                {% endif %}
                 <td class="change-answer">
                     {{ formsetadult.known_to_council_declare }}
                 </td>
             </tr>
+            {% endif %}
+
+            {% if record.known_to_council is True %}
             <tr>
                 <td style="word-wrap: break-word">
                     Tell us why
@@ -465,22 +457,9 @@
                     {{ formsetadult.reasons_known_to_council_health_check_declare }}
                 </td>
             </tr>
-            <tr class="js-hidden" id="reasons_known_to_council_health_check{{formsetadult.instance_id.initial}}">
-                <td colspan="1">
-                    <div>
-                        Enter your reasoning
-                    </div>
-                    <div>
-                        {{ formsetadult.reasons_known_to_council_health_check_comments.help_text}}
-                    </div>
-                </td>
-                <td colspan="2">
-                    <div>
-                        {{ formsetadult.reasons_known_to_council_health_check_comments}}
-                    </div>
-                </td>
-            </tr>
+
             {% endif %}
+
             </tbody>
             <tbody>
 
@@ -778,13 +757,8 @@
                 <td>
                     Known to council social services in regards to your own children?
                 </td>
-                {% if known_to_social_services_pith is True %}
                 <td style="word-wrap: break-word">
-                    Yes
-                </td>
-                {% elif known_to_social_services_pith is False %}
-                <td style="word-wrap: break-word">
-                    No
+                    {{ known_to_social_services_pith|yesno:"Yes,No" }}
                 </td>
                 <td class="change-answer">
                     {{ form.known_to_social_services_pith_declare }}

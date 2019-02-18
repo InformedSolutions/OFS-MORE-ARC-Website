@@ -1,4 +1,3 @@
-from datetime import datetime, timedelta
 from uuid import uuid4
 
 from django.conf import settings
@@ -8,16 +7,16 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render
 
 from arc_application.childminder_task_util import get_show_references
-from ...models.previous_name import PreviousName
-from ...forms.childminder_forms.form import AdultInYourHomeForm, ChildInYourHomeForm, OtherPeopleInYourHomeForm, OtherPersonPreviousNames, \
+from ...decorators import group_required, user_assigned_application
+from ...forms.childminder_forms.form import AdultInYourHomeForm, ChildInYourHomeForm, OtherPeopleInYourHomeForm, \
+    OtherPersonPreviousNames, \
     ChildForm, ChildAddressForm
 from ...models import ChildInHome, AdultInHome, Arc, Application, PreviousAddress, ChildAddress, \
     OtherPersonPreviousRegistrationDetails, HealthCheckCurrent, HealthCheckSerious, HealthCheckHospital, ChildcareType, \
     Child, ApplicantHomeAddress
-
+from ...models.previous_name import PreviousName
 from ...review_util import request_to_comment, save_comments, redirect_selection, build_url
 from ...views import other_people_initial_population, children_initial_population, children_address_initial_population
-from ...decorators import group_required, user_assigned_application
 
 
 @login_required
@@ -30,6 +29,7 @@ def other_people_summary(request):
     :param request: a request object used to generate the HttpResponse
     :return: an HttpResponse object with the rendered People in your home: summary template
     """
+
     # Defines the formset using formset factory
     AdultFormSet = formset_factory(AdultInYourHomeForm, extra=0)
     ChildInHomeFormSet = formset_factory(ChildInYourHomeForm, extra=0)
@@ -66,6 +66,7 @@ def other_people_summary(request):
     adult_name_querysets = []
     adult_address_querysets = []
     previous_registration_querysets = []
+    adult_enhanced_checks = []
 
     # Children in the home data
     children = ChildInHome.objects.filter(application_id=application_id_local).order_by('child')
@@ -94,13 +95,12 @@ def other_people_summary(request):
     for adult in adults:
 
         # TODO replace dbs lookup with references to stored results in database, when implemented
-        dbs_record = None #getattr(dbs.read(adult.dbs_certificate_number), 'record', None)
+        dbs_record = None  # getattr(dbs.read(adult.dbs_certificate_number), 'record', None)
 
-        dbs_on_capita = dbs_record is not None
-        dbs_is_recent = dbs_record is not None \
-                and datetime.strptime(dbs_record['date_of_issue'], '%Y-%m-%d') > datetime.now()-timedelta(days=365/12)
-        asked_capita = not dbs_on_capita
-        asked_on_update = (dbs_on_capita and not dbs_is_recent) or (not dbs_on_capita and adult.capita)
+        dbs_on_capita = adult.capita
+        dbs_is_recent = adult.within_three_months
+        asked_capita = adult.capita
+        asked_on_update = (dbs_on_capita and not dbs_is_recent) or not dbs_on_capita
 
         if adult.middle_names and adult.middle_names != '':
             name = adult.first_name + ' ' + adult.middle_names + ' ' + adult.last_name
@@ -128,6 +128,7 @@ def other_people_summary(request):
         serious_illnesses.append(HealthCheckSerious.objects.filter(person_id=adult.pk))
         hospital_admissions.append(HealthCheckHospital.objects.filter(person_id=adult.pk))
         local_authorities.append(adult.reasons_known_to_council_health_check)
+        adult_enhanced_checks.append(adult.enhanced_check)
 
     for child in children:
         if child.middle_names and child.middle_names != '':
@@ -174,7 +175,7 @@ def other_people_summary(request):
                 adult_birth_month_list, adult_birth_year_list, adult_relationship_list, adult_email_list,
                 adult_dbs_cert_numbers, adult_dbs_on_capitas, adult_dbs_is_recents, adult_dbs_is_capitas,
                 adult_dbs_on_updates, adult_lived_abroad, adult_military_base, formset_adult, current_illnesses,
-                serious_illnesses, hospital_admissions, local_authorities))
+                serious_illnesses, hospital_admissions, local_authorities, adult_enhanced_checks))
 
         initial_child_data = other_people_initial_population(False, children)
 
@@ -195,7 +196,6 @@ def other_people_summary(request):
 
         zero_to_five_list = ChildcareType.objects.get(application_id=application_id_local)
 
-
         variables = {
             'form': form,
             'formset_adult': formset_adult,
@@ -213,7 +213,7 @@ def other_people_summary(request):
             'adult_ebulk_lists': adult_ebulk_lists,
             'previous_registration_lists': previous_registration_lists,
             'providing_care_in_own_home': providing_care_in_own_home,
-            'childcare_type_zero_to_five': zero_to_five_list
+            'childcare_type_zero_to_five': zero_to_five_list,
         }
         return render(request, 'childminder_templates/other-people-summary.html', variables)
 
@@ -313,7 +313,8 @@ def other_people_summary(request):
                                    adult_relationship_list, adult_email_list, adult_dbs_cert_numbers,
                                    adult_dbs_on_capitas, adult_dbs_is_recents, adult_dbs_is_capitas,
                                    adult_dbs_on_updates, adult_lived_abroad, adult_military_base, adult_formset,
-                                   current_illnesses, serious_illnesses, hospital_admissions, local_authorities))
+                                   current_illnesses, serious_illnesses, hospital_admissions, local_authorities,
+                                   adult_enhanced_checks))
 
             child_lists = zip(child_id_list, child_name_list, child_birth_day_list, child_birth_month_list,
                               child_birth_year_list,
@@ -350,7 +351,7 @@ def other_people_summary(request):
                 'adult_ebulk_lists': adult_ebulk_lists,
                 'previous_registration_lists': previous_registration_lists,
                 'providing_care_in_own_home': providing_care_in_own_home,
-                'childcare_type_zero_to_five': zero_to_five_list
+                'childcare_type_zero_to_five': zero_to_five_list,
             }
             return render(request, 'childminder_templates/other-people-summary.html', variables)
 
@@ -495,4 +496,3 @@ def add_previous_name(request):
     }
 
     return render(request, 'childminder_templates/add-previous-names.html', context)
-
