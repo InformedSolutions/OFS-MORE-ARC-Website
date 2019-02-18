@@ -28,21 +28,6 @@ def nanny_all_reviewed(arc_application, application_id):
     """
     return check_all_task_statuses(arc_application, application_id, ['FLAGGED', 'COMPLETED'])
 
-
-def get_your_children_status(application_id):
-    """
-    Helper function to check if the application contains the 'Your children' task
-    :return: True or False depending on if the task is activated
-    """
-    try:
-        your_children_record = NannyGatewayActions().read('applicant-personal-details',
-                                                    params={'application_id': application_id}).record['your_children']
-        return your_children_record
-
-    except AttributeError:
-        return False
-
-
 def check_all_task_statuses(arc_application, application_id, status_list):
     """
     Iterates through the arc_application task's statuses and compares each task status to a given status.
@@ -59,9 +44,6 @@ def check_all_task_statuses(arc_application, application_id, status_list):
                   arc_application.dbs_review,
                   arc_application.insurance_cover_review,
                   ]
-
-    if get_your_children_status(application_id):
-        field_list.append(arc_application.your_children_review, )
 
     for i in field_list:
         if i not in status_list:

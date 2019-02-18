@@ -65,7 +65,14 @@ class PersonalDetailsForm(GOVUKForm):
     own_children_declare = forms.BooleanField(label='This information is correct',
                                               widget=custom_field_widgets.CustomCheckboxInput,
                                               required=False)
-    own_children_comments = forms.CharField(label="Is this another childminder's home?",
+    own_children_comments = forms.CharField(label="Known to council social services?",
+                                            help_text='(Tip: be clear and concise)',
+                                            widget=custom_field_widgets.Textarea, required=False,
+                                            max_length=250)
+    reasons_known_to_social_services_declare = forms.BooleanField(label='This information is correct',
+                                              widget=custom_field_widgets.CustomCheckboxInput,
+                                              required=False)
+    reasons_known_to_social_services_comments = forms.CharField(label="Tell us why",
                                             help_text='(Tip: be clear and concise)',
                                             widget=custom_field_widgets.Textarea, required=False,
                                             max_length=250)
@@ -73,7 +80,8 @@ class PersonalDetailsForm(GOVUKForm):
     checkboxes = [(name_declare, 'name'), (date_of_birth_declare, 'date_of_birth'),
                   (home_address_declare, 'home_address'), (childcare_address_declare, 'childcare_address'),
                   (working_in_other_childminder_home_declare, 'working_in_other_childminder_home'),
-                  (own_children_declare, 'own_children')]
+                  (own_children_declare, 'own_children'),
+                  (reasons_known_to_social_services_declare, 'reasons_known_to_social_services')]
 
     for box in checkboxes:
         box[0].widget.attrs.update({'data_target': box[1],
@@ -903,17 +911,27 @@ class OtherPeopleInYourHomeForm(GOVUKForm):
                                                 widget=custom_field_widgets.Textarea,
                                                 required=False, max_length=250)
 
-    own_children_not_in_the_home_declare = forms.BooleanField(label='This information is correct',
+    known_to_social_services_pith_declare = forms.BooleanField(label='This information is correct',
                                                               widget=custom_field_widgets.CustomCheckboxInput,
                                                               required=False)
-    own_children_not_in_the_home_comments = forms.CharField(label='Do you live with any children?',
+    known_to_social_services_pith_comments = forms.CharField(label='Are you known to council social services '
+                                                                  'in regards to your own children?',
+                                                            help_text='(Tip: be clear and concise)',
+                                                            widget=custom_field_widgets.Textarea,
+                                                            required=False, max_length=250)
+
+    reasons_known_to_social_services_pith_declare = forms.BooleanField(label='This information is correct',
+                                                              widget=custom_field_widgets.CustomCheckboxInput,
+                                                              required=False)
+    reasons_known_to_social_services_pith_comments = forms.CharField(label='Tell us why',
                                                             help_text='(Tip: be clear and concise)',
                                                             widget=custom_field_widgets.Textarea,
                                                             required=False, max_length=250)
 
     checkboxes = [(adults_in_home_declare, 'adults_in_home'),
                   (children_in_home_declare, 'children_in_home'),
-                  (own_children_not_in_the_home_declare, 'own_children_not_in_the_home'), ]
+                  (known_to_social_services_pith_declare, 'known_to_social_services_pith'),
+                  (reasons_known_to_social_services_pith_declare, 'reasons_known_to_social_services_pith')]
 
     for box in checkboxes:
         box[0].widget.attrs.update({'data_target': box[1],
@@ -1093,6 +1111,22 @@ class AdultInYourHomeForm(GOVUKForm):
         choices=cygnum_relationship_choices,
     )
 
+    known_to_council_declare = forms.BooleanField(label='This information is correct',
+                                        widget=custom_field_widgets.CustomCheckboxInput, required=False)
+    known_to_council_comments = forms.CharField(label='Known to council '
+                                                              'social services in regards to their own children?',
+                                      help_text='(Tip: be clear and concise)',
+                                      widget=custom_field_widgets.Textarea,
+                                      required=False, max_length=250)
+
+    reasons_known_to_council_health_check_declare = forms.BooleanField(label='This information is correct',
+                                                          widget=custom_field_widgets.CustomCheckboxInput,
+                                                          required=False)
+    reasons_known_to_council_health_check_comments = forms.CharField(label='Tell us why',
+                                                        help_text='(Tip: be clear and concise)',
+                                                        widget=custom_field_widgets.Textarea,
+                                                        required=False, max_length=250)
+
     # This is the id appended to all htmls names ot make the individual form instance unique, this is given a value in
     # the init
     instance_id = forms.CharField(widget=forms.HiddenInput, required=False)
@@ -1112,6 +1146,8 @@ class AdultInYourHomeForm(GOVUKForm):
             ((self.fields['lived_abroad_declare']), 'lived_abroad' + id_value),
             ((self.fields['military_base_declare']), 'military_base' + id_value),
             ((self.fields['capita_declare']), 'capita' + id_value),
+            ((self.fields['known_to_council_declare']), 'known_to_council' + id_value),
+            ((self.fields['reasons_known_to_council_health_check_declare']), 'reasons_known_to_council_health_check' + id_value)
         ]
 
         for box in checkboxes:
@@ -1237,6 +1273,7 @@ class YourChildrenForm(GOVUKForm):
                                                         help_text='(Tip: be clear and concise)',
                                                         widget=custom_field_widgets.Textarea,
                                                         required=False, max_length=250)
+
     instance_id = forms.CharField(widget=forms.HiddenInput, required=False)
 
     def __init__(self, *args, **kwargs):
@@ -1530,10 +1567,10 @@ class SearchForm(GOVUKForm):
     dob_search_field = forms.CharField(label='Date of birth', required=False, help_text='e.g. 31 03 1980')
     home_postcode_search_field = forms.CharField(label='Home postcode', required=False)
     care_location_postcode_search_field = forms.CharField(label='Work postcode', required=False)
-    application_type_dropdown_search_field = forms.ChoiceField(label='Application type',
-                                                               choices=choices,
-                                                               required=False,
-                                                               widget=Select)
+    # application_type_dropdown_search_field = forms.ChoiceField(label='Application type',
+    #                                                            choices=choices,
+    #                                                            required=False,
+    #                                                            widget=Select)
 
     def __init__(self, *args, **kwargs):
         """

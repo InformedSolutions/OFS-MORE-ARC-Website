@@ -72,7 +72,6 @@ class Application(models.Model):
     publish_details = models.NullBooleanField(blank=True, null=True, default=None)
     working_in_other_childminder_home = models.NullBooleanField(blank=True, null=True, default=None)
     own_children = models.NullBooleanField(blank=True, null=True, default=None)
-    own_children = models.NullBooleanField(blank=True, null=True, default=None)
     reasons_known_to_social_services = models.TextField(null=True, default="")  # with_respect_to_your_children
     known_to_social_services_pith = models.NullBooleanField(blank=True, null=True, default=None)
     reasons_known_to_social_services_pith = models.TextField(null=True, default="")  # with_respect_to_your_children

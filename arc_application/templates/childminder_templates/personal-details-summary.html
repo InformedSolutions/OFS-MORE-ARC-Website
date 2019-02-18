@@ -319,7 +319,7 @@
     </table>
 
     <a href="{% url 'personal_details_previous_addresses' %}?id={{ application_id }}&state=entry&person_id={{ application_id }}&person_type=APPLICANT" class = "button button-secondary">Add previous addresses</a>
-
+ {% if childcare_address == "Same as home address" %}
     <table class="check-your-answers form-group">
         <thead>
         <tr>
@@ -333,7 +333,7 @@
         <tbody>
         <tr>
             <td>
-                Do you have children of your own under 16?
+                Known to council social services?
             </td>
             {% if own_children %}
             <td style="word-wrap: break-word">
@@ -363,10 +363,39 @@
                 </div>
             </td>
         </tr>
+         {% if own_children %}
+        <tr>
 
+            <td>
+                Tell us why
+            </td>
+            <td style="word-wrap: break-word">
+                {{reasons_known_to_social_services}}
+            </td>
+            <td class="change-answer">
+                {{ form.reasons_known_to_social_services_declare }}
+            </td>
+        </tr>
+        <tr class="js-hidden" id="reasons_known_to_social_services">
+            <td colspan="1">
+                <div>
+                    Enter your reasoning
+                </div>
+                <div>
+                    {{ form.reasons_known_to_social_services_comments.help_text}}
+                </div>
+            </td>
+            <td colspan="2">
+                <div>
+                    {{ form.reasons_known_to_social_services_comments}}
+                </div>
+            </td>
+
+        </tr>
+        {% endif %}
         </tbody>
     </table>
-
+{% endif %}
     <br>
 
     {% if previous_names %}
