@@ -62,6 +62,31 @@ def get_adult_details_summary(request):
         adult= AdultInHome.objects.get(adult_id=adult_id_local)
 
         summary_table = [adult.get_summary_table()]
+        current_illnesses = HealthCheckCurrent.objects.filter(person_id=adult_id_local)
+        serious_illnesses = HealthCheckSerious.objects.filter(person_id=adult_id_local)
+        hospital_admissions = HealthCheckHospital.objects.filter(person_id=adult_id_local)
+
+        if adult.current_treatment:
+            current_illnesses_list = [{"title": "Current Treatment", "id": adult_id_local}]
+            for record in current_illnesses:
+                current_illnesses_list.append({"name": "Description", "value": record.description})
+            summary_table.append(current_illnesses_list)
+
+        if adult.serious_illness:
+            serious_illnesses_list = [{"title": "Serious Illnesses", "id": adult_id_local}]
+            for record in serious_illnesses:
+                serious_illnesses_list.append({"name": "Description", "value": record.description})
+                serious_illnesses_list.append({"name": "Start Date", "value": record.start_date})
+                serious_illnesses_list.append({"name": "End Date", "value": record.end_date})
+            summary_table.append(serious_illnesses_list)
+
+        if adult.hospital_admission:
+            hospital_admissions_list = [{"title": "Hospital Admissions", "id": adult_id_local}]
+            for record in hospital_admissions:
+                hospital_admissions_list.append({"name": "Description", "value": record.description})
+                hospital_admissions_list.append({"name": "Start Date", "value": record.start_date})
+                hospital_admissions_list.append({"name": "End Date", "value": record.end_date})
+            summary_table.append(hospital_admissions_list)
 
         variables = {
             'json':  summary_table,
