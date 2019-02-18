@@ -24,17 +24,17 @@ def __format_last_upload():
         return 'File yet to be uploaded.'
 
 
-def __update_last_upload(csvfile):
+def __update_last_upload(csv_file_name):
     date = datetime.now().date()
 
     try:
         capita_dbs_file = CapitaDBSFile.objects.get(pk=1)
-        capita_dbs_file.filename = csvfile
+        capita_dbs_file.filename = csv_file_name
         capita_dbs_file.date_uploaded = date
         capita_dbs_file.save()
 
     except CapitaDBSFile.DoesNotExist:
-        CapitaDBSFile.objects.create(filename=csvfile.name, date_uploaded=date)
+        CapitaDBSFile.objects.create(filename=csv_file_name, date_uploaded=date)
 
     return None
 
@@ -47,12 +47,8 @@ def __format_csv_data(csvfile):
     return data
 
 
-def __handle_file_upload(csvfile):
-    # data = __format_csv_data(csvfile)
-
-    # csvfile.FILES['capita_list_file'].file
-
-    response = dbs_api.batch_overwrite({'capita_list_file': csvfile['capita_list_file'].file})
+def __handle_file_upload(request_files):
+    response = dbs_api.batch_overwrite({'capita_list_file': request_files['capita_list_file'].file})
 
     if response.status_code == 201:
         return
@@ -78,9 +74,6 @@ def upload_capita_dbs(request):
 
         if form.is_valid():
             try:
-                # in_memory_uploaded_file = request.FILES['capita_list_file']
-                # csvfile = in_memory_uploaded_file.file
-                # utf_8_csvfile = csvfile.read().decode('UTF-8')
                 __handle_file_upload(request.FILES)
                 __update_last_upload(request.FILES['capita_list_file'].name)
             except ValidationError:
