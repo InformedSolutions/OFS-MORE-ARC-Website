@@ -62,20 +62,9 @@ def get_adult_details_summary(request):
         adult= AdultInHome.objects.get(adult_id=adult_id_local)
 
         summary_table = [adult.get_summary_table()]
-        health_details = []
-        health_details.append(HealthCheckCurrent.objects.filter(person_id=adult_id_local))
-        health_details.append(HealthCheckSerious.objects.filter(person_id=adult_id_local))
-        health_details.append(HealthCheckHospital.objects.filter(person_id=adult_id_local))
-        for record in health_details:
-            summary_table.append({"name": "Description", "value": record.description})
-            if record.model != HealthCheckCurrent:
-                summary_table.append({"name": "Start Date", "value": record.start_date})
-                summary_table.append({"name": "End Date", "value": record.end_date})
-
-        json = summary_table
 
         variables = {
-            'json': json,
+            'json':  summary_table,
             'adult_id': adult_id_local,
             'application_id': application_id_local,
             'application_reference': application_reference,
