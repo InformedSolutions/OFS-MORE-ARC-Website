@@ -24,6 +24,6 @@ def create(dbs_certificate_number, date_issued, date_of_birth, certificate_infor
     return response
 
 
-def batch_overwrite(data):
-    response = requests.post(DBS_API_ENDPOINT + '/api/v1/dbs/batch-overwrite/', json=data)
+def batch_overwrite(files):
+    response = requests.post(DBS_API_ENDPOINT + '/api/v1/dbs/batch-overwrite/', files=files)
     return response
