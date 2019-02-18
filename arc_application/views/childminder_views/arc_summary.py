@@ -69,6 +69,14 @@ name_field_dict = {
 
 
 def get_application_summary_variables(application_id):
+    """
+    A function for generating the summary page contents in the ARC view. Note that this is re-used by the
+    document generation function so changes will be applied in both the UI and PDF exports.
+    :param application_id: the unique identifier of the application
+    :return: a variables object for use in Django templates including all application information
+    (and similarly EYC form contents).
+    """
+
     ordered_models = [UserDetails, ChildcareType, [ApplicantPersonalDetails, ApplicantName], ApplicantHomeAddress,
                       FirstAidTraining, ChildcareTraining, CriminalRecordCheck]
 

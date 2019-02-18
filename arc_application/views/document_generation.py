@@ -19,6 +19,7 @@ def get_full_application_summary(request):
         result = generate_pdf('pdf-summary.html', file_object=resp, context=variables)
         return result
 
+
 def get_adult_details_summary(request):
 
     resp = HttpResponse(content_type='application/pdf')
