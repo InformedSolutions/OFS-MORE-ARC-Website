@@ -68,7 +68,7 @@ name_field_dict = {
 }
 
 
-def get_application_summary_variables(application_id):
+def get_application_summary_variables(application_id, apply_filtering_for_eyc=False):
     """
     A function for generating the summary page contents in the ARC view. Note that this is re-used by the
     document generation function so changes will be applied in both the UI and PDF exports.
@@ -93,7 +93,7 @@ def get_application_summary_variables(application_id):
     if zero_to_five:
         ordered_models.insert(6, HealthDeclarationBooklet)
         ordered_models.append(Reference)
-    json = load_json(application_id, ordered_models, False)
+    json = load_json(application_id, ordered_models, False, apply_filtering_for_eyc=apply_filtering_for_eyc)
     json = add_comments(json, application_id)
 
     application_reference = application.application_reference
@@ -253,7 +253,7 @@ def get_address(street_line1, street_line2, town, postcode):
     return street_line1 + ', ' + street_line2 + ', ' + town + ', ' + postcode
 
 
-def load_json(application_id_local, ordered_models, recurse):
+def load_json(application_id_local, ordered_models, recurse, apply_filtering_for_eyc=False):
     """
     Dynamically builds a JSON to be consumed by the HTML summary page
     :param application_id_local: the id of the application being handled
@@ -403,6 +403,14 @@ def load_json(application_id_local, ordered_models, recurse):
                              "value": get_bool_as_string(known_to_social_services_pith)}
                         ])
 
+        elif model == AdultInHome:
+            records = model.objects.filter(application_id=application.pk)
+            for record in records:
+                table = record.get_summary_table(apply_filtering_for_eyc=apply_filtering_for_eyc)
+                if recurse:
+                    table_list = table_list + table
+                else:
+                    table_list.append(table)
 
         elif model.objects.filter(application_id=application.pk).exists():
             records = model.objects.filter(application_id=application.pk)

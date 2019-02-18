@@ -2,6 +2,7 @@ import datetime
 from uuid import uuid4
 from django.db import models
 from .application import Application
+from .childcare_type import ChildcareType
 
 
 class AdultInHome(models.Model):
@@ -82,7 +83,7 @@ class AdultInHome(models.Model):
         """
         return datetime.date(self.birth_year, self.birth_month, self.birth_day)
 
-    def get_summary_table(self):
+    def get_summary_table(self, apply_filtering_for_eyc=False):
 
         if self.birth_day < 10:
             birth_day = '0' + str(self.birth_day)
@@ -95,23 +96,35 @@ class AdultInHome(models.Model):
             birth_month = str(self.birth_month)
 
         date_of_birth = birth_day + ' ' + birth_month + ' ' + str(self.birth_year)
-        summary_table = [
-            {"title": self.get_full_name(), "id": self.pk},
-            {"name": "Health questions status", "value": self.health_check_status},
-            {"name": "Name", "value": self.get_full_name()},
-            {"name": "Date of birth", "value": date_of_birth},
-            {"name": "Relationship", "value": self.relationship},
-            {"name": "Email", "value": self.email},
-            {"name": "Ofsted DBS", "value": ("Yes" if self.capita == True else "No")},
-            {"name": "DBS certificate number", "value": self.dbs_certificate_number},
-            {"name": "Lived abroad", "value": ("Yes" if self.known_to_council == True else "No")},
-            {"name": "Known to council", "value": ("Yes" if self.known_to_council == True else "No")}
-        ]
 
-        if self.known_to_council == True:
-            summary_table.append({"name": "Tell us why", "value": self.reasons_known_to_council_health_check})
+        if apply_filtering_for_eyc:
+            summary_table = [
+                {"title": self.get_full_name(), "id": self.pk},
+                {"name": "Health questions status", "value": self.health_check_status},
+                {"name": "Name", "value": self.get_full_name()},
+                {"name": "Date of birth", "value": date_of_birth},
+                {"name": "Relationship", "value": self.relationship},
+                {"name": "Email", "value": self.email},
+                {"name": "Ofsted DBS", "value": ("Yes" if self.capita == True else "No")},
+                {"name": "DBS certificate number", "value": self.dbs_certificate_number},
+                {"name": "Lived abroad", "value": ("Yes" if self.known_to_council == True else "No")}
+            ]
+        else:
+            summary_table = [
+                {"title": self.get_full_name(), "id": self.pk},
+                {"name": "Health questions status", "value": self.health_check_status},
+                {"name": "Name", "value": self.get_full_name()},
+                {"name": "Date of birth", "value": date_of_birth},
+                {"name": "Relationship", "value": self.relationship},
+                {"name": "Email", "value": self.email},
+                {"name": "Ofsted DBS", "value": ("Yes" if self.capita == True else "No")},
+                {"name": "DBS certificate number", "value": self.dbs_certificate_number},
+                {"name": "Lived abroad", "value": ("Yes" if self.known_to_council == True else "No")},
+                {"name": "Known to council", "value": ("Yes" if self.known_to_council == True else "No")}
+            ]
 
-        from .childcare_type import ChildcareType
+            if self.known_to_council == True:
+                summary_table.append({"name": "Tell us why", "value": self.reasons_known_to_council_health_check})
 
         if ChildcareType.objects.get(application_id=self.application_id).zero_to_five:
            summary_table.insert(-1, {"name": "British Military Base", "value":  ("Yes" if self.military_base == True else "No")})
