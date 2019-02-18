@@ -47,6 +47,9 @@ class PreviousName(models.Model):
         else:
             raise AssertionError("Neither 'adult_id' or 'child_id' is set")
 
+    def get_name(self):
+        return self.first_name + " "+self.middle_names + " " + self.last_name
+
     class Meta:
         db_table = 'PREVIOUS_NAME'
 

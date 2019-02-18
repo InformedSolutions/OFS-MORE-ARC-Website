@@ -17,5 +17,13 @@ class PreviousRegistrationDetails(models.Model):
     def get_id(cls, app_id):
         return cls.objects.get(application_id=app_id)
 
+    def get_summary_table(self):
+        return [
+            {"title": "Previous Registration", "id": self.pk},
+            {"name": "Previous Registration", "value": ("Yes" if self.previous_registration == True else "No")},
+            {"name": "Individual Id", "value": self.individual_id},
+            {"name": "Five years in UK", "value": ("Yes" if self.five_years_in_UK == True else "No")}
+        ]
+
     class Meta:
         db_table = 'PREVIOUS_REGISTRATION_DETAILS'

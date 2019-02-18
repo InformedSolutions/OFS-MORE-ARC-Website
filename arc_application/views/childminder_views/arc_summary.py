@@ -77,7 +77,8 @@ def get_application_summary_variables(application_id):
     (and similarly EYC form contents).
     """
 
-    ordered_models = [UserDetails, ChildcareType, [ApplicantPersonalDetails, ApplicantName], ApplicantHomeAddress,
+    ordered_models = [UserDetails, ChildcareType, [ApplicantPersonalDetails, ApplicantName], PreviousName, ApplicantHomeAddress, PreviousAddress,
+                      PreviousRegistrationDetails,
                       FirstAidTraining, ChildcareTraining, CriminalRecordCheck]
 
     # Only display People in your Home tables if the applicant does not work in another childminder's home
@@ -403,6 +404,64 @@ def load_json(application_id_local, ordered_models, recurse):
                              "value": get_bool_as_string(known_to_social_services_pith)}
                         ])
 
+        elif model == Child:
+
+            # Only show People in the home tables when applicant is not working in another childminder's home
+            if application.working_in_other_childminder_home is False:
+
+                if application.own_children is False:
+
+                    table_list.append([
+                        {"title": "Children not in the home", "id": application_id_local},
+                    ])
+
+                    children_not_in_home = Child.objects.filter(application_id=application_id_local,
+                                                                lives_with_childminder=False)
+
+                    for child in children_not_in_home:
+
+                        if child.birth_day < 10:
+                            birth_day = '0' + str(child.birth_day)
+                        else:
+                            birth_day = str(child.birth_day)
+
+                        if child.birth_month < 10:
+                            birth_month = '0' + str(child.birth_month)
+                        else:
+                            birth_month = str(child.birth_month)
+
+                        date_of_birth = birth_day + ' ' + birth_month + ' ' + str(child.birth_year)
+
+                        child_address_record = ChildAddress.objects.get(application_id=application_id_local,
+                                                                        child=child.child)
+
+                        child_address = get_address(child_address_record.street_line1,
+                                                    child_address_record.street_line2, child_address_record.town,
+                                                    child_address_record.postcode)
+
+                        table_list.append([
+                            {"title": child.get_full_name(), "id": child.pk},
+                            {"name": "Name", "value": child.get_full_name()},
+                            {"name": "Date of birth", "value": date_of_birth},
+                            {"name": "Address", "value": child_address}
+                        ])
+
+        elif model == PreviousName:
+            records = model.objects.filter(person_id=application.pk)
+            previous_names = [{"title": "Previous Names", "id": application_id_local}]
+            for record in records:
+                previous_names.append({"name": "Previous Name", "value":record.get_name()})
+            table_list.append(previous_names)
+        
+        elif model == PreviousAddress:
+            records = model.objects.filter(person_id=application.pk)
+            previous_names = [{"title": "Previous Addresses", "id": application_id_local}]
+            for record in records:
+                address = get_address(record.street_line1,
+                                                    record.street_line2, record.town,
+                                                    record.postcode)
+                previous_names.append({"name": "Previous Address", "value": address})
+            table_list.append(previous_names)
 
         elif model.objects.filter(application_id=application.pk).exists():
             records = model.objects.filter(application_id=application.pk)
