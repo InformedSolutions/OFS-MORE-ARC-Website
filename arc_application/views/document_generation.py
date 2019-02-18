@@ -46,3 +46,34 @@ def get_full_application_summary(request):
 
         result = generate_pdf('pdf-summary.html', file_object=resp, context=variables)
         return result
+
+# Need a method here for creating a PDF for the information entered by an adult on their health questionnaires
+# e.g. Illnesses, Hospital admissions etc
+
+def get_adult_details_summary(request):
+
+    resp = HttpResponse(content_type='application/pdf')
+
+    if request.method == 'GET':
+        application_id_local = request.GET["id"]
+        application = Application.objects.get(application_id=application_id_local)
+        application_reference = application.application_reference
+        adult_id_local = request.GET["adult_id"]
+        adult= AdultInHome.objects.get(adult_id=adult_id_local)
+
+        summary_table = [adult.get_summary_table()]
+
+        variables = {
+            'json':  summary_table,
+            'adult_id': adult_id_local,
+            'application_id': application_id_local,
+            'application_reference': application_reference,
+        }
+
+        result = generate_pdf('pdf-summary.html', file_object=resp, context=variables)
+        return result
+
+
+# Steps are effectively to build up data object including all the bits from the questionnaire
+# Push them into PDF using same approach as above
+

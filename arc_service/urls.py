@@ -55,7 +55,7 @@ from django.contrib.auth.views import logout
 
 from arc_application.views.childminder_views.personal_details_addresses import personal_details_previous_address
 
-from arc_application.views.document_generation import get_full_application_summary
+from arc_application.views.document_generation import get_full_application_summary, get_adult_details_summary
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
@@ -63,6 +63,7 @@ urlpatterns = [
     url(r'^login/', custom_login, name='login'),
     url(r'^logout/', logout, {'next_page': settings.URL_PREFIX + '/login/'}),
     url(r'^application-summary-pdf/', get_full_application_summary, name='application_summary_pdf'),
+    url(r'^application-summary-pdf-adult/$', get_adult_details_summary, name='application_summary_pdf_adult'),
     url(r'^summary/', ARCUserSummaryView.as_view(), name='summary'),
     url(r'^review/$', task_list, name='task_list'),
     url(r'^account/summary/', contact_summary, name='contact_summary'),
