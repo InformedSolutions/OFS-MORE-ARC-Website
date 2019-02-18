@@ -12,7 +12,7 @@ from django.contrib.auth.models import Group, User
 from django.db import InternalError
 from django.forms import ValidationError
 from django.http import HttpResponse
-from django.test import SimpleTestCase, TestCase
+from django.test import RequestFactory, SimpleTestCase, TestCase
 from django.urls import resolve, reverse
 
 
@@ -48,12 +48,18 @@ class UploadCapitaDBSRoutingTests(TestCase):
         self.assertContains(response, 'initial-filename.csv (01/01/2019)')
 
     def test_post_request_to_dbs_api_made_for_valid_csv_upload(self, dbs_api_mock):
-        self.client.post(reverse('Upload-Capita-DBS'), data={'capita_list_file': 'arc_application/tests/resources/test_csv.csv'})
+        with open('arc_application/tests/resources/test_csv.csv') as csv_file:
+            self.client.post(reverse('Upload-Capita-DBS'), {'capita_list_file': csv_file})
+
+        csv_file.close()
 
         self.assertTrue(dbs_api_mock.called)
 
     def test_post_request_to_dbs_api_made_for_valid_csvx_upload(self, dbs_api_mock):
-        self.client.post(reverse('Upload-Capita-DBS'), data={'capita_list_file': 'arc_application/tests/resources/test_csvx.csvx'})
+        with open('arc_application/tests/resources/test_csvx.csvx') as csvx_file:
+            self.client.post(reverse('Upload-Capita-DBS'), {'capita_list_file': csvx_file})
+
+        csvx_file.close()
 
         self.assertTrue(dbs_api_mock.called)
 
@@ -75,7 +81,10 @@ class UploadCapitaDBSRoutingTests(TestCase):
         dbs_api_mock.return_value.status_code = 400
         dbs_api_mock.return_value.text = json.dumps('Test error message')
 
-        response = self.client.post(reverse('Upload-Capita-DBS'), data={'capita_list_file': 'arc_application/tests/resources/test_csv.csv'})
+        with open('arc_application/tests/resources/test_csv.csv') as csv_file:
+            response = self.client.post(reverse('Upload-Capita-DBS'), {'capita_list_file': csv_file})
+
+        csv_file.close()
 
         self.assertEqual(response.status_code, 200)
         self.assertFormError(response, 'form', field='capita_list_file', errors='There was an error with the file you tried to upload. Check the file and try again')
@@ -84,7 +93,10 @@ class UploadCapitaDBSRoutingTests(TestCase):
         dbs_api_mock.return_value.status_code = 500
         dbs_api_mock.return_value.text = json.dumps('Test error message')
 
-        response = self.client.post(reverse('Upload-Capita-DBS'), data={'capita_list_file': 'arc_application/tests/resources/test_csv.csv'})
+        with open('arc_application/tests/resources/test_csv.csv') as csv_file:
+            response = self.client.post(reverse('Upload-Capita-DBS'), {'capita_list_file': csv_file})
+
+        csv_file.close()
 
         self.assertEqual(response.status_code, 200)
         self.assertFormError(response, 'form', field='capita_list_file', errors='We couldn\'t upload your new list. Try again')
@@ -92,6 +104,21 @@ class UploadCapitaDBSRoutingTests(TestCase):
 
 @mock.patch.object(dbs_api, 'batch_overwrite', return_value=HttpResponse(status=201))
 class UploadCapitaDBSHelperFunctionTests(TestCase):
+    def setUp(self):
+        # Create ARC user and login.
+        self.arc_user = User.objects.create_user(
+            username='governor_tARCin',
+            email='test@test.com',
+            password='my_secret'
+        )
+
+        g = Group.objects.create(name=settings.ARC_GROUP)
+        g.user_set.add(self.arc_user)
+
+        self.client.login(username='governor_tARCin', password='my_secret')
+
+        self.factory = RequestFactory()
+
     def test_formatting_of_previous_upload_information(self, dbs_api_mock):
         self.skipTest('testNotImplemented')
 
@@ -99,20 +126,38 @@ class UploadCapitaDBSHelperFunctionTests(TestCase):
         dbs_api_mock.return_value.status_code = 400
         dbs_api_mock.return_value.text = json.dumps('Test error message')
 
+        with open('arc_application/tests/resources/test_csv.csv') as csv_file:
+            request = self.factory.post(reverse('Upload-Capita-DBS'), {'capita_list_file': csv_file})
+            request_files = request.FILES
+
+        csv_file.close()
+
         with self.assertRaisesMessage(ValidationError, 'Test error message'):
-            handle_file_upload('arc_application/tests/resources/test_csv.csv')
+            handle_file_upload(request_files)
 
     def test_internal_error_raised_if_not_201_or_400_status_code_from_dbs_api(self, dbs_api_mock):
         dbs_api_mock.return_value.status_code = 500
         dbs_api_mock.return_value.text = json.dumps('Test error message')
 
+        with open('arc_application/tests/resources/test_csv.csv') as csv_file:
+            request = self.factory.post(reverse('Upload-Capita-DBS'), {'capita_list_file': csv_file})
+            request_files = request.FILES
+
+        csv_file.close()
+
         with self.assertRaisesMessage(InternalError, 'The DBS API returned a 500 status code. Response text: Test error message'):
-            handle_file_upload('arc_application/tests/resources/test_csv.csv')
+            handle_file_upload(request_files)
 
     def test_no_error_raised_if_201_status_code_from_dbs_api(self, dbs_api_mock):
         dbs_api_mock.return_value.status_code = 201
 
-        x = handle_file_upload('arc_application/tests/resources/test_csv.csv')
+        with open('arc_application/tests/resources/test_csv.csv') as csv_file:
+            request = self.factory.post(reverse('Upload-Capita-DBS'), {'capita_list_file': csv_file})
+            request_files = request.FILES
+
+        csv_file.close()
+
+        x = handle_file_upload(request_files)
 
         self.assertEqual(x, None)
 
