@@ -57,6 +57,7 @@ name_field_dict = {
     'Ofsted DBS': 'capita',
     'Is it dated within the last 3 months?': 'within_three_months',
     'Is it an enhanced DBS check for home-based childcare?': 'enhanced_check',
+    'Known to council social Services?': 'known_to_social_services',
 
     # PITH
     'Health questions status': 'health_check_status',
@@ -219,8 +220,6 @@ def add_comments(json, app_id):
                 else:
                     field = name_field_dict.get(name, '')
 
-
-
                 row['comment'] = get_comment(id, field)
                 row['link'] = reverse(label) + '?id=' + app_id
             row = row
@@ -289,6 +288,7 @@ def load_json(application_id_local, ordered_models, recurse):
             reasons_known_to_social_services = Application.objects.get(
                 application_id=application_id_local).reasons_known_to_social_services
 
+
             # If the home address is the same as the childcare address
             if home_address_record == childcare_address_record:
                 home_address = get_address(home_address_street_line1, home_address_street_line2, home_address_town,
@@ -303,6 +303,7 @@ def load_json(application_id_local, ordered_models, recurse):
                      "value": get_bool_as_string(working_in_other_childminder_home), 'pk': application_id_local,
                      "index": 5}
                 ])
+
 
             # If the address is only a home address
             if home_address_record != childcare_address_record:

@@ -195,6 +195,17 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.CreateModel(
+            name='CapitaDBSFile',
+            fields=[
+                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('filename', models.CharField(max_length=100)),
+                ('date_uploaded', models.DateField()),
+            ],
+            options={
+                'db_table': 'CAPITA_DBS_FILE',
+            },
+        ),
+        migrations.CreateModel(
             name='Child',
             fields=[
                 ('child_id', models.UUIDField(default=uuid.uuid4, primary_key=True, serialize=False)),

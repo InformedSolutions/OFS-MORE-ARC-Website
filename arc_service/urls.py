@@ -33,6 +33,7 @@ from arc_application.views.contact_centre.nanny_change_details import NannyUpdat
 from arc_application.views.nanny_views.nanny_your_children import NannyYourChildrenSummary
 from arc_application.views.search_router import SearchRouter
 from arc_application.views.your_children import your_children_summary
+from arc_application.views import upload_capita_dbs
 
 # Nanny Views
 
@@ -59,9 +60,10 @@ urlpatterns = [
 
     url(r'^admin/', admin.site.urls),
     url(r'^release/(?P<application_id>[\w\- ]+)', release, name='release'),
-    url(r'^login/', custom_login, name='login'),
-    url(r'^logout/', logout, {'next_page': settings.URL_PREFIX + '/login/'}),
+    url(r'^login', custom_login, name='login'),
+    url(r'^logout/', logout, {'next_page': settings.URL_PREFIX + '/login'}),
     url(r'^summary/', ARCUserSummaryView.as_view(), name='summary'),
+    url(r'^upload-capita-dbs/$', upload_capita_dbs, name='Upload-Capita-DBS'),
 
     # childminder application review
     url(r'^review/$', task_list, name='task_list'),
