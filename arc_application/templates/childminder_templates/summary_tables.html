@@ -2,6 +2,9 @@
 <table class="check-your-answers form-group">
     {% for row in section %}
         {% if row.title %}
+            {% if not forloop.first %}
+            </tbody>
+            {% endif %}
             <thead>
                 <tr>
                     <th colspan="{{ col }}">
@@ -11,6 +14,7 @@
                     </th>
                 </tr>
             </thead>
+            <tbody>
         {% else %}
             {% if row.comment.split %}
                 <tr class="error-row">
@@ -43,6 +47,9 @@
                         </td>
                     {% endif %}
                 </tr>
+            {% if forloop.last %}
+            </tbody>
+            {% endif %}
         {% endif %}
     {% endfor %}
 </table>

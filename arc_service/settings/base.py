@@ -7,6 +7,8 @@ ARC_GROUP = 'arc'
 CONTACT_CENTRE= 'contact-centre'
 APPLICATION_LIMIT = 5
 
+DBS_URL = os.environ.get('APP_DBS_URL')
+
 NOTIFY_URL = os.environ.get('APP_NOTIFY_URL')
 
 # Base URL of addressing-service gateway
