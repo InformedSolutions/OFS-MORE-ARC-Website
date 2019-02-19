@@ -284,7 +284,7 @@ class PeopleInTheHomeFunctionalTests(TestCase):
 
         response = self.client.get(reverse('other_people_summary'), data={'id': self.application.pk})
 
-        utils.assertSummaryField(response, 'Does anyone aged 16 or over work in the home?', 'Yes', heading='Adults in the home')
+        utils.assertSummaryField(response, 'Does anyone aged 16 or over live or work in the home?', 'Yes', heading='Adults in the home')
 
         # TODO conditional?
         #utils.assertSummaryField(response, 'Health questions status', '', heading='Joe Anthony Bloggs')
@@ -294,7 +294,7 @@ class PeopleInTheHomeFunctionalTests(TestCase):
         utils.assertSummaryField(response, 'Email', 'foo@example.com', heading='Joe Anthony Bloggs')
         utils.assertSummaryField(response, 'Lived abroad in the last 5 years?', 'No', heading='Joe Anthony Bloggs')
         # military base field is conditional
-        utils.assertSummaryField(response, 'Did they get their DBS check from the Ofstead DBS application website?', 'Yes',
+        utils.assertSummaryField(response, 'Did they get their DBS check from the Ofsted DBS application website?', 'Yes',
                      heading='Joe Anthony Bloggs')
         # last three months field is conditional
         utils.assertSummaryField(response, 'DBS certificate number', '123456789012', heading='Joe Anthony Bloggs')
