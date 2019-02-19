@@ -57,7 +57,12 @@ def __handle_file_upload(request_files):
         raise ValidationError(response_text)
 
     else:
-        response_text = json.loads(response.text)
+
+        try:
+            response_text = json.loads(response.text)
+        except json.JSONDecodeError:
+            response_text = 'No response text to show.'
+
         raise InternalError('The DBS API returned a %i status code. Response text: %s' % (response.status_code, response_text))
 
 
