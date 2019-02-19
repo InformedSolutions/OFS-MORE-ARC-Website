@@ -104,35 +104,67 @@ class AdultInHome(models.Model):
 
         date_of_birth = birth_day + ' ' + birth_month + ' ' + str(self.birth_year)
         summary_table = [
-            {"title": self.get_full_name(), "id": self.pk},
-            {"name": "Health questions status", "value": self.health_check_status},
-            {"name": "Name", "value": self.get_full_name()},
-            {"name": "Date of birth", "value": date_of_birth},
-            {"name": "Relationship", "value": self.relationship},
-            {"name": "Email", "value": self.email},
-            {"name": "Lived abroad in the last 5 years?", "value": self.bool_to_string(self.lived_abroad)},
-            {"name": "Did they get their DBS check from the Ofsted DBS application website?", "value": self.bool_to_string(self.capita)},
-            {"name": "DBS certificate number", "value": self.dbs_certificate_number},
-            {"name": "Known to council social Services in regards to their own children?", "value": self.bool_to_string(self.known_to_council)},
+            {"title": self.get_full_name(),
+             "id": self.pk},
+            {"name": "Health questions status",
+             "value": self.health_check_status},
+            {"name": "Name",
+             "value": self.get_full_name()},
+            {"name": "Date of birth",
+             "value": date_of_birth},
+            {"name": "Relationship",
+             "value": self.relationship},
+            {"name": "Email",
+             "value": self.email},
+            {"name": "Lived abroad in the last 5 years?",
+             "value": self.bool_to_string(self.lived_abroad)},
         ]
-
         if ChildcareType.objects.get(application_id=self.application_id).zero_to_five:
-           summary_table.insert(-5, {"name": "Lived or worked in British military base in the last 5 years?", "value": self.bool_to_string(self.military_base)})
-
+            summary_table += [
+                {"name": "Lived or worked on British military base in the last 5 years?",
+                 "value": self.bool_to_string(self.military_base)}
+            ]
+        summary_table += [
+            {"name": "Did they get their DBS check from the Ofsted DBS application website?",
+             "value": self.bool_to_string(self.capita)},
+        ]
         if self.capita:
-            summary_table.insert(-2, {"name": "Is it dated within the last 3 months?", "value": self.bool_to_string(self.within_three_months)})
-
+            summary_table += [
+                {"name": "Is it dated within the last 3 months?",
+                 "value": self.bool_to_string(self.within_three_months)}
+            ]
+        summary_table += [
+            {"name": "DBS certificate number",
+             "value": self.dbs_certificate_number},
+        ]
+        if self.show_enhanced_check():
+            summary_table += [
+                {"name": "Enhanced DBS check for home-based childcare?",
+                 "value": self.bool_to_string(self.enhanced_check)}
+            ]
         if self.show_on_update():
-            summary_table.insert(-1, {"name": "Enhanced DBS check for home-based childcare?", "value": self.bool_to_string(self.enhanced_check)})
-            summary_table.insert(-1, {"name": "On the update service?", "value": self.bool_to_string(self.on_update)})
-
+            summary_table += [
+                {"name": "On the update service?",
+                 "value": self.bool_to_string(self.on_update)}
+            ]
+        summary_table += [
+            {"name": "Known to council social Services in regards to their own children?",
+             "value": self.bool_to_string(self.known_to_council)},
+        ]
         if self.known_to_council:
-            summary_table.append({"name": "Tell us why", "value": self.reasons_known_to_council_health_check})
+            summary_table += [
+                {"name": "Tell us why",
+                 "value": self.reasons_known_to_council_health_check}
+            ]
 
         return summary_table
 
+    def show_enhanced_check(self):
+        return not self.capita
+
     def show_on_update(self):
-        return (self.capita and not self.within_three_months) or not self.capita
+        return (not self.capita and self.enhanced_check) \
+               or (self.capita and not self.within_three_months)
 
     # Date of birth property created to keep DRY
     @property

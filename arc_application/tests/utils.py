@@ -404,6 +404,9 @@ def create_childminder_application(user_id=None):
         eyfs_id='da2265c2-2d65-4214-bfef-abcfe59b75aa',
         application_id=application,
         eyfs_course_name='Test Childcare Training',
+        eyfs_course_date_day=1,
+        eyfs_course_date_month=2,
+        eyfs_course_date_year=2018,
     )
 
     models.HealthDeclarationBooklet.objects.create(
@@ -539,7 +542,8 @@ def assertNotSummaryField(response, label, heading=None):
 
 
 def _heading_xpath(heading):
-    return "//*[normalize-space(text())=\"{}\"]".format(heading)
+    return ("(//h1|//h2|//h3|//h4|//h5|//h6|//thead)"
+            "/descendant-or-self::*[normalize-space(text())=\"{}\"]").format(heading)
 
 
 def _field_xpath(label, heading=None):

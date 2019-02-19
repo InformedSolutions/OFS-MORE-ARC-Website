@@ -304,8 +304,6 @@ def load_json(application_id_local, ordered_models, recurse):
                      "index": 5}
                 ])
 
-
-
             # If the address is only a home address
             if home_address_record != childcare_address_record:
                 home_address = get_address(home_address_street_line1, home_address_street_line2, home_address_town,
@@ -350,18 +348,10 @@ def load_json(application_id_local, ordered_models, recurse):
             # Only show People in the home tables when applicant is not working in another childminder's home
             if application.working_in_other_childminder_home is False:
 
-                if application.adults_in_home is True:
-
-                    adults_in_home = 'Yes'
-
-                else:
-
-                    adults_in_home = 'No'
-
                 table_list.append([
                     {"title": "Adults in the home", "id": application_id_local},
                     {"name": "Does anyone aged 16 or over live or work in your home?",
-                     "value": adults_in_home}
+                     "value": 'Yes' if application.adults_in_home else 'No'}
 
                 ])
 
@@ -370,7 +360,6 @@ def load_json(application_id_local, ordered_models, recurse):
             # Only show People in the home tables when applicant is not working in another childminder's home
             if application.working_in_other_childminder_home is False:
                 table_list.append(application.get_summary_table_child())
-
 
             # Only show People in the home tables when applicant is not working in another childminder's home
             if application.working_in_other_childminder_home is False:
@@ -393,7 +382,6 @@ def load_json(application_id_local, ordered_models, recurse):
                             {"name": "Known to council social services in regards to your own children?",
                              "value": get_bool_as_string(known_to_social_services_pith)}
                         ])
-
 
         elif model.objects.filter(application_id=application.pk).exists():
             records = model.objects.filter(application_id=application.pk)

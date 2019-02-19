@@ -71,7 +71,7 @@
             </tbody>
         </table>
 
-        {% for record, id, health_check_status, name, day, month, year, relationship, email, dbs_certificate_number, dbs_on_capita, dbs_is_recent, capita, on_update, lived_abroad, military_base, formsetadult, current_illness_set, serious_illness_set, hospital_admission_set, reasons_known_to_council_health_check, enhanced_check in adult_lists %}
+        {% for record, id, health_check_status, name, day, month, year, relationship, email, dbs_certificate_number, dbs_on_capita, dbs_is_recent, enhanced_check, on_update, lived_abroad, military_base, formsetadult, current_illness_set, serious_illness_set, hospital_admission_set, reasons_known_to_council_health_check, enhanced_check in adult_lists %}
         <table class="check-your-answers form-group">
             <thead>
             <tr>
@@ -293,7 +293,7 @@
                 </td>
             </tr>
             {# ================================== #}
-            {% if zero_to_five_list.zero_to_five %}
+            {% if childcare_type_zero_to_five %}
             <tr>
                 <td style="word-wrap: break-word">
                     {{ formsetadult.military_base_comments.label }}
@@ -374,7 +374,7 @@
                 </td>
             </tr>
             {# ================================== #}
-            {% if on_update is not None %}
+            {% if enhanced_check is not None %}
             <tr>
                 <td style="word-wrap: break-word">
                     Enhanced DBS check for home-based childcare?
@@ -383,7 +383,7 @@
                     {{ enhanced_check|yesno:"Yes,No" }}
                 </td>
                 <td class="change-answer">
-                    {{ formsetadult.capita_declare }}
+                    {{ formsetadult.enhanced_check_declare }}
                 </td>
             </tr>
             <tr class="js-hidden" id="capita{{formsetadult.instance_id.initial}}">
@@ -392,12 +392,12 @@
                         Enter your reasoning
                     </div>
                     <div>
-                        {{ formsetadult.capita_comments.help_text }}
+                        {{ formsetadult.enhanced_check_comments.help_text }}
                     </div>
                 </td>
                 <td colspan="2">
                     <div>
-                        {{ formsetadult.capita_comments }}
+                        {{ formsetadult.enhanced_check_comments }}
                     </div>
                 </td>
             </tr>

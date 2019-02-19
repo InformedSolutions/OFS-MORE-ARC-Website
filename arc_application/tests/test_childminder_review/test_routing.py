@@ -266,6 +266,7 @@ class PeopleInTheHomeFunctionalTests(TestCase):
     def test_displays_adults_main_info_that_is_always_shown(self):
 
         self.application.adults_in_home = True
+        self.application.working_in_other_childminder_home = False
         self.application.save()
 
         adult = models.AdultInHome.objects.get(application_id=self.application.pk)
@@ -284,23 +285,27 @@ class PeopleInTheHomeFunctionalTests(TestCase):
 
         response = self.client.get(reverse('other_people_summary'), data={'id': self.application.pk})
 
-        utils.assertSummaryField(response, 'Does anyone aged 16 or over live or work in the home?', 'Yes', heading='Adults in the home')
+        utils.assertSummaryField(response, 'Does anyone aged 16 or over live or work in the home?', 'Yes',
+                                 heading='Adults in the home')
 
-        # TODO conditional?
-        #utils.assertSummaryField(response, 'Health questions status', '', heading='Joe Anthony Bloggs')
         utils.assertSummaryField(response, 'Name', 'Joe Anthony Bloggs', heading='Joe Anthony Bloggs')
+        # TODO: display of months on this page are inconsistent with other pages
         utils.assertSummaryField(response, 'Date of birth', '28 February 1972', heading='Joe Anthony Bloggs')
         utils.assertSummaryField(response, 'Relationship', 'Uncle', heading='Joe Anthony Bloggs')
         utils.assertSummaryField(response, 'Email', 'foo@example.com', heading='Joe Anthony Bloggs')
         utils.assertSummaryField(response, 'Lived abroad in the last 5 years?', 'No', heading='Joe Anthony Bloggs')
         # military base field is conditional
-        utils.assertSummaryField(response, 'Did they get their DBS check from the Ofsted DBS application website?', 'Yes',
-                     heading='Joe Anthony Bloggs')
+        utils.assertSummaryField(response, 'Did they get their DBS check from the Ofsted DBS application website?',
+                                 'Yes', heading='Joe Anthony Bloggs')
         # last three months field is conditional
         utils.assertSummaryField(response, 'DBS certificate number', '123456789012', heading='Joe Anthony Bloggs')
         # enhanced-check and on-update fields are conditional
 
     def test_displays_adult_military_base_field_if_caring_for_zero_to_five_year_olds(self):
+
+        self.application.adults_in_home = True
+        self.application.working_in_other_childminder_home = False
+        self.application.save()
 
         adult = models.AdultInHome.objects.get(application_id=self.application.pk)
         adult.military_base = True
@@ -312,9 +317,13 @@ class PeopleInTheHomeFunctionalTests(TestCase):
 
         response = self.client.get(reverse('other_people_summary'), data={'id': self.application.pk})
 
-        utils.assertSummaryField(response, 'Lived or worked in British military base in the last 5 years?', 'Yes')
+        utils.assertSummaryField(response, 'Lived or worked on British military base in the last 5 years?', 'Yes')
 
     def test_doesnt_display_adult_military_base_field_if_not_caring_for_zero_to_five_year_olds(self):
+
+        self.application.adults_in_home = True
+        self.application.working_in_other_childminder_home = False
+        self.application.save()
 
         care_type = models.ChildcareType.objects.get(application_id=self.application.pk)
         care_type.zero_to_five = False
@@ -322,11 +331,18 @@ class PeopleInTheHomeFunctionalTests(TestCase):
 
         response = self.client.get(reverse('other_people_summary'), data={'id': self.application.pk})
 
-        utils.assertNotSummaryField(response, 'Lived or worked in British military base in the last 5 years?')
+        utils.assertNotSummaryField(response, 'Lived or worked on British military base in the last 5 years?')
 
     def test_displays_adult_dbs_recent_field_only_for_adults_on_capita_list(self):
 
+        self.application.adults_in_home = True
+        self.application.working_in_other_childminder_home = False
+        self.application.save()
+
         adult1 = models.AdultInHome.objects.get(application_id=self.application.pk)
+        adult1.first_name = 'Joe'
+        adult1.middle_names = 'Anthony'
+        adult1.last_name = 'Bloggs'
         adult1.dbs_certificate_number = '123456789012'
         adult1.capita = False
         adult1.save()
@@ -348,7 +364,14 @@ class PeopleInTheHomeFunctionalTests(TestCase):
 
     def test_displays_adult_dbs_enhanced_check_field_only_for_adults_not_on_capita_list(self):
 
+        self.application.adults_in_home = True
+        self.application.working_in_other_childminder_home = False
+        self.application.save()
+
         adult1 = models.AdultInHome.objects.get(application_id=self.application.pk)
+        adult1.first_name = 'Joe'
+        adult1.middle_names = 'Anthony'
+        adult1.last_name = 'Bloggs'
         adult1.dbs_certificate_number = '123456789012'
         adult1.capita = False
         adult1.enhanced_check = True
@@ -374,9 +397,17 @@ class PeopleInTheHomeFunctionalTests(TestCase):
         utils.assertNotSummaryField(response, 'Enhanced DBS check for home-based childcare?',
                                     heading='Freda Annabel Smith')
 
-    def test_displays_adult_dbs_on_update_field_only_for_adults_with_enhanced_check_dbs_not_on_list_or_not_recent_enough(self):
+    def test_displays_adult_dbs_on_update_field_only_for_adults_with_enhanced_check_dbs_not_on_list_or_not_recent_enough(
+            self):
+
+        self.application.adults_in_home = True
+        self.application.working_in_other_childminder_home = False
+        self.application.save()
 
         adult1 = models.AdultInHome.objects.get(application_id=self.application.pk)
+        adult1.first_name = 'Joe'
+        adult1.middle_names = 'Anthony'
+        adult1.last_name = 'Bloggs'
         adult1.dbs_certificate_number = '123456789012'
         adult1.capita = False
         adult1.enhanced_check = True
@@ -518,4 +549,201 @@ class ReferencesPageFunctionalTests(TestCase):
         # 4. Check flagged boolean indicator is set on the application record
         reloaded_application = models.Application.objects.get(pk=self.application.application_id)
         self.assertTrue(reloaded_application.references_arc_flagged)
+
+
+@tag('http')
+class ChildminderReviewSummaryPageFunctionalTests(TestCase):
+
+    def setUp(self):
+        self.arc_user = create_arc_user()
+        self.application = create_childminder_application(self.arc_user.pk)
+        self.client.login(username='arc_test', password='my_secret')
+
+    def test_can_render_page(self):
+
+        response = self.client.get(reverse('arc-summary'), data={'id': self.application.pk})
+
+        self.assertEqual(200, response.status_code)
+        utils.assertView(response, 'arc_summary')
+
+    def test_displays_adults_main_info_that_is_always_shown(self):
+
+        self.application.adults_in_home = True
+        self.application.working_in_other_childminder_home = False
+        self.application.save()
+
+        adult = models.AdultInHome.objects.get(application_id=self.application.pk)
+        adult.first_name = 'Joe'
+        adult.middle_names = 'Anthony'
+        adult.last_name = 'Bloggs'
+        adult.birth_day = 28
+        adult.birth_month = 2
+        adult.birth_year = 1972
+        adult.relationship = 'Uncle'
+        adult.email = 'foo@example.com'
+        adult.lived_abroad = False
+        adult.dbs_certificate_number = '123456789012'
+        adult.capita = True
+        adult.save()
+
+        response = self.client.get(reverse('arc-summary'), data={'id': self.application.pk})
+
+        utils.assertSummaryField(response, 'Does anyone aged 16 or over live or work in your home?', 'Yes',
+                                 heading='Adults in the home')
+
+        utils.assertSummaryField(response, 'Name', 'Joe Anthony Bloggs', heading='Joe Anthony Bloggs')
+        # TODO: display of months on this page are inconsistent with other pages
+        utils.assertSummaryField(response, 'Date of birth', '28 02 1972', heading='Joe Anthony Bloggs')
+        utils.assertSummaryField(response, 'Relationship', 'Uncle', heading='Joe Anthony Bloggs')
+        utils.assertSummaryField(response, 'Email', 'foo@example.com', heading='Joe Anthony Bloggs')
+        utils.assertSummaryField(response, 'Lived abroad in the last 5 years?', 'No', heading='Joe Anthony Bloggs')
+        # military base field is conditional
+        utils.assertSummaryField(response, 'Did they get their DBS check from the Ofsted DBS application website?',
+                                 'Yes', heading='Joe Anthony Bloggs')
+        # last three months field is conditional
+        utils.assertSummaryField(response, 'DBS certificate number', '123456789012', heading='Joe Anthony Bloggs')
+        # enhanced-check and on-update fields are conditional
+
+    def test_displays_adult_military_base_field_if_caring_for_zero_to_five_year_olds(self):
+
+        self.application.adults_in_home = True
+        self.application.working_in_other_childminder_home = False
+        self.application.save()
+
+        adult = models.AdultInHome.objects.get(application_id=self.application.pk)
+        adult.military_base = True
+        adult.save()
+
+        care_type = models.ChildcareType.objects.get(application_id=self.application.pk)
+        care_type.zero_to_five = True
+        care_type.save()
+
+        response = self.client.get(reverse('arc-summary'), data={'id': self.application.pk})
+
+        utils.assertSummaryField(response, 'Lived or worked on British military base in the last 5 years?', 'Yes')
+
+    def test_doesnt_display_adult_military_base_field_if_not_caring_for_zero_to_five_year_olds(self):
+
+        self.application.adults_in_home = True
+        self.application.working_in_other_childminder_home = False
+        self.application.save()
+
+        care_type = models.ChildcareType.objects.get(application_id=self.application.pk)
+        care_type.zero_to_five = False
+        care_type.save()
+
+        response = self.client.get(reverse('arc-summary'), data={'id': self.application.pk})
+
+        utils.assertNotSummaryField(response, 'Lived or worked on British military base in the last 5 years?')
+
+    def test_displays_adult_dbs_recent_field_only_for_adults_on_capita_list(self):
+
+        self.application.adults_in_home = True
+        self.application.working_in_other_childminder_home = False
+        self.application.save()
+
+        adult1 = models.AdultInHome.objects.get(application_id=self.application.pk)
+        adult1.first_name = 'Joe'
+        adult1.middle_names = 'Anthony'
+        adult1.last_name = 'Bloggs'
+        adult1.dbs_certificate_number = '123456789012'
+        adult1.capita = False
+        adult1.save()
+
+        models.AdultInHome.objects.create(
+            application_id=self.application,
+            first_name='Freda', middle_names='Annabel', last_name='Smith',
+            birth_day=1, birth_month=2, birth_year=1983,
+            dbs_certificate_number='123456789013',
+            capita=True,
+            within_three_months=False,
+            certificate_information='',
+        )
+
+        response = self.client.get(reverse('arc-summary'), data={'id': self.application.pk})
+
+        utils.assertNotSummaryField(response, 'Is it dated within the last 3 months?', heading='Joe Anthony Bloggs')
+        utils.assertSummaryField(response, 'Is it dated within the last 3 months?', 'No', heading='Freda Annabel Smith')
+
+    def test_displays_adult_dbs_enhanced_check_field_only_for_adults_not_on_capita_list(self):
+
+        self.application.adults_in_home = True
+        self.application.working_in_other_childminder_home = False
+        self.application.save()
+
+        adult1 = models.AdultInHome.objects.get(application_id=self.application.pk)
+        adult1.first_name = 'Joe'
+        adult1.middle_names = 'Anthony'
+        adult1.last_name = 'Bloggs'
+        adult1.dbs_certificate_number = '123456789012'
+        adult1.capita = False
+        adult1.enhanced_check = True
+        adult1.on_update = True
+        adult1.save()
+
+        models.AdultInHome.objects.create(
+            application_id=self.application,
+            first_name='Freda', middle_names='Annabel', last_name='Smith',
+            birth_day=1, birth_month=2, birth_year=1983,
+            dbs_certificate_number='123456789013',
+            capita=True,
+            within_three_months=False,
+            certificate_information='',
+            enhanced_check=None,
+            on_update=True,
+        )
+
+        response = self.client.get(reverse('arc-summary'), data={'id': self.application.pk})
+
+        utils.assertSummaryField(response, 'Enhanced DBS check for home-based childcare?', 'Yes',
+                                 heading='Joe Anthony Bloggs')
+        utils.assertNotSummaryField(response, 'Enhanced DBS check for home-based childcare?',
+                                    heading='Freda Annabel Smith')
+
+    def test_displays_adult_dbs_on_update_field_only_for_adults_with_enhanced_check_dbs_not_on_list_or_not_recent_enough(
+            self):
+
+        self.application.adults_in_home = True
+        self.application.working_in_other_childminder_home = False
+        self.application.save()
+
+        adult1 = models.AdultInHome.objects.get(application_id=self.application.pk)
+        adult1.first_name = 'Joe'
+        adult1.middle_names = 'Anthony'
+        adult1.last_name = 'Bloggs'
+        adult1.dbs_certificate_number = '123456789012'
+        adult1.capita = False
+        adult1.enhanced_check = True
+        adult1.on_update = True
+        adult1.save()
+
+        models.AdultInHome.objects.create(
+            application_id=self.application,
+            first_name='Freda', middle_names='Annabel', last_name='Smith',
+            birth_day=1, birth_month=2, birth_year=1983,
+            dbs_certificate_number='123456789013',
+            capita=True,
+            within_three_months=False,
+            certificate_information='',
+            enhanced_check=None,
+            on_update=False,
+        )
+
+        models.AdultInHome.objects.create(
+            application_id=self.application,
+            first_name='Jim', middle_names='Bob', last_name='Robertson',
+            birth_day=1, birth_month=3, birth_year=1985,
+            dbs_certificate_number='123456789014',
+            capita=True,
+            within_three_months=True,
+            certificate_information='',
+            enhanced_check=None,
+            on_update=None,
+        )
+
+        response = self.client.get(reverse('arc-summary'), data={'id': self.application.pk})
+
+        utils.assertSummaryField(response, 'On the update service?', 'Yes', heading='Joe Anthony Bloggs')
+        utils.assertSummaryField(response, 'On the update service?', 'No', heading='Freda Annabel Smith')
+        utils.assertNotSummaryField(response, 'On the update service?', heading='Jim Bob Robertson')
 

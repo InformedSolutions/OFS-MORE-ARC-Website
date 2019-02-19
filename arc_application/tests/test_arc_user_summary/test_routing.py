@@ -77,7 +77,7 @@ class ArcUserSummaryPageFunctionalTests(TestCase):
         #
         # self.assertContains(response, '<table class="table table-hover" id="request-table">', html=True)
 
-        self.skipTest('NotImplemented')
+        self.skipTest('testNotImplemented')
 
     def test_page_renders_without_table_if_user_has_no_assigned_apps(self):
         with mock.patch('arc_application.models.Arc.objects.filter') as arc_objects_filter:
@@ -114,7 +114,7 @@ class ArcUserSummaryPageFunctionalTests(TestCase):
             self.assertContains(response, '<li class="non-field-error">There are currently no more applications ready for a review</li>', html=True)
 
     def test_assigns_childminder_app_if_one_available(self):
-        self.skipTest('NotImplemented')
+        self.skipTest('testNotImplemented')
 
     def test_assigns_nanny_app_if_one_available(self):
         self.skipTest('Nannies temporarily removed from ARC.')
@@ -133,7 +133,7 @@ class ArcUserSummaryPageFunctionalTests(TestCase):
             self.assertEqual(str(arc_filter_query[0].application_id), mock_nanny_application['application_id'])
 
     def test_cannot_assign_more_than_five_applications(self):
-        self.skipTest('NotImplemented')
+        self.skipTest('testNotImplemented')
 
         # with mock.patch('django.db.models.query.QuerySet.count') as mock_count:
         #     mock_count.return_value = 5

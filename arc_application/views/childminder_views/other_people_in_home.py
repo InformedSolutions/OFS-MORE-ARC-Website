@@ -55,7 +55,7 @@ def other_people_summary(request):
     adult_dbs_cert_numbers = []
     adult_dbs_on_capitas = []
     adult_dbs_is_recents = []
-    adult_dbs_is_capitas = []
+    adult_dbs_is_enhanceds = []
     adult_dbs_on_updates = []
     current_illnesses = []
     serious_illnesses = []
@@ -94,14 +94,6 @@ def other_people_summary(request):
 
     for adult in adults:
 
-        # TODO replace dbs lookup with references to stored results in database, when implemented
-        dbs_record = None  # getattr(dbs.read(adult.dbs_certificate_number), 'record', None)
-
-        dbs_on_capita = adult.capita
-        dbs_is_recent = adult.within_three_months
-        asked_capita = adult.capita
-        asked_on_update = (dbs_on_capita and not dbs_is_recent) or not dbs_on_capita
-
         if adult.middle_names and adult.middle_names != '':
             name = adult.first_name + ' ' + adult.middle_names + ' ' + adult.last_name
         else:
@@ -117,11 +109,10 @@ def other_people_summary(request):
         adult_relationship_list.append(adult.relationship)
         adult_email_list.append(adult.email)
         adult_dbs_cert_numbers.append(adult.dbs_certificate_number)
-        adult_dbs_on_capitas.append(dbs_on_capita)
-        adult_dbs_is_recents.append(dbs_is_recent)
-        adult_dbs_is_capitas.append(adult.capita if asked_capita else None)
-        adult_dbs_on_updates.append(adult.on_update if asked_on_update else None)
-        #
+        adult_dbs_on_capitas.append(adult.capita)
+        adult_dbs_is_recents.append(adult.within_three_months)
+        adult_dbs_is_enhanceds.append(adult.enhanced_check if adult.show_enhanced_check() else None)
+        adult_dbs_on_updates.append(adult.on_update if adult.show_on_update() else None)
         adult_lived_abroad.append(adult.lived_abroad)
         adult_military_base.append(adult.military_base)
         current_illnesses.append(HealthCheckCurrent.objects.filter(person_id=adult.pk))
@@ -173,7 +164,7 @@ def other_people_summary(request):
         adult_lists = list(
             zip(adult_record_list, adult_id_list, adult_health_check_status_list, adult_name_list, adult_birth_day_list,
                 adult_birth_month_list, adult_birth_year_list, adult_relationship_list, adult_email_list,
-                adult_dbs_cert_numbers, adult_dbs_on_capitas, adult_dbs_is_recents, adult_dbs_is_capitas,
+                adult_dbs_cert_numbers, adult_dbs_on_capitas, adult_dbs_is_recents, adult_dbs_is_enhanceds,
                 adult_dbs_on_updates, adult_lived_abroad, adult_military_base, formset_adult, current_illnesses,
                 serious_illnesses, hospital_admissions, local_authorities, adult_enhanced_checks))
 
@@ -194,7 +185,7 @@ def other_people_summary(request):
 
         own_child_lists = zip(own_children, own_child_address_list, formset_own_child, formset_own_child_address)
 
-        zero_to_five_list = ChildcareType.objects.get(application_id=application_id_local)
+        childcare_type = ChildcareType.objects.get(application_id=application_id_local)
 
         variables = {
             'form': form,
@@ -213,7 +204,7 @@ def other_people_summary(request):
             'adult_ebulk_lists': adult_ebulk_lists,
             'previous_registration_lists': previous_registration_lists,
             'providing_care_in_own_home': providing_care_in_own_home,
-            'childcare_type_zero_to_five': zero_to_five_list,
+            'childcare_type_zero_to_five': childcare_type.zero_to_five,
         }
         return render(request, 'childminder_templates/other-people-summary.html', variables)
 
@@ -295,7 +286,6 @@ def other_people_summary(request):
             status = Arc.objects.get(pk=application_id_local)
             status.people_in_home_review = section_status
             status.save()
-            childcare_type = ChildcareType.objects.get(application_id=application_id_local)
 
             show_references = get_show_references(application_id_local)
 
@@ -311,7 +301,7 @@ def other_people_summary(request):
             adult_lists = list(zip(adult_record_list, adult_id_list, adult_health_check_status_list, adult_name_list,
                                    adult_birth_day_list, adult_birth_month_list, adult_birth_year_list,
                                    adult_relationship_list, adult_email_list, adult_dbs_cert_numbers,
-                                   adult_dbs_on_capitas, adult_dbs_is_recents, adult_dbs_is_capitas,
+                                   adult_dbs_on_capitas, adult_dbs_is_recents, adult_dbs_is_enhanceds,
                                    adult_dbs_on_updates, adult_lived_abroad, adult_military_base, adult_formset,
                                    current_illnesses, serious_illnesses, hospital_admissions, local_authorities,
                                    adult_enhanced_checks))
@@ -333,7 +323,7 @@ def other_people_summary(request):
                 child_form.error_summary_title = 'There was a problem (' + child_name + ')'
                 child_address_form.error_summary_title = 'There was a problem (' + child_name + ')'
 
-            zero_to_five_list = ChildcareType.objects.get(application_id=application_id_local)
+            childcare_type = ChildcareType.objects.get(application_id=application_id_local)
 
             variables = {
                 'form': form,
@@ -351,7 +341,7 @@ def other_people_summary(request):
                 'adult_ebulk_lists': adult_ebulk_lists,
                 'previous_registration_lists': previous_registration_lists,
                 'providing_care_in_own_home': providing_care_in_own_home,
-                'childcare_type_zero_to_five': zero_to_five_list,
+                'childcare_type_zero_to_five': childcare_type.zero_to_five,
             }
             return render(request, 'childminder_templates/other-people-summary.html', variables)
 

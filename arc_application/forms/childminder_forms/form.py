@@ -1042,7 +1042,7 @@ class AdultInYourHomeForm(GOVUKForm):
 
     military_base_declare = forms.BooleanField(label='This information is correct',
                                                widget=custom_field_widgets.CustomCheckboxInput, required=False)
-    military_base_comments = forms.CharField(label='Lived or worked in British military base in the last 5 years?',
+    military_base_comments = forms.CharField(label='Lived or worked on British military base in the last 5 years?',
                                              help_text='(Tip: be clear and concise)',
                                              widget=custom_field_widgets.Textarea,
                                              required=False, max_length=500)
