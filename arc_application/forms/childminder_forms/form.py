@@ -1106,6 +1106,7 @@ class AdultInYourHomeForm(GOVUKForm):
             ((self.fields['relationship_declare']), 'relationship' + id_value),
             ((self.fields['email_declare']), 'email' + id_value),
             ((self.fields['dbs_certificate_number_declare']), 'dbs_certificate_number' + id_value),
+            ((self.fields['enhanced_check_declare']), 'enhanced_check' + id_value),
             ((self.fields['on_update_declare']), 'on_update' + id_value),
             ((self.fields['lived_abroad_declare']), 'lived_abroad' + id_value),
             ((self.fields['military_base_declare']), 'military_base' + id_value),
