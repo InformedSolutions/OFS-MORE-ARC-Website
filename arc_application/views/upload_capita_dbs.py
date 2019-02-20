@@ -12,6 +12,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ValidationError
 from django.db import InternalError
 from django.shortcuts import render
+from django.views.decorators.cache import never_cache
 
 
 def __format_last_upload():
@@ -66,6 +67,7 @@ def __handle_file_upload(request_files):
         raise InternalError('The DBS API returned a %i status code. Response text: %s' % (response.status_code, response_text))
 
 
+@never_cache
 @login_required
 @group_required(settings.ARC_GROUP)
 def upload_capita_dbs(request):
