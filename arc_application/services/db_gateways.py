@@ -155,7 +155,6 @@ class NannyGatewayActions(DBGatewayActions):
         'arc-comments': 'review_id',
         'applicant-home-address': 'application_id',
         'applicant-personal-details': 'application_id',
-        'your-children': 'child_id',
         'application': 'application_id',
         'childcare-training': 'application_id',
         'dbs-check': 'application_id',

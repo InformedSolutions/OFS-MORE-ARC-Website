@@ -37,7 +37,7 @@ class NannySearchSummary(View):
         application_reference = NannyArcSummary.get_application_reference(application_id)
         publish_details = NannyArcSummary.get_publish_details(application_id)
 
-        context_function_list = NannyArcSummary.get_context_function_list(application_id)
+        context_function_list = NannyArcSummary.get_context_function_list()
 
         context_list = [self.try_get_context_data(context_func, application_id) for context_func in
                         context_function_list if

@@ -40,7 +40,8 @@ mock_personal_details_record = {
     'last_name': 'Selenium',
     'date_of_birth': '2000-01-01',
     'lived_abroad': True,
-    'your_children': True
+    'known_to_social_services': True,
+    'reasons_known_to_social_services': 'An IMPORTANT reason'
 }
 
 mock_childcare_training_record = {
@@ -215,10 +216,6 @@ timeline_log_response = HttpResponse()
 timeline_log_response.status_code = 200
 timeline_log_response.record = mock_timeline_log_record
 
-your_children_response = HttpResponse()
-your_children_response.status_code = 200
-your_children_response.record = mock_your_children_record
-
 
 mock_endpoint_return_values = {
     'application': nanny_application_response,
@@ -233,7 +230,6 @@ mock_endpoint_return_values = {
     'user': identity_response,
     'arc-comments': arc_comments_response,
     'timeline-log': timeline_log_response,
-    'your-children': your_children_response,
 }
 
 

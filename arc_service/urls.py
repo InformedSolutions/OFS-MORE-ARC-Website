@@ -30,9 +30,7 @@ from arc_application.views.contact_centre.change_details import UpdateEmailView,
 from arc_application.contact_centre import search
 from arc_application.views.contact_centre.nanny_change_details import NannyUpdateEmailView, \
     NannyUpdateAddPhoneNumberView, NannyUpdatePhoneNumberView
-from arc_application.views.nanny_views.nanny_your_children import NannyYourChildrenSummary
 from arc_application.views.search_router import SearchRouter
-from arc_application.views.your_children import your_children_summary
 from arc_application.views import upload_capita_dbs
 
 # Nanny Views
@@ -110,7 +108,6 @@ urlpatterns = [
     url(r'^nanny/review/', NannyTaskList.as_view(), name='nanny_task_list'),
     url(r'^nanny/contact-details/', NannyContactDetailsSummary.as_view(), name='nanny_contact_summary'),
     url(r'^nanny/personal-details/', NannyPersonalDetailsSummary.as_view(), name='nanny_personal_details_summary'),
-    url(r'^nanny/your-children/', NannyYourChildrenSummary.as_view(), name='nanny_your_children_summary'),
     url(r'^nanny/childcare-address/', NannyChildcareAddressSummary.as_view(), name='nanny_childcare_address_summary'),
     url(r'^nanny/first-aid-training/', NannyFirstAidTrainingSummary.as_view(), name='nanny_first_aid_training_summary'),
     url(r'^nanny/childcare-training/', NannyChildcareTrainingSummary.as_view(), name='nanny_childcare_training_summary'),

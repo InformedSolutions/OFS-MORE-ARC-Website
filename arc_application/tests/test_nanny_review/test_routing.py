@@ -10,7 +10,7 @@ from arc_application.models import Arc
 from arc_application.services.db_gateways import NannyGatewayActions, IdentityGatewayActions
 from arc_application.views import NannyDbsCheckSummary, NannyArcSummary, NannyContactDetailsSummary, \
     NannyPersonalDetailsSummary, NannyChildcareAddressSummary, NannyFirstAidTrainingSummary, \
-    NannyChildcareTrainingSummary, NannyInsuranceCoverSummary, NannyTaskList, NannyYourChildrenSummary
+    NannyChildcareTrainingSummary, NannyInsuranceCoverSummary, NannyTaskList
 from arc_application.tests.utils import side_effect
 
 test_app_id = side_effect('application').record['application_id']
@@ -64,15 +64,6 @@ class NannyFlaggingFunctionalTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.resolver_match.func.__name__, NannyPersonalDetailsSummary.as_view().__name__)
-
-    def test_can_render_your_children_details_page(self, *args):
-        """
-        Test to ensure that the page for flagging your children details can be rendered.
-        """
-        response = self.client.get(reverse('nanny_your_children_summary') + '?id=' + test_app_id)
-
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.resolver_match.func.__name__, NannyYourChildrenSummary.as_view().__name__)
 
     def test_can_render_childcare_address_details_page(self, *args):
         """
@@ -179,38 +170,6 @@ class NannyFlaggingFunctionalTests(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(found.func.view_class.__name__, NannyPersonalDetailsSummary.as_view().__name__)
 
-    def test_personal_details_redirects_to_the_your_children_page_if_your_children_is_true(self, *args):
-        """
-        Test that a POST request to the personal details page redirects to the your children details page.
-        """
-        response = self.client.post(reverse('nanny_personal_details_summary') + '?id=' + test_app_id)
-        found = resolve(response.url)
-
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(found.func.view_class.__name__, NannyYourChildrenSummary.as_view().__name__, )
-
-    def test_personal_details_redirects_to_the_childcare_address_page_if_your_children_is_false(self, *args):
-        """
-        Test that a POST request to the personal details page redirects to the childcare address details page.
-        """
-        self.skipTest('NotImplemented')
-
-    def test_your_children_redirects_to_the_childcare_address_page(self, *args):
-        """
-        Test that a POST request to the personal details page redirects to the childcare address details page.
-        """
-        response = self.client.post(reverse('nanny_your_children_summary') + '?id=' + test_app_id,
-                                    data={
-                                        'id': test_app_id,
-                                        'form-TOTAL_FORMS': '2',
-                                        'form-INITIAL_FORMS': '2',
-                                        'form-MAX_NUM_FORMS': '2',
-                                    })
-        found = resolve(response.url)
-
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(found.func.view_class.__name__, NannyChildcareAddressSummary.as_view().__name__, )
-
     def test_childcare_address_details_redirects_to_the_first_aid_page(self, *args):
         """
         Test that a POST request to the childcare address details page redirects to the first aid details page.
@@ -278,7 +237,8 @@ class NannyFlaggingFunctionalTests(TestCase):
             'date_of_birth',
             'lived_abroad',
             'home_address',
-            'your_children',
+            'known_to_social_services',
+            'reasons_known_to_social_services'
         ]
 
         post_data = self._create_post_data(fields_to_flag)
@@ -302,7 +262,8 @@ class NannyFlaggingFunctionalTests(TestCase):
             'date_of_birth',
             'lived_abroad',
             'home_address',
-            'your_children',
+            'known_to_social_services',
+            'reasons_known_to_social_services'
         ]
 
         post_data = self._create_post_data(fields_to_flag)
@@ -324,23 +285,6 @@ class NannyFlaggingFunctionalTests(TestCase):
                          })
 
         self.assertEqual(Arc.objects.get(pk=test_app_id).personal_details_review, 'COMPLETED')
-
-    def test_flagging_your_children_details_sets_status_to_flagged(self, *args):
-        self.skipTest('NotImplemented')
-
-    def test_flagging_your_children_details_creates_arc_comments(self, *args):
-        self.skipTest('NotImplemented')
-
-    def test_not_flagging_your_children_details_sets_status_to_reviewed(self, *args):
-        self.client.post(reverse('nanny_your_children_summary') + '?id=' + test_app_id,
-                         data={
-                             'id': test_app_id,
-                             'form-TOTAL_FORMS': '2',
-                             'form-INITIAL_FORMS': '2',
-                             'form-MAX_NUM_FORMS': '2',
-                         })
-
-        self.assertEqual(Arc.objects.get(pk=test_app_id).your_children_review, 'COMPLETED')
 
     def test_flagging_first_two_childcare_address_questions_creates_arc_comments(self, *args):
         fields_to_flag = [
