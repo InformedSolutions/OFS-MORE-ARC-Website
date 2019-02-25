@@ -71,7 +71,8 @@ class NannyFormBuilder:
                                                         label='Enter your reasoning',
                                                         help_text='(Tip: be clear and concise)',
                                                         widget=custom_field_widgets.Textarea,
-                                                        required=False
+                                                        required=False,
+                                                        max_length=500
                                                     )
 
     def update_checkbox_field_widgets(self):

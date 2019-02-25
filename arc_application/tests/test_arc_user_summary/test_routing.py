@@ -8,9 +8,9 @@ from django.test import tag, TestCase
 from django.urls import reverse
 
 from arc_application.models import Arc
-from arc_application.services.application_handler import NannyApplicationHandler
-from arc_application.services.db_gateways import NannyGatewayActions
 from arc_application.views.arc_user_summary import ARCUserSummaryView
+from arc_application.services.db_gateways import NannyGatewayActions
+from arc_application.services.application_handler import NannyApplicationHandler
 
 
 mock_nanny_application = {
@@ -45,7 +45,8 @@ def side_effect(endpoint_name, *args, **kwargs):
     return mock_endpoint_return_values[endpoint_name]
 
 
-class ArcUserSummaryPageTests(TestCase):
+@tag('http')
+class ArcUserSummaryPageFunctionalTests(TestCase):
     """
     Test suite for the functionality within the ARC summary page.
     """
@@ -67,35 +68,35 @@ class ArcUserSummaryPageTests(TestCase):
     # Integration level tests #
     # ----------------------- #
 
-    # @tag('integration')
-    # def test_list_nanny_tasks_to_review(self):
-    #     """
-    #     Test that the _list_tasks_for_review() method returns a complete list of tasks for review.
-    #
-    #     If we were to mock the Gateway response, this test will continue to pass even if the models are updated.
-    #     Must therefore be an integration test.
-    #     """
-    #     test_uuid = str(uuid4())
-    #     NannyGatewayActions().create('application', params={'application_id': test_uuid})
-    #     tasks_list = NannyApplicationHandler(arc_user=self.user)._list_tasks_for_review()
-    #
-    #     expected_list = [
-    #         'login_details',
-    #         'personal_details',
-    #         'childcare_address',
-    #         'first_aid_training',
-    #         'childcare_training',
-    #         'criminal_record_check',
-    #         'dbs',
-    #         'first_aid',
-    #         'insurance_cover',
-    #         'your_children'
-    #     ]
-    #
-    #     for task in tasks_list:
-    #         self.assertIn(task, expected_list)
-    #
-    #     NannyGatewayActions().delete('application', params={'application_id': test_uuid})
+    @tag('integration')
+    def test_list_nanny_tasks_to_review(self):
+        """
+        Test that the _list_tasks_for_review() method returns a complete list of tasks for review.
+
+        If we were to mock the Gateway response, this test will continue to pass even if the models are updated.
+        Must therefore be an integration test.
+        """
+        test_uuid = str(uuid4())
+        NannyGatewayActions().create('application', params={'application_id': test_uuid})
+        tasks_list = NannyApplicationHandler(arc_user=self.user)._list_tasks_for_review()
+
+        expected_list = [
+            'login_details',
+            'personal_details',
+            'childcare_address',
+            'first_aid_training',
+            'childcare_training',
+            'criminal_record_check',
+            'dbs',
+            'first_aid',
+            'insurance_cover',
+            'your_children'
+        ]
+
+        for task in tasks_list:
+            self.assertIn(task, expected_list)
+
+        NannyGatewayActions().delete('application', params={'application_id': test_uuid})
 
     # ---------------- #
     # HTTP level tests #
@@ -111,7 +112,6 @@ class ArcUserSummaryPageTests(TestCase):
         self.assertEqual(200, response.status_code)
         self.assertEqual(response.resolver_match.func.__name__, ARCUserSummaryView.as_view().__name__)
 
-    @tag('http')
     def test_page_renders_with_table_if_user_has_assigned_apps(self):
         # response = self.client.get(reverse('summary'))
         #
@@ -119,9 +119,8 @@ class ArcUserSummaryPageTests(TestCase):
         #
         # self.assertContains(response, '<table class="table table-hover" id="request-table">', html=True)
 
-        self.skipTest('NotImplemented')
+        self.skipTest('testNotImplemented')
 
-    @tag('http')
     def test_page_renders_without_table_if_user_has_no_assigned_apps(self):
         with mock.patch('arc_application.models.Arc.objects.filter') as arc_objects_filter:
 
@@ -131,7 +130,6 @@ class ArcUserSummaryPageTests(TestCase):
 
             self.assertNotContains(response, '<table class="table table-hover" id="request-table">', html=True)
 
-    @tag('http')
     def test_page_renders_with_error_if_no_nanny_apps_available(self):
         with mock.patch('arc_application.services.db_gateways.NannyGatewayActions.list') as mock_nanny_list:
 
@@ -143,7 +141,6 @@ class ArcUserSummaryPageTests(TestCase):
             self.assertEqual(response.resolver_match.func.__name__, ARCUserSummaryView.as_view().__name__)
             self.assertContains(response, '<li class="non-field-error">There are currently no more applications ready for a review</li>', html=True)
 
-    @tag('http')
     def test_page_renders_with_error_if_no_childminder_apps_available(self):
         with mock.patch('arc_application.models.Arc.objects.filter') as arc_objects_filter:
 
@@ -157,11 +154,9 @@ class ArcUserSummaryPageTests(TestCase):
             self.assertEqual(response.resolver_match.func.__name__, ARCUserSummaryView.as_view().__name__)
             self.assertContains(response, '<li class="non-field-error">There are currently no more applications ready for a review</li>', html=True)
 
-    @tag('http')
     def test_assigns_childminder_app_if_one_available(self):
-        self.skipTest('NotImplemented')
+        self.skipTest('testNotImplemented')
 
-    @tag('http')
     def test_assigns_nanny_app_if_one_available(self):
         with mock.patch('arc_application.services.db_gateways.NannyGatewayActions.list') as mock_nanny_list, \
                 mock.patch('arc_application.services.db_gateways.NannyGatewayActions.read') as mock_nanny_read:
@@ -177,9 +172,8 @@ class ArcUserSummaryPageTests(TestCase):
             self.assertTrue(arc_filter_query.exists())
             self.assertEqual(str(arc_filter_query[0].application_id), mock_nanny_application['application_id'])
 
-    @tag('http')
     def test_cannot_assign_more_than_five_applications(self):
-        self.skipTest('NotImplemented')
+        self.skipTest('testNotImplemented')
 
         # with mock.patch('django.db.models.query.QuerySet.count') as mock_count:
         #     mock_count.return_value = 5
@@ -192,54 +186,4 @@ class ArcUserSummaryPageTests(TestCase):
         #     )
         #     self.assertContains(response, 'You have already reached the maximum (' + str(settings.APPLICATION_LIMIT) + ') applications', html=True)
 
-    # ---------- #
-    # UNIT tests #
-    # ---------- #
 
-    @tag('unit')
-    def test_count_assigned_apps(self):
-        self.skipTest('NotImplemented')
-
-    @tag('unit')
-    def test_get_oldest_nanny_app_id(self):
-        self.skipTest('NotImplemented')
-
-    @tag('unit')
-    def test_get_oldest_childminder_app_id(self):
-        self.skipTest('NotImplemented')
-
-    @tag('unit')
-    def test_sort_applications_by_date_submitted(self):
-        self.skipTest('NotImplemented')
-
-    @tag('unit')
-    def test_assign_nanny_app_to_user(self):
-        self.skipTest('NotImplemented')
-
-    @tag('unit')
-    def test_assign_childminder_app_to_user(self):
-        self.skipTest('NotImplemented')
-
-    @tag('unit')
-    def test_list_childminder_tasks_to_review(self):
-        self.skipTest('NotImplemented')
-
-    @tag('unit')
-    def test_release_nanny_app_to_pool(self):
-        self.skipTest('NotImplemented')
-
-    @tag('unit')
-    def test_release_childminder_app_to_pool(self):
-        self.skipTest('NotImplemented')
-
-    @tag('unit')
-    def test_get_all_table_data(self):
-        self.skipTest('NotImplemented')
-
-    @tag('unit')
-    def test_get_nanny_row_data(self):
-        self.skipTest('NotImplemented')
-
-    @tag('unit')
-    def test_get_childminder_row_data(self):
-        self.skipTest('NotImplemented')

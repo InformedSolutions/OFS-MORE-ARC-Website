@@ -1,6 +1,9 @@
 from uuid import uuid4
+
 from django.db import models
+
 from .application import Application
+
 
 class CriminalRecordCheck(models.Model):
     """
@@ -14,7 +17,10 @@ class CriminalRecordCheck(models.Model):
     lived_abroad = models.NullBooleanField(blank=True)
     military_base = models.NullBooleanField(blank=True)
     capita = models.NullBooleanField(blank=True)
+    enhanced_check = models.NullBooleanField(blank=True)
     on_update = models.NullBooleanField(blank=True)
+    certificate_information = models.TextField(blank=True)
+    within_three_months = models.NullBooleanField(blank=True)
 
     @property
     def timelog_fields(self):
@@ -52,24 +58,29 @@ class CriminalRecordCheck(models.Model):
                                        "value": self.get_bool_as_string(self.lived_abroad)})
 
         if self.military_base is not None:
-            summary_table_dict.append({"name": "Have you lived or worked on a British military base outside of the UK in the last 5 years?",
-                                       "value": self.get_bool_as_string(self.military_base)})
+            summary_table_dict.append(
+                {"name": "Have you lived or worked on a British military base outside of the UK in the last 5 years?",
+                 "value": self.get_bool_as_string(self.military_base)})
 
         if self.capita is not None:
-            summary_table_dict.append({"name": "Did you get a DBS certificate from the Ofsted DBS application website in the last 3 months?",
+            summary_table_dict.append({"name": "Did they get their DBS check from the Ofsted DBS application website?",
                                        "value": self.get_bool_as_string(self.capita)})
 
-        if self.on_update is not None:
-            summary_table_dict.append({"name": "Are you on the DBS update service?",
-             "value": self.get_bool_as_string(self.on_update)})
+        if self.within_three_months is not None:
+            summary_table_dict.append({"name": "Is it dated within the last 3 months?",
+                                       "value": self.get_bool_as_string(self.within_three_months)})
 
         if self.dbs_certificate_number is not None:
             summary_table_dict.append({"name": "DBS certificate number",
                                        "value": self.dbs_certificate_number})
 
-        if self.cautions_convictions is not None:
-            summary_table_dict.append({"name": "Do you have any criminal cautions or convictions?",
-                                       "value": self.get_bool_as_string(self.cautions_convictions)})
+        if self.enhanced_check is not None:
+            summary_table_dict.append({"name": "Is it an enhanced DBS check for home-based childcare?",
+                                       "value": self.get_bool_as_string(self.enhanced_check)})
+
+        if self.on_update is not None:
+            summary_table_dict.append({"name": "Are you on the DBS update service?",
+                                       "value": self.get_bool_as_string(self.on_update)})
 
         return summary_table_dict
 

@@ -6,7 +6,7 @@ from django.contrib.auth.models import Group, User
 from django.test import Client
 from django.urls import reverse
 
-from .test_utils import side_effect
+from arc_application.tests.utils import side_effect
 
 from arc_application.views.audit_log import audit_log_dispatcher
 
@@ -14,7 +14,8 @@ from arc_application.views.audit_log import audit_log_dispatcher
 @mock.patch('arc_application.services.db_gateways.NannyGatewayActions.list', side_effect=side_effect)
 @mock.patch('arc_application.services.db_gateways.NannyGatewayActions.create', side_effect=side_effect)
 @mock.patch('arc_application.services.db_gateways.NannyGatewayActions.read', side_effect=side_effect)
-class NannyAuditLogTests(TestCase):
+class NannyAuditLogRoutingTests(TestCase):
+
     @classmethod
     def setUpClass(cls):
         cls.client = Client()

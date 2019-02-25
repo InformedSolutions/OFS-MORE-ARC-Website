@@ -1,8 +1,8 @@
-xmlrunner/
-logs/*
-selenium/
+/xmlrunner/
+/logs/*
+/selenium/
 
-addressing_service/settings.py
+/addressing_service/settings.py
 
 ### Python ###
 # Byte-compiled / optimized / DLL files
@@ -10,7 +10,7 @@ __pycache__/
 *.py[cod]
 db.sqlite3
 .coverage
-staticfiles/
+/staticfiles/
 
 ### Dev files ###
 .idea/
