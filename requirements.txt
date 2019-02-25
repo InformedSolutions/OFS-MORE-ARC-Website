@@ -12,3 +12,4 @@ django-timeline-logger==1.0
 selenium==3.11.0
 faker==0.8.13
 hypothesis==3.70.3
+lxml==4.3.0

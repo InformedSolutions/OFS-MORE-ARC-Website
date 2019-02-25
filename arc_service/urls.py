@@ -33,6 +33,7 @@ from arc_application.views.contact_centre.nanny_change_details import NannyUpdat
 from arc_application.views.nanny_views.nanny_your_children import NannyYourChildrenSummary
 from arc_application.views.search_router import SearchRouter
 from arc_application.views.your_children import your_children_summary
+from arc_application.views import upload_capita_dbs
 
 # Nanny Views
 
@@ -56,11 +57,15 @@ from django.contrib.auth.views import logout
 from arc_application.views.childminder_views.personal_details_addresses import personal_details_previous_address
 
 urlpatterns = [
+
     url(r'^admin/', admin.site.urls),
     url(r'^release/(?P<application_id>[\w\- ]+)', release, name='release'),
-    url(r'^login/', custom_login, name='login'),
-    url(r'^logout/', logout, {'next_page': settings.URL_PREFIX + '/login/'}),
+    url(r'^login', custom_login, name='login'),
+    url(r'^logout/', logout, {'next_page': settings.URL_PREFIX + '/login'}),
     url(r'^summary/', ARCUserSummaryView.as_view(), name='summary'),
+    url(r'^upload-capita-dbs/$', upload_capita_dbs, name='Upload-Capita-DBS'),
+
+    # childminder application review
     url(r'^review/$', task_list, name='task_list'),
     url(r'^account/summary/', contact_summary, name='contact_summary'),
     url(r'^childcare/age-groups/', type_of_childcare_age_groups, name='type_of_childcare_age_groups'),
@@ -79,10 +84,15 @@ urlpatterns = [
     url(r'^health/check-answers/', health_check_answers, name='health_check_answers'),
     url(r'^confirmation/', review, name='review'),
     url(r'^arc-summary/', arc_summary, name='arc-summary'),
+
+    # audit log
     url(r'^auditlog/$', login_required(audit_log_dispatcher), name='auditlog'),
     url(r'^audit-log/index', login_required(NannyAuditLog.as_view()), name='nanny-auditlog'),
+
+    # search
     url(r'^search/', search, name='search'),
     url(r'^search-summary/', SearchRouter.as_view(), name='search_summary'),
+
     url(r'^contact-centre/contact-details/email-address', UpdateEmailView.as_view(), name='update_email'),
     url(r'^contact-centre/contact-details/phone-number', UpdatePhoneNumberView.as_view(), name='update_phone_number'),
     url(r'^contact-centre/contact-details/add-phone-number', UpdateAddPhoneNumberView.as_view(),
@@ -95,7 +105,8 @@ urlpatterns = [
         name='nanny_update_add_number'),
     url(r'^personal-details/previous-registration', PreviousRegistrationDetailsView.as_view(),
         name='previous_registration_details'),
-    url(r'^your-children/summary/', your_children_summary, name='your_children_summary'),
+
+    # nanny application review
     url(r'^nanny/review/', NannyTaskList.as_view(), name='nanny_task_list'),
     url(r'^nanny/contact-details/', NannyContactDetailsSummary.as_view(), name='nanny_contact_summary'),
     url(r'^nanny/personal-details/', NannyPersonalDetailsSummary.as_view(), name='nanny_personal_details_summary'),

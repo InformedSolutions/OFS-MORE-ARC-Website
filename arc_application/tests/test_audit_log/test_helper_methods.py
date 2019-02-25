@@ -5,7 +5,7 @@ from django.test import RequestFactory
 from arc_application.views.audit_log import audit_log_dispatcher, ChildminderAuditlog, NannyAuditLog
 
 
-class AuditLogDispatcherTests(TestCase):
+class AuditLogDispatcherUnitTests(TestCase):
     @classmethod
     def setUpClass(cls):
         cls.factory = RequestFactory()

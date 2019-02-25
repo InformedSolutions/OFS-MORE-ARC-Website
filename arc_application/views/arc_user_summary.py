@@ -19,10 +19,7 @@ class ARCUserSummaryView(View):
 
     def post(self, request):
 
-        if 'add_nanny_application' in request.POST:
-            app_handler = NannyApplicationHandler(arc_user=request.user)
-
-        elif 'add_childminder_application' in request.POST:
+        if 'add_childminder_application' in request.POST:
             app_handler = ChildminderApplicationHandler(arc_user=request.user)
 
         try:
@@ -45,7 +42,7 @@ class ARCUserSummaryView(View):
 
     def get_context_data(self):
         context = dict()
-        context['entries'] = GenericApplicationHandler(arc_user=self.request.user).get_all_table_data()
+        context['entries'] = ChildminderApplicationHandler(arc_user=self.request.user).get_all_table_data()
 
         if not len(context['entries']):
             context['empty'] = 'true'

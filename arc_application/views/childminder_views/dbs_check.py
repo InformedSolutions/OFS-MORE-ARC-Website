@@ -76,6 +76,9 @@ def dbs_check_summary(request):
     capita = criminal_record_check.capita
     on_update = criminal_record_check.on_update
     application = Application.objects.get(pk=application_id_local)
+    within_three_months = criminal_record_check.within_three_months
+    enhanced_check = criminal_record_check.enhanced_check
+
     form.error_summary_title = 'There was a problem'
     variables = {
         'form': form,
@@ -86,7 +89,9 @@ def dbs_check_summary(request):
         'lived_abroad': lived_abroad,
         'military_base': military_base,
         'capita': capita,
-        'on_update': on_update
+        'on_update': on_update,
+        'within_three_months': within_three_months,
+        'enhanced_check': enhanced_check,
     }
 
     return render(request, 'childminder_templates/dbs-check-summary.html', variables)

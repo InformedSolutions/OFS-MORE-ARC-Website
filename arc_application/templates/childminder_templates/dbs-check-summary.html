@@ -77,6 +77,7 @@
             </td>
         </tr>
 
+        {% if capita is not None %}
         <tr>
             <td>
                 {{form.capita_comments.label}}
@@ -107,6 +108,101 @@
                 </div>
             </td>
         </tr>
+        {% endif %}
+
+        {% if within_three_months is not None %}
+        <tr>
+            <td>
+                {{form.within_three_months_comments.label}}
+            </td>
+            <td style="word-wrap: break-word">
+                {% if within_three_months %}
+                    Yes
+                {% else %}
+                    No
+                {% endif %}
+            </td>
+            <td class="change-answer">
+                {{ form.within_three_months_declare }}
+            </td>
+        </tr>
+        <tr class="js-hidden" id="within_three_months">
+            <td colspan="1">
+                <div>
+                    Enter your reasoning
+                </div>
+                <div>
+                    {{ form.within_three_months_comments.help_text}}
+                </div>
+            </td>
+            <td colspan="2">
+                <div>
+                    {{ form.within_three_months_comments}}
+                </div>
+            </td>
+        </tr>
+        {% endif %}
+
+        <tr>
+            <td>
+                DBS certificate number
+            </td>
+            <td style="word-wrap: break-word">
+                {{dbs_certificate_number}}
+            </td>
+            <td class="change-answer">
+                {{ form.dbs_certificate_number_declare }}
+            </td>
+        </tr>
+        <tr class="js-hidden" id="dbs_certificate_number">
+            <td colspan="1">
+                <div>
+                    Enter your reasoning
+                </div>
+                <div>
+                    {{ form.dbs_certificate_number_comments.help_text}}
+                </div>
+            </td>
+            <td colspan="2">
+                <div>
+                    {{ form.dbs_certificate_number_comments}}
+                </div>
+            </td>
+        </tr>
+
+        {% if enhanced_check is not None %}
+        <tr>
+            <td>
+                {{form.enhanced_check_comments.label}}
+            </td>
+            <td style="word-wrap: break-word">
+                {% if enhanced_check %}
+                    Yes
+                {% else %}
+                    No
+                {% endif %}
+            </td>
+            <td class="change-answer">
+                {{ form.enhanced_check_declare }}
+            </td>
+        </tr>
+        <tr class="js-hidden" id="enhanced_check">
+            <td colspan="1">
+                <div>
+                    Enter your reasoning
+                </div>
+                <div>
+                    {{ form.enhanced_check_comments.help_text}}
+                </div>
+            </td>
+            <td colspan="2">
+                <div>
+                    {{ form.enhanced_check_comments}}
+                </div>
+            </td>
+        </tr>
+        {% endif %}
+
         {% if on_update is not None %}
         <tr>
             <td>
@@ -139,33 +235,6 @@
             </td>
         </tr>
         {% endif %}
-
-        <tr>
-            <td>
-                DBS certificate number
-            </td>
-            <td style="word-wrap: break-word">
-                {{dbs_certificate_number}}
-            </td>
-            <td class="change-answer">
-                {{ form.dbs_certificate_number_declare }}
-            </td>
-        </tr>
-        <tr class="js-hidden" id="dbs_certificate_number">
-            <td colspan="1">
-                <div>
-                    Enter your reasoning
-                </div>
-                <div>
-                    {{ form.dbs_certificate_number_comments.help_text}}
-                </div>
-            </td>
-            <td colspan="2">
-                <div>
-                    {{ form.dbs_certificate_number_comments}}
-                </div>
-            </td>
-        </tr>
 
         {% if cautions_convictions is not None %}
         <tr>
