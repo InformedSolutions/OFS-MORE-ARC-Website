@@ -11,7 +11,7 @@ from django import forms
 from django.conf import settings
 from django.forms import ModelForm
 from govuk_forms.forms import GOVUKForm
-from govuk_forms.widgets import InlineRadioSelect, NumberInput
+from govuk_forms.widgets import InlineRadioSelect, NumberInput, Select
 
 from arc_application.models import Arc as ArcReview, PreviousRegistrationDetails
 from arc_application.models import OtherPersonPreviousRegistrationDetails
