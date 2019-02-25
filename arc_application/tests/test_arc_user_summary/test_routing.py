@@ -61,6 +61,45 @@ class ArcUserSummaryPageFunctionalTests(TestCase):
 
         self.client.login(username='governor_tARCin', password='my_secret')
 
+    # ----------------------- #
+    # Integration level tests #
+    # ----------------------- #
+
+    @tag('integration')
+    def test_list_nanny_tasks_to_review(self):
+        """
+        Test that the _list_tasks_for_review() method returns a complete list of tasks for review.
+
+        If we were to mock the Gateway response, this test will continue to pass even if the models are updated.
+        Must therefore be an integration test.
+        """
+        test_uuid = str(uuid4())
+        NannyGatewayActions().create('application', params={'application_id': test_uuid})
+        tasks_list = NannyApplicationHandler(arc_user=self.user)._list_tasks_for_review()
+
+        expected_list = [
+            'login_details',
+            'personal_details',
+            'childcare_address',
+            'first_aid_training',
+            'childcare_training',
+            'criminal_record_check',
+            'dbs',
+            'first_aid',
+            'insurance_cover',
+            'your_children'
+        ]
+
+        for task in tasks_list:
+            self.assertIn(task, expected_list)
+
+        NannyGatewayActions().delete('application', params={'application_id': test_uuid})
+
+    # ---------------- #
+    # HTTP level tests #
+    # ---------------- #
+
+    @tag('http')
     def test_can_render_arc_user_summary_page(self):
         """
         Test that the ARC user summary page can be rendered.
@@ -89,7 +128,6 @@ class ArcUserSummaryPageFunctionalTests(TestCase):
             self.assertNotContains(response, '<table class="table table-hover" id="request-table">', html=True)
 
     def test_page_renders_with_error_if_no_nanny_apps_available(self):
-        self.skipTest('Nannies temporarily removed from ARC.')
         with mock.patch('arc_application.services.db_gateways.NannyGatewayActions.list') as mock_nanny_list:
 
             mock_nanny_list.return_value.status_code = 404
@@ -117,7 +155,6 @@ class ArcUserSummaryPageFunctionalTests(TestCase):
         self.skipTest('testNotImplemented')
 
     def test_assigns_nanny_app_if_one_available(self):
-        self.skipTest('Nannies temporarily removed from ARC.')
         with mock.patch('arc_application.services.db_gateways.NannyGatewayActions.list') as mock_nanny_list, \
                 mock.patch('arc_application.services.db_gateways.NannyGatewayActions.read') as mock_nanny_read:
 
