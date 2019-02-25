@@ -128,7 +128,6 @@ class ArcUserSummaryPageFunctionalTests(TestCase):
             self.assertNotContains(response, '<table class="table table-hover" id="request-table">', html=True)
 
     def test_page_renders_with_error_if_no_nanny_apps_available(self):
-        self.skipTest('Nannies temporarily removed from ARC.')
         with mock.patch('arc_application.services.db_gateways.NannyGatewayActions.list') as mock_nanny_list:
 
             mock_nanny_list.return_value.status_code = 404
@@ -156,7 +155,6 @@ class ArcUserSummaryPageFunctionalTests(TestCase):
         self.skipTest('testNotImplemented')
 
     def test_assigns_nanny_app_if_one_available(self):
-        self.skipTest('Nannies temporarily removed from ARC.')
         with mock.patch('arc_application.services.db_gateways.NannyGatewayActions.list') as mock_nanny_list, \
                 mock.patch('arc_application.services.db_gateways.NannyGatewayActions.read') as mock_nanny_read:
 
