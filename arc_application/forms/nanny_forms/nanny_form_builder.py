@@ -132,6 +132,8 @@ dbs_check_fields = [
     'on_dbs_update_service',
     'dbs_number',
     'convictions',
+    'enhanced_check',
+    'within_three_months'
 ]
 
 insurance_cover_fields = [

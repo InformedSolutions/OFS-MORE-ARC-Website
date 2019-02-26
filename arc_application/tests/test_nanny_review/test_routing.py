@@ -451,7 +451,7 @@ class NannyFlaggingFunctionalTests(TestCase):
     def test_flagging_criminal_record_checks_details_creates_arc_comments(self, *args):
         fields_to_flag = [
             'dbs_number',
-            'convictions',
+            'on_dbs_update_service',
         ]
 
         post_data = self._create_post_data(fields_to_flag)
