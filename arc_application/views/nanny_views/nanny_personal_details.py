@@ -103,7 +103,8 @@ class NannyPersonalDetailsSummary(NannyARCFormView):
                     'id': 'known_to_social_services',
                     'name': 'Known to council social Services?',
                     'info': known_to_social_services,
-                    'declare': personal_details_form['known_to_social_services_declare'] if hasattr(self, 'request') else '',
+                    'declare': personal_details_form['known_to_social_services_declare'] if hasattr(self,
+                                                                                                    'request') else '',
                     'comments': personal_details_form['known_to_social_services_comments'],
                 }
             ]
@@ -115,7 +116,8 @@ class NannyPersonalDetailsSummary(NannyARCFormView):
                     'id': 'reasons_known_to_social_services',
                     'name': 'Tell us why',
                     'info': reasons_known_to_social_services,
-                    'declare': personal_details_form['reasons_known_to_social_services_declare'] if hasattr(self, 'request') else '',
+                    'declare': personal_details_form['reasons_known_to_social_services_declare'] if hasattr(self,
+                                                                                                            'request') else '',
                     'comments': personal_details_form['reasons_known_to_social_services_comments'],
                 }
             )
