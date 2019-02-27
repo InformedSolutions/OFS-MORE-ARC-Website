@@ -51,7 +51,7 @@ class NannyDbsCheckSummary(NannyARCFormView):
                 },
                 {
                     'id': 'is_ofsted_dbs',
-                    'name': 'Did they get their DBS check from the Ofsted DBS application website',
+                    'name': 'Did they get their DBS check from the Ofsted DBS application website?',
                     'info': is_ofsted_dbs
                 },
                 {
