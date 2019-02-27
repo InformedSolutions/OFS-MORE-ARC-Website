@@ -98,9 +98,9 @@ sign_in_form_fields = [
 personal_details_fields = [
     'name',
     'date_of_birth',
-    'lived_abroad',
     'known_to_social_services',
     'reasons_known_to_social_services'
+    'your_children',
 ]
 
 home_address_fields = [
