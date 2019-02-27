@@ -62,19 +62,12 @@ def search(request):
                     application_type = 'Childminder'
 
                 # If no search terms have been entered
-                if not name and not dob and not home_postcode and not care_location_postcode and not reference:
-
-                    if settings.ENABLE_NANNIES:
-                        if not application_type:
-                            context['empty_error'] = True
-                            context['error_title'] = 'There was a problem with your search'
-                            context['error_text'] = 'Please use at least one filter'
-                            return render(request, SEARCH_TEMPLATE_PATH, context)
-                    else:
-                        context['empty_error'] = True
-                        context['error_title'] = 'There was a problem with your search'
-                        context['error_text'] = 'Please use at least one filter'
-                        return render(request, SEARCH_TEMPLATE_PATH, context)
+                if not any([name, dob, home_postcode, care_location_postcode, reference]) \
+                        and not (application_type or not settings.ENABLE_NANNIES):
+                    context['empty_error'] = True
+                    context['error_title'] = 'There was a problem with your search'
+                    context['error_text'] = 'Please use at least one filter'
+                    return render(request, SEARCH_TEMPLATE_PATH, context)
 
                 search_results = SearchService.search(name, dob, home_postcode, care_location_postcode, reference,
                                                       application_type)
