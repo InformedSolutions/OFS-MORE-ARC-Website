@@ -4,6 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from django.views import View
 from django.utils.decorators import method_decorator
+from arc_service import settings
 
 from arc_application.services.application_handler import ChildminderApplicationHandler, GenericApplicationHandler, NannyApplicationHandler
 
@@ -19,10 +20,16 @@ class ARCUserSummaryView(View):
 
     def post(self, request):
 
-        if 'add_nanny_application' in request.POST:
-            app_handler = NannyApplicationHandler(arc_user=request.user)
+        if settings.ENABLE_NANNIES:
+            if 'add_nanny_application' in request.POST:
+                app_handler = NannyApplicationHandler(arc_user=request.user)
+        else:
+            context = self.get_context_data()
+            context['error_exist'] = 'true'
+            context['error_title'] = 'Nannies application review is disabled'
+            context['error_text'] = 'Nannies applications cannot be reviewed at this time.'
 
-        elif 'add_childminder_application' in request.POST:
+        if 'add_childminder_application' in request.POST:
             app_handler = ChildminderApplicationHandler(arc_user=request.user)
 
         try:
@@ -45,9 +52,16 @@ class ARCUserSummaryView(View):
 
     def get_context_data(self):
         context = dict()
-        context['entries'] = GenericApplicationHandler(arc_user=self.request.user).get_all_table_data()
+        if settings.ENABLE_NANNIES:
+            entries = GenericApplicationHandler(arc_user=self.request.user).get_all_table_data()
+        else:
+            entries = ChildminderApplicationHandler(arc_user=self.request.user).get_all_table_data()
+
+        context['entries'] = entries
 
         if not len(context['entries']):
             context['empty'] = 'true'
+
+        context['enable_nannies'] = settings.ENABLE_NANNIES
 
         return context

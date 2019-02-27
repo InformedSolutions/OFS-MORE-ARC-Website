@@ -1507,10 +1507,6 @@ class SearchForm(GOVUKForm):
     dob_search_field = forms.CharField(label='Date of birth', required=False, help_text='e.g. 31 03 1980')
     home_postcode_search_field = forms.CharField(label='Home postcode', required=False)
     care_location_postcode_search_field = forms.CharField(label='Work postcode', required=False)
-    application_type_dropdown_search_field = forms.ChoiceField(label='Application type',
-                                                               choices=choices,
-                                                               required=False,
-                                                               widget=Select)
 
     def __init__(self, *args, **kwargs):
         """
@@ -1518,6 +1514,11 @@ class SearchForm(GOVUKForm):
         :param args: arguments passed to the form
         :param kwargs: keyword arguments passed to the form, e.g. application ID
         """
+        if settings.ENABLE_NANNIES:
+            self.base_fields['application_type_dropdown_search_field'] = forms.ChoiceField(label='Application type',
+                                                                                           choices=self.choices,
+                                                                                           required=False,
+                                                                                           widget=Select)
         super(SearchForm, self).__init__(*args, **kwargs)
 
     def clean(self):

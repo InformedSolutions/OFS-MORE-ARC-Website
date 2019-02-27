@@ -14,7 +14,12 @@ NOTIFY_URL = os.environ.get('APP_NOTIFY_URL')
 # Base URL of addressing-service gateway
 ADDRESSING_URL = os.environ.get('APP_ADDRESSING_URL')
 
+# Base URL of DBS-api application
 DBS_URL = os.environ.get('APP_DBS_URL')
+
+# Bool to determine whether to enable or disable nanny applications showing
+# Default: False
+ENABLE_NANNIES = os.environ.get('ENABLE_NANNIES') in [True, 'True']
 
 # Address of Childminder application
 CHILDMINDER_EMAIL_VALIDATION_URL = os.environ.get('CHILDMINDER_EMAIL_VALIDATION_URL')

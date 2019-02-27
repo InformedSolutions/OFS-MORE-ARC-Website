@@ -103,19 +103,25 @@ urlpatterns = [
         name='nanny_update_add_number'),
     url(r'^personal-details/previous-registration', PreviousRegistrationDetailsView.as_view(),
         name='previous_registration_details'),
-
-    # nanny application review
-    url(r'^nanny/review/', NannyTaskList.as_view(), name='nanny_task_list'),
-    url(r'^nanny/contact-details/', NannyContactDetailsSummary.as_view(), name='nanny_contact_summary'),
-    url(r'^nanny/personal-details/', NannyPersonalDetailsSummary.as_view(), name='nanny_personal_details_summary'),
-    url(r'^nanny/childcare-address/', NannyChildcareAddressSummary.as_view(), name='nanny_childcare_address_summary'),
-    url(r'^nanny/first-aid-training/', NannyFirstAidTrainingSummary.as_view(), name='nanny_first_aid_training_summary'),
-    url(r'^nanny/childcare-training/', NannyChildcareTrainingSummary.as_view(), name='nanny_childcare_training_summary'),
-    url(r'^nanny/dbs/', NannyDbsCheckSummary.as_view(), name='nanny_dbs_summary'),
-    url(r'^nanny/insurance-cover/', NannyInsuranceCoverSummary.as_view(), name='nanny_insurance_cover_summary'),
-    url(r'^nanny/arc-summary/$', NannyArcSummary.as_view(), name='nanny_arc_summary'),
-    url(r'^nanny/arc-summary/confirmation', NannyArcSummaryConfirmation.as_view(), name='nanny_confirmation')
 ]
+
+# nanny application review
+if settings.ENABLE_NANNIES:
+    urlpatterns += [
+        url(r'^nanny/review/', NannyTaskList.as_view(), name='nanny_task_list'),
+        url(r'^nanny/contact-details/', NannyContactDetailsSummary.as_view(), name='nanny_contact_summary'),
+        url(r'^nanny/personal-details/', NannyPersonalDetailsSummary.as_view(), name='nanny_personal_details_summary'),
+        url(r'^nanny/childcare-address/', NannyChildcareAddressSummary.as_view(),
+            name='nanny_childcare_address_summary'),
+        url(r'^nanny/first-aid-training/', NannyFirstAidTrainingSummary.as_view(),
+            name='nanny_first_aid_training_summary'),
+        url(r'^nanny/childcare-training/', NannyChildcareTrainingSummary.as_view(),
+            name='nanny_childcare_training_summary'),
+        url(r'^nanny/dbs/', NannyDbsCheckSummary.as_view(), name='nanny_dbs_summary'),
+        url(r'^nanny/insurance-cover/', NannyInsuranceCoverSummary.as_view(), name='nanny_insurance_cover_summary'),
+        url(r'^nanny/arc-summary/$', NannyArcSummary.as_view(), name='nanny_arc_summary'),
+        url(r'^nanny/arc-summary/confirmation', NannyArcSummaryConfirmation.as_view(), name='nanny_confirmation')
+    ]
 
 if settings.URL_PREFIX:
     prefixed_url_pattern = []

@@ -23,10 +23,15 @@
 <p>Review a new application:</p>
 <form action="" method="post">
     {% csrf_token %}
+
+    {% if enable_nannies %}
     <input name='add_nanny_application' type="submit" class="button" value="Add nanny application" alt='Add nanny application'>
     <br>
     <br>
+    {% endif %}
+
     <input name='add_childminder_application' type="submit" class="button" value="Add childminder application" alt='Add childminder application'>
+
 </form>
 <div class="top-padded">
     {% if empty != "true" %}
