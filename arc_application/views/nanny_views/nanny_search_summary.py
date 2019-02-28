@@ -43,6 +43,9 @@ class NannySearchSummary(View):
                         context_function_list if
                         context_func]
 
+        # Remove None values
+        context_list = [context_dict for context_dict in context_list if context_dict]
+
         # Remove all change_links
         for context_dict in context_list:
             context_dict['change_link'] = None
