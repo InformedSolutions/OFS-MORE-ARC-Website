@@ -43,6 +43,10 @@ class NannySearchSummary(View):
                         context_function_list if
                         context_func]
 
+        # Remove all change_links
+        for context_dict in context_list:
+            context_dict['change_link'] = None
+
         # Custom change_links for each individual field within the contact_details_context
         # This context is assumed to be at context_list[0].
         context_list[0]['search_table'] = True
