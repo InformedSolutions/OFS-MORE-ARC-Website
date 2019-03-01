@@ -99,8 +99,7 @@ personal_details_fields = [
     'name',
     'date_of_birth',
     'known_to_social_services',
-    'reasons_known_to_social_services',
-    'your_children',
+    'reasons_known_to_social_services'
 ]
 
 home_address_fields = [

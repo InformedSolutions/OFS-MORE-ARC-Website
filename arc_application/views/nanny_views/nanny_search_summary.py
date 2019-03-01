@@ -66,7 +66,6 @@ class NannySearchSummary(View):
         # Remove 'Review: ' from page titles.
         for context in valid_context_list:
             context['title'] = context['title'][7:]
-            context['change_link'] = context['change_link'][6:]
 
         context = {
             'application_id': application_id,
