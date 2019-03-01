@@ -49,8 +49,6 @@ class NannyPersonalDetailsSummary(NannyARCFormView):
         county = home_address['county']
         postcode = home_address['postcode']
 
-        lived_abroad = personal_details['lived_abroad']
-
         known_to_social_services = personal_details['known_to_social_services']
 
         reasons_known_to_social_services = personal_details['reasons_known_to_social_services']
@@ -93,19 +91,13 @@ class NannyPersonalDetailsSummary(NannyARCFormView):
                     }
                 },
                 {
-                    'id': 'lived_abroad',
-                    'name': 'Have you lived abroad in the last 5 years?',
-                    'info': lived_abroad,
-                    'declare': personal_details_form['lived_abroad_declare'] if hasattr(self, 'request') else '',
-                    'comments': personal_details_form['lived_abroad_comments'],
-                },
-                {
                     'id': 'known_to_social_services',
                     'name': 'Known to council social Services?',
                     'info': known_to_social_services,
                     'declare': personal_details_form['known_to_social_services_declare'] if hasattr(self,
                                                                                                     'request') else '',
                     'comments': personal_details_form['known_to_social_services_comments'],
+
                 }
             ]
         }

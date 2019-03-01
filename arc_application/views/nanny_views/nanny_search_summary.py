@@ -52,6 +52,7 @@ class NannySearchSummary(View):
 
         # Custom change_links for each individual field within the contact_details_context
         # This context is assumed to be at context_list[0].
+
         context_list[0]['search_table'] = True
         context_list[0]['rows'][0]['change_link'] = 'nanny_update_email_address'
         context_list[0]['rows'][1]['change_link'] = 'nanny_update_phone_number'

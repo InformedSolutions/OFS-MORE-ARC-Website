@@ -89,8 +89,6 @@ class NannyAuditLogRoutingTests(TestCase):
         #                      'name_comments': 'Flag name',
         #                      'date_of_birth_declare': 'on',
         #                      'date_of_birth_comments': 'Flag DoB',
-        #                      'lived_abroad_declare': 'on',
-        #                      'lived_abroad_comments': 'Flag lived abroad',
         #                  })
         #
         # self.assertTrue(mock_create.called_with('timeline-log', params={}))

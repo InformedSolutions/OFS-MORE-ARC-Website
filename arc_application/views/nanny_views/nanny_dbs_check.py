@@ -21,9 +21,7 @@ class NannyDbsCheckSummary(NannyARCFormView):
         nanny_actions = NannyGatewayActions()
         dbs_record = nanny_actions.read('dbs-check', params={'application_id': application_id}).record
 
-
         dbs_page_link = 'dbs:Capita-DBS-Details-View'
-
 
         lived_abroad = dbs_record['lived_abroad']
         is_ofsted_dbs = dbs_record['is_ofsted_dbs']
