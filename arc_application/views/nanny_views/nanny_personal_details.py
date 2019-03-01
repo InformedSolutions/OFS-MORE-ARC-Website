@@ -53,8 +53,6 @@ class NannyPersonalDetailsSummary(NannyARCFormView):
 
         reasons_known_to_social_services = personal_details['reasons_known_to_social_services']
 
-        your_children = personal_details['your_children']
-
         forms = self.get_forms()
         personal_details_form = forms[0]
         home_address_form = forms[1]
@@ -93,12 +91,12 @@ class NannyPersonalDetailsSummary(NannyARCFormView):
                     }
                 },
                 {
-                    'id': 'your_children',
-                    'name': 'Do you have children of your own under 16?',
-                    'info': your_children,
-                    'declare': personal_details_form['your_children_declare'] if hasattr(self, 'request') else '',
-                    'comments': personal_details_form['your_children_comments'],
-
+                    'id': 'known_to_social_services',
+                    'name': 'Known to council social Services?',
+                    'info': known_to_social_services,
+                    'declare': personal_details_form['known_to_social_services_declare'] if hasattr(self,
+                                                                                                    'request') else '',
+                    'comments': personal_details_form['known_to_social_services_comments'],
                 }
             ]
         }

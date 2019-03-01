@@ -52,16 +52,21 @@ class NannySearchSummary(View):
 
         # Custom change_links for each individual field within the contact_details_context
         # This context is assumed to be at context_list[0].
+
         context_list[0]['search_table'] = True
         context_list[0]['rows'][0]['change_link'] = 'nanny_update_email_address'
         context_list[0]['rows'][1]['change_link'] = 'nanny_update_phone_number'
         context_list[0]['rows'][2]['change_link'] = 'nanny_update_add_number'
+
+
+
 
         valid_context_list = [context for context in context_list if context]
 
         # Remove 'Review: ' from page titles.
         for context in valid_context_list:
             context['title'] = context['title'][7:]
+            context['change_link'] = context['change_link'][6:]
 
         context = {
             'application_id': application_id,
