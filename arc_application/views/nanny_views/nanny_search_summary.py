@@ -58,9 +58,6 @@ class NannySearchSummary(View):
         context_list[0]['rows'][1]['change_link'] = 'nanny_update_phone_number'
         context_list[0]['rows'][2]['change_link'] = 'nanny_update_add_number'
 
-
-
-
         valid_context_list = [context for context in context_list if context]
 
         # Remove 'Review: ' from page titles.
