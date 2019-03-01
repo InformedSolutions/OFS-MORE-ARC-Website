@@ -8,7 +8,7 @@ from timeline_logger.models import TimelineLog
 from arc_application.decorators import group_required, user_assigned_application
 from arc_application.models import *
 from arc_application.summary_page_data import link_dict
-from .review import review, has_group
+from ...utils import has_group
 
 """
     to merge multiple models inside a table, represent them as a list within the ordered_models list.
@@ -123,7 +123,9 @@ def arc_summary(request):
         status = Arc.objects.get(pk=application_id_local)
         status.declaration_review = 'COMPLETED'
         status.save()
-        return review(request)
+        return HttpResponseRedirect(
+            reverse('review') + '?id=' + application_id_local
+        )
 
 
 @login_required
