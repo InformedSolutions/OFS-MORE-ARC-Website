@@ -1,11 +1,14 @@
+import base64
 import time
 from datetime import datetime
 
+import requests
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
+from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.views import View
 
@@ -434,5 +437,41 @@ def __create_full_application_export(application_id):
 
     user_details = UserDetails.objects.filter(application_id=application_id)
     export['user_details'] = serializers.serialize('json', list(user_details))
+
+    # Create document exports
+
+    documents = {}
+
+    # Create endpoint URL location
+    eyc_endpoint = reverse('application_summary_pdf') + '?id=' + application_id
+
+    # Retrieve document
+    file_result = requests.get(eyc_endpoint, allow_redirects=True)
+    base64_string = str(base64.b64encode(file_result.content).decode("utf-8"))
+
+    documents['EYC'] = base64_string
+
+    if len(adults_in_home):
+
+        adult_documents = {}
+
+        for adult in adults_in_home:
+            endpoint = reverse('application_summary_pdf_adult') + '?id=' \
+                       + application_id + '&adult_id=' + adult.adult_id
+
+            # Retrieve document
+            file_result = requests.get(endpoint, allow_redirects=True)
+            base64_string = str(base64.b64encode(file_result.content).decode("utf-8"))
+
+            adult_document_object = {
+                "adult_id": adult.adult_id,
+                "document": base64_string,
+            }
+
+            adult_documents.update(adult_document_object)
+
+        documents['EY2'] = adult_documents
+
+    export['documents'] = documents
 
     return export
