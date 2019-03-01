@@ -12,11 +12,11 @@ from ...forms.childminder_forms.form import AdultInYourHomeForm, ChildInYourHome
     OtherPersonPreviousNames, \
     ChildForm, ChildAddressForm
 from ...models import ChildInHome, AdultInHome, Arc, Application, PreviousAddress, ChildAddress, \
-    OtherPersonPreviousRegistrationDetails, HealthCheckCurrent, HealthCheckSerious, HealthCheckHospital, ChildcareType, \
-    Child, ApplicantHomeAddress
+    OtherPersonPreviousRegistrationDetails, HealthCheckCurrent, HealthCheckSerious, HealthCheckHospital, \
+    ChildcareType, Child, ApplicantHomeAddress
 from ...models.previous_name import PreviousName
 from ...review_util import request_to_comment, save_comments, redirect_selection, build_url
-from ...views import other_people_initial_population, children_initial_population, children_address_initial_population
+from .review import other_people_initial_population, children_initial_population, children_address_initial_population
 
 
 @login_required

@@ -5,7 +5,7 @@ from arc_application.forms.update_detail_forms.update_contact_details import Nan
     NannyUpdateAddPhoneNumber
 from arc_application.review_util import build_url
 from arc_application.services.db_gateways import IdentityGatewayActions
-from arc_application.views import has_group
+from arc_application.views.childminder_views.review import has_group
 
 
 class NannyChangeDetails(FormView):

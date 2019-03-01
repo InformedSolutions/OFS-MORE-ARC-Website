@@ -1,6 +1,6 @@
 from django.views import View
 
-from arc_application.views import cc_summary
+from arc_application.views.childminder_views.arc_summary import cc_summary
 from arc_application.views.nanny_views.nanny_search_summary import NannySearchSummary
 
 

@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
@@ -7,7 +9,7 @@ from django.views import View
 from arc_application.services.arc_comments_handler import update_returned_application_statuses
 from arc_application.services.nanny_email_helpers import send_accepted_email, send_returned_email
 from arc_application.services.nanny_view_helpers import nanny_all_completed
-from arc_application.views.base import log_applcation_release
+from arc_application.views.base import release_application
 from arc_application.views.nanny_views.nanny_your_children import NannyYourChildrenSummary
 from .nanny_childcare_address import NannyChildcareAddressSummary
 from .nanny_childcare_training import NannyChildcareTrainingSummary
@@ -24,6 +26,7 @@ from ...services.db_gateways import NannyGatewayActions, IdentityGatewayActions
 @method_decorator(login_required, name='get')
 @method_decorator(login_required, name='post')
 class NannyArcSummary(View):
+
     TEMPLATE_NAME = 'nanny_arc_summary.html'
     FORM_NAME = ''
     REDIRECT_NAME = 'nanny_confirmation'
@@ -51,19 +54,12 @@ class NannyArcSummary(View):
 
         if no_flags_exist:
             send_accepted_email(**email_personalisation)
-            nanny_application['application_status'] = 'ACCEPTED'
+            release_application(request, application_id, 'ACCEPTED')
         else:
             send_returned_email(application_id, **email_personalisation)
-            nanny_application['application_status'] = 'FURTHER_INFORMATION'
-
-        update_response = NannyGatewayActions().put('application', params=nanny_application)
-
-        if update_response.status_code != 200:
-            raise BrokenPipeError('Failed to update nanny_application status')
+            release_application(request, application_id, 'FURTHER_INFORMATION')
 
         update_returned_application_statuses(application_id)
-        log_applcation_release(request, arc_application, nanny_application, nanny_application['application_status'])
-        arc_application.delete()
 
         return HttpResponseRedirect(redirect_address)
 
