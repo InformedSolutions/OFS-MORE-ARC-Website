@@ -53,6 +53,8 @@ class NannyPersonalDetailsSummary(NannyARCFormView):
 
         reasons_known_to_social_services = personal_details['reasons_known_to_social_services']
 
+        your_children = personal_details['your_children']
+
         forms = self.get_forms()
         personal_details_form = forms[0]
         home_address_form = forms[1]
@@ -97,6 +99,7 @@ class NannyPersonalDetailsSummary(NannyARCFormView):
                     'declare': personal_details_form['known_to_social_services_declare'] if hasattr(self,
                                                                                                     'request') else '',
                     'comments': personal_details_form['known_to_social_services_comments'],
+
                 }
             ]
         }
