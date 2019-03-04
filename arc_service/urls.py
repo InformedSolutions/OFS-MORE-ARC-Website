@@ -19,9 +19,11 @@ from arc_application.views.childminder_views.first_aid_training import first_aid
 from arc_application.views.childminder_views.health_declaration_booklet import health_check_answers
 from arc_application.views.childminder_views.other_people_addresses import address_state_dispatcher
 from arc_application.views.childminder_views.other_people_in_home import other_people_summary, add_previous_name
-from arc_application.views.childminder_views.personal_details import personal_details_summary, add_applicant_previous_name
+from arc_application.views.childminder_views.personal_details import personal_details_summary, \
+    add_applicant_previous_name
 from arc_application.views.childminder_views.references import references_summary
-from arc_application.views.childminder_views import review, PreviousRegistrationDetailsView, OtherPersonPreviousRegistrationDetailsView
+from arc_application.views.childminder_views.review import review, PreviousRegistrationDetailsView, \
+    OtherPersonPreviousRegistrationDetailsView
 from arc_application.views.childminder_views.task_list import task_list
 from arc_application.views.childminder_views.type_of_childcare import type_of_childcare_age_groups
 from arc_application.views.childminder_views.arc_summary import arc_summary
@@ -73,12 +75,14 @@ urlpatterns = [
         name='personal_details_previous_addresses'),
     url(r'^first-aid/summary/', first_aid_training_summary, name='first_aid_training_summary'),
     url(r'^dbs-check/summary/', dbs_check_summary, name='dbs_check_summary'),
-    url(r'^childcare-training-check/summary/', ChildcareTrainingCheckSummaryView.as_view(), name='childcare_training_check_summary'),
+    url(r'^childcare-training-check/summary/', ChildcareTrainingCheckSummaryView.as_view(),
+        name='childcare_training_check_summary'),
     url(r'^references/summary/', references_summary, name='references_summary'),
     url(r'^people/summary/', other_people_summary, name='other_people_summary'),
     url(r'^people/previous-names', add_previous_name, name='other-people-previous-names'),
     url(r'^people/previous-addresses', address_state_dispatcher, name='other-people-previous-addresses'),
-    url(r'^people/previous-registration$', OtherPersonPreviousRegistrationDetailsView.as_view(), name='other-people-previous-registration'),
+    url(r'^people/previous-registration$', OtherPersonPreviousRegistrationDetailsView.as_view(),
+        name='other-people-previous-registration'),
     url(r'^health/check-answers/', health_check_answers, name='health_check_answers'),
     url(r'^confirmation/', review, name='review'),
     url(r'^arc-summary/', arc_summary, name='arc-summary'),

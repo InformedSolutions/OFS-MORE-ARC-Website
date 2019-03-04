@@ -1,6 +1,6 @@
 import logging
 
-from datetime import datetime, timedelta
+from datetime import datetime, timezone
 from unittest.mock import patch, Mock
 
 from django.test import TestCase, tag
@@ -13,7 +13,15 @@ from arc_application import models
 
 log = logging.getLogger('')
 
-FLAGGED_STATUS = 'FLAGGED'
+ARC_STATUS_FLAGGED = 'FLAGGED'
+ARC_STATUS_COMPLETED = 'COMPLETED'
+
+APP_STATUS_FLAGGED = 'FLAGGED'
+APP_STATUS_NOT_STARTED = 'NOT_STARTED'
+APP_STATUS_COMPLETED = 'COMPLETED'
+APP_STATUS_FURTHER_INFO = 'FURTHER_INFORMATION'
+APP_STATUS_REVIEW = 'ARC_REVIEW'
+APP_STATUS_ACCEPTED = 'ACCEPTED'
 
 
 @tag('http')
@@ -31,6 +39,9 @@ class SignInDetailsPageFunctionalTests(TestCase):
         self.assertEqual(200, response.status_code)
         utils.assertView(response, 'contact_summary')
 
+    def test_submit_redirects_to_type_of_childcare_page_if_valid(self):
+        self.skipTest('testNotImplemented')
+
 
 @tag('http')
 class TypeOfChildcarePageFunctionalTests(TestCase):
@@ -46,6 +57,9 @@ class TypeOfChildcarePageFunctionalTests(TestCase):
 
         self.assertEqual(200, response.status_code)
         utils.assertView(response, 'type_of_childcare_age_groups')
+
+    def test_submit_redirects_to_personal_details_page_if_valid(self):
+        self.skipTest('testNotImplemented')
 
 
 @tag('http')
@@ -83,7 +97,7 @@ class PersonalDetailsPageFunctionalTests(TestCase):
 
         # 2. Ensure overall task status marked as FLAGGED in ARC view
         reloaded_arc_record = models.Arc.objects.get(pk=self.application.application_id)
-        self.assertEqual(reloaded_arc_record.personal_details_review, FLAGGED_STATUS)
+        self.assertEqual(reloaded_arc_record.personal_details_review, ARC_STATUS_FLAGGED)
 
         # 3. Check that comment has been correctly appended to application
         try:
@@ -102,6 +116,9 @@ class PersonalDetailsPageFunctionalTests(TestCase):
         # 4. Check flagged boolean indicator is set on the application record
         reloaded_application = models.Application.objects.get(pk=self.application.application_id)
         self.assertTrue(reloaded_application.personal_details_arc_flagged)
+
+    def test_submit_redirects_to_first_aid_page_if_valid(self):
+        self.skipTest('testNotImplemented')
 
 
 @tag('http')
@@ -138,7 +155,7 @@ class FirstAidPageFunctionalTests(TestCase):
 
         # 2. Ensure overall task status marked as FLAGGED in ARC view
         reloaded_arc_record = models.Arc.objects.get(pk=self.application.application_id)
-        self.assertEqual(reloaded_arc_record.first_aid_review, FLAGGED_STATUS)
+        self.assertEqual(reloaded_arc_record.first_aid_review, ARC_STATUS_FLAGGED)
 
         # 3. Check that comment has been correctly appended to application
         try:
@@ -158,6 +175,9 @@ class FirstAidPageFunctionalTests(TestCase):
         reloaded_application = models.Application.objects.get(pk=self.application.application_id)
         self.assertTrue(reloaded_application.first_aid_training_arc_flagged)
 
+    def test_submit_redirects_to_childcare_training_page_if_valid(self):
+        self.skipTest('testNotImplemented')
+
 
 @tag('http')
 class ChildcareTrainingPageFunctionalTests(TestCase):
@@ -174,6 +194,9 @@ class ChildcareTrainingPageFunctionalTests(TestCase):
         self.assertEqual(200, response.status_code)
         utils.assertView(response, 'ChildcareTrainingCheckSummaryView')
 
+    def test_submit_redirects_to_health_declaration_page_if_valid(self):
+        self.skipTest('testNotImplemented')
+
 
 @tag('http')
 class HealthDeclarationPageFunctionalTests(TestCase):
@@ -189,6 +212,9 @@ class HealthDeclarationPageFunctionalTests(TestCase):
 
         self.assertEqual(200, response.status_code)
         utils.assertView(response, 'health_check_answers')
+
+    def test_submit_redirects_to_criminal_record_page_if_valid(self):
+        self.skipTest('testNotImplemented')
 
 
 @tag('http')
@@ -225,7 +251,7 @@ class CriminalRecordCheckPageFunctionalTests(TestCase):
 
         # 2. Ensure overall task status marked as FLAGGED in ARC view
         reloaded_arc_record = models.Arc.objects.get(pk=self.application.application_id)
-        self.assertEqual(reloaded_arc_record.dbs_review, FLAGGED_STATUS)
+        self.assertEqual(reloaded_arc_record.dbs_review, ARC_STATUS_FLAGGED)
 
         # 3. Check that comment has been correctly appended to application
         try:
@@ -244,6 +270,9 @@ class CriminalRecordCheckPageFunctionalTests(TestCase):
         # 4. Check flagged boolean indicator is set on the application record
         reloaded_application = models.Application.objects.get(pk=self.application.application_id)
         self.assertTrue(reloaded_application.criminal_record_check_arc_flagged)
+
+    def test_submit_redirects_to_people_in_home_page_if_valid(self):
+        self.skipTest('testNotImplemented')
 
 
 @tag('http')
@@ -463,7 +492,7 @@ class PeopleInTheHomeFunctionalTests(TestCase):
 
         # Ensure overall task status marked as FLAGGED in ARC record
         reloaded_arc_record = models.Arc.objects.get(pk=self.application.application_id)
-        self.assertEqual(reloaded_arc_record.people_in_home_review, FLAGGED_STATUS)
+        self.assertEqual(reloaded_arc_record.people_in_home_review, ARC_STATUS_FLAGGED)
 
         # Check that comment has been correctly appended to application
         arc_comments = models.ArcComments.objects.get(
@@ -478,6 +507,9 @@ class PeopleInTheHomeFunctionalTests(TestCase):
         # Check flagged boolean indicator is set on the application record
         reloaded_application = models.Application.objects.get(pk=self.application.application_id)
         self.assertTrue(reloaded_application.people_in_home_arc_flagged)
+
+    def test_submit_redirects_to_references_page_if_valid(self):
+        self.skipTest('testNotImplemented')
 
     def _make_post_data(self, adults=0, children=0, own_children=0, own_child_addresses=0):
         """Prepares dictionary of post data with necessary form-management fields"""
@@ -530,7 +562,7 @@ class ReferencesPageFunctionalTests(TestCase):
 
         # 2. Ensure overall task status marked as FLAGGED in ARC view
         reloaded_arc_record = models.Arc.objects.get(pk=self.application.application_id)
-        self.assertEqual(reloaded_arc_record.references_review, FLAGGED_STATUS)
+        self.assertEqual(reloaded_arc_record.references_review, ARC_STATUS_FLAGGED)
 
         # 3. Check that comment has been correctly appended to application
         try:
@@ -550,9 +582,12 @@ class ReferencesPageFunctionalTests(TestCase):
         reloaded_application = models.Application.objects.get(pk=self.application.application_id)
         self.assertTrue(reloaded_application.references_arc_flagged)
 
+    def test_submit_redirects_to_task_list_page_if_valid(self):
+        self.skipTest('testNotImplemented')
+
 
 @tag('http')
-class ChildminderReviewSummaryPageFunctionalTests(TestCase):
+class ReviewSummaryAndConfirmationFunctionalTests(TestCase):
 
     def setUp(self):
         self.arc_user = create_arc_user()
@@ -747,3 +782,103 @@ class ChildminderReviewSummaryPageFunctionalTests(TestCase):
         utils.assertSummaryField(response, 'On the update service?', 'No', heading='Freda Annabel Smith')
         utils.assertNotSummaryField(response, 'On the update service?', heading='Jim Bob Robertson')
 
+    class MockDatetime(datetime):
+        @staticmethod
+        def now():
+            return datetime(2019, 2, 27, 17, 30, 5)
+
+    @patch('arc_application.views.base.datetime', new=MockDatetime)
+    def test_submit_summary_releases_application_as_accepted_in_database_if_no_tasks_flagged(self):
+
+        APP_TASKS_ALL = ['login_details', 'personal_details', 'your_children', 'childcare_type', 'first_aid_training',
+                         'childcare_training', 'criminal_record_check', 'health', 'references', 'people_in_home']
+        ARC_TASKS_ALL = ['login_details', 'childcare_type', 'personal_details', 'your_children', 'first_aid',
+                         'childcare_training', 'dbs', 'health', 'references', 'people_in_home']
+
+        for task in APP_TASKS_ALL:
+            setattr(self.application, '{}_status'.format(task), APP_STATUS_COMPLETED)
+            setattr(self.application, '{}_arc_flagged'.format(task), False)
+
+        self.application.declarations_status = APP_STATUS_COMPLETED
+        self.application.declaration_confirmation = True
+        self.application.application_status = APP_STATUS_REVIEW
+        self.application.save()
+
+        arc = models.Arc.objects.get(application_id=self.application.pk)
+
+        for task in ARC_TASKS_ALL:
+            setattr(arc, '{}_review'.format(task), ARC_STATUS_COMPLETED)
+
+        arc.save()
+
+        # id must be both GET and POST parameter
+        self.client.post(reverse('arc-summary')+'?id='+self.application.pk, data={'id': self.application.pk})
+
+        refetched_application = models.Application.objects.get(pk=self.application.pk)
+        # in accepted status
+        self.assertEqual(datetime(2019, 2, 27, 17, 30, 5, tzinfo=timezone.utc), refetched_application.date_accepted)
+        self.assertEqual(APP_STATUS_ACCEPTED, refetched_application.application_status)
+        # declaration unchanged
+        self.assertEqual(APP_STATUS_COMPLETED, refetched_application.declarations_status)
+        self.assertTrue(refetched_application.declaration_confirmation)
+
+        # unassigned from arc user
+        refetched_arc = models.Arc.objects.get(pk=arc.pk)
+        self.assertTrue(refetched_arc.user_id in ('', None))
+
+    @patch('arc_application.views.base.datetime', new=MockDatetime)
+    def test_submit_summary_releases_application_as_needing_info_in_database_if_tasks_have_been_flagged(self):
+
+        ARC_TASKS_FLAGGED = ['childcare_type', 'personal_details']
+        ARC_TASKS_UNFLAGGED = ['login_details', 'your_children', 'first_aid', 'childcare_training', 'dbs', 'health',
+                               'references', 'people_in_home']
+        APP_TASKS_TO_BE_FLAGGED = ['personal_details', 'childcare_type']
+        APP_TASKS_NOT_TO_BE_FLAGGED = ['login_details',  'your_children',  'first_aid_training', 'childcare_training',
+                                       'criminal_record_check', 'health', 'references', 'people_in_home']
+        APP_TASKS_ALL = APP_TASKS_TO_BE_FLAGGED + APP_TASKS_NOT_TO_BE_FLAGGED
+
+        for task in APP_TASKS_ALL:
+            setattr(self.application, '{}_status'.format(task), APP_STATUS_COMPLETED)
+            setattr(self.application, '{}_arc_flagged'.format(task), False)
+
+        self.application.declarations_status = APP_STATUS_COMPLETED
+        self.application.declaration_confirmation = True
+        self.application.application_status = APP_STATUS_REVIEW
+        self.application.save()
+
+        arc = models.Arc.objects.get(application_id=self.application.pk)
+
+        for task in ARC_TASKS_UNFLAGGED:
+            setattr(arc, '{}_review'.format(task), ARC_STATUS_COMPLETED)
+
+        for task in ARC_TASKS_FLAGGED:
+            setattr(arc, '{}_review'.format(task), ARC_STATUS_FLAGGED)
+
+        arc.save()
+
+        # id must be both GET and POST parameter
+        self.client.post(reverse('arc-summary')+'?id='+self.application.pk, data={'id': self.application.pk})
+
+        refetched_application = models.Application.objects.get(pk=self.application.pk)
+        # not in accepted status
+        self.assertIsNone(refetched_application.date_accepted)
+        self.assertEqual(APP_STATUS_FURTHER_INFO, refetched_application.application_status)
+        # declaration has been reset
+        self.assertEqual(APP_STATUS_NOT_STARTED, refetched_application.declarations_status)
+        self.assertFalse(refetched_application.declaration_confirmation)
+
+        # flagged tasks recorded in application
+        for task in APP_TASKS_NOT_TO_BE_FLAGGED:
+            self.assertEqual(APP_STATUS_COMPLETED, getattr(refetched_application, '{}_status'.format(task)))
+        for task in APP_TASKS_TO_BE_FLAGGED:
+            self.assertEqual(APP_STATUS_FLAGGED, getattr(refetched_application, '{}_status'.format(task)))
+
+        # unassigned from arc user
+        refetched_arc = models.Arc.objects.get(pk=arc.pk)
+        self.assertTrue(refetched_arc.user_id in ('', None))
+
+        # flagged tasks still recorded in arc record
+        for task in ARC_TASKS_FLAGGED:
+            self.assertEqual(ARC_STATUS_FLAGGED, getattr(refetched_arc, '{}_review'.format(task)))
+        for task in ARC_TASKS_UNFLAGGED:
+            self.assertEqual(ARC_STATUS_COMPLETED, getattr(refetched_arc, '{}_review'.format(task)))

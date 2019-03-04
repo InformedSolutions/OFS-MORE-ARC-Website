@@ -8,7 +8,7 @@ from django.utils.http import urlencode
 from arc_application.forms.childminder_forms.form_helper import initial_data_filler, data_saver
 from ...forms.update_detail_forms.update_contact_details import UpdateEmail, UpdatePhoneNumber, UpdateAddPhoneNumber
 from arc_application.models import UserDetails, Application
-from arc_application.views import has_group
+from arc_application.views.childminder_views.review import has_group
 
 
 class ChangeDetails(View):

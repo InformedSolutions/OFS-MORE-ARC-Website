@@ -57,12 +57,6 @@ def review(request):
         # If successful
         release_application(request, application_id_local, 'ACCEPTED')
 
-        # Get fresh version of application as it will have been updated in method call
-        if Application.objects.filter(application_id=application_id_local).exists():
-            application = Application.objects.get(application_id=application_id_local)
-            application.date_accepted = datetime.now()
-            application.save()
-
         variables = {
             'application_id': application_id_local,
         }

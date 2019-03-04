@@ -127,10 +127,8 @@ childcare_training_fields = [
 
 dbs_check_fields = [
     'lived_abroad',
-    'is_ofsted_dbs',
     'on_dbs_update_service',
     'dbs_number',
-    'convictions',
     'enhanced_check',
     'within_three_months'
 ]
