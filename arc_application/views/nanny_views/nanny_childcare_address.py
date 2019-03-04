@@ -74,7 +74,7 @@ class NannyChildcareAddressSummary(NannyARCFormView):
                 },
                 {
                     'id': 'both_work_and_home_address',
-                    'name': 'Will you work and live at the same address?',
+                    'name': 'Do you currently live and work at the same address?',
                     'info': work_at_home_bool,
                     'declare': where_you_will_work_form['both_work_and_home_address_declare'] if hasattr(self, 'request') else '',
                     'comments': where_you_will_work_form['both_work_and_home_address_comments']

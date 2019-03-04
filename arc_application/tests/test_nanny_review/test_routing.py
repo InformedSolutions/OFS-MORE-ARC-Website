@@ -3,12 +3,13 @@ from unittest.mock import patch
 
 from django.test import tag, TestCase
 from django.urls import reverse, resolve
+from django.conf import settings
 
 from arc_application.models import Arc
 from arc_application.services.db_gateways import NannyGatewayActions, IdentityGatewayActions
 from arc_application.views import NannyDbsCheckSummary, NannyContactDetailsSummary, NannyArcSummary, \
     NannyPersonalDetailsSummary, NannyChildcareAddressSummary, NannyFirstAidTrainingSummary, \
-    NannyChildcareTrainingSummary, NannyInsuranceCoverSummary, NannyTaskList, NannyYourChildrenSummary
+    NannyChildcareTrainingSummary, NannyInsuranceCoverSummary, NannyTaskList
 from arc_application.tests import utils
 
 
@@ -27,6 +28,7 @@ APP_STATUS_ACCEPTED = 'ACCEPTED'
 class NannyReviewFuncTestsBase(TestCase):
 
     def setUp(self):
+
         # make sure we're logged in as an arc user for each test
         self.arc_user = utils.create_arc_user()
         self.client.login(username='arc_test', password='my_secret')
@@ -151,7 +153,8 @@ class ReviewPersonalDetailsTests(NannyReviewFuncTestsBase):
             'date_of_birth',
             'lived_abroad',
             'home_address',
-            'your_children',
+            'known_to_social_services',
+            'reasons_known_to_social_services'
         ]
 
         post_data = self._create_post_data(fields_to_flag)
@@ -173,7 +176,8 @@ class ReviewPersonalDetailsTests(NannyReviewFuncTestsBase):
             'date_of_birth',
             'lived_abroad',
             'home_address',
-            'your_children',
+            'known_to_social_services',
+            'reasons_known_to_social_services'
         ]
 
         post_data = self._create_post_data(fields_to_flag)
@@ -196,61 +200,8 @@ class ReviewPersonalDetailsTests(NannyReviewFuncTestsBase):
 
         self.assertEqual(Arc.objects.get(pk=self.test_app_id).personal_details_review, 'COMPLETED')
 
-    def test_personal_details_redirects_to_the_your_children_page_if_your_children_is_true(self):
-        """
-        Test that a POST request to the personal details page redirects to the your children details page.
-        """
-        response = self.client.post(reverse('nanny_personal_details_summary') + '?id=' + self.test_app_id)
-
-        self.assertEqual(response.status_code, 302)
-        utils.assertRedirectView(response, NannyYourChildrenSummary.as_view())
-
-    def test_personal_details_redirects_to_the_childcare_address_page_if_your_children_is_false(self):
+    def test_submit_redirects_to_childcare_address_page_if_valid(self):
         self.skipTest('testNotImplemented')
-
-
-class ReviewYourChildrenDetailsTests(NannyReviewFuncTestsBase):
-
-    def test_can_render_your_children_details_page(self):
-        """
-        Test to ensure that the page for flagging your children details can be rendered.
-        """
-        response = self.client.get(reverse('nanny_your_children_summary') + '?id=' + self.test_app_id)
-
-        self.assertEqual(response.status_code, 200)
-        utils.assertView(response, NannyYourChildrenSummary.as_view())
-
-    def test_flagging_your_children_details_sets_status_to_flagged(self):
-        self.skipTest('testNotImplemented')
-
-    def test_flagging_your_children_details_creates_arc_comments(self):
-        self.skipTest('testNotImplemented')
-
-    def test_not_flagging_your_children_details_sets_status_to_reviewed(self):
-        self.client.post(reverse('nanny_your_children_summary') + '?id=' + self.test_app_id,
-                         data={
-                             'id': self.test_app_id,
-                             'form-TOTAL_FORMS': '2',
-                             'form-INITIAL_FORMS': '2',
-                             'form-MAX_NUM_FORMS': '2',
-                         })
-
-        self.assertEqual(Arc.objects.get(pk=self.test_app_id).your_children_review, 'COMPLETED')
-
-    def test_your_children_redirects_to_the_childcare_address_page(self):
-        """
-        Test that a POST request to the personal details page redirects to the childcare address details page.
-        """
-        response = self.client.post(reverse('nanny_your_children_summary') + '?id=' + self.test_app_id,
-                                    data={
-                                        'id': self.test_app_id,
-                                        'form-TOTAL_FORMS': '2',
-                                        'form-INITIAL_FORMS': '2',
-                                        'form-MAX_NUM_FORMS': '2',
-                                    })
-
-        self.assertEqual(response.status_code, 302)
-        utils.assertRedirectView(response, NannyChildcareAddressSummary.as_view())
 
 
 class ReviewChildcareAddressTests(NannyReviewFuncTestsBase):
@@ -478,6 +429,7 @@ class ReviewCriminalRecordTests(NannyReviewFuncTestsBase):
     def test_flagging_criminal_record_checks_details_creates_arc_comments(self):
         fields_to_flag = [
             'dbs_number',
+            'on_dbs_update_service',
         ]
 
         post_data = self._create_post_data(fields_to_flag)
@@ -600,9 +552,9 @@ class ReviewSummaryAndConfirmationFunctionalTests(NannyReviewFuncTestsBase):
         self.ngw_patch_mock.side_effect = record_field_updates
 
         APP_TASKS_ALL = ['childcare_address', 'childcare_training', 'dbs', 'first_aid', 'insurance_cover',
-                         'login_details', 'personal_details', 'your_children']
+                         'login_details', 'personal_details']
         ARC_TASKS_ALL = ['childcare_address', 'childcare_training', 'dbs', 'first_aid', 'insurance_cover',
-                         'login_details', 'personal_details', 'your_children']
+                         'login_details', 'personal_details']
 
         for task in APP_TASKS_ALL:
             self.nanny_gateway.nanny_application['{}_status'.format(task)] = APP_STATUS_COMPLETED
@@ -650,12 +602,10 @@ class ReviewSummaryAndConfirmationFunctionalTests(NannyReviewFuncTestsBase):
         self.ngw_put_mock.side_effect = record_field_updates
         self.ngw_patch_mock.side_effect = record_field_updates
 
-        ARC_TASKS_FLAGGED = ['childcare_address', 'childcare_training', 'dbs', 'first_aid', 'insurance_cover',
-                             'login_details']
-        ARC_TASKS_UNFLAGGED = ['personal_details', 'your_children']
-        APP_TASKS_TO_BE_FLAGGED = ['childcare_address', 'childcare_training', 'dbs', 'first_aid', 'insurance_cover',
-                                   'login_details']
-        APP_TASKS_NOT_TO_BE_FLAGGED = ['personal_details', 'your_children']
+        ARC_TASKS_FLAGGED = ['childcare_address', 'childcare_training', 'dbs', 'insurance_cover', 'login_details']
+        ARC_TASKS_UNFLAGGED = ['personal_details', 'first_aid']
+        APP_TASKS_TO_BE_FLAGGED = ['childcare_address', 'childcare_training', 'dbs', 'insurance_cover', 'login_details']
+        APP_TASKS_NOT_TO_BE_FLAGGED = ['personal_details', 'first_aid']
         APP_TASKS_ALL = APP_TASKS_TO_BE_FLAGGED + APP_TASKS_NOT_TO_BE_FLAGGED
 
         for task in APP_TASKS_ALL:

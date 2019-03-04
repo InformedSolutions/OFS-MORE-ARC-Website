@@ -73,8 +73,6 @@ class StubNannyGatewayActions:
             'login_details_arc_flagged': False,
             'personal_details_status': 'NOT_STARTED',
             'personal_details_arc_flagged': False,
-            'your_children_status': 'NOT STARTED',
-            'your_children_arc_flagged': False,
             'childcare_address_status': 'COMPLETED',
             'childcare_address_arc_flagged': False,
             'first_aid_status': 'COMPLETED',
@@ -107,8 +105,8 @@ class StubNannyGatewayActions:
             'middle_names': '',
             'last_name': 'Selenium',
             'date_of_birth': '2000-01-01',
-            'lived_abroad': True,
-            'your_children': True
+            'known_to_social_services': True,
+            'reasons_known_to_social_services': 'An IMPORTANT reason'
         }
         self.personal_details_read_response = self.make_response(record=self.personal_details_record)
 
@@ -183,48 +181,6 @@ class StubNannyGatewayActions:
         }
         self.insurance_cover_read_response = self.make_response(record=self.insurance_cover_record)
 
-        self.your_children_record = [
-            {
-                "child_id": "ea55fae9-5f9f-421b-8adc-19aaad37016d",
-                "child": 1,
-                "lives_with_applicant": True,
-                "first_name": "Mr",
-                "middle_names": "",
-                "last_name": "Bump",
-                "birth_day": 1,
-                "birth_month": 1,
-                "birth_year": 2008,
-                "date_created": "2018-10-31T13:44:58.948231Z",
-                "street_line1": "FORTIS DEVELOPMENTS LTD, BANK HOUSE",
-                "street_line2": "OLD MARKET PLACE",
-                "town": "ALTRINCHAM",
-                "county": "",
-                "country": None,
-                "postcode": "WA14 4PA",
-                'application_id': '998fd8ec-b96b-4a71-a1a1-a7a3ae186729',
-            },
-            {
-                "child_id": "d02691ff-4050-4e42-bae8-c17c12ff0f27",
-                "child": 2,
-                "lives_with_applicant": False,
-                "first_name": "Mr",
-                "middle_names": "MIDDLE",
-                "last_name": "Happy",
-                "birth_day": 1,
-                "birth_month": 1,
-                "birth_year": 2010,
-                "date_created": "2018-10-31T13:45:16.802325Z",
-                "street_line1": "Palace",
-                "street_line2": "",
-                "town": "London",
-                "county": "",
-                "country": None,
-                "postcode": "SW1 1AA",
-                'application_id': '998fd8ec-b96b-4a71-a1a1-a7a3ae186729',
-            }
-        ]
-        self.your_children_read_response = self.make_response(record=self.your_children_record)
-
         self.declaration_record = {
             'application_id': '998fd8ec-b96b-4a71-a1a1-a7a3ae186729',
             'follow_rules': True,
@@ -259,7 +215,6 @@ class StubNannyGatewayActions:
             'declaration': 'declaration',
             'arc-comments': 'arc_comments',
             'timeline-log': 'timeline_log',
-            'your-children': 'your_children',
         }
 
     def list(self, endpoint, *args, **kwargs):

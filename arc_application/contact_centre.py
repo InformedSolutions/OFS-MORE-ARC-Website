@@ -30,7 +30,12 @@ def search(request):
     if (cc_user or arc_user) and request.user.is_authenticated():
 
         # Display all applications on search page
-        results = SearchService.search("", "", "", "", "", 'All')
+        if settings.ENABLE_NANNIES:
+            application_type = 'All'
+        else:
+            application_type = 'Childminder'
+
+        results = SearchService.search("", "", "", "", "", application_type)
 
         if results is not None and len(results) > 0:
             context['empty'] = False
@@ -50,10 +55,15 @@ def search(request):
                 home_postcode = form.cleaned_data['home_postcode_search_field']
                 care_location_postcode = form.cleaned_data['care_location_postcode_search_field']
                 reference = form.cleaned_data['reference_search_field']
-                application_type = form.cleaned_data['application_type_dropdown_search_field']
+
+                if settings.ENABLE_NANNIES:
+                    application_type = form.cleaned_data['application_type_dropdown_search_field']
+                else:
+                    application_type = 'Childminder'
 
                 # If no search terms have been entered
-                if not name and not dob and not home_postcode and not care_location_postcode and not reference and not application_type:
+                if not any([name, dob, home_postcode, care_location_postcode, reference]) \
+                        and not (application_type or not settings.ENABLE_NANNIES):
                     context['empty_error'] = True
                     context['error_title'] = 'There was a problem with your search'
                     context['error_text'] = 'Please use at least one filter'

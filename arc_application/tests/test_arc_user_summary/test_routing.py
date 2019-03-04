@@ -8,6 +8,8 @@ from django.test import tag, TestCase
 from django.urls import reverse
 
 from arc_application.models import Arc
+from arc_application.services.application_handler import NannyApplicationHandler
+from arc_application.services.db_gateways import NannyGatewayActions
 from arc_application.views.arc_user_summary import ARCUserSummaryView
 from arc_application.services.db_gateways import NannyGatewayActions
 from arc_application.services.application_handler import NannyApplicationHandler
@@ -76,7 +78,7 @@ class ArcUserSummaryPageFunctionalTests(TestCase):
         If we were to mock the Gateway response, this test will continue to pass even if the models are updated.
         Must therefore be an integration test.
         """
-        test_uuid = str(uuid4())
+        test_uuid = '395a2e0c-0d19-4998-95b9-ce6c3539c2be'
         NannyGatewayActions().create('application', params={'application_id': test_uuid})
         tasks_list = NannyApplicationHandler(arc_user=self.user)._list_tasks_for_review()
 
@@ -90,7 +92,6 @@ class ArcUserSummaryPageFunctionalTests(TestCase):
             'dbs',
             'first_aid',
             'insurance_cover',
-            'your_children'
         ]
 
         for task in tasks_list:

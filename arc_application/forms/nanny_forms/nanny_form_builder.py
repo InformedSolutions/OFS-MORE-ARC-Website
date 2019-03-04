@@ -98,8 +98,8 @@ sign_in_form_fields = [
 personal_details_fields = [
     'name',
     'date_of_birth',
-    'lived_abroad',
-    'your_children',
+    'known_to_social_services',
+    'reasons_known_to_social_services'
 ]
 
 home_address_fields = [
@@ -127,9 +127,10 @@ childcare_training_fields = [
 
 dbs_check_fields = [
     'lived_abroad',
-    'enhanced_check',
     'on_dbs_update_service',
     'dbs_number',
+    'enhanced_check',
+    'within_three_months'
 ]
 
 insurance_cover_fields = [
@@ -138,12 +139,6 @@ insurance_cover_fields = [
 
 children_living_with_you_fields = [
     'children_living_with_applicant_selection',
-]
-
-your_children_fields = [
-    'name',
-    'date_of_birth',
-    'address'
 ]
 
 
@@ -155,5 +150,4 @@ FirstAidForm              = NannyFormBuilder(first_aid_training_fields, api_endp
 ChildcareTrainingForm     = NannyFormBuilder(childcare_training_fields, api_endpoint_name='childcare-training').create_form()
 DBSForm                   = NannyFormBuilder(dbs_check_fields, api_endpoint_name='dbs-check').create_form()
 InsuranceCoverForm        = NannyFormBuilder(insurance_cover_fields, api_endpoint_name='insurance-cover').create_form()
-YourChildrenFormset       = NannyFormBuilder(your_children_fields, api_endpoint_name='your-children').create_formset()
 ChildrenLivingWithYouForm = NannyFormBuilder(children_living_with_you_fields, api_endpoint_name='application').create_form()
