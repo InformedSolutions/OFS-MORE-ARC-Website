@@ -790,6 +790,7 @@ class ReviewSummaryAndConfirmationFunctionalTests(TestCase):
         def now(cls):
             return datetime.datetime(2019, 2, 27, 17, 30, 5)
 
+    @skip
     @patch('datetime.datetime', new=MockDatetime)
     def test_submit_summary_releases_application_as_accepted_in_database_if_no_tasks_flagged(self):
 

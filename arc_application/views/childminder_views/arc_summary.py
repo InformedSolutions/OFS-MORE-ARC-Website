@@ -81,12 +81,13 @@ def get_application_summary_variables(application_id, apply_filtering_for_eyc=Fa
     A function for generating the summary page contents in the ARC view. Note that this is re-used by the
     document generation function so changes will be applied in both the UI and PDF exports.
     :param application_id: the unique identifier of the application
+    :param apply_filtering_for_eyc: a filter flag to exclude fields that should not appear in an EYC form
     :return: a variables object for use in Django templates including all application information
     (and similarly EYC form contents).
     """
 
-    ordered_models = [UserDetails, ChildcareType, [ApplicantPersonalDetails, ApplicantName], PreviousName, ApplicantHomeAddress, PreviousAddress,
-                      PreviousRegistrationDetails,
+    ordered_models = [UserDetails, ChildcareType, [ApplicantPersonalDetails, ApplicantName], PreviousName,
+                      ApplicantHomeAddress, PreviousAddress, PreviousRegistrationDetails,
                       FirstAidTraining, ChildcareTraining, CriminalRecordCheck]
 
     # Only display People in your Home tables if the applicant does not work in another childminder's home
