@@ -4,9 +4,9 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from django.views import View
 from django.utils.decorators import method_decorator
-from arc_service import settings
 
-from arc_application.services.application_handler import ChildminderApplicationHandler, GenericApplicationHandler, NannyApplicationHandler
+from ..services.application_handler import ChildminderApplicationHandler, GenericApplicationHandler, \
+    NannyApplicationHandler
 
 
 @method_decorator(login_required, name='get')

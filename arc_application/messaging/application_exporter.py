@@ -4,8 +4,9 @@ from django.conf import settings
 from django.core import serializers
 
 from ..models import Application, ApplicantName, ApplicantHomeAddress, ApplicantPersonalDetails,  AdultInHome, \
-    ChildInHome, PreviousName, PreviousAddress, HealthCheckHospital, HealthCheckSerious, HealthCheckCurrent, CriminalRecordCheck, \
-    ChildcareType, ChildcareTraining, FirstAidTraining, HealthDeclarationBooklet, PreviousRegistrationDetails, Reference, UserDetails
+    ChildInHome, PreviousName, PreviousAddress, HealthCheckHospital, HealthCheckSerious, HealthCheckCurrent, \
+    CriminalRecordCheck, ChildcareType, ChildcareTraining, FirstAidTraining, HealthDeclarationBooklet, \
+    PreviousRegistrationDetails, Reference, UserDetails
 
 from .document_generator import DocumentGenerator
 

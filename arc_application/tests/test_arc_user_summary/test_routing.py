@@ -1,4 +1,4 @@
-from unittest import mock
+from unittest import mock, skipUnless
 
 from django.conf import settings
 from django.contrib.auth.models import Group, User
@@ -68,6 +68,7 @@ class ArcUserSummaryPageFunctionalTests(TestCase):
     # ----------------------- #
 
     @tag('integration')
+    @skipUnless(settings.ENABLE_NANNIES, 'Skipping test as Nanny feature toggle equated to False')
     def test_list_nanny_tasks_to_review(self):
         """
         Test that the _list_tasks_for_review() method returns a complete list of tasks for review.
@@ -128,6 +129,7 @@ class ArcUserSummaryPageFunctionalTests(TestCase):
 
             self.assertNotContains(response, '<table class="table table-hover" id="request-table">', html=True)
 
+    @skipUnless(settings.ENABLE_NANNIES, 'Skipping test as Nanny feature toggle equated to False')
     def test_page_renders_with_error_if_no_nanny_apps_available(self):
         with mock.patch('arc_application.services.db_gateways.NannyGatewayActions.list') as mock_nanny_list:
 
@@ -155,6 +157,7 @@ class ArcUserSummaryPageFunctionalTests(TestCase):
     def test_assigns_childminder_app_if_one_available(self):
         self.skipTest('testNotImplemented')
 
+    @skipUnless(settings.ENABLE_NANNIES, 'Skipping test as Nanny feature toggle equated to False')
     def test_assigns_nanny_app_if_one_available(self):
         with mock.patch('arc_application.services.db_gateways.NannyGatewayActions.list') as mock_nanny_list, \
                 mock.patch('arc_application.services.db_gateways.NannyGatewayActions.read') as mock_nanny_read:

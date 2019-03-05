@@ -31,7 +31,6 @@ class DocumentGenerator:
         """
         resp = HttpResponse(content_type='application/pdf')
 
-
         application = Application.objects.get(application_id=application_id)
         application_reference = application.application_reference
 
