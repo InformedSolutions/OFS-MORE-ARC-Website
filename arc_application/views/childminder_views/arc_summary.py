@@ -5,9 +5,9 @@ from django.shortcuts import render
 from django.urls import reverse
 from timeline_logger.models import TimelineLog
 
-from arc_application.decorators import group_required, user_assigned_application
-from arc_application.models import *
-from arc_application.summary_page_data import link_dict
+from ...decorators import group_required, user_assigned_application
+from ...models import *
+from ...summary_page_data import link_dict
 from ...utils import has_group
 
 """
@@ -40,15 +40,8 @@ name_field_dict = {
     'Known to council social services in regards to their own children?': 'known_to_council',
     'reasons_known_health_check': 'reasons_known_to_council_health_check',
     'Do you have any criminal cautions or convictions?': 'cautions_convictions',
-    'Health questions status': 'health_check_status',
-    'Name': 'full_name',
-    'Date of birth': 'date_of_birth',
-    'Relationship': 'relationship',
-    'Email': 'email',
     'Does anyone aged 16 or over live or work in your home?': 'adults_in_home',
     'Do children under 16 live in the home?': 'children_in_home',
-    'known_pith': 'known_to_social_services_pith',
-    'reasons_known_pith': 'reasons_known_to_social_services_pith',
     'known_personal_details': 'known_to_social_services',
     'reasons_known_personal_details': 'reasons_known_to_social_services',
     'Full name': 'full_name',
@@ -59,12 +52,27 @@ name_field_dict = {
     'Email address': 'email_address',
     'What type of childcare training have you completed?': 'childcare_training',
     'Have you lived outside of the UK in the last 5 years?': 'lived_abroad',
-    'Lived abroad': 'lived_abroad',
     'Have you lived or worked on a British military base outside of the UK in the last 5 years?': 'military_base',
     'British Military Base': 'military_base',
-    'Did you get a DBS certificate from the Ofsted DBS application website in the last 3 months?': 'capita',
     'Ofsted DBS': 'capita',
-    'Are you on the DBS update service?': 'on_update',
+    'Is it dated within the last 3 months?': 'within_three_months',
+    'Is it an enhanced DBS check for home-based childcare?': 'enhanced_check',
+    'Known to council social Services?': 'known_to_social_services',
+
+    # PITH
+    'Health questions status': 'health_check_status',
+    'Name': 'full_name',
+    'Date of birth': 'date_of_birth',
+    'Relationship': 'relationship',
+    'Email': 'email',
+    'Lived abroad in the last 5 years?': 'lived_abroad',
+    'Lived or worked in British military base in the last 5 years?': 'military_base',
+    'Did they get their DBS check from the Ofsted DBS application website?': 'capita',
+    'Enhanced DBS check for home-based childcare?': 'enhanced_check',
+    'On the update service?': 'on_update',
+    'known_pith': 'known_to_social_services_pith',
+    'reasons_known_pith': 'reasons_known_to_social_services_pith',
+
 }
 
 
@@ -228,8 +236,6 @@ def add_comments(json, app_id):
                 else:
                     field = name_field_dict.get(name, '')
 
-
-
                 row['comment'] = get_comment(id, field)
                 row['link'] = reverse(label) + '?id=' + app_id
             row = row
@@ -298,6 +304,7 @@ def load_json(application_id_local, ordered_models, recurse, apply_filtering_for
             reasons_known_to_social_services = Application.objects.get(
                 application_id=application_id_local).reasons_known_to_social_services
 
+
             # If the home address is the same as the childcare address
             if home_address_record == childcare_address_record:
                 home_address = get_address(home_address_street_line1, home_address_street_line2, home_address_town,
@@ -312,7 +319,6 @@ def load_json(application_id_local, ordered_models, recurse, apply_filtering_for
                      "value": get_bool_as_string(working_in_other_childminder_home), 'pk': application_id_local,
                      "index": 5}
                 ])
-
 
 
             # If the address is only a home address
@@ -359,20 +365,10 @@ def load_json(application_id_local, ordered_models, recurse, apply_filtering_for
             # Only show People in the home tables when applicant is not working in another childminder's home
             if application.working_in_other_childminder_home is False:
 
-                if application.adults_in_home is True:
-
-                    adults_in_home = 'Yes'
-
-                else:
-
-                    adults_in_home = 'No'
-
                 table_list.append([
                     {"title": "Adults in the home", "id": application_id_local},
                     {"name": "Does anyone aged 16 or over live or work in your home?",
-                     "value": adults_in_home}
-
-
+                     "value": 'Yes' if application.adults_in_home else 'No'}
 
                 ])
 
@@ -381,7 +377,6 @@ def load_json(application_id_local, ordered_models, recurse, apply_filtering_for
             # Only show People in the home tables when applicant is not working in another childminder's home
             if application.working_in_other_childminder_home is False:
                 table_list.append(application.get_summary_table_child())
-
 
             # Only show People in the home tables when applicant is not working in another childminder's home
             if application.working_in_other_childminder_home is False:
@@ -404,7 +399,6 @@ def load_json(application_id_local, ordered_models, recurse, apply_filtering_for
                             {"name": "Known to council social services in regards to your own children?",
                              "value": get_bool_as_string(known_to_social_services_pith)}
                         ])
-
 
         elif model == PreviousName:
             records = model.objects.filter(person_id=application.pk)

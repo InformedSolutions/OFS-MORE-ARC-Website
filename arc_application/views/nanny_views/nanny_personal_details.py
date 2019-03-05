@@ -49,9 +49,9 @@ class NannyPersonalDetailsSummary(NannyARCFormView):
         county = home_address['county']
         postcode = home_address['postcode']
 
-        lived_abroad = personal_details['lived_abroad']
+        known_to_social_services = personal_details['known_to_social_services']
 
-        your_children = personal_details['your_children']
+        reasons_known_to_social_services = personal_details['reasons_known_to_social_services']
 
         forms = self.get_forms()
         personal_details_form = forms[0]
@@ -91,36 +91,30 @@ class NannyPersonalDetailsSummary(NannyARCFormView):
                     }
                 },
                 {
-                    'id': 'lived_abroad',
-                    'name': 'Have you lived abroad in the last 5 years?',
-                    'info': lived_abroad,
-                    'declare': personal_details_form['lived_abroad_declare'] if hasattr(self, 'request') else '',
-                    'comments': personal_details_form['lived_abroad_comments'],
-                },
-                {
-                    'id': 'your_children',
-                    'name': 'Do you have children of your own under 16?',
-                    'info': your_children,
-                    'declare': personal_details_form['your_children_declare'] if hasattr(self, 'request') else '',
-                    'comments': personal_details_form['your_children_comments'],
+                    'id': 'known_to_social_services',
+                    'name': 'Known to council social Services?',
+                    'info': known_to_social_services,
+                    'declare': personal_details_form['known_to_social_services_declare'] if hasattr(self,
+                                                                                                    'request') else '',
+                    'comments': personal_details_form['known_to_social_services_comments'],
 
                 }
             ]
         }
 
+        if known_to_social_services is True:
+            context['rows'].append(
+                {
+                    'id': 'reasons_known_to_social_services',
+                    'name': 'Tell us why',
+                    'info': reasons_known_to_social_services,
+                    'declare': personal_details_form['reasons_known_to_social_services_declare'] if hasattr(self,
+                                                                                                            'request') else '',
+                    'comments': personal_details_form['reasons_known_to_social_services_comments'],
+                }
+            )
+
         return context
 
     def get_success_url(self):
-        self.application_id = self.request.GET['id']
-
-        nanny_actions = NannyGatewayActions().read('applicant-personal-details',
-                                                   params={'application_id': self.application_id}).record
-        show_your_children = nanny_actions['your_children']
-
-        # If there is a record of a child within the model, link to the 'your children' task
-        if show_your_children:
-            return 'nanny_your_children_summary'
-
-        # If there are no children, link to the childcare address feature
-        else:
-            return 'nanny_childcare_address_summary'
+        return 'nanny_childcare_address_summary'

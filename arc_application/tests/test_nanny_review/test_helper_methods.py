@@ -1,12 +1,39 @@
-from unittest import skip
+import unittest
 
 from django.test import TestCase, tag
+from django.forms import Form
 
-from arc_application.models import Arc
+from ...models import Arc
+from ...services.nanny_view_helpers import *
+from ...forms.nanny_forms.nanny_form_builder import NannyFormBuilder
 
-from arc_application.services.nanny_view_helpers import *
 
-class NannyHelperTests(TestCase):
+@tag('unit')
+class NannyFlaggingUnitTests(unittest.TestCase):
+
+    def test_form_builder(self):
+        """
+        Test to assert that the form_builder functions as expected.
+        """
+        example_fields = [
+            'field_1',
+            'field_2',
+        ]
+
+        form = NannyFormBuilder(example_fields, api_endpoint_name='fake-endpoint').create_form()
+
+        self.assertIsInstance(form(), Form)
+
+        for field in example_fields:
+            self.assertIn(field + '_declare', form().fields)
+            self.assertIn(field + '_comments', form().fields)
+
+    def test_formset_builder(self):
+        self.skipTest('NotImplemented')
+
+
+@tag('unit')
+class NannyHelperUnitTests(TestCase):
     """
     Test suite for testing nanny helper functions
     """
@@ -61,21 +88,16 @@ class NannyHelperTests(TestCase):
             'insurance_cover_review': 'COMPLETED',
         }
 
-    @tag('unit')
     def test_parse_date_of_birth_correct(self):
         for test_case in self.dob_test_list_correct:
             self.assertTrue(testing_parse_date_of_birth(test_case))
 
-    @tag('unit')
-    @skip
     def test_check_all_task_statuses(self):
         mock_app = self.mock_arc_application_all_flagged
 
         self.assertTrue(testing_check_all_task_statuses(mock_app, self.application_id,
                                                         ['FLAGGED']))
 
-    @tag('unit')
-    @skip
     def test_nanny_all_completed(self):
 
         # Test all_completed with a MIXED dictionary asserts FALSE
@@ -87,8 +109,6 @@ class NannyHelperTests(TestCase):
         # Test all_completed with a FLAGGED dictionary asserts FALSE
         self.assertFalse(testing_all_completed(self.mock_arc_application_all_flagged, self.application_id))
 
-    @tag('unit')
-    @skip
     def test_nanny_all_reviewed(self):
 
         # Test all_reviewed with a MIXED dictionary asserts TRUE

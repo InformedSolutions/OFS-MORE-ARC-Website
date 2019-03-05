@@ -8,7 +8,7 @@ from django.test import TestCase, tag
 from arc_application.services.search_service import SearchService
 
 
-class SearchServiceTests(TestCase):
+class SearchServiceUnitTests(TestCase):
     """
     Test case for Nanny search tests.
     """

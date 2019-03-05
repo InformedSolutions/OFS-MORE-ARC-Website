@@ -1,5 +1,5 @@
-from uuid import UUID
 import logging
+from uuid import UUID
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
@@ -7,12 +7,12 @@ from django.forms import modelformset_factory
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 
-from ...forms.childminder_forms.form import PersonalDetailsForm, OtherPersonPreviousNames, PreviousRegistrationDetails
+from arc_application.decorators import group_required, user_assigned_application
 from arc_application.models import ApplicantPersonalDetails, ApplicantName, ApplicantHomeAddress, Arc, Application, \
     PreviousName, uuid4
 from arc_application.review_util import request_to_comment, save_comments, redirect_selection, build_url
 from arc_application.views.childminder_views.personal_details_addresses import get_stored_addresses
-from arc_application.decorators import group_required, user_assigned_application
+from ...forms.childminder_forms.form import PersonalDetailsForm, OtherPersonPreviousNames, PreviousRegistrationDetails
 
 logger = logging.getLogger()
 
@@ -27,6 +27,10 @@ def personal_details_summary(request):
     :param request: a request object used to generate the HttpResponse
     :return: an HttpResponse object with the rendered Your personal details: summary template
     """
+
+    def show_your_children_table(home_record, childcare_record):
+        return home_record != childcare_record
+
     application_id_local = request.GET["id"]
     personal_detail_id = (ApplicantPersonalDetails.objects.get(application_id=application_id_local)).personal_detail_id
     applicant_name_id = (ApplicantName.objects.get(personal_detail_id=personal_detail_id)).name_id
@@ -42,8 +46,10 @@ def personal_details_summary(request):
     CHILDCARE_ADDRESS_FIELDS = ['childcare_address_declare', 'childcare_address_comments']
     WORKING_IN_OTHER_CHILDMINDER_HOME_FIELDS = ['working_in_other_childminder_home_declare',
                                                 'working_in_other_childminder_home_comments']
-    OWN_CHILDREN_FIELDS = ['own_children_declare', 'own_children_comments', 'reasons_known_to_social_services_declare', 'reasons_known_to_social_services_comments']
-    REASONS_KNOWN_TO_SOCIAL_SERVICES_FIELDS = ['reasons_known_to_social_services_declare', 'reasons_known_to_social_services_comments']
+    OWN_CHILDREN_FIELDS = ['own_children_declare', 'own_children_comments', 'reasons_known_to_social_services_declare',
+                           'reasons_known_to_social_services_comments']
+    REASONS_KNOWN_TO_SOCIAL_SERVICES_FIELDS = ['reasons_known_to_social_services_declare',
+                                               'reasons_known_to_social_services_comments']
     PERSON_TYPE = 'APPLICANT'
 
     if request.method == 'GET':
@@ -108,7 +114,8 @@ def personal_details_summary(request):
             working_in_other_childminder_home_comments = request_to_comment(application_id_local, TABLE_NAMES[3],
                                                                             working_in_other_childminder_home_dict)
             own_children_comments = request_to_comment(application_id_local, TABLE_NAMES[3], own_children_dict)
-            reasons_known_to_social_services_comments = request_to_comment(application_id_local, TABLE_NAMES[3], own_children_dict)
+            reasons_known_to_social_services_comments = request_to_comment(application_id_local, TABLE_NAMES[3],
+                                                                           own_children_dict)
 
             birthdate_save_successful = save_comments(request, birthdate_comments)
             name_save_successful = save_comments(request, name_comments)
@@ -117,7 +124,8 @@ def personal_details_summary(request):
             working_in_other_childminder_home_save_successful = save_comments(request,
                                                                               working_in_other_childminder_home_comments)
             own_children_save_successful = save_comments(request, own_children_comments)
-            reasons_known_to_social_services_save_successful = save_comments(request, reasons_known_to_social_services_comments)
+            reasons_known_to_social_services_save_successful = save_comments(request,
+                                                                             reasons_known_to_social_services_comments)
 
             application = Application.objects.get(pk=application_id_local)
 
@@ -179,7 +187,6 @@ def personal_details_summary(request):
     previous_names = PreviousName.objects.filter(other_person_type=PERSON_TYPE, person_id=application_id_local)
     previous_addresses = get_stored_addresses(application_id_local, PERSON_TYPE)
 
-
     form.error_summary_title = 'There was a problem'
 
     variables = {
@@ -206,8 +213,9 @@ def personal_details_summary(request):
         'previous_names': previous_names,
         'previous_addresses': previous_addresses,
         'own_children': application.own_children,
-        'reasons_known_to_social_services' : application.reasons_known_to_social_services,
-        'working_in_other_childminder_home': working_in_other_childminder_home
+        'reasons_known_to_social_services': application.reasons_known_to_social_services,
+        'working_in_other_childminder_home': working_in_other_childminder_home,
+        'show_your_children_table': show_your_children_table(applicant_home_address_record, applicant_childcare_address_record)
     }
 
     try:

@@ -319,7 +319,7 @@
     </table>
 
     <a href="{% url 'personal_details_previous_addresses' %}?id={{ application_id }}&state=entry&person_id={{ application_id }}&person_type=APPLICANT" class = "button button-secondary">Add previous addresses</a>
- {% if childcare_address == "Same as home address" %}
+ {% if show_your_children_table %}
     <table class="check-your-answers form-group">
         <thead>
         <tr>

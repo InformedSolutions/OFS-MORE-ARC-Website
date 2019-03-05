@@ -6,6 +6,8 @@ ALLOWED_HOSTS = ['*']
 
 INSTALLED_APPS = BUILTIN_APPS + THIRD_PARTY_APPS + PROJECT_APPS
 
+ENABLE_NANNIES = os.environ.get('ENABLE_NANNIES') in ['true', True, 'True']
+
 # Database
 # https://docs.djangoproject.com/en/1.11/ref/settings/#databases
 

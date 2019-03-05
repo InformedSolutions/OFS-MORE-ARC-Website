@@ -8,19 +8,19 @@ from django.shortcuts import render
 from django.utils.decorators import method_decorator
 from django.views import View
 
-from arc_application.childminder_task_util import all_complete
-from arc_application.decorators import group_required, user_assigned_application
-from arc_application.forms.childminder_forms.form import AdultInYourHomeForm, ChildInYourHomeForm, \
+from ...childminder_task_util import all_complete
+from ...decorators import group_required, user_assigned_application
+from ...forms.childminder_forms.form import AdultInYourHomeForm, ChildInYourHomeForm, \
     OtherPersonPreviousRegistrationDetailsForm
-from arc_application.forms.childminder_forms.form import PreviousRegistrationDetailsForm, ChildForm, ChildAddressForm
-from arc_application.magic_link import generate_magic_link
-from arc_application.notify import send_email
-from arc_application.views.base import release_application
+from ...forms.childminder_forms.form import PreviousRegistrationDetailsForm, ChildForm, ChildAddressForm
+from ...magic_link import generate_magic_link
+from ...notify import send_email
+from ...views.base import release_application
 
 from ...messaging import ApplicationExporter
 
-from ...models import ApplicantName, ApplicantPersonalDetails, Application, Arc, ArcComments, ChildcareType, ChildcareTraining, UserDetails, OtherPersonPreviousRegistrationDetails, PreviousName, \
-PreviousRegistrationDetails, AdultInHome
+from ...models import ApplicantName, ApplicantPersonalDetails, Application, Arc, ArcComments, ChildcareType, \
+    UserDetails, OtherPersonPreviousRegistrationDetails, PreviousRegistrationDetails, AdultInHome
 
 decorators = [login_required, group_required(settings.ARC_GROUP), user_assigned_application]
 

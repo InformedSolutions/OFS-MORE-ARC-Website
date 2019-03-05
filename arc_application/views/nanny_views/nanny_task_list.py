@@ -1,10 +1,10 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
-from django.views import View
 from django.utils.decorators import method_decorator
+from django.views import View
 
-from arc_application.services.db_gateways import NannyGatewayActions
 from arc_application.models import Arc
+from arc_application.services.db_gateways import NannyGatewayActions
 from arc_application.services.nanny_view_helpers import parse_date_of_birth, \
     nanny_all_reviewed
 
@@ -15,7 +15,6 @@ class NannyTaskList(View):
     FORM_NAME = ''
 
     def get(self, request):
-
         # Get application ID
         application_id = request.GET["id"]
 
@@ -33,9 +32,9 @@ class NannyTaskList(View):
         # Get nanny information
         nanny_actions = NannyGatewayActions()
         nanny_application_dict = nanny_actions.read('application',
-                                            params={'application_id': application_id}).record
+                                                    params={'application_id': application_id}).record
         personal_details_dict = nanny_actions.read('applicant-personal-details',
-                                            params={'application_id': application_id}).record
+                                                   params={'application_id': application_id}).record
 
         arc_application = Arc.objects.get(application_id=application_id)
 
@@ -43,12 +42,10 @@ class NannyTaskList(View):
         first_name = personal_details_dict['first_name']
         middle_names = personal_details_dict['middle_names']
         last_name = personal_details_dict['last_name']
-        review_count = self.get_review_count(nanny_application_dict, arc_application, show_your_children=personal_details_dict['your_children'])
+        review_count = self.get_review_count(nanny_application_dict, arc_application)
 
         dob_str = personal_details_dict['date_of_birth']
         birth_list = parse_date_of_birth(dob_str)
-
-        show_your_children = personal_details_dict['your_children']
 
         # Set up context
         context = {
@@ -59,7 +56,7 @@ class NannyTaskList(View):
             'middle_names': middle_names,
             'last_name': last_name,
             'review_count': review_count,
-            'number_of_tasks': self.number_of_tasks(show_your_children=personal_details_dict['your_children']),
+            'number_of_tasks': self.number_of_tasks(),
             'login_details_status': arc_application.login_details_review,
             'personal_details_status': arc_application.personal_details_review,
             'your_children_status': arc_application.your_children_review,
@@ -72,13 +69,12 @@ class NannyTaskList(View):
             'birth_month': int(birth_list[1]),
             'birth_year': int(birth_list[0]),
             'all_complete': nanny_all_reviewed(arc_application, application_id),
-            'show_your_children': show_your_children
         }
 
         return context
 
     @staticmethod
-    def get_review_count(nanny_application, arc_application, show_your_children):
+    def get_review_count(nanny_application, arc_application):
         """
         :param nanny_application: The nanny_application record
         :param arc_application: The arc_application record
@@ -105,18 +101,12 @@ class NannyTaskList(View):
             'insurance_cover_arc_flagged'
         ]
 
-        if show_your_children:
-            review_fields_to_check.append('your_children_review')
-            flagged_fields_to_check.append('your_children_arc_flagged')
-
         review_count = sum([1 for field in review_fields_to_check if getattr(arc_application, field) == 'COMPLETED'])
         review_count += sum([1 for field in flagged_fields_to_check if nanny_application[field]])
 
         return review_count
 
     @staticmethod
-    def number_of_tasks(show_your_children):
-        if show_your_children:
-            return 8
-        else:
-            return 7
+    def number_of_tasks():
+        # TODO: Rethink purpose of this function
+        return 7

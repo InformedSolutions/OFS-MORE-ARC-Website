@@ -6,17 +6,17 @@ from django.forms import formset_factory, modelformset_factory
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 
-from arc_application.childminder_task_util import get_show_references
-from ...models.previous_name import PreviousName
-from ...forms.childminder_forms.form import AdultInYourHomeForm, ChildInYourHomeForm, OtherPeopleInYourHomeForm, OtherPersonPreviousNames, \
+from ...childminder_task_util import get_show_references
+from ...decorators import group_required, user_assigned_application
+from ...forms.childminder_forms.form import AdultInYourHomeForm, ChildInYourHomeForm, OtherPeopleInYourHomeForm, \
+    OtherPersonPreviousNames, \
     ChildForm, ChildAddressForm
 from ...models import ChildInHome, AdultInHome, Arc, Application, PreviousAddress, ChildAddress, \
-    OtherPersonPreviousRegistrationDetails, HealthCheckCurrent, HealthCheckSerious, HealthCheckHospital, ChildcareType, \
-    Child, ApplicantHomeAddress
-
+    OtherPersonPreviousRegistrationDetails, HealthCheckCurrent, HealthCheckSerious, HealthCheckHospital, \
+    ChildcareType, Child, ApplicantHomeAddress
+from ...models.previous_name import PreviousName
 from ...review_util import request_to_comment, save_comments, redirect_selection, build_url
-from ...views import other_people_initial_population, children_initial_population, children_address_initial_population
-from ...decorators import group_required, user_assigned_application
+from .review import other_people_initial_population, children_initial_population, children_address_initial_population
 
 
 @login_required
@@ -29,6 +29,7 @@ def other_people_summary(request):
     :param request: a request object used to generate the HttpResponse
     :return: an HttpResponse object with the rendered People in your home: summary template
     """
+
     # Defines the formset using formset factory
     AdultFormSet = formset_factory(AdultInYourHomeForm, extra=0)
     ChildInHomeFormSet = formset_factory(ChildInYourHomeForm, extra=0)
@@ -50,17 +51,22 @@ def other_people_summary(request):
     adult_birth_month_list = []
     adult_birth_year_list = []
     adult_relationship_list = []
-    adult_dbs_list = []
+    adult_email_list = []
+    adult_dbs_cert_numbers = []
+    adult_dbs_on_capitas = []
+    adult_dbs_is_recents = []
+    adult_dbs_is_enhanceds = []
+    adult_dbs_on_updates = []
     current_illnesses = []
     serious_illnesses = []
     hospital_admissions = []
     local_authorities = []
     adult_lived_abroad = []
     adult_military_base = []
-    adult_capita_dbs = []
     adult_name_querysets = []
     adult_address_querysets = []
     previous_registration_querysets = []
+    adult_enhanced_checks = []
 
     # Children in the home data
     children = ChildInHome.objects.filter(application_id=application_id_local).order_by('child')
@@ -87,10 +93,12 @@ def other_people_summary(request):
     ]
 
     for adult in adults:
+
         if adult.middle_names and adult.middle_names != '':
             name = adult.first_name + ' ' + adult.middle_names + ' ' + adult.last_name
         else:
             name = adult.first_name + ' ' + adult.last_name
+
         adult_record_list.append(adult)
         adult_id_list.append(adult.adult_id)
         adult_health_check_status_list.append(adult.health_check_status)
@@ -99,13 +107,19 @@ def other_people_summary(request):
         adult_birth_month_list.append(adult.birth_month)
         adult_birth_year_list.append(adult.birth_year)
         adult_relationship_list.append(adult.relationship)
-        adult_dbs_list.append(adult.dbs_certificate_number)
+        adult_email_list.append(adult.email)
+        adult_dbs_cert_numbers.append(adult.dbs_certificate_number)
+        adult_dbs_on_capitas.append(adult.capita)
+        adult_dbs_is_recents.append(adult.within_three_months)
+        adult_dbs_is_enhanceds.append(adult.enhanced_check if adult.show_enhanced_check() else None)
+        adult_dbs_on_updates.append(adult.on_update if adult.show_on_update() else None)
         adult_lived_abroad.append(adult.lived_abroad)
         adult_military_base.append(adult.military_base)
-        adult_capita_dbs.append(adult.capita)
         current_illnesses.append(HealthCheckCurrent.objects.filter(person_id=adult.pk))
         serious_illnesses.append(HealthCheckSerious.objects.filter(person_id=adult.pk))
         hospital_admissions.append(HealthCheckHospital.objects.filter(person_id=adult.pk))
+        local_authorities.append(adult.reasons_known_to_council_health_check)
+        adult_enhanced_checks.append(adult.enhanced_check)
 
     for child in children:
         if child.middle_names and child.middle_names != '':
@@ -149,10 +163,10 @@ def other_people_summary(request):
         # Converts it to a list, there was trouble parsing the form objects when it was in a zip object
         adult_lists = list(
             zip(adult_record_list, adult_id_list, adult_health_check_status_list, adult_name_list, adult_birth_day_list,
-                adult_birth_month_list, adult_birth_year_list, adult_relationship_list, adult_dbs_list,
-                adult_lived_abroad,
-                adult_military_base, adult_capita_dbs,
-                formset_adult, current_illnesses, serious_illnesses, hospital_admissions))
+                adult_birth_month_list, adult_birth_year_list, adult_relationship_list, adult_email_list,
+                adult_dbs_cert_numbers, adult_dbs_on_capitas, adult_dbs_is_recents, adult_dbs_is_enhanceds,
+                adult_dbs_on_updates, adult_lived_abroad, adult_military_base, formset_adult, current_illnesses,
+                serious_illnesses, hospital_admissions, local_authorities, adult_enhanced_checks))
 
         initial_child_data = other_people_initial_population(False, children)
 
@@ -171,8 +185,7 @@ def other_people_summary(request):
 
         own_child_lists = zip(own_children, own_child_address_list, formset_own_child, formset_own_child_address)
 
-        zero_to_five_list = ChildcareType.objects.get(application_id=application_id_local)
-
+        childcare_type = ChildcareType.objects.get(application_id=application_id_local)
 
         variables = {
             'form': form,
@@ -191,7 +204,7 @@ def other_people_summary(request):
             'adult_ebulk_lists': adult_ebulk_lists,
             'previous_registration_lists': previous_registration_lists,
             'providing_care_in_own_home': providing_care_in_own_home,
-            'childcare_type_zero_to_five': zero_to_five_list
+            'childcare_type_zero_to_five': childcare_type.zero_to_five,
         }
         return render(request, 'childminder_templates/other-people-summary.html', variables)
 
@@ -280,7 +293,6 @@ def other_people_summary(request):
             status = Arc.objects.get(pk=application_id_local)
             status.people_in_home_review = section_status
             status.save()
-            childcare_type = ChildcareType.objects.get(application_id=application_id_local)
 
             show_references = get_show_references(application_id_local)
 
@@ -294,10 +306,12 @@ def other_people_summary(request):
             # Zips the formset into the list of adults
             # Converts it to a list, there was trouble parsing the form objects when it was in a zip object
             adult_lists = list(zip(adult_record_list, adult_id_list, adult_health_check_status_list, adult_name_list,
-                                   adult_birth_day_list,
-                                   adult_birth_month_list, adult_birth_year_list, adult_relationship_list,
-                                   adult_dbs_list, adult_lived_abroad, adult_military_base, adult_capita_dbs,
-                                   adult_formset, current_illnesses, serious_illnesses, hospital_admissions, local_authorities))
+                                   adult_birth_day_list, adult_birth_month_list, adult_birth_year_list,
+                                   adult_relationship_list, adult_email_list, adult_dbs_cert_numbers,
+                                   adult_dbs_on_capitas, adult_dbs_is_recents, adult_dbs_is_enhanceds,
+                                   adult_dbs_on_updates, adult_lived_abroad, adult_military_base, adult_formset,
+                                   current_illnesses, serious_illnesses, hospital_admissions, local_authorities,
+                                   adult_enhanced_checks))
 
             child_lists = zip(child_id_list, child_name_list, child_birth_day_list, child_birth_month_list,
                               child_birth_year_list,
@@ -316,7 +330,7 @@ def other_people_summary(request):
                 child_form.error_summary_title = 'There was a problem (' + child_name + ')'
                 child_address_form.error_summary_title = 'There was a problem (' + child_name + ')'
 
-            zero_to_five_list = ChildcareType.objects.get(application_id=application_id_local)
+            childcare_type = ChildcareType.objects.get(application_id=application_id_local)
 
             variables = {
                 'form': form,
@@ -334,7 +348,7 @@ def other_people_summary(request):
                 'adult_ebulk_lists': adult_ebulk_lists,
                 'previous_registration_lists': previous_registration_lists,
                 'providing_care_in_own_home': providing_care_in_own_home,
-                'childcare_type_zero_to_five': zero_to_five_list
+                'childcare_type_zero_to_five': childcare_type.zero_to_five,
             }
             return render(request, 'childminder_templates/other-people-summary.html', variables)
 

@@ -14,3 +14,4 @@ faker==0.8.13
 hypothesis==3.70.3
 django-xhtml2pdf==0.0.4
 boto3==1.7.66
+lxml==4.3.0

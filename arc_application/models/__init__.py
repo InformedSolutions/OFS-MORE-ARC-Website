@@ -1,5 +1,4 @@
 from .base import *
-
 from .adult_in_home import *
 from .applicant_home_address import *
 from .applicant_name import *
@@ -27,3 +26,4 @@ from .previous_name import *
 from .child import *
 from .child_address import *
 from .childbase import *
+from .capita_dbs_file import *

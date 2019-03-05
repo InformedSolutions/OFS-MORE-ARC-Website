@@ -7,6 +7,8 @@ ARC_GROUP = 'arc'
 CONTACT_CENTRE = 'contact-centre'
 APPLICATION_LIMIT = 5
 
+DBS_URL = os.environ.get('APP_DBS_URL')
+
 NOTIFY_URL = os.environ.get('APP_NOTIFY_URL')
 
 # Base URL of addressing-service gateway
@@ -15,6 +17,13 @@ ADDRESSING_URL = os.environ.get('APP_ADDRESSING_URL')
 IDENTITY_URL = os.environ.get('APP_IDENTITY_URL')
 
 NANNY_GATEWAY_URL = os.environ.get('APP_NANNY_GATEWAY_URL')
+
+# Base URL of DBS-api application
+DBS_URL = os.environ.get('APP_DBS_URL')
+
+# Bool to determine whether to enable or disable nanny applications showing
+# Default: False
+ENABLE_NANNIES = os.environ.get('ENABLE_NANNIES') in ['true', True, 'True']
 
 # Address of Childminder application
 CHILDMINDER_EMAIL_VALIDATION_URL = os.environ.get('CHILDMINDER_EMAIL_VALIDATION_URL')
@@ -82,7 +91,7 @@ TEMPLATES = [
                 'govuk_template_base.context_processors.govuk_template_base',
                 "arc_application.middleware.globalise_url_prefix",
                 "arc_application.middleware.globalise_server_name",
-                "arc_application.middleware.set_review_tab_visibility",
+                "arc_application.middleware.set_tab_visibility",
             ],
         },
     },
