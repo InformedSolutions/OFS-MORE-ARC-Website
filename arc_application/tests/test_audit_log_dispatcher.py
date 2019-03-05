@@ -10,13 +10,6 @@ class AuditLogDispatcherTests(TestCase):
     def setUpClass(cls):
         cls.factory = RequestFactory()
 
-    # @mock.patch.object(NannyAuditLog, 'dispatch')
-    # def test_app_type_nanny_returns_nanny_audit_log(self, dispatch):
-    #     request = self.factory.get('arc/auditlog/?app_type=Nanny')
-    #     audit_log_dispatcher(request)
-    #
-    #     self.assertTrue(dispatch.called_with(request))
-
     @mock.patch.object(ChildminderAuditlog, 'dispatch')
     def test_app_type_childminder_returns_childminder_audit_log(self, dispatch):
         request = self.factory.get('arc/auditlog/?app_type=Childminder')

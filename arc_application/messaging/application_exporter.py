@@ -1,13 +1,14 @@
 import json
 
 from django.conf import settings
+from django.core import serializers
 
 from ..models import Application, ApplicantName, ApplicantHomeAddress, ApplicantPersonalDetails,  AdultInHome, \
     ChildInHome, PreviousName, PreviousAddress, HealthCheckHospital, HealthCheckSerious, HealthCheckCurrent, CriminalRecordCheck, \
     ChildcareType, ChildcareTraining, FirstAidTraining, HealthDeclarationBooklet, PreviousRegistrationDetails, Reference, UserDetails
-from django.core import serializers
 
 from .document_generator import DocumentGenerator
+
 from . import SQSHandler
 
 sqs_handler = SQSHandler(settings.APPLICATION_QUEUE_NAME)
@@ -104,7 +105,7 @@ class ApplicationExporter:
         # If adults in home are present, append EY2 documents
         if len(adults_in_home):
 
-            adult_documents = {}
+            adult_documents = []
 
             for adult in adults_in_home:
                 base64_string = DocumentGenerator.get_adult_details_summary(application_id, adult.adult_id)
@@ -114,7 +115,7 @@ class ApplicationExporter:
                     "document": base64_string,
                 }
 
-                adult_documents.update(adult_document_object)
+                adult_documents.append(adult_document_object)
 
             documents['EY2'] = adult_documents
 

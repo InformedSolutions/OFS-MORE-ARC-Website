@@ -5,7 +5,7 @@ from django.contrib.auth.models import Group, User
 from django.test import TestCase, RequestFactory
 from django.urls import reverse
 
-from unittest import mock, skip
+from unittest import skip
 
 from ..models import (AdultInHome,
                       ApplicantHomeAddress,
@@ -22,7 +22,7 @@ from ..models import (AdultInHome,
                       HealthCheckHospital,
                       HealthCheckSerious,
                       HealthCheckCurrent,
-                      UserDetails, ChildcareTraining)
+                      UserDetails)
 
 application = None
 personal_details = None
@@ -71,7 +71,7 @@ def create_application():
         application_reference='2734739'
     )
 
-    childcare_type = ChildcareType.objects.create(
+    ChildcareType.objects.create(
         childcare_id='2bc1fa3c-5b19-4198-9bca-fb3761dc172e',
         zero_to_five=True,
         five_to_eight=False,
@@ -90,7 +90,7 @@ def create_application():
 
     personal_details = details
 
-    home_address = ApplicantHomeAddress.objects.create(
+    ApplicantHomeAddress.objects.create(
         home_address_id='da2265c2-2d65-4214-bfef-abcfe59b75aa',
         personal_detail_id=personal_details,
         application_id=application,
@@ -156,35 +156,35 @@ def create_application():
         email_resent=0
     )
 
-    serious_illness = HealthCheckSerious.objects.create(
+    HealthCheckSerious.objects.create(
         description='influenza',
         start_date='2017-01-01',
         end_date='2018-01-01',
         person_id_id=adult2.pk
     )
 
-    serious_illness = HealthCheckSerious.objects.create(
+    HealthCheckSerious.objects.create(
         description='gangrene',
         start_date='2016-12-01',
         end_date='2017-01-01',
         person_id_id=adult2.pk
     )
 
-    hospital_admissions = HealthCheckHospital.objects.create(
+    HealthCheckHospital.objects.create(
         description='surgery',
         start_date='2017-01-01',
         end_date='2017-01-02',
         person_id_id=adult2.pk
     )
 
-    hospital_admissions = HealthCheckHospital.objects.create(
+    HealthCheckHospital.objects.create(
         description='appendix removal',
         start_date='2018-01-01',
         end_date='2018-02-02',
         person_id_id=adult2.pk
     )
 
-    current_illness = HealthCheckCurrent.objects.create(
+    HealthCheckCurrent.objects.create(
         description='plague',
         person_id_id=adult2.pk
     )
@@ -195,7 +195,7 @@ def create_application():
         email='test@test.com',
     )
 
-    first_aid_training = FirstAidTraining.objects.create(
+    FirstAidTraining.objects.create(
         first_aid_id='da2265c2-2d65-4214-bfef-abcfe59b75aa',
         application_id=application,
         training_organisation='Test First Aid',
@@ -207,14 +207,14 @@ def create_application():
         renew_certificate=True
     )
 
-    criminal_record_check = CriminalRecordCheck.objects.create(
+    CriminalRecordCheck.objects.create(
         criminal_record_id='da2265c2-2d65-4214-bfef-abcfe59b75aa',
         application_id=application,
         dbs_certificate_number='123456654321',
         cautions_convictions=True
     )
 
-    child_in_home = ChildInHome.objects.create(
+    ChildInHome.objects.create(
         child_id='da2265c2-2d65-4214-bfef-abcfe59b75aa',
         application_id=application,
         child='1',
@@ -227,26 +227,7 @@ def create_application():
         relationship='Test'
     )
 
-    reference1 = Reference.objects.create(
-        reference_id='da2265c2-2d65-4214-bfef-abcfe59b75aa',
-        application_id=application,
-        reference='1',
-        first_name='Test',
-        last_name='Test',
-        relationship='Test',
-        years_known='1',
-        months_known='1',
-        street_line1='1 Test Street',
-        street_line2='',
-        town='Testville',
-        county='Testshire',
-        country='Testland',
-        postcode='WA14 4PX',
-        phone_number='07783446526',
-        email='test@informed.com'
-    )
-
-    reference2 = Reference.objects.create(
+    Reference.objects.create(
         reference_id='da2265c2-2d65-4214-bfef-abcfe59b75ab',
         application_id=application,
         reference='2',
