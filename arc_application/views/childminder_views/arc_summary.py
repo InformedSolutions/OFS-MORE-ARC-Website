@@ -72,7 +72,6 @@ name_field_dict = {
     'On the update service?': 'on_update',
     'known_pith': 'known_to_social_services_pith',
     'reasons_known_pith': 'reasons_known_to_social_services_pith',
-
 }
 
 
