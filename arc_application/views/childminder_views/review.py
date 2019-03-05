@@ -17,8 +17,6 @@ from ...magic_link import generate_magic_link
 from ...notify import send_email
 from ...views.base import release_application
 
-from ...messaging import ApplicationExporter
-
 from ...models import ApplicantName, ApplicantPersonalDetails, Application, Arc, ArcComments, ChildcareType, \
     UserDetails, OtherPersonPreviousRegistrationDetails, PreviousRegistrationDetails, AdultInHome
 
@@ -57,6 +55,7 @@ def review(request):
             application.date_accepted = datetime.now()
             application.save()
 
+        from ...messaging import ApplicationExporter
         ApplicationExporter.export_childminder_application(application_id_local)
 
         personalisation = {'first_name': first_name, 'ref': app_ref}

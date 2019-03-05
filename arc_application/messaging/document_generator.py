@@ -6,10 +6,13 @@ from django_xhtml2pdf.utils import generate_pdf
 from ..models import Application, AdultInHome, \
     HealthCheckHospital, HealthCheckSerious, HealthCheckCurrent
 
-from ..views.childminder_views.arc_summary import get_application_summary_variables
+from ..views.childminder_views.childminder_utils import get_application_summary_variables
 
 
 class DocumentGenerator:
+    """
+    A utility class for generating PDF documents used in application submissions
+    """
 
     @staticmethod
     def get_full_application_summary(application_id):
