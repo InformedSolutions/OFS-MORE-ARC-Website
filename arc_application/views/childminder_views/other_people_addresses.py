@@ -141,7 +141,7 @@ def postcode_submission(request):
 
         else:
             selected_address_index = int(request.POST['address'])
-            selected_address = address_helper.AddressHelper.get_posted_address(selected_address_index, request.POST['postcode'])
+            selected_address = AddressHelper.get_posted_address(selected_address_index, request.POST['postcode'])
             line1 = selected_address['line1']
             line2 = selected_address['line2']
             town = selected_address['townOrCity']
