@@ -68,6 +68,12 @@ class ApplicationExporter:
         applicant_home_address = ApplicantHomeAddress.objects.filter(application_id=application_id)
         export['applicant_home_address'] = serializers.serialize('json', list(applicant_home_address))
 
+        applicant_previous_names = PreviousName.objects.filter(other_person_type='APPLICANT')
+        export['applicant_previous_names'] = serializers.serialize('json', list(applicant_previous_names))
+
+        applicant_previous_addresses = PreviousAddress.objects.filter(person_type='APPLICANT')
+        export['applicant_previous_addresses'] = serializers.serialize('json', list(applicant_previous_addresses))
+
         child_in_home = ChildInHome.objects.filter(application_id=application_id)
         export['child_in_home'] = serializers.serialize('json', list(child_in_home))
 
@@ -87,7 +93,7 @@ class ApplicationExporter:
         export['health_declaration_booklet'] = serializers.serialize('json', list(health_declaration_booklet))
 
         previous_registration_details = PreviousRegistrationDetails.objects.filter(application_id=application_id)
-        export['previous_name'] = serializers.serialize('json', list(previous_registration_details))
+        export['previous_registration'] = serializers.serialize('json', list(previous_registration_details))
 
         references = Reference.objects.filter(application_id=application_id)
         export['references'] = serializers.serialize('json', list(references))
