@@ -62,8 +62,8 @@ class GenericApplicationHandler:
 
         application_record = NannyGatewayActions().read('application', params={'application_id': str(application_id)}).record
         row_data['application_id'] = application_record['application_id']
-        row_data['date_submitted'] = datetime.strptime(application_record['date_submitted'][:10], '%Y-%M-%d').strftime('%d/%m/%Y')
-        row_data['last_accessed'] = datetime.strptime(application_record['date_updated'][:10], '%Y-%M-%d').strftime('%d/%m/%Y')
+        row_data['date_submitted'] = datetime.strptime(application_record['date_submitted'][:10], '%Y-%m-%d').strftime('%d/%m/%Y')
+        row_data['last_accessed'] = datetime.strptime(application_record['date_updated'][:10], '%Y-%m-%d').strftime('%d/%m/%Y')
         row_data['app_type'] = 'Nanny'
 
         personal_details_record = NannyGatewayActions().read(
