@@ -16,10 +16,10 @@ INSTALLED_APPS = BUILTIN_APPS + THIRD_PARTY_APPS + DEV_APPS + PROJECT_APPS
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': os.environ.get('POSTGRES_DB', 'postgres'),
-        'USER': os.environ.get('POSTGRES_USER', 'ofsted'),
-        'PASSWORD': os.environ.get('POSTGRES_PASSWORD', 'OfstedB3ta'),
-        'HOST': os.environ.get('POSTGRES_HOST', '130.130.52.132'),
-        'PORT': os.environ.get('POSTGRES_PORT', '5462')
+        'NAME': from_env('POSTGRES_DB', 'postgres'),
+        'USER': from_env('POSTGRES_USER', 'ofsted'),
+        'PASSWORD': from_env('POSTGRES_PASSWORD', 'OfstedB3ta'),
+        'HOST': from_env('POSTGRES_HOST', '130.130.52.132'),
+        'PORT': from_env('POSTGRES_PORT', '5462')
     }
 }

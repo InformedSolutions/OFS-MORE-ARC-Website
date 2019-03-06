@@ -1,5 +1,20 @@
 import os
 
+from django.core.exceptions import ImproperlyConfigured
+
+
+NO_DEFAULT = object()
+
+
+def from_env(name, default=NO_DEFAULT):
+    try:
+        return os.environ[name]
+    except KeyError as e:
+        if default is NO_DEFAULT:
+            raise ImproperlyConfigured('Missing environment variable with no default: {}'.format(name)) from e
+        return default
+
+
 # Server name for showing server that responded to request under load balancing conditions
 SERVER_LABEL = 'Test_1'
 
@@ -7,25 +22,23 @@ ARC_GROUP = 'arc'
 CONTACT_CENTRE= 'contact-centre'
 APPLICATION_LIMIT = 5
 
-DBS_URL = os.environ.get('APP_DBS_URL')
-
-NOTIFY_URL = os.environ.get('APP_NOTIFY_URL')
+NOTIFY_URL = from_env('APP_NOTIFY_URL')
 
 # Base URL of addressing-service gateway
-ADDRESSING_URL = os.environ.get('APP_ADDRESSING_URL')
+ADDRESSING_URL = from_env('APP_ADDRESSING_URL')
 
 # Base URL of DBS-api application
-DBS_URL = os.environ.get('APP_DBS_URL')
+DBS_URL = from_env('APP_DBS_URL')
 
 # Bool to determine whether to enable or disable nanny applications showing
 # Default: False
-ENABLE_NANNIES = os.environ.get('ENABLE_NANNIES') in ['true', True, 'True']
+ENABLE_NANNIES = from_env('ENABLE_NANNIES', '') in ['true', True, 'True']
 
 # Address of Childminder application
-CHILDMINDER_EMAIL_VALIDATION_URL = os.environ.get('CHILDMINDER_EMAIL_VALIDATION_URL')
+CHILDMINDER_EMAIL_VALIDATION_URL = from_env('CHILDMINDER_EMAIL_VALIDATION_URL')
 
 # Address of Nanny application
-NANNY_PUBLIC_URL = os.environ.get('NANNY_PUBLIC_URL')
+NANNY_PUBLIC_URL = from_env('NANNY_PUBLIC_URL')
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -33,7 +46,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__fil
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'm$9lif+zcnb5i5n21q9yecn8vs4h%(%7=!k%#6rlbhkfuq1mfq'
 
-EXECUTING_AS_TEST = os.environ.get('EXECUTING_AS_TEST')
+EXECUTING_AS_TEST = from_env('EXECUTING_AS_TEST')
 
 # Application definition
 
@@ -140,10 +153,6 @@ SECURE_BROWSER_XSS_FILTER = True
 CSRF_COOKIE_HTTPONLY = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
 
-SECURE_BROWSER_XSS_FILTER = True
-CSRF_COOKIE_HTTPONLY = True
-SECURE_CONTENT_TYPE_NOSNIFF = True
-
 STATICFILES_FINDERS = [
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
@@ -185,38 +194,38 @@ REGEX = {
 }
 
 LOGGING = {
-  'version': 1,
-  'disable_existing_loggers': False,
-  'formatters': {
-    'console': {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'console': {
             # exact format is not important, this is the minimum information
             'format': '%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
         },
+    },
+    'handlers': {
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.handlers.TimedRotatingFileHandler',
+            'filename': 'logs/output.log',
+            'formatter': 'console',
+            'when': 'midnight',
+            'backupCount': 10
         },
-  'handlers': {
-    'file': {
-        'level': 'DEBUG',
-        'class': 'logging.handlers.TimedRotatingFileHandler',
-        'filename': 'logs/output.log',
-        'formatter': 'console',
-        'when': 'midnight',
-        'backupCount': 10
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler'
+        },
     },
-    'console': {
-        'level': 'DEBUG',
-        'class': 'logging.StreamHandler'
-    },
-   },
-   'loggers': {
-     '': {
-       'handlers': ['file', 'console'],
-         'level': 'DEBUG',
-           'propagate': True,
-      },
-      'django.server': {
-       'handlers': ['file', 'console'],
-         'level': 'INFO',
-           'propagate': True,
-      },
+    'loggers': {
+        '': {
+            'handlers': ['file', 'console'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+        'django.server': {
+            'handlers': ['file', 'console'],
+            'level': 'INFO',
+            'propagate': True,
+        },
     },
 }
