@@ -5,7 +5,7 @@ from unittest.mock import patch
 
 from django.test import TestCase, tag
 
-from arc_application.services.search_service import SearchService
+from ...services.search_service import SearchService
 
 
 class SearchServiceUnitTests(TestCase):

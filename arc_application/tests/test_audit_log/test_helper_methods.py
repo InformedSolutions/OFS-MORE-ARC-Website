@@ -2,7 +2,7 @@ from unittest import mock, TestCase
 
 from django.test import RequestFactory
 
-from arc_application.views.audit_log import audit_log_dispatcher, ChildminderAuditlog, NannyAuditLog
+from ...views.audit_log import audit_log_dispatcher, ChildminderAuditlog, NannyAuditLog
 
 
 class AuditLogDispatcherUnitTests(TestCase):

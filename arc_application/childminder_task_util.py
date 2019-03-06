@@ -1,4 +1,4 @@
-from arc_application.models import Application, ChildcareType, Arc
+from .models import Application, ChildcareType, Arc
 
 
 def get_application(app_id):

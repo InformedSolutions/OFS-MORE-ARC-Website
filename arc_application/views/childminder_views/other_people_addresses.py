@@ -3,12 +3,12 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 
-from arc_application import address_helper
-from arc_application.forms.childminder_forms.form import OtherPersonPreviousPostcodeEntry, OtherPeoplePreviousAddressLookupForm, \
+from ...address_helper import AddressHelper
+from ...forms.childminder_forms.form import OtherPersonPreviousPostcodeEntry, OtherPeoplePreviousAddressLookupForm, \
     OtherPeoplePreviousAddressManualForm
-from arc_application.models import PreviousAddress
-from arc_application.review_util import build_url
-from arc_application.decorators import group_required, user_assigned_application
+from ...models import PreviousAddress
+from ...review_util import build_url
+from ...decorators import group_required, user_assigned_application
 
 
 @login_required
@@ -79,7 +79,7 @@ def postcode_selection(request):
 
     if request.method == 'GET':
         # Call addressing API with entered postcode
-        addresses = address_helper.AddressHelper.create_address_lookup_list(context['postcode'])
+        addresses = AddressHelper.create_address_lookup_list(context['postcode'])
 
         # Populate form for page with choices from this API call
         context['form'] = OtherPeoplePreviousAddressLookupForm(choices=addresses)
@@ -87,7 +87,7 @@ def postcode_selection(request):
         return render(request, 'childminder_templates/previous-address-lookup.html', context)
 
     if request.method == 'POST':
-        addresses = address_helper.AddressHelper.create_address_lookup_list(request.POST['postcode'])
+        addresses = AddressHelper.create_address_lookup_list(request.POST['postcode'])
 
         if 'postcode-search' in request.POST:
             context['form'] = OtherPeoplePreviousAddressLookupForm(choices=addresses)

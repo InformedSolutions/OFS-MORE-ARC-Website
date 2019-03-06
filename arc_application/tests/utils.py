@@ -7,7 +7,7 @@ from django.http import HttpResponse
 from django.conf import settings
 from django.contrib.auth.models import User, Group
 
-from arc_application import models
+from ..models import *
 
 
 class StubIdentityGatewayActions:
@@ -314,7 +314,7 @@ def assertRedirectView(response, expected_view_obj):
 
 def create_childminder_application(user_id=None):
 
-    application = models.Application.objects.create(
+    application = Application.objects.create(
         application_type='CHILDMINDER',
         application_id='da2265c2-2d65-4214-bfef-abcfe59b75aa',
         application_status='DRAFTING',
@@ -348,7 +348,7 @@ def create_childminder_application(user_id=None):
         reasons_known_to_social_services_pith=None,
     )
 
-    details = models.ApplicantPersonalDetails.objects.create(
+    details = ApplicantPersonalDetails.objects.create(
         personal_detail_id='da2265c2-2d65-4214-bfef-abcfe59b75aa',
         application_id=application,
         birth_day='01',
@@ -356,7 +356,7 @@ def create_childminder_application(user_id=None):
         birth_year='2001'
     )
 
-    models.ChildcareType.objects.create(
+    ChildcareType.objects.create(
         application_id=application,
         zero_to_five=True,
         five_to_eight=True,
@@ -364,7 +364,7 @@ def create_childminder_application(user_id=None):
         overnight_care=True
     )
 
-    models.ApplicantHomeAddress.objects.create(
+    ApplicantHomeAddress.objects.create(
         home_address_id='da2265c2-2d65-4214-bfef-abcfe59b75aa',
         personal_detail_id=details,
         application_id=application,
@@ -380,7 +380,7 @@ def create_childminder_application(user_id=None):
         move_in_year=0
     )
 
-    models.ApplicantName.objects.create(
+    ApplicantName.objects.create(
         name_id='da2265c2-2d65-4214-bfef-abcfe59b75aa',
         personal_detail_id=details,
         application_id=application,
@@ -390,13 +390,13 @@ def create_childminder_application(user_id=None):
         last_name='Odense'
     )
 
-    models.UserDetails.objects.create(
+    UserDetails.objects.create(
         login_id='8362d470-ecc9-4069-876b-9b3ddc2cae07',
         application_id=application,
         email='test@test.com',
     )
 
-    models.FirstAidTraining.objects.create(
+    FirstAidTraining.objects.create(
         first_aid_id='da2265c2-2d65-4214-bfef-abcfe59b75aa',
         application_id=application,
         training_organisation='Test First Aid',
@@ -408,7 +408,7 @@ def create_childminder_application(user_id=None):
         renew_certificate=True
     )
 
-    models.ChildcareTraining.objects.create(
+    ChildcareTraining.objects.create(
         eyfs_id='da2265c2-2d65-4214-bfef-abcfe59b75aa',
         application_id=application,
         eyfs_course_name='Test Childcare Training',
@@ -417,20 +417,20 @@ def create_childminder_application(user_id=None):
         eyfs_course_date_year=2018,
     )
 
-    models.HealthDeclarationBooklet.objects.create(
+    HealthDeclarationBooklet.objects.create(
         hdb_id='da2265c2-2d65-4214-bfef-abcfe59b75aa',
         application_id=application,
         send_hdb_declare=True,
     )
 
-    models.CriminalRecordCheck.objects.create(
+    CriminalRecordCheck.objects.create(
         criminal_record_id='da2265c2-2d65-4214-bfef-abcfe59b75aa',
         application_id=application,
         dbs_certificate_number='123456654321',
         cautions_convictions=True
     )
 
-    models.AdultInHome.objects.create(
+    AdultInHome.objects.create(
         adult_id='da2265c2-2d65-4214-bfef-abcfe59b75aa',
         application_id=application,
         adult=1,
@@ -444,7 +444,7 @@ def create_childminder_application(user_id=None):
         dbs_certificate_number='123456789012',
     )
 
-    models.ChildInHome.objects.create(
+    ChildInHome.objects.create(
         child_id='da2265c2-2d65-4214-bfef-abcfe59b75aa',
         application_id=application,
         child='1',
@@ -457,7 +457,7 @@ def create_childminder_application(user_id=None):
         relationship='Test'
     )
 
-    models.Reference.objects.create(
+    Reference.objects.create(
         reference_id='da2265c2-2d65-4214-bfef-abcfe59b75aa',
         application_id=application,
         reference='1',
@@ -476,7 +476,7 @@ def create_childminder_application(user_id=None):
         email='test@informed.com'
     )
 
-    models.Reference.objects.create(
+    Reference.objects.create(
         reference_id='da2265c2-2d65-4214-bfef-abcfe59b75ab',
         application_id=application,
         reference='2',
@@ -502,7 +502,7 @@ def create_childminder_application(user_id=None):
 
 
 def create_childminder_review(application_id, user_id=None):
-    return models.Arc.objects.create(
+    return Arc.objects.create(
         application_id=application_id,
         # user_id field is non-null and uses empty string when no user is assigned
         user_id=user_id if user_id is not None else '',
@@ -511,7 +511,7 @@ def create_childminder_review(application_id, user_id=None):
 
 
 def create_nanny_review(application_id, user_id=None):
-    return models.Arc.objects.create(
+    return Arc.objects.create(
         application_id=application_id,
         # user_id field is non-null and uses empty string when no user is assigned
         user_id=user_id if user_id is not None else '',
