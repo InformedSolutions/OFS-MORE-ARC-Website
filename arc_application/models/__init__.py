@@ -27,3 +27,4 @@ from arc_application.models.previous_name import *
 from arc_application.models.child import *
 from arc_application.models.child_address import *
 from arc_application.models.childbase import *
+from arc_application.models.capita_dbs_file import *

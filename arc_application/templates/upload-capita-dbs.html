@@ -1,0 +1,23 @@
+{% extends 'govuk_template.html' %}
+{% block page_title %}Upload Capita DBS list{% endblock %}
+{% load static %}
+{% load govuk_template_base %}
+{% block inner_content %}
+
+{{ form.error_summary }}
+
+<h1 class="form-title heading-large">
+    Upload Capita DBS List
+</h1>
+
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    {{ form.as_div }}
+    <input type="submit" class="button" value="Save and continue">
+</form>
+
+<br>
+<b class="bold">Last upload:</b> {{ formatted_last_upload }}
+
+{% endblock %}

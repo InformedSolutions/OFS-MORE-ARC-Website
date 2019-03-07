@@ -26,15 +26,19 @@ class AdultInHome(models.Model):
     current_treatment = models.NullBooleanField(null=True)
     serious_illness = models.NullBooleanField(null=True)
     known_to_council = models.NullBooleanField(null=True)
-    children_details = models.TextField(default='', null=True)
+    reasons_known_to_council_health_check = models.TextField(default='', null=True)
     hospital_admission = models.NullBooleanField(null=True)
     health_check_status = models.CharField(max_length=50, default='To do')
     email_resent = models.IntegerField(default=0)
     email_resent_timestamp = models.DateTimeField(null=True, blank=True)
     lived_abroad = models.NullBooleanField(blank=True)
     military_base = models.NullBooleanField(blank=True)
-    capita = models.NullBooleanField(blank=True)
-    on_update = models.NullBooleanField(blank=True)
+    capita = models.NullBooleanField(blank=True)  # dbs was found on capita list?
+    enhanced_check = models.NullBooleanField(blank=True)  # stated they have a capita dbs?
+    on_update = models.NullBooleanField(blank=True)  # stated they are signed up to dbs update service?
+    certificate_information = models.TextField(blank=True)  # information from dbs certificate
+    within_three_months = models.NullBooleanField(blank=True)  # dbs was issued within three months of lookup?
+
 
     @property
     def timelog_fields(self):
@@ -60,7 +64,7 @@ class AdultInHome(models.Model):
             'relationship',
             'email',
             'dbs_certificate_number',
-            'health_check_status'
+            'health_check_status',
         )
 
     @classmethod
@@ -81,7 +85,12 @@ class AdultInHome(models.Model):
         """
         return datetime.date(self.birth_year, self.birth_month, self.birth_day)
 
+    @staticmethod
+    def bool_to_string(bool):
+        return "Yes" if bool else "No"
+
     def get_summary_table(self):
+        from .childcare_type import ChildcareType
 
         if self.birth_day < 10:
             birth_day = '0' + str(self.birth_day)
@@ -95,19 +104,67 @@ class AdultInHome(models.Model):
 
         date_of_birth = birth_day + ' ' + birth_month + ' ' + str(self.birth_year)
         summary_table = [
-            {"title": self.get_full_name(), "id": self.pk},
-            {"name": "Health questions status", "value": self.health_check_status},
-            {"name": "Name", "value": self.get_full_name()},
-            {"name": "Date of birth", "value": date_of_birth},
-            {"name": "Relationship", "value": self.relationship},
-            {"name": "Email", "value": self.email},
-            {"name": "DBS certificate number", "value": self.dbs_certificate_number},
-            {"name": "Known to council", "value": ("Yes" if self.known_to_council == True else "No")}
+            {"title": self.get_full_name(),
+             "id": self.pk},
+            {"name": "Health questions status",
+             "value": self.health_check_status},
+            {"name": "Name",
+             "value": self.get_full_name()},
+            {"name": "Date of birth",
+             "value": date_of_birth},
+            {"name": "Relationship",
+             "value": self.relationship},
+            {"name": "Email",
+             "value": self.email},
+            {"name": "Lived abroad in the last 5 years?",
+             "value": self.bool_to_string(self.lived_abroad)},
         ]
-        if self.known_to_council == True:
-            summary_table.append({"name": "Details of children", "value": self.children_details})
+        if ChildcareType.objects.get(application_id=self.application_id).zero_to_five:
+            summary_table += [
+                {"name": "Lived or worked on British military base in the last 5 years?",
+                 "value": self.bool_to_string(self.military_base)}
+            ]
+        summary_table += [
+            {"name": "Did they get their DBS check from the Ofsted DBS application website?",
+             "value": self.bool_to_string(self.capita)},
+        ]
+        if self.capita:
+            summary_table += [
+                {"name": "Is it dated within the last 3 months?",
+                 "value": self.bool_to_string(self.within_three_months)}
+            ]
+        summary_table += [
+            {"name": "DBS certificate number",
+             "value": self.dbs_certificate_number},
+        ]
+        if self.show_enhanced_check():
+            summary_table += [
+                {"name": "Enhanced DBS check for home-based childcare?",
+                 "value": self.bool_to_string(self.enhanced_check)}
+            ]
+        if self.show_on_update():
+            summary_table += [
+                {"name": "On the update service?",
+                 "value": self.bool_to_string(self.on_update)}
+            ]
+        summary_table += [
+            {"name": "Known to council social Services in regards to their own children?",
+             "value": self.bool_to_string(self.known_to_council)},
+        ]
+        if self.known_to_council:
+            summary_table += [
+                {"name": "Tell us why",
+                 "value": self.reasons_known_to_council_health_check}
+            ]
 
         return summary_table
+
+    def show_enhanced_check(self):
+        return not self.capita
+
+    def show_on_update(self):
+        return (not self.capita and self.enhanced_check) \
+               or (self.capita and not self.within_three_months)
 
     # Date of birth property created to keep DRY
     @property

@@ -46,23 +46,6 @@
             </td>
          </tr>
 
-         {% if show_your_children %}
-            <tr id="nanny_your_children">
-               <td class="task">
-                  <a href="{% url 'nanny_your_children_summary' %}?id={{application_id}}">
-                     <span class="task-name">Your children</span>
-                     {% if your_children_status == 'NOT_STARTED' %}
-                     <strong class="task-finished task-to-do">To do</strong>
-                     {% elif your_children_status == 'FLAGGED' %}
-                     <strong class="task-finished task-flagged">Flagged</strong>
-                     {% elif your_children_status == 'COMPLETED' %}
-                     <strong class="task-finished">Reviewed</strong>
-                     {% endif %}
-                  </a>
-               </td>
-            </tr>
-         {% endif %}
-
          <tr id="nanny_childcare_address">
             <td class="task">
                <a href="{% url 'nanny_childcare_address_summary' %}?id={{application_id}}">

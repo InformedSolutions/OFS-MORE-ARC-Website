@@ -143,7 +143,7 @@ class IdentityGatewayActions(DBGatewayActions):
         'summary': 'application_id'
     }
 
-    # target_url_prefix = os.environ.get('APP_IDENTITY_URL') + 'api/v1/'
+    target_url_prefix = os.environ.get('APP_IDENTITY_URL') + 'api/v1/'
 
 
 class NannyGatewayActions(DBGatewayActions):
@@ -155,7 +155,6 @@ class NannyGatewayActions(DBGatewayActions):
         'arc-comments': 'review_id',
         'applicant-home-address': 'application_id',
         'applicant-personal-details': 'application_id',
-        'your-children': 'child_id',
         'application': 'application_id',
         'childcare-training': 'application_id',
         'dbs-check': 'application_id',
@@ -168,4 +167,4 @@ class NannyGatewayActions(DBGatewayActions):
         'timeline-log': 'object_id'
     }
 
-    # target_url_prefix = os.environ.get('APP_NANNY_GATEWAY_URL') + '/api/v1/'
+    target_url_prefix = os.environ.get('APP_NANNY_GATEWAY_URL') + '/api/v1/'

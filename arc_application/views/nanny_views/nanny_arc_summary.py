@@ -8,7 +8,6 @@ from arc_application.services.arc_comments_handler import update_returned_applic
 from arc_application.services.nanny_email_helpers import send_accepted_email, send_returned_email
 from arc_application.services.nanny_view_helpers import nanny_all_completed
 from arc_application.views.base import log_applcation_release
-from arc_application.views.nanny_views.nanny_your_children import NannyYourChildrenSummary
 from .nanny_childcare_address import NannyChildcareAddressSummary
 from .nanny_childcare_training import NannyChildcareTrainingSummary
 from .nanny_contact_details import NannyContactDetailsSummary
@@ -47,7 +46,7 @@ class NannyArcSummary(View):
                                  'first_name': nanny_personal_details['first_name'],
                                  'ref': nanny_application['application_reference']}
 
-        no_flags_exist = nanny_all_completed(arc_application)
+        no_flags_exist = nanny_all_completed(arc_application, application_id)
 
         if no_flags_exist:
             send_accepted_email(**email_personalisation)
@@ -77,7 +76,7 @@ class NannyArcSummary(View):
         application_reference = self.get_application_reference(application_id)
         publish_details = self.get_publish_details(application_id)
 
-        context_function_list = self.get_context_function_list(application_id)
+        context_function_list = self.get_context_function_list()
 
         context_list = [context_func(application_id) for context_func in context_function_list if context_func]
 
@@ -93,41 +92,26 @@ class NannyArcSummary(View):
             'html_title': 'Application summary',
             'context_list': context_list,
             'summary_page': True,
-            'your_children_context_index': 2,
             'publish_details': publish_details
         }
 
         return context
 
     @staticmethod
-    def get_context_function_list(application_id):
+    def get_context_function_list():
         """
         A method to return the contexts to be rendered on the master summary page.
         :return: A list of functions that can be called with application_id to return a context dictionary.
         """
-        show_your_children = NannyArcSummary.get_show_your_children(application_id)
-
         return [
             NannyContactDetailsSummary.create_context,
             NannyPersonalDetailsSummary().get_context_data,
-            NannyYourChildrenSummary().get_context_data if show_your_children else None,
             NannyChildcareAddressSummary().get_context_data,
             NannyFirstAidTrainingSummary().get_context_data,
             NannyChildcareTrainingSummary().get_context_data,
             NannyDbsCheckSummary().get_context_data,
             NannyInsuranceCoverSummary().get_context_data
         ]
-
-    @staticmethod
-    def get_show_your_children(application_id):
-        """
-        A method to return the condition on which to show the your_children task as part of the summary.
-        :return: A boolean True if the your_children summary should be shown.
-        Optional TODO: Relocate this function to a routing helper file.
-        """
-        nanny_personal_details_dict = NannyGatewayActions().read('applicant-personal-details',
-                                                                 params={'application_id': application_id}).record
-        return nanny_personal_details_dict['your_children']
 
     @staticmethod
     def get_publish_details(application_id):

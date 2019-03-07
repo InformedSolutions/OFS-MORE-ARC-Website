@@ -2,22 +2,21 @@ from unittest import mock
 
 from django.conf import settings
 from django.contrib.auth.models import Group, User
-from django.forms import Form
 from django.http import HttpResponse
 from django.test import tag, TestCase
 from django.urls import reverse, resolve
 
-from arc_application.forms.nanny_forms.nanny_form_builder import NannyFormBuilder
 from arc_application.models import Arc
 from arc_application.services.db_gateways import NannyGatewayActions, IdentityGatewayActions
 from arc_application.views import NannyDbsCheckSummary, NannyArcSummary, NannyContactDetailsSummary, \
     NannyPersonalDetailsSummary, NannyChildcareAddressSummary, NannyFirstAidTrainingSummary, \
-    NannyChildcareTrainingSummary, NannyInsuranceCoverSummary, NannyTaskList, NannyYourChildrenSummary
-from .test_utils import side_effect
+    NannyChildcareTrainingSummary, NannyInsuranceCoverSummary, NannyTaskList
+from arc_application.tests.utils import side_effect
 
 test_app_id = side_effect('application').record['application_id']
 
 
+@tag('http')
 @mock.patch.object(IdentityGatewayActions, 'read', side_effect=side_effect)
 @mock.patch.object(NannyGatewayActions, 'create', side_effect=side_effect)
 @mock.patch.object(NannyGatewayActions, 'read', side_effect=side_effect)
@@ -25,7 +24,7 @@ test_app_id = side_effect('application').record['application_id']
 @mock.patch.object(NannyGatewayActions, 'patch', side_effect=side_effect)
 @mock.patch.object(NannyGatewayActions, 'put', side_effect=side_effect)
 @mock.patch.object(NannyGatewayActions, 'delete', side_effect=side_effect)
-class TestNannyFlagging(TestCase):
+class NannyFlaggingFunctionalTests(TestCase):
     """
     Test suite for the functionality to flag fields as an ARC user.
     """
@@ -40,60 +39,13 @@ class TestNannyFlagging(TestCase):
         g = Group.objects.create(name=settings.ARC_GROUP)
         g.user_set.add(cls.user)
 
-        super(TestNannyFlagging, cls).setUpTestData()
+        super(NannyFlaggingFunctionalTests, cls).setUpTestData()
 
     def setUp(self):
         self.client.login(username='governor_tARCin', password='my_secret')
         Arc.objects.create(application_id=test_app_id)
 
-        super(TestNannyFlagging, self).setUp()
-
-    # -------------- #
-    # Helper methods #
-    # -------------- #
-
-    @staticmethod
-    def _create_post_data(fields_to_flag):
-        post_data = dict((field + '_declare', 'on') for field in fields_to_flag)
-
-        for field in fields_to_flag:
-            post_data[field + '_comments'] = 'Flagged'
-
-        return post_data
-
-    @staticmethod
-    def _assert_create_call_made_with_given_params(create_mock, endpoint, params):
-        """
-        Use to assert that a 'create' method was called with a given endpoint and parameters at least once.
-        Custom method easier than accessing table pk for a given form and using bulit-in mock.assert_any_call()
-        """
-        # Get all calls made to the given endpoint.
-        endpoint_calls = [call for call in create_mock.call_args_list if call[0][0] == endpoint]
-
-        if len(endpoint_calls) == 0:
-            raise AssertionError('The "create" method was not called with the endpoint "{0}".'.format(endpoint))
-
-        # Iterate through list of calls to endpoint.
-        # Iterate through the expected parameter values.
-        # If any value in call != expected value, break, then move to next call.
-        # If all values match that call, return None; a match for the expected parameters values was found. Test passes.
-        # If any no calls match, raise AssertionError. Test fails.
-
-        for call in endpoint_calls:
-            for param_name, exp_param_val in params.items():
-                if not call[1]['params'][param_name] == exp_param_val or (
-                        type(exp_param_val) == str and not call[1]['params'][param_name] in exp_param_val):
-                    break
-            else:
-                return None
-
-        raise AssertionError(
-            'The "create" method was called using the "{0}" endpoint, but not with the specified parameters.'.format(
-                endpoint))
-
-    # ---------- #
-    # HTTP tests #
-    # ---------- #
+        super(NannyFlaggingFunctionalTests, self).setUp()
 
     def test_can_render_sign_in_details_page(self, *args):
         """
@@ -112,15 +64,6 @@ class TestNannyFlagging(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.resolver_match.func.__name__, NannyPersonalDetailsSummary.as_view().__name__)
-
-    def test_can_render_your_children_details_page(self, *args):
-        """
-        Test to ensure that the page for flagging your children details can be rendered.
-        """
-        response = self.client.get(reverse('nanny_your_children_summary') + '?id=' + test_app_id)
-
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.resolver_match.func.__name__, NannyYourChildrenSummary.as_view().__name__)
 
     def test_can_render_childcare_address_details_page(self, *args):
         """
@@ -227,38 +170,6 @@ class TestNannyFlagging(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(found.func.view_class.__name__, NannyPersonalDetailsSummary.as_view().__name__)
 
-    def test_personal_details_redirects_to_the_your_children_page_if_your_children_is_true(self, *args):
-        """
-        Test that a POST request to the personal details page redirects to the your children details page.
-        """
-        response = self.client.post(reverse('nanny_personal_details_summary') + '?id=' + test_app_id)
-        found = resolve(response.url)
-
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(found.func.view_class.__name__, NannyYourChildrenSummary.as_view().__name__, )
-
-    def test_personal_details_redirects_to_the_childcare_address_page_if_your_children_is_false(self, *args):
-        """
-        Test that a POST request to the personal details page redirects to the childcare address details page.
-        """
-        self.skipTest('NotImplemented')
-
-    def test_your_children_redirects_to_the_childcare_address_page(self, *args):
-        """
-        Test that a POST request to the personal details page redirects to the childcare address details page.
-        """
-        response = self.client.post(reverse('nanny_your_children_summary') + '?id=' + test_app_id,
-                                    data={
-                                        'id': test_app_id,
-                                        'form-TOTAL_FORMS': '2',
-                                        'form-INITIAL_FORMS': '2',
-                                        'form-MAX_NUM_FORMS': '2',
-                                    })
-        found = resolve(response.url)
-
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(found.func.view_class.__name__, NannyChildcareAddressSummary.as_view().__name__, )
-
     def test_childcare_address_details_redirects_to_the_first_aid_page(self, *args):
         """
         Test that a POST request to the childcare address details page redirects to the first aid details page.
@@ -326,7 +237,8 @@ class TestNannyFlagging(TestCase):
             'date_of_birth',
             'lived_abroad',
             'home_address',
-            'your_children',
+            'known_to_social_services',
+            'reasons_known_to_social_services'
         ]
 
         post_data = self._create_post_data(fields_to_flag)
@@ -350,7 +262,8 @@ class TestNannyFlagging(TestCase):
             'date_of_birth',
             'lived_abroad',
             'home_address',
-            'your_children',
+            'known_to_social_services',
+            'reasons_known_to_social_services'
         ]
 
         post_data = self._create_post_data(fields_to_flag)
@@ -372,23 +285,6 @@ class TestNannyFlagging(TestCase):
                          })
 
         self.assertEqual(Arc.objects.get(pk=test_app_id).personal_details_review, 'COMPLETED')
-
-    def test_flagging_your_children_details_sets_status_to_flagged(self, *args):
-        self.skipTest('NotImplemented')
-
-    def test_flagging_your_children_details_creates_arc_comments(self, *args):
-        self.skipTest('NotImplemented')
-
-    def test_not_flagging_your_children_details_sets_status_to_reviewed(self, *args):
-        self.client.post(reverse('nanny_your_children_summary') + '?id=' + test_app_id,
-                         data={
-                             'id': test_app_id,
-                             'form-TOTAL_FORMS': '2',
-                             'form-INITIAL_FORMS': '2',
-                             'form-MAX_NUM_FORMS': '2',
-                         })
-
-        self.assertEqual(Arc.objects.get(pk=test_app_id).your_children_review, 'COMPLETED')
 
     def test_flagging_first_two_childcare_address_questions_creates_arc_comments(self, *args):
         fields_to_flag = [
@@ -555,7 +451,7 @@ class TestNannyFlagging(TestCase):
     def test_flagging_criminal_record_checks_details_creates_arc_comments(self, *args):
         fields_to_flag = [
             'dbs_number',
-            'convictions',
+            'on_dbs_update_service',
         ]
 
         post_data = self._create_post_data(fields_to_flag)
@@ -624,28 +520,45 @@ class TestNannyFlagging(TestCase):
     def test_get_form_initial_values_populates_with_existing_arc_comments(self, *args):
         self.skipTest('NotImplemented')
 
-    # ---------- #
-    # UNIT tests #
-    # ---------- #
+    # -------------- #
+    # Helper methods #
+    # -------------- #
 
-    @tag('unit')
-    def test_form_builder(self, *args):
+    @staticmethod
+    def _create_post_data(fields_to_flag):
+        post_data = dict((field + '_declare', 'on') for field in fields_to_flag)
+
+        for field in fields_to_flag:
+            post_data[field + '_comments'] = 'Flagged'
+
+        return post_data
+
+    @staticmethod
+    def _assert_create_call_made_with_given_params(create_mock, endpoint, params):
         """
-        Test to assert that the form_builder functions as expected.
+        Use to assert that a 'create' method was called with a given endpoint and parameters at least once.
+        Custom method easier than accessing table pk for a given form and using bulit-in mock.assert_any_call()
         """
-        example_fields = [
-            'field_1',
-            'field_2',
-        ]
+        # Get all calls made to the given endpoint.
+        endpoint_calls = [call for call in create_mock.call_args_list if call[0][0] == endpoint]
 
-        form = NannyFormBuilder(example_fields, api_endpoint_name='fake-endpoint').create_form()
+        if len(endpoint_calls) == 0:
+            raise AssertionError('The "create" method was not called with the endpoint "{0}".'.format(endpoint))
 
-        self.assertIsInstance(form(), Form)
+        # Iterate through list of calls to endpoint.
+        # Iterate through the expected parameter values.
+        # If any value in call != expected value, break, then move to next call.
+        # If all values match that call, return None; a match for the expected parameters values was found. Test passes.
+        # If any no calls match, raise AssertionError. Test fails.
 
-        for field in example_fields:
-            self.assertIn(field + '_declare', form().fields)
-            self.assertIn(field + '_comments', form().fields)
+        for call in endpoint_calls:
+            for param_name, exp_param_val in params.items():
+                if not call[1]['params'][param_name] == exp_param_val or (
+                        type(exp_param_val) == str and not call[1]['params'][param_name] in exp_param_val):
+                    break
+            else:
+                return None
 
-    @tag('unit')
-    def test_formset_builder(self, *args):
-        self.skipTest('NotImplemented')
+        raise AssertionError(
+            'The "create" method was called using the "{0}" endpoint, but not with the specified parameters.'.format(
+                endpoint))
