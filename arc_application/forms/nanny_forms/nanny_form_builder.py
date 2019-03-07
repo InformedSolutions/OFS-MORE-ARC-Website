@@ -107,7 +107,9 @@ home_address_fields = [
 ]
 
 previous_registration_fields = [
-    'home_address',
+    'previous_registration',
+    'individual_id',
+    'five_years_in_UK'
 ]
 
 where_you_will_work_fields = [

@@ -1,65 +1,52 @@
+from django.conf import settings
+from django.shortcuts import render
+from django.http import HttpResponseRedirect
+
 from ...forms.nanny_forms.nanny_form_builder import PreviousRegistrationForm
 from arc_application.services.db_gateways import NannyGatewayActions
-
-from .nanny_form_view import NannyARCFormView
-
-
-class NannyPreviousRegistrationView(NannyARCFormView):
-    template_name = 'nanny_add_previous_registration_template.html'
-    success_url = 'nanny_personal_details_summary'
-    #task_for_review = 'personal_details_review'
-    verbose_task_name = 'Previous Registration'
-    form_class = PreviousRegistrationForm
-
-    def get_context_data(self, application_id):
-        """
-        Creates the context dictionary for this view.
-        :param application_id: Reviewed application's id.
-        :return: Context dictionary.
-        """
-        self.application_id = application_id
-        # Get nanny information
-        nanny_actions = NannyGatewayActions()
-        dbs_record = nanny_actions.read('dbs-check', params={'application_id': application_id}).record
-
-        dbs_page_link = 'dbs:Capita-DBS-Details-View'
-        lived_abroad = dbs_record['lived_abroad']
-        is_ofsted_dbs = dbs_record['is_ofsted_dbs']
-        within_three_months = dbs_record['within_three_months']
+from arc_application.models import Application
+from .nanny_form_view import FormView
 
 
-        lived_abroad = dbs_record['lived_abroad']
-        is_ofsted_dbs = dbs_record['is_ofsted_dbs']
-        on_dbs_update_service = dbs_record['on_dbs_update_service']
-        dbs_number = dbs_record['dbs_number']
-        form = self.get_form()
+class NannyPreviousRegistrationView(FormView):
 
-        context = {
-            'application_id': application_id,
-            'title': 'Review: ' + self.verbose_task_name,
-            'form': form,
-            'change_link': 'nanny_dbs_summary',
-            'rows': [
-                {
-                    'id': 'lived_abroad',
-                    'name': 'Have you lived outside of the UK in the last 5 years?',
-                    'info': lived_abroad,
-                    # Prevent checkbox appearing if summary page is calling get_context_data.
-                    'declare': form['lived_abroad_declare'] if hasattr(self, 'request') else '',
-                    'comments': form['lived_abroad_comments'],
-                },
-                {
-                    'id': 'is_ofsted_dbs',
-                    'name': 'Did they get their DBS check from the Ofsted DBS application website?',
-                    'info': is_ofsted_dbs
-                },
-                {
-                    'id': 'within_three_months',
-                    'name': 'Is it dated within the last 3 months?',
-                    'info': within_three_months,
-                    'hidden': not is_ofsted_dbs
-                },
-            ]
-        }
+        def get(self, request, *args, **kwargs):
+            application_id_local = request.GET["id"]
+            form = PreviousRegistrationForm()
+            variables = {
+                'form': form,
+                'application_id': application_id_local,
+            }
 
-        return context
+            return render(request, 'nanny_add_previous_registration.html', variables)
+
+        def post(self, request, *args, **kwargs):
+            application_id_local = request.POST["id"]
+            form = PreviousRegistrationForm(request.POST, id=application_id_local)
+
+            if form.is_valid():
+                app = Application.objects.get(pk=application_id_local)
+                previous_registration = form.cleaned_data.get('previous_registration')
+                individual_id = form.cleaned_data.get('individual_id')
+                five_years_in_uk = form.cleaned_data.get('five_years_in_UK')
+
+                if PreviousRegistrationForm.objects.filter(application_id=app).exists():
+                    previous_reg_details = PreviousRegistrationForm.objects.get(application_id=app)
+                else:
+                    previous_reg_details = PreviousRegistrationForm(application_id=app)
+
+                previous_reg_details.previous_registration = previous_registration
+                previous_reg_details.individual_id = individual_id
+                previous_reg_details.five_years_in_UK = five_years_in_uk
+                previous_reg_details.save()
+
+                redirect_link = '/nanny/personal-details/summary'
+                return HttpResponseRedirect(settings.URL_PREFIX + redirect_link + '?id=' + application_id_local)
+
+            else:
+                variables = {
+                    'form': form,
+                    'application_id': application_id_local,
+                }
+
+                return render(request, 'nanny_add_previous_registration.html', context=variables)
