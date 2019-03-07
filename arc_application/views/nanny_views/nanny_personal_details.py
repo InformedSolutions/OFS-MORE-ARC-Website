@@ -117,4 +117,5 @@ class NannyPersonalDetailsSummary(NannyARCFormView):
         return context
 
     def get_success_url(self):
-        return 'nanny_childcare_address_summary'
+        return 'nanny_previous_registration'
+        #return 'nanny_childcare_address_summary'
