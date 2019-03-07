@@ -34,6 +34,8 @@ class NannyPersonalDetailsSummary(NannyARCFormView):
                                               params={'application_id': application_id}).record
         home_address = nanny_actions.read('applicant-home-address',
                                           params={'application_id': application_id}).record
+        previous_registration_details = nanny_actions.read('nanny-previous-registration-details',
+                                          params={'application_id': application_id}).record
 
         first_name = personal_details['first_name']
         middle_names = personal_details['middle_names']
@@ -53,9 +55,14 @@ class NannyPersonalDetailsSummary(NannyARCFormView):
 
         reasons_known_to_social_services = personal_details['reasons_known_to_social_services']
 
+        previous_registration = previous_registration_details['previous_registration']
+        individual_id = previous_registration_details['individual_id']
+        five_years_in_UK = previous_registration_details['five_years_in_UK']
+
         forms = self.get_forms()
         personal_details_form = forms[0]
         home_address_form = forms[1]
+        previous_registration_form = forms[2]
 
         context = {
             'application_id': application_id,
@@ -98,6 +105,27 @@ class NannyPersonalDetailsSummary(NannyARCFormView):
                                                                                                     'request') else '',
                     'comments': personal_details_form['known_to_social_services_comments'],
 
+                },
+                {
+                    'id': 'previous_registration',
+                    'name': 'Previously registered with Ofsted?',
+                    'info': previous_registration,
+                    'declare': previous_registration_form['previous_registration_declare'] if hasattr(self, 'request') else '',
+                    'comments': previous_registration_form['previous_registration_comments'],
+                },
+                {
+                    'id': 'individual_id',
+                    'name': 'Individual ID',
+                    'info': individual_id,
+                    'declare': previous_registration_form['individual_id_declare'] if hasattr(self, 'request') else '',
+                    'comments': previous_registration_form['individual_id_comments'],
+                },
+                {
+                    'id': 'five_years_in_UK',
+                    'name': 'Lived in England for more than 5 years?',
+                    'info': five_years_in_UK,
+                    'declare': previous_registration_form['five_years_in_UK_declare'] if hasattr(self, 'request') else '',
+                    'comments': previous_registration_form['five_years_in_UK_comments'],
                 }
             ]
         }
