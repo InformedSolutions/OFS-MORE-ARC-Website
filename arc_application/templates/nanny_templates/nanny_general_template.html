@@ -57,8 +57,20 @@
 
         {% endfor %}
 
+
         </tbody>
     </table>
+
+        {% block personal_details_review %}
+            {% for row in rows %}
+                {% if row.id == 'name' %}
+                    <button type="submit" name="previous_registration_details" class="button button-secondary button-add-another" value="/personal-details/previous-registration/">
+                        Add previous registration
+                    </button>
+                    <br>
+                {% endif %}
+            {% endfor %}
+        {% endblock %}
 
     <input type="submit" class="button" value="Confirm and continue"/>
     <input type="hidden" value="{{application_id}}" name="id"/>
