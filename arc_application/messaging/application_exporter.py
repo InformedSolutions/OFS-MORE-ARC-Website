@@ -57,7 +57,7 @@ class ApplicationExporter:
                 'current_illnesses': serializers.serialize('json', list(current_illnesses))
             })
 
-        export['health'] = adults_in_home_export
+        export['additional_adult_details'] = json.dumps(adults_in_home_export)
 
         applicant_name = ApplicantName.objects.filter(application_id=application_id)
         export['applicant_name'] = serializers.serialize('json', applicant_name)
