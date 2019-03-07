@@ -78,5 +78,5 @@
    {% include 'nanny_templates/nanny_return_to_list.html' %}
 
 </form>
-
+ <a href="{% url 'personal_details_previous_names' %}?id={{ application_id }}&person_id={{ application_id }}&type=APPLICANT" class="button button-secondary">Add previous names</a>
 {% endblock %}
