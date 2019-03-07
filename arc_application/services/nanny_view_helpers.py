@@ -1,6 +1,3 @@
-from arc_application.services.db_gateways import NannyGatewayActions
-
-
 def parse_date_of_birth(dob_str):
     '''
     Converts dob_str to it's corresponding parts.

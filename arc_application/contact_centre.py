@@ -3,8 +3,8 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 
-from arc_application.services.search_service import SearchService
-from arc_application.views.childminder_views.review import has_group
+from .services.search_service import SearchService
+from .views.base import has_group
 from .forms.childminder_forms.form import SearchForm
 from .models import ApplicantName, ApplicantPersonalDetails, Application
 

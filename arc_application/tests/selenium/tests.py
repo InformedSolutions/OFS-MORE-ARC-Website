@@ -13,7 +13,7 @@ from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.chrome.options import Options
 
 from .selenium_task_executor import SeleniumTaskExecutor
-from arc_application.models import Application
+from ...models import Application
 
 from faker import Faker
 

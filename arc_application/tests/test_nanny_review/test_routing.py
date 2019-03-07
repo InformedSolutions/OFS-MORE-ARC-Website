@@ -1,17 +1,17 @@
-from datetime import datetime, timezone
+from datetime import datetime
+from unittest import skipUnless
 from unittest.mock import patch
 
 from django.test import tag, TestCase
 from django.urls import reverse, resolve
 from django.conf import settings
 
-from arc_application.models import Arc
-from arc_application.services.db_gateways import NannyGatewayActions, IdentityGatewayActions
-from arc_application.views import NannyDbsCheckSummary, NannyContactDetailsSummary, NannyArcSummary, \
+from ...models import Arc
+from ...services.db_gateways import NannyGatewayActions, IdentityGatewayActions
+from ...views import NannyDbsCheckSummary, NannyContactDetailsSummary, NannyArcSummary, \
     NannyPersonalDetailsSummary, NannyChildcareAddressSummary, NannyFirstAidTrainingSummary, \
     NannyChildcareTrainingSummary, NannyInsuranceCoverSummary, NannyTaskList
-from arc_application.tests import utils
-
+from ...tests import utils
 
 ARC_STATUS_FLAGGED = 'FLAGGED'
 ARC_STATUS_COMPLETED = 'COMPLETED'
@@ -25,6 +25,7 @@ APP_STATUS_ACCEPTED = 'ACCEPTED'
 
 
 @tag('http')
+@skipUnless(settings.ENABLE_NANNIES, 'Skipping test as Nanny feature toggle equated to False')
 class NannyReviewFuncTestsBase(TestCase):
 
     def setUp(self):
@@ -170,7 +171,7 @@ class ReviewPersonalDetailsTests(NannyReviewFuncTestsBase):
                 'flagged': True,
             })
 
-    def test_flagging_personal_details_sets_status_to_flagged(self,):
+    def test_flagging_personal_details_sets_status_to_flagged(self, ):
         fields_to_flag = [
             'name',
             'date_of_birth',
@@ -571,7 +572,7 @@ class ReviewSummaryAndConfirmationFunctionalTests(NannyReviewFuncTestsBase):
         arc.save()
 
         # id must be both GET and POST parameter
-        self.client.post(reverse('nanny_arc_summary')+'?id='+self.test_app_id, data={'id': self.test_app_id})
+        self.client.post(reverse('nanny_arc_summary') + '?id=' + self.test_app_id, data={'id': self.test_app_id})
 
         # in accepted status
         self.assertTrue('date_accepted' in app_field_updates)
@@ -586,7 +587,7 @@ class ReviewSummaryAndConfirmationFunctionalTests(NannyReviewFuncTestsBase):
         refetched_arc = Arc.objects.get(pk=arc.pk)
         self.assertTrue(refetched_arc.user_id in ('', None))
 
-    @patch('arc_application.views.base.datetime', new=MockDatetime)
+    @patch('datetime.datetime', new=MockDatetime)
     def test_submit_summary_releases_application_as_needing_info_in_database_if_tasks_have_been_flagged(self):
 
         # set up gateway mocks to record changes to application fields
@@ -625,7 +626,7 @@ class ReviewSummaryAndConfirmationFunctionalTests(NannyReviewFuncTestsBase):
         arc.save()
 
         # id must be both GET and POST parameter
-        self.client.post(reverse('nanny_arc_summary')+'?id='+self.test_app_id, data={'id': self.test_app_id})
+        self.client.post(reverse('nanny_arc_summary') + '?id=' + self.test_app_id, data={'id': self.test_app_id})
 
         # not in accepted status
         self.assertTrue('date_accepted' not in app_field_updates
@@ -645,4 +646,3 @@ class ReviewSummaryAndConfirmationFunctionalTests(NannyReviewFuncTestsBase):
             self.assertEqual(ARC_STATUS_FLAGGED, getattr(refetched_arc, '{}_review'.format(task)))
         for task in ARC_TASKS_UNFLAGGED:
             self.assertEqual(ARC_STATUS_COMPLETED, getattr(refetched_arc, '{}_review'.format(task)))
-

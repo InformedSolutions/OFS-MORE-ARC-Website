@@ -2,13 +2,12 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
-from django.views.generic import FormView
 
-from arc_application.childminder_task_util import get_show_people_in_the_home, get_show_references
+from ...childminder_task_util import get_show_people_in_the_home, get_show_references
 from ...forms.childminder_forms.form import DBSCheckForm
-from arc_application.models import Application, Arc, CriminalRecordCheck
-from arc_application.review_util import redirect_selection, request_to_comment, save_comments
-from arc_application.decorators import group_required, user_assigned_application
+from ...models import Application, Arc, CriminalRecordCheck
+from ...review_util import redirect_selection, request_to_comment, save_comments
+from ...decorators import group_required, user_assigned_application
 
 
 @login_required

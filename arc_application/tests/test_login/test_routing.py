@@ -2,8 +2,8 @@
 from django.test import TestCase, tag
 from django.urls import reverse
 
-from arc_application.models import Arc, Application
-from arc_application.tests.utils import create_childminder_application, create_arc_user
+from ...models import Arc, Application
+from ...tests.utils import create_childminder_application, create_arc_user
 
 
 @tag('http')

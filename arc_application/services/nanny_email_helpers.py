@@ -4,8 +4,8 @@ import time
 
 from django.conf import settings
 
-from arc_application.notify import send_email
-from arc_application.services.db_gateways import IdentityGatewayActions
+from ..notify import send_email
+from ..services.db_gateways import IdentityGatewayActions
 
 
 def send_accepted_email(email, first_name, ref):

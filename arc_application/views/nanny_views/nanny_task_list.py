@@ -3,9 +3,9 @@ from django.shortcuts import render
 from django.utils.decorators import method_decorator
 from django.views import View
 
-from arc_application.models import Arc
-from arc_application.services.db_gateways import NannyGatewayActions
-from arc_application.services.nanny_view_helpers import parse_date_of_birth, \
+from ...models import Arc
+from ...services.db_gateways import NannyGatewayActions
+from ...services.nanny_view_helpers import parse_date_of_birth, \
     nanny_all_reviewed
 
 

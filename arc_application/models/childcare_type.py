@@ -2,6 +2,7 @@ from uuid import uuid4
 from django.db import models
 from .application import Application
 
+
 class ChildcareType(models.Model):
     """
     Model for CHILDCARE_TYPE table

@@ -4,9 +4,9 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render
 
 from ...forms.childminder_forms.form import FirstAidTrainingForm
-from arc_application.models import Application, Arc, FirstAidTraining
-from arc_application.review_util import redirect_selection, request_to_comment, save_comments
-from arc_application.decorators import group_required, user_assigned_application
+from ...models import Application, Arc, FirstAidTraining
+from ...review_util import redirect_selection, request_to_comment, save_comments
+from ...decorators import group_required, user_assigned_application
 
 
 @login_required

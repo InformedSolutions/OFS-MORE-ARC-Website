@@ -15,9 +15,9 @@ from django.utils.text import capfirst
 
 from govuk_forms.forms import GOVUKForm
 from timeline_logger.models import TimelineLog
-from arc_application.review_util import reset_declaration
-from arc_application.models import Application, Arc
-from arc_application.services.db_gateways import NannyGatewayActions
+from ..review_util import reset_declaration
+from ..models import Application, Arc
+from ..services.db_gateways import NannyGatewayActions
 
 
 def custom_login(request):

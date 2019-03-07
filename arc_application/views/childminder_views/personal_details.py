@@ -7,11 +7,11 @@ from django.forms import modelformset_factory
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 
-from arc_application.decorators import group_required, user_assigned_application
-from arc_application.models import ApplicantPersonalDetails, ApplicantName, ApplicantHomeAddress, Arc, Application, \
+from ...decorators import group_required, user_assigned_application
+from ...models import ApplicantPersonalDetails, ApplicantName, ApplicantHomeAddress, Arc, Application, \
     PreviousName, uuid4
-from arc_application.review_util import request_to_comment, save_comments, redirect_selection, build_url
-from arc_application.views.childminder_views.personal_details_addresses import get_stored_addresses
+from ...review_util import request_to_comment, save_comments, redirect_selection, build_url
+from ...views.childminder_views.personal_details_addresses import get_stored_addresses
 from ...forms.childminder_forms.form import PersonalDetailsForm, OtherPersonPreviousNames, PreviousRegistrationDetails
 
 logger = logging.getLogger()

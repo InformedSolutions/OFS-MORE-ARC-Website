@@ -3,24 +3,22 @@ from datetime import datetime
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import Group
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.utils.decorators import method_decorator
 from django.views import View
 
-from arc_application.childminder_task_util import all_complete
-from arc_application.decorators import group_required, user_assigned_application
-from arc_application.forms.childminder_forms.form import AdultInYourHomeForm, ChildInYourHomeForm, \
+from ...childminder_task_util import all_complete
+from ...decorators import group_required, user_assigned_application
+from ...forms.childminder_forms.form import AdultInYourHomeForm, ChildInYourHomeForm, \
     OtherPersonPreviousRegistrationDetailsForm
-from arc_application.forms.childminder_forms.form import PreviousRegistrationDetailsForm, ChildForm, ChildAddressForm
-from arc_application.magic_link import generate_magic_link
-from arc_application.models import AdultInHome
-from arc_application.models import ApplicantName, ApplicantPersonalDetails, Application, Arc, ArcComments, \
-    ChildcareType, UserDetails
-from arc_application.models import PreviousRegistrationDetails, OtherPersonPreviousRegistrationDetails
-from arc_application.notify import send_email
-from arc_application.views.base import release_application
+from ...forms.childminder_forms.form import PreviousRegistrationDetailsForm, ChildForm, ChildAddressForm
+from ...magic_link import generate_magic_link
+from ...notify import send_email
+from ...views.base import release_application
+
+from ...models import ApplicantName, ApplicantPersonalDetails, Application, Arc, ArcComments, ChildcareType, \
+    UserDetails, OtherPersonPreviousRegistrationDetails, PreviousRegistrationDetails, AdultInHome
 
 decorators = [login_required, group_required(settings.ARC_GROUP), user_assigned_application]
 
@@ -50,6 +48,16 @@ def review(request):
             first_name = applicant_name.first_name
 
     if all_complete(application_id_local, True):
+
+        # Get fresh version of application as it will have been updated in method call
+        if Application.objects.filter(application_id=application_id_local).exists():
+            application = Application.objects.get(application_id=application_id_local)
+            application.date_accepted = datetime.now()
+            application.save()
+
+        from ...messaging import ApplicationExporter
+        ApplicationExporter.export_childminder_application(application_id_local)
+
         personalisation = {'first_name': first_name, 'ref': app_ref}
         accepted_email(email, first_name, app_ref, application_id_local)
         send_survey_email(email, personalisation, application)
@@ -93,16 +101,6 @@ def review(request):
         }
 
         return render(request, 'review-sent-back.html', variables)
-
-
-def has_group(user, group_name):
-    """
-    Check if user is in group
-    :return: True if user is in group, else false
-    """
-    group = Group.objects.get(name=group_name)
-
-    return True if group in user.groups.all() else False
 
 
 def send_survey_email(email, personalisation, application):
@@ -188,6 +186,9 @@ def other_people_initial_population(adult, person_list):
                     field_name_local = field[:-8]
                     checkbox = (ArcComments.objects.filter(table_pk=table_id).get(field_name=field_name_local)).flagged
                     temp_dict[field] = True
+
+                if adult and field == 'cygnum_relationship':
+                    temp_dict[field] = person.cygnum_relationship_to_childminder
 
             except ArcComments.DoesNotExist:
                 pass

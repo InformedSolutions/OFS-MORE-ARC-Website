@@ -3,7 +3,7 @@ from django.shortcuts import render
 from django.views import View
 from django.utils.decorators import method_decorator
 
-from arc_application.services.db_gateways import NannyGatewayActions
+from ...services.db_gateways import NannyGatewayActions
 
 
 @method_decorator(login_required, name='get')

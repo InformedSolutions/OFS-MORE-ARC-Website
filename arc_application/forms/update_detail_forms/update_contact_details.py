@@ -10,7 +10,7 @@ from django import forms
 from django.conf import settings
 from govuk_forms.forms import GOVUKForm
 
-from arc_application.models import UserDetails
+from ...models import UserDetails
 from ..childminder_forms.form_helper import initial_data_filler
 
 

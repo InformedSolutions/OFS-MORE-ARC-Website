@@ -1,10 +1,10 @@
 
 from django.test import TestCase, tag
 
-from arc_application.models import ChildcareType
-from arc_application.tests.utils import create_childminder_application, create_arc_user
-from arc_application.childminder_task_util import get_number_of_tasks
-from arc_application.views.childminder_views.type_of_childcare import get_register_name
+from ...models import ChildcareType
+from ...tests.utils import create_childminder_application, create_arc_user
+from ...childminder_task_util import get_number_of_tasks
+from ...views.childminder_views.type_of_childcare import get_register_name
 
 
 @tag('unit')

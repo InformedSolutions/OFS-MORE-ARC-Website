@@ -1,7 +1,7 @@
 import abc
 import json
 
-from arc_application.models import Arc
+from ..models import Arc
 from .db_gateways import NannyGatewayActions
 
 

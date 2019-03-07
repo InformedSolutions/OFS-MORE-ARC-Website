@@ -4,9 +4,9 @@ from django.shortcuts import render
 from django.utils.decorators import method_decorator
 from django.views import View
 
-from arc_application.models import Arc
-from arc_application.review_util import build_url
-from arc_application.services.db_gateways import IdentityGatewayActions
+from ...models import Arc
+from ...review_util import build_url
+from ...services.db_gateways import IdentityGatewayActions
 
 
 @method_decorator(login_required, name='get')

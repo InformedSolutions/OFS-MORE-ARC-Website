@@ -2,10 +2,10 @@ import csv
 from datetime import datetime
 import json
 
-from arc_application.decorators import group_required
-from arc_application.models import CapitaDBSFile
-from arc_application.services import dbs_api
-from arc_application.forms import UploadCapitaDBSForm
+from ..decorators import group_required
+from ..models import CapitaDBSFile
+from ..services import dbs_api
+from ..forms import UploadCapitaDBSForm
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required

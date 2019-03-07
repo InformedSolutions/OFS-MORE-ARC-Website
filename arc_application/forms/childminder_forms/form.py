@@ -13,9 +13,9 @@ from django.forms import ModelForm
 from govuk_forms.forms import GOVUKForm
 from govuk_forms.widgets import InlineRadioSelect, NumberInput, Select
 
-from arc_application.models import Arc as ArcReview, PreviousRegistrationDetails
-from arc_application.models import OtherPersonPreviousRegistrationDetails
-from arc_application.models import PreviousAddress, PreviousName
+from ...models import Arc as ArcReview, PreviousRegistrationDetails
+from ...models import OtherPersonPreviousRegistrationDetails
+from ...models import PreviousAddress, PreviousName
 from ... import custom_field_widgets
 from ...review_util import populate_initial_values, get_non_db_field_arc_comment
 from ...widgets.ConditionalPostChoiceWidget import ConditionalPostInlineRadioSelect
@@ -1001,6 +1001,7 @@ class AdultInYourHomeForm(GOVUKForm):
     """
     Comments form for the People in your home review page: adults in home
     """
+    auto_replace_widgets = True
 
     health_check_status_declare = forms.BooleanField(label='This information is correct',
                                                      widget=custom_field_widgets.CustomCheckboxInput, required=False)
@@ -1051,6 +1052,69 @@ class AdultInYourHomeForm(GOVUKForm):
                                       help_text='(Tip: be clear and concise)',
                                       widget=custom_field_widgets.Textarea, required=False,
                                       max_length=500)
+
+    cygnum_relationship_choices = (
+        (None, ''),
+        ('Acting manager', 'Acting manager'),
+        ('Boyfriend', 'Boyfriend'),
+        ('Brother', 'Brother'),
+        ('Brother in law', 'Brother in law'),
+        ('Chairperson', 'Chairperson'),
+        ('Childminding Assistant', 'Childminding Assistant'),
+        ('CIO Member', 'CIO Member'),
+        ('Co-Childminder', 'Co-Childminder'),
+        ('Committee Member', 'Committee Member'),
+        ('Co-Ordinator', 'Co-Ordinator'),
+        ('Cousin', 'Cousin'),
+        ('Daughter', 'Daughter'),
+        ('Deputy Manager', 'Deputy Manager'),
+        ('Director', 'Director'),
+        ('Father', 'Father'),
+        ('Father in Law', 'Father in Law'),
+        ('Fiancé', 'Fiancé'),
+        ('Foster Child', 'Foster Child'),
+        ('Friend', 'Friend'),
+        ('Governor', 'Governor'),
+        ('Granddaughter', 'Granddaughter'),
+        ('Grandson', 'Grandson'),
+        ('Head Teacher', 'Head Teacher'),
+        ('Home Childcarer', 'Home Childcarer'),
+        ('Husband', 'Husband'),
+        ('Job Share', 'Job Share'),
+        ('Joint Manager', 'Joint Manager'),
+        ('Lodger', 'Lodger'),
+        ('Manager', 'Manager'),
+        ('Managing Director', 'Managing Director'),
+        ('Mother', 'Mother'),
+        ('Mother in Law', 'Mother in Law'),
+        ('Named Contact', 'Named Contact'),
+        ('Nephew', 'Nephew'),
+        ('Niece', 'Niece'),
+        ('Owner', 'Owner'),
+        ('Partner', 'Partner'),
+        ('Person in Charge', 'Person in Charge'),
+        ('Secretary', 'Secretary'),
+        ('Sister', 'Sister'),
+        ('Son', 'Son'),
+        ('Son in Law', 'Son in Law'),
+        ('Step-Daughter', 'Step-Daughter'),
+        ('Step-Son', 'Step-Son'),
+        ('Supervisor', 'Supervisor'),
+        ('Tenant', 'Tenant'),
+        ('Treasurer', 'Treasurer'),
+        ('Trustee', 'Trustee'),
+        ('Vice Chair', 'Vice Chair'),
+        ('Wife', 'Wife'),
+    )
+
+    cygnum_relationship = forms.ChoiceField(
+        label='Select (Cygnum) relationship type',
+        required=True,
+        error_messages={
+            'required': 'You must select a relationship type for this person'
+        },
+        choices=cygnum_relationship_choices,
+    )
 
     within_three_months_comments = forms.CharField(label='Is it dated within the last 3 months?',
                                                    help_text='(Tip: be clear and concise)',
@@ -1215,6 +1279,7 @@ class YourChildrenForm(GOVUKForm):
                                                         help_text='(Tip: be clear and concise)',
                                                         widget=custom_field_widgets.Textarea,
                                                         required=False, max_length=500)
+
     instance_id = forms.CharField(widget=forms.HiddenInput, required=False)
 
     def __init__(self, *args, **kwargs):
@@ -1379,6 +1444,8 @@ class ChildInYourHomeForm(GOVUKForm):
     """
     Comments form for the People in your home review page: children in home
     """
+    auto_replace_widgets = True
+
     full_name_declare = forms.BooleanField(label='This information is correct',
                                            widget=custom_field_widgets.CustomCheckboxInput, required=False)
     full_name_comments = forms.CharField(label='Name', help_text='(Tip: be clear and concise)',

@@ -1,11 +1,11 @@
 from django.conf import settings
 from django.views.generic import FormView
 
-from arc_application.forms.update_detail_forms.update_contact_details import NannyUpdateEmail, NannyUpdatePhoneNumber, \
+from ...forms.update_detail_forms.update_contact_details import NannyUpdateEmail, NannyUpdatePhoneNumber, \
     NannyUpdateAddPhoneNumber
-from arc_application.review_util import build_url
-from arc_application.services.db_gateways import IdentityGatewayActions
-from arc_application.views.childminder_views.review import has_group
+from ...review_util import build_url
+from ...services.db_gateways import IdentityGatewayActions
+from ...views.base import has_group
 
 
 class NannyChangeDetails(FormView):

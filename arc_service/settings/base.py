@@ -4,7 +4,7 @@ import os
 SERVER_LABEL = 'Test_1'
 
 ARC_GROUP = 'arc'
-CONTACT_CENTRE= 'contact-centre'
+CONTACT_CENTRE = 'contact-centre'
 APPLICATION_LIMIT = 5
 
 DBS_URL = os.environ.get('APP_DBS_URL')
@@ -13,6 +13,10 @@ NOTIFY_URL = os.environ.get('APP_NOTIFY_URL')
 
 # Base URL of addressing-service gateway
 ADDRESSING_URL = os.environ.get('APP_ADDRESSING_URL')
+
+IDENTITY_URL = os.environ.get('APP_IDENTITY_URL')
+
+NANNY_GATEWAY_URL = os.environ.get('APP_NANNY_GATEWAY_URL')
 
 # Base URL of DBS-api application
 DBS_URL = os.environ.get('APP_DBS_URL')
@@ -220,3 +224,7 @@ LOGGING = {
       },
     },
 }
+
+APPLICATION_QUEUE_NAME = os.environ.get('SQS_QUEUE_PREFIX') + "_CM_APPLICATION_QUEUE"
+AWS_SQS_ACCESS_KEY_ID = os.environ.get('AWS_SQS_ACCESS_KEY_ID')
+AWS_SQS_SECRET_ACCESS_KEY = os.environ.get('AWS_SQS_SECRET_ACCESS_KEY')

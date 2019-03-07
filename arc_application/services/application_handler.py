@@ -6,8 +6,8 @@ from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 
 from timeline_logger.models import TimelineLog
 
-from arc_application.models import Arc, Application, ApplicantName
-from arc_application.services.db_gateways import NannyGatewayActions
+from ..models import Arc, Application, ApplicantName
+from ..services.db_gateways import NannyGatewayActions
 
 
 class GenericApplicationHandler:

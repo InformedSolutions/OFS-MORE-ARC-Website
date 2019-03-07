@@ -2,6 +2,7 @@ import datetime
 from uuid import uuid4
 from django.db import models
 from .application import Application
+from .childcare_type import ChildcareType
 
 
 class AdultInHome(models.Model):
@@ -33,12 +34,12 @@ class AdultInHome(models.Model):
     email_resent_timestamp = models.DateTimeField(null=True, blank=True)
     lived_abroad = models.NullBooleanField(blank=True)
     military_base = models.NullBooleanField(blank=True)
+    cygnum_relationship_to_childminder = models.CharField(max_length=100, blank=True)
     capita = models.NullBooleanField(blank=True)  # dbs was found on capita list?
     enhanced_check = models.NullBooleanField(blank=True)  # stated they have a capita dbs?
     on_update = models.NullBooleanField(blank=True)  # stated they are signed up to dbs update service?
     certificate_information = models.TextField(blank=True)  # information from dbs certificate
     within_three_months = models.NullBooleanField(blank=True)  # dbs was issued within three months of lookup?
-
 
     @property
     def timelog_fields(self):
@@ -89,8 +90,13 @@ class AdultInHome(models.Model):
     def bool_to_string(bool):
         return "Yes" if bool else "No"
 
-    def get_summary_table(self):
-        from .childcare_type import ChildcareType
+    def get_summary_table(self, apply_filtering_for_eyc=False):
+        """
+        Method for generating a summary table of details pertaining to an adult
+        :param apply_filtering_for_eyc: a flag to indicate whether fields should be excluded when used to generate EYC
+        summary tables
+        :return: a summary table of the adult
+        """
 
         if self.birth_day < 10:
             birth_day = '0' + str(self.birth_day)
@@ -103,6 +109,7 @@ class AdultInHome(models.Model):
             birth_month = str(self.birth_month)
 
         date_of_birth = birth_day + ' ' + birth_month + ' ' + str(self.birth_year)
+
         summary_table = [
             {"title": self.get_full_name(),
              "id": self.pk},
@@ -119,43 +126,52 @@ class AdultInHome(models.Model):
             {"name": "Lived abroad in the last 5 years?",
              "value": self.bool_to_string(self.lived_abroad)},
         ]
+
         if ChildcareType.objects.get(application_id=self.application_id).zero_to_five:
             summary_table += [
                 {"name": "Lived or worked on British military base in the last 5 years?",
                  "value": self.bool_to_string(self.military_base)}
             ]
+
         summary_table += [
             {"name": "Did they get their DBS check from the Ofsted DBS application website?",
              "value": self.bool_to_string(self.capita)},
         ]
+
         if self.capita:
             summary_table += [
                 {"name": "Is it dated within the last 3 months?",
                  "value": self.bool_to_string(self.within_three_months)}
             ]
+
         summary_table += [
             {"name": "DBS certificate number",
              "value": self.dbs_certificate_number},
         ]
+
         if self.show_enhanced_check():
             summary_table += [
                 {"name": "Enhanced DBS check for home-based childcare?",
                  "value": self.bool_to_string(self.enhanced_check)}
             ]
+
         if self.show_on_update():
             summary_table += [
                 {"name": "On the update service?",
                  "value": self.bool_to_string(self.on_update)}
             ]
-        summary_table += [
-            {"name": "Known to council social Services in regards to their own children?",
-             "value": self.bool_to_string(self.known_to_council)},
-        ]
-        if self.known_to_council:
+
+        if not apply_filtering_for_eyc:
             summary_table += [
-                {"name": "Tell us why",
-                 "value": self.reasons_known_to_council_health_check}
+                {"name": "Known to council social Services in regards to their own children?",
+                 "value": self.bool_to_string(self.known_to_council)},
             ]
+
+            if self.known_to_council:
+                summary_table += [
+                    {"name": "Tell us why",
+                     "value": self.reasons_known_to_council_health_check}
+                ]
 
         return summary_table
 

@@ -6,7 +6,7 @@ from django.shortcuts import render
 from django.utils.decorators import method_decorator
 from django.views import View
 
-from arc_application.views import NannyArcSummary
+from ...views import NannyArcSummary
 from ..base import has_group
 from ...services.db_gateways import NannyGatewayActions
 

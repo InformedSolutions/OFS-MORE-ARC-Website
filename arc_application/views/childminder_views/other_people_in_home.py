@@ -6,7 +6,7 @@ from django.forms import formset_factory, modelformset_factory
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 
-from arc_application.childminder_task_util import get_show_references
+from ...childminder_task_util import get_show_references
 from ...decorators import group_required, user_assigned_application
 from ...forms.childminder_forms.form import AdultInYourHomeForm, ChildInYourHomeForm, OtherPeopleInYourHomeForm, \
     OtherPersonPreviousNames, \
@@ -265,6 +265,13 @@ def other_people_summary(request):
                 for person_post_data, person_model in zip(section['POST_data'], section['models']):
                     person_comments = request_to_comment(person_model.pk, person_model._meta.db_table, person_post_data)
                     save_comments(request, person_comments)
+
+                    # Save cygnum relationship type equivalent to person object being iterated
+                    if type(person_model) is AdultInHome:
+                        person_model.cygnum_relationship_to_childminder = person_post_data['cygnum_relationship']
+
+                    person_model.save()
+
                     if person_comments:
                         section_status = 'FLAGGED'
                         application = Application.objects.get(pk=application_id_local)

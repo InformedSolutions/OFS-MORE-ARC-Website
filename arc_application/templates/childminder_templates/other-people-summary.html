@@ -72,6 +72,7 @@
         </table>
 
         {% for record, id, health_check_status, name, day, month, year, relationship, email, dbs_certificate_number, dbs_on_capita, dbs_is_recent, enhanced_check, on_update, lived_abroad, military_base, formsetadult, current_illness_set, serious_illness_set, hospital_admission_set, reasons_known_to_council_health_check, enhanced_check in adult_lists %}
+
         <table class="check-your-answers form-group">
             <thead>
             <tr>
@@ -470,6 +471,30 @@
         <br>
         <a href="{% url 'other-people-previous-addresses' %}?id={{ application_id }}&state=entry&person_id={{id}}&person_type=ADULT" class="button button-secondary">Add previous addresses</a>
 
+        <table class="check-your-answers form-group">
+            <thead>
+            <tr>
+                <th colspan="3">
+                    <div class="heading-medium">
+                        {{ name }} relationship
+                    </div>
+                </th>
+            </tr>
+            </thead>
+            <tbody>
+                <td colspan="1">
+                    <label id="{{ formsetadult.cygnum_relationship.auto_id }}-label">
+                        {{ formsetadult.cygnum_relationship.label }}
+                    </label>
+                </td>
+                <td colspan="2">
+                    {% for error in formsetadult.cygnum_relationship.errors %}
+                      <span class="error-message">{{ error }}</span>
+                    {% endfor %}
+                    {{ formsetadult.cygnum_relationship }}
+                </td>
+            </tbody>
+        </table>
 
 
          <table class="check-your-answers">

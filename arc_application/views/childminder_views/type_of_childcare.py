@@ -2,9 +2,9 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
-from arc_application.models import Arc, ChildcareType
-from arc_application.review_util import redirect_selection
-from arc_application.decorators import group_required, user_assigned_application
+from ...models import Arc, ChildcareType
+from ...review_util import redirect_selection
+from ...decorators import group_required, user_assigned_application
 
 
 @login_required

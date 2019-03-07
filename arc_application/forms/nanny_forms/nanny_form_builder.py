@@ -2,7 +2,7 @@ from django import forms
 from django.forms import formset_factory
 from django.utils.functional import cached_property
 
-from arc_application import custom_field_widgets
+from ...custom_field_widgets import *
 
 
 class NannyFormBuilder:
@@ -64,13 +64,13 @@ class NannyFormBuilder:
         for field in self.field_names:
             self.form_fields[field + '_declare'] = forms.BooleanField(
                                                         label='This information is correct',
-                                                        widget=custom_field_widgets.CustomCheckboxInput,
+                                                        widget=CustomCheckboxInput,
                                                         required=False
                                                     )
             self.form_fields[field + '_comments'] = forms.CharField(
                                                         label='Enter your reasoning',
                                                         help_text='(Tip: be clear and concise)',
-                                                        widget=custom_field_widgets.Textarea,
+                                                        widget=Textarea,
                                                         required=False,
                                                         max_length=500
                                                     )
