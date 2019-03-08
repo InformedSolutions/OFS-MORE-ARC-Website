@@ -100,13 +100,12 @@ class ChildminderApplicationHandler(GenericApplicationHandler):
             for app in childminder_apps_for_review:
                 if app.date_updated > app.date_submitted:
                     resubmitted_apps.append(app)
-                else:
-                    submitted_apps.append(app)
+
         if any(resubmitted_apps):
             resubmitted_apps = sorted(resubmitted_apps, key=lambda i: i.date_updated)
             return resubmitted_apps[0].application_id
-        elif any(submitted_apps):
-            submitted_apps = sorted(submitted_apps, key=lambda i: i.date_updated)
+        elif any(childminder_apps_for_review):
+            submitted_apps = sorted(childminder_apps_for_review, key=lambda i: i.date_updated)
             return submitted_apps[0].application_id
         else:
             raise ObjectDoesNotExist('No applications available.')
