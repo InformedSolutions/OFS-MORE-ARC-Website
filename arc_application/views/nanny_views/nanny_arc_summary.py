@@ -51,6 +51,11 @@ class NannyArcSummary(View):
 
         if no_flags_exist:
             send_accepted_email(**email_personalisation)
+
+            # Import used here explicitly to prevent circular import
+            from ...messaging import ApplicationExporter
+            ApplicationExporter.create_full_nanny_application_export(application_id)
+
             release_application(request, application_id, 'ACCEPTED')
         else:
             send_returned_email(application_id, **email_personalisation)
