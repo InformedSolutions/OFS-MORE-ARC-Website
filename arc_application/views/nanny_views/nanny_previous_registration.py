@@ -4,7 +4,6 @@ from django.http import HttpResponseRedirect
 
 from arc_application.forms.nanny_forms.nanny_previous_registration_form import PreviousRegistrationDetailsForm
 from arc_application.services.db_gateways import NannyGatewayActions
-from ...forms.nanny_forms.nanny_form_builder import PreviousRegistrationForm
 from .nanny_form_view import FormView
 
 
@@ -22,7 +21,7 @@ class NannyPreviousRegistrationView(FormView):
 
         def post(self, request, *args, **kwargs):
             application_id = request.POST["id"]
-            form = PreviousRegistrationForm(request.POST)
+            form = PreviousRegistrationDetailsForm(request.POST)
 
             if form.is_valid():
                 previous_registration = form.cleaned_data.get('previous_registration')
@@ -38,7 +37,7 @@ class NannyPreviousRegistrationView(FormView):
                     previous_registration_record['individual_id'] = self.request.POST['individual_id']
                     previous_registration_record['five_years_in_UK'] = self.request.POST['five_years_in_UK']
 
-                    NannyGatewayActions().put('nanny-previous-registration-details', params=previous_registration)
+                    NannyGatewayActions().put('nanny-previous-registration-details', params=previous_registration_record)
                 else:
                     previous_registration_new = {}
                     previous_registration_new['application_id'] = application_id
@@ -46,7 +45,7 @@ class NannyPreviousRegistrationView(FormView):
                     previous_registration_new['individual_id'] = self.request.POST['individual_id']
                     previous_registration_new['five_years_in_UK'] = self.request.POST['five_years_in_UK']
 
-                    NannyGatewayActions().create('nanny-previous-registration-details', params=previous_registration)
+                    response = NannyGatewayActions().create('nanny-previous-registration-details', params=previous_registration_new)
 
                 redirect_link = '/nanny/personal-details/'
                 return HttpResponseRedirect(settings.URL_PREFIX + redirect_link + '?id=' + application_id)
