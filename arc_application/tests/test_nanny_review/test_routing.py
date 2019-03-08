@@ -1,5 +1,5 @@
 from datetime import datetime
-from unittest import skipUnless
+from unittest import skipUnless, mock
 from unittest.mock import patch
 
 from django.test import tag, TestCase
@@ -539,53 +539,55 @@ class ReviewSummaryAndConfirmationFunctionalTests(NannyReviewFuncTestsBase):
     @patch('arc_application.views.base.datetime', new=MockDatetime)
     def test_submit_summary_releases_application_as_accepted_in_database_if_no_tasks_flagged(self):
 
-        # set up gateway mocks to record changes to application fields
-        app_field_updates = {}
-        ok_response = self.nanny_gateway.make_response(200)
+        with mock.patch('arc_application.messaging.application_exporter.ApplicationExporter.create_full_nanny_application_export'):
 
-        def record_field_updates(endpoint, params):
-            if endpoint == 'application' and params['application_id'] == self.test_app_id:
-                app_field_updates.update(params)
-            return ok_response
+            # set up gateway mocks to record changes to application fields
+            app_field_updates = {}
+            ok_response = self.nanny_gateway.make_response(200)
 
-        self.ngw_delete_mock.side_effect = lambda e, p: self.fail()
-        self.ngw_put_mock.side_effect = record_field_updates
-        self.ngw_patch_mock.side_effect = record_field_updates
+            def record_field_updates(endpoint, params):
+                if endpoint == 'application' and params['application_id'] == self.test_app_id:
+                    app_field_updates.update(params)
+                return ok_response
 
-        APP_TASKS_ALL = ['childcare_address', 'childcare_training', 'dbs', 'first_aid', 'insurance_cover',
-                         'login_details', 'personal_details']
-        ARC_TASKS_ALL = ['childcare_address', 'childcare_training', 'dbs', 'first_aid', 'insurance_cover',
-                         'login_details', 'personal_details']
+            self.ngw_delete_mock.side_effect = lambda e, p: self.fail()
+            self.ngw_put_mock.side_effect = record_field_updates
+            self.ngw_patch_mock.side_effect = record_field_updates
 
-        for task in APP_TASKS_ALL:
-            self.nanny_gateway.nanny_application['{}_status'.format(task)] = APP_STATUS_COMPLETED
-            self.nanny_gateway.nanny_application['{}_arc_flagged'.format(task)] = False
+            APP_TASKS_ALL = ['childcare_address', 'childcare_training', 'dbs', 'first_aid', 'insurance_cover',
+                             'login_details', 'personal_details']
+            ARC_TASKS_ALL = ['childcare_address', 'childcare_training', 'dbs', 'first_aid', 'insurance_cover',
+                             'login_details', 'personal_details']
 
-        self.nanny_gateway.nanny_application['declarations_status'] = APP_STATUS_COMPLETED
-        self.nanny_gateway.nanny_application['application_status'] = APP_STATUS_REVIEW
+            for task in APP_TASKS_ALL:
+                self.nanny_gateway.nanny_application['{}_status'.format(task)] = APP_STATUS_COMPLETED
+                self.nanny_gateway.nanny_application['{}_arc_flagged'.format(task)] = False
 
-        arc = Arc.objects.get(application_id=self.test_app_id)
+            self.nanny_gateway.nanny_application['declarations_status'] = APP_STATUS_COMPLETED
+            self.nanny_gateway.nanny_application['application_status'] = APP_STATUS_REVIEW
 
-        for task in ARC_TASKS_ALL:
-            setattr(arc, '{}_review'.format(task), ARC_STATUS_COMPLETED)
+            arc = Arc.objects.get(application_id=self.test_app_id)
 
-        arc.save()
+            for task in ARC_TASKS_ALL:
+                setattr(arc, '{}_review'.format(task), ARC_STATUS_COMPLETED)
 
-        # id must be both GET and POST parameter
-        self.client.post(reverse('nanny_arc_summary') + '?id=' + self.test_app_id, data={'id': self.test_app_id})
+            arc.save()
 
-        # in accepted status
-        self.assertTrue('date_accepted' in app_field_updates)
-        self.assertEqual(datetime(2019, 2, 27, 17, 30, 5), app_field_updates['date_accepted'])
-        self.assertTrue('application_status' in app_field_updates)
-        self.assertEqual(APP_STATUS_ACCEPTED, app_field_updates['application_status'])
-        # declaration unchanged
-        self.assertTrue('declarations_status' not in app_field_updates
-                        or app_field_updates['declarations_status'] == APP_STATUS_COMPLETED)
+            # id must be both GET and POST parameter
+            self.client.post(reverse('nanny_arc_summary') + '?id=' + self.test_app_id, data={'id': self.test_app_id})
 
-        # unassigned from arc user
-        refetched_arc = Arc.objects.get(pk=arc.pk)
-        self.assertTrue(refetched_arc.user_id in ('', None))
+            # in accepted status
+            self.assertTrue('date_accepted' in app_field_updates)
+            self.assertEqual(datetime(2019, 2, 27, 17, 30, 5), app_field_updates['date_accepted'])
+            self.assertTrue('application_status' in app_field_updates)
+            self.assertEqual(APP_STATUS_ACCEPTED, app_field_updates['application_status'])
+            # declaration unchanged
+            self.assertTrue('declarations_status' not in app_field_updates
+                            or app_field_updates['declarations_status'] == APP_STATUS_COMPLETED)
+
+            # unassigned from arc user
+            refetched_arc = Arc.objects.get(pk=arc.pk)
+            self.assertTrue(refetched_arc.user_id in ('', None))
 
     @patch('datetime.datetime', new=MockDatetime)
     def test_submit_summary_releases_application_as_needing_info_in_database_if_tasks_have_been_flagged(self):

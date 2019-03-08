@@ -7,6 +7,7 @@ from ..models import Application, AdultInHome, \
     HealthCheckHospital, HealthCheckSerious, HealthCheckCurrent
 
 from ..views.childminder_views.childminder_utils import get_application_summary_variables
+from ..views.nanny_views.nanny_utils import get_nanny_summary_variables
 
 
 class DocumentGenerator:
@@ -15,14 +16,14 @@ class DocumentGenerator:
     """
 
     @staticmethod
-    def get_full_application_summary(application_id):
+    def get_full_childminder_application_summary(application_id):
         """
         Generates a full application summary in a PDF format that has been base64 encoded
         (for EYC portions of a document submission to NOO)
         """
         resp = HttpResponse(content_type='application/pdf')
         variables = get_application_summary_variables(application_id, apply_filtering_for_eyc=True)
-        result = generate_pdf('pdf-summary.html', file_object=resp, context=variables)
+        result = generate_pdf('childminder-pdf-summary.html', file_object=resp, context=variables)
         base64_string = str(base64.b64encode(result.content).decode("utf-8"))
         return base64_string
 
@@ -77,6 +78,21 @@ class DocumentGenerator:
             'application_reference': application_reference,
         }
 
-        result = generate_pdf('pdf-summary.html', file_object=resp, context=variables)
+        result = generate_pdf('childminder-pdf-summary.html', file_object=resp, context=variables)
+        base64_string = str(base64.b64encode(result.content).decode("utf-8"))
+        return base64_string
+
+    @staticmethod
+    def get_full_nanny_application_summary(application_id, application_reference):
+        """
+        Generates a full nanny application summary in a PDF format that has been base64 encoded
+        """
+        resp = HttpResponse(content_type='application/pdf')
+        nanny_summary_tables = get_nanny_summary_variables(application_id)
+        variables = {
+            'application_reference': application_reference,
+            'json': nanny_summary_tables
+        }
+        result = generate_pdf('nanny-pdf-summary.html', file_object=resp, context=variables)
         base64_string = str(base64.b64encode(result.content).decode("utf-8"))
         return base64_string

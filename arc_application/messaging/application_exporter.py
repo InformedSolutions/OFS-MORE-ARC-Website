@@ -111,11 +111,7 @@ class ApplicationExporter:
 
         # Create document exports
 
-        documents = {}
-
-        base64_string = DocumentGenerator.get_full_application_summary(application_id)
-
-        documents['EYC'] = base64_string
+        documents = {'EYC': DocumentGenerator.get_full_childminder_application_summary(application_id)}
 
         # If adults in home are present, append EY2 documents
         if len(adults_in_home):
@@ -139,7 +135,7 @@ class ApplicationExporter:
         return export
 
     @staticmethod
-    def create_full_nanny_application_export(application_id):
+    def create_full_nanny_application_export(application_id, application_reference):
         """
         Method for exporting a full nanny application in a dictionary format
         :param application_id: the identifier of the application to be exported
@@ -185,5 +181,11 @@ class ApplicationExporter:
 
         user_details = IdentityGatewayActions().read('user', params={'application_id': application_id}).record
         export['user_details'] = json.dumps(user_details)
+
+        documents = {
+            'CR1': DocumentGenerator.get_full_nanny_application_summary(application_id, application_reference)
+        }
+
+        export['documents'] = json.dumps(documents)
 
         return export

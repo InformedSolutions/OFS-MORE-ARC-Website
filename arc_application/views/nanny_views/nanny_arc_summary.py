@@ -8,16 +8,10 @@ from ...services.arc_comments_handler import update_returned_application_statuse
 from ...services.nanny_email_helpers import send_accepted_email, send_returned_email
 from ...services.nanny_view_helpers import nanny_all_completed
 from ...views.base import release_application
-from .nanny_childcare_address import NannyChildcareAddressSummary
-from .nanny_childcare_training import NannyChildcareTrainingSummary
-from .nanny_contact_details import NannyContactDetailsSummary
-from .nanny_dbs_check import NannyDbsCheckSummary
-from .nanny_first_aid import NannyFirstAidTrainingSummary
-from .nanny_insurance_cover import NannyInsuranceCoverSummary
-from .nanny_personal_details import NannyPersonalDetailsSummary
 from ...models import Arc
 from ...review_util import build_url
 from ...services.db_gateways import NannyGatewayActions, IdentityGatewayActions
+from .nanny_utils import get_nanny_summary_variables
 
 
 @method_decorator(login_required, name='get')
@@ -54,7 +48,8 @@ class NannyArcSummary(View):
 
             # Import used here explicitly to prevent circular import
             from ...messaging import ApplicationExporter
-            ApplicationExporter.create_full_nanny_application_export(application_id)
+            ApplicationExporter.create_full_nanny_application_export(application_id,
+                                                                     self.get_application_reference(application_id))
 
             release_application(request, application_id, 'ACCEPTED')
         else:
@@ -75,14 +70,7 @@ class NannyArcSummary(View):
         application_reference = self.get_application_reference(application_id)
         publish_details = self.get_publish_details(application_id)
 
-        context_function_list = self.get_context_function_list()
-
-        context_list = [context_func(application_id) for context_func in context_function_list if context_func]
-
-        # Remove 'Review: ' from page titles.
-        # FIXME Change each view to use verbose_task_name property instead.
-        for context in context_list:
-            context['title'] = context['title'][7:]
+        context_list = get_nanny_summary_variables(application_id)
 
         context = {
             'application_id': application_id,
@@ -95,22 +83,6 @@ class NannyArcSummary(View):
         }
 
         return context
-
-    @staticmethod
-    def get_context_function_list():
-        """
-        A method to return the contexts to be rendered on the master summary page.
-        :return: A list of functions that can be called with application_id to return a context dictionary.
-        """
-        return [
-            NannyContactDetailsSummary.create_context,
-            NannyPersonalDetailsSummary().get_context_data,
-            NannyChildcareAddressSummary().get_context_data,
-            NannyFirstAidTrainingSummary().get_context_data,
-            NannyChildcareTrainingSummary().get_context_data,
-            NannyDbsCheckSummary().get_context_data,
-            NannyInsuranceCoverSummary().get_context_data
-        ]
 
     @staticmethod
     def get_publish_details(application_id):
