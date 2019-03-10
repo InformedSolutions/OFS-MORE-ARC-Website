@@ -132,7 +132,7 @@ class ApplicationExporter:
 
         export['documents'] = json.dumps(documents)
 
-        return export
+        cm_application_sqs_handler.send_message(export)
 
     @staticmethod
     def create_full_nanny_application_export(application_id, application_reference):
@@ -188,4 +188,5 @@ class ApplicationExporter:
 
         export['documents'] = json.dumps(documents)
 
-        return export
+        na_application_sqs_handler.send_message(export)
+
