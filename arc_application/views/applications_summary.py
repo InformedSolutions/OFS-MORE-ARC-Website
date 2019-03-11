@@ -66,6 +66,10 @@ class ApplicationsSummaryView(View):
               
 
     def get_context_data(self):
+        """
+        method to get all row data for the applications summary
+        :return: context data
+        """
         context = {}
         childminder_data = self.get_childminder_data()
         nanny_data = self.get_nanny_data()
