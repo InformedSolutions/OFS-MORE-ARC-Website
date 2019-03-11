@@ -1,0 +1,30 @@
+{% extends 'govuk_template.html' %}
+{% load static %}
+{% load govuk_template_base %}
+{% block page_title %}Applications summary{% endblock %}
+
+{% block inner_content %}
+
+<div class="top-padded">
+
+<h2 class="heading-large">Applications summary</h2>
+
+<table class="table table-hover" id="request-table">
+        <thead>
+        <tr>
+            <th>Type</th>
+            <th>Childminder applications</th>
+            <th>Nanny applications</th>
+        </tr>
+        </thead>
+        {% for row in rows %}
+        <tr>
+            <td class="col-xs-1">{{row.name}}</td>
+            <td class="col-xs-1">{{row.childminder}}</td>
+            <td class="col-xs-1">{{row.nanny}}</td>
+        </tr>
+        {% endfor %}
+</table>
+</div>
+
+{% endblock %}
