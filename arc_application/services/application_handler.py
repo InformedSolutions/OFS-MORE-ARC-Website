@@ -92,12 +92,21 @@ class GenericApplicationHandler:
 class ChildminderApplicationHandler(GenericApplicationHandler):
 
     def _get_oldest_app_id(self):
-        childminder_apps_for_review = Application.objects.filter(application_status='SUBMITTED')
+        childminder_apps_for_review = list(Application.objects.filter(
+            application_status='SUBMITTED'))
+        resubmitted_apps = []
+        submitted_apps = []
+        if any(childminder_apps_for_review):
+            for app in childminder_apps_for_review:
+                if app.date_updated > app.date_submitted:
+                    resubmitted_apps.append(app)
 
-        if childminder_apps_for_review.exists():
-            childminder_apps_for_review = childminder_apps_for_review.order_by('date_updated')
-            return childminder_apps_for_review[0].application_id
-
+        if any(resubmitted_apps):
+            resubmitted_apps = sorted(resubmitted_apps, key=lambda i: i.date_updated)
+            return resubmitted_apps[0].application_id
+        elif any(childminder_apps_for_review):
+            submitted_apps = sorted(childminder_apps_for_review, key=lambda i: i.date_updated)
+            return submitted_apps[0].application_id
         else:
             raise ObjectDoesNotExist('No applications available.')
 

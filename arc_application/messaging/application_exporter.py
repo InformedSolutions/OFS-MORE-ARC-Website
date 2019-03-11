@@ -10,20 +10,28 @@ from ..models import Application, ApplicantName, ApplicantHomeAddress, Applicant
 
 from .document_generator import DocumentGenerator
 
+from ..services.db_gateways import NannyGatewayActions, IdentityGatewayActions
+
 from . import SQSHandler
 
-sqs_handler = SQSHandler(settings.APPLICATION_QUEUE_NAME)
+cm_application_sqs_handler = SQSHandler(settings.CM_APPLICATION_QUEUE_NAME)
+na_application_sqs_handler = SQSHandler(settings.NA_APPLICATION_QUEUE_NAME)
 
 
 class ApplicationExporter:
 
     @staticmethod
     def export_childminder_application(application_id):
-        payload = ApplicationExporter.create_full_application_export(application_id)
-        sqs_handler.send_message(payload)
+        payload = ApplicationExporter.create_full_childminder_application_export(application_id)
+        cm_application_sqs_handler.send_message(payload)
 
     @staticmethod
-    def create_full_application_export(application_id):
+    def export_nanny_application(application_id):
+        payload = ApplicationExporter.create_full_nanny_application_export(application_id)
+        na_application_sqs_handler.send_message(payload)
+
+    @staticmethod
+    def create_full_childminder_application_export(application_id):
         """
         Method for exporting a full application in a dictionary format
         :param application_id: the identifier of the application to be exported
@@ -127,5 +135,55 @@ class ApplicationExporter:
             documents['EY2'] = adult_documents
 
         export['documents'] = json.dumps(documents)
+
+        return export
+
+    @staticmethod
+    def create_full_nanny_application_export(application_id):
+        """
+        Method for exporting a full nanny application in a dictionary format
+        :param application_id: the identifier of the application to be exported
+        :return: a dictionary export of an application
+        """
+
+        export = {}
+
+        application = NannyGatewayActions().read('application', params={'application_id': application_id}).record
+
+        export['application'] = json.dumps(application)
+
+        # Try fetch childcare address if it exists
+        try:
+            childcare_addresses = NannyGatewayActions().list('childcare-address',
+                                                             params={'application_id': application_id}).record
+            export['childcare_addresses'] = json.dumps(childcare_addresses)
+        except:
+            export['childcare_addresses'] = json.dumps({})
+
+        applicant_personal_details = NannyGatewayActions().read('applicant-personal-details',
+                                                                params={'application_id': application_id}).record
+        export['applicant_personal_details'] = json.dumps(applicant_personal_details)
+
+        applicant_home_address = NannyGatewayActions().read('applicant-home-address',
+                                                            params={'application_id': application_id}).record
+        export['applicant_home_address'] = json.dumps(applicant_home_address)
+
+        childcare_training = NannyGatewayActions().read('childcare-training',
+                                                        params={'application_id': application_id}).record
+        export['childcare_training'] = json.dumps(childcare_training)
+
+        criminal_record_check = NannyGatewayActions().read('dbs-check',
+                                                           params={'application_id': application_id}).record
+        export['criminal_record_check'] = json.dumps(criminal_record_check)
+
+        first_aid_training = NannyGatewayActions().read('first-aid', params={'application_id': application_id}).record
+        export['first_aid_training'] = json.dumps(first_aid_training)
+
+        insurance_declaration = NannyGatewayActions().read('insurance-cover',
+                                                           params={'application_id': application_id}).record
+        export['insurance_declaration'] = json.dumps(insurance_declaration)
+
+        user_details = IdentityGatewayActions().read('user', params={'application_id': application_id}).record
+        export['user_details'] = json.dumps(user_details)
 
         return export
