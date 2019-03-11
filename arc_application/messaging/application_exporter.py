@@ -183,7 +183,7 @@ class ApplicationExporter:
         export['user_details'] = json.dumps(user_details)
 
         documents = {
-            'CR1': DocumentGenerator.get_full_nanny_application_summary(application_id, application_reference)
+            'CR': DocumentGenerator.get_full_nanny_application_summary(application_id, application_reference)
         }
 
         export['documents'] = json.dumps(documents)
