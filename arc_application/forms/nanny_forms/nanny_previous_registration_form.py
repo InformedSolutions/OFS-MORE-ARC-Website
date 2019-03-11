@@ -4,7 +4,7 @@ from django.forms import ModelForm
 from govuk_forms.forms import GOVUKForm
 from govuk_forms.widgets import InlineRadioSelect, NumberInput
 
-from ...widgets.ConditionalPostChoiceWidget import ConditionalPostInlineRadioSelect
+from ...widgets import ConditionalPostInlineRadioSelect
 
 class PreviousRegistrationDetailsForm(GOVUKForm):
     """
