@@ -53,18 +53,13 @@ class ApplicationsSummaryView(View):
         nanny_data['pending_applications'] = len(
             pending_apps_response.record) if pending_apps_response.status_code == 200 else 0
 
-        # get applications which have been submitted
-        # get applications in arc review
-        arc_apps_response = NannyGatewayActions().list("application", params={'application_status': "ARC_REVIEW"})
-        nanny_data['arc_applications'] = len(
-            arc_apps_response.record) if arc_apps_response.status_code == 200 else 0
-        # sum all applications not in drafting
-        nanny_data['non_draft_applications'] = nanny_data['pending_applications'] + nanny_data['returned_applications'] \
-                         + nanny_data['new_applications'] + nanny_data['arc_applications']
+        # get all applications
+        total_applications = len(NannyGatewayActions().list("application", params={"true": "true"}).record)
+        # take any applications in draft off the number of total applications
+        nanny_data['non_draft_applications'] = total_applications - nanny_data["draft_applications"]
 
         return nanny_data
               
-
     def get_context_data(self):
         """
         method to get all row data for the applications summary
