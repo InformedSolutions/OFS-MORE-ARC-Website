@@ -132,7 +132,8 @@ def release_application(request, application_id, status):
 
         if status == 'ACCEPTED':
             from ..messaging import ApplicationExporter
-            ApplicationExporter.create_full_nanny_application_export(application_id)
+            application_reference = app['application_reference']
+            ApplicationExporter.create_full_nanny_application_export(application_id, application_reference)
 
     # keep arc record but un-assign user from it
     if Arc.objects.filter(application_id=application_id).exists():
