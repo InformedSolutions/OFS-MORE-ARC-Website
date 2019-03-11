@@ -2,26 +2,29 @@
 {% load static %}
 {% load govuk_template_base %}
 {% block page_title %}Applications summary{% endblock %}
-
 {% block inner_content %}
 
 <div class="top-padded">
 
 <h2 class="heading-large">Applications summary</h2>
 
-<table class="table table-hover" id="request-table">
+<table>
         <thead>
         <tr>
             <th>Type</th>
-            <th>Childminder applications</th>
-            <th>Nanny applications</th>
+            <th class="col-center">Childminder applications</th>
+            <th class="col-center">Nanny applications</th>
         </tr>
         </thead>
         {% for row in rows %}
         <tr>
-            <td class="col-xs-1">{{row.name}}</td>
-            <td class="col-xs-1">{{row.childminder}}</td>
-            <td class="col-xs-1">{{row.nanny}}</td>
+            {% if row.id == "draft" or row.id == "total_submitted"%}
+                <td class="col-xs-1">{{row.name}}</td>
+            {% else %}
+                <td class="col-xs-1 col-indent">{{row.name}}</td>
+            {% endif %}
+            <td class="col-xs-1 col-center">{{row.childminder}}</td>
+            <td class="col-xs-1 col-center">{{row.nanny}}</td>
         </tr>
         {% endfor %}
 </table>
