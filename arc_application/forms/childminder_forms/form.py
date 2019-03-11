@@ -18,7 +18,7 @@ from ...models import OtherPersonPreviousRegistrationDetails
 from ...models import PreviousAddress, PreviousName
 from ... import custom_field_widgets
 from ...review_util import populate_initial_values, get_non_db_field_arc_comment
-from ...widgets.ConditionalPostChoiceWidget import ConditionalPostInlineRadioSelect
+from arc_application.widgets import ConditionalPostInlineRadioSelect
 
 
 class CheckBox(GOVUKForm):
