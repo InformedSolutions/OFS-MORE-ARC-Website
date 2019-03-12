@@ -4,7 +4,6 @@ from .adult_in_home import *
 from .applicant_personal_details import *
 from .applicant_home_address import *
 from .applicant_name import *
-from .application_reference import *
 from .arc import *
 from .arc_comments import *
 from .child_in_home import *

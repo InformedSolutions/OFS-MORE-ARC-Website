@@ -55,6 +55,7 @@ def review(request):
             application.date_accepted = datetime.now()
             application.save()
 
+        # Import used here explicitly to prevent circular import
         from ...messaging import ApplicationExporter
         ApplicationExporter.export_childminder_application(application_id_local)
 
