@@ -59,6 +59,7 @@ class NannyChildcareAddressSummary(NannyARCFormView):
             home_address_locations = {}
 
         where_you_will_work_form, childcare_address_formset = self.get_forms()
+        no_childcare_addresses = len(childcare_address_formset.forms)
 
         context = {
             'application_id': application_id,
@@ -83,8 +84,8 @@ class NannyChildcareAddressSummary(NannyARCFormView):
                     'id': 'home_address_locations',
                     'name': 'Childcare address',
                     'info': home_address_locations,
-                    'formset': childcare_address_formset
-                },
+                    'formset': childcare_address_formset if hasattr(self, 'request') else [''] * no_childcare_addresses
+                }
             ]
         }
 
