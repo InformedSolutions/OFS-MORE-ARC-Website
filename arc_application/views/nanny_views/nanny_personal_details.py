@@ -1,15 +1,17 @@
 import datetime
 
 from .nanny_form_view import NannyARCFormView
-from ...forms.nanny_forms.nanny_form_builder import HomeAddressForm, PersonalDetailsForm
+from ...forms.nanny_forms.nanny_form_builder import HomeAddressForm, PersonalDetailsForm, PreviousRegistrationForm
 from ...services.db_gateways import NannyGatewayActions
 
 
 class NannyPersonalDetailsSummary(NannyARCFormView):
-    template_name = 'nanny_general_template.html'
+    template_name = 'nanny_personal_details_summary.html'
     task_for_review = 'personal_details_review'
     verbose_task_name = 'Your personal details'
+    #form_class = [PersonalDetailsForm, HomeAddressForm, PreviousRegistrationForm]
     form_class = [PersonalDetailsForm, HomeAddressForm]
+
 
     @staticmethod
     def month_converter(dob_string):
@@ -132,7 +134,7 @@ class NannyPersonalDetailsSummary(NannyARCFormView):
             )
 
         if previous_registration_record_exists is True:
-            context['rows'] += [
+            context['rows'].append(
                 {
                     'id': 'previous_registration',
                     'name': 'Previously registered with Ofsted?',
@@ -140,14 +142,17 @@ class NannyPersonalDetailsSummary(NannyARCFormView):
                     'declare': previous_registration_form['previous_registration_declare'] if hasattr(self,
                                                                                                       'request') else '',
                     'comments': previous_registration_form['previous_registration_comments'],
-                },
-                {
-                    'id': 'individual_id',
-                    'name': 'Individual ID',
-                    'info': individual_id,
-                    'declare': previous_registration_form['individual_id_declare'] if hasattr(self, 'request') else '',
-                    'comments': previous_registration_form['individual_id_comments'],
-                },
+                })
+            if previous_registration is True:
+                context['rows'].append(
+                    {
+                        'id': 'individual_id',
+                        'name': 'Individual ID',
+                        'info': individual_id,
+                        'declare': previous_registration_form['individual_id_declare'] if hasattr(self, 'request') else '',
+                        'comments': previous_registration_form['individual_id_comments'],
+                    })
+            context['rows'].append(
                 {
                     'id': 'five_years_in_UK',
                     'name': 'Lived in England for more than 5 years?',
@@ -155,7 +160,7 @@ class NannyPersonalDetailsSummary(NannyARCFormView):
                     'declare': previous_registration_form['five_years_in_UK_declare'] if hasattr(self,
                                                                                                  'request') else '',
                     'comments': previous_registration_form['five_years_in_UK_comments'],
-                }]
+                })
 
         return context
 

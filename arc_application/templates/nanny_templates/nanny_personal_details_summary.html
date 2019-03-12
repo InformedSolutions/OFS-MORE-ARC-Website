@@ -56,6 +56,59 @@
         </tbody>
     </table>
 
+    <table class="check-your-answers form-group">
+        <thead>
+        <tr>
+            <th colspan="3">
+                <div class="heading-medium">
+                    Your own children
+                </div>
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+
+        {% for row in rows %}
+        {% if row.id|template_string_in_list:'known_to_social_services reasons_known_to_social_services' %}
+        {% include 'nanny_general_table_template.html' %}
+        {% endif %}
+        {% endfor %}
+
+        </tbody>
+    </table>
+
+    {% if row.id|template_string_in_list:'previous_registration five_years_in_UK' %}
+    <table class="check-your-answers form-group">
+        <thead>
+        <tr>
+            <th colspan="3">
+                <div class="heading-medium">
+                    Previous Registration
+                </div>
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+
+        {% for row in rows %}
+        {% if row.id|template_string_in_list:'previous_registration individual_id five_years_in_UK' %}
+        {% include 'nanny_general_table_template.html' %}
+        {% endif %}
+        {% endfor %}
+
+        </tbody>
+    </table>
+    {% endif %}
+
+    {% if not row.id|template_string_in_list:'previous_registration five_years_in_UK' %}
+        {% for row in rows %}
+            {% if row.id == 'name' %}
+            <a href="{% url 'nanny_previous_registration' %}?id={{ application_id }}&person_id={{ application_id }}&type=APPLICANT" class="button button-secondary">Add previous registration</a>
+            <br>
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+
     {% csrf_token %}
 
     <input type="submit" class="button" value="Confirm and continue"/>

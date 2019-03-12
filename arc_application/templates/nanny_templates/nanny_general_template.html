@@ -61,16 +61,6 @@
         </tbody>
     </table>
 
-        {% block personal_details_review %}
-            {% for row in rows %}
-                {% if row.id == 'name' %}
-
-                     <a href="{% url 'nanny_previous_registration' %}?id={{ application_id }}&person_id={{ application_id }}&type=APPLICANT" class="button button-secondary">Add previous registration</a>
-                    <br>
-                {% endif %}
-            {% endfor %}
-        {% endblock %}
-
     <input type="submit" class="button" value="Confirm and continue"/>
     <input type="hidden" value="{{application_id}}" name="id"/>
 
