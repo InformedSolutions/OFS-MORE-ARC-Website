@@ -77,7 +77,8 @@
         </tbody>
     </table>
 
-    {% if row.id|template_string_in_list:'previous_registration five_years_in_UK' %}
+    {% for row in rows %}
+    {% if row.id|template_string_in_list:'previous_registration' %}
     <table class="check-your-answers form-group">
         <thead>
         <tr>
@@ -99,15 +100,18 @@
         </tbody>
     </table>
     {% endif %}
+    {% endfor %}
 
-    {% if not row.id|template_string_in_list:'previous_registration five_years_in_UK' %}
+
+
         {% for row in rows %}
             {% if row.id == 'name' %}
+            {% if not row.id|template_string_in_list:'previous_registration' %}
             <a href="{% url 'nanny_previous_registration' %}?id={{ application_id }}&person_id={{ application_id }}&type=APPLICANT" class="button button-secondary">Add previous registration</a>
             <br>
             {% endif %}
+            {% endif %}
         {% endfor %}
-    {% endif %}
 
     {% csrf_token %}
 
