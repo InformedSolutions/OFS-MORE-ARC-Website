@@ -54,7 +54,7 @@ class ApplicationsSummaryView(View):
             pending_apps_response.record) if pending_apps_response.status_code == 200 else 0
 
         # get all applications
-        total_applications = len(NannyGatewayActions().list("application", params={"true": "true"}).record)
+        total_applications = len(NannyGatewayActions().list("application", params={}).record)
         # take any applications in draft off the number of total applications
         nanny_data['non_draft_applications'] = total_applications - nanny_data["draft_applications"]
 
