@@ -59,7 +59,6 @@ class NannyChildcareAddressSummary(NannyARCFormView):
             home_address_locations = {}
 
         where_you_will_work_form, childcare_address_formset = self.get_forms()
-        no_childcare_addresses = len(childcare_address_formset.forms)
 
         context = {
             'application_id': application_id,
