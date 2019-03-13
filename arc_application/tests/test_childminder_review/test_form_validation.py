@@ -315,3 +315,21 @@ class ReviewPersonalDetailsPreviousNamesFormValidationTests(TestCase):
             'start_date': [ERROR_MESSAGE_START_DATE_AFTER_END_DATE],
             'end_date': [ERROR_MESSAGE_END_DATE_BEFORE_START_DATE],
         })
+
+    def test_valid_when_all_fields_ok(self):
+
+        data = {
+            'first_name': 'Fred',
+            'middle_names': '',
+            'last_name': 'Bloggs',
+            'start_date_0': '21',
+            'start_date_1': '6',
+            'start_date_2': '2017',
+            'end_date_0': '15',
+            'end_date_1': '12',
+            'end_date_2': '2018',
+        }
+
+        form = self.form(data)
+
+        self.assertTrue(form.is_valid())

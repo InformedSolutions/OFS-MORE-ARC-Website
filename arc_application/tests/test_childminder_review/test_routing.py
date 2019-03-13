@@ -335,7 +335,8 @@ class ApplicantPreviousNamesFunctionalTests(TestCase):
 
         self.assertEqual(200, response.status_code)
         utils.assertView(response, 'add_applicant_previous_name')
-        utils.assertXPath(response, '//*[normalize-space(@class)="field-error"]')
+        utils.assertXPath(response, '//*[normalize-space(@class)="field-error" '
+                                    'or normalize-space(@class)="error-message"]')
 
     def test_submit_confirm_redirects_to_personal_details_summary_if_all_valid(self):
 
@@ -1193,9 +1194,6 @@ class AdultPreviousNamesFunctionalTests(TestCase):
         self.valid_names_post_data = [
             {
                 'form-0-previous_name_id': '888888884444AAAA4444121212121212',
-                'initial-form-0-previous_name_id': '888888884444AAAA4444121212121212',
-                'form-0-person_id': self.adult.pk,
-                'form-0-other_person_type': 'ADULT',
                 'form-0-first_name': 'Joe',
                 'form-0-middle_names': 'P',
                 'form-0-last_name': 'Smith',
@@ -1208,9 +1206,6 @@ class AdultPreviousNamesFunctionalTests(TestCase):
             },
             {
                 'form-1-previous_name_id': 'BBBBBBBB4444AAAA4444121212121212',
-                'initial-form-1-previous_name_id': 'BBBBBBBB4444AAAA4444121212121212',
-                'form-1-person_id': self.adult.pk,
-                'form-1-other_person_type': 'ADULT',
                 'form-1-first_name': 'Bill',
                 'form-1-middle_names': 'N',
                 'form-1-last_name': 'Ted',
@@ -1257,19 +1252,19 @@ class AdultPreviousNamesFunctionalTests(TestCase):
 
         self.assertEqual(200, response.status_code)
 
-        for field, value in [('first_name', 'Fresh'), ('first_name', 'Will'),
-                             ('middle_names', 'Prince'), ('middle_names', ''),
-                             ('last_name', 'Belair'), ('last_name', 'Smith'),
-                             ('start_date_0', '1'), ('start_date_0', '9'),
-                             ('start_date_1', '10'), ('start_date_1', '4'),
-                             ('start_date_2', '1999'), ('start_date_2', '2015'),
-                             ('end_date_0', '10'), ('end_date_0', '3'),
-                             ('end_date_1', '11'), ('end_date_1', '12'),
-                             ('end_date_2', '2007'), ('end_date_2', '2016')]:
+        for field, ftype, value in [('first_name', 'text', 'Fresh'), ('first_name', 'text', 'Will'),
+                                    ('middle_names', 'text', 'Prince'), ('middle_names', 'text', ''),
+                                    ('last_name', 'text', 'Belair'), ('last_name', 'text', 'Smith'),
+                                    ('start_date_0', 'number', '1'), ('start_date_0', 'number', '9'),
+                                    ('start_date_1', 'number', '10'), ('start_date_1', 'number', '4'),
+                                    ('start_date_2', 'number', '1999'), ('start_date_2', 'number', '2015'),
+                                    ('end_date_0', 'number', '10'), ('end_date_0', 'number', '3'),
+                                    ('end_date_1', 'number', '11'), ('end_date_1', 'number', '12'),
+                                    ('end_date_2', 'number', '2007'), ('end_date_2', 'number', '2016')]:
             utils.assertXPath(
                 response,
-                ('//input[normalize-space(@type)="text" and contains(normalize-space(@name), "{field}") '
-                 'and normalize-space(@value)="{value}"]').format(field=field, value=value)
+                ('//input[normalize-space(@type)="{ftype}" and contains(normalize-space(@name), "{field}") '
+                 'and normalize-space(@value)="{value}"]').format(field=field, value=value, ftype=ftype)
             )
 
     def test_submit_confirm_returns_to_page_with_error_if_any_not_valid(self):
@@ -1288,7 +1283,8 @@ class AdultPreviousNamesFunctionalTests(TestCase):
 
         self.assertEqual(200, response.status_code)
         utils.assertView(response, 'add_previous_name')
-        utils.assertXPath(response, '//*[normalize-space(@class)="field-error"]')
+        utils.assertXPath(response, '//*[normalize-space(@class)="field-error" '
+                                    'or normalize-space(@class)="error-message"]')
 
     def test_submit_confirm_redirects_to_people_in_home_summary_if_all_valid(self):
 
@@ -1343,25 +1339,26 @@ class AdultPreviousNamesFunctionalTests(TestCase):
         data = self._make_post_data(1, 'Add another name')
         data.update(self.valid_names_post_data[0])
 
-        response = self.client.post(url, data)
+        # follow redirects to land on target page
+        response = self.client.post(url, data, follow=True)
 
-        self.assertEqual(302, response.status_code)
-        utils.assertRedirectView(response, 'add_previous_name')
+        # check we were actually redirected
+        self.assertTrue(len(response.redirect_chain) > 0)
 
         # exactly one of each
-        for field, value in [('first_name', ''), ('first_name', 'Joe'),
-                             ('middle_names', ''), ('middle_names', 'P'),
-                             ('last_name', ''), ('last_name', 'Smith'),
-                             ('start_date_0', ''), ('start_date_0', '1'),
-                             ('start_date_1', ''), ('start_date_1', '10'),
-                             ('start_date_2', ''), ('start_date_2', '2010'),
-                             ('end_date_0', ''), ('end_date_0', '15'),
-                             ('end_date_1', ''), ('end_date_1', '9'),
-                             ('end_date_2', ''), ('end_date_2', '2016')]:
+        for field, ftype, value in [('first_name', 'text', ''), ('first_name', 'text', 'Joe'),
+                                    ('middle_names', 'text', ''), ('middle_names', 'text', 'P'),
+                                    ('last_name', 'text', ''), ('last_name', 'text', 'Smith'),
+                                    ('start_date_0', 'number', ''), ('start_date_0', 'number', '1'),
+                                    ('start_date_1', 'number', ''), ('start_date_1', 'number', '10'),
+                                    ('start_date_2', 'number', ''), ('start_date_2', 'number', '2010'),
+                                    ('end_date_0', 'number', ''), ('end_date_0', 'number', '15'),
+                                    ('end_date_1', 'number', ''), ('end_date_1', 'number', '9'),
+                                    ('end_date_2', 'number', ''), ('end_date_2', 'number', '2016')]:
             utils.assertXPathCount(
                 response,
-                ('//input[normalize-space(@type)="text" and normalize-space(@value)="{value}" '
-                 'and contains(normalize-space(@name), "{field}")]').format(field=field, value=value),
+                ('//input[normalize-space(@type)="{ftype}" and normalize-space(@value)="{value}" '
+                 'and contains(normalize-space(@name), "{field}")]').format(field=field, value=value, ftype=ftype),
                 1
             )
 
@@ -1378,7 +1375,6 @@ class AdultPreviousNamesFunctionalTests(TestCase):
         self.assertEqual(302, response.status_code)
 
         fetched_names = models.PreviousName.objects.filter(
-            application_id=self.application.pk,
             person_id=self.adult.pk,
             other_person_type='ADULT')
 
@@ -1398,34 +1394,71 @@ class AdultPreviousNamesFunctionalTests(TestCase):
 
     def test_submit_remove_returns_to_page_with_name_fields_removed(self):
 
+        # create existing database records which match the posted data
+        models.PreviousName.objects.create(
+            previous_name_id=self.valid_names_post_data[0]['form-0-previous_name_id'],
+            person_id=self.adult.pk,
+            other_person_type='ADULT',
+            first_name=self.valid_names_post_data[0]['form-0-first_name'],
+            middle_names=self.valid_names_post_data[0]['form-0-middle_names'],
+            last_name=self.valid_names_post_data[0]['form-0-last_name'],
+            start_day=int(self.valid_names_post_data[0]['form-0-start_date_0']),
+            start_month=int(self.valid_names_post_data[0]['form-0-start_date_1']),
+            start_year=int(self.valid_names_post_data[0]['form-0-start_date_2']),
+            end_day=int(self.valid_names_post_data[0]['form-0-end_date_0']),
+            end_month=int(self.valid_names_post_data[0]['form-0-end_date_1']),
+            end_year=int(self.valid_names_post_data[0]['form-0-end_date_2']),
+        )
+        models.PreviousName.objects.create(
+            previous_name_id=self.valid_names_post_data[1]['form-1-previous_name_id'],
+            person_id=self.adult.pk,
+            other_person_type='ADULT',
+            first_name=self.valid_names_post_data[1]['form-1-first_name'],
+            middle_names=self.valid_names_post_data[1]['form-1-middle_names'],
+            last_name=self.valid_names_post_data[1]['form-1-last_name'],
+            start_day=int(self.valid_names_post_data[1]['form-1-start_date_0']),
+            start_month=int(self.valid_names_post_data[1]['form-1-start_date_1']),
+            start_year=int(self.valid_names_post_data[1]['form-1-start_date_2']),
+            end_day=int(self.valid_names_post_data[1]['form-1-end_date_0']),
+            end_month=int(self.valid_names_post_data[1]['form-1-end_date_1']),
+            end_year=int(self.valid_names_post_data[1]['form-1-end_date_2']),
+        )
+
         url = reverse('other-people-previous-names') \
             + '?id={}&person_id={}&type={}'.format(self.application.pk, self.adult.pk, 'ADULT')
 
-        data = self._make_post_data(2, 'delete')
+        data = self._make_post_data(2)
         data.update(self.valid_names_post_data[0])
         data.update(self.valid_names_post_data[1])
-        data[data['form-0-previous_name_id']] = 'Remove this name'
+        data['delete-'+data['form-0-previous_name_id']] = 'Remove this name'
 
-        response = self.client.post(url, data)
+        # follow redirects to land on target page
+        response = self.client.post(url, data, follow=True)
 
-        self.assertEqual(302, response.status_code)
-        utils.assertRedirectView(response, 'add_previous_name')
+        # check that we were actually redirected
+        self.assertTrue(len(response.redirect_chain) > 0)
 
-        for field, value in [('first_name', 'Bill'), ('middle_names', 'N'), ('last_name', 'Ted'),
-                             ('start_date_0', '15'), ('start_date_1', '2'), ('start_date_2', '2009'),
-                             ('end_date_0', '23'), ('end_date_1', '12'), ('end_date_2', '2017')]:
+        for field, ftype, value in [('first_name', 'text', 'Bill'),
+                                    ('middle_names', 'text', 'N'),
+                                    ('last_name', 'text', 'Ted'),
+                                    ('start_date_0', 'number', '15'),
+                                    ('start_date_1', 'number', '2'),
+                                    ('start_date_2', 'number', '2009'),
+                                    ('end_date_0', 'number', '23'),
+                                    ('end_date_1', 'number', '12'),
+                                    ('end_date_2', 'number', '2017')]:
             # exactly one of each field name regardless of value
             utils.assertXPathCount(
                 response,
-                '//input[normalize-space(@type)="text" and contains(normalize-space(@name), "{field}")]'
-                    .format(field=field),
+                '//input[normalize-space(@type)="{ftype}" and contains(normalize-space(@name), "{field}")]'
+                    .format(field=field, ftype=ftype),
                 1
             )
             # each field should have the correct value
             utils.assertXPathValue(
                 response,
-                ('normalize-space(//input[normalize-space(@type)="text" '
-                 'and contains(normalize-space(@name), "{field}")]/@value)').format(field=field),
+                ('normalize-space(//input[normalize-space(@type)="{ftype}" '
+                 'and contains(normalize-space(@name), "{field}")]/@value)').format(field=field, ftype=ftype),
                 value
             )
 
@@ -1461,10 +1494,10 @@ class AdultPreviousNamesFunctionalTests(TestCase):
             end_year=int(self.valid_names_post_data[1]['form-1-end_date_2']),
         )
 
-        data = self._make_post_data(2, 'delete')
+        data = self._make_post_data(2)
         data.update(self.valid_names_post_data[0])
         data.update(self.valid_names_post_data[1])
-        data[data['form-0-previous_name_id']] = 'Remove this name'
+        data['delete-'+data['form-0-previous_name_id']] = 'Remove this name'
 
         url = reverse('other-people-previous-names') \
               + '?id={}&person_id={}&type={}'.format(self.application.pk, self.adult.pk, 'ADULT')
@@ -1474,7 +1507,6 @@ class AdultPreviousNamesFunctionalTests(TestCase):
         self.assertEqual(302, response.status_code)
 
         fetched_names = models.PreviousName.objects.filter(
-            application_id=self.application.pk,
             person_id=self.adult.pk,
             other_person_type='ADULT')
 
@@ -1491,18 +1523,19 @@ class AdultPreviousNamesFunctionalTests(TestCase):
         self.assertEqual(12, name.end_month)
         self.assertEqual(2017, name.end_year)
 
-    def _make_post_data(self, num_names, action):
-        return {
+    def _make_post_data(self, num_names, action=None):
+        data = {
             'id': self.application.pk,
             'person_id': self.adult.pk,
             'type': 'ADULT',
-            'extra': 1,
-            'action': action,
             'form-TOTAL_FORMS': num_names,
             'form-INITIAL_FORMS': num_names,
             'form-MIN_NUM_FORMS': 0,
             'form-MAX_NUM_FORMS': 1000,
         }
+        if action is not None:
+            data['action'] = action
+        return data
 
 
 @tag('http')

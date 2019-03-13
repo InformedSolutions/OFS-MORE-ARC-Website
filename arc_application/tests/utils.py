@@ -290,7 +290,7 @@ def assertXPathCount(response, xpath, expected_quantity):
     """
     result = _do_xpath(response, xpath)
     if len(result) != expected_quantity:
-        raise AssertionError('Expected {} instances of "{}", found {}', expected_quantity, xpath, len(result))
+        raise AssertionError('Expected {} instances of "{}", found {}'.format(expected_quantity, xpath, len(result)))
 
 
 def _do_xpath(response, xpath):

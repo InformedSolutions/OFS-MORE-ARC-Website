@@ -33,6 +33,10 @@ class PersonPreviousNameForm(GOVUKForm):
     field_label_classes = 'form-label-bold'
     error_summary_title = 'There was a problem on this page'
 
+    previous_name_id = forms.CharField(
+        widget=forms.widgets.HiddenInput
+    )
+
     first_name = forms.CharField(
         label='First name',
         max_length=200,
