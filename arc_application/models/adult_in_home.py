@@ -1,6 +1,9 @@
 import datetime
+from datetime import date
 from uuid import uuid4
+
 from django.db import models
+
 from .application import Application
 from .childcare_type import ChildcareType
 
@@ -19,7 +22,10 @@ class AdultInHome(models.Model):
     birth_day = models.IntegerField(blank=True)
     birth_month = models.IntegerField(blank=True)
     birth_year = models.IntegerField(blank=True)
+
     relationship = models.CharField(max_length=100, blank=True)
+    cygnum_relationship_to_childminder = models.CharField(max_length=100, blank=True)
+
     email = models.CharField(max_length=100, blank=True, null=True)
     dbs_certificate_number = models.CharField(max_length=50, blank=True)
     token = models.CharField(max_length=100, blank=True, null=True)
@@ -34,12 +40,19 @@ class AdultInHome(models.Model):
     email_resent_timestamp = models.DateTimeField(null=True, blank=True)
     lived_abroad = models.NullBooleanField(blank=True)
     military_base = models.NullBooleanField(blank=True)
-    cygnum_relationship_to_childminder = models.CharField(max_length=100, blank=True)
     capita = models.NullBooleanField(blank=True)  # dbs was found on capita list?
     enhanced_check = models.NullBooleanField(blank=True)  # stated they have a capita dbs?
     on_update = models.NullBooleanField(blank=True)  # stated they are signed up to dbs update service?
     certificate_information = models.TextField(blank=True)  # information from dbs certificate
     within_three_months = models.NullBooleanField(blank=True)  # dbs was issued within three months of lookup?
+
+    # Current name fields
+    name_start_day = models.IntegerField(blank=True, null=True)
+    name_start_month = models.IntegerField(blank=True, null=True)
+    name_start_year = models.IntegerField(blank=True, null=True)
+    name_end_day = models.IntegerField(blank=True, null=True)
+    name_end_month = models.IntegerField(blank=True, null=True)
+    name_end_year = models.IntegerField(blank=True, null=True)
 
     @property
     def timelog_fields(self):
@@ -189,3 +202,23 @@ class AdultInHome(models.Model):
 
     class Meta:
         db_table = 'ADULT_IN_HOME'
+
+    def get_start_date(self):
+        return date(self.start_year, self.start_month, self.start_day)
+
+    def set_start_date(self, start_date):
+        self.start_year = start_date.year
+        self.start_month = start_date.month
+        self.start_day = start_date.day
+
+    start_date = property(get_start_date, set_start_date)
+
+    def get_end_date(self):
+        return date(self.end_year, self.end_month, self.end_day)
+
+    def set_end_date(self, end_date):
+        self.end_year = end_date.year
+        self.end_month = end_date.month
+        self.end_day = end_date.day
+
+    end_date = property(get_end_date, set_end_date)

@@ -4,60 +4,15 @@ OFS-MORE-CCN3: Apply to be a Childminder Beta
 @author: Informed Solutions
 """
 
+import datetime
+
 from django import forms
 from django.utils.timezone import now
 from django.utils.translation import gettext, gettext_lazy as _
-from govuk_forms import widgets as gov
+from govuk_forms import widgets as govw
+from govuk_forms import fields as govf
 
-from arc_application.widgets import ExpirySplitDateWidget, TimeKnownSplitDateWidget
-
-
-class YearField(forms.IntegerField):
-    """
-    In integer field that accepts years between 1900 and now
-    Allows 2-digit year entry which is converted depending on the `era_boundary`
-    """
-
-    def __init__(self, era_boundary=None, **kwargs):
-        """
-        When initialised, this field object will create attributes for later validation base of the current time and
-        year, error messages and field options are specified here.
-        :param era_boundary: If supplied, will limit how far back a user cna enter without raising an error
-        :param kwargs: Any other key word arguments passed during the implementation of the class
-        """
-        self.current_year = now().year
-        self.century = 100 * (self.current_year // 100)
-        if era_boundary is None:
-            # 2-digit dates are a minimum of 10 years ago by default
-            era_boundary = self.current_year - self.century - 10
-        self.era_boundary = era_boundary
-        bounds_error = gettext('TBC') % {
-            'current_year': self.current_year
-        }
-        options = {
-            'min_value': self.current_year,
-            'error_messages': {
-                'min_value': bounds_error,
-                'invalid': gettext('TBC'),
-            }
-        }
-        options.update(kwargs)
-        super().__init__(**options)
-
-    def clean(self, value):
-        """
-        This will clean the two year value enetered into the field in order to ensure the value entered is in the write
-        century, for example, 68 will be changed to 1968 rather the 2068 as the latter has not occured yet
-        :param value:The value object obtained from the form
-        :return:This returns the cleaned value object (after cleaning specified above
-        """
-        value = self.to_python(value)
-        if isinstance(value, int) and value < 100:
-            if value > self.era_boundary:
-                value += self.century - 100
-            else:
-                value += self.century
-        return super().clean(value)
+from .widgets import ExpirySplitDateWidget, TimeKnownSplitDateWidget
 
 
 class ExpirySplitDateField(forms.MultiValueField):
@@ -66,7 +21,7 @@ class ExpirySplitDateField(forms.MultiValueField):
     fields
     """
     widget = ExpirySplitDateWidget
-    hidden_widget = gov.SplitHiddenDateWidget
+    hidden_widget = govw.SplitHiddenDateWidget
     default_error_messages = {
         'invalid': _('TBC.')
     }
@@ -79,7 +34,7 @@ class ExpirySplitDateField(forms.MultiValueField):
         :param kwargs: Standard key word arguments parameter
         """
         month_bounds_error = gettext('Month should be between 1 and 12.')
-
+        self.current_year = now().year
         # Field definition
         self.fields = [
             forms.IntegerField(min_value=1, max_value=12, error_messages={
@@ -88,7 +43,7 @@ class ExpirySplitDateField(forms.MultiValueField):
                 'invalid': gettext('TBC.')
             }),
             # Uses a clean year field defined above
-            YearField(),
+            govf.YearField(min_value=self.current_year, max_value=None),
         ]
 
         super().__init__(self.fields, *args, **kwargs)
@@ -130,7 +85,7 @@ class TimeKnownField(forms.MultiValueField):
     Class that defines the field type used for both month and years in the TimeKnownWidget
     """
     widget = TimeKnownSplitDateWidget
-    hidden_widget = gov.SplitHiddenDateWidget
+    hidden_widget = govw.SplitHiddenDateWidget
     default_error_messages = {
         'invalid': _('Enter a valid date.')
     }
@@ -192,3 +147,143 @@ class TimeKnownField(forms.MultiValueField):
         return attrs
 
 
+class CustomSplitDateField(govf.SplitDateField):
+    """
+    Extends govuk_forms.fields.SplitDateField to:
+    * allow all child field options and error messages to be customised (prefix with "day_", "month_" or "year_")
+    * use different default bounds and error messages
+    * introduce finer-grained error messages for date validation
+    * allow 4-digit years to be required
+    """
+
+    # Sentinel which can be passed in for min_value or max_value, triggering a different error message than if a fixed
+    # date was passed in
+    TODAY = object()
+
+    default_error_messages = {
+        'invalid': 'Enter a real date',
+        'required': 'Enter the date, including the day, month and year',
+        'incomplete': 'Enter the date, including the day, month and year',
+        'min_value': 'Date must be after 1 Jan 1900',
+        'max_value': "Date must be before today's date",
+        'min_today': 'Date must be in the future',
+        'max_today': 'Date must be in the past',
+        'short_year': 'The year is too short',
+    }
+
+    def __init__(self, *args, **kwargs):
+
+        day_args = self._pop_prefixed_kwargs(kwargs, 'day_')
+        day_options = {
+            'min_value': 1,
+            'max_value': 31,
+            'error_messages': {
+                'min_value': 'Day must be between 1 and 31',
+                'max_value': 'Day must be between 1 and 31',
+                'invalid': 'Enter day as a number',
+            },
+        }
+        day_options.update(day_args)
+
+        month_args = self._pop_prefixed_kwargs(kwargs, 'month_')
+        month_options = {
+            'min_value': 1,
+            'max_value': 12,
+            'error_messages': {
+                'min_value': 'Month must be between 1 and 12',
+                'max_value': 'Month must be between 1 and 12',
+                'invalid': 'Enter month as a number',
+            },
+        }
+        month_options.update(month_args)
+
+        year_args = self._pop_prefixed_kwargs(kwargs, 'year_')
+        current_year = datetime.date.today().year
+        century = 100 * (current_year // 100)
+        era_boundary = current_year - century
+        year_options = {
+            'min_value': 2000,
+            'max_value': current_year,
+            'era_boundary': era_boundary,
+            'error_messages': {
+                'min_value': 'Year must be between 2000 and the current year',
+                'max_value': 'Year must be between 2000 and the current year',
+                'invalid': 'Enter year as a number',
+            },
+        }
+        year_options.update(year_args)
+
+        options = {
+            'min_value': datetime.date(1900, 1, 1),
+            'max_value': self.TODAY,
+            'required': False,
+            'allow_short_year': True,
+        }
+        options.update(**kwargs)
+
+        self.min_value = options.pop('min_value')
+        self.max_value = options.pop('max_value')
+        self.required = options.pop('required')
+        self.allow_short_year = options.pop('allow_short_year')
+
+        self.fields = [
+            forms.IntegerField(**day_options),
+            forms.IntegerField(**month_options)
+        ]
+        if self.allow_short_year:
+            self.fields.append(govf.YearField(**year_options))
+        else:
+            # simple 4-year number - use an integer field and replace min_value to impose 4-digit requirement.
+            # Actual min_value is checked later in compress
+            year_options.pop('era_boundary')
+            self.year_min_value = year_options['min_value']
+            year_options['min_value'] = 1000
+            self.year_min_value_msg = year_options['error_messages'].get('min_value', None)
+            year_options['error_messages']['min_value'] = options['error_messages'].get(
+                'short_year', self.default_error_messages['short_year'])
+            self.fields.append(forms.IntegerField(**year_options))
+
+        super(govf.SplitDateField, self).__init__(self.fields, *args, **options)
+
+    def compress(self, data_list):
+        """
+        `compress` is used in place of `clean` for subclasses of MultiValueField
+        """
+        if not data_list:
+            return None
+
+        if any(item in self.empty_values for item in data_list):
+            if self.required:
+                raise forms.ValidationError(self.error_messages['required'], code='required')
+            else:
+                return None
+
+        if not self.allow_short_year and self.year_min_value is not None and data_list[2] < self.year_min_value:
+            raise forms.ValidationError(self.year_min_value_msg, code='short_year')
+
+        try:
+            date_compressed = datetime.date(data_list[2], data_list[1], data_list[0])
+        except ValueError:
+            raise forms.ValidationError(self.error_messages['invalid'], code='invalid')
+
+        if self.min_value is not None:
+            if self.min_value is self.TODAY and date_compressed < datetime.date.today():
+                raise forms.ValidationError(self.error_messages['min_today'], code='min_today')
+            elif self.min_value is not self.TODAY and date_compressed < self.min_value:
+                raise forms.ValidationError(self.error_messages['min_value'], code='min_value')
+
+        if self.max_value is not None:
+            if self.max_value is self.TODAY and date_compressed > datetime.date.today():
+                raise forms.ValidationError(self.error_messages['max_today'], code='max_today')
+            elif self.max_value is not self.TODAY and date_compressed < self.max_value:
+                raise forms.ValidationError(self.error_messages['max_value'], code='max_value')
+
+        return date_compressed
+
+    def _pop_prefixed_kwargs(self, kwarg_dict, prefix):
+        result = {}
+        dict_copy = dict(kwarg_dict)
+        for k, v in dict_copy.items():
+            if k.startswith(prefix):
+                result[k[len(prefix):]] = kwarg_dict.pop(k)
+        return result
