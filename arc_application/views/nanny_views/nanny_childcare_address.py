@@ -84,7 +84,7 @@ class NannyChildcareAddressSummary(NannyARCFormView):
                     'id': 'home_address_locations',
                     'name': 'Childcare address',
                     'info': home_address_locations,
-                    'formset': childcare_address_formset if hasattr(self, 'request') else [''] * no_childcare_addresses
+                    'formset': childcare_address_formset
                 }
             ]
         }

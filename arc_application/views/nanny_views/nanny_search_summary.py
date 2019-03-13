@@ -68,7 +68,7 @@ class NannySearchSummary(View):
             'application_id': application_id,
             'application_reference': application_reference,
             'context_list': valid_context_list,
-            'summary_page': False,
+            'summary_page': True,
             'publish_details': publish_details
         }
 
