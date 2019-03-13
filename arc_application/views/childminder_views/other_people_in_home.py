@@ -296,7 +296,7 @@ def other_people_summary(request):
 
             show_references = get_show_references(application_id_local)
 
-            default = '/references/summary' if show_references else '/review'
+            default = '/references/summary/' if show_references else '/review/'
             redirect_link = redirect_selection(request, default)
 
             return HttpResponseRedirect(settings.URL_PREFIX + redirect_link + '?id=' + application_id_local)

@@ -47,12 +47,12 @@ class AdultInHome(models.Model):
     within_three_months = models.NullBooleanField(blank=True)  # dbs was issued within three months of lookup?
 
     # Current name fields
-    start_day = models.IntegerField(blank=True, null=True)
-    start_month = models.IntegerField(blank=True, null=True)
-    start_year = models.IntegerField(blank=True, null=True)
-    end_day = models.IntegerField(blank=True, null=True)
-    end_month = models.IntegerField(blank=True, null=True)
-    end_year = models.IntegerField(blank=True, null=True)
+    name_start_day = models.IntegerField(blank=True, null=True)
+    name_start_month = models.IntegerField(blank=True, null=True)
+    name_start_year = models.IntegerField(blank=True, null=True)
+    name_end_day = models.IntegerField(blank=True, null=True)
+    name_end_month = models.IntegerField(blank=True, null=True)
+    name_end_year = models.IntegerField(blank=True, null=True)
 
     @property
     def timelog_fields(self):
