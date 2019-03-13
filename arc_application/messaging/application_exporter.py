@@ -35,7 +35,6 @@ class ApplicationExporter:
         """
         Method for exporting a full application in a dictionary format
         :param application_id: the identifier of the application to be exported
-        :return: a dictionary export of an application
         """
 
         export = {}
@@ -139,7 +138,7 @@ class ApplicationExporter:
         """
         Method for exporting a full nanny application in a dictionary format
         :param application_id: the identifier of the application to be exported
-        :return: a dictionary export of an application
+        :param application_reference: the customer facing reference number assigned to an application
         """
 
         export = {}
@@ -189,4 +188,3 @@ class ApplicationExporter:
         export['documents'] = json.dumps(documents)
 
         na_application_sqs_handler.send_message(export)
-
