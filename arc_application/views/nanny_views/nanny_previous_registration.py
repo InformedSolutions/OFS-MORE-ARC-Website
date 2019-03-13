@@ -28,7 +28,7 @@ class NannyPreviousRegistrationView(FormView):
                 individual_id = form.cleaned_data.get('individual_id')
                 five_years_in_uk = form.cleaned_data.get('five_years_in_UK')
 
-                api_response = NannyGatewayActions().read('nanny-previous-registration-details',
+                api_response = NannyGatewayActions().read('previous-registration-details',
                                                           params={'application_id': application_id})
 
                 if api_response.status_code == 200:
@@ -37,7 +37,7 @@ class NannyPreviousRegistrationView(FormView):
                     previous_registration_record['individual_id'] = self.request.POST['individual_id']
                     previous_registration_record['five_years_in_UK'] = self.request.POST['five_years_in_UK']
 
-                    NannyGatewayActions().put('nanny-previous-registration-details', params=previous_registration_record)
+                    NannyGatewayActions().put('previous-registration-details', params=previous_registration_record)
                 else:
                     previous_registration_new = {}
                     previous_registration_new['application_id'] = application_id
@@ -45,7 +45,7 @@ class NannyPreviousRegistrationView(FormView):
                     previous_registration_new['individual_id'] = self.request.POST['individual_id']
                     previous_registration_new['five_years_in_UK'] = self.request.POST['five_years_in_UK']
 
-                    response =  NannyGatewayActions().create('nanny-previous-registration-details',
+                    response =  NannyGatewayActions().create('previous-registration-details',
                                                              params=previous_registration_new)
 
                 redirect_link = '/nanny/personal-details/'
@@ -61,7 +61,7 @@ class NannyPreviousRegistrationView(FormView):
 
         def get_initial(self):
             initial = super().get_initial()
-            api_response = NannyGatewayActions().read('nanny-previous-registration-details', params={'application_id': self.application_id})
+            api_response = NannyGatewayActions().read('previous-registration-details', params={'application_id': self.application_id})
             if api_response.status_code == 200:
                 previous_response = api_response.record
                 initial['previous_registration'] = previous_response['previous_registration']

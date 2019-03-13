@@ -10,21 +10,25 @@ class NannyPersonalDetailsSummary(NannyARCFormView):
     task_for_review = 'personal_details_review'
     verbose_task_name = 'Your personal details'
 
-   # def get_initial(self):
-   #      initial = {}
-   #      application_id = self.request.GET.get('id')
-   #      previous_registration_details = NannyGatewayActions().read('nanny-previous-registration-details',
-   #                                                         params={'application_id': application_id})
-   #      if previous_registration_details.status_code != 404:
-   #          self.form_class = [PersonalDetailsForm, HomeAddressForm, PreviousRegistrationForm]
-   #      else:
-   #          self.form_class = [PersonalDetailsForm, HomeAddressForm]
-   #
-   #      return initial
+    # def get_initial(self):
+    #     initial = {}
+    #     application_id = self.request.GET.get('id')
+    #     previous_registration_details = NannyGatewayActions().read('previous-registration-details',
+    #                                                        params={'application_id': application_id})
+    #     if previous_registration_details.status_code != 404:
+    #         self.form_class = [PersonalDetailsForm, HomeAddressForm, PreviousRegistrationForm]
+    #     else:
+    #         self.form_class = [PersonalDetailsForm, HomeAddressForm]
+    #
+    #         return initial
 
-    def get_form_class(self):
-        application_id = self.request.GET.get('id')
-        previous_registration_details = NannyGatewayActions().read('nanny-previous-registration-details',
+    def get_form_class(self, **kwargs):
+        if hasattr(self, 'request'):
+            application_id = self.request.GET.get('id')
+        else:
+            application_id = kwargs.pop('application_id')
+
+        previous_registration_details = NannyGatewayActions().read('previous-registration-details',
                                                                    params={'application_id': application_id})
         if previous_registration_details.status_code != 404:
             return [PersonalDetailsForm, HomeAddressForm, PreviousRegistrationForm]
@@ -54,7 +58,7 @@ class NannyPersonalDetailsSummary(NannyARCFormView):
                                               params={'application_id': application_id}).record
         home_address = nanny_actions.read('applicant-home-address',
                                           params={'application_id': application_id}).record
-        previous_registration_details = nanny_actions.read('nanny-previous-registration-details',
+        previous_registration_details = nanny_actions.read('previous-registration-details',
                                           params={'application_id': application_id})
 
 
@@ -79,13 +83,13 @@ class NannyPersonalDetailsSummary(NannyARCFormView):
 
         previous_registration_record_exists = False
 
-        forms = self.get_forms()
+        forms = self.get_forms(application_id)
         personal_details_form = forms[0]
         home_address_form = forms[1]
 
         if previous_registration_details.status_code != 404:
             previous_registration_record_exists = True
-            previous_registration_details = nanny_actions.read('nanny-previous-registration-details',
+            previous_registration_details = nanny_actions.read('previous-registration-details',
                                                                params={'application_id': application_id}).record
             previous_registration = previous_registration_details['previous_registration']
             individual_id = str(previous_registration_details['individual_id'])
@@ -182,6 +186,8 @@ class NannyPersonalDetailsSummary(NannyARCFormView):
 
         return context
 
+    def get_forms(self, application_id):
+        return [self.get_form(form_class=form_class) for form_class in self.get_form_class(application_id=application_id)]
 
     def get_success_url(self):
         return 'nanny_childcare_address_summary'
