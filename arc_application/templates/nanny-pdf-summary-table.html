@@ -1,0 +1,34 @@
+{% load general_table_extras %}
+
+<table class="response-table">
+        <thead>
+            <tr>
+                <th>
+                    {{section.title}}
+                </th>
+            </tr>
+        </thead>
+
+        {% for row in section.rows %}
+            {% if not row.hidden %}
+            <tr class="response-row">
+                <td class="question-label">
+                    {{row.name}}
+                </td>
+                 <td>
+                     {% if row.info|template_is_instance:'str' %}
+                        {{row.info|default:"Not answered"}}
+                     {% elif row.info|template_is_instance:'bool' %}
+                        {% if row.info %}
+                            Yes
+                        {% else %}
+                            No
+                        {% endif %}
+                    {% elif row.info|template_is_instance:'dict' %}
+                        {% include 'nanny_general_address_template.html' %}
+                    {% endif %}
+                 </td>
+            </tr>
+            {% endif %}
+        {% endfor %}
+</table>
