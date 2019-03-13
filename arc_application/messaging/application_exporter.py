@@ -22,16 +22,6 @@ class ApplicationExporter:
 
     @staticmethod
     def export_childminder_application(application_id):
-        payload = ApplicationExporter.create_full_childminder_application_export(application_id)
-        cm_application_sqs_handler.send_message(payload)
-
-    @staticmethod
-    def export_nanny_application(application_id):
-        payload = ApplicationExporter.create_full_nanny_application_export(application_id)
-        na_application_sqs_handler.send_message(payload)
-
-    @staticmethod
-    def create_full_childminder_application_export(application_id):
         """
         Method for exporting a full application in a dictionary format
         :param application_id: the identifier of the application to be exported
@@ -134,7 +124,7 @@ class ApplicationExporter:
         cm_application_sqs_handler.send_message(export)
 
     @staticmethod
-    def create_full_nanny_application_export(application_id, application_reference):
+    def export_nanny_application(application_id, application_reference):
         """
         Method for exporting a full nanny application in a dictionary format
         :param application_id: the identifier of the application to be exported
