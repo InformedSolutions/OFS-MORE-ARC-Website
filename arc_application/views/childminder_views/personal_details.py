@@ -143,10 +143,10 @@ def personal_details_summary(request):
                 status = Arc.objects.get(pk=application_id_local)
                 status.personal_details_review = section_status
                 status.save()
-                default = '/first-aid/summary'
+                default = '/first-aid/summary/'
 
                 if application.own_children:
-                    default = '/first-aid/summary'
+                    default = '/first-aid/summary/'
 
                 redirect_link = redirect_selection(request, default)
 

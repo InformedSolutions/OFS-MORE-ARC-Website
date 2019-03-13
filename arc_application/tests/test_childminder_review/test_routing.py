@@ -74,7 +74,33 @@ class PersonalDetailsPageFunctionalTests(TestCase):
         utils.assertView(response, 'personal_details_summary')
 
     def test_shows_previous_names(self):
-        self.skipTest('testNotImplemented')
+
+        models.PreviousName.objects.create(
+            person_id=self.application.pk,
+            other_person_type='APPLICANT',
+            first_name='The', middle_names='Lone', last_name='Ranger',
+            start_day=5, start_month=4, start_year=1999,
+            end_day=10, end_month=12, end_year=2001,
+        )
+        models.PreviousName.objects.create(
+            person_id=self.application.pk,
+            other_person_type='APPLICANT',
+            first_name='Billy', middle_names='Bob', last_name='Billington-Bobbington',
+            start_day=25, start_month=12, start_year=1988,
+            end_day=13, end_month=8, end_year=1999,
+        )
+
+        response = self.client.get(reverse('personal_details_summary'), data={'id': self.application.pk})
+
+        self.assertEqual(200, response.status_code)
+
+        utils.assertSummaryField(response, 'Your previous name 1', 'The Lone Ranger', heading="Previous names")
+        utils.assertSummaryField(response, 'Start date 1', '5 April 1999', heading="Previous names")
+        utils.assertSummaryField(response, 'End date 1', '10 December 2001', heading="Previous names")
+        utils.assertSummaryField(response, 'Your previous name 2', 'Billy Bob Billington-Bobbington',
+                                 heading="Previous names")
+        utils.assertSummaryField(response, 'Start date 2', '25 December 1988', heading="Previous names")
+        utils.assertSummaryField(response, 'End date 2', '13 August 1999', heading="Previous names")
 
     def test_shows_Add_Previous_Names_button(self):
 
@@ -131,8 +157,75 @@ class PersonalDetailsPageFunctionalTests(TestCase):
         reloaded_application = models.Application.objects.get(pk=self.application.application_id)
         self.assertTrue(reloaded_application.personal_details_arc_flagged)
 
+    class MockDate(date):
+        @classmethod
+        def today(cls):
+            return date(2019, 2, 24)
+
+    @patch('datetime.date', new=MockDate)
+    def test_submit_stores_current_name_end_date_as_today_and_start_date_as_latest_previous_name_end_date(self):
+
+        models.PreviousName.objects.create(
+            person_id=self.application.pk,
+            other_person_type='APPLICANT',
+            first_name='Jack', middle_names='O', last_name='Spades',
+            start_day=14, start_month=2, start_year=2016,
+            end_day=23, end_month=6, end_year=2017,
+        )
+        models.PreviousName.objects.create(
+            person_id=self.application.pk,
+            other_person_type='APPLICANT',
+            first_name='Ace', middle_names='', last_name="O'Hearts",
+            start_day=16, start_month=1, start_year=2015,
+            end_day=12, end_month=4, end_year=2016,
+        )
+
+        url = reverse('personal_details_summary') + '?id=' + self.application.application_id
+        data = {'id': self.application.application_id}
+
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, 302)
+
+        fetched_details = models.ApplicantName.objects.get(application_id=self.application.pk)
+        self.assertEqual(23, fetched_details.start_day)
+        self.assertEqual(6, fetched_details.start_month)
+        self.assertEqual(2017, fetched_details.start_year)
+        self.assertEqual(24, fetched_details.end_day)
+        self.assertEqual(2, fetched_details.end_month)
+        self.assertEqual(2019, fetched_details.end_year)
+
+    @patch('datetime.date', new=MockDate)
+    def test_submit_stores_current_name_end_date_as_today_and_start_date_as_dob_if_no_previous_names(self):
+
+        details = models.ApplicantPersonalDetails.objects.get(application_id=self.application.pk)
+        details.birth_day = 20
+        details.birth_month = 8
+        details.birth_month = 1979
+        details.save()
+
+        url = reverse('personal_details_summary') + '?id=' + self.application.application_id
+        data = {'id': self.application.application_id}
+
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, 302)
+
+        fetched_details = models.ApplicantName.objects.get(application_id=self.application.pk)
+        self.assertEqual(20, fetched_details.start_day)
+        self.assertEqual(8, fetched_details.start_month)
+        self.assertEqual(1979, fetched_details.start_year)
+        self.assertEqual(24, fetched_details.end_day)
+        self.assertEqual(2, fetched_details.end_month)
+        self.assertEqual(2019, fetched_details.end_year)
+
     def test_submit_redirects_to_first_aid_page_if_valid(self):
-        self.skipTest('testNotImplemented')
+
+        url = reverse('personal_details_summary') + '?id=' + self.application.application_id
+        data = {'id': self.application.application_id}
+
+        response = self.client.post(url, data)
+
+        self.assertEqual(response.status_code, 302)
+        utils.assertRedirectView(response, 'first_aid_training_summary')
 
 
 @tag('http')
@@ -149,7 +242,7 @@ class ApplicantPreviousNamesFunctionalTests(TestCase):
                 'form-0-person_id': self.application.pk,
                 'form-0-other_person_type': 'APPLICANT',
                 'form-0-first_name': 'David',
-                'form-0-middle_name': 'Anty',
+                'form-0-middle_names': 'Anty',
                 'form-0-last_name': 'Goliath',
                 'form-0-start_date_0': '10',  # Day
                 'form-0-start_date_1': '03',  # Month
@@ -164,7 +257,7 @@ class ApplicantPreviousNamesFunctionalTests(TestCase):
                 'form-1-person_id': self.application.pk,
                 'form-1-other_person_type': 'APPLICANT',
                 'form-1-first_name': 'James',
-                'form-1-middle_name': 'Rather-Large',
+                'form-1-middle_names': 'Rather-Large',
                 'form-1-last_name': 'Peach',
                 'form-1-start_date_0': '12',  # Day
                 'form-1-start_date_1': '08',  # Month
@@ -184,7 +277,7 @@ class ApplicantPreviousNamesFunctionalTests(TestCase):
         response = self.client.get(url)
 
         self.assertEqual(200, response.status_code)
-        utils.assertView(response, 'personal_details_previous_names')
+        utils.assertView(response, 'add_applicant_previous_name')
 
     def test_shows_fields_for_existing_stored_names(self):
 
@@ -220,7 +313,7 @@ class ApplicantPreviousNamesFunctionalTests(TestCase):
                                 ('end_date_0', names[6]), ('end_date_1', names[7]), ('end_date_2', names[8])]:
                 utils.assertXPath(
                     response,
-                    ('//input[normalize-space[@type)="text" and contains(normalize-space(@name), "{field}") '
+                    ('//input[normalize-space(@type)="text" and contains(normalize-space(@name), "{field}") '
                      'and normalize-space(@value)="{name}"]').format(field=field, name=name)
                 )
 
@@ -241,7 +334,7 @@ class ApplicantPreviousNamesFunctionalTests(TestCase):
         response = self.client.post(url, data)
 
         self.assertEqual(200, response.status_code)
-        utils.assertView(response, 'personal_details_previous_names')
+        utils.assertView(response, 'add_applicant_previous_name')
         utils.assertXPath(response, '//*[normalize-space(@class)="field-error"]')
 
     def test_submit_confirm_redirects_to_personal_details_summary_if_all_valid(self):
@@ -273,10 +366,10 @@ class ApplicantPreviousNamesFunctionalTests(TestCase):
         self.assertEqual(302, response.status_code)
 
         # Assert application was updated
-        if not models.PreviousName.objects.filter(application_id=application_id).exists():
+        if not models.PreviousName.objects.filter(person_id=application_id).exists():
             raise AssertionError('No previous name record was found')
 
-        previous_name_record = models.PreviousName.objects.get(application_id=application_id)
+        previous_name_record = models.PreviousName.objects.get(person_id=application_id)
 
         self.assertEqual(previous_name_record.other_person_type, data['form-0-other_person_type'])
         self.assertEqual(previous_name_record.first_name, data['form-0-first_name'])
@@ -303,7 +396,7 @@ class ApplicantPreviousNamesFunctionalTests(TestCase):
 
         # Assert that the page returned was the same page.
         self.assertEqual(302, response.status_code)
-        utils.assertRedirectView(response, 'personal_details_previous_names')
+        utils.assertRedirectView(response, 'add_applicant_previous_name')
 
         # exactly one of each
         for field, value in [('first_name', ''), ('first_name', 'David'),
@@ -335,11 +428,10 @@ class ApplicantPreviousNamesFunctionalTests(TestCase):
 
         # Assert that the page returned was the same page.
         self.assertEqual(302, response.status_code)
-        utils.assertRedirectView(response, 'personal_details_previous_names')
+        utils.assertRedirectView(response, 'add_applicant_previous_name')
 
         # Get Applicant's previous name data
         previous_names = models.PreviousName.objects.filter(
-            application_id=application_id,
             person_id=application_id,
             other_person_type='APPLICANT')
 
@@ -374,7 +466,7 @@ class ApplicantPreviousNamesFunctionalTests(TestCase):
 
         # Assert that the page returned was the same page.
         self.assertEqual(302, response.status_code)
-        utils.assertRedirectView(response, 'personal_details_previous_names')
+        utils.assertRedirectView(response, 'add_applicant_previous_name')
 
         # exactly one of each
         for field, value in [('first_name', 'James'),
@@ -400,27 +492,31 @@ class ApplicantPreviousNamesFunctionalTests(TestCase):
         # create existing database records which match the posted data
         models.PreviousName.objects.create(
             previous_name_id=self.valid_previous_name_data[0]['form-0-previous_name_id'],
-            application_id=application_id,
             person_id=application_id,
             other_person_type='APPLICANT',
             first_name=self.valid_previous_name_data[0]['form-0-first_name'],
-            middle_names=self.valid_previous_name_data[0]['form-0-middle-names'],
-            last_name=self.valid_previous_name_data[0]['form-0-last-name'],
-            start_day=int(self.valid_previous_name_data[0]['form-0-start_day']),
-            start_month=int(self.valid_previous_name_data[0]['form-0-start_month']),
-            start_year=int(self.valid_previous_name_data[0]['form-0-start_year']),
+            middle_names=self.valid_previous_name_data[0]['form-0-middle_names'],
+            last_name=self.valid_previous_name_data[0]['form-0-last_name'],
+            start_day=int(self.valid_previous_name_data[0]['form-0-start_date_0']),
+            start_month=int(self.valid_previous_name_data[0]['form-0-start_date_1']),
+            start_year=int(self.valid_previous_name_data[0]['form-0-start_date_2']),
+            end_day=int(self.valid_previous_name_data[0]['form-0-end_date_0']),
+            end_month=int(self.valid_previous_name_data[0]['form-0-end_date_1']),
+            end_year=int(self.valid_previous_name_data[0]['form-0-end_date_2']),
         )
         models.PreviousName.objects.create(
             previous_name_id=self.valid_previous_name_data[1]['form-1-previous_name_id'],
-            application_id=application_id,
             person_id=application_id,
             other_person_type='APPLICANT',
             first_name=self.valid_previous_name_data[1]['form-1-first_name'],
-            middle_names=self.valid_previous_name_data[1]['form-1-middle-names'],
+            middle_names=self.valid_previous_name_data[1]['form-1-middle_names'],
             last_name=self.valid_previous_name_data[1]['form-1-last_name'],
-            start_day=int(self.valid_previous_name_data[1]['form-1-start_day']),
-            start_month=int(self.valid_previous_name_data[1]['form-1-start_month']),
-            start_year=int(self.valid_previous_name_data[1]['form-1-start_year']),
+            start_day=int(self.valid_previous_name_data[1]['form-1-start_date_0']),
+            start_month=int(self.valid_previous_name_data[1]['form-1-start_date_1']),
+            start_year=int(self.valid_previous_name_data[1]['form-1-start_date_2']),
+            end_day=int(self.valid_previous_name_data[1]['form-1-end_date_0']),
+            end_month=int(self.valid_previous_name_data[1]['form-1-end_date_1']),
+            end_year=int(self.valid_previous_name_data[1]['form-1-end_date_2']),
         )
 
         data = self._make_post_data(2, 'delete')
@@ -436,7 +532,6 @@ class ApplicantPreviousNamesFunctionalTests(TestCase):
         self.assertEqual(302, response.status_code)
 
         fetched_names = models.PreviousName.objects.filter(
-            application_id=application_id,
             person_id=application_id,
             other_person_type='APPLICANT')
 
@@ -818,21 +913,19 @@ class PeopleInTheHomeFunctionalTests(TestCase):
         self.application.save()
 
         adult1 = models.AdultInHome.objects.get(application_id=self.application.pk)
-        adult1.first_name='John'
-        adult1.middle_names='Jimbo'
-        adult1.last_name='Johnnington'
+        adult1.first_name = 'John'
+        adult1.middle_names = 'Jimbo'
+        adult1.last_name = 'Johnnington'
         adult1.save()
         models.PreviousName.objects.create(
-            application_id=self.application,
-            person_id=adult1,
+            person_id=adult1.pk,
             other_person_type='ADULT',
             first_name='Bilbo', middle_names='B', last_name='Baggins',
             start_day=1, start_month=3, start_year=1985,
             end_day=10, end_month=12, end_year=2001,
         )
         models.PreviousName.objects.create(
-            application_id=self.application,
-            person_id=adult1,
+            person_id=adult1.pk,
             other_person_type='ADULT',
             first_name='George', middle_names='', last_name='Lucas',
             start_day=9, start_month=10, start_year=2011,
@@ -844,9 +937,8 @@ class PeopleInTheHomeFunctionalTests(TestCase):
             first_name='Freda', middle_names='Annabel', last_name='Smith',
             birth_day=1, birth_month=2, birth_year=1983,
         )
-        models.PreviousName.object.create(
-            application_id=self.application,
-            person_id=adult2,
+        models.PreviousName.objects.create(
+            person_id=adult2.pk,
             other_person_type='ADULT',
             first_name='Gertrude', middle_names='Geraldine', last_name='Gorton',
             start_day=1, start_month=8, start_year=1972,
@@ -963,6 +1055,100 @@ class PeopleInTheHomeFunctionalTests(TestCase):
         utils.assertView(response, 'other_people_summary')
         utils.assertXPath(response, '//*[normalize-space(@class)="field-error"]')
 
+    class MockDate(date):
+        @classmethod
+        def today(cls):
+            return date(2019, 3, 2)
+
+    @patch('datetime.date', new=MockDate)
+    def test_submit_stores_each_adult_name_end_date_as_today_and_start_date_as_latest_previous_name_end_date(self):
+
+        adult1 = models.AdultInHome.objects.get(application_id=self.application.pk)
+        adult1.last_name = 'Anderson'
+        adult1.save()
+        models.PreviousName.objects.create(
+            person_id=adult1.pk,
+            other_person_type='ADULT',
+            first_name='Bob', middle_names='B', last_name='Bobobob',
+            start_day=4, start_month=5, start_year=1964,
+            end_day=10, end_month=10, end_year=1992,
+        )
+        models.PreviousName.objects.create(
+            person_id=adult1.pk,
+            other_person_type='ADULT',
+            first_name='Rob', middle_names='R', last_name='Rororob',
+            start_day=9, start_month=8, start_year=1972,
+            end_day=12, end_month=6, end_year=2001,
+        )
+
+        adult2 = models.AdultInHome.objects.create(
+            application_id=self.application,
+            first_name='Jim', middle_names='Jimmy', last_name='Jimson',
+            birth_day=23, birth_month=9, birth_year=1982,
+        )
+        models.PreviousName.objects.create(
+            person_id=adult2.pk,
+            other_person_type='ADULT',
+            first_name='Jon', middle_names='J', last_name='Jononon',
+            start_day=15, start_month=9, start_year=1989,
+            end_day=16, end_month=9, end_year=1989,
+        )
+
+        data = self._make_post_data(adults=2)
+        data.update({
+            'adult-0-cygnum_relationship': 'Brother',
+            'adult-1-cygnum_relationship': 'Brother',
+        })
+
+        response = self.client.post(reverse('other_people_summary'), data)
+
+        self.assertEqual(302, response.status_code)
+
+        fetched_adults = models.AdultInHome.objects.filter(application_id=self.application.pk).order_by('last_name')
+
+        fetched0 = fetched_adults[0]
+        self.assertEqual(12, fetched0.name_start_day)
+        self.assertEqual(6, fetched0.name_start_month)
+        self.assertEqual(2001, fetched0.name_start_year)
+        self.assertEqual(2, fetched0.name_end_day)
+        self.assertEqual(3, fetched0.name_end_month)
+        self.assertEqual(2019, fetched0.name_end_year)
+
+        fetched1 = fetched_adults[1]
+        self.assertEqual(16, fetched1.name_start_day)
+        self.assertEqual(9, fetched1.name_start_month)
+        self.assertEqual(1989, fetched1.name_start_year)
+        self.assertEqual(2, fetched1.name_end_day)
+        self.assertEqual(3, fetched1.name_end_month)
+        self.assertEqual(2019, fetched1.name_end_year)
+
+    @patch('datetime.date', new=MockDate)
+    def test_submit_stores_each_adult_name_end_date_as_today_and_start_date_as_dob_if_no_previous_names(self):
+
+        adult1 = models.AdultInHome.objects.get(application_id=self.application.pk)
+        adult1.birth_day = 5
+        adult1.birth_month = 11
+        adult1.birth_year = 1977
+        adult1.save()
+
+        data = self._make_post_data(adults=1)
+        data.update({
+            'adult-0-cygnum_relationship': 'Brother',
+        })
+
+        response = self.client.post(reverse('other_people_summary'), data)
+
+        self.assertEqual(302, response.status_code)
+
+        fetched = models.AdultInHome.objects.get(application_id=self.application.pk)
+
+        self.assertEqual(5, fetched.name_start_day)
+        self.assertEqual(11, fetched.name_start_month)
+        self.assertEqual(1977, fetched.name_start_year)
+        self.assertEqual(2, fetched.name_end_day)
+        self.assertEqual(3, fetched.name_end_month)
+        self.assertEqual(2019, fetched.name_end_year)
+
     def test_submit_redirects_to_references_page_if_valid(self):
 
         data = self._make_post_data(adults=1)
@@ -1002,7 +1188,7 @@ class AdultPreviousNamesFunctionalTests(TestCase):
     def setUp(self):
         self.arc_user = create_arc_user()
         self.application = create_childminder_application(self.arc_user.pk)
-        self.adult = models.AdultInHome.objects.get(self.application.pk)
+        self.adult = models.AdultInHome.objects.get(application_id=self.application.pk)
         self.client.login(username='arc_test', password='my_secret')
         self.valid_names_post_data = [
             {
@@ -1028,12 +1214,12 @@ class AdultPreviousNamesFunctionalTests(TestCase):
                 'form-1-first_name': 'Bill',
                 'form-1-middle_names': 'N',
                 'form-1-last_name': 'Ted',
-                'form-0-start_date_0': 15,
-                'form-0-start_date_1': 2,
-                'form-0-start_date_2': 2009,
-                'form-0-end_date_0': 23,
-                'form-0-end_date_1': 12,
-                'form-0-end_date_2': 2017,
+                'form-1-start_date_0': 15,
+                'form-1-start_date_1': 2,
+                'form-1-start_date_2': 2009,
+                'form-1-end_date_0': 23,
+                'form-1-end_date_1': 12,
+                'form-1-end_date_2': 2017,
             }
         ]
 
@@ -1083,7 +1269,7 @@ class AdultPreviousNamesFunctionalTests(TestCase):
             utils.assertXPath(
                 response,
                 ('//input[normalize-space(@type)="text" and contains(normalize-space(@name), "{field}") '
-                 'and normalize-space(@value)="{value}"]').format(field=field, name=value)
+                 'and normalize-space(@value)="{value}"]').format(field=field, value=value)
             )
 
     def test_submit_confirm_returns_to_page_with_error_if_any_not_valid(self):
@@ -1247,33 +1433,37 @@ class AdultPreviousNamesFunctionalTests(TestCase):
 
         # create existing database records which match the posted data
         models.PreviousName.objects.create(
-            previous_name_id=self.valid_previous_name_data[0]['form-0-previous_name_id'],
-            application_id=self.application.pk,
+            previous_name_id=self.valid_names_post_data[0]['form-0-previous_name_id'],
             person_id=self.adult.pk,
             other_person_type='ADULT',
-            first_name=self.valid_previous_name_data[0]['form-0-first_name'],
-            middle_names=self.valid_previous_name_data[0]['form-0-middle-names'],
-            last_name=self.valid_previous_name_data[0]['form-0-last-name'],
-            start_day=int(self.valid_previous_name_data[0]['form-0-start_day']),
-            start_month=int(self.valid_previous_name_data[0]['form-0-start_month']),
-            start_year=int(self.valid_previous_name_data[0]['form-0-start_year']),
+            first_name=self.valid_names_post_data[0]['form-0-first_name'],
+            middle_names=self.valid_names_post_data[0]['form-0-middle_names'],
+            last_name=self.valid_names_post_data[0]['form-0-last_name'],
+            start_day=int(self.valid_names_post_data[0]['form-0-start_date_0']),
+            start_month=int(self.valid_names_post_data[0]['form-0-start_date_1']),
+            start_year=int(self.valid_names_post_data[0]['form-0-start_date_2']),
+            end_day=int(self.valid_names_post_data[0]['form-0-end_date_0']),
+            end_month=int(self.valid_names_post_data[0]['form-0-end_date_1']),
+            end_year=int(self.valid_names_post_data[0]['form-0-end_date_2']),
         )
         models.PreviousName.objects.create(
-            previous_name_id=self.valid_previous_name_data[1]['form-1-previous_name_id'],
-            application_id=self.application.pk,
+            previous_name_id=self.valid_names_post_data[1]['form-1-previous_name_id'],
             person_id=self.adult.pk,
             other_person_type='ADULT',
-            first_name=self.valid_previous_name_data[1]['form-1-first_name'],
-            middle_names=self.valid_previous_name_data[1]['form-1-middle-names'],
-            last_name=self.valid_previous_name_data[1]['form-1-last_name'],
-            start_day=int(self.valid_previous_name_data[1]['form-1-start_day']),
-            start_month=int(self.valid_previous_name_data[1]['form-1-start_month']),
-            start_year=int(self.valid_previous_name_data[1]['form-1-start_year']),
+            first_name=self.valid_names_post_data[1]['form-1-first_name'],
+            middle_names=self.valid_names_post_data[1]['form-1-middle_names'],
+            last_name=self.valid_names_post_data[1]['form-1-last_name'],
+            start_day=int(self.valid_names_post_data[1]['form-1-start_date_0']),
+            start_month=int(self.valid_names_post_data[1]['form-1-start_date_1']),
+            start_year=int(self.valid_names_post_data[1]['form-1-start_date_2']),
+            end_day=int(self.valid_names_post_data[1]['form-1-end_date_0']),
+            end_month=int(self.valid_names_post_data[1]['form-1-end_date_1']),
+            end_year=int(self.valid_names_post_data[1]['form-1-end_date_2']),
         )
 
         data = self._make_post_data(2, 'delete')
-        data.update(self.valid_previous_name_data[0])
-        data.update(self.valid_previous_name_data[1])
+        data.update(self.valid_names_post_data[0])
+        data.update(self.valid_names_post_data[1])
         data[data['form-0-previous_name_id']] = 'Remove this name'
 
         url = reverse('other-people-previous-names') \

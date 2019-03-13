@@ -307,7 +307,10 @@ def assertView(response, expected_view_obj):
 
 def assertRedirectView(response, expected_view_obj):
     expected_name = expected_view_obj if isinstance(expected_view_obj, str) else expected_view_obj.__name__
-    actual_name = django.urls.resolve(response.url).func.__name__
+    try:
+        actual_name = django.urls.resolve(response.url).func.__name__
+    except django.urls.exceptions.Resolver404:
+        raise AssertionError('Redirect url "{}" did not resolve to a view'.format(response.url))
     if actual_name != expected_name:
         raise AssertionError('Expected redirect to view "{}", found view "{}"'.format(expected_name, actual_name))
 
