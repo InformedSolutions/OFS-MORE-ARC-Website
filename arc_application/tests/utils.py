@@ -110,6 +110,15 @@ class StubNannyGatewayActions:
         }
         self.personal_details_read_response = self.make_response(record=self.personal_details_record)
 
+        self.previous_registration_record = {
+            'application_id': '998fd8ec-b96b-4a71-a1a1-a7a3ae186729',
+            'previous_registration_id': '9835bf3b-8ba9-4162-a25b-4c55e7d33d69',
+            'previous_registration': True,
+            'indiviual_id': '12345567',
+            'five_years_in_UK': True
+        }
+        self.previous_registration_read_response = self.make_response(record=self.previous_registration_record)
+
         self.childcare_training_record = {
             'application_id': '998fd8ec-b96b-4a71-a1a1-a7a3ae186729',
             'childcare_training_id': '9835bf3b-8ba9-4162-a25b-4c55e7d33d69',
@@ -206,6 +215,7 @@ class StubNannyGatewayActions:
         self.endpoint_mapping = {
             'application': 'nanny_application',
             'applicant-personal-details': 'personal_details',
+            'previous-registration-details': 'previous_registration',
             'childcare-training': 'childcare_training',
             'childcare-address': 'childcare_address',
             'applicant-home-address': 'home_address',

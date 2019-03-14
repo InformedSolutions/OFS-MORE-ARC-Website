@@ -10,7 +10,7 @@ from ...models import Arc
 from ...services.db_gateways import NannyGatewayActions, IdentityGatewayActions
 from ...views import NannyDbsCheckSummary, NannyContactDetailsSummary, NannyArcSummary, \
     NannyPersonalDetailsSummary, NannyChildcareAddressSummary, NannyFirstAidTrainingSummary, \
-    NannyChildcareTrainingSummary, NannyInsuranceCoverSummary, NannyTaskList
+    NannyChildcareTrainingSummary, NannyInsuranceCoverSummary, NannyTaskList, NannyPreviousRegistrationView
 from ...tests import utils
 
 ARC_STATUS_FLAGGED = 'FLAGGED'
@@ -203,6 +203,67 @@ class ReviewPersonalDetailsTests(NannyReviewFuncTestsBase):
 
     def test_submit_redirects_to_childcare_address_page_if_valid(self):
         self.skipTest('testNotImplemented')
+
+
+class PreviousRegistrationTests(NannyReviewFuncTestsBase):
+
+    def test_can_render_previous_registration_page(self):
+        """
+        Test to ensure that the page for entering previous registration details can be rendered.
+        """
+        response = self.client.get(reverse('nanny-previous-registration-view') + '?id=' + self.test_app_id)
+
+        self.assertEqual(response.status_code, 200)
+        utils.assertView(response, NannyPreviousRegistrationView.as_view())
+
+    def test_redirect_from_review_page(self):
+        """
+         Test to assert that clicking 'Continue' on the guidance page takes you to the
+         'Type-Of-Childcare-Training' page.
+        """
+        with patch.object(NannyGatewayActions, 'read') as nanny_api_get, \
+                patch.object(NannyGatewayActions, 'put') as nanny_api_put:
+            nanny_api_get.return_value.record = self.application_record
+            nanny_api_put.return_value.status_code = 200
+
+            response = self.client.post(reverse('nanny-previous-registration-view') + '?id=' + self.application_id)
+            found = resolve(response.url)
+
+            self.assertEqual(response.status_code, 302)
+            self.assertEqual(found.func.view_class, NannyPreviousRegistrationView)
+
+    def test_redirect_after_submitting_details(self):
+        """
+         Test to assert that clicking 'Continue' on the guidance page takes you to the
+         'Type-Of-Childcare-Training' page.
+        """
+        with patch.object(NannyGatewayActions, 'read') as nanny_api_get, \
+                patch.object(NannyGatewayActions, 'put') as nanny_api_put:
+            nanny_api_get.return_value.record = self.application_record
+            nanny_api_put.return_value.status_code = 200
+
+            response = self.client.post(reverse('nanny_personal_details_summary') + '?id=' + self.application_id)
+            found = resolve(response.url)
+
+            self.assertEqual(response.status_code, 302)
+            self.assertEqual(found.func.view_class, NannyPersonalDetailsSummary)
+
+    def test_redirect_after_submitting_page_without_entering_details(self):
+        """
+         Test to assert that clicking 'Continue' on the guidance page takes you to the
+         'Type-Of-Childcare-Training' page.
+        """
+        with patch.object(NannyGatewayActions, 'read') as nanny_api_get, \
+                patch.object(NannyGatewayActions, 'put') as nanny_api_put:
+            nanny_api_get.return_value.record = self.application_record
+            nanny_api_put.return_value.status_code = 200
+
+            response = self.client.post(reverse('nanny-previous-registration-view') + '?id=' + self.application_id)
+            found = resolve(response.url)
+
+            self.assertNotEqual(response.status_code, 302)
+            self.assertEqual(found.func.view_class, NannyPersonalDetailsSummary)
+
 
 
 class ReviewChildcareAddressTests(NannyReviewFuncTestsBase):
