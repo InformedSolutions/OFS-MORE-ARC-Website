@@ -77,14 +77,13 @@
         </tbody>
     </table>
 
-    {% for row in rows %}
-    {% if row.id|template_string_in_list:'previous_registration' %}
+    {% if show_previous_registration %}
     <table class="check-your-answers form-group">
         <thead>
         <tr>
             <th colspan="3">
                 <div class="heading-medium">
-                    Previous Registration
+                    Previous registration
                 </div>
             </th>
         </tr>
@@ -92,18 +91,62 @@
         <tbody>
 
         {% for row in rows %}
-        {% if row.id|template_string_in_list:'previous_registration individual_id five_years_in_UK' %}
-        {% include 'nanny_general_table_template.html' %}
+        {% if row.id|template_string_in_list:'previous_registration' %}
+                <tr>
+                    <td>
+                        Previously registered with Ofsted?
+                    </td>
+                    <td>
+                        {% if row.info %}
+                            Yes
+                        {% else %}
+                            No
+                        {% endif %}
+                    </td>
+                    <td class="change-answer">
+                        <a href="{% url 'nanny_previous_registration' %}/?id={{application_id}}">Change</a>
+                    </td>
+                </tr>
+                {% endif %}
+                {% if row.id|template_string_in_list:'individual_id' %}
+                <tr>
+                    <td>
+                        Individual ID
+                    </td>
+                    <td>
+                            {{ row.info }}
+                    </td>
+                    <td class="change-answer">
+                        <a href="{% url 'nanny_previous_registration' %}/?id={{application_id}}">Change</a>
+                    </td>
+                </tr>
+                {% endif %}
+                {% if row.id|template_string_in_list:'five_years_in_UK' %}
+                <tr>
+                    <td>
+                        Lived in England for more than 5 years?
+                    </td>
+                    <td>
+                        {% if row.info %}
+                            Yes
+                        {% else %}
+                            No
+                        {% endif %}
+                    </td>
+                    <td class="change-answer">
+                        <a href="{% url 'nanny_previous_registration' %}/?id={{application_id}}">Change</a>
+                    </td>
+                </tr>
         {% endif %}
         {% endfor %}
 
         </tbody>
     </table>
+
     {% endif %}
-    {% endfor %}
 
 
-
+    {% if not show_previous_registration %}
         {% for row in rows %}
             {% if row.id == 'name' %}
             {% if not row.id|template_string_in_list:'previous_registration' %}
@@ -112,6 +155,7 @@
             {% endif %}
             {% endif %}
         {% endfor %}
+    {% endif %}
 
     {% csrf_token %}
 

@@ -217,7 +217,7 @@ class PreviousRegistrationTests(NannyReviewFuncTestsBase):
         self.assertEqual(response.status_code, 200)
         utils.assertView(response, NannyPreviousRegistrationView.as_view())
 
-    def test_redirect_after_submitting_details(self):
+    def test_redirect_after_submitting_valid_details(self):
         """
          Test to assert that clicking 'Continue' on the guidance page takes you to the
          'Type-Of-Childcare-Training' page.
@@ -227,7 +227,12 @@ class PreviousRegistrationTests(NannyReviewFuncTestsBase):
             nanny_api_get.return_value.record = self.nanny_gateway.previous_registration_record
             nanny_api_put.return_value.status_code = 200
 
-            response = self.client.post(reverse('nanny_previous_registration') + '?id=' + self.test_app_id)
+            data = {'id': self.test_app_id,
+                    'previous_registration': True,
+                    'individual_id': 1234567,
+                    'five_years_in_UK': True}
+
+            response = self.client.post(reverse('nanny_previous_registration') + '?id=' + self.test_app_id, data)
             found = resolve(response.url)
 
             self.assertEqual(response.status_code, 302)
@@ -243,7 +248,9 @@ class PreviousRegistrationTests(NannyReviewFuncTestsBase):
             nanny_api_get.return_value.record = None
             nanny_api_put.return_value.status_code = 200
 
-            response = self.client.post(reverse('nanny_previous_registration') + '?id=' + self.test_app_id)
+            data = {'id': self.test_app_id}
+
+            response = self.client.post(reverse('nanny_previous_registration') + '?id=' + self.test_app_id, data)
             found = resolve(response.url)
 
             self.assertEqual(response.status_code, 200)

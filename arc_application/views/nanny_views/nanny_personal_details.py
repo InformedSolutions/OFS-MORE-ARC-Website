@@ -101,6 +101,7 @@ class NannyPersonalDetailsSummary(NannyARCFormView):
         context = {
             'application_id': application_id,
             'title': 'Review: ' + self.verbose_task_name,
+            'show_previous_registration':  previous_registration_record_exists,
             'change_link': 'nanny_personal_details_summary',
             'rows': [
                 {
