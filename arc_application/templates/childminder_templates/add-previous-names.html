@@ -6,7 +6,7 @@
 {% block inner_content %}
 {% include 'back-button.html' %}
 
-{% for form in form_set %}
+{% for form in formset %}
     {{form.error_summary}}
 {% endfor %}
 
@@ -15,7 +15,6 @@
         <input type="hidden" value="{{ application_id }}" name="id"/>
         <input type="hidden" value="{{ person_id }}" name="person_id"/>
         <input type="hidden" value="{{ person_type }}" name="type"/>
-        <input type="hidden" value="{{ extra }}" name="extra"/>
         {{ formset.management_form }}
         {% csrf_token %}
 
@@ -29,7 +28,7 @@
 
             {{ form }}
 
-            <input type="submit" class="hidden-link-2" name="delete-{{ form.previous_name_id.value }}"
+            <input type="submit" class="hidden-link-2" name="delete-{{ form.previous_name_id.value|default:'' }}"
                    value="Remove this name"/>
 
         {% endfor %}

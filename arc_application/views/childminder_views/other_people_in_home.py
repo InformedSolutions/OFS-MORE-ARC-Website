@@ -141,7 +141,8 @@ def other_people_summary(request):
         own_child_name_list.append(name)
 
     for adult_id, adult_name in zip(adult_id_list, adult_name_list):
-        adult_name_querysets.append(PreviousName.objects.filter(person_id=adult_id, other_person_type='ADULT'))
+        adult_name_querysets.append(PreviousName.objects.filter(person_id=adult_id, other_person_type='ADULT')
+                                    .order_by('order'))
         adult_address_querysets.append(PreviousAddress.objects.filter(person_id=adult_id, person_type='ADULT'))
         previous_registration_querysets.append(
             OtherPersonPreviousRegistrationDetails.objects.filter(person_id_id=adult_id))
@@ -290,6 +291,24 @@ def other_people_summary(request):
             if not successful:
                 return render(request, '500.html')
 
+            # calculate start and end dates for each adult's current name
+            for adult in AdultInHome.objects.filter(application_id=application_id_local):
+                # find most recent previous name
+                try:
+                    prev_name = PreviousName.objects.filter(person_id=adult.pk, other_person_type='ADULT')\
+                                    .order_by('-end_year', '-end_month', '-end_day')[0]
+                except IndexError:
+                    prev_name = None
+
+                today = datetime.date.today()
+                adult.name_start_day = prev_name.end_day if prev_name else adult.birth_day
+                adult.name_start_month = prev_name.end_month if prev_name else adult.birth_month
+                adult.name_start_year = prev_name.end_year if prev_name else adult.birth_year
+                adult.name_end_day = today.day
+                adult.name_end_month = today.month
+                adult.name_end_year = today.year
+                adult.save()
+
             status = Arc.objects.get(pk=application_id_local)
             status.people_in_home_review = section_status
             status.save()
@@ -366,8 +385,7 @@ def add_previous_name(request):
         person_type = request.POST["type"]
 
         # Create formset and populate from post data
-        PreviousNamesFormset = formset_factory(PersonPreviousNameForm)
-        formset = PreviousNamesFormset(request.POST)
+        formset = _previous_names_page_formset(data=request.POST)
 
         # Delete is a special case that should be done without validating the rest of the form.
         # Look for parameter name starting with 'delete' from special submit button
@@ -439,10 +457,23 @@ def _previous_names_page_redirect(app_id, person_id, person_type, show_extra=Non
     return HttpResponseRedirect(build_url(add_previous_name, get=params))
 
 
+def _previous_names_page_formset(data=None, initial=None, show_extra=False):
+
+    # create formset type and instantiate
+    PreviousNameFormset = formset_factory(PersonPreviousNameForm, extra=1 if show_extra else 0)
+    formset = PreviousNameFormset(data=data, initial=initial)
+
+    # ensure extra forms are required to be filled, as they're not by default
+    for form in formset:
+        form.empty_permitted = False
+
+    return formset
+
+
 def _fetch_previous_names(person_id, person_type, show_extra=None):
 
     # Grab data already in table for the passed in person_id of the right person_type
-    models = PreviousName.objects.filter(other_person_type=person_type, person_id=person_id)
+    models = PreviousName.objects.filter(other_person_type=person_type, person_id=person_id).order_by('order')
 
     # Determine whether to show additional empty form in formset
     if show_extra is None:
@@ -459,8 +490,7 @@ def _fetch_previous_names(person_id, person_type, show_extra=None):
     } for m in models]
 
     # create and return formset
-    PreviousNameFormset = formset_factory(PersonPreviousNameForm, extra=1 if show_extra else 0)
-    return PreviousNameFormset(initial=initial_data)
+    return _previous_names_page_formset(initial=initial_data, show_extra=show_extra)
 
 
 def _replace_previous_names(person_id, person_type, formset):
@@ -469,7 +499,7 @@ def _replace_previous_names(person_id, person_type, formset):
     PreviousName.objects.filter(person_id=person_id, other_person_type=person_type).delete()
 
     # save new names
-    for form in formset:
+    for i, form in enumerate(formset):
         PreviousName.objects.create(
             person_id=person_id,
             other_person_type=person_type,
@@ -482,5 +512,6 @@ def _replace_previous_names(person_id, person_type, formset):
             end_day=form.cleaned_data['end_date'].day,
             end_month=form.cleaned_data['end_date'].month,
             end_year=form.cleaned_data['end_date'].year,
+            order=i,
         )
 

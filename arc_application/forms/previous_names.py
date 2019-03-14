@@ -34,7 +34,8 @@ class PersonPreviousNameForm(GOVUKForm):
     error_summary_title = 'There was a problem on this page'
 
     previous_name_id = forms.CharField(
-        widget=forms.widgets.HiddenInput
+        widget=forms.widgets.HiddenInput,
+        required=False,
     )
 
     first_name = forms.CharField(
@@ -57,7 +58,7 @@ class PersonPreviousNameForm(GOVUKForm):
     start_date = form_fields.CustomSplitDateField(
         label='Start date',
         required=True,
-        help_text='For example, 31 03 1980',
+        help_text='For example, 31 3 2010',
         min_value=None,
         max_value=form_fields.CustomSplitDateField.TODAY,
         allow_short_year=False,
@@ -80,7 +81,7 @@ class PersonPreviousNameForm(GOVUKForm):
     end_date = form_fields.CustomSplitDateField(
         label='End date',
         required=True,
-        help_text='For example, 31 03 1980',
+        help_text='For example, 31 3 2019',
         min_value=None,
         max_value=form_fields.CustomSplitDateField.TODAY,
         allow_short_year=False,

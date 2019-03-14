@@ -1013,13 +1013,35 @@
             {% for name in previous_names %}
             <tr>
                 <td>
-                    Previous name ({{ forloop.counter }})
+                    Previous name {{ forloop.counter }}
                 </td>
                 <td>
                     {{ name.first_name }} {{name.middle_names}} {{name.last_name}}
                 </td>
                 <td class="change-answer">
-                    <a href="{% url 'other-people-previous-names' %}?id={{ application_id }}&person_id={{ id }}&type=ADULT&referrer=list">Change</a>
+                    <a href="{% url 'other-people-previous-names' %}?id={{ application_id }}&person_id={{ id }}&type=ADULT">Change</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Start date {{ forloop.counter }}
+                </td>
+                <td>
+                    {{ name.start_date|date:'j F Y' }}
+                </td>
+                <td class="change-answer">
+                    <a href="{% url 'other-people-previous-names' %}?id={{ application_id }}&person_id={{ id }}&type=ADULT">Change</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    End date {{ forloop.counter }}
+                </td>
+                <td>
+                    {{ name.end_date|date:'j F Y' }}
+                </td>
+                <td class="change-answer">
+                    <a href="{% url 'other-people-previous-names' %}?id={{ application_id }}&person_id={{ id }}&type=ADULT">Change</a>
                 </td>
             </tr>
             {% endfor %}
