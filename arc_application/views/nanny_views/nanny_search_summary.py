@@ -6,7 +6,7 @@ from django.shortcuts import render
 from django.utils.decorators import method_decorator
 from django.views import View
 
-from ...views import NannyArcSummary, get_nanny_summary_variables
+from ...views import NannyArcSummary, get_nanny_summary_functions
 from ..base import has_group
 from ...services.db_gateways import NannyGatewayActions
 
@@ -37,7 +37,10 @@ class NannySearchSummary(View):
         application_reference = NannyArcSummary.get_application_reference(application_id)
         publish_details = NannyArcSummary.get_publish_details(application_id)
 
-        context_list = get_nanny_summary_variables(application_id)
+        context_function_list = get_nanny_summary_functions()
+        context_list = [self.try_get_context_data(context_func, application_id) for context_func in context_function_list]
+
+        context_list = [context_dict for context_dict in context_list if context_dict is not None]
 
         # Remove all change_links
         for context_dict in context_list:
