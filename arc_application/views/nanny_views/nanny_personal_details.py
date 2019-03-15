@@ -10,18 +10,6 @@ class NannyPersonalDetailsSummary(NannyARCFormView):
     task_for_review = 'personal_details_review'
     verbose_task_name = 'Your personal details'
 
-    # def get_initial(self):
-    #     initial = {}
-    #     application_id = self.request.GET.get('id')
-    #     previous_registration_details = NannyGatewayActions().read('previous-registration-details',
-    #                                                        params={'application_id': application_id})
-    #     if previous_registration_details.status_code != 404:
-    #         self.form_class = [PersonalDetailsForm, HomeAddressForm, PreviousRegistrationForm]
-    #     else:
-    #         self.form_class = [PersonalDetailsForm, HomeAddressForm]
-    #
-    #         return initial
-
     def get_form_class(self, **kwargs):
         if hasattr(self, 'request'):
             application_id = self.request.GET.get('id')

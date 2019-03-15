@@ -236,7 +236,7 @@ class PreviousRegistrationTests(NannyReviewFuncTestsBase):
             response = self.client.post(reverse('nanny_previous_registration') + '?id=' + self.test_app_id, data)
 
             self.assertEqual(response.status_code, 302)
-            self.assertEqual(resolve(response.url).func.__name__, NannyPersonalDetailsSummary.__name__)
+            utils.assertRedirectView(response, NannyPersonalDetailsSummary.as_view())
 
     def test_redirect_after_submitting_page_without_entering_details(self):
         """
@@ -252,7 +252,8 @@ class PreviousRegistrationTests(NannyReviewFuncTestsBase):
             response = self.client.post(reverse('nanny_previous_registration') + '?id=' + self.test_app_id, data)
 
             self.assertEqual(response.status_code, 200)
-            self.assertEqual(response.resolver_match.func.__name__, NannyPreviousRegistrationView.__name__)
+            utils.assertView(response, NannyPreviousRegistrationView.as_view())
+
 
 class ReviewChildcareAddressTests(NannyReviewFuncTestsBase):
 

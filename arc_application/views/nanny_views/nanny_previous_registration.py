@@ -58,10 +58,10 @@ class NannyPreviousRegistrationView(FormView):
                 previous_registration_new['individual_id'] = self.request.POST['individual_id']
                 previous_registration_new['five_years_in_UK'] = self.request.POST['five_years_in_UK']
 
-                response = NannyGatewayActions().create('previous-registration-details',
+                NannyGatewayActions().create('previous-registration-details',
                                                         params=previous_registration_new)
 
-            redirect_link = '/nanny/personal-details/'
+            redirect_link = '/nanny/personal-details/review/'
             return HttpResponseRedirect(settings.URL_PREFIX + redirect_link + '?id=' + application_id)
 
         else:
