@@ -9,11 +9,107 @@ from .. import form_fields
 
 
 class PreviousAddressEntryForm(GOVUKForm):
-    pass
+    """
+    GOV.UK form for the Your children's address page for postcode search
+    """
+    field_label_classes = 'form-label-bold'
+    error_summary_template_name = 'standard-error-summary.html'
+    auto_replace_widgets = True
+
+    postcode = forms.CharField(label='Postcode', error_messages={'required': 'Please enter your postcode'})
+
+    def clean_postcode(self):
+        postcode = self.cleaned_data['postcode']
+        return shared_clean_postcode(postcode)
 
 
 class PreviousAddressSelectForm(GOVUKForm):
-    pass
+    # Moved in/out date validation messages
+    ERROR_MESSAGE_DATE_BLANK = 'Enter the date, including the month and year'
+    ERROR_MESSAGE_DAY_OUT_OF_RANGE = 'Day must be between 1 and 31'
+    ERROR_MESSAGE_MONTH_OUT_OF_RANGE = 'Month must be between 1 and 12'
+    ERROR_MESSAGE_MOVED_IN_YEAR_BEFORE_1900 = 'Date moved in must be after 1900'
+    ERROR_MESSAGE_MOVED_OUT_YEAR_BEFORE_1900 = 'Date you moved out must be after 1900'
+    ERROR_MESSAGE_YEAR_LESS_THAN_4_DIGITS = 'Enter the whole year (4 digits)'
+    ERROR_MESSAGE_INVALID_DATE = 'Enter a real date'
+    ERROR_MESSAGE_NON_NUMERIC = 'Use numbers for the date'
+
+    ERROR_MESSAGE_MOVED_IN_DATE_AFTER_CURRENT_DATE = 'Date moved in must be today or in the past'
+    ERROR_MESSAGE_START_DATE_AFTER_END_DATE = 'Date you moved in must be before date you moved out'
+
+    ERROR_MESSAGE_MOVED_OUT_DATE_AFTER_CURRENT_DATE = 'Date you moved out must be today or in the past'
+    ERROR_MESSAGE_MOVED_OUT_DATE_BEFORE_MOVED_IN_DATE = 'Date you moved out must be after the date you moved in'
+
+    auto_replace_widgets = True
+    field_label_classes = 'form-label-bold'
+    error_summary_title = 'There was a problem on this page'
+
+    address = forms.ChoiceField(
+        label='Select address',
+        required=True,
+        error_messages={'required': 'Please select your address'}
+    )
+    moved_in_date = form_fields.CustomSplitDateField(
+        label='Moved in',
+        required=True,
+        help_text='For example, 31 03 1980',
+        min_value=None,
+        max_value=form_fields.CustomSplitDateField.TODAY,
+        allow_short_year=False,
+        error_messages={'required': ERROR_MESSAGE_DATE_BLANK,
+                        'incomplete': ERROR_MESSAGE_DATE_BLANK,
+                        'max_today': ERROR_MESSAGE_MOVED_IN_DATE_AFTER_CURRENT_DATE,
+                        'invalid': ERROR_MESSAGE_INVALID_DATE,
+                        'short_year': ERROR_MESSAGE_YEAR_LESS_THAN_4_DIGITS},
+        day_error_messages={'min_value': ERROR_MESSAGE_DAY_OUT_OF_RANGE,
+                            'max_value': ERROR_MESSAGE_DAY_OUT_OF_RANGE,
+                            'invalid': ERROR_MESSAGE_NON_NUMERIC},
+        month_error_messages={'min_value': ERROR_MESSAGE_MONTH_OUT_OF_RANGE,
+                              'max_value': ERROR_MESSAGE_MONTH_OUT_OF_RANGE,
+                              'invalid': ERROR_MESSAGE_NON_NUMERIC},
+        year_min_value=1900,
+        year_max_value=None,
+        year_error_messages={'min_value': ERROR_MESSAGE_MOVED_IN_YEAR_BEFORE_1900,
+                             'invalid': ERROR_MESSAGE_NON_NUMERIC},
+    )
+    moved_out_date = form_fields.CustomSplitDateField(
+        label='Moved out',
+        required=True,
+        help_text='For example, 31 03 1980',
+        min_value=None,
+        max_value=form_fields.CustomSplitDateField.TODAY,
+        allow_short_year=False,
+        error_messages={'required': ERROR_MESSAGE_DATE_BLANK,
+                        'incomplete': ERROR_MESSAGE_DATE_BLANK,
+                        'max_today': ERROR_MESSAGE_MOVED_OUT_DATE_AFTER_CURRENT_DATE,
+                        'invalid': ERROR_MESSAGE_INVALID_DATE,
+                        'short_year': ERROR_MESSAGE_YEAR_LESS_THAN_4_DIGITS},
+        day_error_messages={'min_value': ERROR_MESSAGE_DAY_OUT_OF_RANGE,
+                            'max_value': ERROR_MESSAGE_DAY_OUT_OF_RANGE,
+                            'invalid': ERROR_MESSAGE_NON_NUMERIC},
+        month_error_messages={'min_value': ERROR_MESSAGE_MONTH_OUT_OF_RANGE,
+                              'max_value': ERROR_MESSAGE_MONTH_OUT_OF_RANGE,
+                              'invalid': ERROR_MESSAGE_NON_NUMERIC},
+        year_min_value=1900,
+        year_max_value=None,
+        year_error_messages={'min_value': ERROR_MESSAGE_MOVED_OUT_YEAR_BEFORE_1900,
+                             'invalid': ERROR_MESSAGE_NON_NUMERIC},
+    )
+
+    def clean(self):
+        super().clean()
+
+        # check start date is after end date
+        start_date = self.cleaned_data.get('moved_in_date', None)
+        end_date = self.cleaned_data.get('moved_out_date', None)
+        if start_date and end_date and end_date < start_date:
+            self.add_error('moved_in_date', self.ERROR_MESSAGE_START_DATE_AFTER_END_DATE)
+            self.add_error('moved_out_date', self.ERROR_MESSAGE_END_DATE_BEFORE_START_DATE)
+
+        # de-duplicate error messages for each field
+        for field, errors in self.errors.items():
+            dedup = OrderedDict([(k, None) for k in errors])
+            self.errors[field] = list(dedup.keys())
 
 
 class PreviousAddressManualForm(GOVUKForm):
@@ -82,7 +178,7 @@ class PreviousAddressManualForm(GOVUKForm):
     )
 
     moved_in_date = form_fields.CustomSplitDateField(
-        label='Start date',
+        label='Moved in',
         required=True,
         help_text='For example, 31 03 1980',
         min_value=None,
@@ -105,7 +201,7 @@ class PreviousAddressManualForm(GOVUKForm):
                              'invalid': ERROR_MESSAGE_NON_NUMERIC},
     )
     moved_out_date = form_fields.CustomSplitDateField(
-        label='End date',
+        label='Moved out',
         required=True,
         help_text='For example, 31 03 1980',
         min_value=None,
@@ -189,16 +285,8 @@ class PreviousAddressManualForm(GOVUKForm):
         return county
 
     def clean_postcode(self):
-        """
-        Postcode validation
-        :return: string
-        """
         postcode = self.cleaned_data['postcode']
-        postcode_no_space = postcode.replace(" ", "")
-        postcode_uppercase = postcode_no_space.upper()
-        if re.match(settings.REGEX['POSTCODE_UPPERCASE'], postcode_uppercase) is None:
-            raise forms.ValidationError('Please enter a valid postcode')
-        return postcode
+        return shared_clean_postcode(postcode)
 
 
 class PersonalDetailsPreviousAddressForm(PreviousAddressManualForm):
@@ -213,3 +301,16 @@ class PersonPreviousAddressForm(PreviousAddressManualForm):
     Form to enter a Person's previous address details manually
     Inherits from shared PreviousAddressManualForm, this class handles any deltas between previous address implementations
     """
+
+
+### Shared clean methods ###
+def shared_clean_postcode(postcode):
+    """
+    Postcode validation
+    :return: string
+    """
+    postcode_no_space = postcode.replace(" ", "")
+    postcode_uppercase = postcode_no_space.upper()
+    if re.match(settings.REGEX['POSTCODE_UPPERCASE'], postcode_uppercase) is None:
+        raise forms.ValidationError('Please enter a valid postcode')
+    return postcode
