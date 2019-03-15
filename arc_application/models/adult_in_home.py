@@ -99,6 +99,8 @@ class AdultInHome(models.Model):
         """
         return datetime.date(self.birth_year, self.birth_month, self.birth_day)
 
+    date_of_birth = property(get_dob_as_date)
+
     @staticmethod
     def bool_to_string(bool):
         return "Yes" if bool else "No"
@@ -111,18 +113,6 @@ class AdultInHome(models.Model):
         :return: a summary table of the adult
         """
 
-        if self.birth_day < 10:
-            birth_day = '0' + str(self.birth_day)
-        else:
-            birth_day = str(self.birth_day)
-
-        if self.birth_month < 10:
-            birth_month = '0' + str(self.birth_month)
-        else:
-            birth_month = str(self.birth_month)
-
-        date_of_birth = birth_day + ' ' + birth_month + ' ' + str(self.birth_year)
-
         summary_table = [
             {"title": self.get_full_name(),
              "id": self.pk},
@@ -131,7 +121,7 @@ class AdultInHome(models.Model):
             {"name": "Name",
              "value": self.get_full_name()},
             {"name": "Date of birth",
-             "value": date_of_birth},
+             "value": self.get_dob_as_date().strftime('%d %m %Y')},
             {"name": "Relationship",
              "value": self.relationship},
             {"name": "Email",
@@ -188,17 +178,36 @@ class AdultInHome(models.Model):
 
         return summary_table
 
+    def get_previous_names_and_addresses_summary_table(self):
+
+        # late import to avoid circular dependency
+        from .previous_name import PreviousName
+
+        previous_names = PreviousName.objects.filter(person_id=self.pk, other_person_type='ADULT').order_by('order')
+        if len(previous_names) == 0:
+            return None
+
+        summary_table = [
+            {"title": "{}'s previous names and addresses".format(self.get_full_name()),
+             "id": self.pk}
+        ]
+        for i, name in enumerate(previous_names):
+            summary_table.extend([
+                {"name": "Previous name {}".format(i+1),
+                 "value": name.name},
+                {"name": "Start date",
+                 "value": name.start_date.strftime("%d %B %Y")},
+                {"name": "End date",
+                 "value": name.end_date.strftime("%d %B %Y")},
+            ])
+        return summary_table
+
     def show_enhanced_check(self):
         return not self.capita
 
     def show_on_update(self):
         return (not self.capita and self.enhanced_check) \
                or (self.capita and not self.within_three_months)
-
-    # Date of birth property created to keep DRY
-    @property
-    def date_of_birth(self):
-        return datetime(year=self.birth_year, month=self.birth_month, day=self.birth_day)
 
     class Meta:
         db_table = 'ADULT_IN_HOME'

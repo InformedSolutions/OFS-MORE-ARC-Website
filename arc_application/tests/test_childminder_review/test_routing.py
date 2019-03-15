@@ -1,6 +1,7 @@
 import logging
 from datetime import datetime, timezone, date
 from unittest.mock import patch
+from unittest import skip
 
 from django.test import TestCase, tag
 from django.urls import reverse
@@ -73,6 +74,7 @@ class PersonalDetailsPageFunctionalTests(TestCase):
         self.assertEqual(200, response.status_code)
         utils.assertView(response, 'personal_details_summary')
 
+    @skip('functionalityNotImplemented')
     def test_shows_previous_names(self):
 
         models.PreviousName.objects.create(
@@ -162,6 +164,7 @@ class PersonalDetailsPageFunctionalTests(TestCase):
         def today(cls):
             return date(2019, 2, 24)
 
+    @skip('functionalityNotImplemented')
     @patch('datetime.date', new=MockDate)
     def test_submit_stores_current_name_end_date_as_today_and_start_date_as_latest_previous_name_end_date(self):
 
@@ -194,6 +197,7 @@ class PersonalDetailsPageFunctionalTests(TestCase):
         self.assertEqual(2, fetched_details.end_month)
         self.assertEqual(2019, fetched_details.end_year)
 
+    @skip('functionalityNotImplemented')
     @patch('datetime.date', new=MockDate)
     def test_submit_stores_current_name_end_date_as_today_and_start_date_as_dob_if_no_previous_names(self):
 
@@ -228,6 +232,7 @@ class PersonalDetailsPageFunctionalTests(TestCase):
         utils.assertRedirectView(response, 'first_aid_training_summary')
 
 
+@skip('functionalityNotImplemented')
 @tag('http')
 class ApplicantPreviousNamesFunctionalTests(TestCase):
 
@@ -951,18 +956,18 @@ class PeopleInTheHomeFunctionalTests(TestCase):
         response = self.client.get(reverse('other_people_summary'), data={'id': self.application.pk})
         self.assertEqual(200, response.status_code)
 
-        head1 = "John Jimbo Johnnington's eBulk details"
+        head1 = "John Jimbo Johnnington's previous names and addresses"
         utils.assertSummaryField(response, 'Previous name 1', 'Bilbo B Baggins', heading=head1)
-        utils.assertSummaryField(response, 'Start date 1', '1 March 1985', heading=head1)
-        utils.assertSummaryField(response, 'End date 1', '10 December 2001', heading=head1)
+        utils.assertSummaryField(response, 'Start date', '1 March 1985', heading=head1)
+        utils.assertSummaryField(response, 'End date', '10 December 2001', heading=head1)
         utils.assertSummaryField(response, 'Previous name 2', 'George Lucas', heading=head1)
-        utils.assertSummaryField(response, 'Start date 2', '9 October 2011', heading=head1)
-        utils.assertSummaryField(response, 'End date 2', '1 January 2012', heading=head1)
+        utils.assertSummaryField(response, 'Start date', '9 October 2011', heading=head1)
+        utils.assertSummaryField(response, 'End date', '1 January 2012', heading=head1)
 
-        head2 = "Freda Annabel Smith's eBulk details"
+        head2 = "Freda Annabel Smith's previous names and addresses"
         utils.assertSummaryField(response, 'Previous name 1', 'Gertrude Geraldine Gorton', heading=head2)
-        utils.assertSummaryField(response, 'Start date 1', '1 August 1972', heading=head2)
-        utils.assertSummaryField(response, 'End date 1', '2 August 1972', heading=head2)
+        utils.assertSummaryField(response, 'Start date', '1 August 1972', heading=head2)
+        utils.assertSummaryField(response, 'End date', '2 August 1972', heading=head2)
 
     def test_shows_Add_Previous_Names_button_for_each_adult(self):
 
@@ -1694,6 +1699,12 @@ class ReviewSummaryAndConfirmationFunctionalTests(TestCase):
         self.assertEqual(200, response.status_code)
         utils.assertView(response, 'arc_summary')
 
+    def test_shows_applicants_previous_names(self):
+        self.skipTest('testNotImplemented')
+
+    def test_shows_applicants_previous_addresses(self):
+        self.skipTest('testNotImplemented')
+
     def test_displays_adults_main_info_that_is_always_shown(self):
 
         self.application.adults_in_home = True
@@ -1875,10 +1886,70 @@ class ReviewSummaryAndConfirmationFunctionalTests(TestCase):
         utils.assertSummaryField(response, 'On the update service?', 'No', heading='Freda Annabel Smith')
         utils.assertNotSummaryField(response, 'On the update service?', heading='Jim Bob Robertson')
 
-    def test_shows_applicants_previous_names(self):
-        self.skipTest('testNotImplemented')
+    def test_displays_adult_previous_names(self):
 
-    def test_shows_applicants_previous_addresses(self):
+        self.application.adults_in_home = True
+        self.application.working_in_other_childminder_home = False
+        self.application.save()
+
+        adult1 = models.AdultInHome.objects.get(application_id=self.application.pk)
+        adult1.first_name = 'Joe'
+        adult1.middle_names = 'Anthony'
+        adult1.last_name = 'Bloggs'
+        adult1.save()
+        models.PreviousName.objects.create(
+            person_id=adult1.pk,
+            other_person_type='ADULT',
+            first_name='Dave', middle_names='Alan', last_name='Alandave',
+            start_day=1, start_month=4, start_year=1999,
+            end_day=2, end_month=6, end_year=2000,
+            order=1,
+        )
+        models.PreviousName.objects.create(
+            person_id=adult1.pk,
+            other_person_type='ADULT',
+            first_name='Tim', middle_names='', last_name='Timson',
+            start_day=4, start_month=4, start_year=2004,
+            end_day=11, end_month=12, end_year=2013,
+            order=2,
+        )
+
+        adult2 = models.AdultInHome.objects.create(
+            application_id=self.application,
+            first_name='Freda', middle_names='Annabel', last_name='Smith',
+            birth_day=1, birth_month=2, birth_year=1983,
+            dbs_certificate_number='123456789013',
+            capita=True,
+            within_three_months=False,
+            certificate_information='',
+            enhanced_check=None,
+            on_update=False,
+        )
+        models.PreviousName.objects.create(
+            person_id=adult2.pk,
+            other_person_type='ADULT',
+            first_name='Tina', middle_names='T', last_name='Tuna',
+            start_day=8, start_month=9, start_year=2001,
+            end_day=1,  end_month=1, end_year=2002,
+            order=0,
+        )
+
+        response = self.client.get(reverse('arc-summary'), data={'id': self.application.pk})
+
+        head1 = "Joe Anthony Bloggs's previous names and addresses"
+        utils.assertSummaryField(response, 'Previous name 1', 'Dave Alan Alandave', heading=head1)
+        utils.assertSummaryField(response, 'Start date', '01 April 1999', heading=head1)
+        utils.assertSummaryField(response, 'End date', '02 June 2000', heading=head1)
+        utils.assertSummaryField(response, 'Previous name 2', 'Tim Timson', heading=head1)
+        utils.assertSummaryField(response, 'Start date', '04 April 2004', heading=head1)
+        utils.assertSummaryField(response, 'End date', '11 December 2013', heading=head1)
+
+        head2 = "Freda Annabel Smith's previous names and addresses"
+        utils.assertSummaryField(response, 'Previous name 1', 'Tina T Tuna', heading=head2)
+        utils.assertSummaryField(response, 'Start date', '08 September 2001', heading=head2)
+        utils.assertSummaryField(response, 'End date', '01 January 2002', heading=head2)
+
+    def test_display_adult_previous_addresses(self):
         self.skipTest('testNotImplemented')
 
     class MockDatetime(datetime):
@@ -1886,8 +1957,10 @@ class ReviewSummaryAndConfirmationFunctionalTests(TestCase):
         def now(cls):
             return datetime(2019, 2, 27, 17, 30, 5)
 
+    @patch('arc_application.messaging')
+    @patch('arc_application.messaging')
     @patch('arc_application.views.base.datetime', new=MockDatetime)
-    def test_submit_summary_releases_application_as_accepted_in_database_if_no_tasks_flagged(self):
+    def test_submit_summary_releases_application_as_accepted_in_database_if_no_tasks_flagged(self, *_):
 
         APP_TASKS_ALL = ['login_details', 'personal_details', 'your_children', 'childcare_type', 'first_aid_training',
                          'childcare_training', 'criminal_record_check', 'health', 'references', 'people_in_home']
@@ -1929,8 +2002,10 @@ class ReviewSummaryAndConfirmationFunctionalTests(TestCase):
         refetched_arc = models.Arc.objects.get(pk=arc.pk)
         self.assertTrue(refetched_arc.user_id in ('', None))
 
+    @patch('arc_application.messaging')
+    @patch('arc_application.messaging')
     @patch('arc_application.views.base.datetime', new=MockDatetime)
-    def test_submit_summary_releases_application_as_needing_info_in_database_if_tasks_have_been_flagged(self):
+    def test_submit_summary_releases_application_as_needing_info_in_database_if_tasks_have_been_flagged(self, *_):
 
         ARC_TASKS_FLAGGED = ['childcare_type', 'personal_details']
         ARC_TASKS_UNFLAGGED = ['login_details', 'your_children', 'first_aid', 'childcare_training', 'dbs', 'health',

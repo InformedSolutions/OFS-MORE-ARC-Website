@@ -306,6 +306,13 @@ def load_json(application_id_local, ordered_models, recurse, apply_filtering_for
                 else:
                     table_list.append(table)
 
+                prev_names_addresses_table = record.get_previous_names_and_addresses_summary_table()
+                if prev_names_addresses_table is not None:
+                    if recurse:
+                        table_list = table_list + prev_names_addresses_table
+                    else:
+                        table_list.append(prev_names_addresses_table)
+
         elif model.objects.filter(application_id=application.pk).exists():
             records = model.objects.filter(application_id=application.pk)
             for record in records:

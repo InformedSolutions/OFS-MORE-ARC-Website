@@ -267,15 +267,18 @@ def assertNotXPath(response, xpath):
         raise AssertionError('"{}" evaluated to {} but no content expected'.format(xpath, repr(result)))
 
 
-def assertXPathValue(response, xpath, expected_value):
+def assertXPathValue(response, xpath, expected_value, strip=False):
     """
     Asserts that the given value can be found at the given xpath in the response's HTML
 
     :param response: The http response object
     :param xpath: An XPath expression to test for
     :param expected_value: The content expected to be found
+    :param strip: (optional) Run results through str.strip to trim whitespace
     """
     result = _do_xpath(response, xpath)
+    if strip:
+        result = list(map(str.strip, result))
     if expected_value not in result:
         raise AssertionError('Expected {} at "{}", but found {}'.format(repr(expected_value), xpath, repr(result)))
 
@@ -550,7 +553,7 @@ def assertSummaryField(response, label, value, heading=None):
         assertXPath(response, _heading_xpath(heading))
 
     assertXPath(response, _field_xpath(label, heading))
-    assertXPathValue(response, _field_value_xpath(label, heading), value)
+    assertXPathValue(response, _field_value_xpath(label, heading), value, strip=True)
 
 
 def assertNotSummaryField(response, label, heading=None):
@@ -583,7 +586,7 @@ def _field_xpath(label, heading=None):
 def _field_value_xpath(label, heading=None):
     xpath = _field_xpath(label, heading)
     xpath += "/following-sibling::td[1]/text()"
-    return 'normalize-space({})'.format(xpath)
+    return xpath
 
 
 def patch_for_setUp(test_case, *args, **kwargs):

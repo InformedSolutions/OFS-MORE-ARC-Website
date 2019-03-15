@@ -67,6 +67,8 @@ def other_people_summary(request):
     adult_address_querysets = []
     previous_registration_querysets = []
     adult_enhanced_checks = []
+    adult_previous_name_lists_list = []
+    adult_previous_address_lists_list = []
 
     # Children in the home data
     children = ChildInHome.objects.filter(application_id=application_id_local).order_by('child')
@@ -120,6 +122,12 @@ def other_people_summary(request):
         hospital_admissions.append(HealthCheckHospital.objects.filter(person_id=adult.pk))
         local_authorities.append(adult.reasons_known_to_council_health_check)
         adult_enhanced_checks.append(adult.enhanced_check)
+        previous_registration_querysets.append(
+            OtherPersonPreviousRegistrationDetails.objects.filter(person_id_id=adult.pk))
+        adult_previous_name_lists_list.append(
+            PreviousName.objects.filter(person_id=adult.pk, other_person_type='ADULT').order_by('order'))
+        adult_previous_address_lists_list.append(
+            PreviousAddress.objects.filter(person_id=adult.pk, person_type='ADULT'))
 
     for child in children:
         if child.middle_names and child.middle_names != '':
@@ -140,14 +148,6 @@ def other_people_summary(request):
             name = child.first_name + ' ' + child.last_name
         own_child_name_list.append(name)
 
-    for adult_id, adult_name in zip(adult_id_list, adult_name_list):
-        adult_name_querysets.append(PreviousName.objects.filter(person_id=adult_id, other_person_type='ADULT')
-                                    .order_by('order'))
-        adult_address_querysets.append(PreviousAddress.objects.filter(person_id=adult_id, person_type='ADULT'))
-        previous_registration_querysets.append(
-            OtherPersonPreviousRegistrationDetails.objects.filter(person_id_id=adult_id))
-
-    adult_ebulk_lists = list(zip(adult_id_list, adult_name_list, adult_name_querysets, adult_address_querysets))
     previous_registration_lists = list(zip(adult_id_list, adult_name_list, previous_registration_querysets))
 
     form.error_summary_title = 'There was a problem'
@@ -167,7 +167,8 @@ def other_people_summary(request):
                 adult_birth_month_list, adult_birth_year_list, adult_relationship_list, adult_email_list,
                 adult_dbs_cert_numbers, adult_dbs_on_capitas, adult_dbs_is_recents, adult_dbs_is_enhanceds,
                 adult_dbs_on_updates, adult_lived_abroad, adult_military_base, formset_adult, current_illnesses,
-                serious_illnesses, hospital_admissions, local_authorities, adult_enhanced_checks))
+                serious_illnesses, hospital_admissions, local_authorities, adult_enhanced_checks,
+                adult_previous_name_lists_list, adult_previous_address_lists_list))
 
         initial_child_data = other_people_initial_population(False, children)
 
@@ -202,7 +203,6 @@ def other_people_summary(request):
             'adult_lists': adult_lists,
             'child_lists': child_lists,
             'own_child_lists': own_child_lists,
-            'adult_ebulk_lists': adult_ebulk_lists,
             'previous_registration_lists': previous_registration_lists,
             'providing_care_in_own_home': providing_care_in_own_home,
             'childcare_type_zero_to_five': childcare_type.zero_to_five,
@@ -330,7 +330,8 @@ def other_people_summary(request):
                                    adult_dbs_on_capitas, adult_dbs_is_recents, adult_dbs_is_enhanceds,
                                    adult_dbs_on_updates, adult_lived_abroad, adult_military_base, adult_formset,
                                    current_illnesses, serious_illnesses, hospital_admissions, local_authorities,
-                                   adult_enhanced_checks))
+                                   adult_enhanced_checks, adult_previous_name_lists_list,
+                                   adult_previous_address_lists_list))
 
             child_lists = zip(child_id_list, child_name_list, child_birth_day_list, child_birth_month_list,
                               child_birth_year_list,
@@ -364,7 +365,6 @@ def other_people_summary(request):
                 'adult_lists': adult_lists,
                 'child_lists': child_lists,
                 'own_child_lists': own_child_lists,
-                'adult_ebulk_lists': adult_ebulk_lists,
                 'previous_registration_lists': previous_registration_lists,
                 'providing_care_in_own_home': providing_care_in_own_home,
                 'childcare_type_zero_to_five': childcare_type.zero_to_five,
