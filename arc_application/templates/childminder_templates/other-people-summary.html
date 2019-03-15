@@ -2,6 +2,7 @@
 {% block page_title %}Review: people in the home{% endblock %}
 {% load static %}
 {% load govuk_template_base %}
+{% load alt_text_extras %}
 
 {% block inner_content %}
 {% include 'back-button.html' %}
@@ -489,7 +490,8 @@
                     {{ prevname.name }}
                 </td>
                 <td class="change-answer">
-                    <a href="{% url 'other-people-previous-names' %}?id={{ application_id }}&person_id={{ id }}&type=ADULT">Change</a>
+                    <a href="{% url 'other-people-previous-names' %}?id={{ application_id }}&person_id={{ id }}&type=ADULT"
+                        alt="Change the {{ forloop.counter|inflect }} previous name">Change</a>
                 </td>
             </tr>
             <tr>
@@ -500,7 +502,8 @@
                     {{ prevname.start_date|date:'j F Y' }}
                 </td>
                 <td class="change-answer">
-                    <a href="{% url 'other-people-previous-names' %}?id={{ application_id }}&person_id={{ id }}&type=ADULT">Change</a>
+                    <a href="{% url 'other-people-previous-names' %}?id={{ application_id }}&person_id={{ id }}&type=ADULT"
+                        alt="Change the start date for the {{ forloop.counter|inflect }} previous name">Change</a>
                 </td>
             </tr>
             <tr>
@@ -511,7 +514,8 @@
                     {{ prevname.end_date|date:'j F Y' }}
                 </td>
                 <td class="change-answer">
-                    <a href="{% url 'other-people-previous-names' %}?id={{ application_id }}&person_id={{ id }}&type=ADULT">Change</a>
+                    <a href="{% url 'other-people-previous-names' %}?id={{ application_id }}&person_id={{ id }}&type=ADULT"
+                        alt="Change the end date for the {{ forloop.counter|inflect }} previous name">Change</a>
                 </td>
             </tr>
             {% endfor %}
