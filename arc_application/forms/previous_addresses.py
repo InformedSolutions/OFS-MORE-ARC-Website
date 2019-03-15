@@ -12,6 +12,9 @@ class PreviousAddressEntryForm(GOVUKForm):
     """
     GOV.UK form for the Your children's address page for postcode search
     """
+    ERROR_MESSAGE_POSTCODE_NOT_ENTERED = 'Please enter your postcode'
+    ERROR_MESSAGE_POSTCODE_INVALID = 'Please enter a valid postcode'
+
     field_label_classes = 'form-label-bold'
     error_summary_template_name = 'standard-error-summary.html'
     auto_replace_widgets = True
@@ -19,11 +22,23 @@ class PreviousAddressEntryForm(GOVUKForm):
     postcode = forms.CharField(label='Postcode', error_messages={'required': 'Please enter your postcode'})
 
     def clean_postcode(self):
+        """
+        Postcode validation
+        :return: string
+        """
         postcode = self.cleaned_data['postcode']
-        return shared_clean_postcode(postcode)
+        postcode_no_space = postcode.replace(" ", "")
+        postcode_uppercase = postcode_no_space.upper()
+        if re.match(settings.REGEX['POSTCODE_UPPERCASE'], postcode_uppercase) is None:
+            raise forms.ValidationError(self.ERROR_MESSAGE_POSTCODE_INVALID)
+        return postcode_uppercase
 
 
 class PreviousAddressSelectForm(GOVUKForm):
+
+    # Address validation messages
+    ERROR_MESSAGE_ADDRESS_BLANK = 'Please select your address'
+
     # Moved in/out date validation messages
     ERROR_MESSAGE_DATE_BLANK = 'Enter the date, including the month and year'
     ERROR_MESSAGE_DAY_OUT_OF_RANGE = 'Day must be between 1 and 31'
@@ -35,7 +50,7 @@ class PreviousAddressSelectForm(GOVUKForm):
     ERROR_MESSAGE_NON_NUMERIC = 'Use numbers for the date'
 
     ERROR_MESSAGE_MOVED_IN_DATE_AFTER_CURRENT_DATE = 'Date moved in must be today or in the past'
-    ERROR_MESSAGE_START_DATE_AFTER_END_DATE = 'Date you moved in must be before date you moved out'
+    ERROR_MESSAGE_MOVED_IN_DATE_AFTER_MOVED_OUT_DATE = 'Date you moved in must be before date you moved out'
 
     ERROR_MESSAGE_MOVED_OUT_DATE_AFTER_CURRENT_DATE = 'Date you moved out must be today or in the past'
     ERROR_MESSAGE_MOVED_OUT_DATE_BEFORE_MOVED_IN_DATE = 'Date you moved out must be after the date you moved in'
@@ -47,7 +62,7 @@ class PreviousAddressSelectForm(GOVUKForm):
     address = forms.ChoiceField(
         label='Select address',
         required=True,
-        error_messages={'required': 'Please select your address'}
+        error_messages={'required': ERROR_MESSAGE_ADDRESS_BLANK}
     )
     moved_in_date = form_fields.CustomSplitDateField(
         label='Moved in',
@@ -96,6 +111,14 @@ class PreviousAddressSelectForm(GOVUKForm):
                              'invalid': ERROR_MESSAGE_NON_NUMERIC},
     )
 
+    def __init__(self, *args, **kwargs):
+        """
+        Configure available address choices via passed kwarg.
+        """
+        self.choices = kwargs.pop('choices')
+        super(PreviousAddressSelectForm, self).__init__(*args, **kwargs)
+        self.fields['address'].choices = self.choices
+
     def clean(self):
         super().clean()
 
@@ -103,8 +126,8 @@ class PreviousAddressSelectForm(GOVUKForm):
         start_date = self.cleaned_data.get('moved_in_date', None)
         end_date = self.cleaned_data.get('moved_out_date', None)
         if start_date and end_date and end_date < start_date:
-            self.add_error('moved_in_date', self.ERROR_MESSAGE_START_DATE_AFTER_END_DATE)
-            self.add_error('moved_out_date', self.ERROR_MESSAGE_END_DATE_BEFORE_START_DATE)
+            self.add_error('moved_in_date', self.ERROR_MESSAGE_MOVED_IN_DATE_AFTER_MOVED_OUT_DATE)
+            self.add_error('moved_out_date', self.ERROR_MESSAGE_MOVED_OUT_DATE_BEFORE_MOVED_IN_DATE)
 
         # de-duplicate error messages for each field
         for field, errors in self.errors.items():
@@ -140,7 +163,7 @@ class PreviousAddressManualForm(GOVUKForm):
     ERROR_MESSAGE_NON_NUMERIC = 'Use numbers for the date'
 
     ERROR_MESSAGE_MOVED_IN_DATE_AFTER_CURRENT_DATE = 'Date moved in must be today or in the past'
-    ERROR_MESSAGE_START_DATE_AFTER_END_DATE = 'Date you moved in must be before date you moved out'
+    ERROR_MESSAGE_MOVED_IN_DATE_AFTER_MOVED_OUT_DATE = 'Date you moved in must be before date you moved out'
 
     ERROR_MESSAGE_MOVED_OUT_DATE_AFTER_CURRENT_DATE = 'Date you moved out must be today or in the past'
     ERROR_MESSAGE_MOVED_OUT_DATE_BEFORE_MOVED_IN_DATE = 'Date you moved out must be after the date you moved in'
@@ -152,7 +175,7 @@ class PreviousAddressManualForm(GOVUKForm):
     street_line1 = forms.CharField(
         label='Address line 1',
         required=True,
-        error_messages={'required': 'Please enter the first line of your address'}
+        error_messages={'required': ERROR_MESSAGE_STREET_LINE_1_BLANK}
     )
 
     street_line2 = forms.CharField(
@@ -163,7 +186,7 @@ class PreviousAddressManualForm(GOVUKForm):
     town = forms.CharField(
         label='Town or city',
         required=True,
-        error_messages={'required': 'Please enter the name of the town or city'}
+        error_messages={'required': ERROR_MESSAGE_TOWN_BLANK}
     )
 
     county = forms.CharField(
@@ -174,7 +197,7 @@ class PreviousAddressManualForm(GOVUKForm):
     postcode = forms.CharField(
         label='Postcode',
         required=True,
-        error_messages={'required': 'Please enter your postcode'}
+        error_messages={'required': ERROR_MESSAGE_POSTCODE_BLANK}
     )
 
     moved_in_date = form_fields.CustomSplitDateField(
@@ -231,8 +254,8 @@ class PreviousAddressManualForm(GOVUKForm):
         start_date = self.cleaned_data.get('moved_in_date', None)
         end_date = self.cleaned_data.get('moved_out_date', None)
         if start_date and end_date and end_date < start_date:
-            self.add_error('moved_in_date', self.ERROR_MESSAGE_START_DATE_AFTER_END_DATE)
-            self.add_error('moved_out_date', self.ERROR_MESSAGE_END_DATE_BEFORE_START_DATE)
+            self.add_error('moved_in_date', self.ERROR_MESSAGE_MOVED_IN_DATE_AFTER_MOVED_OUT_DATE)
+            self.add_error('moved_out_date', self.ERROR_MESSAGE_MOVED_OUT_DATE_BEFORE_MOVED_IN_DATE)
 
         # de-duplicate error messages for each field
         for field, errors in self.errors.items():
@@ -246,7 +269,7 @@ class PreviousAddressManualForm(GOVUKForm):
         """
         street_line1 = self.cleaned_data['street_line1']
         if len(street_line1) > 50:
-            raise forms.ValidationError('The first line of your address must be under 50 characters long')
+            raise forms.ValidationError(self.ERROR_MESSAGE_STREET_LINE_1_TOO_LONG)
         return street_line1
 
     def clean_street_line2(self):
@@ -256,7 +279,7 @@ class PreviousAddressManualForm(GOVUKForm):
         """
         street_line2 = self.cleaned_data['street_line2']
         if len(street_line2) > 50:
-            raise forms.ValidationError('The second line of your address must be under 50 characters long')
+            raise forms.ValidationError(self.ERROR_MESSAGE_STREET_LINE_2_TOO_LONG)
         return street_line2
 
     def clean_town(self):
@@ -266,9 +289,9 @@ class PreviousAddressManualForm(GOVUKForm):
         """
         town = self.cleaned_data['town']
         if re.match(settings.REGEX['TOWN'], town) is None:
-            raise forms.ValidationError('Please spell out the name of the town or city using letters')
+            raise forms.ValidationError(self.ERROR_MESSAGE_TOWN_INVALID)
         if len(town) > 50:
-            raise forms.ValidationError('The name of the town or city must be under 50 characters long')
+            raise forms.ValidationError(self.ERROR_MESSAGE_TOWN_TOO_LONG)
         return town
 
     def clean_county(self):
@@ -279,38 +302,19 @@ class PreviousAddressManualForm(GOVUKForm):
         county = self.cleaned_data['county']
         if county != '':
             if re.match(settings.REGEX['COUNTY'], county) is None:
-                raise forms.ValidationError('Please spell out the name of the county using letters')
+                raise forms.ValidationError(self.ERROR_MESSAGE_COUNTY_INVALID)
             if len(county) > 50:
-                raise forms.ValidationError('The name of the county must be under 50 characters long')
+                raise forms.ValidationError(self.ERROR_MESSAGE_COUNTY_TOO_LONG)
         return county
 
     def clean_postcode(self):
+        """
+        Postcode validation
+        :return: string
+        """
         postcode = self.cleaned_data['postcode']
-        return shared_clean_postcode(postcode)
-
-
-class PersonalDetailsPreviousAddressForm(PreviousAddressManualForm):
-    """
-    Form to enter an Applicant's previous address details manually
-    Inherits from shared PreviousAddressManualForm, this class handles any deltas between previous address implementations
-    """
-
-
-class PersonPreviousAddressForm(PreviousAddressManualForm):
-    """
-    Form to enter a Person's previous address details manually
-    Inherits from shared PreviousAddressManualForm, this class handles any deltas between previous address implementations
-    """
-
-
-### Shared clean methods ###
-def shared_clean_postcode(postcode):
-    """
-    Postcode validation
-    :return: string
-    """
-    postcode_no_space = postcode.replace(" ", "")
-    postcode_uppercase = postcode_no_space.upper()
-    if re.match(settings.REGEX['POSTCODE_UPPERCASE'], postcode_uppercase) is None:
-        raise forms.ValidationError('Please enter a valid postcode')
-    return postcode
+        postcode_no_space = postcode.replace(" ", "")
+        postcode_uppercase = postcode_no_space.upper()
+        if re.match(settings.REGEX['POSTCODE_UPPERCASE'], postcode_uppercase) is None:
+            raise forms.ValidationError(self.ERROR_MESSAGE_POSTCODE_INVALID)
+        return postcode_uppercase

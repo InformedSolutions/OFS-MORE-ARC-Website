@@ -3,33 +3,31 @@ from unittest.mock import patch
 
 from django.test import TestCase, tag
 
-from arc_application.forms.previous_addresses import PersonalDetailsPreviousAddressForm
+from ...forms.previous_addresses import PreviousAddressManualForm, PreviousAddressSelectForm, PreviousAddressEntryForm
 from ..utils import create_childminder_application, create_arc_user
 from ...forms.previous_names import PersonPreviousNameForm
-
-# TODO Move below to ReviewPersonalDetailsPreviousNamesFormValidationTests
-ERROR_MESSAGE_FIRST_NAME_BLANK = 'You must enter a first name'
-ERROR_MESSAGE_LAST_NAME_BLANK = 'You must enter a last name'
-
-ERROR_MESSAGE_DATE_BLANK = 'Enter the date, including the month and year'
-ERROR_MESSAGE_DAY_OUT_OF_RANGE = 'Day must be between 1 and 31'
-ERROR_MESSAGE_MONTH_OUT_OF_RANGE = 'Month must be between 1 and 12'
-ERROR_MESSAGE_START_YEAR_BEFORE_1900 = 'Start date must be after 1900'
-ERROR_MESSAGE_END_YEAR_BEFORE_1900 = 'End date must be after 1900'
-ERROR_MESSAGE_YEAR_LESS_THAN_4_DIGITS = 'Enter the whole year (4 digits)'
-ERROR_MESSAGE_INVALID_DATE = 'Enter a real date'
-ERROR_MESSAGE_NON_NUMERIC = 'Use numbers for the date'
-
-ERROR_MESSAGE_START_DATE_AFTER_CURRENT_DATE = 'Start date must be today or in the past'
-ERROR_MESSAGE_START_DATE_AFTER_END_DATE = 'Start date must be before the end date'
-
-ERROR_MESSAGE_END_DATE_AFTER_CURRENT_DATE = 'End date must be before today or in the past'
-ERROR_MESSAGE_END_DATE_BEFORE_START_DATE = 'End date must be after the start date'
-
 
 @tag('unit')
 class ReviewPersonalDetailsPreviousNamesFormValidationTests(TestCase):
     form = PersonPreviousNameForm
+
+    ERROR_MESSAGE_FIRST_NAME_BLANK = 'You must enter a first name'
+    ERROR_MESSAGE_LAST_NAME_BLANK = 'You must enter a last name'
+
+    ERROR_MESSAGE_DATE_BLANK = 'Enter the date, including the month and year'
+    ERROR_MESSAGE_DAY_OUT_OF_RANGE = 'Day must be between 1 and 31'
+    ERROR_MESSAGE_MONTH_OUT_OF_RANGE = 'Month must be between 1 and 12'
+    ERROR_MESSAGE_START_YEAR_BEFORE_1900 = 'Start date must be after 1900'
+    ERROR_MESSAGE_END_YEAR_BEFORE_1900 = 'End date must be after 1900'
+    ERROR_MESSAGE_YEAR_LESS_THAN_4_DIGITS = 'Enter the whole year (4 digits)'
+    ERROR_MESSAGE_INVALID_DATE = 'Enter a real date'
+    ERROR_MESSAGE_NON_NUMERIC = 'Use numbers for the date'
+
+    ERROR_MESSAGE_START_DATE_AFTER_CURRENT_DATE = 'Start date must be today or in the past'
+    ERROR_MESSAGE_START_DATE_AFTER_END_DATE = 'Start date must be before the end date'
+
+    ERROR_MESSAGE_END_DATE_AFTER_CURRENT_DATE = 'End date must be before today or in the past'
+    ERROR_MESSAGE_END_DATE_BEFORE_START_DATE = 'End date must be after the start date'
 
     def setUp(self):
         self.arc_user = create_arc_user()
@@ -54,10 +52,10 @@ class ReviewPersonalDetailsPreviousNamesFormValidationTests(TestCase):
 
         # Check error messages
         self.assertEqual(form.errors, {
-            'first_name': [ERROR_MESSAGE_FIRST_NAME_BLANK],
-            'last_name': [ERROR_MESSAGE_LAST_NAME_BLANK],
-            'start_date': [ERROR_MESSAGE_DATE_BLANK],
-            'end_date': [ERROR_MESSAGE_DATE_BLANK],
+            'first_name': [self.ERROR_MESSAGE_FIRST_NAME_BLANK],
+            'last_name': [self.ERROR_MESSAGE_LAST_NAME_BLANK],
+            'start_date': [self.ERROR_MESSAGE_DATE_BLANK],
+            'end_date': [self.ERROR_MESSAGE_DATE_BLANK],
         })
 
     def test_invalid_when_start_or_end_day_too_large(self):
@@ -78,8 +76,8 @@ class ReviewPersonalDetailsPreviousNamesFormValidationTests(TestCase):
 
         # Check error messages
         self.assertEqual(form.errors, {
-            'start_date': [ERROR_MESSAGE_DAY_OUT_OF_RANGE],
-            'end_date': [ERROR_MESSAGE_DAY_OUT_OF_RANGE]
+            'start_date': [self.ERROR_MESSAGE_DAY_OUT_OF_RANGE],
+            'end_date': [self.ERROR_MESSAGE_DAY_OUT_OF_RANGE]
         })
 
     def test_invalid_when_start_or_end_day_too_small(self):
@@ -100,8 +98,8 @@ class ReviewPersonalDetailsPreviousNamesFormValidationTests(TestCase):
 
         # Check error messages
         self.assertEqual(form.errors, {
-            'start_date': [ERROR_MESSAGE_DAY_OUT_OF_RANGE],
-            'end_date': [ERROR_MESSAGE_DAY_OUT_OF_RANGE]
+            'start_date': [self.ERROR_MESSAGE_DAY_OUT_OF_RANGE],
+            'end_date': [self.ERROR_MESSAGE_DAY_OUT_OF_RANGE]
         })
 
     def test_invalid_if_start_or_end_month_too_large(self):
@@ -122,8 +120,8 @@ class ReviewPersonalDetailsPreviousNamesFormValidationTests(TestCase):
 
         # Check error messages
         self.assertEqual(form.errors, {
-            'start_date': [ERROR_MESSAGE_MONTH_OUT_OF_RANGE],
-            'end_date': [ERROR_MESSAGE_MONTH_OUT_OF_RANGE]
+            'start_date': [self.ERROR_MESSAGE_MONTH_OUT_OF_RANGE],
+            'end_date': [self.ERROR_MESSAGE_MONTH_OUT_OF_RANGE]
         })
 
     def test_invalid_if_start_or_end_month_too_small(self):
@@ -144,8 +142,8 @@ class ReviewPersonalDetailsPreviousNamesFormValidationTests(TestCase):
 
         # Check error messages
         self.assertEqual(form.errors, {
-            'start_date': [ERROR_MESSAGE_MONTH_OUT_OF_RANGE],
-            'end_date': [ERROR_MESSAGE_MONTH_OUT_OF_RANGE]
+            'start_date': [self.ERROR_MESSAGE_MONTH_OUT_OF_RANGE],
+            'end_date': [self.ERROR_MESSAGE_MONTH_OUT_OF_RANGE]
         })
 
     def test_invalid_if_start_or_end_year_before_1900(self):
@@ -166,8 +164,8 @@ class ReviewPersonalDetailsPreviousNamesFormValidationTests(TestCase):
 
         # Check error messages
         self.assertEqual(form.errors, {
-            'start_date': [ERROR_MESSAGE_START_YEAR_BEFORE_1900],
-            'end_date': [ERROR_MESSAGE_END_YEAR_BEFORE_1900]
+            'start_date': [self.ERROR_MESSAGE_START_YEAR_BEFORE_1900],
+            'end_date': [self.ERROR_MESSAGE_END_YEAR_BEFORE_1900]
         })
 
     def test_invalid_if_start_or_end_year_less_than_4_digits(self):
@@ -188,8 +186,8 @@ class ReviewPersonalDetailsPreviousNamesFormValidationTests(TestCase):
 
         # Check error messages
         self.assertEqual(form.errors, {
-            'start_date': [ERROR_MESSAGE_YEAR_LESS_THAN_4_DIGITS],
-            'end_date': [ERROR_MESSAGE_YEAR_LESS_THAN_4_DIGITS],
+            'start_date': [self.ERROR_MESSAGE_YEAR_LESS_THAN_4_DIGITS],
+            'end_date': [self.ERROR_MESSAGE_YEAR_LESS_THAN_4_DIGITS],
         })
 
     def test_invalid_if_start_or_end_date_is_not_a_real_date(self):
@@ -210,8 +208,8 @@ class ReviewPersonalDetailsPreviousNamesFormValidationTests(TestCase):
 
         # Check error messages
         self.assertEqual(form.errors, {
-            'start_date': [ERROR_MESSAGE_INVALID_DATE],
-            'end_date': [ERROR_MESSAGE_INVALID_DATE],
+            'start_date': [self.ERROR_MESSAGE_INVALID_DATE],
+            'end_date': [self.ERROR_MESSAGE_INVALID_DATE],
         })
 
     def test_invalid_if_start_or_end_date_contains_non_numeric_data(self):
@@ -232,8 +230,8 @@ class ReviewPersonalDetailsPreviousNamesFormValidationTests(TestCase):
 
         # Check error messages
         self.assertEqual(form.errors, {
-            'start_date': [ERROR_MESSAGE_NON_NUMERIC],
-            'end_date': [ERROR_MESSAGE_NON_NUMERIC],
+            'start_date': [self.ERROR_MESSAGE_NON_NUMERIC],
+            'end_date': [self.ERROR_MESSAGE_NON_NUMERIC],
         })
 
     class MockDate(datetime.date):
@@ -260,7 +258,7 @@ class ReviewPersonalDetailsPreviousNamesFormValidationTests(TestCase):
 
         # Check error messages
         self.assertEqual(form.errors, {
-            'start_date': [ERROR_MESSAGE_START_DATE_AFTER_CURRENT_DATE],
+            'start_date': [self.ERROR_MESSAGE_START_DATE_AFTER_CURRENT_DATE],
         })
 
     @patch('datetime.date', MockDate)
@@ -282,7 +280,7 @@ class ReviewPersonalDetailsPreviousNamesFormValidationTests(TestCase):
 
         # Check error messages
         self.assertEqual(form.errors, {
-            'end_date': [ERROR_MESSAGE_END_DATE_AFTER_CURRENT_DATE],
+            'end_date': [self.ERROR_MESSAGE_END_DATE_AFTER_CURRENT_DATE],
         })
 
     def test_invalid_if_start_date_after_end_date(self):
@@ -303,16 +301,17 @@ class ReviewPersonalDetailsPreviousNamesFormValidationTests(TestCase):
 
         # Check error messages
         self.assertEqual(form.errors, {
-            'start_date': [ERROR_MESSAGE_START_DATE_AFTER_END_DATE],
-            'end_date': [ERROR_MESSAGE_END_DATE_BEFORE_START_DATE],
+            'start_date': [self.ERROR_MESSAGE_START_DATE_AFTER_END_DATE],
+            'end_date': [self.ERROR_MESSAGE_END_DATE_BEFORE_START_DATE],
         })
+
 
 @tag('unit')
 class PersonalDetailsPreviousAddressEnterPostCodeFormValidationTests(TestCase):
     """
     Tests to check that the PreviousAddress ENTER PostCode Form validates correctly.
     """
-    form = None
+    form = PreviousAddressEntryForm
 
     ERROR_MESSAGE_POSTCODE_NOT_ENTERED = 'Please enter your postcode'
     ERROR_MESSAGE_POSTCODE_INVALID = 'Please enter a valid postcode'
@@ -327,7 +326,7 @@ class PersonalDetailsPreviousAddressEnterPostCodeFormValidationTests(TestCase):
 
         # Check error messages
         self.assertEqual(form.errors, {
-            'postcode': self.ERROR_MESSAGE_POSTCODE_NOT_ENTERED
+            'postcode': [self.ERROR_MESSAGE_POSTCODE_NOT_ENTERED]
         })
 
     def test_invalid_when_postcode_random_characters(self):
@@ -340,7 +339,7 @@ class PersonalDetailsPreviousAddressEnterPostCodeFormValidationTests(TestCase):
 
         # Check error messages
         self.assertEqual(form.errors, {
-            'postcode': self.ERROR_MESSAGE_POSTCODE_INVALID
+            'postcode': [self.ERROR_MESSAGE_POSTCODE_INVALID]
         })
 
     def test_invalid_when_postcode_numeric(self):
@@ -353,7 +352,7 @@ class PersonalDetailsPreviousAddressEnterPostCodeFormValidationTests(TestCase):
 
         # Check error messages
         self.assertEqual(form.errors, {
-            'postcode': self.ERROR_MESSAGE_POSTCODE_INVALID
+            'postcode': [self.ERROR_MESSAGE_POSTCODE_INVALID]
         })
 
     def test_invalid_when_postcode_too_long(self):
@@ -366,7 +365,7 @@ class PersonalDetailsPreviousAddressEnterPostCodeFormValidationTests(TestCase):
 
         # Check error messages
         self.assertEqual(form.errors, {
-            'postcode': self.ERROR_MESSAGE_POSTCODE_INVALID
+            'postcode': [self.ERROR_MESSAGE_POSTCODE_INVALID]
         })
 
     def test_invalid_when_postcode_too_short(self):
@@ -379,21 +378,19 @@ class PersonalDetailsPreviousAddressEnterPostCodeFormValidationTests(TestCase):
 
         # Check error messages
         self.assertEqual(form.errors, {
-            'postcode': self.ERROR_MESSAGE_POSTCODE_INVALID
+            'postcode': [self.ERROR_MESSAGE_POSTCODE_INVALID]
         })
 
-    def test_invalid_when_postcode_has_space_in_invalid_position(self):
+    def test_valid_when_postcode_has_space_in_invalid_positions(self):
         data = {
-            'postcode': 'WA1 41RF'
+            'postcode': 'WA1 41 R  F'
         }
         form = self.form(data)
 
-        self.assertFalse(form.is_valid())
+        self.assertTrue(form.is_valid())
 
-        # Check error messages
-        self.assertEqual(form.errors, {
-            'postcode': self.ERROR_MESSAGE_POSTCODE_INVALID
-        })
+        # Assert that the cleaned postcode does not contain spaces
+        self.assertEqual(form.cleaned_data['postcode'], 'WA141RF')
 
     def test_valid_when_postcode_entered_without_space(self):
         data = {
@@ -403,23 +400,26 @@ class PersonalDetailsPreviousAddressEnterPostCodeFormValidationTests(TestCase):
 
         self.assertTrue(form.is_valid())
 
-    def test_valid_when_postcode_entered_with_space(self):
+    def test_valid_when_postcode_entered_lowercase(self):
         data = {
-            'postcode': 'WA14 1RF'
+            'postcode': 'wa14 1rf'
         }
         form = self.form(data)
 
         self.assertTrue(form.is_valid())
 
+        # Assert that the cleaned postcode is stored uppercase
+        self.assertEqual(form.cleaned_data['postcode'], 'WA141RF')
 
 @tag('unit')
 class PersonalDetailsPreviousAddressSelectPostCodeFormValidationTests(TestCase):
     """
     Tests to check that the PreviousAddress SELECT PostCode Form validates correctly.
     """
-    form = None
+    form = PreviousAddressSelectForm
 
-    ERROR_MESSAGE_POSTCODE_NOT_SELECTED = 'Please select your address'
+    ERROR_MESSAGE_ADDRESS_BLANK = 'Please select your address'
+    ERROR_MESSAGE_ADDRESS_INVALID = 'Select a valid choice. {0} is not one of the available choices.'
 
     ERROR_MESSAGE_DATE_BLANK = 'Enter the date, including the month and year'
     ERROR_MESSAGE_DAY_OUT_OF_RANGE = 'Day must be between 1 and 31'
@@ -431,15 +431,19 @@ class PersonalDetailsPreviousAddressSelectPostCodeFormValidationTests(TestCase):
     ERROR_MESSAGE_NON_NUMERIC = 'Use numbers for the date'
 
     ERROR_MESSAGE_MOVED_IN_DATE_AFTER_CURRENT_DATE = 'Date moved in must be today or in the past'
-    ERROR_MESSAGE_START_DATE_AFTER_END_DATE = 'Date you moved in must be before date you moved out'
+    ERROR_MESSAGE_MOVED_IN_DATE_AFTER_MOVED_OUT_DATE = 'Date you moved in must be before date you moved out'
 
     ERROR_MESSAGE_MOVED_OUT_DATE_AFTER_CURRENT_DATE = 'Date you moved out must be today or in the past'
     ERROR_MESSAGE_MOVED_OUT_DATE_BEFORE_MOVED_IN_DATE = 'Date you moved out must be after the date you moved in'
 
     # Valid data for use in tests that are not testing that functionality #
     VALID_POSTCODE_DATA = {
-        'address': 'Informed Solutions'  # TODO CHANGE ME!
+        'address': 'Informed Solutions',
     }
+
+    VALID_CHOICES = [
+        ('Informed Solutions', 'Informed Solutions')
+    ]
 
     VALID_MOVED_IN_AND_OUT_DATE_DATA = {
         'moved_in_date_0': '21',  # Day
@@ -451,204 +455,224 @@ class PersonalDetailsPreviousAddressSelectPostCodeFormValidationTests(TestCase):
     }
 
     def test_invalid_when_all_data_is_blank(self):
-        self.skipTest('functionalityNotImplemented')
-
-        # TODO add data to the following, update the errors shown
         data = {
             'address': '',
-            'start_date_0': '',
-            'start_date_1': '',
-            'start_date_2': '',
-            'end_date_0': '',
-            'end_date_1': '',
-            'end_date_2': '',
+            'moved_in_date_0': '',
+            'moved_in_date_1': '',
+            'moved_in_date_2': '',
+            'moved_out_date_0': '',
+            'moved_out_date_1': '',
+            'moved_out_date_2': '',
         }
-        form = self.form(data)
+        choices = []
+
+        form = self.form(data, choices=choices)
 
         self.assertFalse(form.is_valid())
 
         # Check error messages
         self.assertEqual(form.errors, {
-            'first_name': [ERROR_MESSAGE_FIRST_NAME_BLANK],
-            'last_name': [ERROR_MESSAGE_LAST_NAME_BLANK],
-            'start_date': [ERROR_MESSAGE_DATE_BLANK],
-            'end_date': [ERROR_MESSAGE_DATE_BLANK],
+            'address': [self.ERROR_MESSAGE_ADDRESS_BLANK],
+            'moved_in_date': [self.ERROR_MESSAGE_DATE_BLANK],
+            'moved_out_date': [self.ERROR_MESSAGE_DATE_BLANK],
+        })
+
+    def test_invalid_when_address_not_in_choices(self):
+        data = {
+            'address': 'Some Other Address'
+        }
+        data.update(self.VALID_MOVED_IN_AND_OUT_DATE_DATA)
+
+        form = self.form(data, choices=self.VALID_CHOICES)
+
+        self.assertFalse(form.is_valid())
+
+        # Check error messages
+        self.assertEqual(form.errors, {
+            'address': [self.ERROR_MESSAGE_ADDRESS_INVALID.format('Some Other Address')]
+        })
+
+    def test_invalid_when_choices_blank(self):
+        data = {
+            'address': 'Some Other Address'
+        }
+        data.update(self.VALID_MOVED_IN_AND_OUT_DATE_DATA)
+
+        form = self.form(data, choices=[])
+
+        self.assertFalse(form.is_valid())
+
+        # Check error messages
+        self.assertEqual(form.errors, {
+            'address': [self.ERROR_MESSAGE_ADDRESS_INVALID.format('Some Other Address')]
         })
 
     def test_invalid_when_start_or_end_day_too_large(self):
-        self.skipTest('functionalityNotImplemented')
-
-        # TODO add data to the following, update the errors shown
         data = {
-            'start_date_0': '32',
-            'start_date_1': '12',
-            'start_date_2': '2018',
-            'end_date_0': '33',
-            'end_date_1': '11',
-            'end_date_2': '2018',
+            'moved_in_date_0': '32',
+            'moved_in_date_1': '12',
+            'moved_in_date_2': '2018',
+            'moved_out_date_0': '33',
+            'moved_out_date_1': '11',
+            'moved_out_date_2': '2018',
         }
-        form = self.form(data)
+        data.update(self.VALID_POSTCODE_DATA)
+
+        form = self.form(data, choices=self.VALID_CHOICES)
 
         self.assertFalse(form.is_valid())
 
         # Check error messages
         self.assertEqual(form.errors, {
-            'start_date': [ERROR_MESSAGE_DAY_OUT_OF_RANGE],
-            'end_date': [ERROR_MESSAGE_DAY_OUT_OF_RANGE]
+            'moved_in_date': [self.ERROR_MESSAGE_DAY_OUT_OF_RANGE],
+            'moved_out_date': [self.ERROR_MESSAGE_DAY_OUT_OF_RANGE]
         })
 
     def test_invalid_when_start_or_end_day_too_small(self):
-        self.skipTest('functionalityNotImplemented')
-
-        # TODO add data to the following, update the errors shown
         data = {
-            'start_date_0': '0',
-            'start_date_1': '9',
-            'start_date_2': '2018',
-            'end_date_0': '0',
-            'end_date_1': '11',
-            'end_date_2': '2018',
+            'moved_in_date_0': '0',
+            'moved_in_date_1': '9',
+            'moved_in_date_2': '2018',
+            'moved_out_date_0': '0',
+            'moved_out_date_1': '11',
+            'moved_out_date_2': '2018',
         }
-        form = self.form(data)
+        data.update(self.VALID_POSTCODE_DATA)
+
+        form = self.form(data, choices=self.VALID_CHOICES)
 
         self.assertFalse(form.is_valid())
 
         # Check error messages
         self.assertEqual(form.errors, {
-            'start_date': [ERROR_MESSAGE_DAY_OUT_OF_RANGE],
-            'end_date': [ERROR_MESSAGE_DAY_OUT_OF_RANGE]
+            'moved_in_date': [self.ERROR_MESSAGE_DAY_OUT_OF_RANGE],
+            'moved_out_date': [self.ERROR_MESSAGE_DAY_OUT_OF_RANGE]
         })
 
-    def test_invalid_if_start_or_end_month_too_large(self):
-        self.skipTest('functionalityNotImplemented')
-
-        # TODO add data to the following, update the errors shown
+    def test_invalid_if_moved_in_or_moved_out_month_too_large(self):
         data = {
-            'start_date_0': '1',
-            'start_date_1': '13',
-            'start_date_2': '2018',
-            'end_date_0': '2',
-            'end_date_1': '14',
-            'end_date_2': '2018',
+            'moved_in_date_0': '1',
+            'moved_in_date_1': '13',
+            'moved_in_date_2': '2018',
+            'moved_out_date_0': '2',
+            'moved_out_date_1': '14',
+            'moved_out_date_2': '2018',
         }
-        form = self.form(data)
+        data.update(self.VALID_POSTCODE_DATA)
+
+        form = self.form(data, choices=self.VALID_CHOICES)
 
         self.assertFalse(form.is_valid())
 
         # Check error messages
         self.assertEqual(form.errors, {
-            'start_date': [ERROR_MESSAGE_MONTH_OUT_OF_RANGE],
-            'end_date': [ERROR_MESSAGE_MONTH_OUT_OF_RANGE]
+            'moved_in_date': [self.ERROR_MESSAGE_MONTH_OUT_OF_RANGE],
+            'moved_out_date': [self.ERROR_MESSAGE_MONTH_OUT_OF_RANGE]
         })
 
-    def test_invalid_if_start_or_end_month_too_small(self):
-        self.skipTest('functionalityNotImplemented')
-
-        # TODO add data to the following, update the errors shown
+    def test_invalid_if_moved_in_or_moved_out_month_too_small(self):
         data = {
-            'start_date_0': '1',
-            'start_date_1': '0',
-            'start_date_2': '2018',
-            'end_date_0': '2',
-            'end_date_1': '0',
-            'end_date_2': '2018',
+            'moved_in_date_0': '1',
+            'moved_in_date_1': '0',
+            'moved_in_date_2': '2018',
+            'moved_out_date_0': '2',
+            'moved_out_date_1': '0',
+            'moved_out_date_2': '2018',
         }
-        form = self.form(data)
+        data.update(self.VALID_POSTCODE_DATA)
+
+        form = self.form(data, choices=self.VALID_CHOICES)
 
         self.assertFalse(form.is_valid())
 
         # Check error messages
         self.assertEqual(form.errors, {
-            'start_date': [ERROR_MESSAGE_MONTH_OUT_OF_RANGE],
-            'end_date': [ERROR_MESSAGE_MONTH_OUT_OF_RANGE]
+            'moved_in_date': [self.ERROR_MESSAGE_MONTH_OUT_OF_RANGE],
+            'moved_out_date': [self.ERROR_MESSAGE_MONTH_OUT_OF_RANGE]
         })
 
-    def test_invalid_if_start_or_end_year_before_1900(self):
-        self.skipTest('functionalityNotImplemented')
-
-        # TODO add data to the following, update the errors shown
+    def test_invalid_if_moved_in_or_moved_out_year_before_1900(self):
         data = {
-            'start_date_0': '1',
-            'start_date_1': '8',
-            'start_date_2': '1888',
-            'end_date_0': '2',
-            'end_date_1': '10',
-            'end_date_2': '1889',
+            'moved_in_date_0': '1',
+            'moved_in_date_1': '8',
+            'moved_in_date_2': '1888',
+            'moved_out_date_0': '2',
+            'moved_out_date_1': '10',
+            'moved_out_date_2': '1889',
         }
-        form = self.form(data)
+        data.update(self.VALID_POSTCODE_DATA)
+
+        form = self.form(data, choices=self.VALID_CHOICES)
 
         self.assertFalse(form.is_valid())
 
         # Check error messages
         self.assertEqual(form.errors, {
-            'start_date': [ERROR_MESSAGE_START_YEAR_BEFORE_1900],
-            'end_date': [ERROR_MESSAGE_END_YEAR_BEFORE_1900]
+            'moved_in_date': [self.ERROR_MESSAGE_MOVED_IN_YEAR_BEFORE_1900],
+            'moved_out_date': [self.ERROR_MESSAGE_MOVED_OUT_YEAR_BEFORE_1900]
         })
 
-    def test_invalid_if_start_or_end_year_less_than_4_digits(self):
-        self.skipTest('functionalityNotImplemented')
-
-        # TODO add data to the following, update the errors shown
+    def test_invalid_if_moved_in_or_moved_out_year_less_than_4_digits(self):
         data = {
-            'start_date_0': '1',
-            'start_date_1': '8',
-            'start_date_2': '199',
-            'end_date_0': '2',
-            'end_date_1': '10',
-            'end_date_2': '18',
+            'moved_in_date_0': '1',
+            'moved_in_date_1': '8',
+            'moved_in_date_2': '199',
+            'moved_out_date_0': '2',
+            'moved_out_date_1': '10',
+            'moved_out_date_2': '18',
         }
-        form = self.form(data)
+        data.update(self.VALID_POSTCODE_DATA)
+
+        form = self.form(data, choices=self.VALID_CHOICES)
 
         self.assertFalse(form.is_valid())
 
         # Check error messages
         self.assertEqual(form.errors, {
-            'start_date': [ERROR_MESSAGE_YEAR_LESS_THAN_4_DIGITS],
-            'end_date': [ERROR_MESSAGE_YEAR_LESS_THAN_4_DIGITS],
+            'moved_in_date': [self.ERROR_MESSAGE_YEAR_LESS_THAN_4_DIGITS],
+            'moved_out_date': [self.ERROR_MESSAGE_YEAR_LESS_THAN_4_DIGITS],
         })
 
-    def test_invalid_if_start_or_end_date_is_not_a_real_date(self):
-        self.skipTest('functionalityNotImplemented')
-
-        # TODO add data to the following, update the errors shown
+    def test_invalid_if_moved_in_or_moved_out_date_is_not_a_real_date(self):
         data = {
-            'start_date_0': '31',  # Only 30 days in June
-            'start_date_1': '6',
-            'start_date_2': '2017',
-            'end_date_0': '29',  # 1999 wasn't a leap year
-            'end_date_1': '2',
-            'end_date_2': '1999',
+            'moved_in_date_0': '31',  # Only 30 days in June
+            'moved_in_date_1': '6',
+            'moved_in_date_2': '2017',
+            'moved_out_date_0': '29',  # 1999 wasn't a leap year
+            'moved_out_date_1': '2',
+            'moved_out_date_2': '1999',
         }
-        form = self.form(data)
+        data.update(self.VALID_POSTCODE_DATA)
+
+        form = self.form(data, choices=self.VALID_CHOICES)
 
         self.assertFalse(form.is_valid())
 
         # Check error messages
         self.assertEqual(form.errors, {
-            'start_date': [ERROR_MESSAGE_INVALID_DATE],
-            'end_date': [ERROR_MESSAGE_INVALID_DATE],
+            'moved_in_date': [self.ERROR_MESSAGE_INVALID_DATE],
+            'moved_out_date': [self.ERROR_MESSAGE_INVALID_DATE],
         })
 
-    def test_invalid_if_start_or_end_date_contains_non_numeric_data(self):
-        self.skipTest('functionalityNotImplemented')
-
-        # TODO add data to the following, update the errors shown
+    def test_invalid_if_moved_in_or_moved_out_date_contains_non_numeric_data(self):
         data = {
-            'start_date_0': '16',
-            'start_date_1': 'H',
-            'start_date_2': '2017',
-            'end_date_0': '!!',
-            'end_date_1': '3',
-            'end_date_2': '20XX',
+            'moved_in_date_0': '16',
+            'moved_in_date_1': 'H',
+            'moved_in_date_2': '2017',
+            'moved_out_date_0': '!!',
+            'moved_out_date_1': '3',
+            'moved_out_date_2': '20XX',
         }
-        form = self.form(data)
+        data.update(self.VALID_POSTCODE_DATA)
+
+        form = self.form(data, choices=self.VALID_CHOICES)
 
         self.assertFalse(form.is_valid())
 
         # Check error messages
         self.assertEqual(form.errors, {
-            'start_date': [ERROR_MESSAGE_NON_NUMERIC],
-            'end_date': [ERROR_MESSAGE_NON_NUMERIC],
+            'moved_in_date': [self.ERROR_MESSAGE_NON_NUMERIC],
+            'moved_out_date': [self.ERROR_MESSAGE_NON_NUMERIC],
         })
 
     class MockDate(datetime.date):
@@ -657,84 +681,74 @@ class PersonalDetailsPreviousAddressSelectPostCodeFormValidationTests(TestCase):
             return datetime.date(2018, 12, 14)
 
     @patch('datetime.date', MockDate)
-    def test_invalid_if_start_date_after_current_date(self):
-        self.skipTest('functionalityNotImplemented')
-
-        # TODO add data to the following, update the errors shown
+    def test_invalid_if_moved_in_date_after_current_date(self):
         data = {
-            'start_date_0': '15',
-            'start_date_1': '12',
-            'start_date_2': '2018',
-            'end_date_0': '1',
-            'end_date_1': '11',
-            'end_date_2': '2017',
+            'moved_in_date_0': '15',
+            'moved_in_date_1': '12',
+            'moved_in_date_2': '2018',
+            'moved_out_date_0': '1',
+            'moved_out_date_1': '11',
+            'moved_out_date_2': '2017',
         }
-        form = self.form(data)
+        data.update(self.VALID_POSTCODE_DATA)
+
+        form = self.form(data, choices=self.VALID_CHOICES)
 
         self.assertFalse(form.is_valid())
 
         # Check error messages
         self.assertEqual(form.errors, {
-            'start_date': [ERROR_MESSAGE_START_DATE_AFTER_CURRENT_DATE],
+            'moved_in_date': [self.ERROR_MESSAGE_MOVED_IN_DATE_AFTER_CURRENT_DATE],
         })
 
     @patch('datetime.date', MockDate)
-    def test_invalid_if_end_date_after_current_date(self):
-        self.skipTest('functionalityNotImplemented')
-
-        # TODO add data to the following, update the errors shown
+    def test_invalid_if_moved_out_date_after_current_date(self):
         data = {
-            'start_date_0': '21',
-            'start_date_1': '6',
-            'start_date_2': '2017',
-            'end_date_0': '15',
-            'end_date_1': '12',
-            'end_date_2': '2018',
+            'moved_in_date_0': '21',
+            'moved_in_date_1': '6',
+            'moved_in_date_2': '2017',
+            'moved_out_date_0': '15',
+            'moved_out_date_1': '12',
+            'moved_out_date_2': '2018',
         }
-        form = self.form(data)
+        data.update(self.VALID_POSTCODE_DATA)
+
+        form = self.form(data, choices=self.VALID_CHOICES)
 
         self.assertFalse(form.is_valid())
 
         # Check error messages
         self.assertEqual(form.errors, {
-            'end_date': [ERROR_MESSAGE_END_DATE_AFTER_CURRENT_DATE],
+            'moved_out_date': [self.ERROR_MESSAGE_MOVED_OUT_DATE_AFTER_CURRENT_DATE],
         })
 
-    def test_invalid_if_start_date_after_end_date(self):
-        self.skipTest('functionalityNotImplemented')
-
-        # TODO add data to the following, update the errors shown
+    def test_invalid_if_moved_in_date_after_moved_out_date(self):
         data = {
-            'start_date_0': '21',
-            'start_date_1': '6',
-            'start_date_2': '2017',
-            'end_date_0': '15',
-            'end_date_1': '12',
-            'end_date_2': '2016',
+            'moved_in_date_0': '21',
+            'moved_in_date_1': '6',
+            'moved_in_date_2': '2017',
+            'moved_out_date_0': '15',
+            'moved_out_date_1': '12',
+            'moved_out_date_2': '2016',
         }
-        form = self.form(data)
+        data.update(self.VALID_POSTCODE_DATA)
+
+        form = self.form(data, choices=self.VALID_CHOICES)
 
         self.assertFalse(form.is_valid())
 
         # Check error messages
         self.assertEqual(form.errors, {
-            'start_date': [ERROR_MESSAGE_START_DATE_AFTER_END_DATE],
-            'end_date': [ERROR_MESSAGE_END_DATE_BEFORE_START_DATE],
+            'moved_in_date': [self.ERROR_MESSAGE_MOVED_IN_DATE_AFTER_MOVED_OUT_DATE],
+            'moved_out_date': [self.ERROR_MESSAGE_MOVED_OUT_DATE_BEFORE_MOVED_IN_DATE],
         })
 
     def test_valid_data(self):
-        self.skipTest('functionalityNotImplemented')
+        data = {}
+        data.update(self.VALID_MOVED_IN_AND_OUT_DATE_DATA)
+        data.update(self.VALID_POSTCODE_DATA)
 
-        # TODO add data to the following, update the errors shown
-        data = {
-            'start_date_0': '',
-            'start_date_1': '',
-            'start_date_2': '',
-            'end_date_0': '',
-            'end_date_1': '',
-            'end_date_2': '',
-        }
-        form = self.form(data)
+        form = self.form(data, choices=self.VALID_CHOICES)
 
         self.assertTrue(form.is_valid())
 
@@ -744,14 +758,14 @@ class PersonalDetailsPreviousAddressManualPostCodeFormValidationTests(TestCase):
     """
     Tests to check that the PreviousAddress MANUAL PostCode Form validates correctly.
     """
-    form = PersonalDetailsPreviousAddressForm
+    form = PreviousAddressManualForm
 
     # Manual address entry field validation messages
     ERROR_MESSAGE_STREET_LINE_1_BLANK = 'Please enter the first line of your address'
     ERROR_MESSAGE_STREET_LINE_1_TOO_LONG = 'The first line of your address must be under 50 characters long'
     ERROR_MESSAGE_STREET_LINE_2_TOO_LONG = 'The second line of your address must be under 50 characters long'
     ERROR_MESSAGE_TOWN_BLANK = 'Please enter the name of the town or city'
-    ERROR_MESSAGE_TOWN_INVALID = 'Please spell out the name of the town or city using letters'  # TODO: Investigate this error message, seems too specific for a regex fail.
+    ERROR_MESSAGE_TOWN_INVALID = 'Please spell out the name of the town or city using letters'
     ERROR_MESSAGE_TOWN_TOO_LONG = 'The name of the town or city must be under 50 characters long'
     ERROR_MESSAGE_COUNTY_INVALID = 'Please spell out the name of the county using letters'
     ERROR_MESSAGE_COUNTY_TOO_LONG = 'The name of the county must be under 50 characters long'
@@ -769,7 +783,7 @@ class PersonalDetailsPreviousAddressManualPostCodeFormValidationTests(TestCase):
     ERROR_MESSAGE_NON_NUMERIC = 'Use numbers for the date'
 
     ERROR_MESSAGE_MOVED_IN_DATE_AFTER_CURRENT_DATE = 'Date moved in must be today or in the past'
-    ERROR_MESSAGE_START_DATE_AFTER_END_DATE = 'Date you moved in must be before date you moved out'
+    ERROR_MESSAGE_MOVED_IN_DATE_AFTER_MOVED_OUT_DATE = 'Date you moved in must be before date you moved out'
 
     ERROR_MESSAGE_MOVED_OUT_DATE_AFTER_CURRENT_DATE = 'Date you moved out must be today or in the past'
     ERROR_MESSAGE_MOVED_OUT_DATE_BEFORE_MOVED_IN_DATE = 'Date you moved out must be after the date you moved in'
@@ -793,21 +807,18 @@ class PersonalDetailsPreviousAddressManualPostCodeFormValidationTests(TestCase):
     }
 
     def test_invalid_when_all_data_is_blank(self):
-        self.skipTest('functionalityNotImplemented')
-
-        # TODO add data to the following, update the errors shown
         data = {
             'street_line1': '',
             'street_line2': '',
             'town': '',
             'county': '',
             'postcode': '',
-            'start_date_0': '',
-            'start_date_1': '',
-            'start_date_2': '',
-            'end_date_0': '',
-            'end_date_1': '',
-            'end_date_2': '',
+            'moved_in_date_0': '',
+            'moved_in_date_1': '',
+            'moved_in_date_2': '',
+            'moved_out_date_0': '',
+            'moved_out_date_1': '',
+            'moved_out_date_2': '',
         }
         form = self.form(data)
 
@@ -815,23 +826,21 @@ class PersonalDetailsPreviousAddressManualPostCodeFormValidationTests(TestCase):
 
         # Check error messages
         self.assertEqual(form.errors, {
-            'first_name': [ERROR_MESSAGE_FIRST_NAME_BLANK],
-            'last_name': [ERROR_MESSAGE_LAST_NAME_BLANK],
-            'start_date': [ERROR_MESSAGE_DATE_BLANK],
-            'end_date': [ERROR_MESSAGE_DATE_BLANK],
+            'street_line1': [self.ERROR_MESSAGE_STREET_LINE_1_BLANK],
+            'town': [self.ERROR_MESSAGE_TOWN_BLANK],
+            'postcode': [self.ERROR_MESSAGE_POSTCODE_BLANK],
+            'moved_in_date': [self.ERROR_MESSAGE_DATE_BLANK],
+            'moved_out_date': [self.ERROR_MESSAGE_DATE_BLANK],
         })
 
-    def test_invalid_when_start_or_end_day_too_large(self):
-        self.skipTest('functionalityNotImplemented')
-
-        # TODO add data to the following, update the errors shown
+    def test_invalid_when_moved_in_or_moved_out_day_too_large(self):
         data = {
-            'start_date_0': '32',
-            'start_date_1': '12',
-            'start_date_2': '2018',
-            'end_date_0': '33',
-            'end_date_1': '11',
-            'end_date_2': '2018',
+            'moved_in_date_0': '32',
+            'moved_in_date_1': '12',
+            'moved_in_date_2': '2018',
+            'moved_out_date_0': '33',
+            'moved_out_date_1': '11',
+            'moved_out_date_2': '2018',
         }
         data.update(self.VALID_ADDRESS_DATA)
 
@@ -841,21 +850,18 @@ class PersonalDetailsPreviousAddressManualPostCodeFormValidationTests(TestCase):
 
         # Check error messages
         self.assertEqual(form.errors, {
-            'start_date': [ERROR_MESSAGE_DAY_OUT_OF_RANGE],
-            'end_date': [ERROR_MESSAGE_DAY_OUT_OF_RANGE]
+            'moved_in_date': [self.ERROR_MESSAGE_DAY_OUT_OF_RANGE],
+            'moved_out_date': [self.ERROR_MESSAGE_DAY_OUT_OF_RANGE]
         })
 
-    def test_invalid_when_start_or_end_day_too_small(self):
-        self.skipTest('functionalityNotImplemented')
-
-        # TODO add data to the following, update the errors shown
+    def test_invalid_when_moved_in_or_moved_out_day_too_small(self):
         data = {
-            'start_date_0': '0',
-            'start_date_1': '9',
-            'start_date_2': '2018',
-            'end_date_0': '0',
-            'end_date_1': '11',
-            'end_date_2': '2018',
+            'moved_in_date_0': '0',
+            'moved_in_date_1': '9',
+            'moved_in_date_2': '2018',
+            'moved_out_date_0': '0',
+            'moved_out_date_1': '11',
+            'moved_out_date_2': '2018',
         }
         form = self.form(data)
         data.update(self.VALID_ADDRESS_DATA)
@@ -864,21 +870,18 @@ class PersonalDetailsPreviousAddressManualPostCodeFormValidationTests(TestCase):
 
         # Check error messages
         self.assertEqual(form.errors, {
-            'start_date': [ERROR_MESSAGE_DAY_OUT_OF_RANGE],
-            'end_date': [ERROR_MESSAGE_DAY_OUT_OF_RANGE]
+            'moved_in_date': [self.ERROR_MESSAGE_DAY_OUT_OF_RANGE],
+            'moved_out_date': [self.ERROR_MESSAGE_DAY_OUT_OF_RANGE]
         })
 
-    def test_invalid_if_start_or_end_month_too_large(self):
-        self.skipTest('functionalityNotImplemented')
-
-        # TODO add data to the following, update the errors shown
+    def test_invalid_if_moved_in_or_moved_out_month_too_large(self):
         data = {
-            'start_date_0': '1',
-            'start_date_1': '13',
-            'start_date_2': '2018',
-            'end_date_0': '2',
-            'end_date_1': '14',
-            'end_date_2': '2018',
+            'moved_in_date_0': '1',
+            'moved_in_date_1': '13',
+            'moved_in_date_2': '2018',
+            'moved_out_date_0': '2',
+            'moved_out_date_1': '14',
+            'moved_out_date_2': '2018',
         }
         form = self.form(data)
         data.update(self.VALID_ADDRESS_DATA)
@@ -887,21 +890,18 @@ class PersonalDetailsPreviousAddressManualPostCodeFormValidationTests(TestCase):
 
         # Check error messages
         self.assertEqual(form.errors, {
-            'start_date': [ERROR_MESSAGE_MONTH_OUT_OF_RANGE],
-            'end_date': [ERROR_MESSAGE_MONTH_OUT_OF_RANGE]
+            'moved_in_date': [self.ERROR_MESSAGE_MONTH_OUT_OF_RANGE],
+            'moved_out_date': [self.ERROR_MESSAGE_MONTH_OUT_OF_RANGE]
         })
 
-    def test_invalid_if_start_or_end_month_too_small(self):
-        self.skipTest('functionalityNotImplemented')
-
-        # TODO add data to the following, update the errors shown
+    def test_invalid_if_moved_in_or_moved_out_month_too_small(self):
         data = {
-            'start_date_0': '1',
-            'start_date_1': '0',
-            'start_date_2': '2018',
-            'end_date_0': '2',
-            'end_date_1': '0',
-            'end_date_2': '2018',
+            'moved_in_date_0': '1',
+            'moved_in_date_1': '0',
+            'moved_in_date_2': '2018',
+            'moved_out_date_0': '2',
+            'moved_out_date_1': '0',
+            'moved_out_date_2': '2018',
         }
         form = self.form(data)
         data.update(self.VALID_ADDRESS_DATA)
@@ -910,21 +910,18 @@ class PersonalDetailsPreviousAddressManualPostCodeFormValidationTests(TestCase):
 
         # Check error messages
         self.assertEqual(form.errors, {
-            'start_date': [ERROR_MESSAGE_MONTH_OUT_OF_RANGE],
-            'end_date': [ERROR_MESSAGE_MONTH_OUT_OF_RANGE]
+            'moved_in_date': [self.ERROR_MESSAGE_MONTH_OUT_OF_RANGE],
+            'moved_out_date': [self.ERROR_MESSAGE_MONTH_OUT_OF_RANGE]
         })
 
-    def test_invalid_if_start_or_end_year_before_1900(self):
-        self.skipTest('functionalityNotImplemented')
-
-        # TODO add data to the following, update the errors shown
+    def test_invalid_if_moved_in_or_moved_out_year_before_1900(self):
         data = {
-            'start_date_0': '1',
-            'start_date_1': '8',
-            'start_date_2': '1888',
-            'end_date_0': '2',
-            'end_date_1': '10',
-            'end_date_2': '1889',
+            'moved_in_date_0': '1',
+            'moved_in_date_1': '8',
+            'moved_in_date_2': '1888',
+            'moved_out_date_0': '2',
+            'moved_out_date_1': '10',
+            'moved_out_date_2': '1889',
         }
         form = self.form(data)
         data.update(self.VALID_ADDRESS_DATA)
@@ -933,21 +930,18 @@ class PersonalDetailsPreviousAddressManualPostCodeFormValidationTests(TestCase):
 
         # Check error messages
         self.assertEqual(form.errors, {
-            'start_date': [ERROR_MESSAGE_START_YEAR_BEFORE_1900],
-            'end_date': [ERROR_MESSAGE_END_YEAR_BEFORE_1900]
+            'moved_in_date': [self.ERROR_MESSAGE_MOVED_IN_YEAR_BEFORE_1900],
+            'moved_out_date': [self.ERROR_MESSAGE_MOVED_OUT_YEAR_BEFORE_1900]
         })
 
-    def test_invalid_if_start_or_end_year_less_than_4_digits(self):
-        self.skipTest('functionalityNotImplemented')
-
-        # TODO add data to the following, update the errors shown
+    def test_invalid_if_moved_in_or_moved_out_year_less_than_4_digits(self):
         data = {
-            'start_date_0': '1',
-            'start_date_1': '8',
-            'start_date_2': '199',
-            'end_date_0': '2',
-            'end_date_1': '10',
-            'end_date_2': '18',
+            'moved_in_date_0': '1',
+            'moved_in_date_1': '8',
+            'moved_in_date_2': '199',
+            'moved_out_date_0': '2',
+            'moved_out_date_1': '10',
+            'moved_out_date_2': '18',
         }
         form = self.form(data)
         data.update(self.VALID_ADDRESS_DATA)
@@ -956,21 +950,18 @@ class PersonalDetailsPreviousAddressManualPostCodeFormValidationTests(TestCase):
 
         # Check error messages
         self.assertEqual(form.errors, {
-            'start_date': [ERROR_MESSAGE_YEAR_LESS_THAN_4_DIGITS],
-            'end_date': [ERROR_MESSAGE_YEAR_LESS_THAN_4_DIGITS],
+            'moved_in_date': [self.ERROR_MESSAGE_YEAR_LESS_THAN_4_DIGITS],
+            'moved_out_date': [self.ERROR_MESSAGE_YEAR_LESS_THAN_4_DIGITS],
         })
 
-    def test_invalid_if_start_or_end_date_is_not_a_real_date(self):
-        self.skipTest('functionalityNotImplemented')
-
-        # TODO add data to the following, update the errors shown
+    def test_invalid_if_moved_in_or_moved_out_date_is_not_a_real_date(self):
         data = {
-            'start_date_0': '31',  # Only 30 days in June
-            'start_date_1': '6',
-            'start_date_2': '2017',
-            'end_date_0': '29',  # 1999 wasn't a leap year
-            'end_date_1': '2',
-            'end_date_2': '1999',
+            'moved_in_date_0': '31',  # Only 30 days in June
+            'moved_in_date_1': '6',
+            'moved_in_date_2': '2017',
+            'moved_out_date_0': '29',  # 1999 wasn't a leap year
+            'moved_out_date_1': '2',
+            'moved_out_date_2': '1999',
         }
         form = self.form(data)
         data.update(self.VALID_ADDRESS_DATA)
@@ -979,21 +970,18 @@ class PersonalDetailsPreviousAddressManualPostCodeFormValidationTests(TestCase):
 
         # Check error messages
         self.assertEqual(form.errors, {
-            'start_date': [ERROR_MESSAGE_INVALID_DATE],
-            'end_date': [ERROR_MESSAGE_INVALID_DATE],
+            'moved_in_date': [self.ERROR_MESSAGE_INVALID_DATE],
+            'moved_out_date': [self.ERROR_MESSAGE_INVALID_DATE],
         })
 
-    def test_invalid_if_start_or_end_date_contains_non_numeric_data(self):
-        self.skipTest('functionalityNotImplemented')
-
-        # TODO add data to the following, update the errors shown
+    def test_invalid_if_moved_in_or_moved_out_date_contains_non_numeric_data(self):
         data = {
-            'start_date_0': '16',
-            'start_date_1': 'H',
-            'start_date_2': '2017',
-            'end_date_0': '!!',
-            'end_date_1': '3',
-            'end_date_2': '20XX',
+            'moved_in_date_0': '16',
+            'moved_in_date_1': 'H',
+            'moved_in_date_2': '2017',
+            'moved_out_date_0': '!!',
+            'moved_out_date_1': '3',
+            'moved_out_date_2': '20XX',
         }
         form = self.form(data)
         data.update(self.VALID_ADDRESS_DATA)
@@ -1002,8 +990,8 @@ class PersonalDetailsPreviousAddressManualPostCodeFormValidationTests(TestCase):
 
         # Check error messages
         self.assertEqual(form.errors, {
-            'start_date': [ERROR_MESSAGE_NON_NUMERIC],
-            'end_date': [ERROR_MESSAGE_NON_NUMERIC],
+            'moved_in_date': [self.ERROR_MESSAGE_NON_NUMERIC],
+            'moved_out_date': [self.ERROR_MESSAGE_NON_NUMERIC],
         })
 
     class MockDate(datetime.date):
@@ -1012,17 +1000,14 @@ class PersonalDetailsPreviousAddressManualPostCodeFormValidationTests(TestCase):
             return datetime.date(2018, 12, 14)
 
     @patch('datetime.date', MockDate)
-    def test_invalid_if_start_date_after_current_date(self):
-        self.skipTest('functionalityNotImplemented')
-
-        # TODO add data to the following, update the errors shown
+    def test_invalid_if_moved_in_date_after_current_date(self):
         data = {
-            'start_date_0': '15',
-            'start_date_1': '12',
-            'start_date_2': '2018',
-            'end_date_0': '1',
-            'end_date_1': '11',
-            'end_date_2': '2017',
+            'moved_in_date_0': '15',
+            'moved_in_date_1': '12',
+            'moved_in_date_2': '2018',
+            'moved_out_date_0': '1',
+            'moved_out_date_1': '11',
+            'moved_out_date_2': '2017',
         }
         form = self.form(data)
         data.update(self.VALID_ADDRESS_DATA)
@@ -1031,21 +1016,18 @@ class PersonalDetailsPreviousAddressManualPostCodeFormValidationTests(TestCase):
 
         # Check error messages
         self.assertEqual(form.errors, {
-            'start_date': [ERROR_MESSAGE_START_DATE_AFTER_CURRENT_DATE],
+            'moved_in_date': [self.ERROR_MESSAGE_MOVED_IN_DATE_AFTER_CURRENT_DATE],
         })
 
     @patch('datetime.date', MockDate)
-    def test_invalid_if_end_date_after_current_date(self):
-        self.skipTest('functionalityNotImplemented')
-
-        # TODO add data to the following, update the errors shown
+    def test_invalid_if_moved_out_date_after_current_date(self):
         data = {
-            'start_date_0': '21',
-            'start_date_1': '6',
-            'start_date_2': '2017',
-            'end_date_0': '15',
-            'end_date_1': '12',
-            'end_date_2': '2018',
+            'moved_in_date_0': '21',
+            'moved_in_date_1': '6',
+            'moved_in_date_2': '2017',
+            'moved_out_date_0': '15',
+            'moved_out_date_1': '12',
+            'moved_out_date_2': '2018',
         }
         form = self.form(data)
         data.update(self.VALID_ADDRESS_DATA)
@@ -1054,20 +1036,17 @@ class PersonalDetailsPreviousAddressManualPostCodeFormValidationTests(TestCase):
 
         # Check error messages
         self.assertEqual(form.errors, {
-            'end_date': [ERROR_MESSAGE_END_DATE_AFTER_CURRENT_DATE],
+            'moved_out_date': [self.ERROR_MESSAGE_MOVED_OUT_DATE_AFTER_CURRENT_DATE],
         })
 
-    def test_invalid_if_start_date_after_end_date(self):
-        self.skipTest('functionalityNotImplemented')
-
-        # TODO add data to the following, update the errors shown
+    def test_invalid_if_moved_in_date_after_moved_out_date(self):
         data = {
-            'start_date_0': '21',
-            'start_date_1': '6',
-            'start_date_2': '2017',
-            'end_date_0': '15',
-            'end_date_1': '12',
-            'end_date_2': '2016',
+            'moved_in_date_0': '21',
+            'moved_in_date_1': '6',
+            'moved_in_date_2': '2017',
+            'moved_out_date_0': '15',
+            'moved_out_date_1': '12',
+            'moved_out_date_2': '2016',
         }
         form = self.form(data)
         data.update(self.VALID_ADDRESS_DATA)
@@ -1076,14 +1055,11 @@ class PersonalDetailsPreviousAddressManualPostCodeFormValidationTests(TestCase):
 
         # Check error messages
         self.assertEqual(form.errors, {
-            'start_date': [ERROR_MESSAGE_START_DATE_AFTER_END_DATE],
-            'end_date': [ERROR_MESSAGE_END_DATE_BEFORE_START_DATE],
+            'moved_in_date': [self.ERROR_MESSAGE_MOVED_IN_DATE_AFTER_MOVED_OUT_DATE],
+            'moved_out_date': [self.ERROR_MESSAGE_MOVED_OUT_DATE_BEFORE_MOVED_IN_DATE],
         })
 
     def test_valid_data(self):
-        self.skipTest('functionalityNotImplemented')
-
-        # TODO add data to the following, update the errors shown
         data = {}
         data.update(self.VALID_ADDRESS_DATA)
         data.update(self.VALID_MOVED_IN_AND_OUT_DATE_DATA)
