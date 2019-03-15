@@ -109,6 +109,7 @@
                 </tr>
                 {% endif %}
                 {% if row.id|template_string_in_list:'individual_id' %}
+                {% if show_individual_id %}
                 <tr>
                     <td>
                         Individual ID
@@ -120,6 +121,7 @@
                         <a href="{% url 'nanny_previous_registration' %}/?id={{application_id}}">Change</a>
                     </td>
                 </tr>
+                {% endif %}
                 {% endif %}
                 {% if row.id|template_string_in_list:'five_years_in_UK' %}
                 <tr>

@@ -82,6 +82,7 @@ class NannyPersonalDetailsSummary(NannyARCFormView):
         reasons_known_to_social_services = personal_details['reasons_known_to_social_services']
 
         previous_registration_record_exists = False
+        show_individual_id = False
 
         forms = self.get_forms(application_id)
         personal_details_form = forms[0]
@@ -96,12 +97,17 @@ class NannyPersonalDetailsSummary(NannyARCFormView):
             five_years_in_UK = previous_registration_details['five_years_in_UK']
             previous_registration_form = forms[2]
 
+            if previous_registration is True:
+                show_individual_id = True
+
 
 
         context = {
             'application_id': application_id,
             'title': 'Review: ' + self.verbose_task_name,
             'show_previous_registration':  previous_registration_record_exists,
+            #used for conditional reveal of individual_id on summary page
+            'show_individual_id' : show_individual_id,
             'change_link': 'nanny_personal_details_summary',
             'rows': [
                 {
@@ -166,6 +172,7 @@ class NannyPersonalDetailsSummary(NannyARCFormView):
                                                                                                       'request') else '',
                     'comments': previous_registration_form['previous_registration_comments'],
                 })
+            #required for conditional reveal of individual_id on master summary
             if previous_registration is True:
                 context['rows'].append(
                     {
