@@ -1957,8 +1957,8 @@ class ReviewSummaryAndConfirmationFunctionalTests(TestCase):
         def now(cls):
             return datetime(2019, 2, 27, 17, 30, 5)
 
-    @patch('arc_application.messaging')
-    @patch('arc_application.messaging')
+    @patch('arc_application.messaging.application_exporter.ApplicationExporter.export_childminder_application')
+    @patch('arc_application.messaging.application_exporter.ApplicationExporter.export_nanny_application')
     @patch('arc_application.views.base.datetime', new=MockDatetime)
     def test_submit_summary_releases_application_as_accepted_in_database_if_no_tasks_flagged(self, *_):
 
@@ -2002,8 +2002,8 @@ class ReviewSummaryAndConfirmationFunctionalTests(TestCase):
         refetched_arc = models.Arc.objects.get(pk=arc.pk)
         self.assertTrue(refetched_arc.user_id in ('', None))
 
-    @patch('arc_application.messaging')
-    @patch('arc_application.messaging')
+    @patch('arc_application.messaging.application_exporter.ApplicationExporter.export_childminder_application')
+    @patch('arc_application.messaging.application_exporter.ApplicationExporter.export_nanny_application')
     @patch('arc_application.views.base.datetime', new=MockDatetime)
     def test_submit_summary_releases_application_as_needing_info_in_database_if_tasks_have_been_flagged(self, *_):
 
