@@ -267,15 +267,18 @@ def assertNotXPath(response, xpath):
         raise AssertionError('"{}" evaluated to {} but no content expected'.format(xpath, repr(result)))
 
 
-def assertXPathValue(response, xpath, expected_value):
+def assertXPathValue(response, xpath, expected_value, strip=False):
     """
     Asserts that the given value can be found at the given xpath in the response's HTML
 
     :param response: The http response object
     :param xpath: An XPath expression to test for
     :param expected_value: The content expected to be found
+    :param strip: (optional) Run results through str.strip to trim whitespace
     """
     result = _do_xpath(response, xpath)
+    if strip:
+        result = list(map(str.strip, result))
     if expected_value not in result:
         raise AssertionError('Expected {} at "{}", but found {}'.format(repr(expected_value), xpath, repr(result)))
 
@@ -290,7 +293,7 @@ def assertXPathCount(response, xpath, expected_quantity):
     """
     result = _do_xpath(response, xpath)
     if len(result) != expected_quantity:
-        raise AssertionError('Expected {} instances of "{}", found {}', expected_quantity, xpath, len(result))
+        raise AssertionError('Expected {} instances of "{}", found {}'.format(expected_quantity, xpath, len(result)))
 
 
 def _do_xpath(response, xpath):
@@ -307,7 +310,10 @@ def assertView(response, expected_view_obj):
 
 def assertRedirectView(response, expected_view_obj):
     expected_name = expected_view_obj if isinstance(expected_view_obj, str) else expected_view_obj.__name__
-    actual_name = django.urls.resolve(response.url).func.__name__
+    try:
+        actual_name = django.urls.resolve(response.url).func.__name__
+    except django.urls.exceptions.Resolver404:
+        raise AssertionError('Redirect url "{}" did not resolve to a view'.format(response.url))
     if actual_name != expected_name:
         raise AssertionError('Expected redirect to view "{}", found view "{}"'.format(expected_name, actual_name))
 
@@ -547,7 +553,7 @@ def assertSummaryField(response, label, value, heading=None):
         assertXPath(response, _heading_xpath(heading))
 
     assertXPath(response, _field_xpath(label, heading))
-    assertXPathValue(response, _field_value_xpath(label, heading), value)
+    assertXPathValue(response, _field_value_xpath(label, heading), value, strip=True)
 
 
 def assertNotSummaryField(response, label, heading=None):
@@ -580,7 +586,7 @@ def _field_xpath(label, heading=None):
 def _field_value_xpath(label, heading=None):
     xpath = _field_xpath(label, heading)
     xpath += "/following-sibling::td[1]/text()"
-    return 'normalize-space({})'.format(xpath)
+    return xpath
 
 
 def patch_for_setUp(test_case, *args, **kwargs):

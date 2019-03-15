@@ -20,7 +20,7 @@ class NannyPersonalDetailsSummary(NannyARCFormView):
         """
         birth_datetime = datetime.datetime.strptime(dob_string, '%Y-%m-%d')
 
-        return birth_datetime.strftime('%d %b %Y')
+        return birth_datetime.strftime('%d/%m/%Y')
 
     def get_context_data(self, application_id):
         """

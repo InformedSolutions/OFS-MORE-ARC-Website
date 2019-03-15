@@ -41,6 +41,8 @@ class PreviousName(models.Model):
     end_month = models.IntegerField(blank=True, null=True)
     end_year = models.IntegerField(blank=True, null=True)
 
+    order = models.IntegerField(blank=True, null=True)
+
     @property
     def person(self):
         """
@@ -57,7 +59,9 @@ class PreviousName(models.Model):
             raise AssertionError("Neither 'adult_id' or 'child_id' is set")
 
     def get_name(self):
-        return self.first_name + " "+self.middle_names + " " + self.last_name
+        return self.first_name + ((" "+self.middle_names) if self.middle_names else "") + " " + self.last_name
+
+    name = property(get_name)
 
     class Meta:
         db_table = 'PREVIOUS_NAME'

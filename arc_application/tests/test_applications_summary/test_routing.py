@@ -1,14 +1,18 @@
 from unittest import mock
 
-
 from django.conf import settings
 from django.contrib.auth.models import Group, User
 from django.test import TestCase
-from django.urls import resolve, reverse
-from ..views.applications_summary import ApplicationsSummaryView
-from ..services.db_gateways import NannyGatewayActions
+from django.urls import reverse
+from django.test import tag
 
-class ApplicationsSummaryTest(TestCase):
+from ...views.applications_summary import ApplicationsSummaryView
+from ...services.db_gateways import NannyGatewayActions
+from .. import utils
+
+
+@tag('http')
+class ApplicationsSummaryFunctionalTests(TestCase):
     """
     Testing the applications summary page
     """
@@ -35,4 +39,5 @@ class ApplicationsSummaryTest(TestCase):
             response = self.client.get(reverse('applications-summary'))
 
             self.assertEqual(response.status_code, 200)
-            self.assertEqual(response.resolver_match.func.__name__, ApplicationsSummaryView.__name__)
+            utils.assertView(response, ApplicationsSummaryView)
+

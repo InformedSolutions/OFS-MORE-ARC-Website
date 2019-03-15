@@ -307,7 +307,6 @@ class ReviewPersonalDetailsPreviousNamesFormValidationTests(TestCase):
             'end_date': [ERROR_MESSAGE_END_DATE_BEFORE_START_DATE],
         })
 
-
 @tag('unit')
 class PersonalDetailsPreviousAddressEnterPostCodeFormValidationTests(TestCase):
     """
