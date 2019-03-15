@@ -217,6 +217,7 @@ class PreviousRegistrationTests(NannyReviewFuncTestsBase):
         self.assertEqual(response.status_code, 200)
         utils.assertView(response, NannyPreviousRegistrationView.as_view())
 
+
     def test_redirect_after_submitting_valid_details(self):
         """
          Test to assert that clicking 'Continue' on the guidance page takes you to the
@@ -233,10 +234,9 @@ class PreviousRegistrationTests(NannyReviewFuncTestsBase):
                     'five_years_in_UK': True}
 
             response = self.client.post(reverse('nanny_previous_registration') + '?id=' + self.test_app_id, data)
-            found = resolve(response.url)
 
             self.assertEqual(response.status_code, 302)
-            self.assertEqual(found.func.view_class, NannyPersonalDetailsSummary)
+            self.assertEqual(resolve(response.url).func.__name__, NannyPersonalDetailsSummary.__name__)
 
     def test_redirect_after_submitting_page_without_entering_details(self):
         """
@@ -246,28 +246,13 @@ class PreviousRegistrationTests(NannyReviewFuncTestsBase):
         with patch.object(NannyGatewayActions, 'read') as nanny_api_get, \
                 patch.object(NannyGatewayActions, 'put') as nanny_api_put:
             nanny_api_get.return_value.record = None
-            nanny_api_put.return_value.status_code = 200
 
             data = {'id': self.test_app_id}
 
             response = self.client.post(reverse('nanny_previous_registration') + '?id=' + self.test_app_id, data)
-            found = resolve(response.url)
 
             self.assertEqual(response.status_code, 200)
-            self.assertEqual(found.func.view_class, NannyPreviousRegistrationView)
-
-    # def test_displays_previous_registration_questions_if_record_exists(self):
-    #
-    #     self.nanny_application.previous_registration_record = True
-    #     self.application.save()
-    #
-    #     previous_registration_record = NannyPreviousRegistrationDetails.objects.get(application_id=self.application.pk)
-    #     previous_registration_record.save()
-    #
-    #     response = self.client.get(reverse('nanny_personal_details_summary'), data={'id': self.application.pk})
-    #
-    #     utils.assertSummaryField(response, 'Previously registered with Ofsted?', 'Yes')
-
+            self.assertEqual(response.resolver_match.func.__name__, NannyPreviousRegistrationView.__name__)
 
 class ReviewChildcareAddressTests(NannyReviewFuncTestsBase):
 

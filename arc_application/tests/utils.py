@@ -114,7 +114,7 @@ class StubNannyGatewayActions:
             'application_id': '998fd8ec-b96b-4a71-a1a1-a7a3ae186729',
             'previous_registration_id': '9835bf3b-8ba9-4162-a25b-4c55e7d33d69',
             'previous_registration': True,
-            'indiviual_id': '12345567',
+            'individual_id': '12345567',
             'five_years_in_UK': True
         }
         self.previous_registration_read_response = self.make_response(record=self.previous_registration_record)
