@@ -67,6 +67,8 @@ class PreviousName(models.Model):
         db_table = 'PREVIOUS_NAME'
 
     def get_start_date(self):
+        if not all((self.start_year, self.start_month, self.start_day)):
+            return None
         return date(self.start_year, self.start_month, self.start_day)
 
     def set_start_date(self, start_date):
@@ -77,6 +79,8 @@ class PreviousName(models.Model):
     start_date = property(get_start_date, set_start_date)
 
     def get_end_date(self):
+        if not all((self.end_year, self.end_month, self.end_day)):
+            return None
         return date(self.end_year, self.end_month, self.end_day)
 
     def set_end_date(self, end_date):

@@ -1624,49 +1624,6 @@ class SearchForm(GOVUKForm):
         return cleaned_data
 
 
-class OtherPersonPreviousNames(GOVUKForm, ModelForm):
-    """
-    Form for previous names of adults in home
-    """
-    field_label_classes = 'form-label-bold'
-    auto_replace_widgets = True
-    error_summary_title = "There was a problem on this page"
-
-    def __init__(self, *args, **kwargs):
-        super(OtherPersonPreviousNames, self).__init__(*args, **kwargs)
-
-    def clean_first_name(self):
-        first_name = self.cleaned_data['first_name']
-        if len(first_name) > 100:
-            raise forms.ValidationError('First name must be under 100 characters long')
-        else:
-            return first_name
-
-    def clean_middle_names(self):
-        middle_names = self.cleaned_data['middle_names']
-        if len(middle_names) > 100:
-            raise forms.ValidationError('Middle names must be under 100 characters long')
-        else:
-            return middle_names
-
-    def clean_last_name(self):
-        last_name = self.cleaned_data['last_name']
-        if len(last_name) > 100:
-            raise forms.ValidationError('Last name must be under 100 characters long')
-        else:
-            return last_name
-
-    class Meta:
-        model = PreviousName
-        fields = ['first_name', 'middle_names', 'last_name',
-                  'previous_name_id', 'person_id', 'other_person_type']
-        widgets = {
-            'previous_name_id': forms.HiddenInput(),
-            'person_id': forms.HiddenInput(),
-            'other_person_type': forms.HiddenInput()
-        }
-
-
 class OtherPersonPreviousPostcodeEntry(GOVUKForm):
     """
     Form for previous postcode entry of adults in home
@@ -1816,28 +1773,6 @@ class OtherPeoplePreviousAddressManualForm(GOVUKForm):
         if len(postcode) > 50:
             raise forms.ValidationError('The postcode must be under 50 characters long')
         return postcode
-
-
-class PersonalDetailsPreviousNames(GOVUKForm, ModelForm):
-    """
-    Form for previous names
-    """
-    field_label_classes = 'form-label-bold'
-    auto_replace_widgets = True
-    error_summary_title = "There was a problem on this page"
-
-    def __init__(self, *args, **kwargs):
-        super(PersonalDetailsPreviousNames, self).__init__(*args, **kwargs)
-
-    class Meta:
-        model = PreviousName
-        fields = ['first_name', 'middle_names', 'last_name',
-                  'previous_name_id', 'person_id', 'other_person_type']
-        widgets = {
-            'previous_name_id': forms.HiddenInput(),
-            'person_id': forms.HiddenInput(),
-            'other_person_type': forms.HiddenInput()
-        }
 
 
 class PersonalDetailsPreviousPostcodeEntry(GOVUKForm):
