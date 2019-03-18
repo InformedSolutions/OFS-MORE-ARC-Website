@@ -104,7 +104,8 @@
                         {% endif %}
                     </td>
                     <td class="change-answer">
-                        <a href="{% url 'nanny_previous_registration' %}/?id={{application_id}}">Change</a>
+                        <a href="{% url 'nanny_previous_registration' %}/?id={{application_id}}"
+                           alt="Change whether the applicant has previously registered with Ofsted">Change</a>
                     </td>
                 </tr>
                 {% endif %}
@@ -118,7 +119,8 @@
                             {{ row.info }}
                     </td>
                     <td class="change-answer">
-                        <a href="{% url 'nanny_previous_registration' %}/?id={{application_id}}">Change</a>
+                        <a href="{% url 'nanny_previous_registration' %}/?id={{application_id}}"
+                           alt="Change the individual ID">Change</a>
                     </td>
                 </tr>
                 {% endif %}
@@ -136,7 +138,8 @@
                         {% endif %}
                     </td>
                     <td class="change-answer">
-                        <a href="{% url 'nanny_previous_registration' %}/?id={{application_id}}">Change</a>
+                        <a href="{% url 'nanny_previous_registration' %}/?id={{application_id}}"
+                           alt="Change whether the applicant has lived in England for more than 5 years">Change</a>
                     </td>
                 </tr>
         {% endif %}
@@ -152,7 +155,8 @@
         {% for row in rows %}
             {% if row.id == 'name' %}
             {% if not row.id|template_string_in_list:'previous_registration' %}
-            <a href="{% url 'nanny_previous_registration' %}?id={{ application_id }}&person_id={{ application_id }}&type=APPLICANT" class="button button-secondary">Add previous registration</a>
+            <a href="{% url 'nanny_previous_registration' %}?id={{ application_id }}&person_id={{ application_id }}&type=APPLICANT"
+               class="button button-secondary">Add previous registration</a>
             <br>
             {% endif %}
             {% endif %}
