@@ -41,6 +41,7 @@ from arc_application.views.applications_summary import ApplicationsSummaryView
 from arc_application.views.nanny_views.nanny_task_list import NannyTaskList
 from arc_application.views.nanny_views.nanny_contact_details import NannyContactDetailsSummary
 from arc_application.views.nanny_views.nanny_personal_details import NannyPersonalDetailsSummary
+from arc_application.views.nanny_views.nanny_previous_registration import NannyPreviousRegistrationView
 from arc_application.views.nanny_views.nanny_childcare_address import NannyChildcareAddressSummary
 from arc_application.views.nanny_views.nanny_first_aid import NannyFirstAidTrainingSummary
 from arc_application.views.nanny_views.nanny_childcare_training import NannyChildcareTrainingSummary
@@ -117,7 +118,8 @@ if settings.ENABLE_NANNIES:
     urlpatterns += [
         url(r'^nanny/review/', NannyTaskList.as_view(), name='nanny_task_list'),
         url(r'^nanny/contact-details/', NannyContactDetailsSummary.as_view(), name='nanny_contact_summary'),
-        url(r'^nanny/personal-details/', NannyPersonalDetailsSummary.as_view(), name='nanny_personal_details_summary'),
+        url(r'^nanny/personal-details/review/', NannyPersonalDetailsSummary.as_view(), name='nanny_personal_details_summary'),
+        url(r'^nanny/personal-details/previous-registration/', NannyPreviousRegistrationView.as_view(), name='nanny_previous_registration'),
         url(r'^nanny/childcare-address/', NannyChildcareAddressSummary.as_view(),
             name='nanny_childcare_address_summary'),
         url(r'^nanny/first-aid-training/', NannyFirstAidTrainingSummary.as_view(),

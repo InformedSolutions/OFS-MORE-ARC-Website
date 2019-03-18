@@ -10,7 +10,7 @@ from ...models import Arc
 from ...services.db_gateways import NannyGatewayActions, IdentityGatewayActions
 from ...views import NannyDbsCheckSummary, NannyContactDetailsSummary, NannyArcSummary, \
     NannyPersonalDetailsSummary, NannyChildcareAddressSummary, NannyFirstAidTrainingSummary, \
-    NannyChildcareTrainingSummary, NannyInsuranceCoverSummary, NannyTaskList
+    NannyChildcareTrainingSummary, NannyInsuranceCoverSummary, NannyTaskList, NannyPreviousRegistrationView
 from ...tests import utils
 
 ARC_STATUS_FLAGGED = 'FLAGGED'
@@ -203,6 +203,72 @@ class ReviewPersonalDetailsTests(NannyReviewFuncTestsBase):
 
     def test_submit_redirects_to_childcare_address_page_if_valid(self):
         self.skipTest('testNotImplemented')
+
+
+class PreviousRegistrationTests(NannyReviewFuncTestsBase):
+
+    def test_can_render_previous_registration_page(self):
+        """
+        Test to ensure that the page for entering previous registration details can be rendered.
+        """
+        response = self.client.get(reverse('nanny_previous_registration') + '?id=' + self.test_app_id)
+
+        self.assertEqual(response.status_code, 200)
+        utils.assertView(response, NannyPreviousRegistrationView.as_view())
+
+
+    def test_redirect_after_submitting_valid_details(self):
+        """
+         Test to assert that clicking 'Continue' on the guidance page takes you to the
+         'Type-Of-Childcare-Training' page.
+        """
+        with patch.object(NannyGatewayActions, 'read') as nanny_api_get, \
+                patch.object(NannyGatewayActions, 'put') as nanny_api_put:
+            nanny_api_get.return_value.record = self.nanny_gateway.previous_registration_record
+            nanny_api_put.return_value.status_code = 200
+
+            data = {'id': self.test_app_id,
+                    'previous_registration': True,
+                    'individual_id': 1234567,
+                    'five_years_in_UK': True}
+
+            response = self.client.post(reverse('nanny_previous_registration') + '?id=' + self.test_app_id, data)
+
+            self.assertEqual(response.status_code, 302)
+            utils.assertRedirectView(response, NannyPersonalDetailsSummary.as_view())
+
+    def test_redirect_after_submitting_page_without_entering_details(self):
+        """
+         Test to assert that clicking 'Continue' on the guidance page takes you to the
+         'Type-Of-Childcare-Training' page.
+        """
+        with patch.object(NannyGatewayActions, 'read') as nanny_api_get, \
+                patch.object(NannyGatewayActions, 'put') as nanny_api_put:
+            nanny_api_get.return_value.record = None
+
+            data = {'id': self.test_app_id}
+
+            response = self.client.post(reverse('nanny_previous_registration') + '?id=' + self.test_app_id, data)
+
+            self.assertEqual(response.status_code, 200)
+            utils.assertView(response, NannyPreviousRegistrationView.as_view())
+
+    def test_previous_registration_appears_on_review_page(self):
+        """
+        Testing previous registration appears on the review page when there is a previous registration record
+        """
+        with patch.object(NannyGatewayActions, 'read') as nanny_api_get, \
+                patch.object(NannyGatewayActions, 'put') as nanny_api_put:
+            nanny_api_get.return_value.record = {**self.nanny_gateway.previous_registration_record,
+                                                 **self.nanny_gateway.personal_details_record, **self.nanny_gateway.home_address_record }
+            nanny_api_put.return_value.status_code = 200
+
+            response = self.client.get(reverse('nanny_personal_details_summary') + '?id=' + self.test_app_id)
+
+            self.assertContains(response, "Previous registration", status_code=200)
+            self.assertContains(response, "Previously registered with Ofsted?", status_code=200)
+            self.assertContains(response, "Individual ID", status_code=200)
+            self.assertContains(response, "Lived in England for more than 5 years?", status_code=200)
 
 
 class ReviewChildcareAddressTests(NannyReviewFuncTestsBase):

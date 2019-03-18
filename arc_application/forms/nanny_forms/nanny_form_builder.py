@@ -106,6 +106,12 @@ home_address_fields = [
     'home_address',
 ]
 
+previous_registration_fields = [
+    'previous_registration',
+    'individual_id',
+    'five_years_in_UK'
+]
+
 where_you_will_work_fields = [
     'address_to_be_provided',
     'both_work_and_home_address'
@@ -144,6 +150,7 @@ children_living_with_you_fields = [
 
 PersonalDetailsForm       = NannyFormBuilder(personal_details_fields, api_endpoint_name='applicant-personal-details').create_form()
 HomeAddressForm           = NannyFormBuilder(home_address_fields, api_endpoint_name='applicant-home-address').create_form()
+PreviousRegistrationForm  = NannyFormBuilder(previous_registration_fields, api_endpoint_name='previous-registration-details').create_form()
 WhereYouWillWorkForm      = NannyFormBuilder(where_you_will_work_fields, api_endpoint_name='application').create_form()
 ChildcareAddressFormset   = NannyFormBuilder(childcare_address_fields, api_endpoint_name='childcare-address').create_formset()
 FirstAidForm              = NannyFormBuilder(first_aid_training_fields, api_endpoint_name='first-aid').create_form()
