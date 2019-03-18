@@ -249,7 +249,6 @@ def load_json(application_id_local, ordered_models, recurse, apply_filtering_for
                     {"title": "Adults in the home", "id": application_id_local},
                     {"name": "Does anyone aged 16 or over live or work in your home?",
                      "value": 'Yes' if application.adults_in_home else 'No'}
-
                 ])
 
         elif model == Application:
@@ -281,20 +280,27 @@ def load_json(application_id_local, ordered_models, recurse, apply_filtering_for
                         ])
 
         elif model == PreviousName:
-            records = model.objects.filter(person_id=application.pk)
-            previous_names = [{"title": "Previous Names", "id": application_id_local}]
-            for record in records:
-                previous_names.append({"name": "Previous Name", "value": record.get_name()})
+            records = model.objects.filter(person_id=application.pk, other_person_type='APPLICANT')
+            previous_names = [{"title": "Previous names", "id": application_id_local}]
+            for i, record in enumerate(records):
+                previous_names.extend([
+                    {"name": "Previous name {}".format(i+1),
+                     "value": record.get_name()},
+                    {"name": "Start date",
+                     "value": record.start_date.strftime('%d %B %Y') if record.start_date else ''},
+                    {"name": "End date",
+                     "value": record.end_date.strftime('%d %B %Y') if record.end_date else ''},
+                ])
             table_list.append(previous_names)
 
         elif model == PreviousAddress:
             records = model.objects.filter(person_id=application.pk)
-            previous_names = [{"title": "Previous Addresses", "id": application_id_local}]
+            previous_names = [{"title": "Previous addresses", "id": application_id_local}]
             for record in records:
                 address = get_address(record.street_line1,
                                       record.street_line2, record.town,
                                       record.postcode)
-                previous_names.append({"name": "Previous Address", "value": address})
+                previous_names.append({"name": "Previous address", "value": address})
             table_list.append(previous_names)
 
         elif model == AdultInHome:

@@ -286,10 +286,25 @@ def assertXPathValue(response, xpath, expected_value, strip=False):
     :param expected_value: The content expected to be found
     :param strip: (optional) Run results through str.strip to trim whitespace
     """
+    if strip and not isinstance(expected_value, str):
+        raise ValueError('strip parameter only applies to expected str type')
+
     result = _do_xpath(response, xpath)
+
     if strip:
-        result = list(map(str.strip, result))
-    if expected_value not in result:
+        if isinstance(result, str):
+            result = result.strip()
+        elif isinstance(result, list):
+            result = list(map(str.strip, result))
+        else:
+            raise AssertionError('Expected str or list to strip at "{}", but found {}'.format(xpath, repr(result)))
+
+    if isinstance(result, list):
+        found = expected_value in result
+    else:
+        found = result == expected_value
+
+    if not found:
         raise AssertionError('Expected {} at "{}", but found {}'.format(repr(expected_value), xpath, repr(result)))
 
 

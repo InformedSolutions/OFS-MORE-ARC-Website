@@ -196,9 +196,9 @@ class AdultInHome(models.Model):
                 {"name": "Previous name {}".format(i+1),
                  "value": name.name},
                 {"name": "Start date",
-                 "value": name.start_date.strftime("%d %B %Y")},
+                 "value": name.start_date.strftime("%d %B %Y") if name.start_date else ''},
                 {"name": "End date",
-                 "value": name.end_date.strftime("%d %B %Y")},
+                 "value": name.end_date.strftime("%d %B %Y") if name.end_date else ''},
             ])
         return summary_table
 
