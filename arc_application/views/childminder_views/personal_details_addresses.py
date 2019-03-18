@@ -4,8 +4,8 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render
 
 from ...address_helper import AddressHelper
-from ...forms.childminder_forms.form import OtherPersonPreviousPostcodeEntry, OtherPeoplePreviousAddressLookupForm, \
-    OtherPeoplePreviousAddressManualForm
+from ...forms.previous_addresses import PreviousAddressEntryForm, PreviousAddressSelectForm, \
+    PreviousAddressManualForm
 from ...models import PreviousAddress
 from ...review_util import build_url
 from ...decorators import group_required, user_assigned_application
@@ -47,17 +47,17 @@ def postcode_entry(request):
     context = get_context(request)
 
     if request.method == 'GET':
-        context['form'] = OtherPersonPreviousPostcodeEntry()
+        context['form'] = PreviousAddressEntryForm()
         return render(request, 'childminder_templates/previous-address-select.html', context)
 
     if request.method == 'POST':
 
         if 'add-another' in request.POST:
-            form = OtherPersonPreviousPostcodeEntry()
+            form = PreviousAddressEntryForm()
             context['form'] = form
             return render(request, 'previous-address-select.html', context)
 
-        form = OtherPersonPreviousPostcodeEntry(request.POST)
+        form = PreviousAddressEntryForm(request.POST)
         context['form'] = form
 
         if form.is_valid():
@@ -82,7 +82,7 @@ def postcode_selection(request):
         addresses = AddressHelper.create_address_lookup_list(context['postcode'])
 
         # Populate form for page with choices from this API call
-        context['form'] = OtherPeoplePreviousAddressLookupForm(choices=addresses)
+        context['form'] = PreviousAddressSelectForm(choices=addresses)
 
         return render(request, 'childminder_templates/previous-address-lookup.html', context)
 
@@ -90,10 +90,10 @@ def postcode_selection(request):
         addresses = AddressHelper.create_address_lookup_list(request.POST['postcode'])
 
         if 'postcode-search' in request.POST:
-            context['form'] = OtherPeoplePreviousAddressLookupForm(choices=addresses)
+            context['form'] = PreviousAddressSelectForm(choices=addresses)
             return render(request, 'previous-address-lookup.html', context)
 
-        current_form = OtherPeoplePreviousAddressLookupForm(request.POST, choices=addresses)
+        current_form = PreviousAddressSelectForm(request.POST, choices=addresses)
         context['form'] = current_form
 
         if current_form.is_valid():
@@ -111,11 +111,11 @@ def postcode_manual(request):
     context = get_context(request)
 
     if request.method == 'GET':
-        context['form'] = OtherPeoplePreviousAddressManualForm()
+        context['form'] = PreviousAddressManualForm()
         return render(request, 'childminder_templates/other-people-previous-address-manual.html', context)
 
     if request.method == 'POST':
-        current_form = OtherPeoplePreviousAddressManualForm(request.POST)
+        current_form = PreviousAddressManualForm(request.POST)
         context['postcode'] = request.POST['postcode2']
         context['form'] = current_form
 
@@ -149,15 +149,16 @@ def postcode_submission(request):
             postcode = selected_address['postcode']
 
         # Actual saving is the same regardless of lookup, so done beneath
-        previous_address_record = PreviousAddress(person_id=request.POST['person_id'],
-                                                  person_type=request.POST['person_type'],
-                                                  street_line1=line1,
-                                                  street_line2=line2,
-                                                  town=town,
-                                                  county=county,
-                                                  country='United Kingdom',
-                                                  postcode=postcode)
-        previous_address_record.save()
+        create_previous_address(
+            person_id=request.POST['person_id'],
+            person_type=request.POST['person_type'],
+            street_line1=line1,
+            street_line2=line2,
+            town=town,
+            county=county,
+            country='United Kingdom',
+            postcode=postcode
+        )
 
         if 'save-and-continue' in request.POST:
             return HttpResponseRedirect(build_url('personal_details_summary', get={'id': request.POST['id']}))
@@ -174,13 +175,16 @@ def address_update(request):
     context = get_context(request)
 
     if request.method == 'GET':
-        context['form'] = OtherPeoplePreviousAddressManualForm(id=request.GET['address_id'])
+        context['form'] = PreviousAddressManualForm(id=request.GET['address_id'])
         return render(request, 'childminder_templates/previous-address-manual-update.html', context)
 
     if request.method == 'POST':
-        current_form = OtherPeoplePreviousAddressManualForm(request.POST)
+        address_id = context['address_id']
+        address_record = get_previous_address(address_id)
+
+        current_form = PreviousAddressManualForm(request.POST)
         context['form'] = current_form
-        address_record = PreviousAddress.objects.get(previous_name_id=context['address_id'])
+
         if current_form.is_valid():
             # For ease of use, update saving is done here rather than in submission section, adding it would make it
             # harder to understand
@@ -204,7 +208,7 @@ def get_stored_addresses(person_id, person_type):
     :param person_type: Whether the person is an adult or child
     :return:
     """
-    return PreviousAddress.objects.filter(person_id=person_id, person_type=person_type)
+    return filter_previous_address(person_id=person_id, person_type=person_type)
 
 
 def get_context(request):
@@ -282,3 +286,34 @@ def get_link_urls(url_variables_dict):
     context['entry_url'] = build_url('personal_details_previous_addresses', get=url_variables_dict)
 
     return context
+
+
+def get_previous_address(pk):
+    return PreviousAddress.objects.get(pk=pk)
+
+
+def filter_previous_address(**kwargs):
+    return PreviousAddress.objects.filter(**kwargs)
+
+
+def create_previous_address(**kwargs):
+    person_id = kwargs.pop['person_id']
+    person_type = kwargs.pop['person_type']
+    street_line1 = kwargs.pop['street_line1']
+    street_line2 = kwargs.pop['street_line2']
+    town = kwargs.pop['town']
+    county = kwargs.pop['county']
+    postcode = kwargs.pop['postcode']
+
+    # Default
+    country = 'United Kingdom'
+
+    previous_address_record = PreviousAddress(person_id=person_id,
+                                              person_type=person_type,
+                                              street_line1=street_line1,
+                                              street_line2=street_line2,
+                                              town=town,
+                                              county=county,
+                                              country=country,
+                                              postcode=postcode)
+    previous_address_record.save()
