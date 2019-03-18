@@ -22,20 +22,9 @@ class ApplicationExporter:
 
     @staticmethod
     def export_childminder_application(application_id):
-        payload = ApplicationExporter.create_full_childminder_application_export(application_id)
-        cm_application_sqs_handler.send_message(payload)
-
-    @staticmethod
-    def export_nanny_application(application_id):
-        payload = ApplicationExporter.create_full_nanny_application_export(application_id)
-        na_application_sqs_handler.send_message(payload)
-
-    @staticmethod
-    def create_full_childminder_application_export(application_id):
         """
         Method for exporting a full application in a dictionary format
         :param application_id: the identifier of the application to be exported
-        :return: a dictionary export of an application
         """
 
         export = {}
@@ -111,11 +100,7 @@ class ApplicationExporter:
 
         # Create document exports
 
-        documents = {}
-
-        base64_string = DocumentGenerator.get_full_application_summary(application_id)
-
-        documents['EYC'] = base64_string
+        documents = {'EYC': DocumentGenerator.get_full_childminder_application_summary(application_id)}
 
         # If adults in home are present, append EY2 documents
         if len(adults_in_home):
@@ -136,14 +121,14 @@ class ApplicationExporter:
 
         export['documents'] = json.dumps(documents)
 
-        return export
+        cm_application_sqs_handler.send_message(export)
 
     @staticmethod
-    def create_full_nanny_application_export(application_id):
+    def export_nanny_application(application_id, application_reference):
         """
         Method for exporting a full nanny application in a dictionary format
         :param application_id: the identifier of the application to be exported
-        :return: a dictionary export of an application
+        :param application_reference: the customer facing reference number assigned to an application
         """
 
         export = {}
@@ -186,4 +171,10 @@ class ApplicationExporter:
         user_details = IdentityGatewayActions().read('user', params={'application_id': application_id}).record
         export['user_details'] = json.dumps(user_details)
 
-        return export
+        documents = {
+            'CR': DocumentGenerator.get_full_nanny_application_summary(application_id, application_reference)
+        }
+
+        export['documents'] = json.dumps(documents)
+
+        na_application_sqs_handler.send_message(export)

@@ -55,9 +55,6 @@ def review(request):
             application.date_accepted = datetime.now()
             application.save()
 
-        from ...messaging import ApplicationExporter
-        ApplicationExporter.export_childminder_application(application_id_local)
-
         personalisation = {'first_name': first_name, 'ref': app_ref}
         accepted_email(email, first_name, app_ref, application_id_local)
         send_survey_email(email, personalisation, application)

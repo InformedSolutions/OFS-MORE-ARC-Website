@@ -34,6 +34,7 @@ from arc_application.views.contact_centre.nanny_change_details import NannyUpdat
     NannyUpdateAddPhoneNumberView, NannyUpdatePhoneNumberView
 from arc_application.views.search_router import SearchRouter
 from arc_application.views import upload_capita_dbs
+from arc_application.views.applications_summary import ApplicationsSummaryView
 
 # Nanny Views
 
@@ -66,6 +67,7 @@ urlpatterns = [
     url(r'^logout/', logout, {'next_page': settings.URL_PREFIX + '/login'}),
     url(r'^summary/', ARCUserSummaryView.as_view(), name='summary'),
     url(r'^upload-capita-dbs/$', upload_capita_dbs, name='Upload-Capita-DBS'),
+    url(r'^applications-summary/$', ApplicationsSummaryView.as_view(), name='applications-summary'),
 
     # childminder application review
     url(r'^review/$', task_list, name='task_list'),

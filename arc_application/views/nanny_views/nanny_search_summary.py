@@ -6,7 +6,7 @@ from django.shortcuts import render
 from django.utils.decorators import method_decorator
 from django.views import View
 
-from ...views import NannyArcSummary
+from ...views import NannyArcSummary, get_nanny_summary_functions
 from ..base import has_group
 from ...services.db_gateways import NannyGatewayActions
 
@@ -37,14 +37,10 @@ class NannySearchSummary(View):
         application_reference = NannyArcSummary.get_application_reference(application_id)
         publish_details = NannyArcSummary.get_publish_details(application_id)
 
-        context_function_list = NannyArcSummary.get_context_function_list()
+        context_function_list = get_nanny_summary_functions()
+        context_list = [self.try_get_context_data(context_func, application_id) for context_func in context_function_list]
 
-        context_list = [self.try_get_context_data(context_func, application_id) for context_func in
-                        context_function_list if
-                        context_func]
-
-        # Remove None values
-        context_list = [context_dict for context_dict in context_list if context_dict]
+        context_list = [context_dict for context_dict in context_list if context_dict is not None]
 
         # Remove all change_links
         for context_dict in context_list:
@@ -60,15 +56,11 @@ class NannySearchSummary(View):
 
         valid_context_list = [context for context in context_list if context]
 
-        # Remove 'Review: ' from page titles.
-        for context in valid_context_list:
-            context['title'] = context['title'][7:]
-
         context = {
             'application_id': application_id,
             'application_reference': application_reference,
             'context_list': valid_context_list,
-            'summary_page': False,
+            'summary_page': True,
             'publish_details': publish_details
         }
 

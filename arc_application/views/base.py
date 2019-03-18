@@ -117,6 +117,11 @@ def release_application(request, application_id, status):
         app.application_status = status
         app.save()
 
+        if status == 'ACCEPTED':
+            # Import used here explicitly to prevent circular import
+            from ..messaging import ApplicationExporter
+            ApplicationExporter.export_childminder_application(application_id)
+
     # If application_id doesn't correspond to a Childminder application, it must be a Nanny one.
     else:
         nanny_api_response = NannyGatewayActions().read('application', params={'application_id': application_id})
@@ -129,6 +134,11 @@ def release_application(request, application_id, status):
 
         app['application_status'] = status
         NannyGatewayActions().put('application', params=app)
+
+        if status == 'ACCEPTED':
+            from ..messaging import ApplicationExporter
+            application_reference = app['application_reference']
+            ApplicationExporter.export_nanny_application(application_id, application_reference)
 
     # keep arc record but un-assign user from it
     if Arc.objects.filter(application_id=application_id).exists():

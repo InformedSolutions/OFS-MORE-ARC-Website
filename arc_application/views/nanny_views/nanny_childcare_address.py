@@ -84,7 +84,7 @@ class NannyChildcareAddressSummary(NannyARCFormView):
                     'name': 'Childcare address',
                     'info': home_address_locations,
                     'formset': childcare_address_formset
-                },
+                }
             ]
         }
 
