@@ -567,7 +567,7 @@ class PreviousRegistrationDetailsForm(GOVUKForm):
 
     previous_registration = forms.ChoiceField(choices=choices,
                                               label='Has the applicant previously registered with Ofsted?',
-                                              widget=InlineRadioSelect, required=True,
+                                              widget=ConditionalPostInlineRadioSelect, required=True,
                                               error_messages={'required': "Please select one"})
     custom_number_input = NumberInput()
     custom_number_input.input_classes = 'form-control form-control-1-4'
@@ -597,7 +597,7 @@ class PreviousRegistrationDetailsForm(GOVUKForm):
             individual_id = None
         if previous_registration == 'True':
             if individual_id is None:
-                raise forms.ValidationError("Please select one")
+                raise forms.ValidationError("Please enter an Individual ID")
             if len(str(individual_id)) > 7:
                 raise forms.ValidationError("Individual ID must be fewer than 7 digits")
         return individual_id
@@ -1973,7 +1973,7 @@ class OtherPersonPreviousRegistrationDetailsForm(GOVUKForm):
             individual_id = None
         if previous_registration == 'True':
             if individual_id is None:
-                raise forms.ValidationError("Please select one")
+                raise forms.ValidationError("Please enter an Individual ID")
             if len(str(individual_id)) > 7:
                 raise forms.ValidationError("Individual ID must be fewer than 7 digits")
         return individual_id
