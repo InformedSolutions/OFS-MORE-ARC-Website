@@ -110,6 +110,15 @@ class StubNannyGatewayActions:
         }
         self.personal_details_read_response = self.make_response(record=self.personal_details_record)
 
+        self.previous_registration_record = {
+            'application_id': '998fd8ec-b96b-4a71-a1a1-a7a3ae186729',
+            'previous_registration_id': '9835bf3b-8ba9-4162-a25b-4c55e7d33d69',
+            'previous_registration': True,
+            'individual_id': '12345567',
+            'five_years_in_UK': True
+        }
+        self.previous_registration_read_response = self.make_response(record=self.previous_registration_record)
+
         self.childcare_training_record = {
             'application_id': '998fd8ec-b96b-4a71-a1a1-a7a3ae186729',
             'childcare_training_id': '9835bf3b-8ba9-4162-a25b-4c55e7d33d69',
@@ -206,6 +215,7 @@ class StubNannyGatewayActions:
         self.endpoint_mapping = {
             'application': 'nanny_application',
             'applicant-personal-details': 'personal_details',
+            'previous-registration-details': 'previous_registration',
             'childcare-training': 'childcare_training',
             'childcare-address': 'childcare_address',
             'applicant-home-address': 'home_address',
@@ -276,10 +286,25 @@ def assertXPathValue(response, xpath, expected_value, strip=False):
     :param expected_value: The content expected to be found
     :param strip: (optional) Run results through str.strip to trim whitespace
     """
+    if strip and not isinstance(expected_value, str):
+        raise ValueError('strip parameter only applies to expected str type')
+
     result = _do_xpath(response, xpath)
+
     if strip:
-        result = list(map(str.strip, result))
-    if expected_value not in result:
+        if isinstance(result, str):
+            result = result.strip()
+        elif isinstance(result, list):
+            result = list(map(str.strip, result))
+        else:
+            raise AssertionError('Expected str or list to strip at "{}", but found {}'.format(xpath, repr(result)))
+
+    if isinstance(result, list):
+        found = expected_value in result
+    else:
+        found = result == expected_value
+
+    if not found:
         raise AssertionError('Expected {} at "{}", but found {}'.format(repr(expected_value), xpath, repr(result)))
 
 
