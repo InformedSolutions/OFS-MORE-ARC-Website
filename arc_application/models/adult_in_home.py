@@ -1,6 +1,9 @@
 import datetime
+from datetime import date
 from uuid import uuid4
+
 from django.db import models
+
 from .application import Application
 from .childcare_type import ChildcareType
 
@@ -19,7 +22,10 @@ class AdultInHome(models.Model):
     birth_day = models.IntegerField(blank=True)
     birth_month = models.IntegerField(blank=True)
     birth_year = models.IntegerField(blank=True)
+
     relationship = models.CharField(max_length=100, blank=True)
+    cygnum_relationship_to_childminder = models.CharField(max_length=100, blank=True)
+
     email = models.CharField(max_length=100, blank=True, null=True)
     dbs_certificate_number = models.CharField(max_length=50, blank=True)
     token = models.CharField(max_length=100, blank=True, null=True)
@@ -34,12 +40,19 @@ class AdultInHome(models.Model):
     email_resent_timestamp = models.DateTimeField(null=True, blank=True)
     lived_abroad = models.NullBooleanField(blank=True)
     military_base = models.NullBooleanField(blank=True)
-    cygnum_relationship_to_childminder = models.CharField(max_length=100, blank=True)
     capita = models.NullBooleanField(blank=True)  # dbs was found on capita list?
     enhanced_check = models.NullBooleanField(blank=True)  # stated they have a capita dbs?
     on_update = models.NullBooleanField(blank=True)  # stated they are signed up to dbs update service?
     certificate_information = models.TextField(blank=True)  # information from dbs certificate
     within_three_months = models.NullBooleanField(blank=True)  # dbs was issued within three months of lookup?
+
+    # Current name fields
+    name_start_day = models.IntegerField(blank=True, null=True)
+    name_start_month = models.IntegerField(blank=True, null=True)
+    name_start_year = models.IntegerField(blank=True, null=True)
+    name_end_day = models.IntegerField(blank=True, null=True)
+    name_end_month = models.IntegerField(blank=True, null=True)
+    name_end_year = models.IntegerField(blank=True, null=True)
 
     @property
     def timelog_fields(self):
@@ -86,6 +99,8 @@ class AdultInHome(models.Model):
         """
         return datetime.date(self.birth_year, self.birth_month, self.birth_day)
 
+    date_of_birth = property(get_dob_as_date)
+
     @staticmethod
     def bool_to_string(bool):
         return "Yes" if bool else "No"
@@ -98,18 +113,6 @@ class AdultInHome(models.Model):
         :return: a summary table of the adult
         """
 
-        if self.birth_day < 10:
-            birth_day = '0' + str(self.birth_day)
-        else:
-            birth_day = str(self.birth_day)
-
-        if self.birth_month < 10:
-            birth_month = '0' + str(self.birth_month)
-        else:
-            birth_month = str(self.birth_month)
-
-        date_of_birth = birth_day + ' ' + birth_month + ' ' + str(self.birth_year)
-
         summary_table = [
             {"title": self.get_full_name(),
              "id": self.pk},
@@ -118,7 +121,7 @@ class AdultInHome(models.Model):
             {"name": "Name",
              "value": self.get_full_name()},
             {"name": "Date of birth",
-             "value": date_of_birth},
+             "value": self.get_dob_as_date().strftime('%d %m %Y')},
             {"name": "Relationship",
              "value": self.relationship},
             {"name": "Email",
@@ -175,6 +178,30 @@ class AdultInHome(models.Model):
 
         return summary_table
 
+    def get_previous_names_and_addresses_summary_table(self):
+
+        # late import to avoid circular dependency
+        from .previous_name import PreviousName
+
+        previous_names = PreviousName.objects.filter(person_id=self.pk, other_person_type='ADULT').order_by('order')
+        if len(previous_names) == 0:
+            return None
+
+        summary_table = [
+            {"title": "{}'s previous names and addresses".format(self.get_full_name()),
+             "id": self.pk}
+        ]
+        for i, name in enumerate(previous_names):
+            summary_table.extend([
+                {"name": "Previous name {}".format(i+1),
+                 "value": name.name},
+                {"name": "Start date",
+                 "value": name.start_date.strftime("%d %B %Y")},
+                {"name": "End date",
+                 "value": name.end_date.strftime("%d %B %Y")},
+            ])
+        return summary_table
+
     def show_enhanced_check(self):
         return not self.capita
 
@@ -182,10 +209,25 @@ class AdultInHome(models.Model):
         return (not self.capita and self.enhanced_check) \
                or (self.capita and not self.within_three_months)
 
-    # Date of birth property created to keep DRY
-    @property
-    def date_of_birth(self):
-        return datetime(year=self.birth_year, month=self.birth_month, day=self.birth_day)
-
     class Meta:
         db_table = 'ADULT_IN_HOME'
+
+    def get_start_date(self):
+        return date(self.start_year, self.start_month, self.start_day)
+
+    def set_start_date(self, start_date):
+        self.start_year = start_date.year
+        self.start_month = start_date.month
+        self.start_day = start_date.day
+
+    start_date = property(get_start_date, set_start_date)
+
+    def get_end_date(self):
+        return date(self.end_year, self.end_month, self.end_day)
+
+    def set_end_date(self, end_date):
+        self.end_year = end_date.year
+        self.end_month = end_date.month
+        self.end_day = end_date.day
+
+    end_date = property(get_end_date, set_end_date)

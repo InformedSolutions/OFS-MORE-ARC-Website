@@ -143,10 +143,10 @@ def personal_details_summary(request):
                 status = Arc.objects.get(pk=application_id_local)
                 status.personal_details_review = section_status
                 status.save()
-                default = '/first-aid/summary'
+                default = '/first-aid/summary/'
 
                 if application.own_children:
-                    default = '/first-aid/summary'
+                    default = '/first-aid/summary/'
 
                 redirect_link = redirect_selection(request, default)
 
@@ -272,7 +272,7 @@ def add_applicant_previous_name(request):
                     'person_type': person_type,
                     'extra': extra
                 }
-                return render(request, 'childminder_templates/add-previous-names.html', context)
+                return render(request, 'childminder_templates/add-previous-names-old.html', context)
 
         if request.POST['action'] == 'delete':
             # This scans the request post dictionary for a key submitted by clicking remove person
@@ -318,7 +318,7 @@ def add_applicant_previous_name(request):
                     'extra': extra
                 }
 
-                return render(request, 'childminder_templates/add-previous-names.html', context)
+                return render(request, 'childminder_templates/add-previous-names-old.html', context)
 
     if request.method == "GET":
 
@@ -364,4 +364,4 @@ def add_applicant_previous_name(request):
         'referrer': referrer
     }
 
-    return render(request, 'childminder_templates/add-previous-names.html', context)
+    return render(request, 'childminder_templates/add-previous-names-old.html', context)
