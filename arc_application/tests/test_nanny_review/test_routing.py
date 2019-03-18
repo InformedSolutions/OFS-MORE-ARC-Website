@@ -6,7 +6,6 @@ from django.test import tag, TestCase
 from django.urls import reverse, resolve
 from django.conf import settings
 
-#from application.models import NannyPreviousRegistrationDetails
 from ...models import Arc
 from ...services.db_gateways import NannyGatewayActions, IdentityGatewayActions
 from ...views import NannyDbsCheckSummary, NannyContactDetailsSummary, NannyArcSummary, \
@@ -253,6 +252,23 @@ class PreviousRegistrationTests(NannyReviewFuncTestsBase):
 
             self.assertEqual(response.status_code, 200)
             utils.assertView(response, NannyPreviousRegistrationView.as_view())
+
+    def test_previous_registration_appears_on_review_page(self):
+        """
+        Testing previous registration appears on the review page when there is a previous registration record
+        """
+        with patch.object(NannyGatewayActions, 'read') as nanny_api_get, \
+                patch.object(NannyGatewayActions, 'put') as nanny_api_put:
+            nanny_api_get.return_value.record = {**self.nanny_gateway.previous_registration_record,
+                                                 **self.nanny_gateway.personal_details_record, **self.nanny_gateway.home_address_record }
+            nanny_api_put.return_value.status_code = 200
+
+            response = self.client.get(reverse('nanny_personal_details_summary') + '?id=' + self.test_app_id)
+
+            self.assertContains(response, "Previous registration", status_code=200)
+            self.assertContains(response, "Previously registered with Ofsted?", status_code=200)
+            self.assertContains(response, "Individual ID", status_code=200)
+            self.assertContains(response, "Lived in England for more than 5 years?", status_code=200)
 
 
 class ReviewChildcareAddressTests(NannyReviewFuncTestsBase):
