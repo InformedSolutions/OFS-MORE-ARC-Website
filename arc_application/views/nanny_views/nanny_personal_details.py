@@ -1,15 +1,27 @@
 import datetime
 
 from .nanny_form_view import NannyARCFormView
-from ...forms.nanny_forms.nanny_form_builder import HomeAddressForm, PersonalDetailsForm
+from ...forms.nanny_forms.nanny_form_builder import HomeAddressForm, PersonalDetailsForm, PreviousRegistrationForm
 from ...services.db_gateways import NannyGatewayActions
 
 
 class NannyPersonalDetailsSummary(NannyARCFormView):
-    template_name = 'nanny_general_template.html'
+    template_name = 'nanny_personal_details_summary.html'
     task_for_review = 'personal_details_review'
     verbose_task_name = 'Your personal details'
-    form_class = [PersonalDetailsForm, HomeAddressForm]
+
+    def get_form_class(self, **kwargs):
+        if hasattr(self, 'request'):
+            application_id = self.request.GET.get('id')
+        else:
+            application_id = kwargs.pop('application_id')
+
+        previous_registration_details = NannyGatewayActions().read('previous-registration-details',
+                                                                   params={'application_id': application_id})
+        if previous_registration_details.status_code != 404:
+            return [PersonalDetailsForm, HomeAddressForm, PreviousRegistrationForm]
+        else:
+            return [PersonalDetailsForm, HomeAddressForm]
 
     @staticmethod
     def month_converter(dob_string):
@@ -34,6 +46,10 @@ class NannyPersonalDetailsSummary(NannyARCFormView):
                                               params={'application_id': application_id}).record
         home_address = nanny_actions.read('applicant-home-address',
                                           params={'application_id': application_id}).record
+        previous_registration_details = nanny_actions.read('previous-registration-details',
+                                          params={'application_id': application_id})
+
+
 
         first_name = personal_details['first_name']
         middle_names = personal_details['middle_names']
@@ -53,13 +69,33 @@ class NannyPersonalDetailsSummary(NannyARCFormView):
 
         reasons_known_to_social_services = personal_details['reasons_known_to_social_services']
 
-        forms = self.get_forms()
+        previous_registration_record_exists = False
+        show_individual_id = False
+
+        forms = self.get_forms(application_id)
         personal_details_form = forms[0]
         home_address_form = forms[1]
+
+        if previous_registration_details.status_code != 404:
+            previous_registration_record_exists = True
+            previous_registration_details = nanny_actions.read('previous-registration-details',
+                                                               params={'application_id': application_id}).record
+            previous_registration = previous_registration_details['previous_registration']
+            individual_id = str(previous_registration_details['individual_id'])
+            five_years_in_UK = previous_registration_details['five_years_in_UK']
+            previous_registration_form = forms[2]
+
+            if previous_registration is True:
+                show_individual_id = True
+
+
 
         context = {
             'application_id': application_id,
             'title': 'Review: ' + self.verbose_task_name,
+            'show_previous_registration':  previous_registration_record_exists,
+            #used for conditional reveal of individual_id on summary page
+            'show_individual_id' : show_individual_id,
             'change_link': 'nanny_personal_details_summary',
             'rows': [
                 {
@@ -114,7 +150,40 @@ class NannyPersonalDetailsSummary(NannyARCFormView):
                 }
             )
 
+        if previous_registration_record_exists is True:
+            context['rows'].append(
+                {
+                    'id': 'previous_registration',
+                    'name': 'Previously registered with Ofsted?',
+                    'info': previous_registration,
+                    'declare': previous_registration_form['previous_registration_declare'] if hasattr(self,
+                                                                                                      'request') else '',
+                    'comments': previous_registration_form['previous_registration_comments'],
+                })
+            #required for conditional reveal of individual_id on master summary
+            if previous_registration is True:
+                context['rows'].append(
+                    {
+                        'id': 'individual_id',
+                        'name': 'Individual ID',
+                        'info': individual_id,
+                        'declare': previous_registration_form['individual_id_declare'] if hasattr(self, 'request') else '',
+                        'comments': previous_registration_form['individual_id_comments'],
+                    })
+            context['rows'].append(
+                {
+                    'id': 'five_years_in_UK',
+                    'name': 'Lived in England for more than 5 years?',
+                    'info': five_years_in_UK,
+                    'declare': previous_registration_form['five_years_in_UK_declare'] if hasattr(self,
+                                                                                                 'request') else '',
+                    'comments': previous_registration_form['five_years_in_UK_comments'],
+                })
+
         return context
+
+    def get_forms(self, application_id):
+        return [self.get_form(form_class=form_class) for form_class in self.get_form_class(application_id=application_id)]
 
     def get_success_url(self):
         return 'nanny_childcare_address_summary'

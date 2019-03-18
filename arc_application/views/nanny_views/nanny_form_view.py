@@ -36,7 +36,8 @@ class NannyARCFormView(FormView):
 
     def __handle_post_data(self):
         # Cast self.form_class to a list if not already a list. Then iterate over list.
-        _form_classes = [self.form_class] if not isinstance(self.form_class, list) else self.form_class
+        form_class = self.get_form_class()
+        _form_classes = [form_class] if not isinstance(form_class, list) else form_class
 
         flagged_fields = any([ARCCommentsProcessor.process_comments(
             request=self.request,
@@ -58,7 +59,7 @@ class NannyARCFormView(FormView):
         return form_class(initial=initial)
 
     def get_forms(self):
-        return [self.get_form(form_class=form_class) for form_class in self.form_class]
+        return [self.get_form(form_class=form_class) for form_class in self.get_form_class()]
 
     def get_context_data(self, *args, **kwargs):
         raise NotImplementedError('You must set the context_data and pk for this FormView with the record from the db.')
