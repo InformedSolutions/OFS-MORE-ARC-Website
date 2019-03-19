@@ -170,6 +170,13 @@ class ApplicationExporter:
                                                            params={'application_id': application_id}).record
         export['insurance_declaration'] = json.dumps(insurance_declaration)
 
+        try:
+            previous_registration_details = NannyGatewayActions().read('previous-registration-details',
+                                                      params={'application_id': application_id}).record
+            export['previous_registration'] = json.dumps(previous_registration_details)
+        except:
+            export['previous_registration'] = json.dumps({})
+
         user_details = IdentityGatewayActions().read('user', params={'application_id': application_id}).record
         export['user_details'] = json.dumps(user_details)
 
