@@ -4,8 +4,8 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render
 
 from ...address_helper import AddressHelper
-from ...forms.childminder_forms.form import OtherPersonPreviousPostcodeEntry, OtherPeoplePreviousAddressLookupForm, \
-    OtherPeoplePreviousAddressManualForm
+from ...forms.previous_addresses import PreviousAddressManualForm, PreviousAddressSelectForm, \
+    PreviousAddressEntryForm
 from ...models import PreviousAddress
 from ...review_util import build_url
 from ...decorators import group_required, user_assigned_application
@@ -47,17 +47,17 @@ def postcode_entry(request):
     context = get_context(request)
 
     if request.method == 'GET':
-        context['form'] = OtherPersonPreviousPostcodeEntry()
+        context['form'] = PreviousAddressEntryForm()
         return render(request, 'childminder_templates/previous-address-select.html', context)
 
     if request.method == 'POST':
 
         if 'add-another' in request.POST:
-            form = OtherPersonPreviousPostcodeEntry()
+            form = PreviousAddressEntryForm()
             context['form'] = form
             return render(request, 'childminder_templates/previous-address-select.html', context)
 
-        form = OtherPersonPreviousPostcodeEntry(request.POST)
+        form = PreviousAddressEntryForm(request.POST)
         context['form'] = form
 
         if form.is_valid():
@@ -82,7 +82,7 @@ def postcode_selection(request):
         addresses = AddressHelper.create_address_lookup_list(context['postcode'])
 
         # Populate form for page with choices from this API call
-        context['form'] = OtherPeoplePreviousAddressLookupForm(choices=addresses)
+        context['form'] = PreviousAddressSelectForm(choices=addresses)
 
         return render(request, 'childminder_templates/previous-address-lookup.html', context)
 
@@ -90,10 +90,10 @@ def postcode_selection(request):
         addresses = AddressHelper.create_address_lookup_list(request.POST['postcode'])
 
         if 'postcode-search' in request.POST:
-            context['form'] = OtherPeoplePreviousAddressLookupForm(choices=addresses)
+            context['form'] = PreviousAddressSelectForm(choices=addresses)
             return render(request, 'childminder_templates/previous-address-lookup.html', context)
 
-        current_form = OtherPeoplePreviousAddressLookupForm(request.POST, choices=addresses)
+        current_form = PreviousAddressSelectForm(request.POST, choices=addresses)
         context['form'] = current_form
 
         if current_form.is_valid():
@@ -111,11 +111,11 @@ def postcode_manual(request):
     context = get_context(request)
 
     if request.method == 'GET':
-        context['form'] = OtherPeoplePreviousAddressManualForm()
+        context['form'] = PreviousAddressManualForm()
         return render(request, 'childminder_templates/other-people-previous-address-manual.html', context)
 
     if request.method == 'POST':
-        current_form = OtherPeoplePreviousAddressManualForm(request.POST)
+        current_form = PreviousAddressManualForm(request.POST)
         context['postcode'] = request.POST['postcode2']
         context['form'] = current_form
 
@@ -174,11 +174,11 @@ def address_update(request):
     context = get_context(request)
 
     if request.method == 'GET':
-        context['form'] = OtherPeoplePreviousAddressManualForm(id=request.GET['address_id'])
+        context['form'] = PreviousAddressManualForm(id=request.GET['address_id'])
         return render(request, 'childminder_templates/previous-address-manual-update.html', context)
 
     if request.method == 'POST':
-        current_form = OtherPeoplePreviousAddressManualForm(request.POST)
+        current_form = PreviousAddressManualForm(request.POST)
         context['form'] = current_form
         address_record = PreviousAddress.objects.get(previous_name_id=context['address_id'])
         if current_form.is_valid():

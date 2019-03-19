@@ -9,7 +9,7 @@ from django.shortcuts import render
 from ...decorators import group_required, user_assigned_application
 from ...models import ApplicantPersonalDetails, ApplicantName, ApplicantHomeAddress, Arc, Application, PreviousName
 from ...review_util import request_to_comment, save_comments, redirect_selection
-from ...views.childminder_views.personal_details_addresses import get_stored_addresses
+from ...views.childminder_views.personal_details_addresses import get_stored_addresses, update_applicant_current_address
 from ...forms.childminder_forms.form import PersonalDetailsForm, PreviousRegistrationDetails
 
 logger = logging.getLogger()
@@ -146,6 +146,8 @@ def personal_details_summary(request):
             name_record.end_month = today.month
             name_record.end_year = today.year
             name_record.save()
+
+            update_applicant_current_address(application_id_local)
 
             # update arc status
             arc_record = Arc.objects.get(pk=application_id_local)

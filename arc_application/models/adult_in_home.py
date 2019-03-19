@@ -193,7 +193,7 @@ class AdultInHome(models.Model):
         ]
         for i, name in enumerate(previous_names):
             summary_table.extend([
-                {"name": "Previous name {}".format(i+1),
+                {"name": "Previous name {}".format(i + 1),
                  "value": name.name},
                 {"name": "Start date",
                  "value": name.start_date.strftime("%d %B %Y") if name.start_date else ''},
