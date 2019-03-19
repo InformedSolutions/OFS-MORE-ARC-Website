@@ -49,6 +49,7 @@ from arc_application.views.nanny_views.nanny_dbs_check import NannyDbsCheckSumma
 from arc_application.views.nanny_views.nanny_insurance_cover import NannyInsuranceCoverSummary
 from arc_application.views.nanny_views.nanny_arc_summary import NannyArcSummary
 from arc_application.views.nanny_views.nanny_arc_summary_confirmation import NannyArcSummaryConfirmation
+from arc_application.views.nanny_views.nanny_previous_names import nanny_add_previous_name
 
 from django.conf import settings
 from django.conf.urls import include, url
@@ -120,6 +121,8 @@ if settings.ENABLE_NANNIES:
         url(r'^nanny/contact-details/', NannyContactDetailsSummary.as_view(), name='nanny_contact_summary'),
         url(r'^nanny/personal-details/review/', NannyPersonalDetailsSummary.as_view(), name='nanny_personal_details_summary'),
         url(r'^nanny/personal-details/previous-registration/', NannyPreviousRegistrationView.as_view(), name='nanny_previous_registration'),
+        url(r'^nanny/personal-details/previous-names/', nanny_add_previous_name,
+            name='nanny_previous_names'),
         url(r'^nanny/childcare-address/', NannyChildcareAddressSummary.as_view(),
             name='nanny_childcare_address_summary'),
         url(r'^nanny/first-aid-training/', NannyFirstAidTrainingSummary.as_view(),
