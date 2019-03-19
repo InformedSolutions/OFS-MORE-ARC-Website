@@ -405,6 +405,7 @@ def update_applicant_current_address(application_id):
         moved_out_date = get_latest_moved_out_date(previous_address_records)
 
     applicant_personal_details_record.moved_out_date = date.today()
+    applicant_personal_details_record.save()
 
 
 def get_latest_moved_out_date(previous_address_list):
