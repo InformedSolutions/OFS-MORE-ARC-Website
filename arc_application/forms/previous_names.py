@@ -112,8 +112,3 @@ class PersonPreviousNameForm(GOVUKForm):
             self.add_error('start_date', self.ERROR_MESSAGE_START_DATE_AFTER_END_DATE)
             self.add_error('end_date', self.ERROR_MESSAGE_END_DATE_BEFORE_START_DATE)
 
-        # de-duplicate error messages for each field
-        for field, errors in self.errors.items():
-            dedup = OrderedDict([(k, None) for k in errors])
-            self.errors[field] = list(dedup.keys())
-

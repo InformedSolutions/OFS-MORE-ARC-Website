@@ -257,11 +257,6 @@ class PreviousAddressManualForm(GOVUKForm):
             self.add_error('moved_in_date', self.ERROR_MESSAGE_MOVED_IN_DATE_AFTER_MOVED_OUT_DATE)
             self.add_error('moved_out_date', self.ERROR_MESSAGE_MOVED_OUT_DATE_BEFORE_MOVED_IN_DATE)
 
-        # de-duplicate error messages for each field
-        for field, errors in self.errors.items():
-            dedup = OrderedDict([(k, None) for k in errors])
-            self.errors[field] = list(dedup.keys())
-
     def clean_street_line1(self):
         """
         Street name and number validation
