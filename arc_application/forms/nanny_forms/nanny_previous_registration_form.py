@@ -43,5 +43,7 @@ class PreviousRegistrationDetailsForm(GOVUKForm):
 
         if previous_registration == 'True' and individual_id == None:
             self.add_error('individual_id', "Enter individual ID")
+        if len(str(individual_id)) > 7:
+            self.add_error('individual_id', "Individual ID must be fewer than 7 digits")
 
         return cleaned_data
