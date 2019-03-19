@@ -16,8 +16,8 @@ class PreviousAddressEntryForm(GOVUKForm):
     ERROR_MESSAGE_POSTCODE_INVALID = 'Please enter a valid postcode'
 
     field_label_classes = 'form-label-bold'
-    error_summary_template_name = 'standard-error-summary.html'
     auto_replace_widgets = True
+    error_summary_title = 'There was a problem on this page'
 
     postcode = forms.CharField(label='Postcode', error_messages={'required': 'Please enter your postcode'})
 
