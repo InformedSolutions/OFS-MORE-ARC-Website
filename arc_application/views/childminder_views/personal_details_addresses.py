@@ -248,15 +248,6 @@ def address_update(request, remove=False):
         return render(request, 'childminder_templates/previous-address-manual-update.html', context)
 
 
-def remove_address(request, redirect_name=None):
-    """
-    View to remove an address and redirect to the relevant page
-    :param redirect_name: Kwarg that allows for a specific page to be redirected to (Path NAME).
-    :return:
-    """
-    pass
-
-
 def get_stored_addresses(person_id, person_type):
     """
     A utility function to get the addresses already stored in the previous address table for the current person
