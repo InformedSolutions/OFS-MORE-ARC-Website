@@ -10,12 +10,13 @@
 <!-- Initialise error summary for page -->
 {{form.error_summary}}
 
+<h1 class="form-title heading-large">
+    Previous {% if person_type == 'APPLICANT' %}home {% endif %}address {{previous_addresses|length|add:"1"}}
+</h1>
+{% include 'childminder_templates/previous-address-snippet.html' with queryset=previous_addresses %}
+
 <form method="post" novalidate {% if form.is_multipart %}enctype="multipart/form-data" {% endif %}>
     <div class="form-group">
-        <h1 class="form-title heading-large">
-            Previous {% if person_type == 'APPLICANT' %}home {% endif %}address {{previous_addresses|length|add:"1"}}
-        </h1>
-        {% include 'childminder_templates/previous-address-snippet.html' with queryset=previous_addresses %}
 
         {% for field in form %}
 

@@ -8,7 +8,7 @@ Previous address {{ forloop.counter }}: <br/>
 {{address.country}}{% if address.country %}<br/>{% endif %}
 {{address.postcode}}{% if address.postcode %}<br/>{% endif %}
 <br/>
-<p>
+
 <form action="{% url 'personal_details_previous_addresses' %}">
     {% csrf_token %}
     <input type="hidden" name="id" value="{{id}}"/>
@@ -17,14 +17,17 @@ Previous address {{ forloop.counter }}: <br/>
     <input type="hidden" name="person_type" value="APPLICANT"/>
     <input type="hidden" name="remove" value="1"/>
 
+    {% if postcode %}
+    <input type="hidden" name="postcode" value="{{postcode}}"/>
+    {% endif %}
+
     <input class="hidden-link-2"
            type="submit"
            value="Remove this address"
            name="remove-{{address.previous_name_id}}"
            id="remove-{{address.previous_name_id}}"/>
 </form>
-
-</p>
+<br>
 
 {% endfor %}
 

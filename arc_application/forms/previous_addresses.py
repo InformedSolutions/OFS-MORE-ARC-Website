@@ -203,7 +203,7 @@ class PreviousAddressManualForm(GOVUKForm):
     moved_in_date = form_fields.CustomSplitDateField(
         label='Moved in',
         required=True,
-        help_text='For example, 31 03 1980',
+        help_text='For example, 31 3 2012',
         min_value=None,
         max_value=form_fields.CustomSplitDateField.TODAY,
         allow_short_year=False,
@@ -226,7 +226,7 @@ class PreviousAddressManualForm(GOVUKForm):
     moved_out_date = form_fields.CustomSplitDateField(
         label='Moved out',
         required=True,
-        help_text='For example, 31 03 1980',
+        help_text='For example, 31 3 2012',
         min_value=None,
         max_value=form_fields.CustomSplitDateField.TODAY,
         allow_short_year=False,
@@ -246,6 +246,23 @@ class PreviousAddressManualForm(GOVUKForm):
         year_error_messages={'min_value': ERROR_MESSAGE_MOVED_OUT_YEAR_BEFORE_1900,
                              'invalid': ERROR_MESSAGE_NON_NUMERIC},
     )
+
+    def __init__(self, *args, **kwargs):
+        """
+        Setup initial data for the manual form
+        """
+        record = kwargs.pop('record', None)
+        super().__init__(*args, **kwargs)
+
+        if record:
+            self.fields['street_line1'].initial = record.street_line1
+            self.fields['street_line2'].initial = record.street_line2
+            self.fields['town'].initial = record.town
+            self.fields['county'].initial = record.county
+            self.fields['postcode'].initial = record.postcode
+            self.fields['moved_in_date'].initial = record.moved_in_date
+            self.fields['moved_out_date'].initial = record.moved_out_date
+
 
     def clean(self):
         super().clean()
