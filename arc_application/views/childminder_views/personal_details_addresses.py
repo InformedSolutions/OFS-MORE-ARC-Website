@@ -1,3 +1,5 @@
+import re
+
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
@@ -20,7 +22,15 @@ def personal_details_previous_address(request):
     :param request: HttpRequest object.
     :return: function call for the appropriate state.
     """
-    state = getattr(request, request.method).get('state')
+    request_data = getattr(request, request.method)
+
+    state = request_data.get('state')
+
+    remove = request_data.get('remove')
+    if remove:
+        remove_regex = re.compile('remove-([A-Z])*\w+')
+        remove_address_pk = get_remove_address_pk(request_data)
+        remove_previous_address(previous_name_id=remove_address_pk)
 
     if state == 'entry':
         return postcode_entry(request)
@@ -36,6 +46,8 @@ def personal_details_previous_address(request):
 
     if state == 'update':
         return address_update(request)
+
+    raise ValueError('State not found. State: {0}'.format(state))
 
 
 def postcode_entry(request):
@@ -133,8 +145,8 @@ def postcode_submission(request):
     """
     if request.method == 'POST':
         if request.POST['state'] == 'manual':
-            line1 = request.POST['street_name_and_number']
-            line2 = request.POST['street_name_and_number2']
+            line1 = request.POST['street_line1']
+            line2 = request.POST['street_line2']
             town = request.POST['town']
             county = request.POST['county']
             postcode = request.POST['postcode']
@@ -148,8 +160,11 @@ def postcode_submission(request):
             county = ''
             postcode = selected_address['postcode']
 
+        moved_in_date = request.POST['moved_in_date']
+        moved_out_date = request.POST['moved_out_date']
+
         # Actual saving is the same regardless of lookup, so done beneath
-        create_previous_address(
+        previous_address_record = create_previous_address(
             person_id=request.POST['person_id'],
             person_type=request.POST['person_type'],
             street_line1=line1,
@@ -159,6 +174,11 @@ def postcode_submission(request):
             country='United Kingdom',
             postcode=postcode
         )
+
+        # Update previous address moved in/out dates
+        previous_address_record.moved_in_date = moved_in_date
+        previous_address_record.moved_out_date = moved_out_date
+        previous_address_record.save()
 
         if 'save-and-continue' in request.POST:
             return HttpResponseRedirect(build_url('personal_details_summary', get={'id': request.POST['id']}))
@@ -194,11 +214,25 @@ def address_update(request):
             address_record.county = current_form.cleaned_data['county']
             address_record.country = 'United Kingdom'
             address_record.postcode = current_form.cleaned_data['postcode']
+
+            # Update previous address moved in/out dates
+            address_record.moved_in_date = current_form.cleaned_data['moved_in_date']
+            address_record.moved_out_date = current_form.cleaned_data['moved_out_date']
+
             address_record.save()
 
             return HttpResponseRedirect(build_url('personal_details_summary', get={'id': context['id']}))
 
         return render(request, 'childminder_templates/previous-address-manual-update.html', context)
+
+
+def remove_address(request, redirect_name=None):
+    """
+    View to remove an address and redirect to the relevant page
+    :param redirect_name: Kwarg that allows for a specific page to be redirected to (Path NAME).
+    :return:
+    """
+    pass
 
 
 def get_stored_addresses(person_id, person_type):
@@ -297,23 +331,26 @@ def filter_previous_address(**kwargs):
 
 
 def create_previous_address(**kwargs):
-    person_id = kwargs.pop['person_id']
-    person_type = kwargs.pop['person_type']
-    street_line1 = kwargs.pop['street_line1']
-    street_line2 = kwargs.pop['street_line2']
-    town = kwargs.pop['town']
-    county = kwargs.pop['county']
-    postcode = kwargs.pop['postcode']
+    if kwargs.get('country'):
+        country = kwargs.pop('country')
+    else:
+        # Default
+        country = 'United Kingdom'
 
-    # Default
-    country = 'United Kingdom'
-
-    previous_address_record = PreviousAddress(person_id=person_id,
-                                              person_type=person_type,
-                                              street_line1=street_line1,
-                                              street_line2=street_line2,
-                                              town=town,
-                                              county=county,
-                                              country=country,
-                                              postcode=postcode)
+    previous_address_record = PreviousAddress(**kwargs)
     previous_address_record.save()
+
+    return previous_address_record
+
+
+def remove_previous_address(**kwargs):
+    previous_address_record = PreviousAddress.objects.get(**kwargs)
+    previous_address_record.delete()
+
+
+def get_remove_address_pk(request_data):
+    for key, value in request_data.items():
+        if key.startswith('remove-'):
+            return key[7:]
+
+    raise ValueError('No address pk to remove found in request_data')

@@ -1,14 +1,32 @@
 {% for address in queryset %}
-    Previous address {{ forloop.counter }}: <br />
-    <br/>
-    {{address.street_line1}}{% if address.street_line1 %}<br />{% endif %}
-    {{address.street_line2}}{% if address.street_line2 %}<br />{% endif %}
-    {{address.town}}{% if address.town %}<br />{% endif %}
-    {{address.county}}{% if address.county %}<br />{% endif %}
-    {{address.country}}{% if address.country %}<br />{% endif %}
-    {{address.postcode}}{% if address.postcode %}<br />{% endif %}
-    <br/>
+Previous address {{ forloop.counter }}: <br/>
+<br/>
+{{address.street_line1}}{% if address.street_line1 %}<br/>{% endif %}
+{{address.street_line2}}{% if address.street_line2 %}<br/>{% endif %}
+{{address.town}}{% if address.town %}<br/>{% endif %}
+{{address.county}}{% if address.county %}<br/>{% endif %}
+{{address.country}}{% if address.country %}<br/>{% endif %}
+{{address.postcode}}{% if address.postcode %}<br/>{% endif %}
+<br/>
+<p>
+<form action="{% url 'personal_details_previous_addresses' %}">
+    {% csrf_token %}
+    <input type="hidden" name="id" value="{{id}}"/>
+    <input type="hidden" name="person_id" value="{{id}}"/>
+    <input type="hidden" name="state" value="{{state}}"/>
+    <input type="hidden" name="person_type" value="APPLICANT"/>
+    <input type="hidden" name="remove" value="1"/>
+
+    <input class="hidden-link-2"
+           type="submit"
+           value="Remove this address"
+           name="remove-{{address.previous_name_id}}"
+           id="remove-{{address.previous_name_id}}"/>
+</form>
+
+</p>
 
 {% endfor %}
-    Previous address {{queryset|length|add:"1"}}:<br />
-    <br/>
+
+Previous address {{queryset|length|add:"1"}}:<br/>
+<br/>
