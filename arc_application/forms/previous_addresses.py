@@ -39,7 +39,7 @@ class PreviousAddressSelectForm(GOVUKForm):
     ERROR_MESSAGE_ADDRESS_BLANK = 'Please select your address'
 
     # Moved in/out date validation messages
-    ERROR_MESSAGE_DATE_BLANK = 'Enter the date, including the month and year'
+    ERROR_MESSAGE_DATE_BLANK = 'Enter the full date, including the day, month and year'
     ERROR_MESSAGE_DAY_OUT_OF_RANGE = 'Day must be between 1 and 31'
     ERROR_MESSAGE_MONTH_OUT_OF_RANGE = 'Month must be between 1 and 12'
     ERROR_MESSAGE_MOVED_IN_YEAR_BEFORE_1900 = 'Date moved in must be after 1900'
@@ -152,7 +152,7 @@ class PreviousAddressManualForm(GOVUKForm):
     ERROR_MESSAGE_POSTCODE_INVALID = 'Please enter a valid postcode'
 
     # Moved in/out date validation messages
-    ERROR_MESSAGE_DATE_BLANK = 'Enter the date, including the month and year'
+    ERROR_MESSAGE_DATE_BLANK = 'Enter the full date, including the day, month and year'
     ERROR_MESSAGE_DAY_OUT_OF_RANGE = 'Day must be between 1 and 31'
     ERROR_MESSAGE_MONTH_OUT_OF_RANGE = 'Month must be between 1 and 12'
     ERROR_MESSAGE_MOVED_IN_YEAR_BEFORE_1900 = 'Date moved in must be after 1900'
