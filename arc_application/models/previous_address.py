@@ -44,6 +44,8 @@ class PreviousAddress(models.Model):
         db_table = 'PREVIOUS_ADDRESS'
 
     def get_moved_in_date(self):
+        if not all((self.moved_in_year, self.moved_in_month, self.moved_in_day)):
+            return None
         return date(self.moved_in_year, self.moved_in_month, self.moved_in_day)
 
     def set_moved_in_date(self, moved_in_date):
@@ -54,6 +56,8 @@ class PreviousAddress(models.Model):
     moved_in_date = property(get_moved_in_date, set_moved_in_date)
 
     def get_moved_out_date(self):
+        if not all((self.moved_out_year, self.moved_out_month, self.moved_out_day)):
+            return None
         return date(self.moved_out_year, self.moved_out_month, self.moved_out_day)
 
     def set_moved_out_date(self, moved_out_date):

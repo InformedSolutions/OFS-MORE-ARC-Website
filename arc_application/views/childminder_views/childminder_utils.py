@@ -294,14 +294,24 @@ def load_json(application_id_local, ordered_models, recurse, apply_filtering_for
             table_list.append(previous_names)
 
         elif model == PreviousAddress:
-            records = model.objects.filter(person_id=application.pk)
-            previous_names = [{"title": "Previous addresses", "id": application_id_local}]
-            for record in records:
+            unsorted_addresses = model.objects.filter(person_id=application.pk)
+            records = sorted(unsorted_addresses, key=lambda address: address.order if address.order else 0)
+
+            previous_addresses = [{"title": "Previous addresses", "id": application_id_local}]
+            for index, record in enumerate(records):
+                order = index + 1
                 address = get_address(record.street_line1,
                                       record.street_line2, record.town,
                                       record.postcode)
-                previous_names.append({"name": "Previous address", "value": address})
-            table_list.append(previous_names)
+                previous_addresses.append({"name": f"Previous address {order}", "value": address})
+                if record.moved_in_date:
+                    previous_addresses.append(
+                        {"name": f"Moved in date {order}", "value": record.moved_in_date.strftime('%d %B %Y')})
+                if record.moved_out_date:
+                    previous_addresses.append(
+                        {"name": f"Moved out date {order}", "value": record.moved_out_date.strftime('%d %B %Y')})
+
+            table_list.append(previous_addresses)
 
         elif model == AdultInHome:
             records = model.objects.filter(application_id=application.pk)

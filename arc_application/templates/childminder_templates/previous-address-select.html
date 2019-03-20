@@ -11,14 +11,16 @@
 
 {{form.error_summary}}
 
+<h1 class="form-title heading-large">
+                Previous {% if person_type == 'APPLICANT' %}home {% endif %}address {{previous_addresses|length|add:"1"}}
+            </h1>
+        {% include 'childminder_templates/previous-address-snippet.html' with queryset=previous_addresses %}
+
 <!-- Form -->
 <form method="post" novalidate {% if form.is_multipart %}enctype="multipart/form-data" {% endif %}>
     <!-- Content -->
     <div class="form-group">
-            <h1 class="form-title heading-large">
-                Previous {% if person_type == 'APPLICANT' %}home {% endif %}address {{previous_addresses|length|add:"1"}}
-            </h1>
-        {% include 'childminder_templates/previous-address-snippet.html' with queryset=previous_addresses %}
+
         {% if not form.errors %}
         <div id="id_postcode-group" class="form-group-required form-group">
             <label id="id_postcode-label" class="form-label-bold" for="id_postcode">
@@ -59,7 +61,7 @@
         <a href="{{ manual_url }}"
            name="manual" id="manual">Enter address manually</a>
         <input type="hidden" id="id" name="id" value="{{id}}"/>
-        <input type="hidden" name="state" value="entry"/>
+        <input type="hidden" name="state" value="selection"/>
         <input type="hidden" name="person_id" value="{{ person_id }}"/>
         <input type="hidden" name="person_type" value="{{ person_type }}"/>
     </div>

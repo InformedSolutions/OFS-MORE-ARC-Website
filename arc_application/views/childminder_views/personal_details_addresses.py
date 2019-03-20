@@ -1,14 +1,16 @@
 import re
+from datetime import date
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
+from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 
 from ...address_helper import AddressHelper
 from ...forms.previous_addresses import PreviousAddressEntryForm, PreviousAddressSelectForm, \
     PreviousAddressManualForm
-from ...models import PreviousAddress
+from ...models import PreviousAddress, ApplicantPersonalDetails
 from ...review_util import build_url
 from ...decorators import group_required, user_assigned_application
 
@@ -26,31 +28,30 @@ def personal_details_previous_address(request):
 
     state = request_data.get('state')
 
-    remove = request_data.get('remove')
+    remove = request_data.get('remove', False)
     if remove:
-        remove_regex = re.compile('remove-([A-Z])*\w+')
         remove_address_pk = get_remove_address_pk(request_data)
         remove_previous_address(previous_name_id=remove_address_pk)
 
     if state == 'entry':
-        return postcode_entry(request)
+        return postcode_entry(request, remove=remove)
 
     if state == 'selection':
-        return postcode_selection(request)
+        return postcode_selection(request, remove=remove)
 
     if state == 'manual':
-        return postcode_manual(request)
+        return postcode_manual(request, remove=remove)
 
     if state == 'submission':
         return postcode_submission(request)
 
     if state == 'update':
-        return address_update(request)
+        return address_update(request, remove=remove)
 
     raise ValueError('State not found. State: {0}'.format(state))
 
 
-def postcode_entry(request):
+def postcode_entry(request, remove=False):
     """
     Function to refer the user to the postcode entry page, or redirect them appropriately should it be a POST request
     :param request: Standard Httprequest object
@@ -58,11 +59,11 @@ def postcode_entry(request):
     """
     context = get_context(request)
 
-    if request.method == 'GET':
+    if request.method == 'GET' or remove is True:
         context['form'] = PreviousAddressEntryForm()
         return render(request, 'childminder_templates/previous-address-select.html', context)
 
-    if request.method == 'POST':
+    elif request.method == 'POST':
 
         if 'add-another' in request.POST:
             form = PreviousAddressEntryForm()
@@ -81,7 +82,7 @@ def postcode_entry(request):
         return render(request, 'childminder_templates/previous-address-select.html', context)
 
 
-def postcode_selection(request):
+def postcode_selection(request, remove=False):
     """
     Function to allow the user to select the postcode from the list, or redirect appropriately
     :param request: Standard Httprequest object
@@ -89,16 +90,17 @@ def postcode_selection(request):
     """
     context = get_context(request)
 
-    if request.method == 'GET':
+    if request.method == 'GET' or remove is True:
         # Call addressing API with entered postcode
-        addresses = AddressHelper.create_address_lookup_list(context['postcode'])
+        postcode = context.get('postcode', None)
+        addresses = AddressHelper.create_address_lookup_list(postcode)
 
         # Populate form for page with choices from this API call
         context['form'] = PreviousAddressSelectForm(choices=addresses)
 
         return render(request, 'childminder_templates/previous-address-lookup.html', context)
 
-    if request.method == 'POST':
+    elif request.method == 'POST':
         addresses = AddressHelper.create_address_lookup_list(request.POST['postcode'])
 
         if 'postcode-search' in request.POST:
@@ -114,7 +116,7 @@ def postcode_selection(request):
     return render(request, 'childminder_templates/previous-address-lookup.html', context)
 
 
-def postcode_manual(request):
+def postcode_manual(request, remove=False):
     """
     Function to allow the user to manually enter an address, or be redirected appropriately
     :param request: Standard Httprequest object
@@ -122,13 +124,13 @@ def postcode_manual(request):
     """
     context = get_context(request)
 
-    if request.method == 'GET':
+    if request.method == 'GET' or remove is True:
         context['form'] = PreviousAddressManualForm()
         return render(request, 'childminder_templates/other-people-previous-address-manual.html', context)
 
-    if request.method == 'POST':
+    elif request.method == 'POST':
         current_form = PreviousAddressManualForm(request.POST)
-        context['postcode'] = request.POST['postcode2']
+        context['postcode'] = request.POST['postcode']
         context['form'] = current_form
 
         if current_form.is_valid():
@@ -160,8 +162,16 @@ def postcode_submission(request):
             county = ''
             postcode = selected_address['postcode']
 
-        moved_in_date = request.POST['moved_in_date']
-        moved_out_date = request.POST['moved_out_date']
+        moved_in_day = int(request.POST['moved_in_date_0'])
+        moved_in_month = int(request.POST['moved_in_date_1'])
+        moved_in_year = int(request.POST['moved_in_date_2'])
+
+        moved_out_day = int(request.POST['moved_out_date_0'])
+        moved_out_month = int(request.POST['moved_out_date_1'])
+        moved_out_year = int(request.POST['moved_out_date_2'])
+
+        moved_in_date = date(moved_in_year, moved_in_month, moved_in_day)
+        moved_out_date = date(moved_out_year, moved_out_month, moved_out_day)
 
         # Actual saving is the same regardless of lookup, so done beneath
         previous_address_record = create_previous_address(
@@ -180,13 +190,17 @@ def postcode_submission(request):
         previous_address_record.moved_out_date = moved_out_date
         previous_address_record.save()
 
+        # If updating a record related to the applicant, set their moved in/out dates for their current address
+        if previous_address_record.person_type == 'APPLICANT':
+            update_applicant_current_address(previous_address_record.person_id)
+
         if 'save-and-continue' in request.POST:
             return HttpResponseRedirect(build_url('personal_details_summary', get={'id': request.POST['id']}))
         elif 'add-another' in request.POST:
             return postcode_entry(request)
 
 
-def address_update(request):
+def address_update(request, remove=False):
     """
     Function to allow the user to update an entry to the address table from the other people summary page
     :param request: Standard Httprequest object
@@ -194,11 +208,15 @@ def address_update(request):
     """
     context = get_context(request)
 
+    if remove:
+        return HttpResponseRedirect(build_url('personal_details_summary', get={'id': context['id']}))
+
     if request.method == 'GET':
-        context['form'] = PreviousAddressManualForm(id=request.GET['address_id'])
+        record = get_previous_address(pk=request.GET['address_id'])
+        context['form'] = PreviousAddressManualForm(record=record)
         return render(request, 'childminder_templates/previous-address-manual-update.html', context)
 
-    if request.method == 'POST':
+    elif request.method == 'POST':
         address_id = context['address_id']
         address_record = get_previous_address(address_id)
 
@@ -208,8 +226,8 @@ def address_update(request):
         if current_form.is_valid():
             # For ease of use, update saving is done here rather than in submission section, adding it would make it
             # harder to understand
-            address_record.street_line1 = current_form.cleaned_data['street_name_and_number']
-            address_record.street_line2 = current_form.cleaned_data['street_name_and_number2']
+            address_record.street_line1 = current_form.cleaned_data['street_line1']
+            address_record.street_line2 = current_form.cleaned_data['street_line2']
             address_record.town = current_form.cleaned_data['town']
             address_record.county = current_form.cleaned_data['county']
             address_record.country = 'United Kingdom'
@@ -221,18 +239,13 @@ def address_update(request):
 
             address_record.save()
 
+            # If updating a record related to the applicant, set their moved in/out dates for their current address
+            if address_record.person_type == 'APPLICANT':
+                update_applicant_current_address(address_record.person_id)
+
             return HttpResponseRedirect(build_url('personal_details_summary', get={'id': context['id']}))
 
         return render(request, 'childminder_templates/previous-address-manual-update.html', context)
-
-
-def remove_address(request, redirect_name=None):
-    """
-    View to remove an address and redirect to the relevant page
-    :param redirect_name: Kwarg that allows for a specific page to be redirected to (Path NAME).
-    :return:
-    """
-    pass
 
 
 def get_stored_addresses(person_id, person_type):
@@ -242,7 +255,10 @@ def get_stored_addresses(person_id, person_type):
     :param person_type: Whether the person is an adult or child
     :return:
     """
-    return filter_previous_address(person_id=person_id, person_type=person_type)
+    unsorted_addresses = filter_previous_address(person_id=person_id, person_type=person_type)
+
+    # If an address does not have an order associated with it, display these addresses first.
+    return sorted(unsorted_addresses, key=lambda address: address.order if address.order else 0)
 
 
 def get_context(request):
@@ -289,7 +305,8 @@ def get_post_data(request):
         'address',
         'lookup',
         'address_id',
-        'referrer'
+        'referrer',
+        'state'
     ]
 
     post_data_vars = dict((var, getattr(request, request.method).get(var, None)) for var in post_vars_to_check)
@@ -331,21 +348,40 @@ def filter_previous_address(**kwargs):
 
 
 def create_previous_address(**kwargs):
-    if kwargs.get('country'):
+    if kwargs.get('country') is not None:
         country = kwargs.pop('country')
     else:
         # Default
         country = 'United Kingdom'
 
-    previous_address_record = PreviousAddress(**kwargs)
+    if kwargs.get('order') is not None:
+        # If order is being set
+        order = kwargs.pop('order')
+    else:
+        # Calculate order
+        person_id = kwargs.get('person_id')
+        person_type = kwargs.get('person_type')
+
+        stored_address = get_stored_addresses(person_id, person_type)
+        order = len(stored_address) + 1
+
+    previous_address_record = PreviousAddress(**kwargs, country=country, order=order)
     previous_address_record.save()
 
     return previous_address_record
 
 
 def remove_previous_address(**kwargs):
-    previous_address_record = PreviousAddress.objects.get(**kwargs)
-    previous_address_record.delete()
+    """
+    :param kwargs: kwargs for getting the PreviousAddress record, must contain information to select exactly one record.
+    :return: None
+    """
+    try:
+        previous_address_record = PreviousAddress.objects.get(**kwargs)
+        previous_address_record.delete()
+    except ObjectDoesNotExist:
+        # If the address cannot be found, we assume that the user has already deleted the address.
+        pass
 
 
 def get_remove_address_pk(request_data):
@@ -354,3 +390,29 @@ def get_remove_address_pk(request_data):
             return key[7:]
 
     raise ValueError('No address pk to remove found in request_data')
+
+
+def update_applicant_current_address(application_id):
+    applicant_personal_details_record = ApplicantPersonalDetails.objects.get(application_id=application_id)
+    previous_address_records = PreviousAddress.objects.filter(person_id=application_id)
+
+    if not previous_address_records:
+        # Set moved_in_date to Applicant's DOB
+        applicant_personal_details_record.moved_in_date = applicant_personal_details_record.date_of_birth
+
+    else:
+        # Set moved_in_date to latest moved_out_date of previous addresses
+        moved_out_date = get_latest_moved_out_date(previous_address_records)
+
+    applicant_personal_details_record.moved_out_date = date.today()
+    applicant_personal_details_record.save()
+
+
+def get_latest_moved_out_date(previous_address_list):
+    # Construct a list of moved_out_dates, removes redundant data
+    moved_out_date_list = [address.moved_out_date for address in previous_address_list if
+                           address.moved_out_date is not None]
+
+    # Return the first element of the sorted list, as this will be the greatest moved_out_date
+    latest_moved_out_date = sorted(moved_out_date_list, reverse=True)[0]
+    return latest_moved_out_date

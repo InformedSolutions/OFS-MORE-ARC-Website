@@ -19,9 +19,9 @@
         </h1>
 
         {{form.as_div}}
-        {% csrf_token %}
     </div>
 
+    {% csrf_token %}
     <input type="hidden" id="id" name="id" value="{{id}}"/>
     <input type="hidden" name="state" value="update"/>
     <input type="hidden" name="person_id" value="{{ person_id }}"/>
@@ -30,6 +30,24 @@
 
     <input type="submit" class="button" value="Save and continue">
 </form>
+
+<br>
+
+<form action="{% url 'personal_details_previous_addresses' %}">
+    {% csrf_token %}
+    <input type="hidden" name="id" value="{{id}}"/>
+    <input type="hidden" name="person_id" value="{{ person_id }}"/>
+    <input type="hidden" name="state" value="{{state}}"/>
+    <input type="hidden" name="person_type" value="APPLICANT"/>
+    <input type="hidden" name="remove" value="1"/>
+
+    <input class="hidden-link-2"
+           type="submit"
+           value="Remove this address"
+           name="remove-{{address_id}}"
+           id="remove-{{address_id}}"/>
+</form>
+<br>
 
 {% include 'childminder_templates/return-to-list.html' %}
 
