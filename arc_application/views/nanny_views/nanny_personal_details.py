@@ -3,6 +3,7 @@ import datetime
 from .nanny_form_view import NannyARCFormView
 from ...forms.nanny_forms.nanny_form_builder import HomeAddressForm, PersonalDetailsForm, PreviousRegistrationForm
 from ...services.db_gateways import NannyGatewayActions
+import inflect
 
 
 class NannyPersonalDetailsSummary(NannyARCFormView):
@@ -88,6 +89,46 @@ class NannyPersonalDetailsSummary(NannyARCFormView):
             if previous_registration is True:
                 show_individual_id = True
 
+        previous_names_response = nanny_actions.list('previous-name',
+                                                               params={'application_id': application_id})
+
+        previous_names = []
+        inflect_engine = inflect.engine()
+        if previous_names_response.status_code == 200:
+            previous_names_list = previous_names_response.record
+            for name in previous_names_list:
+                first_name = name['first_name']
+                middle_names = name['middle_names']
+                last_name = name['last_name']
+                full_name = "{0} {1} {2}".format(first_name, middle_names, last_name)
+                start_date = "{0}/{1}/{2}".format(name['start_day'], name['start_month'], name['start_year'])
+                end_date = "{0}/{1}/{2}".format(name['end_day'], name['end_month'], name['end_year'])
+                order = str(name['order'] + 1)
+                ordinal = inflect_engine.ordinal(inflect_engine.number_to_words(order))
+                previous_names.append(
+                    {
+                        'id': 'previous_name',
+                        'name': 'Previous name '+ order,
+                        'info': full_name,
+                        'change_link': 'nanny_previous_names',
+                        'alt_text': "Change the {0} previous name".format(ordinal)
+                    })
+                previous_names.append(
+                    {
+                        'id': 'start_date',
+                        'name': 'Start date',
+                        'info':start_date,
+                        'change_link': 'nanny_previous_names',
+                        'alt_text': "Change the start date for the {0} previous name".format(ordinal)
+                    })
+                previous_names.append(
+                    {
+                     'id': 'end_date',
+                     'name': 'End date',
+                     'info': end_date,
+                    'change_link': 'nanny_previous_names',
+                        'alt_text':"Change the end date for the {0} previous name".format(ordinal)
+                     })
 
 
         context = {
@@ -105,15 +146,21 @@ class NannyPersonalDetailsSummary(NannyARCFormView):
                     # Prevent checkbox appearing if summary page is calling get_context_data.
                     'declare': personal_details_form['name_declare'] if hasattr(self, 'request') else '',
                     'comments': personal_details_form['name_comments'],
-                },
-                {
+                }]}
+
+        if any(previous_names):
+            context['rows'] += previous_names
+
+
+        context['rows'].append({
                     'id': 'date_of_birth',
                     'name': 'Date of birth',
                     'info': dob_string_with_month,
                     'declare': personal_details_form['date_of_birth_declare'] if hasattr(self, 'request') else '',
                     'comments': personal_details_form['date_of_birth_comments'],
-                },
-                {
+                })
+
+        context['rows'].append ({
                     'id': 'home_address',
                     'name': 'Your home address',
                     'declare': home_address_form['home_address_declare'] if hasattr(self, 'request') else '',
@@ -125,7 +172,9 @@ class NannyPersonalDetailsSummary(NannyARCFormView):
                         'county': county,
                         'postcode': postcode,
                     }
-                },
+                })
+
+        context['rows'].append(
                 {
                     'id': 'known_to_social_services',
                     'name': 'Known to council social Services?',
@@ -134,9 +183,8 @@ class NannyPersonalDetailsSummary(NannyARCFormView):
                                                                                                     'request') else '',
                     'comments': personal_details_form['known_to_social_services_comments'],
 
-                }
-            ]
-        }
+                })
+
 
         if known_to_social_services is True:
             context['rows'].append(

@@ -46,6 +46,8 @@
             <a class="change-answer" href="{% url row.change_link %}?id={{ application_id }}">Change</a>
         {% elif context.change_link %}
             <a class="change-answer" href="{% url context.change_link %}?id={{ application_id }}">Change</a>
+        {% elif row.id|template_string_in_list:'previous_name start_date end_date' and row.change_link %}
+            <a class="change-answer" alt="{{row.alt_text}}" href="{% url row.change_link %}?id={{ application_id }}">Change</a>
         {% endif %}
     </td>
 </tr>
