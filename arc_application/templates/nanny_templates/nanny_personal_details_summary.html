@@ -30,6 +30,9 @@
         {% if row.id|template_string_in_list:'name date_of_birth' %}
         {% include 'nanny_general_table_template.html' %}
         {% endif %}
+        {% if row.id|template_string_in_list:'previous_name start_date end_date' %}
+        {% include 'nanny_general_table_template.html' %}
+        {% endif %}
         {% endfor %}
 
         </tbody>
