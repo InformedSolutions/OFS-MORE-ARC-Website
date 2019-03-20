@@ -42,7 +42,7 @@ from arc_application.views.nanny_views import (
     NannyTaskList, NannyContactDetailsSummary, NannyPersonalDetailsSummary, NannyPreviousRegistrationView,
     NannyChildcareAddressSummary, NannyFirstAidTrainingSummary, NannyChildcareTrainingSummary,
     NannyDbsCheckSummary, NannyInsuranceCoverSummary, NannyArcSummary, NannyArcSummaryConfirmation,
-    NannyPreviousAddressesView,
+    NannyPreviousAddressesView, NannyChangePreviousAddressView,
 )
 
 from django.conf import settings
@@ -115,6 +115,8 @@ if settings.ENABLE_NANNIES:
         url(r'^nanny/contact-details/', NannyContactDetailsSummary.as_view(), name='nanny_contact_summary'),
         url(r'^nanny/personal-details/review/', NannyPersonalDetailsSummary.as_view(),
             name='nanny_personal_details_summary'),
+        url(r'^nanny/personal-details/previous-address/', NannyChangePreviousAddressView.as_view(),
+            name='nanny_change_previous_address'),
         url(r'^nanny/personal-details/previous-addresses/', NannyPreviousAddressesView.as_view(),
             name='nanny_previous_addresses'),
         url(r'^nanny/personal-details/previous-registration/', NannyPreviousRegistrationView.as_view(),

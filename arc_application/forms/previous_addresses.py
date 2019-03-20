@@ -9,9 +9,7 @@ from .. import form_fields
 
 
 class PreviousAddressEntryForm(GOVUKForm):
-    """
-    GOV.UK form for the Your children's address page for postcode search
-    """
+
     ERROR_MESSAGE_POSTCODE_NOT_ENTERED = 'Please enter your postcode'
     ERROR_MESSAGE_POSTCODE_INVALID = 'Please enter a valid postcode'
 
@@ -262,7 +260,6 @@ class PreviousAddressManualForm(GOVUKForm):
             self.fields['postcode'].initial = record.postcode
             self.fields['moved_in_date'].initial = record.moved_in_date
             self.fields['moved_out_date'].initial = record.moved_out_date
-
 
     def clean(self):
         super().clean()

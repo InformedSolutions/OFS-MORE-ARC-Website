@@ -137,8 +137,8 @@ class NannyPersonalDetailsSummary(NannyARCFormView):
             },
         ]
         for i, prev_addr in enumerate(previous_addresses or []):
-            addr_change_view = 'nanny_previous_addresses'
-            addr_change_params = urlencode({'person_id': application_id, 'type': 'APPLICANT'})
+            addr_change_view = 'nanny_change_previous_address'
+            addr_change_params = urlencode({'previous_address_id': prev_addr['previous_address_id']})
             rows.extend([
                 {
                     'id': 'previous_home_address'.format(i+1),
