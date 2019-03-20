@@ -48,13 +48,16 @@
         <tbody>
 
         {% for row in rows %}
-        {% if row.id|template_string_in_list:'home_address lived_abroad' %}
+        {% if row.id|template_string_in_list:'home_address lived_abroad previous_home_address' %}
         {% include 'nanny_general_table_template.html' %}
         {% endif %}
         {% endfor %}
 
         </tbody>
     </table>
+
+    <a href="{% url 'nanny_previous_addresses' %}?id={{ application_id }}&amp;person_id={{ application_id }}&amp;type=APPLICANT"
+       class="button button-secondary">Add previous addresses</a>
 
     <table class="check-your-answers form-group">
         <thead>
@@ -155,7 +158,7 @@
         {% for row in rows %}
             {% if row.id == 'name' %}
             {% if not row.id|template_string_in_list:'previous_registration' %}
-            <a href="{% url 'nanny_previous_registration' %}?id={{ application_id }}&person_id={{ application_id }}&type=APPLICANT"
+            <a href="{% url 'nanny_previous_registration' %}?id={{ application_id }}&amp;person_id={{ application_id }}&amp;type=APPLICANT"
                class="button button-secondary">Add previous registration</a>
             <br>
             {% endif %}

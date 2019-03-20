@@ -1,5 +1,7 @@
-import inflect
 from django import template
+
+from ..utils import spatial_ordinal
+
 
 register = template.Library()
 
@@ -12,9 +14,4 @@ def number_to_spatial_ordinal(value):
     :param value:
     :return:
     """
-    engine = inflect.engine()
-
-    abbreviated = engine.ordinal(value)
-    ordinal = engine.number_to_words(abbreviated)
-
-    return ordinal
+    return spatial_ordinal(value)
