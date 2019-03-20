@@ -61,14 +61,14 @@ def postcode_entry(request, remove=False):
 
     if request.method == 'GET' or remove is True:
         context['form'] = PreviousAddressEntryForm()
-        return render(request, 'childminder_templates/previous-address-select.html', context)
+        return render(request, 'childminder_templates/previous-address-entry.html', context)
 
     elif request.method == 'POST':
 
         if 'add-another' in request.POST:
             form = PreviousAddressEntryForm()
             context['form'] = form
-            return render(request, 'previous-address-select.html', context)
+            return render(request, 'childminder_templates/previous-address-entry.html', context)
 
         form = PreviousAddressEntryForm(request.POST)
         context['form'] = form
@@ -79,7 +79,7 @@ def postcode_entry(request, remove=False):
             if 'postcode-search' in request.POST:
                 return postcode_selection(request)
 
-        return render(request, 'childminder_templates/previous-address-select.html', context)
+        return render(request, 'childminder_templates/previous-address-entry.html', context)
 
 
 def postcode_selection(request, remove=False):
@@ -98,14 +98,14 @@ def postcode_selection(request, remove=False):
         # Populate form for page with choices from this API call
         context['form'] = PreviousAddressSelectForm(choices=addresses)
 
-        return render(request, 'childminder_templates/previous-address-lookup.html', context)
+        return render(request, 'childminder_templates/previous-address-select.html', context)
 
     elif request.method == 'POST':
         addresses = AddressHelper.create_address_lookup_list(request.POST['postcode'])
 
         if 'postcode-search' in request.POST:
             context['form'] = PreviousAddressSelectForm(choices=addresses)
-            return render(request, 'previous-address-lookup.html', context)
+            return render(request, 'childminder_templates/previous-address-select.html', context)
 
         current_form = PreviousAddressSelectForm(request.POST, choices=addresses)
         context['form'] = current_form
@@ -113,7 +113,7 @@ def postcode_selection(request, remove=False):
         if current_form.is_valid():
             return postcode_submission(request)
 
-    return render(request, 'childminder_templates/previous-address-lookup.html', context)
+    return render(request, 'childminder_templates/previous-address-select.html', context)
 
 
 def postcode_manual(request, remove=False):
@@ -126,7 +126,7 @@ def postcode_manual(request, remove=False):
 
     if request.method == 'GET' or remove is True:
         context['form'] = PreviousAddressManualForm()
-        return render(request, 'childminder_templates/other-people-previous-address-manual.html', context)
+        return render(request, 'childminder_templates/previous-address-manual.html', context)
 
     elif request.method == 'POST':
         current_form = PreviousAddressManualForm(request.POST)
@@ -136,7 +136,7 @@ def postcode_manual(request, remove=False):
         if current_form.is_valid():
             return postcode_submission(request)
 
-        return render(request, 'childminder_templates/other-people-previous-address-manual.html', context)
+        return render(request, 'childminder_templates/previous-address-manual.html', context)
 
 
 def postcode_submission(request):
@@ -214,7 +214,7 @@ def address_update(request, remove=False):
     if request.method == 'GET':
         record = get_previous_address(pk=request.GET['address_id'])
         context['form'] = PreviousAddressManualForm(record=record)
-        return render(request, 'childminder_templates/previous-address-manual-update.html', context)
+        return render(request, 'childminder_templates/previous-address-change.html', context)
 
     elif request.method == 'POST':
         address_id = context['address_id']
@@ -245,7 +245,7 @@ def address_update(request, remove=False):
 
             return HttpResponseRedirect(build_url('personal_details_summary', get={'id': context['id']}))
 
-        return render(request, 'childminder_templates/previous-address-manual-update.html', context)
+        return render(request, 'childminder_templates/previous-address-change.html', context)
 
 
 def get_stored_addresses(person_id, person_type):
