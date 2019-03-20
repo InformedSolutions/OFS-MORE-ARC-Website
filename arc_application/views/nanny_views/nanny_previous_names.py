@@ -35,11 +35,11 @@ def nanny_add_previous_name(request):
             # id will be blank if user is removing the new, empty form. Can safely ignore
             if delete_id != '':
                 response = NannyGatewayActions().delete('previous-name',
-                                           params={'id': delete_id, 'application_id':app_id})
+                                           params={'previous_name_id': delete_id})
 
 
             # redirect back to page
-            return _previous_names_page_redirect(app_id, show_extra=False)
+            return _previous_names_page_redirect(app_id)
 
         # other operation require validation of form to update list of previous names
         if not formset.is_valid():
@@ -91,7 +91,7 @@ def _previous_names_page_redirect(app_id, show_extra=None):
     return HttpResponseRedirect(build_url(nanny_add_previous_name, get=params))
 
 
-def _previous_names_page_formset(data=None, initial=None, show_extra=True):
+def _previous_names_page_formset(data=None, initial=None, show_extra=False):
 
     # create formset type and instantiate
     PreviousNameFormset = formset_factory(PersonPreviousNameForm, extra=1 if show_extra else 0)
@@ -109,14 +109,10 @@ def _fetch_previous_names(application_id, show_extra=None):
     # Grab data already in table for the passed in person_id of the right person_type
     response = NannyGatewayActions().list('previous-name', params={'application_id': application_id})
     initial_data = []
-    show_extra = None
 
     # Determine whether to show additional empty form in formset
     if response.status_code == 200:
         names = response.record
-        if show_extra is None:
-            show_extra = len(names) == 0
-
 
         # prepare form data
         initial_data = [{
@@ -128,18 +124,19 @@ def _fetch_previous_names(application_id, show_extra=None):
             'end_date': date(m['end_year'], m['end_month'], m['end_day']),
         } for m in names]
 
+    else:
+        show_extra = True
+
     # create and return formset
-    return _previous_names_page_formset(initial=initial_data, show_extra=False)
+    return _previous_names_page_formset(initial=initial_data, show_extra=show_extra)
 
 
 def _replace_previous_names(application_id, formset):
 
-    # remove existing names
-    NannyGatewayActions().delete('previous-name', params={'application_id':application_id})
-
     # save new names
     for i, form in enumerate(formset):
-        NannyGatewayActions().create('previous-name', params = {
+        NannyGatewayActions().delete('previous-name', params={'previous_name_id': form.cleaned_data['previous_name_id']})
+        NannyGatewayActions().create('previous-name', params={
             'application_id': application_id,
             'first_name': form.cleaned_data['first_name'],
             'middle_names': form.cleaned_data['middle_names'],
