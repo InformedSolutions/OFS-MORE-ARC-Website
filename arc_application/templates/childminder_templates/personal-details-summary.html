@@ -129,7 +129,7 @@
         <tr>
             <th colspan="3">
                 <div class="heading-medium">
-                    Your home and childcare address
+                    Home and childcare address
                 </div>
             </th>
         </tr>
@@ -175,6 +175,75 @@
                 </div>
             </td>
         </tr>
+
+        {% for address in previous_addresses %}
+        <tr>
+            <td>
+                Your previous home address {{ forloop.counter }}
+            </td>
+            <td>
+                {{address.street_line1}}{% if address.street_line1 %}<br/>{% endif %}
+                {{address.street_line2}}{% if address.street_line2 %}<br/>{% endif %}
+                {{address.town}}{% if address.town %}<br/>{% endif %}
+                {{address.county}}{% if address.county %}<br/>{% endif %}
+                {{address.country}}{% if address.country %}<br/>{% endif %}
+                {{address.postcode}}{% if address.postcode %}<br/>{% endif %}
+            </td>
+            <td class="change-answer">
+                <a href="{% url 'personal_details_previous_addresses_change' %}?id={{ application_id }}&state=update&person_id={{ application_id }}&person_type=APPLICANT&address_id={{address.pk}}"
+                   alt="Change the {{ forloop.counter|inflect }} previous address">Change</a>
+            </td>
+        </tr>
+
+        {% if address.moved_in_date %}
+        <tr>
+            <td>
+                Moved in
+            </td>
+            <td>
+                {{ address.moved_in_date|date:"d F Y" }}
+            </td>
+            <td class="change-answer">
+                <a href="{% url 'personal_details_previous_addresses_change' %}?id={{ application_id }}&state=update&person_id={{ application_id }}&person_type=APPLICANT&address_id={{address.pk}}"
+                   alt="Change the move in date for {{ forloop.counter|inflect }} previous address">Change</a>
+            </td>
+
+        </tr>
+        {% endif %}
+
+        {% if address.moved_out_date %}
+        <tr>
+            <td>
+                Moved out
+            </td>
+            <td>
+                {{ address.moved_out_date|date:"d F Y" }}
+            </td>
+            <td class="change-answer">
+                <a href="{% url 'personal_details_previous_addresses_change' %}?id={{ application_id }}&state=update&person_id={{ application_id }}&person_type=APPLICANT&address_id={{address.pk}}"
+                   alt="Change the move out date for {{ forloop.counter|inflect }} previous address">Change</a>
+            </td>
+        </tr>
+        {% endif %}
+
+        {% endfor %}
+
+        <tr class="js-hidden" id="childcare_address">
+            <td colspan="1">
+                <div>
+                    Enter your reasoning
+                </div>
+                <div>
+                    {{ form.childcare_address_comments.help_text}}
+                </div>
+            </td>
+            <td colspan="2">
+                <div>
+                    {{ form.childcare_address_comments}}
+                </div>
+            </td>
+        </tr>
+
         <tr>
             <td>
                 Childcare address
@@ -209,73 +278,6 @@
             </td>
         </tr>
 
-        {% for address in previous_addresses %}
-        <tr>
-            <td>
-                Your previous home address {{ forloop.counter }}
-            </td>
-            <td>
-                {{address.street_line1}}{% if address.street_line1 %}<br/>{% endif %}
-                {{address.street_line2}}{% if address.street_line2 %}<br/>{% endif %}
-                {{address.town}}{% if address.town %}<br/>{% endif %}
-                {{address.county}}{% if address.county %}<br/>{% endif %}
-                {{address.country}}{% if address.country %}<br/>{% endif %}
-                {{address.postcode}}{% if address.postcode %}<br/>{% endif %}
-            </td>
-            <td class="change-answer">
-                <a href="{% url 'personal_details_previous_addresses' %}?id={{ application_id }}&state=update&person_id={{ application_id }}&person_type=APPLICANT&address_id={{address.pk}}"
-                   alt="Change the {{ forloop.counter|inflect }} previous address">Change</a>
-            </td>
-        </tr>
-
-        {% if address.moved_in_date %}
-        <tr>
-            <td>
-                Moved in date {{ forloop.counter }}
-            </td>
-            <td>
-                {{ address.moved_in_date|date:"d F Y" }}
-            </td>
-            <td class="change-answer">
-                <a href="{% url 'personal_details_previous_addresses' %}?id={{ application_id }}&state=update&person_id={{ application_id }}&person_type=APPLICANT&address_id={{address.pk}}"
-                   alt="Change the moved in date for {{ forloop.counter|inflect }} previous address">Change</a>
-            </td>
-
-        </tr>
-        {% endif %}
-
-        {% if address.moved_out_date %}
-        <tr>
-            <td>
-                Moved out date {{ forloop.counter }}
-            </td>
-            <td>
-                {{ address.moved_out_date|date:"d F Y" }}
-            </td>
-            <td class="change-answer">
-                <a href="{% url 'personal_details_previous_addresses' %}?id={{ application_id }}&state=update&person_id={{ application_id }}&person_type=APPLICANT&address_id={{address.pk}}"
-                   alt="Change the moved out date for {{ forloop.counter|inflect }} previous address">Change</a>
-            </td>
-        </tr>
-        {% endif %}
-
-        {% endfor %}
-
-        <tr class="js-hidden" id="childcare_address">
-            <td colspan="1">
-                <div>
-                    Enter your reasoning
-                </div>
-                <div>
-                    {{ form.childcare_address_comments.help_text}}
-                </div>
-            </td>
-            <td colspan="2">
-                <div>
-                    {{ form.childcare_address_comments}}
-                </div>
-            </td>
-        </tr>
         <tr>
             <td>
                 Is this another childminder's home?

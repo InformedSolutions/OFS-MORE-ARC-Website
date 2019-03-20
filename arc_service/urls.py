@@ -56,7 +56,7 @@ from django.contrib import admin
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import logout
 
-from arc_application.views.childminder_views.personal_details_addresses import personal_details_previous_address
+from arc_application.views.childminder_views.personal_details_addresses import personal_details_previous_address, personal_details_previous_address_change
 
 
 urlpatterns = [
@@ -77,6 +77,7 @@ urlpatterns = [
     url(r'^personal-details/previous-names/', add_previous_name, name='personal_details_previous_names'),
     url(r'^personal-details/previous-addresses', personal_details_previous_address,
         name='personal_details_previous_addresses'),
+    url(r'^personal-details/previous-address$', personal_details_previous_address_change, name='personal_details_previous_addresses_change'),
     url(r'^first-aid/summary/', first_aid_training_summary, name='first_aid_training_summary'),
     url(r'^dbs-check/summary/', dbs_check_summary, name='dbs_check_summary'),
     url(r'^childcare-training-check/summary/', ChildcareTrainingCheckSummaryView.as_view(),

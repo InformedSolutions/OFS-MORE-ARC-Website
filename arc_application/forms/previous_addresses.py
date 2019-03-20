@@ -17,7 +17,7 @@ class PreviousAddressEntryForm(GOVUKForm):
 
     field_label_classes = 'form-label-bold'
     auto_replace_widgets = True
-    error_summary_title = 'There was a problem on this page'
+    error_summary_title = 'There was a problem'
 
     postcode = forms.CharField(label='Postcode', error_messages={'required': 'Please enter your postcode'})
 
@@ -57,7 +57,7 @@ class PreviousAddressSelectForm(GOVUKForm):
 
     auto_replace_widgets = True
     field_label_classes = 'form-label-bold'
-    error_summary_title = 'There was a problem on this page'
+    error_summary_title = 'There was a problem'
 
     address = forms.ChoiceField(
         label='Select address',
@@ -67,7 +67,7 @@ class PreviousAddressSelectForm(GOVUKForm):
     moved_in_date = form_fields.CustomSplitDateField(
         label='Moved in',
         required=True,
-        help_text='For example, 31 03 1980',
+        help_text='For example, 31 3 1980',
         min_value=None,
         max_value=form_fields.CustomSplitDateField.TODAY,
         allow_short_year=False,
@@ -90,7 +90,7 @@ class PreviousAddressSelectForm(GOVUKForm):
     moved_out_date = form_fields.CustomSplitDateField(
         label='Moved out',
         required=True,
-        help_text='For example, 31 03 1980',
+        help_text='For example, 31 3 1980',
         min_value=None,
         max_value=form_fields.CustomSplitDateField.TODAY,
         allow_short_year=False,
@@ -125,7 +125,7 @@ class PreviousAddressSelectForm(GOVUKForm):
         # check start date is after end date
         start_date = self.cleaned_data.get('moved_in_date', None)
         end_date = self.cleaned_data.get('moved_out_date', None)
-        if start_date and end_date and end_date < start_date:
+        if start_date and end_date and end_date <= start_date:
             self.add_error('moved_in_date', self.ERROR_MESSAGE_MOVED_IN_DATE_AFTER_MOVED_OUT_DATE)
             self.add_error('moved_out_date', self.ERROR_MESSAGE_MOVED_OUT_DATE_BEFORE_MOVED_IN_DATE)
 
@@ -170,7 +170,7 @@ class PreviousAddressManualForm(GOVUKForm):
 
     auto_replace_widgets = True
     field_label_classes = 'form-label-bold'
-    error_summary_title = 'There was a problem on this page'
+    error_summary_title = 'There was a problem'
 
     street_line1 = forms.CharField(
         label='Address line 1',
@@ -270,7 +270,7 @@ class PreviousAddressManualForm(GOVUKForm):
         # check start date is after end date
         start_date = self.cleaned_data.get('moved_in_date', None)
         end_date = self.cleaned_data.get('moved_out_date', None)
-        if start_date and end_date and end_date < start_date:
+        if start_date and end_date and end_date <= start_date:
             self.add_error('moved_in_date', self.ERROR_MESSAGE_MOVED_IN_DATE_AFTER_MOVED_OUT_DATE)
             self.add_error('moved_out_date', self.ERROR_MESSAGE_MOVED_OUT_DATE_BEFORE_MOVED_IN_DATE)
 
