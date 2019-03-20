@@ -323,14 +323,14 @@ def get_link_urls(url_variables_dict):
     context = dict()
 
     # List url does not require a new state, so set after state changes, once it has been reset
-    context['list_url'] = build_url('personal_details_summary', get={'id': url_variables_dict['id']})
+    context['list_url'] = build_url('other_people_summary', get={'id': url_variables_dict['id']})
 
     # These two urls need certain 'states' to be built, therefore state is saved then changed, and finally reset
     url_variables_dict['state'] = 'manual'
-    context['manual_url'] = build_url('personal_details_previous_addresses', get=url_variables_dict)
+    context['manual_url'] = build_url('other-people-previous-addresses', get=url_variables_dict)
 
     url_variables_dict['state'] = 'entry'
-    context['entry_url'] = build_url('personal_details_previous_addresses', get=url_variables_dict)
+    context['entry_url'] = build_url('other-people-previous-addresses', get=url_variables_dict)
 
     return context
 
