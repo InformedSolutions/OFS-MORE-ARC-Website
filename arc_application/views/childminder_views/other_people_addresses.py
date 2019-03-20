@@ -191,7 +191,7 @@ def postcode_submission(request):
         previous_address_record.save()
 
         if 'save-and-continue' in request.POST:
-            return HttpResponseRedirect(build_url('personal_details_summary', get={'id': request.POST['id']}))
+            return HttpResponseRedirect(build_url('other_people_summary', get={'id': request.POST['id']}))
         elif 'add-another' in request.POST:
             return postcode_entry(request)
 
@@ -205,7 +205,7 @@ def address_update(request, remove=False):
     context = get_context(request)
 
     if remove:
-        return HttpResponseRedirect(build_url('personal_details_summary', get={'id': context['id']}))
+        return HttpResponseRedirect(build_url('other_people_summary', get={'id': context['id']}))
 
     if request.method == 'GET':
         record = get_previous_address(pk=request.GET['address_id'])
@@ -239,7 +239,7 @@ def address_update(request, remove=False):
             if address_record.person_type == 'APPLICANT':
                 update_applicant_current_address(address_record.person_id)
 
-            return HttpResponseRedirect(build_url('personal_details_summary', get={'id': context['id']}))
+            return HttpResponseRedirect(build_url('other_people_summary', get={'id': context['id']}))
 
         return render(request, 'childminder_templates/previous-address-change.html', context)
 
@@ -386,29 +386,3 @@ def get_remove_address_pk(request_data):
             return key[7:]
 
     raise ValueError('No address pk to remove found in request_data')
-
-
-def update_applicant_current_address(application_id):
-    applicant_personal_details_record = ApplicantPersonalDetails.objects.get(application_id=application_id)
-    previous_address_records = PreviousAddress.objects.filter(person_id=application_id)
-
-    if not previous_address_records:
-        # Set moved_in_date to Applicant's DOB
-        applicant_personal_details_record.moved_in_date = applicant_personal_details_record.date_of_birth
-
-    else:
-        # Set moved_in_date to latest moved_out_date of previous addresses
-        moved_out_date = get_latest_moved_out_date(previous_address_records)
-
-    applicant_personal_details_record.moved_out_date = date.today()
-    applicant_personal_details_record.save()
-
-
-def get_latest_moved_out_date(previous_address_list):
-    # Construct a list of moved_out_dates, removes redundant data
-    moved_out_date_list = [address.moved_out_date for address in previous_address_list if
-                           address.moved_out_date is not None]
-
-    # Return the first element of the sorted list, as this will be the greatest moved_out_date
-    latest_moved_out_date = sorted(moved_out_date_list, reverse=True)[0]
-    return latest_moved_out_date
