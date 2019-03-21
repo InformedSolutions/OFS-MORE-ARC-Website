@@ -148,11 +148,20 @@ class NannyApplicationHandler(GenericApplicationHandler):
 
     def _get_oldest_app_id(self):
         response = NannyGatewayActions().list(
-            'application', params={'application_status': 'SUBMITTED', 'ordering': 'date_submitted'})
+            'application', params={'application_status': 'SUBMITTED', 'ordering':'date_updated'})
 
         if response.status_code == 200:
+            resubmitted_apps = []
             submitted_apps = response.record
-            return submitted_apps[0]['application_id']
+            for app in submitted_apps:
+                if app['date_updated'] > app['date_submitted']:
+                    resubmitted_apps.append(app)
+
+            if any(resubmitted_apps):
+                resubmitted_apps = sorted(resubmitted_apps, key=lambda i: i['date_updated'])
+                return resubmitted_apps[0]['application_id']
+            else:
+                return submitted_apps[0]['application_id']
 
         else:
             raise ObjectDoesNotExist('No applications available.')
