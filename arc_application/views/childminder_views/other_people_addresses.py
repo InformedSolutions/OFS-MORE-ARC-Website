@@ -1,4 +1,3 @@
-import re
 from datetime import date
 
 from django.conf import settings
@@ -8,11 +7,11 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render
 
 from ...address_helper import AddressHelper
+from ...decorators import group_required, user_assigned_application
 from ...forms.previous_addresses import PreviousAddressEntryForm, PreviousAddressSelectForm, \
     PreviousAddressManualForm
 from ...models import PreviousAddress
 from ...review_util import build_url
-from ...decorators import group_required, user_assigned_application
 
 
 @login_required
@@ -86,6 +85,7 @@ def postcode_selection(request, remove=False):
     :return:
     """
     context = get_context(request)
+    context['state'] = 'selection'
 
     if request.method == 'GET' or remove is True:
         # Call addressing API with entered postcode
@@ -144,6 +144,7 @@ def postcode_manual(request, remove=False, swap_to_manual=False, address=None):
     :return:
     """
     context = get_context(request)
+    context['state'] = 'manual'
 
     if request.method == 'GET' or remove is True or swap_to_manual is True:
         if not swap_to_manual:
@@ -225,15 +226,19 @@ def postcode_submission(request):
 @login_required
 @group_required(settings.ARC_GROUP)
 @user_assigned_application
-def people_in_the_home_previous_address_change(request, remove=False):
+def people_in_the_home_previous_address_change(request):
     """
     Function to allow the user to update an entry to the address table from the other people summary page
     :param request: Standard Httprequest object
     :return:
     """
     context = get_context(request)
+    request_data = getattr(request, request.method)
+    remove_address_pk = get_remove_address_pk(request_data)
 
-    if remove:
+    if remove_address_pk is not None:
+        remove_previous_address(previous_name_id=remove_address_pk)
+
         return HttpResponseRedirect(build_url('other_people_summary', get={'id': context['id']}))
 
     if request.method == 'GET':
@@ -410,4 +415,4 @@ def get_remove_address_pk(request_data):
         if key.startswith('remove-'):
             return key[7:]
 
-    raise ValueError('No address pk to remove found in request_data')
+    return None
