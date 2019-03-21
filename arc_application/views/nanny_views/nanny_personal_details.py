@@ -117,8 +117,7 @@ class NannyPersonalDetailsSummary(NannyARCFormView):
                         'name': 'Previous name '+ order,
                         'info': full_name,
                         'change_link': 'nanny_previous_names',
-                        'alt_text': "Change the {0} previous name".format(ordinal),
-
+                        'alt_text': "Change the {0} previous name".format(ordinal)
                     })
                 previous_names.append(
                     {
@@ -126,7 +125,7 @@ class NannyPersonalDetailsSummary(NannyARCFormView):
                         'name': 'Start date',
                         'info':start_date,
                         'change_link': 'nanny_previous_names',
-                        'alt_text': "Change the start date for the {0} previous name".format(ordinal),
+                        'alt_text': "Change the start date for the {0} previous name".format(ordinal)
                     })
                 previous_names.append(
                     {
@@ -134,7 +133,7 @@ class NannyPersonalDetailsSummary(NannyARCFormView):
                      'name': 'End date',
                      'info': end_date,
                     'change_link': 'nanny_previous_names',
-                        'alt_text':"Change the end date for the {0} previous name".format(ordinal),
+                        'alt_text':"Change the end date for the {0} previous name".format(ordinal)
                      })
 
 
@@ -254,7 +253,11 @@ class NannyPersonalDetailsSummary(NannyARCFormView):
         end_date = datetime.date.today()
         if personal_details_response.status_code == 200:
             pd_record = personal_details_response.record
+<<<<<<< HEAD
             if previous_names_response.status_code == 200 and any(previous_names_response.record):
+=======
+            if previous_names_response.status_code == 200:
+>>>>>>> 36ae8740ac0ec7ee8b74230590a57e373748e42e
                 previous_names_list = previous_names_response.record
                 for name in previous_names_list:
                     name['end_date'] = datetime.date(name['end_year'], name['end_month'], name['end_day'])

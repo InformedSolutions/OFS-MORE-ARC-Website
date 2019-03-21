@@ -271,6 +271,15 @@ class ReviewPersonalDetailsTests(NannyReviewFuncTestsBase):
             utils.assertSummaryField(response, 'Start date', '03/12/2004', heading=heading)
             utils.assertSummaryField(response, 'End date', '07/12/2004', heading=heading)
 
+    def test_shows_Add_Previous_Names_button(self):
+
+        # GET request to personal details summary
+        response = self.client.get(reverse('personal_details_summary') + '?id=' + self.application.application_id)
+
+        # Assert that the 'Add previous names' button is on the page.
+        utils.assertXPath(response, '//a[@href="{url}?id={app_id}&person_id={app_id}&type=APPLICANT"]'.format(
+            url=reverse('personal_details_previous_names'), app_id=self.application.pk))
+
 
 class PreviousRegistrationTests(NannyReviewFuncTestsBase):
 
