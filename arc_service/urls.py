@@ -42,7 +42,8 @@ from arc_application.views.nanny_views import (
     NannyTaskList, NannyContactDetailsSummary, NannyPersonalDetailsSummary, NannyPreviousRegistrationView,
     NannyChildcareAddressSummary, NannyFirstAidTrainingSummary, NannyChildcareTrainingSummary,
     NannyDbsCheckSummary, NannyInsuranceCoverSummary, NannyArcSummary, NannyArcSummaryConfirmation,
-    NannyPreviousAddressesView, NannyChangePreviousAddressView,
+    NannyChangePreviousAddressView, NannyAddPreviousAddressSearchView, NannyAddPreviousAddressSelectView,
+    NannyAddPreviousAddressManualView,
 )
 
 from django.conf import settings
@@ -117,8 +118,12 @@ if settings.ENABLE_NANNIES:
             name='nanny_personal_details_summary'),
         url(r'^nanny/personal-details/previous-address/', NannyChangePreviousAddressView.as_view(),
             name='nanny_change_previous_address'),
-        url(r'^nanny/personal-details/previous-addresses/', NannyPreviousAddressesView.as_view(),
-            name='nanny_previous_addresses'),
+        url(r'^nanny/personal-details/previous-addresses/select/', NannyAddPreviousAddressSelectView.as_view(),
+            name='nanny_add_previous_address_select'),
+        url(r'^nanny/personal-details/previous-addresses/manual/', NannyAddPreviousAddressManualView.as_view(),
+            name='nanny_add_previous_address_manual'),
+        url(r'^nanny/personal-details/previous-addresses/', NannyAddPreviousAddressSearchView.as_view(),
+            name='nanny_add_previous_address_search'),
         url(r'^nanny/personal-details/previous-registration/', NannyPreviousRegistrationView.as_view(),
             name='nanny_previous_registration'),
         url(r'^nanny/childcare-address/', NannyChildcareAddressSummary.as_view(),

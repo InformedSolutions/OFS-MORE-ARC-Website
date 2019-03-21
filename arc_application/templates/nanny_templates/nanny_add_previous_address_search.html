@@ -1,0 +1,35 @@
+{% extends 'govuk_template.html' %}
+{% block page_title %}Previous addresses{% endblock %}
+{% load static %}
+{% load govuk_template_base %}
+{% block inner_content %}
+{% include 'back-button.html' %}
+
+{{ form.error_summary }}
+
+<h1 class="form-title heading-large">
+    Previous home addresses
+</h1>
+
+<form method="post" novalidate>
+    {% csrf_token %}
+
+    {% include 'nanny_templates/nanny_add_previous_address_addresses.html' %}
+
+    <p>
+        Previous address {{ previous_addresses|length|add:"1" }}:
+    </p>
+
+    {{ form.as_div }}
+
+    <p>
+        <input type="submit" class="button" value="Find address" />
+    </p>
+    <p>
+        <input type="submit" class="hidden-link-2" name="manual" value="Enter address manually" />
+    </p>
+</form>
+
+{% include 'nanny_templates/nanny_return_to_list.html' %}
+
+{% endblock %}
