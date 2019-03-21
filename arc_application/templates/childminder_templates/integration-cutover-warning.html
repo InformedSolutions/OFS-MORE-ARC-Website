@@ -1,0 +1,9 @@
+{% if 'CM' in application_reference %}
+    <div class="error-summary" aria-labelledby="error-summary-heading-{{ random_string }}" role="alert" tabindex="-1">
+       <h1 class="heading-medium error-summary-heading">
+         Warning
+       </h1>
+       <p>This application was submitted before Cygnum integration was introduced into MORe.
+          You must continue to copy these details into RSA manually before releasing the application.</p>
+     </div>
+{% endif %}
