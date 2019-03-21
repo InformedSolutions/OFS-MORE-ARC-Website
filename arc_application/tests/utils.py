@@ -140,6 +140,23 @@ class StubNannyGatewayActions:
         }
         self.dbs_check_read_response = self.make_response(record=self.dbs_record)
 
+        self.previous_name_record = {
+            'application_id': '998fd8ec-b96b-4a71-a1a1-a7a3ae186729',
+            'previous_name_id': '9935bf3b-8ba9-4162-a25b-4c55e7d33d67',
+            'first_name': 'Robin',
+            'middle_names':'',
+            'last_name': 'Hood',
+            'start_day':1,
+            'start_month': 12,
+            'start_year': 2003,
+            'end_day': 3,
+            'end_month': 12,
+            'end_year': 2004,
+            'order': 0
+        }
+        self.previous_name_read_response = self.make_response(record=self.previous_name_record)
+
+
         self.home_address_record = {
             'application_id': '998fd8ec-b96b-4a71-a1a1-a7a3ae186729',
             'home_address_id': '9935bf3b-8ba9-4162-a25b-4c55e7d33d67',
@@ -225,6 +242,7 @@ class StubNannyGatewayActions:
             'declaration': 'declaration',
             'arc-comments': 'arc_comments',
             'timeline-log': 'timeline_log',
+            'previous-name': 'previous_name'
         }
 
     def list(self, endpoint, *args, **kwargs):
