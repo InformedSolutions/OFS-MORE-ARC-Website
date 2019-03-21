@@ -190,7 +190,7 @@
                 {{address.postcode}}{% if address.postcode %}<br/>{% endif %}
             </td>
             <td class="change-answer">
-                <a href="{% url 'personal_details_previous_addresses_change' %}?id={{ application_id }}&state=update&person_id={{ application_id }}&person_type=APPLICANT&address_id={{address.pk}}"
+                <a href="{% url 'personal_details_previous_addresses_change' %}?id={{ application_id }}&state=change&person_id={{ application_id }}&person_type=APPLICANT&address_id={{address.pk}}"
                    alt="Change the {{ forloop.counter|inflect }} previous address">Change</a>
             </td>
         </tr>
@@ -204,7 +204,7 @@
                 {{ address.moved_in_date|date:"d F Y" }}
             </td>
             <td class="change-answer">
-                <a href="{% url 'personal_details_previous_addresses_change' %}?id={{ application_id }}&state=update&person_id={{ application_id }}&person_type=APPLICANT&address_id={{address.pk}}"
+                <a href="{% url 'personal_details_previous_addresses_change' %}?id={{ application_id }}&state=change&person_id={{ application_id }}&person_type=APPLICANT&address_id={{address.pk}}"
                    alt="Change the move in date for {{ forloop.counter|inflect }} previous address">Change</a>
             </td>
 
@@ -220,7 +220,7 @@
                 {{ address.moved_out_date|date:"d F Y" }}
             </td>
             <td class="change-answer">
-                <a href="{% url 'personal_details_previous_addresses_change' %}?id={{ application_id }}&state=update&person_id={{ application_id }}&person_type=APPLICANT&address_id={{address.pk}}"
+                <a href="{% url 'personal_details_previous_addresses_change' %}?id={{ application_id }}&state=change&person_id={{ application_id }}&person_type=APPLICANT&address_id={{address.pk}}"
                    alt="Change the move out date for {{ forloop.counter|inflect }} previous address">Change</a>
             </td>
         </tr>
