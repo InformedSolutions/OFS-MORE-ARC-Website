@@ -9,1053 +9,1053 @@
 
 {{form.error_summary}}
 {% for form in formset_adult %}
-{{form.error_summary}}
+    {{form.error_summary}}
 {% endfor %}
 {% for form in formset_child %}
-{{form.error_summary}}
+    {{form.error_summary}}
 {% endfor %}
 {% for form in formset_own_child %}
-{{form.error_summary}}
+    {{form.error_summary}}
 {% endfor %}
 {% for form in formset_own_child_address %}
-{{form.error_summary}}
+    {{form.error_summary}}
 {% endfor %}
 
-<form method="post" novalidate>
-    <h1 class="form-title heading-large">Review: people in the home</h1>
-    <p>
-        Please check the boxes if there are errors.
-    </p>
-    {% csrf_token %}
-    {{ formset_adult.management_form }}
-    {{ formset_child.management_form }}
-    {{ formset_own_child.management_form }}
-    {{ formset_own_child_address.management_form }}
+    <form method="post" novalidate>
+        <h1 class="form-title heading-large">Review: people in the home</h1>
+        <p>
+            Please check the boxes if there are  errors.
+        </p>
+        {% csrf_token %}
+        {{ formset_adult.management_form }}
+        {{ formset_child.management_form }}
+        {{ formset_own_child.management_form }}
+        {{ formset_own_child_address.management_form }}
 
-    <table class="check-your-answers form-group">
-        <thead>
-        <tr>
-            <th colspan="3">
-                <div class="heading-medium">
-                    Adults in the home
-                </div>
-            </th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr>
-            <td>
-                Does anyone aged 16 or over live or work in the home?
-            </td>
-            <td style="word-wrap: break-word">
-                {{ adults_in_home|yesno:"Yes,No" }}
-            </td>
-            <td class="change-answer">
-                {{ form.adults_in_home_declare }}
-            </td>
-        </tr>
-        <tr class="js-hidden" id="adults_in_home">
-            <td colspan="1">
-                <div>
-                    Enter your reasoning
-                </div>
-                <div>
-                    {{ form.adults_in_home_comments.help_text}}
-                </div>
-            </td>
-            <td colspan="2">
-                <div>
-                    {{ form.adults_in_home_comments}}
-                </div>
-            </td>
-        </tr>
-        </tbody>
-    </table>
+        <table class="check-your-answers form-group">
+            <thead>
+            <tr>
+                <th colspan="3">
+                    <div class="heading-medium">
+                        Adults in the home
+                    </div>
+                </th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>
+                    Does anyone aged 16 or over live or work in the home?
+                </td>
+                <td style="word-wrap: break-word">
+                    {{ adults_in_home|yesno:"Yes,No" }}
+                </td>
+                <td class="change-answer">
+                    {{ form.adults_in_home_declare }}
+                </td>
+            </tr>
+            <tr class="js-hidden" id="adults_in_home">
+                <td colspan="1">
+                    <div>
+                        Enter your reasoning
+                    </div>
+                    <div>
+                        {{ form.adults_in_home_comments.help_text}}
+                    </div>
+                </td>
+                <td colspan="2">
+                    <div>
+                        {{ form.adults_in_home_comments}}
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
 
-    {% for record, id, health_check_status, name, day, month, year, relationship, email, dbs_certificate_number,
-    dbs_on_capita, dbs_is_recent, enhanced_check, on_update, lived_abroad, military_base, formsetadult,
-    current_illness_set, serious_illness_set, hospital_admission_set, reasons_known_to_council_health_check,
-    enhanced_check, previous_names, previous_addresses in adult_lists %}
+        {% for record, id, health_check_status, name, day, month, year, relationship, email, dbs_certificate_number, dbs_on_capita, dbs_is_recent, enhanced_check, on_update, lived_abroad, military_base, formsetadult, current_illness_set, serious_illness_set, hospital_admission_set, reasons_known_to_council_health_check, enhanced_check, previous_names, previous_addresses in adult_lists %}
 
-    <table class="check-your-answers form-group">
-        <thead>
-        <tr>
-            <th colspan="3">
-                <div class="heading-medium">
+        <table class="check-your-answers form-group">
+            <thead>
+            <tr>
+                <th colspan="3">
+                    <div class="heading-medium">
+                        {{name}}
+                    </div>
+                </th>
+            </tr>
+            </thead>
+
+            <tbody>
+            {# ================================== #}
+            <tr>
+                <td style="word-wrap: break-word">
+                    Health questions status
+                </td>
+                <td style="word-wrap: break-word">
+                    {{health_check_status}}
+                </td>
+                <td class="change-answer">
+                    {{ formsetadult.health_check_status_declare }}
+                </td>
+            </tr>
+            <tr class="js-hidden" id="health_check_status{{formsetadult.instance_id.initial}}">
+                <td colspan="1">
+                    <div>
+                        Enter your reasoning
+                    </div>
+                    <div>
+                        {{ formsetadult.health_check_status_comments.help_text}}
+                    </div>
+                </td>
+                <td colspan="2">
+                    <div>
+                        {{ formsetadult.health_check_status_comments}}
+                    </div>
+                </td>
+            </tr>
+            {# ================================== #}
+            <tr>
+                <td style="word-wrap: break-word">
+                    Name
+                </td>
+                <td style="word-wrap: break-word">
                     {{name}}
-                </div>
-            </th>
-        </tr>
-        </thead>
-
-        <tbody>
-        {# ================================== #}
-        <tr>
-            <td style="word-wrap: break-word">
-                Health questions status
-            </td>
-            <td style="word-wrap: break-word">
-                {{health_check_status}}
-            </td>
-            <td class="change-answer">
-                {{ formsetadult.health_check_status_declare }}
-            </td>
-        </tr>
-        <tr class="js-hidden" id="health_check_status{{formsetadult.instance_id.initial}}">
-            <td colspan="1">
-                <div>
-                    Enter your reasoning
-                </div>
-                <div>
-                    {{ formsetadult.health_check_status_comments.help_text}}
-                </div>
-            </td>
-            <td colspan="2">
-                <div>
-                    {{ formsetadult.health_check_status_comments}}
-                </div>
-            </td>
-        </tr>
-        {# ================================== #}
-        <tr>
-            <td style="word-wrap: break-word">
-                Name
-            </td>
-            <td style="word-wrap: break-word">
-                {{name}}
-            </td>
-            <td class="change-answer">
-                {{ formsetadult.full_name_declare }}
-            </td>
-        </tr>
-        <tr class="js-hidden" id="full_name{{formsetadult.instance_id.initial}}">
-            <td colspan="1">
-                <div>
-                    Enter your reasoning
-                </div>
-                <div>
-                    {{ formsetadult.full_name_comments.help_text}}
-                </div>
-            </td>
-            <td colspan="2">
-                <div>
-                    {{ formsetadult.full_name_comments}}
-                </div>
-            </td>
-        </tr>
-        {# ================================== #}
-        <tr>
-            <td style="word-wrap: break-word">
-                Date of birth
-            </td>
-            {% if month == 1 %}
-            <td style="word-wrap: break-word">
-                {{day}} January {{year}}
-            </td>
-            {% elif month == 2 %}
-            <td style="word-wrap: break-word">
-                {{day}} February {{year}}
-            </td>
-            {% elif month == 3 %}
-            <td style="word-wrap: break-word">
-                {{day}} March {{year}}
-            </td>
-            {% elif month == 4 %}
-            <td style="word-wrap: break-word">
-                {{day}} April {{year}}
-            </td>
-            {% elif month == 5 %}
-            <td style="word-wrap: break-word">
-                {{day}} May {{year}}
-            </td>
-            {% elif month == 6 %}
-            <td style="word-wrap: break-word">
-                {{day}} June {{year}}
-            </td>
-            {% elif month == 7 %}
-            <td style="word-wrap: break-word">
-                {{day}} July {{year}}
-            </td>
-            {% elif month == 8 %}
-            <td style="word-wrap: break-word">
-                {{day}} August {{year}}
-            </td>
-            {% elif month == 9 %}
-            <td style="word-wrap: break-word">
-                {{day}} September {{year}}
-            </td>
-            {% elif month == 10 %}
-            <td style="word-wrap: break-word">
-                {{day}} October {{year}}
-            </td>
-            {% elif month == 11 %}
-            <td style="word-wrap: break-word">
-                {{day}} November {{year}}
-            </td>
-            {% elif month == 12 %}
-            <td style="word-wrap: break-word">
-                {{day}} December {{year}}
-            </td>
+                </td>
+                <td class="change-answer">
+                    {{ formsetadult.full_name_declare }}
+                </td>
+            </tr>
+            <tr class="js-hidden" id="full_name{{formsetadult.instance_id.initial}}">
+                <td colspan="1">
+                    <div>
+                        Enter your reasoning
+                    </div>
+                    <div>
+                        {{ formsetadult.full_name_comments.help_text}}
+                    </div>
+                </td>
+                <td colspan="2">
+                    <div>
+                        {{ formsetadult.full_name_comments}}
+                    </div>
+                </td>
+            </tr>
+            {# ================================== #}
+            <tr>
+                <td style="word-wrap: break-word">
+                    Date of birth
+                </td>
+                {% if month == 1 %}
+                <td style="word-wrap: break-word">
+                    {{day}} January {{year}}
+                </td>
+                {% elif month == 2 %}
+                <td style="word-wrap: break-word">
+                    {{day}} February {{year}}
+                </td>
+                {% elif month == 3 %}
+                <td style="word-wrap: break-word">
+                    {{day}} March {{year}}
+                </td>
+                {% elif month == 4 %}
+                <td style="word-wrap: break-word">
+                    {{day}} April {{year}}
+                </td>
+                {% elif month == 5 %}
+                <td style="word-wrap: break-word">
+                    {{day}} May {{year}}
+                </td>
+                {% elif month == 6 %}
+                <td style="word-wrap: break-word">
+                    {{day}} June {{year}}
+                </td>
+                {% elif month == 7 %}
+                <td style="word-wrap: break-word">
+                    {{day}} July {{year}}
+                </td>
+                {% elif month == 8 %}
+                <td style="word-wrap: break-word">
+                    {{day}} August {{year}}
+                </td>
+                {% elif month == 9 %}
+                <td style="word-wrap: break-word">
+                    {{day}} September {{year}}
+                </td>
+                {% elif month == 10 %}
+                <td style="word-wrap: break-word">
+                    {{day}} October {{year}}
+                </td>
+                {% elif month == 11 %}
+                <td style="word-wrap: break-word">
+                    {{day}} November {{year}}
+                </td>
+                {% elif month == 12 %}
+                <td style="word-wrap: break-word">
+                    {{day}} December {{year}}
+                </td>
+                {% endif %}
+                <td class="change-answer">
+                    {{ formsetadult.date_of_birth_declare }}
+                </td>
+            </tr>
+            <tr class="js-hidden" id="date_of_birth{{formsetadult.instance_id.initial}}">
+                <td colspan="1">
+                    <div>
+                        Enter your reasoning
+                    </div>
+                    <div>
+                        {{ formsetadult.date_of_birth_comments.help_text}}
+                    </div>
+                </td>
+                <td colspan="2">
+                    <div>
+                        {{ formsetadult.date_of_birth_comments}}
+                    </div>
+                </td>
+            </tr>
+            {# ================================== #}
+            <tr>
+                <td style="word-wrap: break-word">
+                    Relationship
+                </td>
+                <td style="word-wrap: break-word">
+                    {{relationship}}
+                </td>
+                <td class="change-answer">
+                    {{ formsetadult.relationship_declare }}
+                </td>
+            </tr>
+            <tr class="js-hidden" id="relationship{{formsetadult.instance_id.initial}}">
+                <td colspan="1">
+                    <div>
+                        Enter your reasoning
+                    </div>
+                    <div>
+                        {{ formsetadult.relationship_comments.help_text}}
+                    </div>
+                </td>
+                <td colspan="2">
+                    <div>
+                        {{ formsetadult.relationship_comments}}
+                    </div>
+                </td>
+            </tr>
+            {# ================================== #}
+            <tr>
+                <td style="word-wrap: break-word">
+                    Email
+                </td>
+                <td style="word-wrap: break-word">
+                    {{email}}
+                </td>
+                <td class="change-answer">
+                    {{ formsetadult.email_declare }}
+                </td>
+            </tr>
+            <tr class="js-hidden" id="email{{formsetadult.instance_id.initial}}">
+                <td colspan="1">
+                    <div>
+                        Enter your reasoning
+                    </div>
+                    <div>
+                        {{ formsetadult.email_comments.help_text}}
+                    </div>
+                </td>
+                <td colspan="2">
+                    <div>
+                        {{ formsetadult.email_comments}}
+                    </div>
+                </td>
+            </tr>
+            {# ================================== #}
+            <tr>
+                <td style="word-wrap: break-word">
+                    {{ formsetadult.lived_abroad_comments.label }}
+                </td>
+                <td style="word-wrap: break-word">
+                    {{ lived_abroad|yesno:"Yes,No"}}
+                </td>
+                <td class="change-answer">
+                    {{ formsetadult.lived_abroad_declare }}
+                </td>
+            </tr>
+            <tr class="js-hidden" id="lived_abroad{{formsetadult.instance_id.initial}}">
+                <td colspan="1">
+                    <div>
+                        Enter your reasoning
+                    </div>
+                    <div>
+                        {{ formsetadult.lived_abroad_comments.help_text}}
+                    </div>
+                </td>
+                <td colspan="2">
+                    <div>
+                        {{ formsetadult.lived_abroad_comments}}
+                    </div>
+                </td>
+            </tr>
+            {# ================================== #}
+            {% if childcare_type_zero_to_five %}
+            <tr>
+                <td style="word-wrap: break-word">
+                    {{ formsetadult.military_base_comments.label }}
+                </td>
+                </td>
+                <td style="word-wrap: break-word">
+                    {{ military_base|yesno:"Yes,No" }}
+                </td>
+                <td class="change-answer">
+                    {{ formsetadult.military_base_declare }}
+                </td>
+            </tr>
+            <tr class="js-hidden" id="military_base{{formsetadult.instance_id.initial}}">
+                <td colspan="1">
+                    <div>
+                        Enter your reasoning
+                    </div>
+                    <div>
+                        {{ formsetadult.military_base_comments.help_text}}
+                    </div>
+                </td>
+                <td colspan="2">
+                    <div>
+                        {{ formsetadult.military_base_comments}}
+                    </div>
+                </td>
+            </tr>
             {% endif %}
-            <td class="change-answer">
-                {{ formsetadult.date_of_birth_declare }}
-            </td>
-        </tr>
-        <tr class="js-hidden" id="date_of_birth{{formsetadult.instance_id.initial}}">
-            <td colspan="1">
-                <div>
-                    Enter your reasoning
-                </div>
-                <div>
-                    {{ formsetadult.date_of_birth_comments.help_text}}
-                </div>
-            </td>
-            <td colspan="2">
-                <div>
-                    {{ formsetadult.date_of_birth_comments}}
-                </div>
-            </td>
-        </tr>
-        {# ================================== #}
-        <tr>
-            <td style="word-wrap: break-word">
-                Relationship
-            </td>
-            <td style="word-wrap: break-word">
-                {{relationship}}
-            </td>
-            <td class="change-answer">
-                {{ formsetadult.relationship_declare }}
-            </td>
-        </tr>
-        <tr class="js-hidden" id="relationship{{formsetadult.instance_id.initial}}">
-            <td colspan="1">
-                <div>
-                    Enter your reasoning
-                </div>
-                <div>
-                    {{ formsetadult.relationship_comments.help_text}}
-                </div>
-            </td>
-            <td colspan="2">
-                <div>
-                    {{ formsetadult.relationship_comments}}
-                </div>
-            </td>
-        </tr>
-        {# ================================== #}
-        <tr>
-            <td style="word-wrap: break-word">
-                Email
-            </td>
-            <td style="word-wrap: break-word">
-                {{email}}
-            </td>
-            <td class="change-answer">
-                {{ formsetadult.email_declare }}
-            </td>
-        </tr>
-        <tr class="js-hidden" id="email{{formsetadult.instance_id.initial}}">
-            <td colspan="1">
-                <div>
-                    Enter your reasoning
-                </div>
-                <div>
-                    {{ formsetadult.email_comments.help_text}}
-                </div>
-            </td>
-            <td colspan="2">
-                <div>
-                    {{ formsetadult.email_comments}}
-                </div>
-            </td>
-        </tr>
-        {# ================================== #}
-        <tr>
-            <td style="word-wrap: break-word">
-                {{ formsetadult.lived_abroad_comments.label }}
-            </td>
-            <td style="word-wrap: break-word">
-                {{ lived_abroad|yesno:"Yes,No"}}
-            </td>
-            <td class="change-answer">
-                {{ formsetadult.lived_abroad_declare }}
-            </td>
-        </tr>
-        <tr class="js-hidden" id="lived_abroad{{formsetadult.instance_id.initial}}">
-            <td colspan="1">
-                <div>
-                    Enter your reasoning
-                </div>
-                <div>
-                    {{ formsetadult.lived_abroad_comments.help_text}}
-                </div>
-            </td>
-            <td colspan="2">
-                <div>
-                    {{ formsetadult.lived_abroad_comments}}
-                </div>
-            </td>
-        </tr>
-        {# ================================== #}
-        {% if childcare_type_zero_to_five %}
-        <tr>
-            <td style="word-wrap: break-word">
-                {{ formsetadult.military_base_comments.label }}
-            </td>
-            </td>
-            <td style="word-wrap: break-word">
-                {{ military_base|yesno:"Yes,No" }}
-            </td>
-            <td class="change-answer">
-                {{ formsetadult.military_base_declare }}
-            </td>
-        </tr>
-        <tr class="js-hidden" id="military_base{{formsetadult.instance_id.initial}}">
-            <td colspan="1">
-                <div>
-                    Enter your reasoning
-                </div>
-                <div>
-                    {{ formsetadult.military_base_comments.help_text}}
-                </div>
-            </td>
-            <td colspan="2">
-                <div>
-                    {{ formsetadult.military_base_comments}}
-                </div>
-            </td>
-        </tr>
-        {% endif %}
-        {# ================================== #}
-        <tr>
-            <td style="word-wrap: break-word">
-                {{ formsetadult.capita_comments.label }}
-            </td>
-            <td style="word-wrap: break-word">
-                {{ dbs_on_capita|yesno:"Yes,No" }}
-            </td>
-            <td class="change-answer">
-            </td>
-        </tr>
-        {# ================================== #}
-        {% if dbs_on_capita %}
-        <tr>
-            <td style="word-wrap: break-word">
-                Is it dated within the last 3 months?
-            </td>
-            <td style="word-wrap: break-word">
-                {{ dbs_is_recent|yesno:"Yes,No" }}
-            </td>
-            <td class="change-answer">
-            </td>
-        </tr>
-        {% endif %}
-        {# ================================== #}
-        <tr>
-            <td style="word-wrap: break-word">
-                DBS certificate number
-            </td>
-            <td style="word-wrap: break-word">
-                {{dbs_certificate_number}}
-            </td>
-            <td class="change-answer">
-                {{ formsetadult.dbs_certificate_number_declare }}
-            </td>
-        </tr>
-        <tr class="js-hidden" id="dbs_certificate_number{{formsetadult.instance_id.initial}}">
-            <td colspan="1">
-                <div>
-                    Enter your reasoning
-                </div>
-                <div>
-                    {{ formsetadult.dbs_certificate_number_comments.help_text}}
-                </div>
-            </td>
-            <td colspan="2">
-                <div>
-                    {{ formsetadult.dbs_certificate_number_comments}}
-                </div>
-            </td>
-        </tr>
-        {# ================================== #}
-        {% if enhanced_check is not None %}
-        <tr>
-            <td style="word-wrap: break-word">
-                Enhanced DBS check for home-based childcare?
-            </td>
-            <td style="word-wrap: break-word">
-                {{ enhanced_check|yesno:"Yes,No" }}
-            </td>
-            <td class="change-answer">
-                {{ formsetadult.enhanced_check_declare }}
-            </td>
-        </tr>
-        <tr class="js-hidden" id="enhanced_check{{formsetadult.instance_id.initial}}">
-            <td colspan="1">
-                <div>
-                    Enter your reasoning
-                </div>
-                <div>
-                    {{ formsetadult.enhanced_check_comments.help_text }}
-                </div>
-            </td>
-            <td colspan="2">
-                <div>
-                    {{ formsetadult.enhanced_check_comments }}
-                </div>
-            </td>
-        </tr>
-        {% endif %}
+            {# ================================== #}
+            <tr>
+                <td style="word-wrap: break-word">
+                    {{ formsetadult.capita_comments.label }}
+                </td>
+                <td style="word-wrap: break-word">
+                    {{ dbs_on_capita|yesno:"Yes,No" }}
+                </td>
+                <td class="change-answer">
+                </td>
+            </tr>
+            {# ================================== #}
+            {% if dbs_on_capita %}
+            <tr>
+                <td style="word-wrap: break-word">
+                    Is it dated within the last 3 months?
+                </td>
+                <td style="word-wrap: break-word">
+                    {{ dbs_is_recent|yesno:"Yes,No" }}
+                </td>
+                <td class="change-answer">
+                </td>
+            </tr>
+            {% endif %}
+            {# ================================== #}
+            <tr>
+                <td style="word-wrap: break-word">
+                    DBS certificate number
+                </td>
+                <td style="word-wrap: break-word">
+                    {{dbs_certificate_number}}
+                </td>
+                <td class="change-answer">
+                    {{ formsetadult.dbs_certificate_number_declare }}
+                </td>
+            </tr>
+            <tr class="js-hidden" id="dbs_certificate_number{{formsetadult.instance_id.initial}}">
+                <td colspan="1">
+                    <div>
+                        Enter your reasoning
+                    </div>
+                    <div>
+                        {{ formsetadult.dbs_certificate_number_comments.help_text}}
+                    </div>
+                </td>
+                <td colspan="2">
+                    <div>
+                        {{ formsetadult.dbs_certificate_number_comments}}
+                    </div>
+                </td>
+            </tr>
+            {# ================================== #}
+            {% if enhanced_check is not None %}
+            <tr>
+                <td style="word-wrap: break-word">
+                    Enhanced DBS check for home-based childcare?
+                </td>
+                <td style="word-wrap: break-word">
+                    {{ enhanced_check|yesno:"Yes,No" }}
+                </td>
+                <td class="change-answer">
+                    {{ formsetadult.enhanced_check_declare }}
+                </td>
+            </tr>
+            <tr class="js-hidden" id="enhanced_check{{formsetadult.instance_id.initial}}">
+                <td colspan="1">
+                    <div>
+                        Enter your reasoning
+                    </div>
+                    <div>
+                        {{ formsetadult.enhanced_check_comments.help_text }}
+                    </div>
+                </td>
+                <td colspan="2">
+                    <div>
+                        {{ formsetadult.enhanced_check_comments }}
+                    </div>
+                </td>
+            </tr>
+            {% endif %}
 
-        {% if on_update is not None %}
-        <tr>
-            <td style="word-wrap: break-word">
-                On the update service?
-            </td>
-            <td style="word-wrap: break-word">
-                {{ on_update|yesno:"Yes,No" }}
-            </td>
-            <td class="change-answer">
-                {{ formsetadult.on_update_declare }}
-            </td>
-        </tr>
-        <tr class="js-hidden" id="on_update{{formsetadult.instance_id.initial}}">
-            <td colspan="1">
-                <div>
-                    Enter your reasoning
-                </div>
-                <div>
-                    {{ formsetadult.on_update_comments.help_text }}
-                </div>
-            </td>
-            <td colspan="2">
-                <div>
-                    {{ formsetadult.on_update_comments }}
-                </div>
-            </td>
-        </tr>
-        {% endif %}
+            {% if on_update is not None %}
+            <tr>
+                <td style="word-wrap: break-word">
+                    On the update service?
+                </td>
+                <td style="word-wrap: break-word">
+                    {{ on_update|yesno:"Yes,No" }}
+                </td>
+                <td class="change-answer">
+                    {{ formsetadult.on_update_declare }}
+                </td>
+            </tr>
+            <tr class="js-hidden" id="on_update{{formsetadult.instance_id.initial}}">
+                <td colspan="1">
+                    <div>
+                        Enter your reasoning
+                    </div>
+                    <div>
+                        {{ formsetadult.on_update_comments.help_text }}
+                    </div>
+                </td>
+                <td colspan="2">
+                    <div>
+                        {{ formsetadult.on_update_comments }}
+                    </div>
+                </td>
+            </tr>
+            {% endif %}
 
-        {# ================================== #}
-        {% if record.known_to_council is not None %}
-        <tr>
-            <td style="word-wrap: break-word">
-                Known to council social Services in regards to their own children?
-            </td>
-            <td style="word-wrap: break-word">
-                {{ record.known_to_council|yesno:"Yes,No" }}
-            </td>
-            <td class="change-answer">
-                {{ formsetadult.known_to_council_declare }}
-            </td>
-        </tr>
-        {% endif %}
+            {# ================================== #}
+            {% if record.known_to_council is not None %}
+            <tr>
+                <td style="word-wrap: break-word">
+                    Known to council social Services in regards to their own children?
+                </td>
+                <td style="word-wrap: break-word">
+                    {{ record.known_to_council|yesno:"Yes,No" }}
+                </td>
+                <td class="change-answer">
+                    {{ formsetadult.known_to_council_declare }}
+                </td>
+            </tr>
+            {% endif %}
 
-        {% if record.known_to_council is True %}
-        <tr>
-            <td style="word-wrap: break-word">
-                Tell us why
-            </td>
-            <td style="word-wrap: break-word">
-                {{ reasons_known_to_council_health_check }}
-            </td>
-            <td class="change-answer">
-                {{ formsetadult.reasons_known_to_council_health_check_declare }}
-            </td>
-        </tr>
+            {% if record.known_to_council is True %}
+            <tr>
+                <td style="word-wrap: break-word">
+                    Tell us why
+                </td>
+                <td style="word-wrap: break-word">
+                    {{ reasons_known_to_council_health_check }}
+                </td>
+                <td class="change-answer">
+                    {{ formsetadult.reasons_known_to_council_health_check_declare }}
+                </td>
+            </tr>
 
-        {% endif %}
+            {% endif %}
 
-        </tbody>
-        <tbody>
+            </tbody>
+            <tbody>
 
-    </table>
+        </table>
 
-    {% if previous_names %}
-    <table class="check-your-answers form-group">
-        <thead>
-        <tr>
-            <th colspan="3">
-                <div class="heading-medium">
-                    {{name}}'s previous names and addresses
-                </div>
-            </th>
-        </tr>
-        </thead>
-        <tbody>
-        {% for prevname in previous_names %}
-        <tr>
-            <td>
-                Previous name {{ forloop.counter }}
-            </td>
-            <td>
-                {{ prevname.name }}
-            </td>
-            <td class="change-answer">
-                <a href="{% url 'other-people-previous-names' %}?id={{ application_id }}&person_id={{ id }}&type=ADULT"
-                   alt="Change the {{ forloop.counter|inflect }} previous name">Change</a>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                Start date
-            </td>
-            <td>
-                {{ prevname.start_date|date:'j F Y' }}
-            </td>
-            <td class="change-answer">
-                <a href="{% url 'other-people-previous-names' %}?id={{ application_id }}&person_id={{ id }}&type=ADULT"
-                   alt="Change the start date for the {{ forloop.counter|inflect }} previous name">Change</a>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                End date
-            </td>
-            <td>
-                {{ prevname.end_date|date:'j F Y' }}
-            </td>
-            <td class="change-answer">
-                <a href="{% url 'other-people-previous-names' %}?id={{ application_id }}&person_id={{ id }}&type=ADULT"
-                   alt="Change the end date for the {{ forloop.counter|inflect }} previous name">Change</a>
-            </td>
-        </tr>
-        {% endfor %}
-        {% for address in previous_addresses %}
-        <tr>
-            <td>
-                Previous address {{ forloop.counter }}
-            </td>
-            <td>
-                {{address.street_line1}}{% if address.street_line1 %}<br/>{% endif %}
-                {{address.street_line2}}{% if address.street_line2 %}<br/>{% endif %}
-                {{address.town}}{% if address.town %}<br/>{% endif %}
-                {{address.county}}{% if address.county %}<br/>{% endif %}
-                {{address.country}}{% if address.country %}<br/>{% endif %}
-                {{address.postcode}}{% if address.postcode %}<br/>{% endif %}
-            </td>
-            <td class="change-answer">
-                <a href="{% url 'other-people-previous-addresses' %}?id={{ application_id }}&state=update&person_id={{id}}&person_type=ADULT&address_id={{address.previous_name_id}}"
-                alt="Change the {{ forloop.counter|inflect }} previous address">Change</a>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                Moved in
-            </td>
-            <td style="word-wrap: break-word">
-                {{ address.moved_in_date|date:"d/m/Y" }}
-            </td>
-            <td class="change-answer">
-                <a href="{% url 'other-people-previous-addresses' %}?id={{ application_id }}&state=update&person_id={{ application_id }}&person_type=ADULT&address_id={{address.pk}}"
-                   alt="Change the move in date for the {{ forloop.counter|inflect }} previous address">Change</a>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                Moved out
-            </td>
-            <td style="word-wrap: break-word">
-                {{ address.moved_out_date|date:"d/m/Y" }}
-            </td>
-            <td class="change-answer">
-                <a href="{% url 'other-people-previous-addresses' %}?id={{ application_id }}&state=update&person_id={{ application_id }}&person_type=ADULT&address_id={{address.pk}}"
-                   alt="Change the move out date for the {{ forloop.counter|inflect }} previous address">Change</a>
-            </td>
-        </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-    {% endif %}
-
-    <a href="{% url 'other-people-previous-names' %}?id={{ application_id }}&person_id={{ id }}&type=ADULT"
-       class="button button-secondary">Add previous names</a>
-    <br>
-    <a href="{% url 'other-people-previous-addresses' %}?id={{ application_id }}&state=entry&person_id={{id}}&person_type=ADULT"
-       class="button button-secondary">Add previous addresses</a>
-
-    <table class="check-your-answers form-group">
-        <thead>
-        <tr>
-            <th colspan="3">
-                <div class="heading-medium">
-                    {{ name }} relationship
-                </div>
-            </th>
-        </tr>
-        </thead>
-        <tbody>
-        <td colspan="1">
-            <label id="{{ formsetadult.cygnum_relationship.auto_id }}-label">
-                {{ formsetadult.cygnum_relationship.label }}
-            </label>
-        </td>
-        <td colspan="2">
-            {% for error in formsetadult.cygnum_relationship.errors %}
-            <span class="error-message">{{ error }}</span>
+        {% if previous_names %}
+        <table class="check-your-answers form-group">
+            <thead>
+            <tr>
+                <th colspan="3">
+                    <div class="heading-medium">
+                        {{name}}'s previous names and addresses
+                    </div>
+                </th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for prevname in previous_names %}
+            <tr>
+                <td>
+                    Previous name {{ forloop.counter }}
+                </td>
+                <td>
+                    {{ prevname.name }}
+                </td>
+                <td class="change-answer">
+                    <a href="{% url 'other-people-previous-names' %}?id={{ application_id }}&person_id={{ id }}&type=ADULT"
+                        alt="Change the {{ forloop.counter|inflect }} previous name">Change</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Start date
+                </td>
+                <td>
+                    {{ prevname.start_date|date:'j F Y' }}
+                </td>
+                <td class="change-answer">
+                    <a href="{% url 'other-people-previous-names' %}?id={{ application_id }}&person_id={{ id }}&type=ADULT"
+                        alt="Change the start date for the {{ forloop.counter|inflect }} previous name">Change</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    End date
+                </td>
+                <td>
+                    {{ prevname.end_date|date:'j F Y' }}
+                </td>
+                <td class="change-answer">
+                    <a href="{% url 'other-people-previous-names' %}?id={{ application_id }}&person_id={{ id }}&type=ADULT"
+                        alt="Change the end date for the {{ forloop.counter|inflect }} previous name">Change</a>
+                </td>
+            </tr>
             {% endfor %}
-            {{ formsetadult.cygnum_relationship }}
-        </td>
-        </tbody>
-    </table>
+            {% for address in previous_addresses %}
+            <tr>
+                <td>
+                    Previous address {{ forloop.counter }}
+                </td>
+                <td>
+                    {{address.street_line1}}{% if address.street_line1 %}<br />{% endif %}
+                    {{address.street_line2}}{% if address.street_line2 %}<br />{% endif %}
+                    {{address.town}}{% if address.town %}<br />{% endif %}
+                    {{address.county}}{% if address.county %}<br />{% endif %}
+                    {{address.country}}{% if address.country %}<br />{% endif %}
+                    {{address.postcode}}{% if address.postcode %}<br />{% endif %}
+                </td>
+                <td class="change-answer">
+                    <a href="{% url 'other-people-previous-addresses' %}?id={{ application_id }}&state=update&person_id={{id}}&person_type=ADULT&address_id={{address.previous_name_id}}">Change</a>
+                </td>
+            </tr>
 
+            {% if address.moved_in_date %}
+            <tr>
+                <td>
+                    Moved in
+                </td>
+                <td>
+                    {{ address.moved_in_date|date:"d F Y" }}
+                </td>
+                <td class="change-answer">
+                    <a href="{% url 'personal_details_previous_addresses_change' %}?id={{ application_id }}&state=update&person_id={{ application_id }}&person_type=APPLICANT&address_id={{address.pk}}"
+                       alt="Change the move in date for {{ forloop.counter|inflect }} previous address">Change</a>
+                </td>
 
-    <table class="check-your-answers">
-        <colgroup>
-            <col class="summary-column">
-            <col class="summary-column">
-            <col class="change-answer">
-        </colgroup>
-        <thead>
-        <th colspan="3">
-            <h2 class="heading-medium">
-                Current treatment
-            </h2>
-        </th>
-        </thead>
-        <tbody>
-        <tr>
-            <td class=summary-column> Are you currently being treated by your GP, another doctor or a hospital?</td>
-            <td class=summary-column> {{ record.current_treatment|yesno:"Yes,No" }}</td>
-        </tr>
+            </tr>
+            {% endif %}
 
-        {% for treatment in current_illness_set %}
-        <tr>
-            <td class=summary-column>Details of the illness or condition</td>
-            <td class=summary-column>{{ treatment.description }}</td>
-        </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-
-    <table class="check-your-answers">
-        <colgroup>
-            <col class="summary-column">
-            <col class="summary-column">
-            <col class="change-answer">
-        </colgroup>
-        <thead>
-        <th colspan="3">
-            <h2 class="heading-medium">
-                Serious illnesses
-            </h2>
-        </th>
-        </thead>
-        <tbody>
-        <tr>
-            <td class=summary-column>Have you had any serious illnesses within the last five years?</td>
-            <td class=summary-column>{{ record.serious_illness|yesno:"Yes,No" }}</td>
-        </tr>
-        {% if record.serious_illness %}
-        {% for illness in serious_illness_set %}
-        <tr>
-            <td class=summary-column>{{ illness.description }}</td>
-            <td class=summary-column>{{ illness.start_date|date:"d/m/Y" }} to {{ illness.end_date|date:"d/m/Y" }}</td>
-        </tr>
-        {% endfor %}
+            {% if address.moved_out_date %}
+            <tr>
+                <td>
+                    Moved out
+                </td>
+                <td>
+                    {{ address.moved_out_date|date:"d F Y" }}
+                </td>
+                <td class="change-answer">
+                    <a href="{% url 'personal_details_previous_addresses_change' %}?id={{ application_id }}&state=update&person_id={{ application_id }}&person_type=APPLICANT&address_id={{address.pk}}"
+                       alt="Change the move out date for {{ forloop.counter|inflect }} previous address">Change</a>
+                </td>
+            </tr>
+            {% endif %}
+            {% endfor %}
+            </tbody>
+        </table>
         {% endif %}
-        </tbody>
-    </table>
 
-    <table class="check-your-answers">
-        <colgroup>
-            <col class="summary-column">
-            <col class="summary-column">
-            <col class="change-answer">
-        </colgroup>
-        <thead>
-        <th colspan="3">
-            <h2 class="heading-medium">
-                Hospital admissions
-            </h2>
-        </th>
-        </thead>
-        <tbody>
-        <tr>
-            <td>Have you been admitted to hospital in the last 2 years?</td>
-            <td>{{ record.hospital_admission|yesno:"Yes,No" }}</td>
-        </tr>
-        {% if record.hospital_admission %}
-        {% for illness in hospital_admission_set %}
-        <tr>
-            <td>{{ illness.description }}</td>
-            <td>{{ illness.start_date|date:"d/m/Y" }} to {{ illness.end_date|date:"d/m/Y" }}</td>
-        </tr>
+        <a href="{% url 'other-people-previous-names' %}?id={{ application_id }}&person_id={{ id }}&type=ADULT" class="button button-secondary">Add previous names</a>
+        <br>
+        <a href="{% url 'other-people-previous-addresses' %}?id={{ application_id }}&state=entry&person_id={{id}}&person_type=ADULT" class="button button-secondary">Add previous addresses</a>
+
+        <table class="check-your-answers form-group">
+            <thead>
+            <tr>
+                <th colspan="3">
+                    <div class="heading-medium">
+                        {{ name }} relationship
+                    </div>
+                </th>
+            </tr>
+            </thead>
+            <tbody>
+                <td colspan="1">
+                    <label id="{{ formsetadult.cygnum_relationship.auto_id }}-label">
+                        {{ formsetadult.cygnum_relationship.label }}
+                    </label>
+                </td>
+                <td colspan="2">
+                    {% for error in formsetadult.cygnum_relationship.errors %}
+                      <span class="error-message">{{ error }}</span>
+                    {% endfor %}
+                    {{ formsetadult.cygnum_relationship }}
+                </td>
+            </tbody>
+        </table>
+
+
+         <table class="check-your-answers">
+            <colgroup>
+                <col class="summary-column">
+                <col class="summary-column">
+                <col class="change-answer">
+            </colgroup>
+            <thead>
+                <th colspan="3">
+                        <h2 class="heading-medium">
+                            Current treatment
+                        </h2>
+                </th>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class=summary-column> Are you currently being treated by your GP, another doctor or a hospital?</td>
+                    <td class=summary-column> {{ record.current_treatment|yesno:"Yes,No" }} </td>
+                </tr>
+
+                {% for treatment in current_illness_set %}
+                <tr>
+                    <td class=summary-column>Details of the illness or condition</td>
+                    <td class=summary-column>{{ treatment.description }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <table class="check-your-answers">
+            <colgroup>
+                <col class="summary-column">
+                <col class="summary-column">
+                <col class="change-answer">
+            </colgroup>
+            <thead>
+                <th colspan="3">
+                        <h2 class="heading-medium">
+                            Serious illnesses
+                        </h2>
+                </th>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class=summary-column>Have you had any serious illnesses within the last five years?</td>
+                    <td class=summary-column>{{ record.serious_illness|yesno:"Yes,No" }}</td>
+                </tr>
+                {% if record.serious_illness %}
+                {% for illness in serious_illness_set %}
+                <tr>
+                    <td class=summary-column>{{ illness.description }}</td>
+                    <td class=summary-column>{{ illness.start_date|date:"d/m/Y" }} to {{ illness.end_date|date:"d/m/Y" }}</td>
+                </tr>
+                {% endfor %}
+                {% endif %}
+            </tbody>
+        </table>
+
+        <table class="check-your-answers">
+            <colgroup>
+                <col class="summary-column">
+                <col class="summary-column">
+                <col class="change-answer">
+            </colgroup>
+            <thead>
+                <th colspan="3">
+                        <h2 class="heading-medium">
+                            Hospital admissions
+                        </h2>
+                </th>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Have you been admitted to hospital in the last 2 years?</td>
+                    <td>{{ record.hospital_admission|yesno:"Yes,No" }}</td>
+                </tr>
+                {% if record.hospital_admission %}
+                {% for illness in hospital_admission_set %}
+                <tr>
+                    <td>{{ illness.description }}</td>
+                    <td>{{ illness.start_date|date:"d/m/Y" }} to {{ illness.end_date|date:"d/m/Y" }}</td>
+                </tr>
+                {% endfor %}
+                {% endif %}
+            </tbody>
+        </table>
+
+        <a href="{% url 'other-people-previous-registration' %}?id={{ application_id }}&person_id={{ id }}" class="button button-secondary">Add previous registration details</a>
         {% endfor %}
-        {% endif %}
-        </tbody>
-    </table>
 
-    <a href="{% url 'other-people-previous-registration' %}?id={{ application_id }}&person_id={{ id }}"
-       class="button button-secondary">Add previous registration details</a>
-    {% endfor %}
+        <table class="check-your-answers form-group">
+            <thead>
+            <tr>
+                <th colspan="3">
+                    <div class="heading-medium">
+                        Children in the home
+                    </div>
+                </th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>
+                    Do children under 16 live in the home?
+                </td>
+                <td style="word-wrap: break-word">
+                    {{ children_in_home|yesno:"Yes,No" }}
+                </td>
+                <td class="change-answer">
+                    {{ form.children_in_home_declare }}
+                </td>
+            </tr>
+            <tr class="js-hidden" id="children_in_home">
+                <td colspan="1">
+                    <div>
+                        Enter your reasoning
+                    </div>
+                    <div>
+                        {{ form.children_in_home_comments.help_text}}
+                    </div>
+                </td>
+                <td colspan="2">
+                    <div>
+                        {{ form.children_in_home_comments}}
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
 
-    <table class="check-your-answers form-group">
-        <thead>
-        <tr>
-            <th colspan="3">
-                <div class="heading-medium">
-                    Children in the home
-                </div>
-            </th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr>
-            <td>
-                Do children under 16 live in the home?
-            </td>
-            <td style="word-wrap: break-word">
-                {{ children_in_home|yesno:"Yes,No" }}
-            </td>
-            <td class="change-answer">
-                {{ form.children_in_home_declare }}
-            </td>
-        </tr>
-        <tr class="js-hidden" id="children_in_home">
-            <td colspan="1">
-                <div>
-                    Enter your reasoning
-                </div>
-                <div>
-                    {{ form.children_in_home_comments.help_text}}
-                </div>
-            </td>
-            <td colspan="2">
-                <div>
-                    {{ form.children_in_home_comments}}
-                </div>
-            </td>
-        </tr>
-        </tbody>
-    </table>
-
-    {% for id, name, day, month, year, relationship, formsetchild in child_lists %}
-    <table class="check-your-answers form-group">
-        <thead>
-        <tr>
-            <th colspan="3">
-                <div class="heading-medium">
+        {% for id, name, day, month, year, relationship, formsetchild in child_lists %}
+        <table class="check-your-answers form-group">
+            <thead>
+            <tr>
+                <th colspan="3">
+                    <div class="heading-medium">
+                        {{name}}
+                    </div>
+                </th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td style="word-wrap: break-word">
+                    Name
+                </td>
+                <td style="word-wrap: break-word">
                     {{name}}
-                </div>
-            </th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr>
-            <td style="word-wrap: break-word">
-                Name
-            </td>
-            <td style="word-wrap: break-word">
-                {{name}}
-            </td>
-            <td class="change-answer">
-                {{ formsetchild.full_name_declare }}
-            </td>
-        </tr>
-        <tr class="js-hidden" id="full_name{{formsetchild.instance_id.initial}}">
-            <td colspan="1">
-                <div>
-                    Enter your reasoning
-                </div>
-                <div>
-                    {{ formsetchild.full_name_comments.help_text}}
-                </div>
-            </td>
-            <td colspan="2">
-                <div>
-                    {{ formsetchild.full_name_comments}}
-                </div>
-            </td>
-        </tr>
-        <tr>
-            <td style="word-wrap: break-word">
-                Date of birth
-            </td>
-            {% if month == 1 %}
-            <td style="word-wrap: break-word">
-                {{day}} January {{year}}
-            </td>
-            {% elif month == 2 %}
-            <td style="word-wrap: break-word">
-                {{day}} February {{year}}
-            </td>
-            {% elif month == 3 %}
-            <td style="word-wrap: break-word">
-                {{day}} March {{year}}
-            </td>
-            {% elif month == 4 %}
-            <td style="word-wrap: break-word">
-                {{day}} April {{year}}
-            </td>
-            {% elif month == 5 %}
-            <td style="word-wrap: break-word">
-                {{day}} May {{year}}
-            </td>
-            {% elif month == 6 %}
-            <td style="word-wrap: break-word">
-                {{day}} June {{year}}
-            </td>
-            {% elif month == 7 %}
-            <td style="word-wrap: break-word">
-                {{day}} July {{year}}
-            </td>
-            {% elif month == 8 %}
-            <td style="word-wrap: break-word">
-                {{day}} August {{year}}
-            </td>
-            {% elif month == 9 %}
-            <td style="word-wrap: break-word">
-                {{day}} September {{year}}
-            </td>
-            {% elif month == 10 %}
-            <td style="word-wrap: break-word">
-                {{day}} October {{year}}
-            </td>
-            {% elif month == 11 %}
-            <td style="word-wrap: break-word">
-                {{day}} November {{year}}
-            </td>
-            {% elif month == 12 %}
-            <td style="word-wrap: break-word">
-                {{day}} December {{year}}
-            </td>
+                </td>
+                <td class="change-answer">
+                    {{ formsetchild.full_name_declare }}
+                </td>
+            </tr>
+            <tr class="js-hidden" id="full_name{{formsetchild.instance_id.initial}}">
+                <td colspan="1">
+                    <div>
+                        Enter your reasoning
+                    </div>
+                    <div>
+                        {{ formsetchild.full_name_comments.help_text}}
+                    </div>
+                </td>
+                <td colspan="2">
+                    <div>
+                        {{ formsetchild.full_name_comments}}
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td style="word-wrap: break-word">
+                    Date of birth
+                </td>
+                {% if month == 1 %}
+                <td style="word-wrap: break-word">
+                    {{day}} January {{year}}
+                </td>
+                {% elif month == 2 %}
+                <td style="word-wrap: break-word">
+                    {{day}} February {{year}}
+                </td>
+                {% elif month == 3 %}
+                <td style="word-wrap: break-word">
+                    {{day}} March {{year}}
+                </td>
+                {% elif month == 4 %}
+                <td style="word-wrap: break-word">
+                    {{day}} April {{year}}
+                </td>
+                {% elif month == 5 %}
+                <td style="word-wrap: break-word">
+                    {{day}} May {{year}}
+                </td>
+                {% elif month == 6 %}
+                <td style="word-wrap: break-word">
+                    {{day}} June {{year}}
+                </td>
+                {% elif month == 7 %}
+                <td style="word-wrap: break-word">
+                    {{day}} July {{year}}
+                </td>
+                {% elif month == 8 %}
+                <td style="word-wrap: break-word">
+                    {{day}} August {{year}}
+                </td>
+                {% elif month == 9 %}
+                <td style="word-wrap: break-word">
+                    {{day}} September {{year}}
+                </td>
+                {% elif month == 10 %}
+                <td style="word-wrap: break-word">
+                    {{day}} October {{year}}
+                </td>
+                {% elif month == 11 %}
+                <td style="word-wrap: break-word">
+                    {{day}} November {{year}}
+                </td>
+                {% elif month == 12 %}
+                <td style="word-wrap: break-word">
+                    {{day}} December {{year}}
+                </td>
+                {% endif %}
+                <td class="change-answer">
+                    {{ formsetchild.date_of_birth_declare }}
+                </td>
+            </tr>
+            <tr class="js-hidden" id="date_of_birth{{formsetchild.instance_id.initial}}">
+                <td colspan="1">
+                    <div>
+                        Enter your reasoning
+                    </div>
+                    <div>
+                        {{ formsetchild.date_of_birth_comments.help_text}}
+                    </div>
+                </td>
+                <td colspan="2">
+                    <div>
+                        {{ formsetchild.date_of_birth_comments}}
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td style="word-wrap: break-word">
+                    Relationship
+                </td>
+                <td style="word-wrap: break-word">
+                    {{relationship}}
+                </td>
+                <td class="change-answer">
+                    {{ formsetchild.relationship_declare }}
+                </td>
+            </tr>
+            <tr class="js-hidden" id="relationship{{formsetchild.instance_id.initial}}">
+                <td colspan="1">
+                    <div>
+                        Enter your reasoning
+                    </div>
+                    <div>
+                        {{ formsetchild.relationship_comments.help_text}}
+                    </div>
+                </td>
+                <td colspan="2">
+                    <div>
+                        {{ formsetchild.relationship_comments}}
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+        {% endfor %}
+
+        {% if providing_care_in_own_home %}
+
+        <table class="check-your-answers form-group">
+            <thead>
+            <tr>
+                <th colspan="3">
+                    <div class="heading-medium">
+                        Your own children
+                    </div>
+                </th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>
+                    Known to council social services in regards to your own children?
+                </td>
+                <td style="word-wrap: break-word">
+                    {{ known_to_social_services_pith|yesno:"Yes,No" }}
+                </td>
+                <td class="change-answer">
+                    {{ form.known_to_social_services_pith_declare }}
+                </td>
+            </tr>
+            <tr class="js-hidden" id="known_to_social_services_pith">
+                <td colspan="1">
+                    <div>
+                        Enter your reasoning
+                    </div>
+                    <div>
+                        {{ form.known_to_social_services_pith_comments.help_text}}
+                    </div>
+                </td>
+                <td colspan="2">
+                    <div>
+                        {{ form.known_to_social_services_pith_comments}}
+                    </div>
+                </td>
+            </tr>
+            {% if known_to_social_services_pith == True %}
+             <tr>
+                <td>
+                    Tell us why
+                </td>
+                <td style="word-wrap: break-word">
+                    {{reasons_known_to_social_services_pith}}
+                </td>
+                <td class="change-answer">
+                    {{ form.reasons_known_to_social_services_pith_declare }}
+                </td>
+            </tr>
+            <tr class="js-hidden" id="reasons_known_to_social_services_pith">
+                <td colspan="1">
+                    <div>
+                        Enter your reasoning
+                    </div>
+                    <div>
+                        {{ form.reasons_known_to_social_services_pith_comments.help_text}}
+                    </div>
+                </td>
+                <td colspan="2">
+                    <div>
+                        {{ form.reasons_known_to_social_services_pith_comments}}
+                    </div>
+                </td>
+            </tr>
             {% endif %}
-            <td class="change-answer">
-                {{ formsetchild.date_of_birth_declare }}
-            </td>
-        </tr>
-        <tr class="js-hidden" id="date_of_birth{{formsetchild.instance_id.initial}}">
-            <td colspan="1">
-                <div>
-                    Enter your reasoning
-                </div>
-                <div>
-                    {{ formsetchild.date_of_birth_comments.help_text}}
-                </div>
-            </td>
-            <td colspan="2">
-                <div>
-                    {{ formsetchild.date_of_birth_comments}}
-                </div>
-            </td>
-        </tr>
-        <tr>
-            <td style="word-wrap: break-word">
-                Relationship
-            </td>
-            <td style="word-wrap: break-word">
-                {{relationship}}
-            </td>
-            <td class="change-answer">
-                {{ formsetchild.relationship_declare }}
-            </td>
-        </tr>
-        <tr class="js-hidden" id="relationship{{formsetchild.instance_id.initial}}">
-            <td colspan="1">
-                <div>
-                    Enter your reasoning
-                </div>
-                <div>
-                    {{ formsetchild.relationship_comments.help_text}}
-                </div>
-            </td>
-            <td colspan="2">
-                <div>
-                    {{ formsetchild.relationship_comments}}
-                </div>
-            </td>
-        </tr>
-        </tbody>
-    </table>
+            </tbody>
+        </table>
 
-    {% endfor %}
-
-    {% if providing_care_in_own_home %}
-
-    <table class="check-your-answers form-group">
-        <thead>
-        <tr>
-            <th colspan="3">
-                <div class="heading-medium">
-                    Your own children
-                </div>
-            </th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr>
-            <td>
-                Known to council social services in regards to your own children?
-            </td>
-            <td style="word-wrap: break-word">
-                {{ known_to_social_services_pith|yesno:"Yes,No" }}
-            </td>
-            <td class="change-answer">
-                {{ form.known_to_social_services_pith_declare }}
-            </td>
-        </tr>
-        <tr class="js-hidden" id="known_to_social_services_pith">
-            <td colspan="1">
-                <div>
-                    Enter your reasoning
-                </div>
-                <div>
-                    {{ form.known_to_social_services_pith_comments.help_text}}
-                </div>
-            </td>
-            <td colspan="2">
-                <div>
-                    {{ form.known_to_social_services_pith_comments}}
-                </div>
-            </td>
-        </tr>
-        {% if known_to_social_services_pith == True %}
-        <tr>
-            <td>
-                Tell us why
-            </td>
-            <td style="word-wrap: break-word">
-                {{reasons_known_to_social_services_pith}}
-            </td>
-            <td class="change-answer">
-                {{ form.reasons_known_to_social_services_pith_declare }}
-            </td>
-        </tr>
-        <tr class="js-hidden" id="reasons_known_to_social_services_pith">
-            <td colspan="1">
-                <div>
-                    Enter your reasoning
-                </div>
-                <div>
-                    {{ form.reasons_known_to_social_services_pith_comments.help_text}}
-                </div>
-            </td>
-            <td colspan="2">
-                <div>
-                    {{ form.reasons_known_to_social_services_pith_comments}}
-                </div>
-            </td>
-        </tr>
-        {% endif %}
-        </tbody>
-    </table>
-
-    {% for child, child_address, formsetchild, address_formset_child in own_child_lists %}
-    <table class="check-your-answers form-group">
-        <thead>
-        <tr>
-            <th colspan="3">
-                <div class="heading-medium">
+        {% for child, child_address, formsetchild, address_formset_child in own_child_lists %}
+        <table class="check-your-answers form-group">
+            <thead>
+            <tr>
+                <th colspan="3">
+                    <div class="heading-medium">
+                        {{ child.get_full_name }}
+                    </div>
+                </th>
+            </tr>
+            </thead>
+            <tbody>
+            {# ================================== #}
+            <tr>
+                <td style="word-wrap: break-word">
+                    Name
+                </td>
+                <td style="word-wrap: break-word">
                     {{ child.get_full_name }}
-                </div>
-            </th>
-        </tr>
-        </thead>
-        <tbody>
-        {# ================================== #}
-        <tr>
-            <td style="word-wrap: break-word">
-                Name
-            </td>
-            <td style="word-wrap: break-word">
-                {{ child.get_full_name }}
-            </td>
-            <td class="change-answer">
-                {{ formsetchild.full_name_declare }}
-            </td>
-        </tr>
-        <tr class="js-hidden" id="full_name{{formsetchild.instance_id.initial}}">
-            <td colspan="1">
-                <div>
-                    Enter your reasoning
-                </div>
-                <div>
-                    {{ formsetchild.full_name_comments.help_text}}
-                </div>
-            </td>
-            <td colspan="2">
-                <div>
-                    {{ formsetchild.full_name_comments}}
-                </div>
-            </td>
-        </tr>
-        {# ================================== #}
-        <tr>
-            <td style="word-wrap: break-word">
-                Date of birth
-            </td>
-            {% if child.birth_month == 1 %}
-            <td style="word-wrap: break-word">
-                {{ child.birth_day }} January {{ child.birth_year }}
-            </td>
-            {% elif child.birth_month == 2 %}
-            <td style="word-wrap: break-word">
-                {{ child.birth_day }} February {{ child.birth_year }}
-            </td>
-            {% elif child.birth_month == 3 %}
-            <td style="word-wrap: break-word">
-                {{ child.birth_day }} March {{ child.birth_year }}
-            </td>
-            {% elif child.birth_month == 4 %}
-            <td style="word-wrap: break-word">
-                {{ child.birth_day }} April {{ child.birth_year }}
-            </td>
-            {% elif child.birth_month == 5 %}
-            <td style="word-wrap: break-word">
-                {{ child.birth_day }} May {{ child.birth_year }}
-            </td>
-            {% elif child.birth_month == 6 %}
-            <td style="word-wrap: break-word">
-                {{ child.birth_day }} June {{ child.birth_year }}
-            </td>
-            {% elif child.birth_month == 7 %}
-            <td style="word-wrap: break-word">
-                {{ child.birth_day }} July {{ child.birth_year }}
-            </td>
-            {% elif child.birth_month == 8 %}
-            <td style="word-wrap: break-word">
-                {{ child.birth_day }} August {{ child.birth_year }}
-            </td>
-            {% elif child.birth_month == 9 %}
-            <td style="word-wrap: break-word">
-                {{ child.birth_day }} September {{ child.birth_year }}
-            </td>
-            {% elif child.birth_month == 10 %}
-            <td style="word-wrap: break-word">
-                {{ child.birth_day}} October {{ child.birth_year }}
-            </td>
-            {% elif child.birth_month == 11 %}
-            <td style="word-wrap: break-word">
-                {{ child.birth_day }} November {{ child.birth_year }}
-            </td>
-            {% elif child.birth_month == 12 %}
-            <td style="word-wrap: break-word">
-                {{ child.birth_day }} December {{ child.birth_year }}
-            </td>
-            {% endif %}
-            <td class="change-answer">
-                {{ formsetchild.date_of_birth_declare }}
-            </td>
-        </tr>
-        <tr class="js-hidden" id="date_of_birth{{formsetchild.instance_id.initial}}">
-            <td colspan="1">
-                <div>
-                    Enter your reasoning
-                </div>
-                <div>
-                    {{ formsetchild.date_of_birth_comments.help_text}}
-                </div>
-            </td>
-            <td colspan="2">
-                <div>
-                    {{ formsetchild.date_of_birth_comments}}
-                </div>
-            </td>
-        </tr>
-        {# ================================== #}
-        <tr>
+                </td>
+                <td class="change-answer">
+                    {{ formsetchild.full_name_declare }}
+                </td>
+            </tr>
+            <tr class="js-hidden" id="full_name{{formsetchild.instance_id.initial}}">
+                <td colspan="1">
+                    <div>
+                        Enter your reasoning
+                    </div>
+                    <div>
+                        {{ formsetchild.full_name_comments.help_text}}
+                    </div>
+                </td>
+                <td colspan="2">
+                    <div>
+                        {{ formsetchild.full_name_comments}}
+                    </div>
+                </td>
+            </tr>
+            {# ================================== #}
+            <tr>
+                <td style="word-wrap: break-word">
+                    Date of birth
+                </td>
+                {% if  child.birth_month == 1 %}
+                <td style="word-wrap: break-word">
+                    {{ child.birth_day }} January {{ child.birth_year }}
+                </td>
+                {% elif child.birth_month == 2 %}
+                <td style="word-wrap: break-word">
+                    {{ child.birth_day }} February {{ child.birth_year }}
+                </td>
+                {% elif child.birth_month == 3 %}
+                <td style="word-wrap: break-word">
+                    {{ child.birth_day }} March {{ child.birth_year }}
+                </td>
+                {% elif child.birth_month == 4 %}
+                <td style="word-wrap: break-word">
+                    {{ child.birth_day }} April {{ child.birth_year }}
+                </td>
+                {% elif child.birth_month == 5 %}
+                <td style="word-wrap: break-word">
+                    {{ child.birth_day }} May {{ child.birth_year }}
+                </td>
+                {% elif child.birth_month == 6 %}
+                <td style="word-wrap: break-word">
+                    {{ child.birth_day }} June {{ child.birth_year }}
+                </td>
+                {% elif child.birth_month == 7 %}
+                <td style="word-wrap: break-word">
+                    {{ child.birth_day }} July {{ child.birth_year }}
+                </td>
+                {% elif child.birth_month == 8 %}
+                <td style="word-wrap: break-word">
+                    {{ child.birth_day }} August {{ child.birth_year }}
+                </td>
+                {% elif child.birth_month == 9 %}
+                <td style="word-wrap: break-word">
+                    {{ child.birth_day }} September {{ child.birth_year }}
+                </td>
+                {% elif child.birth_month == 10 %}
+                <td style="word-wrap: break-word">
+                    {{ child.birth_day}} October {{ child.birth_year }}
+                </td>
+                {% elif child.birth_month == 11 %}
+                <td style="word-wrap: break-word">
+                    {{ child.birth_day }} November {{ child.birth_year }}
+                </td>
+                {% elif child.birth_month == 12 %}
+                <td style="word-wrap: break-word">
+                    {{ child.birth_day }} December {{ child.birth_year }}
+                </td>
+                {% endif %}
+                <td class="change-answer">
+                    {{ formsetchild.date_of_birth_declare }}
+                </td>
+            </tr>
+            <tr class="js-hidden" id="date_of_birth{{formsetchild.instance_id.initial}}">
+                <td colspan="1">
+                    <div>
+                        Enter your reasoning
+                    </div>
+                    <div>
+                        {{ formsetchild.date_of_birth_comments.help_text}}
+                    </div>
+                </td>
+                <td colspan="2">
+                    <div>
+                        {{ formsetchild.date_of_birth_comments}}
+                    </div>
+                </td>
+            </tr>
+            {# ================================== #}
+            <tr>
             <td>
                 Child address
             </td>
@@ -1081,77 +1081,71 @@
             <td class="change-answer">
                 {{ address_formset_child.address_declare }}
             </td>
-        </tr>
-        <tr class="js-hidden" id="address{{address_formset_child.instance_id.initial}}">
-            <td colspan="1">
-                <div>
-                    Enter your reasoning
-                </div>
-                <div>
-                    {{ address_formset_child.address_comments.help_text}}
-                </div>
-            </td>
-            <td colspan="2">
-                <div>
-                    {{ address_formset_child.address_comments}}
-                </div>
-            </td>
-        </tr>
-        </tbody>
-    </table>
+            </tr>
+            <tr class="js-hidden" id="address{{address_formset_child.instance_id.initial}}">
+                <td colspan="1">
+                    <div>
+                        Enter your reasoning
+                    </div>
+                    <div>
+                        {{ address_formset_child.address_comments.help_text}}
+                    </div>
+                </td>
+                <td colspan="2">
+                    <div>
+                        {{ address_formset_child.address_comments}}
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
 
-    {% endfor %}
-    {% endif %}
-
-    {% for id, name, previous_names, previous_addresses in adult_ebulk_lists %}
-
-    {% endfor %}
-
-
-    {% for id, name, previous_registrations in previous_registration_lists %}
-    {% for previous_registration in previous_registrations %}
-    <table class="check-your-answers form-group">
-        <thead>
-        <tr>
-            <th colspan="3">
-                <div class="heading-medium">
-                    {{name}} previous registration
-                </div>
-            </th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr>
-            <td>Has the applicant previously registered with Ofsted?</td>
-            <td>{{ previous_registration.previous_registration|yesno:"Yes,No" }}</td>
-            <td>
-                <a href="{% url 'other-people-previous-registration' %}?id={{ application_id }}&person_id={{id}}">Change</a>
-            </td>
-        </tr>
-        {% if previous_registration.previous_registration %}
-        <tr>
-            <td>Individual ID</td>
-            <td>{{ previous_registration.individual_id }}</td>
-            <td>
-                <a href="{% url 'other-people-previous-registration' %}?id={{ application_id }}&person_id={{id}}">Change</a>
-            </td>
-        </tr>
+        {% endfor %}
         {% endif %}
-        <tr>
-            <td>Has the applicant lived in England for more than 5 years</td>
-            <td>{{ previous_registration.five_years_in_UK|yesno:"Yes,No" }}</td>
-            <td>
-                <a href="{% url 'other-people-previous-registration' %}?id={{ application_id }}&person_id={{id}}">Change</a>
-            </td>
-        </tr>
-        </tbody>
-    </table>
-    {% endfor %}
-    {% endfor %}
 
-    <input type="submit" class="button" value="Confirm and continue"/>
-    <input type="hidden" value="{{application_id}}" name="id"/>
-    {% include 'childminder_templates/return-to-list.html' %}
-</form>
+        {% for id, name, previous_names, previous_addresses in adult_ebulk_lists %}
+
+        {% endfor %}
+
+
+        {% for id, name, previous_registrations in previous_registration_lists %}
+        {% for previous_registration in previous_registrations %}
+                <table class="check-your-answers form-group">
+                    <thead>
+                    <tr>
+                        <th colspan="3">
+                            <div class="heading-medium">
+                                {{name}} previous registration
+                            </div>
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>Has the applicant previously registered with Ofsted?</td>
+                        <td>{{ previous_registration.previous_registration|yesno:"Yes,No" }}</td>
+                        <td><a href="{% url 'other-people-previous-registration' %}?id={{ application_id }}&person_id={{id}}">Change</a></td>
+                    </tr>
+                    {% if previous_registration.previous_registration %}
+                    <tr>
+                        <td>Individual ID</td>
+                        <td>{{ previous_registration.individual_id }}</td>
+                        <td><a href="{% url 'other-people-previous-registration' %}?id={{ application_id }}&person_id={{id}}">Change</a></td>
+                    </tr>
+                    {% endif %}
+                    <tr>
+                        <td>Has the applicant lived in England for more than 5 years</td>
+                        <td>{{ previous_registration.five_years_in_UK|yesno:"Yes,No" }}</td>
+                        <td><a href="{% url 'other-people-previous-registration' %}?id={{ application_id }}&person_id={{id}}">Change</a></td>
+                    </tr>
+                    </tbody>
+                </table>
+                    {% endfor %}
+        {% endfor %}
+
+        <input type="submit" class="button" value="Confirm and continue"/>
+        <input type="hidden" value="{{application_id}}" name="id"/>
+        {% include 'childminder_templates/return-to-list.html' %}
+    </form>
 
 {% endblock %}

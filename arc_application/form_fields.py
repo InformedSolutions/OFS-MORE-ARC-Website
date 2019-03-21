@@ -7,10 +7,11 @@ OFS-MORE-CCN3: Apply to be a Childminder Beta
 import datetime
 
 from django import forms
+from django.core.exceptions import ValidationError
 from django.utils.timezone import now
 from django.utils.translation import gettext, gettext_lazy as _
-from govuk_forms import widgets as govw
 from govuk_forms import fields as govf
+from govuk_forms import widgets as govw
 
 from .widgets import ExpirySplitDateWidget, TimeKnownSplitDateWidget
 
@@ -209,6 +210,7 @@ class CustomSplitDateField(govf.SplitDateField):
                 'min_value': 'Year must be between 2000 and the current year',
                 'max_value': 'Year must be between 2000 and the current year',
                 'invalid': 'Enter year as a number',
+                'short_year': 'Enter year in long year format.'
             },
         }
         year_options.update(year_args)
@@ -230,18 +232,12 @@ class CustomSplitDateField(govf.SplitDateField):
             forms.IntegerField(**day_options),
             forms.IntegerField(**month_options)
         ]
+
         if self.allow_short_year:
             self.fields.append(govf.YearField(**year_options))
         else:
-            # simple 4-year number - use an integer field and replace min_value to impose 4-digit requirement.
-            # Actual min_value is checked later in compress
             year_options.pop('era_boundary')
-            self.year_min_value = year_options['min_value']
-            year_options['min_value'] = 1000
-            self.year_min_value_msg = year_options['error_messages'].get('min_value', None)
-            year_options['error_messages']['min_value'] = options['error_messages'].get(
-                'short_year', self.default_error_messages['short_year'])
-            self.fields.append(forms.IntegerField(**year_options))
+            self.fields.append(NoShortYearField(**year_options))
 
         super(govf.SplitDateField, self).__init__(self.fields, *args, **options)
 
@@ -257,9 +253,6 @@ class CustomSplitDateField(govf.SplitDateField):
                 raise forms.ValidationError(self.error_messages['required'], code='required')
             else:
                 return None
-
-        if not self.allow_short_year and self.year_min_value is not None and data_list[2] < self.year_min_value:
-            raise forms.ValidationError(self.year_min_value_msg, code='short_year')
 
         try:
             date_compressed = datetime.date(data_list[2], data_list[1], data_list[0])
@@ -287,3 +280,28 @@ class CustomSplitDateField(govf.SplitDateField):
             if k.startswith(prefix):
                 result[k[len(prefix):]] = kwarg_dict.pop(k)
         return result
+
+
+class NoShortYearField(forms.IntegerField):
+    default_error_messages = {
+        'short_year': _('Enter year in long year format.'),
+    }
+
+    def __init__(self, **kwargs):
+        self.current_year = now().year
+        options = {
+            'min_value': 1900,
+            'max_value': self.current_year,
+            'error_messages': {
+                'invalid': gettext('Enter year as a number.'),
+                'short_year': 'Enter year in long year format.'
+            }
+        }
+        options.update(kwargs)
+        super().__init__(**options)
+
+    def clean(self, value):
+        value = self.to_python(value)
+        if isinstance(value, int) and value < 1000:
+            raise ValidationError(self.error_messages['short_year'], code='short_year')
+        return super().clean(value)
