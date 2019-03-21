@@ -31,7 +31,7 @@ class PersonPreviousNameForm(GOVUKForm):
 
     auto_replace_widgets = True
     field_label_classes = 'form-label-bold'
-    error_summary_title = 'There was a problem on this page'
+    error_summary_title = 'There was a problem'
 
     previous_name_id = forms.CharField(
         widget=forms.widgets.HiddenInput,
