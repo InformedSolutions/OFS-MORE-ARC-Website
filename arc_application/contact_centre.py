@@ -29,18 +29,6 @@ def search(request):
 
     if (cc_user or arc_user) and request.user.is_authenticated():
 
-        # Display all applications on search page
-        if settings.ENABLE_NANNIES:
-            application_type = 'All'
-        else:
-            application_type = 'Childminder'
-
-        results = SearchService.search("", "", "", "", "", application_type)
-
-        if results is not None and len(results) > 0:
-            context['empty'] = False
-            context['app'] = results
-
         if request.method == 'GET':
             context['form'] = SearchForm()
             return render(request, SEARCH_TEMPLATE_PATH, context)
@@ -73,6 +61,7 @@ def search(request):
                                                       application_type)
 
                 if search_results is not None and len(search_results) > 0:
+                    context['empty'] = False
                     context['app'] = search_results
 
                 else:
