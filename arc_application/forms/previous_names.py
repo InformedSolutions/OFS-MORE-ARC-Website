@@ -65,8 +65,7 @@ class PersonPreviousNameForm(GOVUKForm):
         error_messages={'required': ERROR_MESSAGE_DATE_BLANK,
                         'incomplete': ERROR_MESSAGE_DATE_BLANK,
                         'max_today': ERROR_MESSAGE_START_DATE_AFTER_CURRENT_DATE,
-                        'invalid': ERROR_MESSAGE_INVALID_DATE,
-                        'short_year': ERROR_MESSAGE_YEAR_LESS_THAN_4_DIGITS},
+                        'invalid': ERROR_MESSAGE_INVALID_DATE},
         day_error_messages={'min_value': ERROR_MESSAGE_DAY_OUT_OF_RANGE,
                             'max_value': ERROR_MESSAGE_DAY_OUT_OF_RANGE,
                             'invalid': ERROR_MESSAGE_NON_NUMERIC},
@@ -76,7 +75,8 @@ class PersonPreviousNameForm(GOVUKForm):
         year_min_value=1900,
         year_max_value=None,
         year_error_messages={'min_value': ERROR_MESSAGE_START_YEAR_BEFORE_1900,
-                             'invalid': ERROR_MESSAGE_NON_NUMERIC},
+                             'invalid': ERROR_MESSAGE_NON_NUMERIC,
+                             'short_year': ERROR_MESSAGE_YEAR_LESS_THAN_4_DIGITS},
     )
     end_date = form_fields.CustomSplitDateField(
         label='End date',
@@ -88,8 +88,7 @@ class PersonPreviousNameForm(GOVUKForm):
         error_messages={'required': ERROR_MESSAGE_DATE_BLANK,
                         'incomplete': ERROR_MESSAGE_DATE_BLANK,
                         'max_today': ERROR_MESSAGE_END_DATE_AFTER_CURRENT_DATE,
-                        'invalid': ERROR_MESSAGE_INVALID_DATE,
-                        'short_year': ERROR_MESSAGE_YEAR_LESS_THAN_4_DIGITS},
+                        'invalid': ERROR_MESSAGE_INVALID_DATE},
         day_error_messages={'min_value': ERROR_MESSAGE_DAY_OUT_OF_RANGE,
                             'max_value': ERROR_MESSAGE_DAY_OUT_OF_RANGE,
                             'invalid': ERROR_MESSAGE_NON_NUMERIC},
@@ -99,7 +98,8 @@ class PersonPreviousNameForm(GOVUKForm):
         year_min_value=1900,
         year_max_value=None,
         year_error_messages={'min_value': ERROR_MESSAGE_END_YEAR_BEFORE_1900,
-                             'invalid': ERROR_MESSAGE_NON_NUMERIC},
+                             'invalid': ERROR_MESSAGE_NON_NUMERIC,
+                             'short_year': ERROR_MESSAGE_YEAR_LESS_THAN_4_DIGITS},
     )
 
     def clean(self):
@@ -116,4 +116,3 @@ class PersonPreviousNameForm(GOVUKForm):
         for field, errors in self.errors.items():
             dedup = OrderedDict([(k, None) for k in errors])
             self.errors[field] = list(dedup.keys())
-

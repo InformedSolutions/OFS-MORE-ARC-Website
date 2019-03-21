@@ -7,6 +7,7 @@ from ...forms.previous_addresses import PreviousAddressManualForm, PreviousAddre
 from ..utils import create_childminder_application, create_arc_user
 from ...forms.previous_names import PersonPreviousNameForm
 
+
 @tag('unit')
 class ReviewPersonalDetailsPreviousNamesFormValidationTests(TestCase):
     form = PersonPreviousNameForm
@@ -166,6 +167,30 @@ class ReviewPersonalDetailsPreviousNamesFormValidationTests(TestCase):
         self.assertEqual(form.errors, {
             'start_date': [self.ERROR_MESSAGE_START_YEAR_BEFORE_1900],
             'end_date': [self.ERROR_MESSAGE_END_YEAR_BEFORE_1900]
+        })
+
+    def test_invalid_all_error_messages_show_when_all_values_out_of_range(self):
+        data = {
+            'first_name': 'Fred',
+            'middle_names': '',
+            'last_name': 'Bloggs',
+            'start_date_0': '43',
+            'start_date_1': '59',
+            'start_date_2': '1400',
+            'end_date_0': '350',
+            'end_date_1': '13',
+            'end_date_2': '1889',
+        }
+        form = self.form(data)
+
+        self.assertFalse(form.is_valid())
+
+        # Check error messages
+        self.assertEqual(form.errors, {
+            'start_date': [self.ERROR_MESSAGE_DAY_OUT_OF_RANGE, self.ERROR_MESSAGE_MONTH_OUT_OF_RANGE,
+                           self.ERROR_MESSAGE_START_YEAR_BEFORE_1900],
+            'end_date': [self.ERROR_MESSAGE_DAY_OUT_OF_RANGE, self.ERROR_MESSAGE_MONTH_OUT_OF_RANGE,
+                         self.ERROR_MESSAGE_END_YEAR_BEFORE_1900]
         })
 
     def test_invalid_if_start_or_end_year_less_than_4_digits(self):
@@ -411,6 +436,7 @@ class PersonalDetailsPreviousAddressEnterPostCodeFormValidationTests(TestCase):
         # Assert that the cleaned postcode is stored uppercase
         self.assertEqual(form.cleaned_data['postcode'], 'WA141RF')
 
+
 @tag('unit')
 class PersonalDetailsPreviousAddressSelectPostCodeFormValidationTests(TestCase):
     """
@@ -421,7 +447,7 @@ class PersonalDetailsPreviousAddressSelectPostCodeFormValidationTests(TestCase):
     ERROR_MESSAGE_ADDRESS_BLANK = 'Please select your address'
     ERROR_MESSAGE_ADDRESS_INVALID = 'Select a valid choice. {0} is not one of the available choices.'
 
-    ERROR_MESSAGE_DATE_BLANK = 'Enter the date, including the month and year'
+    ERROR_MESSAGE_DATE_BLANK = 'Enter the full date, including the day, month and year'
     ERROR_MESSAGE_DAY_OUT_OF_RANGE = 'Day must be between 1 and 31'
     ERROR_MESSAGE_MONTH_OUT_OF_RANGE = 'Month must be between 1 and 12'
     ERROR_MESSAGE_MOVED_IN_YEAR_BEFORE_1900 = 'Date moved in must be after 1900'
@@ -773,7 +799,7 @@ class PersonalDetailsPreviousAddressManualPostCodeFormValidationTests(TestCase):
     ERROR_MESSAGE_POSTCODE_INVALID = 'Please enter a valid postcode'
 
     # Moved in/out date validation messages
-    ERROR_MESSAGE_DATE_BLANK = 'Enter the date, including the month and year'
+    ERROR_MESSAGE_DATE_BLANK = 'Enter the full date, including the day, month and year'
     ERROR_MESSAGE_DAY_OUT_OF_RANGE = 'Day must be between 1 and 31'
     ERROR_MESSAGE_MONTH_OUT_OF_RANGE = 'Month must be between 1 and 12'
     ERROR_MESSAGE_MOVED_IN_YEAR_BEFORE_1900 = 'Date moved in must be after 1900'

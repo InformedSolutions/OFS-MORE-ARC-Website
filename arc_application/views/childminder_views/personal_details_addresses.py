@@ -45,9 +45,6 @@ def personal_details_previous_address(request):
     if state == 'submission':
         return postcode_submission(request)
 
-    if state == 'update':
-        return address_update(request, remove=remove)
-
     raise ValueError('State not found. State: {0}'.format(state))
 
 
@@ -101,6 +98,30 @@ def postcode_selection(request, remove=False):
         return render(request, 'childminder_templates/previous-address-lookup.html', context)
 
     elif request.method == 'POST':
+
+        # If the user selects 'I can't find my address in the list', redirect them to the manual address page.
+        # Also, populate the manual form with data that has already been entered (postcode, move in/out)
+        request_data = getattr(request, request.method)
+
+        swap_to_manual = request_data.get('swap-to-manual', None)
+        if swap_to_manual is not None:
+            postcode = request_data['postcode']
+
+            moved_in_day = request_data['moved_in_date_0']
+            moved_in_month = request_data['moved_in_date_1']
+            moved_in_year = request_data['moved_in_date_2']
+
+            moved_out_day = request_data['moved_out_date_0']
+            moved_out_month = request_data['moved_out_date_1']
+            moved_out_year = request_data['moved_out_date_2']
+
+            address = {
+                'postcode': postcode,
+                'moved_in_date': [moved_in_day, moved_in_month, moved_in_year],
+                'moved_out_date': [moved_out_day, moved_out_month, moved_out_year]
+            }
+            return postcode_manual(request, swap_to_manual=True, address=address)
+
         addresses = AddressHelper.create_address_lookup_list(request.POST['postcode'])
 
         if 'postcode-search' in request.POST:
@@ -116,7 +137,7 @@ def postcode_selection(request, remove=False):
     return render(request, 'childminder_templates/previous-address-lookup.html', context)
 
 
-def postcode_manual(request, remove=False):
+def postcode_manual(request, remove=False, swap_to_manual=False, address=None):
     """
     Function to allow the user to manually enter an address, or be redirected appropriately
     :param request: Standard Httprequest object
@@ -124,8 +145,13 @@ def postcode_manual(request, remove=False):
     """
     context = get_context(request)
 
-    if request.method == 'GET' or remove is True:
-        context['form'] = PreviousAddressManualForm()
+    if request.method == 'GET' or remove is True or swap_to_manual is True:
+        if not swap_to_manual:
+            context['form'] = PreviousAddressManualForm()
+        else:
+            # If you've come from the address selection page, then populate the form with the entered data
+            context['form'] = PreviousAddressManualForm(initial=address)
+
         return render(request, 'childminder_templates/other-people-previous-address-manual.html', context)
 
     elif request.method == 'POST':
@@ -200,7 +226,7 @@ def postcode_submission(request):
             return postcode_entry(request)
 
 
-def address_update(request, remove=False):
+def personal_details_previous_address_change(request, remove=False):
     """
     Function to allow the user to update an entry to the address table from the other people summary page
     :param request: Standard Httprequest object
@@ -402,7 +428,7 @@ def update_applicant_current_address(application_id):
 
     else:
         # Set moved_in_date to latest moved_out_date of previous addresses
-        moved_out_date = get_latest_moved_out_date(previous_address_records)
+        applicant_personal_details_record.moved_in_date = get_latest_moved_out_date(previous_address_records)
 
     applicant_personal_details_record.moved_out_date = date.today()
     applicant_personal_details_record.save()
