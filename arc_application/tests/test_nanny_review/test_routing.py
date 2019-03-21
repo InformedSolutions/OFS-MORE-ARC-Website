@@ -153,7 +153,6 @@ class ReviewPersonalDetailsTests(NannyReviewFuncTestsBase):
         fields_to_flag = [
             'name',
             'date_of_birth',
-            'lived_abroad',
             'home_address',
             'known_to_social_services',
             'reasons_known_to_social_services'
@@ -176,7 +175,6 @@ class ReviewPersonalDetailsTests(NannyReviewFuncTestsBase):
         fields_to_flag = [
             'name',
             'date_of_birth',
-            'lived_abroad',
             'home_address',
             'known_to_social_services',
             'reasons_known_to_social_services'
@@ -189,10 +187,26 @@ class ReviewPersonalDetailsTests(NannyReviewFuncTestsBase):
         self.assertEqual(Arc.objects.get(pk=self.test_app_id).personal_details_review, 'FLAGGED')
 
     def test_flagging_home_address_only_sets_personal_details_status_to_flagged(self):
-        self.skipTest('testNotImplemented')
+        fields_to_flag = [
+            'home_address'
+        ]
+
+        post_data = self._create_post_data(fields_to_flag)
+
+        self.client.post(reverse('nanny_personal_details_summary') + '?id=' + self.test_app_id, data=post_data)
+
+        self.assertEqual(Arc.objects.get(pk=self.test_app_id).personal_details_review, 'FLAGGED')
 
     def test_flagging_name_only_sets_personal_details_status_to_flagged(self):
-        self.skipTest('testNotImplemented')
+        fields_to_flag = [
+            'name'
+        ]
+
+        post_data = self._create_post_data(fields_to_flag)
+
+        self.client.post(reverse('nanny_personal_details_summary') + '?id=' + self.test_app_id, data=post_data)
+
+        self.assertEqual(Arc.objects.get(pk=self.test_app_id).personal_details_review, 'FLAGGED')
 
     def test_not_flagging_personal_details_sets_status_to_reviewed(self):
         self.client.post(reverse('nanny_personal_details_summary') + '?id=' + self.test_app_id,
@@ -203,16 +217,59 @@ class ReviewPersonalDetailsTests(NannyReviewFuncTestsBase):
         self.assertEqual(Arc.objects.get(pk=self.test_app_id).personal_details_review, 'COMPLETED')
 
     def test_submit_redirects_to_childcare_address_page_if_valid(self):
-        self.skipTest('testNotImplemented')
+        fields_to_flag = [
+            'name',
+            'date_of_birth',
+            'lived_abroad',
+            'home_address',
+            'known_to_social_services',
+            'reasons_known_to_social_services'
+        ]
+
+        post_data = self._create_post_data(fields_to_flag)
+        response = self.client.post(reverse('nanny_personal_details_summary') + '?id=' + self.test_app_id, data=post_data)
+
+        self.assertEqual(response.status_code, 302)
 
     def test_shows_Add_Previous_Names_button(self):
 
         # GET request to personal details summary
-        response = self.client.get(reverse('personal_details_summary') + '?id=' + self.application.application_id)
+        response = self.client.get(reverse('nanny_personal_details_summary') + '?id=' + self.test_app_id)
 
         # Assert that the 'Add previous names' button is on the page.
-        utils.assertXPath(response, '//a[@href="{url}?id={app_id}&person_id={app_id}&type=APPLICANT"]'.format(
-            url=reverse('personal_details_previous_names'), app_id=self.application.pk))
+        utils.assertXPath(response, '//a[@href="{url}?id={app_id}"]'.format(
+            url=reverse('nanny_previous_names'), app_id=self.test_app_id))
+
+
+    def test_shows_previous_names_in_creation_order(self):
+
+        with patch.object(NannyGatewayActions, 'list') as nanny_api_list:
+        #patch.object(NannyGatewayActions, 'read') as nanny_api_read:
+            prev_name_record_2 = {'application_id': '998fd8ec-b96b-4a71-a1a1-a7a3ae186729',
+            'previous_name_id': '9935bf3b-8ba9-4162-a25b-4c55e7d33d67',
+            'first_name': 'Buffy',
+            'middle_names':'',
+            'last_name': 'Summers',
+            'start_day':3,
+            'start_month': 12,
+            'start_year': 2004,
+            'end_day': 7,
+            'end_month': 12,
+            'end_year': 2004,
+            'order': 1}
+            nanny_api_list.return_value.record = [self.nanny_gateway.previous_name_record, prev_name_record_2]
+            nanny_api_list.return_value.status_code = 200
+
+            response = self.client.get(reverse('nanny_personal_details_summary') + '?id=' + self.test_app_id)
+            self.assertEqual(200, response.status_code)
+
+            heading = "Name and date of birth"
+            utils.assertSummaryField(response, 'Previous name 1', 'Robin Hood', heading=heading)
+            utils.assertSummaryField(response, 'Start date', '01/12/2003', heading=heading)
+            utils.assertSummaryField(response, 'End date', '03/12/2004', heading=heading)
+            utils.assertSummaryField(response, 'Previous name 2', 'Buffy Summers', heading=heading)
+            utils.assertSummaryField(response, 'Start date', '03/12/2004', heading=heading)
+            utils.assertSummaryField(response, 'End date', '07/12/2004', heading=heading)
 
 
 class PreviousRegistrationTests(NannyReviewFuncTestsBase):

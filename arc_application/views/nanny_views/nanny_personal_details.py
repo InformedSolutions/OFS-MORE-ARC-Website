@@ -101,7 +101,10 @@ class NannyPersonalDetailsSummary(NannyARCFormView):
                 first_name = name['first_name']
                 middle_names = name['middle_names']
                 last_name = name['last_name']
-                full_name = "{0} {1} {2}".format(first_name, middle_names, last_name)
+                if middle_names != '':
+                    full_name = "{0} {1} {2}".format(first_name, middle_names, last_name)
+                else:
+                    full_name = "{0} {1}".format(first_name, last_name)
                 start_date_datetime = datetime.date(name['start_year'], name['start_month'], name['start_day'])
                 start_date = start_date_datetime.strftime('%d/%m/%Y')
                 end_date_datetime = datetime.date(name['end_year'], name['end_month'], name['end_day'])
@@ -114,7 +117,8 @@ class NannyPersonalDetailsSummary(NannyARCFormView):
                         'name': 'Previous name '+ order,
                         'info': full_name,
                         'change_link': 'nanny_previous_names',
-                        'alt_text': "Change the {0} previous name".format(ordinal)
+                        'alt_text': "Change the {0} previous name".format(ordinal),
+
                     })
                 previous_names.append(
                     {
@@ -122,7 +126,7 @@ class NannyPersonalDetailsSummary(NannyARCFormView):
                         'name': 'Start date',
                         'info':start_date,
                         'change_link': 'nanny_previous_names',
-                        'alt_text': "Change the start date for the {0} previous name".format(ordinal)
+                        'alt_text': "Change the start date for the {0} previous name".format(ordinal),
                     })
                 previous_names.append(
                     {
@@ -130,7 +134,7 @@ class NannyPersonalDetailsSummary(NannyARCFormView):
                      'name': 'End date',
                      'info': end_date,
                     'change_link': 'nanny_previous_names',
-                        'alt_text':"Change the end date for the {0} previous name".format(ordinal)
+                        'alt_text':"Change the end date for the {0} previous name".format(ordinal),
                      })
 
 
@@ -250,7 +254,7 @@ class NannyPersonalDetailsSummary(NannyARCFormView):
         end_date = datetime.date.today()
         if personal_details_response.status_code == 200:
             pd_record = personal_details_response.record
-            if previous_names_response.status_code == 200:
+            if previous_names_response.status_code == 200 and any(previous_names_response.record):
                 previous_names_list = previous_names_response.record
                 for name in previous_names_list:
                     name['end_date'] = datetime.date(name['end_year'], name['end_month'], name['end_day'])
