@@ -247,9 +247,9 @@ class ReviewPersonalDetailsTests(NannyReviewFuncTestsBase):
         #patch.object(NannyGatewayActions, 'read') as nanny_api_read:
             prev_name_record_2 = {'application_id': '998fd8ec-b96b-4a71-a1a1-a7a3ae186729',
             'previous_name_id': '9935bf3b-8ba9-4162-a25b-4c55e7d33d67',
-            'first_name': 'Buffy',
-            'middle_names':'',
-            'last_name': 'Summers',
+            'first_name': 'Hi',
+            'middle_names':'Hello',
+            'last_name': 'Hey',
             'start_day':3,
             'start_month': 12,
             'start_year': 2004,
@@ -267,7 +267,7 @@ class ReviewPersonalDetailsTests(NannyReviewFuncTestsBase):
             utils.assertSummaryField(response, 'Previous name 1', 'Robin Hood', heading=heading)
             utils.assertSummaryField(response, 'Start date', '01/12/2003', heading=heading)
             utils.assertSummaryField(response, 'End date', '03/12/2004', heading=heading)
-            utils.assertSummaryField(response, 'Previous name 2', 'Buffy Summers', heading=heading)
+            utils.assertSummaryField(response, 'Previous name 2', 'Hi Hello Hey', heading=heading)
             utils.assertSummaryField(response, 'Start date', '03/12/2004', heading=heading)
             utils.assertSummaryField(response, 'End date', '07/12/2004', heading=heading)
 
