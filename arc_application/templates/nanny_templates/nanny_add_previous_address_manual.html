@@ -1,0 +1,56 @@
+{% extends 'govuk_template.html' %}
+{% block page_title %}Previous home address{% endblock %}
+{% load static %}
+{% load govuk_template_base %}
+{% block inner_content %}
+{% include 'back-button.html' %}
+
+{{ form.error_summary }}
+
+<h1 class="form-title heading-large">
+    Previous home address
+</h1>
+
+<form method="post" novalidate>
+    {% csrf_token %}
+
+    {% include 'nanny_templates/nanny_add_previous_address_addresses.html' %}
+
+    <p>
+        Previous address {{ previous_addresses|length|add:"1" }}:
+    </p>
+
+    {# Rending fields individually so that link can be added below address fields #}
+    {% for field in form %}
+
+    <div id="{{ field.auto_id }}-label"
+        class="form-group-required form-group {% if field.errors %} form-group-error {% endif %}">
+
+        <div id="{{ field.id_for_label }}" class="form-label-bold">{{ field.label }}</div>
+        {% for error in field.errors %}
+        <span class="error-message">{{ error }}</span>
+        {% endfor %}
+        <span class="form-hint">{{ field.help_text }}</span>
+        {{ field }}
+    </div>
+
+    {% if field.id_for_label == 'id_postcode' %}
+    <p>
+        <input type="submit" class="hidden-link-2" name="search" value="Use postcode search" />
+    </p>
+    {% endif %}
+
+    {% endfor %}
+
+    <p>
+        <input type="submit" class="button button-secondary button-add-another" name="another"
+               value="Add another address" />
+    </p>
+    <p>
+        <input type="submit" class="button" value="Save and continue" />
+    </p>
+</form>
+
+{% include 'nanny_templates/nanny_return_to_list.html' %}
+
+{% endblock %}

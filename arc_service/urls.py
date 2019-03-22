@@ -38,18 +38,13 @@ from arc_application.views.applications_summary import ApplicationsSummaryView
 
 # Nanny Views
 
-from arc_application.views.nanny_views.nanny_task_list import NannyTaskList
-from arc_application.views.nanny_views.nanny_contact_details import NannyContactDetailsSummary
-from arc_application.views.nanny_views.nanny_personal_details import NannyPersonalDetailsSummary
-from arc_application.views.nanny_views.nanny_previous_registration import NannyPreviousRegistrationView
-from arc_application.views.nanny_views.nanny_childcare_address import NannyChildcareAddressSummary
-from arc_application.views.nanny_views.nanny_first_aid import NannyFirstAidTrainingSummary
-from arc_application.views.nanny_views.nanny_childcare_training import NannyChildcareTrainingSummary
-from arc_application.views.nanny_views.nanny_dbs_check import NannyDbsCheckSummary
-from arc_application.views.nanny_views.nanny_insurance_cover import NannyInsuranceCoverSummary
-from arc_application.views.nanny_views.nanny_arc_summary import NannyArcSummary
-from arc_application.views.nanny_views.nanny_arc_summary_confirmation import NannyArcSummaryConfirmation
-from arc_application.views.nanny_views.nanny_previous_names import nanny_add_previous_name
+from arc_application.views.nanny_views import (
+    NannyTaskList, NannyContactDetailsSummary, NannyPersonalDetailsSummary, NannyPreviousRegistrationView,
+    NannyChildcareAddressSummary, NannyFirstAidTrainingSummary, NannyChildcareTrainingSummary,
+    NannyDbsCheckSummary, NannyInsuranceCoverSummary, NannyArcSummary, NannyArcSummaryConfirmation,
+    NannyChangePreviousAddressView, NannyAddPreviousAddressSearchView, NannyAddPreviousAddressSelectView,
+    NannyAddPreviousAddressManualView, nanny_add_previous_name
+)
 
 from django.conf import settings
 from django.conf.urls import include, url
@@ -121,8 +116,18 @@ if settings.ENABLE_NANNIES:
     urlpatterns += [
         url(r'^nanny/review/', NannyTaskList.as_view(), name='nanny_task_list'),
         url(r'^nanny/contact-details/', NannyContactDetailsSummary.as_view(), name='nanny_contact_summary'),
-        url(r'^nanny/personal-details/review/', NannyPersonalDetailsSummary.as_view(), name='nanny_personal_details_summary'),
-        url(r'^nanny/personal-details/previous-registration/', NannyPreviousRegistrationView.as_view(), name='nanny_previous_registration'),
+        url(r'^nanny/personal-details/review/', NannyPersonalDetailsSummary.as_view(),
+            name='nanny_personal_details_summary'),
+        url(r'^nanny/personal-details/previous-address/', NannyChangePreviousAddressView.as_view(),
+            name='nanny_change_previous_address'),
+        url(r'^nanny/personal-details/previous-addresses/select/', NannyAddPreviousAddressSelectView.as_view(),
+            name='nanny_add_previous_address_select'),
+        url(r'^nanny/personal-details/previous-addresses/manual/', NannyAddPreviousAddressManualView.as_view(),
+            name='nanny_add_previous_address_manual'),
+        url(r'^nanny/personal-details/previous-addresses/', NannyAddPreviousAddressSearchView.as_view(),
+            name='nanny_add_previous_address_search'),
+        url(r'^nanny/personal-details/previous-registration/', NannyPreviousRegistrationView.as_view(),
+            name='nanny_previous_registration'),
         url(r'^nanny/personal-details/previous-names/', nanny_add_previous_name,
             name='nanny_previous_names'),
         url(r'^nanny/childcare-address/', NannyChildcareAddressSummary.as_view(),

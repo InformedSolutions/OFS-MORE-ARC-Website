@@ -9,9 +9,7 @@ from .. import form_fields
 
 
 class PreviousAddressEntryForm(GOVUKForm):
-    """
-    GOV.UK form for the Your children's address page for postcode search
-    """
+
     ERROR_MESSAGE_POSTCODE_NOT_ENTERED = 'Please enter your postcode'
     ERROR_MESSAGE_POSTCODE_INVALID = 'Please enter a valid postcode'
 
@@ -271,11 +269,6 @@ class PreviousAddressManualForm(GOVUKForm):
         if start_date and end_date and end_date <= start_date:
             self.add_error('moved_in_date', self.ERROR_MESSAGE_MOVED_IN_DATE_AFTER_MOVED_OUT_DATE)
             self.add_error('moved_out_date', self.ERROR_MESSAGE_MOVED_OUT_DATE_BEFORE_MOVED_IN_DATE)
-
-        # de-duplicate error messages for each field
-        for field, errors in self.errors.items():
-            dedup = OrderedDict([(k, None) for k in errors])
-            self.errors[field] = list(dedup.keys())
 
     def clean_street_line1(self):
         """

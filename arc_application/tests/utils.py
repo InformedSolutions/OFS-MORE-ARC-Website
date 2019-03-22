@@ -144,9 +144,9 @@ class StubNannyGatewayActions:
             'application_id': '998fd8ec-b96b-4a71-a1a1-a7a3ae186729',
             'previous_name_id': '9935bf3b-8ba9-4162-a25b-4c55e7d33d67',
             'first_name': 'Robin',
-            'middle_names':'',
+            'middle_names': '',
             'last_name': 'Hood',
-            'start_day':1,
+            'start_day': 1,
             'start_month': 12,
             'start_year': 2003,
             'end_day': 3,
@@ -155,7 +155,6 @@ class StubNannyGatewayActions:
             'order': 0
         }
         self.previous_name_read_response = self.make_response(record=self.previous_name_record)
-
 
         self.home_address_record = {
             'application_id': '998fd8ec-b96b-4a71-a1a1-a7a3ae186729',
@@ -168,6 +167,23 @@ class StubNannyGatewayActions:
             'childcare_address': False,
         }
         self.home_address_read_response = self.make_response(record=self.home_address_record)
+
+        self.previous_address_record = {
+            'previous_address_id': '88888888-4444-4444-4444-121212121212',
+            'person_id': '998fd8ec-b96b-4a71-a1a1-a7a3ae186729',
+            'person_type': 'APPLICANT',
+            'street_line1': '1 Street Road',
+            'street_line2': '',
+            'town': 'Cityston',
+            'county': 'Greater Countyshire',
+            'country': '',
+            'postcode': 'M9 9MP',
+            'moved_in_date': '2016-06-02',
+            'moved_out_date': '2018-02-23',
+            'order': 0,
+        }
+        self.previous_address_read_response = self.make_response(record=self.previous_address_record)
+        self.previous_address_list_response = self.make_response(record=[self.previous_address_record])
 
         self.childcare_address_record = [
             {
@@ -242,27 +258,29 @@ class StubNannyGatewayActions:
             'declaration': 'declaration',
             'arc-comments': 'arc_comments',
             'timeline-log': 'timeline_log',
-            'previous-name': 'previous_name'
+            'previous-name': 'previous_name',
+            'previous-address': 'previous_address',
         }
 
-    def list(self, endpoint, *args, **kwargs):
+    def list(self, endpoint, *_, **__):
         return getattr(self, '{}_list_response'.format(self.endpoint_mapping[endpoint]), self.default_list_response)
 
-    def read(self, endpoint, *args, **kwargs):
+    def read(self, endpoint, *_, **__):
         return getattr(self, '{}_read_response'.format(self.endpoint_mapping[endpoint]), self.default_read_response)
 
-    def create(self, endpoint, *args, **kwargs):
+    def create(self, endpoint, *_, **__):
         return getattr(self, '{}_create_response'.format(self.endpoint_mapping[endpoint]), self.default_create_response)
 
-    def patch(self, endpoint, *args, **kwargs):
+    def patch(self, endpoint, *_, **__):
         return getattr(self, '{}_patch_response'.format(self.endpoint_mapping[endpoint]), self.default_patch_response)
 
-    def put(self, endpoint, *args, **kwargs):
+    def put(self, endpoint, *_, **__):
         return getattr(self, '{}_put_response'.format(self.endpoint_mapping[endpoint]), self.default_put_response)
 
-    def delete(self, endpoint, *args, **kwargs):
+    def delete(self, endpoint, *_, **__):
         return getattr(self, '{}_delete_response'.format(self.endpoint_mapping[endpoint]), self.default_delete_response)
 
+    # noinspection PyMethodMayBeStatic
     def make_response(self, status=200, record=None):
         resp = HttpResponse()
         resp.status_code = status

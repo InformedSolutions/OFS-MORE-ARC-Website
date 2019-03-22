@@ -125,7 +125,3 @@ class PersonPreviousNameForm(GOVUKForm):
         if len(last_name)>100:
             self.add_error('last_name', self.ERROR_MESSAGE_LAST_NAME_TOO_LONG)
 
-        # de-duplicate error messages for each field
-        for field, errors in self.errors.items():
-            dedup = OrderedDict([(k, None) for k in errors])
-            self.errors[field] = list(dedup.keys())

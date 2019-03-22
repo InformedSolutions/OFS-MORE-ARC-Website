@@ -118,3 +118,21 @@ class SelectDateWidget(gov.MultiWidget):
         if value:
             return [value.month, value.year]
         return [None, None]
+
+
+class CustomCheckboxInput(gov.CheckboxInput):
+
+    template_name = 'widgets/checkbox.html'
+
+
+class Textarea(gov.Textarea):
+    """
+    Custom textarea field to give better default size
+    """
+    template_name = 'widgets/textarea.html'
+
+    def __init__(self, attrs=None):
+        default_attrs = {'cols': '40', 'rows': '3'}
+        if attrs:
+            default_attrs.update(attrs)
+        super().__init__(default_attrs)

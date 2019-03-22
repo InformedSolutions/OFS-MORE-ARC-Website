@@ -56,14 +56,16 @@ class DBGatewayActions:
 
                 if func.__name__ == 'list':
                     logger.error(
-                        '!GATEWAY ERROR! "{}" request to API endpoint "{}" with {}: {} returned {} status code - see the Gateway logs for traceback'.format(
+                        ('!GATEWAY ERROR! "{}" request to API endpoint "{}" with {}: {} returned {} status code '
+                         '- see the Gateway logs for traceback').format(
                             verb_name, endpoint_name, list(kwargs['params'].keys()), list(kwargs['params'].values()),
                             response.status_code)
                     )
 
                 else:
                     logger.error(
-                        '!GATEWAY ERROR! "{}" request to API endpoint "{}" with {}: {} returned {} status code - see the Gateway logs for traceback'.format(
+                        ('!GATEWAY ERROR! "{}" request to API endpoint "{}" with {}: {} returned {} status code '
+                         '- see the Gateway logs for traceback').format(
                             verb_name, args[0], endpoint_lookup_field, kwargs['params'][endpoint_lookup_field],
                             response.status_code)
                     )
@@ -154,6 +156,7 @@ class NannyGatewayActions(DBGatewayActions):
         'childcare-address': 'childcare_address_id',
         'arc-comments': 'review_id',
         'applicant-home-address': 'application_id',
+        'previous-address': 'previous_address_id',
         'applicant-personal-details': 'application_id',
         'previous-registration-details': 'application_id',
         'previous-name': 'previous_name_id',

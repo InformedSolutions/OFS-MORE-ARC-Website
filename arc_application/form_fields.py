@@ -5,12 +5,13 @@ OFS-MORE-CCN3: Apply to be a Childminder Beta
 """
 
 import datetime
+from collections import OrderedDict
 
 from django import forms
-from django.core.exceptions import ValidationError
 from django.utils.timezone import now
 from django.utils.translation import gettext, gettext_lazy as _
 from govuk_forms import fields as govf
+from django.core.exceptions import ValidationError
 from govuk_forms import widgets as govw
 
 from .widgets import ExpirySplitDateWidget, TimeKnownSplitDateWidget
@@ -154,6 +155,8 @@ class CustomSplitDateField(govf.SplitDateField):
     * allow all child field options and error messages to be customised (prefix with "day_", "month_" or "year_")
     * use different default bounds and error messages
     * introduce finer-grained error messages for date validation
+    * allow same error message to be used for multiple validation types without duplicate messages being
+      added to error list
     * allow 4-digit years to be required
     """
 
@@ -240,6 +243,20 @@ class CustomSplitDateField(govf.SplitDateField):
             self.fields.append(NoShortYearField(**year_options))
 
         super(govf.SplitDateField, self).__init__(self.fields, *args, **options)
+
+    def clean(self, value):
+        """
+        `clean` is not usually overidden for MultiValueField subclasses, however we're just
+        overriding to do a final de-duplication on the error messages before the ValidationError
+        is raised
+        """
+        try:
+            return super().clean(value)
+        except ValidationError as e:
+            # de-duplicate error message list and raise new ValidationError.
+            # Using keys of OrderedDict because python has no OrderedSet class
+            uniques = OrderedDict((err.message, None) for err in e.error_list)
+            raise ValidationError(list(uniques.keys())) from e
 
     def compress(self, data_list):
         """
