@@ -13,6 +13,9 @@ class PersonPreviousNameForm(GOVUKForm):
 
     ERROR_MESSAGE_FIRST_NAME_BLANK = 'You must enter a first name'
     ERROR_MESSAGE_LAST_NAME_BLANK = 'You must enter a last name'
+    ERROR_MESSAGE_FIRST_NAME_TOO_LONG = 'First name must be under 100 characters long'
+    ERROR_MESSAGE_MIDDLE_NAMES_TOO_LONG = 'Middle names must be under 100 characters long'
+    ERROR_MESSAGE_LAST_NAME_TOO_LONG = 'Last name must be under 100 characters long'
 
     ERROR_MESSAGE_DATE_BLANK = 'Enter the date, including the month and year'
     ERROR_MESSAGE_DAY_OUT_OF_RANGE = 'Day must be between 1 and 31'
@@ -28,6 +31,7 @@ class PersonPreviousNameForm(GOVUKForm):
 
     ERROR_MESSAGE_END_DATE_AFTER_CURRENT_DATE = 'End date must be before today or in the past'
     ERROR_MESSAGE_END_DATE_BEFORE_START_DATE = 'End date must be after the start date'
+
 
     auto_replace_widgets = True
     field_label_classes = 'form-label-bold'
@@ -108,7 +112,16 @@ class PersonPreviousNameForm(GOVUKForm):
         # check start date is after end date
         start_date = self.cleaned_data.get('start_date', None)
         end_date = self.cleaned_data.get('end_date', None)
+        first_name = self.cleaned_data.get('first_name', '')
+        middle_names = self.cleaned_data.get('middle_names', '')
+        last_name = self.cleaned_data.get('last_name', '')
         if start_date and end_date and end_date < start_date:
             self.add_error('start_date', self.ERROR_MESSAGE_START_DATE_AFTER_END_DATE)
             self.add_error('end_date', self.ERROR_MESSAGE_END_DATE_BEFORE_START_DATE)
+        if len(first_name)>100:
+            self.add_error('first_name', self.ERROR_MESSAGE_FIRST_NAME_TOO_LONG)
+        if len(middle_names)>100:
+            self.add_error('middle_names', self.ERROR_MESSAGE_MIDDLE_NAMES_TOO_LONG)
+        if len(last_name)>100:
+            self.add_error('last_name', self.ERROR_MESSAGE_LAST_NAME_TOO_LONG)
 

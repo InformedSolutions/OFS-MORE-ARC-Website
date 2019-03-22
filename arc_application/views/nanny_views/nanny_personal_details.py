@@ -79,7 +79,7 @@ class NannyPersonalDetailsSummary(NannyARCFormView):
         first_name = personal_details['first_name']
         middle_names = personal_details['middle_names']
         last_name = personal_details['last_name']
-        full_name = self.format_name(first_name, middle_names, last_name)
+        current_full_name = self.format_name(first_name, middle_names, last_name)
 
         dob_string = personal_details['date_of_birth']
         dob_string_with_month = self.format_date(dob_string)
@@ -116,7 +116,7 @@ class NannyPersonalDetailsSummary(NannyARCFormView):
             {
                 'id': 'name',
                 'name': 'Your name',
-                'info': full_name,
+                'info': current_full_name,
                 # Prevent checkbox appearing if summary page is calling get_context_data.
                 'declare': personal_details_form['name_declare'] if hasattr(self, 'request') else '',
                 'comments': personal_details_form['name_comments'],
