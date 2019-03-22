@@ -469,7 +469,7 @@
 
         </table>
 
-        {% if previous_names %}
+        {% if previous_names or previous_addresses %}
         <table class="check-your-answers form-group">
             <thead>
             <tr>
@@ -533,9 +533,41 @@
                     {{address.postcode}}{% if address.postcode %}<br />{% endif %}
                 </td>
                 <td class="change-answer">
-                    <a href="{% url 'other-people-previous-addresses' %}?id={{ application_id }}&state=update&person_id={{id}}&person_type=ADULT&address_id={{address.previous_name_id}}">Change</a>
+                    <a href="{% url 'other-people-previous-addresses-change' %}?id={{ application_id }}&state=change&person_id={{id}}&person_type=ADULT&address_id={{address.previous_name_id}}"
+                    alt="Change the {{ forloop.counter|inflect }} previous address">Change</a>
                 </td>
             </tr>
+
+            {% if address.moved_in_date %}
+            <tr>
+                <td>
+                    Moved in
+                </td>
+                <td>
+                    {{ address.moved_in_date|date:"d F Y" }}
+                </td>
+                <td class="change-answer">
+                    <a href="{% url 'other-people-previous-addresses-change' %}?id={{ application_id }}&state=change&person_id={{ application_id }}&person_type=APPLICANT&address_id={{address.pk}}"
+                       alt="Change the move in date for {{ forloop.counter|inflect }} previous address">Change</a>
+                </td>
+
+            </tr>
+            {% endif %}
+
+            {% if address.moved_out_date %}
+            <tr>
+                <td>
+                    Moved out
+                </td>
+                <td>
+                    {{ address.moved_out_date|date:"d F Y" }}
+                </td>
+                <td class="change-answer">
+                    <a href="{% url 'other-people-previous-addresses-change' %}?id={{ application_id }}&state=change&person_id={{ application_id }}&person_type=APPLICANT&address_id={{address.pk}}"
+                       alt="Change the move out date for {{ forloop.counter|inflect }} previous address">Change</a>
+                </td>
+            </tr>
+            {% endif %}
             {% endfor %}
             </tbody>
         </table>

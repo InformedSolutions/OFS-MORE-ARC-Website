@@ -17,7 +17,7 @@ from arc_application.views.childminder_views.dbs_check import dbs_check_summary
 from arc_application.views.childminder_views.childcare_training_check import ChildcareTrainingCheckSummaryView
 from arc_application.views.childminder_views.first_aid_training import first_aid_training_summary
 from arc_application.views.childminder_views.health_declaration_booklet import health_check_answers
-from arc_application.views.childminder_views.other_people_addresses import address_state_dispatcher
+from arc_application.views.childminder_views.other_people_addresses import people_in_the_home_previous_address, people_in_the_home_previous_address_change
 from arc_application.views.childminder_views.other_people_in_home import other_people_summary
 from arc_application.views.childminder_views.previous_names import add_previous_name
 from arc_application.views.childminder_views.personal_details import personal_details_summary
@@ -49,6 +49,7 @@ from arc_application.views.nanny_views.nanny_dbs_check import NannyDbsCheckSumma
 from arc_application.views.nanny_views.nanny_insurance_cover import NannyInsuranceCoverSummary
 from arc_application.views.nanny_views.nanny_arc_summary import NannyArcSummary
 from arc_application.views.nanny_views.nanny_arc_summary_confirmation import NannyArcSummaryConfirmation
+from arc_application.views.nanny_views.nanny_previous_names import nanny_add_previous_name
 
 from django.conf import settings
 from django.conf.urls import include, url
@@ -85,7 +86,8 @@ urlpatterns = [
     url(r'^references/summary/', references_summary, name='references_summary'),
     url(r'^people/summary/', other_people_summary, name='other_people_summary'),
     url(r'^people/previous-names', add_previous_name, name='other-people-previous-names'),
-    url(r'^people/previous-addresses', address_state_dispatcher, name='other-people-previous-addresses'),
+    url(r'^people/previous-addresses', people_in_the_home_previous_address, name='other-people-previous-addresses'),
+    url(r'^people/previous-address', people_in_the_home_previous_address_change, name='other-people-previous-addresses-change'),
     url(r'^people/previous-registration$', OtherPersonPreviousRegistrationDetailsView.as_view(),
         name='other-people-previous-registration'),
     url(r'^health/check-answers/', health_check_answers, name='health_check_answers'),
@@ -121,6 +123,8 @@ if settings.ENABLE_NANNIES:
         url(r'^nanny/contact-details/', NannyContactDetailsSummary.as_view(), name='nanny_contact_summary'),
         url(r'^nanny/personal-details/review/', NannyPersonalDetailsSummary.as_view(), name='nanny_personal_details_summary'),
         url(r'^nanny/personal-details/previous-registration/', NannyPreviousRegistrationView.as_view(), name='nanny_previous_registration'),
+        url(r'^nanny/personal-details/previous-names/', nanny_add_previous_name,
+            name='nanny_previous_names'),
         url(r'^nanny/childcare-address/', NannyChildcareAddressSummary.as_view(),
             name='nanny_childcare_address_summary'),
         url(r'^nanny/first-aid-training/', NannyFirstAidTrainingSummary.as_view(),
