@@ -112,9 +112,9 @@ class PersonPreviousNameForm(GOVUKForm):
         # check start date is after end date
         start_date = self.cleaned_data.get('start_date', None)
         end_date = self.cleaned_data.get('end_date', None)
-        first_name = self.cleaned_data.get('first_name', None)
-        middle_names = self.cleaned_data.get('middle_names', None)
-        last_name = self.cleaned_data.get('last_name', None)
+        first_name = self.cleaned_data.get('first_name', '')
+        middle_names = self.cleaned_data.get('middle_names', '')
+        last_name = self.cleaned_data.get('last_name', '')
         if start_date and end_date and end_date < start_date:
             self.add_error('start_date', self.ERROR_MESSAGE_START_DATE_AFTER_END_DATE)
             self.add_error('end_date', self.ERROR_MESSAGE_END_DATE_BEFORE_START_DATE)
