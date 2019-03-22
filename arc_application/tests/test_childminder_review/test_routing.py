@@ -2328,6 +2328,7 @@ class ReviewSummaryAndConfirmationFunctionalTests(TestCase):
         self.application.declarations_status = APP_STATUS_COMPLETED
         self.application.declaration_confirmation = True
         self.application.application_status = APP_STATUS_REVIEW
+        self.application.application_reference = '123456789'
         self.application.save()
 
         arc = models.Arc.objects.get(application_id=self.application.pk)
