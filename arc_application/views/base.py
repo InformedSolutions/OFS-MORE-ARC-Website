@@ -120,7 +120,10 @@ def release_application(request, application_id, status):
         if status == 'ACCEPTED':
             # Import used here explicitly to prevent circular import
             from ..messaging import ApplicationExporter
-            ApplicationExporter.export_childminder_application(application_id)
+
+            # If the application does not contain a legacy prefix, export for submission to NOO.
+            if 'CM' not in app.application_reference:
+                ApplicationExporter.export_childminder_application(application_id)
 
     # If application_id doesn't correspond to a Childminder application, it must be a Nanny one.
     else:
