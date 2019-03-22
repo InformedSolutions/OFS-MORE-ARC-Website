@@ -15,7 +15,7 @@ class PreviousAddressEntryForm(GOVUKForm):
 
     field_label_classes = 'form-label-bold'
     auto_replace_widgets = True
-    error_summary_title = 'There was a problem on this page'
+    error_summary_title = 'There was a problem'
 
     postcode = forms.CharField(label='Postcode', error_messages={'required': 'Please enter your postcode'})
 
@@ -33,12 +33,11 @@ class PreviousAddressEntryForm(GOVUKForm):
 
 
 class PreviousAddressSelectForm(GOVUKForm):
-
     # Address validation messages
     ERROR_MESSAGE_ADDRESS_BLANK = 'Please select your address'
 
     # Moved in/out date validation messages
-    ERROR_MESSAGE_DATE_BLANK = 'Enter the date, including the month and year'
+    ERROR_MESSAGE_DATE_BLANK = 'Enter the full date, including the day, month and year'
     ERROR_MESSAGE_DAY_OUT_OF_RANGE = 'Day must be between 1 and 31'
     ERROR_MESSAGE_MONTH_OUT_OF_RANGE = 'Month must be between 1 and 12'
     ERROR_MESSAGE_MOVED_IN_YEAR_BEFORE_1900 = 'Date moved in must be after 1900'
@@ -55,7 +54,7 @@ class PreviousAddressSelectForm(GOVUKForm):
 
     auto_replace_widgets = True
     field_label_classes = 'form-label-bold'
-    error_summary_title = 'There was a problem on this page'
+    error_summary_title = 'There was a problem'
 
     address = forms.ChoiceField(
         label='Select address',
@@ -65,15 +64,14 @@ class PreviousAddressSelectForm(GOVUKForm):
     moved_in_date = form_fields.CustomSplitDateField(
         label='Moved in',
         required=True,
-        help_text='For example, 31 03 1980',
+        help_text='For example, 31 3 1980',
         min_value=None,
         max_value=form_fields.CustomSplitDateField.TODAY,
         allow_short_year=False,
         error_messages={'required': ERROR_MESSAGE_DATE_BLANK,
                         'incomplete': ERROR_MESSAGE_DATE_BLANK,
                         'max_today': ERROR_MESSAGE_MOVED_IN_DATE_AFTER_CURRENT_DATE,
-                        'invalid': ERROR_MESSAGE_INVALID_DATE,
-                        'short_year': ERROR_MESSAGE_YEAR_LESS_THAN_4_DIGITS},
+                        'invalid': ERROR_MESSAGE_INVALID_DATE},
         day_error_messages={'min_value': ERROR_MESSAGE_DAY_OUT_OF_RANGE,
                             'max_value': ERROR_MESSAGE_DAY_OUT_OF_RANGE,
                             'invalid': ERROR_MESSAGE_NON_NUMERIC},
@@ -83,20 +81,20 @@ class PreviousAddressSelectForm(GOVUKForm):
         year_min_value=1900,
         year_max_value=None,
         year_error_messages={'min_value': ERROR_MESSAGE_MOVED_IN_YEAR_BEFORE_1900,
-                             'invalid': ERROR_MESSAGE_NON_NUMERIC},
+                             'invalid': ERROR_MESSAGE_NON_NUMERIC,
+                             'short_year': ERROR_MESSAGE_YEAR_LESS_THAN_4_DIGITS},
     )
     moved_out_date = form_fields.CustomSplitDateField(
         label='Moved out',
         required=True,
-        help_text='For example, 31 03 1980',
+        help_text='For example, 31 3 1980',
         min_value=None,
         max_value=form_fields.CustomSplitDateField.TODAY,
         allow_short_year=False,
         error_messages={'required': ERROR_MESSAGE_DATE_BLANK,
                         'incomplete': ERROR_MESSAGE_DATE_BLANK,
                         'max_today': ERROR_MESSAGE_MOVED_OUT_DATE_AFTER_CURRENT_DATE,
-                        'invalid': ERROR_MESSAGE_INVALID_DATE,
-                        'short_year': ERROR_MESSAGE_YEAR_LESS_THAN_4_DIGITS},
+                        'invalid': ERROR_MESSAGE_INVALID_DATE},
         day_error_messages={'min_value': ERROR_MESSAGE_DAY_OUT_OF_RANGE,
                             'max_value': ERROR_MESSAGE_DAY_OUT_OF_RANGE,
                             'invalid': ERROR_MESSAGE_NON_NUMERIC},
@@ -106,7 +104,8 @@ class PreviousAddressSelectForm(GOVUKForm):
         year_min_value=1900,
         year_max_value=None,
         year_error_messages={'min_value': ERROR_MESSAGE_MOVED_OUT_YEAR_BEFORE_1900,
-                             'invalid': ERROR_MESSAGE_NON_NUMERIC},
+                             'invalid': ERROR_MESSAGE_NON_NUMERIC,
+                             'short_year': ERROR_MESSAGE_YEAR_LESS_THAN_4_DIGITS},
     )
 
     def __init__(self, *args, **kwargs):
@@ -123,7 +122,7 @@ class PreviousAddressSelectForm(GOVUKForm):
         # check start date is after end date
         start_date = self.cleaned_data.get('moved_in_date', None)
         end_date = self.cleaned_data.get('moved_out_date', None)
-        if start_date and end_date and end_date < start_date:
+        if start_date and end_date and end_date <= start_date:
             self.add_error('moved_in_date', self.ERROR_MESSAGE_MOVED_IN_DATE_AFTER_MOVED_OUT_DATE)
             self.add_error('moved_out_date', self.ERROR_MESSAGE_MOVED_OUT_DATE_BEFORE_MOVED_IN_DATE)
 
@@ -151,7 +150,7 @@ class PreviousAddressManualForm(GOVUKForm):
     ERROR_MESSAGE_POSTCODE_INVALID = 'Please enter a valid postcode'
 
     # Moved in/out date validation messages
-    ERROR_MESSAGE_DATE_BLANK = 'Enter the date, including the month and year'
+    ERROR_MESSAGE_DATE_BLANK = 'Enter the full date, including the day, month and year'
     ERROR_MESSAGE_DAY_OUT_OF_RANGE = 'Day must be between 1 and 31'
     ERROR_MESSAGE_MONTH_OUT_OF_RANGE = 'Month must be between 1 and 12'
     ERROR_MESSAGE_MOVED_IN_YEAR_BEFORE_1900 = 'Date moved in must be after 1900'
@@ -168,7 +167,7 @@ class PreviousAddressManualForm(GOVUKForm):
 
     auto_replace_widgets = True
     field_label_classes = 'form-label-bold'
-    error_summary_title = 'There was a problem on this page'
+    error_summary_title = 'There was a problem'
 
     street_line1 = forms.CharField(
         label='Address line 1',
@@ -208,8 +207,7 @@ class PreviousAddressManualForm(GOVUKForm):
         error_messages={'required': ERROR_MESSAGE_DATE_BLANK,
                         'incomplete': ERROR_MESSAGE_DATE_BLANK,
                         'max_today': ERROR_MESSAGE_MOVED_IN_DATE_AFTER_CURRENT_DATE,
-                        'invalid': ERROR_MESSAGE_INVALID_DATE,
-                        'short_year': ERROR_MESSAGE_YEAR_LESS_THAN_4_DIGITS},
+                        'invalid': ERROR_MESSAGE_INVALID_DATE},
         day_error_messages={'min_value': ERROR_MESSAGE_DAY_OUT_OF_RANGE,
                             'max_value': ERROR_MESSAGE_DAY_OUT_OF_RANGE,
                             'invalid': ERROR_MESSAGE_NON_NUMERIC},
@@ -219,7 +217,8 @@ class PreviousAddressManualForm(GOVUKForm):
         year_min_value=1900,
         year_max_value=None,
         year_error_messages={'min_value': ERROR_MESSAGE_MOVED_IN_YEAR_BEFORE_1900,
-                             'invalid': ERROR_MESSAGE_NON_NUMERIC},
+                             'invalid': ERROR_MESSAGE_NON_NUMERIC,
+                             'short_year': ERROR_MESSAGE_YEAR_LESS_THAN_4_DIGITS},
     )
     moved_out_date = form_fields.CustomSplitDateField(
         label='Moved out',
@@ -231,8 +230,7 @@ class PreviousAddressManualForm(GOVUKForm):
         error_messages={'required': ERROR_MESSAGE_DATE_BLANK,
                         'incomplete': ERROR_MESSAGE_DATE_BLANK,
                         'max_today': ERROR_MESSAGE_MOVED_OUT_DATE_AFTER_CURRENT_DATE,
-                        'invalid': ERROR_MESSAGE_INVALID_DATE,
-                        'short_year': ERROR_MESSAGE_YEAR_LESS_THAN_4_DIGITS},
+                        'invalid': ERROR_MESSAGE_INVALID_DATE},
         day_error_messages={'min_value': ERROR_MESSAGE_DAY_OUT_OF_RANGE,
                             'max_value': ERROR_MESSAGE_DAY_OUT_OF_RANGE,
                             'invalid': ERROR_MESSAGE_NON_NUMERIC},
@@ -242,7 +240,8 @@ class PreviousAddressManualForm(GOVUKForm):
         year_min_value=1900,
         year_max_value=None,
         year_error_messages={'min_value': ERROR_MESSAGE_MOVED_OUT_YEAR_BEFORE_1900,
-                             'invalid': ERROR_MESSAGE_NON_NUMERIC},
+                             'invalid': ERROR_MESSAGE_NON_NUMERIC,
+                             'short_year': ERROR_MESSAGE_YEAR_LESS_THAN_4_DIGITS},
     )
 
     def __init__(self, *args, **kwargs):
@@ -267,7 +266,7 @@ class PreviousAddressManualForm(GOVUKForm):
         # check start date is after end date
         start_date = self.cleaned_data.get('moved_in_date', None)
         end_date = self.cleaned_data.get('moved_out_date', None)
-        if start_date and end_date and end_date < start_date:
+        if start_date and end_date and end_date <= start_date:
             self.add_error('moved_in_date', self.ERROR_MESSAGE_MOVED_IN_DATE_AFTER_MOVED_OUT_DATE)
             self.add_error('moved_out_date', self.ERROR_MESSAGE_MOVED_OUT_DATE_BEFORE_MOVED_IN_DATE)
 

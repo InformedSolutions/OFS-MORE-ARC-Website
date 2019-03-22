@@ -45,6 +45,8 @@
         {% endcomment %}
         {% if row.declare %}
             {{ row.declare }}
+	{% elif row.id|template_string_in_list:'previous_name start_date end_date' and row.change_link %}
+            <a class="change-answer" alt="{{row.alt_text}}" href="{% url row.change_link %}?id={{ application_id }}">Change</a>
         {% elif context.search_table or row.change_link %}
             <a class="change-answer"
                href="{% url row.change_link %}?id={{ application_id }}{% if row.change_link_params %}&{{ row.change_link_params }}{% endif %}"

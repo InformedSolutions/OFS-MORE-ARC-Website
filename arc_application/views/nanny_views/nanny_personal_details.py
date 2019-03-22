@@ -4,6 +4,7 @@ from urllib.parse import urlencode
 from .nanny_form_view import NannyARCFormView
 from ...forms.nanny_forms.nanny_form_builder import HomeAddressForm, PersonalDetailsForm, PreviousRegistrationForm
 from ...services.db_gateways import NannyGatewayActions
+from operator import itemgetter
 from ...utils import spatial_ordinal
 
 
@@ -28,12 +29,15 @@ class NannyPersonalDetailsSummary(NannyARCFormView):
         return forms
 
     @staticmethod
-    def format_date(iso_date_str):
+    def format_date(date_or_iso_str):
         """
-        :param iso_date_str: a Date Of Birth string in the format 'YYYY-MM-DD'
-        :return: a DOB string in format 'DD-Month-YYYY'
+        :param date_or_iso_str: a date object or string in the format 'YYYY-MM-DD'
+        :return: a date string in the format 'DD/MM/YYYY'
         """
-        the_date = datetime.datetime.strptime(iso_date_str, '%Y-%M-%d').date()
+        if isinstance(date_or_iso_str, datetime.date):
+            the_date = date_or_iso_str
+        else:
+            the_date = datetime.datetime.strptime(iso_date_str, '%Y-%M-%d').date()
         return the_date.strftime('%d/%m/%Y')
 
     @staticmethod
@@ -63,6 +67,8 @@ class NannyPersonalDetailsSummary(NannyARCFormView):
         nanny_actions = NannyGatewayActions()
         personal_details = self.read_record(nanny_actions, 'applicant-personal-details',
                                             {'application_id': application_id})
+        previous_names = self.list_records(nanny_actions, 'previous-name', 
+                                           {'application_id': application_id})
         home_address = self.read_record(nanny_actions, 'applicant-home-address',
                                         {'application_id': application_id})
         previous_addresses = self.list_records(nanny_actions, 'previous-address',
@@ -114,7 +120,40 @@ class NannyPersonalDetailsSummary(NannyARCFormView):
                 # Prevent checkbox appearing if summary page is calling get_context_data.
                 'declare': personal_details_form['name_declare'] if hasattr(self, 'request') else '',
                 'comments': personal_details_form['name_comments'],
-            },
+            }
+        ]
+
+        if previous_names is not None and len(previous_names) > 0:
+            for i, name in enumerate(previous_names):
+                full_name = format_name(name['first_name'], name['middle_names'], name['last_name'])
+                start_date = datetime.date(name['start_year'], name['start_month'], name['start_day'])
+                end_date = datetime.date(name['end_year'], name['end_month'], name['end_day'])
+                ordinal = spatial_ordinal(i+1)
+                rows.extend([
+                    {
+                        'id': 'previous_name',
+                        'name': 'Previous name '+ (i+1),
+                        'info': full_name,
+                        'change_link': 'nanny_previous_names',
+                        'alt_text': "Change the {0} previous name".format(ordinal)
+                    },
+                    {
+                        'id': 'start_date',
+                        'name': 'Start date',
+                        'info': format_date(start_date),
+                        'change_link': 'nanny_previous_names',
+                        'alt_text': "Change the start date for the {0} previous name".format(ordinal)
+                    },
+                    {
+                        'id': 'end_date',
+                        'name': 'End date',
+                        'info': format_date(end_date),
+                        'change_link': 'nanny_previous_names',
+                        'alt_text':"Change the end date for the {0} previous name".format(ordinal)
+                    },
+                ])
+
+        rows.extend([
             {
                 'id': 'date_of_birth',
                 'name': 'Date of birth',
@@ -135,7 +174,7 @@ class NannyPersonalDetailsSummary(NannyARCFormView):
                     'postcode': postcode,
                 }
             },
-        ]
+        ])
         for i, prev_addr in enumerate(previous_addresses or []):
             addr_change_view = 'nanny_change_previous_address'
             addr_change_params = urlencode({'previous_address_id': prev_addr['previous_address_id']})
@@ -244,4 +283,33 @@ class NannyPersonalDetailsSummary(NannyARCFormView):
                 for form_class in self.get_form_class(application_id=application_id)]
 
     def get_success_url(self):
+        self.__handle_previous_name_dates()
         return 'nanny_childcare_address_summary'
+
+    def __handle_previous_name_dates(self):
+        """
+        Function to get start_date for current name and update start and end date for current name in db
+        """
+        previous_names_response = NannyGatewayActions().list('previous-name', params={'application_id': self.application_id})
+        personal_details_response = NannyGatewayActions().read('applicant-personal-details',
+                                                               params={'application_id': self.application_id})
+        end_date = datetime.date.today()
+        if personal_details_response.status_code == 200:
+            pd_record = personal_details_response.record
+            if previous_names_response.status_code == 200 and any(previous_names_response.record):
+                previous_names_list = previous_names_response.record
+                for name in previous_names_list:
+                    name['end_date'] = datetime.date(name['end_year'], name['end_month'], name['end_day'])
+                sorted_previous_names = sorted(previous_names_list, key=itemgetter('end_date'), reverse=True)
+                start_date = sorted_previous_names[0]['end_date']
+
+            else:
+                start_date = datetime.datetime.strptime(pd_record['date_of_birth'], "%Y-%m-%d")
+
+            pd_record['name_start_day'] = start_date.day
+            pd_record['name_start_month'] = start_date.month
+            pd_record['name_start_year'] = start_date.year
+            pd_record['name_end_day'] = end_date.day
+            pd_record['name_end_month'] = end_date.month
+            pd_record['name_end_year'] = end_date.year
+            NannyGatewayActions().put('applicant-personal-details', params=pd_record)

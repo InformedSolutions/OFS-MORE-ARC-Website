@@ -1,5 +1,5 @@
 {% extends 'govuk_template.html' %}
-{% block page_title %}Previous addresses {% if person_type != 'APPLICANT' %}of adults in your home{% endif %}{% endblock %}
+{% block page_title %}Previous home addresses{% endblock %}
 {% load static %}
 {% load govuk_template_base %}
 
@@ -11,7 +11,7 @@
 {{form.error_summary}}
 
 <h1 class="form-title heading-large">
-    Previous {% if person_type == 'APPLICANT' %}home {% endif %}address {{previous_addresses|length|add:"1"}}
+    Previous {% if person_type == 'APPLICANT' %}home {% endif %}addresses
 </h1>
 {% include 'childminder_templates/previous-address-snippet.html' with queryset=previous_addresses %}
 

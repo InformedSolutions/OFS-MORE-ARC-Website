@@ -159,6 +159,7 @@ class NannyGatewayActions(DBGatewayActions):
         'previous-address': 'previous_address_id',
         'applicant-personal-details': 'application_id',
         'previous-registration-details': 'application_id',
+        'previous-name': 'previous_name_id',
         'application': 'application_id',
         'childcare-training': 'application_id',
         'dbs-check': 'application_id',

@@ -30,10 +30,23 @@
         {% if row.id|template_string_in_list:'name date_of_birth' %}
         {% include 'nanny_general_table_template.html' %}
         {% endif %}
+        {% if row.id|template_string_in_list:'previous_name start_date end_date' %}
+        {% include 'nanny_general_table_template.html' %}
+        {% endif %}
         {% endfor %}
 
         </tbody>
     </table>
+
+    {% for row in rows %}
+            {% if row.id == 'name' %}
+            {% if not row.id|template_string_in_list:'previous_names' %}
+            <a href="{% url 'nanny_previous_names' %}?id={{ application_id }}"
+               class="button button-secondary">Add previous names</a>
+            <br>
+            {% endif %}
+            {% endif %}
+        {% endfor %}
 
     <table class="check-your-answers form-group">
         <thead>
