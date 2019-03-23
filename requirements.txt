@@ -4,7 +4,7 @@ psycopg2-binary==2.7.4
 unittest-xml-reporting==1.11.0
 django-govuk-template==0.4
 django-govuk-forms==0.4
-requests==2.18.4
+requests==2.20.0
 whitenoise==3.3.1
 inflect==0.2.5
 django-debug-toolbar==1.9.1
