@@ -170,12 +170,32 @@ class ApplicationExporter:
                                                            params={'application_id': application_id}).record
         export['insurance_declaration'] = json.dumps(insurance_declaration)
 
-        try:
-            previous_registration_details = NannyGatewayActions().read('previous-registration-details',
-                                                      params={'application_id': application_id}).record
-            export['previous_registration'] = json.dumps(previous_registration_details)
-        except:
+        # In the event no previous registrations, names or addresses have been listed, the below methods will 404.
+        # Explicit case handling is included for this. Other errors (500 etc.) will cause exception to be raised
+        # as the record property will be absent.
+
+        previous_registration_details = NannyGatewayActions().read('previous-registration-details',
+                                                                       params={'application_id': application_id})
+
+        if previous_registration_details.status_code == 404:
             export['previous_registration'] = json.dumps({})
+        else:
+            export['previous_registration'] = json.dumps(previous_registration_details.record)
+
+        previous_names = NannyGatewayActions().list('previous-name', params={'application_id': application_id})
+
+        if previous_names.status_code == 404:
+            export['applicant_previous_names'] = json.dumps({})
+        else:
+            export['applicant_previous_names'] = json.dumps(previous_names.record)
+
+        previous_addresses = NannyGatewayActions().list('previous-address',
+                                   params={'person_id': application_id, 'person_type': 'APPLICANT'})
+
+        if previous_addresses.status_code == 404:
+            export['applicant_previous_addresses'] = json.dumps({})
+        else:
+            export['applicant_previous_addresses'] = json.dumps(previous_addresses.record)
 
         user_details = IdentityGatewayActions().read('user', params={'application_id': application_id}).record
         export['user_details'] = json.dumps(user_details)
