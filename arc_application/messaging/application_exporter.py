@@ -140,12 +140,13 @@ class ApplicationExporter:
         export['application'] = json.dumps(application)
 
         # Try fetch childcare address if it exists
-        try:
-            childcare_addresses = NannyGatewayActions().list('childcare-address',
-                                                             params={'application_id': application_id}).record
-            export['childcare_addresses'] = json.dumps(childcare_addresses)
-        except:
+        childcare_addresses = NannyGatewayActions().list('childcare-address',
+                                                         params={'application_id': application_id})
+
+        if childcare_addresses.status_code == 404:
             export['childcare_addresses'] = json.dumps({})
+        else:
+            export['childcare_addresses'] = json.dumps(childcare_addresses.record)
 
         applicant_personal_details = NannyGatewayActions().read('applicant-personal-details',
                                                                 params={'application_id': application_id}).record
