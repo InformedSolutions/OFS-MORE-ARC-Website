@@ -281,37 +281,22 @@ def load_json(application_id_local, ordered_models, recurse, apply_filtering_for
 
         elif model == PreviousName:
             records = model.objects.filter(person_id=application.pk, other_person_type='APPLICANT')
-            previous_names = [{"title": "Previous names", "id": application_id_local}]
-            for i, record in enumerate(records):
-                previous_names.extend([
-                    {"name": "Previous name {}".format(i+1),
-                     "value": record.get_name()},
-                    {"name": "Start date",
-                     "value": record.start_date.strftime('%d %B %Y') if record.start_date else ''},
-                    {"name": "End date",
-                     "value": record.end_date.strftime('%d %B %Y') if record.end_date else ''},
-                ])
-            table_list.append(previous_names)
+            if len(records) != 0:
+                previous_names = [{"title": "Previous names", "id": application_id_local}]
+                for i, record in enumerate(records):
+                    previous_names.extend(render_previous_name(record, i + 1))
+                table_list.append(previous_names)
 
         elif model == PreviousAddress:
             unsorted_addresses = model.objects.filter(person_id=application.pk)
-            records = sorted(unsorted_addresses, key=lambda address: address.order if address.order else 0)
+            records = sorted(unsorted_addresses, key=lambda addr: addr.order if addr.order else 0)
 
-            previous_addresses = [{"title": "Previous addresses", "id": application_id_local}]
-            for index, record in enumerate(records):
-                order = index + 1
-                address = get_address(record.street_line1,
-                                      record.street_line2, record.town,
-                                      record.postcode)
-                previous_addresses.append({"name": f"Previous address {order}", "value": address})
-                if record.moved_in_date:
-                    previous_addresses.append(
-                        {"name": f"Moved in date {order}", "value": record.moved_in_date.strftime('%d %B %Y')})
-                if record.moved_out_date:
-                    previous_addresses.append(
-                        {"name": f"Moved out date {order}", "value": record.moved_out_date.strftime('%d %B %Y')})
+            if len(records) != 0:
+                previous_addresses = [{"title": "Previous addresses", "id": application_id_local}]
+                for index, record in enumerate(records):
+                    previous_addresses.extend(render_previous_address(record, index + 1))
 
-            table_list.append(previous_addresses)
+                table_list.append(previous_addresses)
 
         elif model == AdultInHome:
             records = model.objects.filter(application_id=application.pk)
@@ -341,6 +326,32 @@ def load_json(application_id_local, ordered_models, recurse, apply_filtering_for
     if recurse:
         table_list = sorted(table_list, key=lambda k: k['index'])
     return table_list
+
+
+def render_previous_name(previous_name_record, index):
+    return [
+        {"name": "Previous name {}".format(index),
+         "value": previous_name_record.get_name()},
+        {"name": "Start date",
+         "value": previous_name_record.start_date.strftime('%d %B %Y') if previous_name_record.start_date else ''},
+        {"name": "End date",
+         "value": previous_name_record.end_date.strftime('%d %B %Y') if previous_name_record.end_date else ''},
+    ]
+
+
+def render_previous_address(previous_address_record, index):
+    address = get_address(previous_address_record.street_line1,
+                          previous_address_record.street_line2, previous_address_record.town,
+                          previous_address_record.postcode)
+    return [
+        {"name": "Previous address {}".format(index),
+         "value": address},
+        {"name": "Moved in date",
+         "value": previous_address_record.moved_in_date.strftime(
+             '%d %B %Y') if previous_address_record.moved_in_date else ''},
+        {"name": "Moved out date",
+         "value": previous_address_record.moved_out_date.strftime('%d %B %Y') if previous_address_record.moved_out_date else ''},
+    ]
 
 
 def get_application_summary_variables(application_id, apply_filtering_for_eyc=False):
