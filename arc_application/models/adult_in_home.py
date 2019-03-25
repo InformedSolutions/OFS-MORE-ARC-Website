@@ -182,24 +182,29 @@ class AdultInHome(models.Model):
 
         # late import to avoid circular dependency
         from .previous_name import PreviousName
+        from .previous_address import PreviousAddress
+        from arc_application.views.childminder_views.childminder_utils import render_previous_name
+        from arc_application.views.childminder_views.childminder_utils import render_previous_address
 
         previous_names = PreviousName.objects.filter(person_id=self.pk, other_person_type='ADULT').order_by('order')
-        if len(previous_names) == 0:
+        previous_addresses = PreviousAddress.objects.filter(person_id=self.pk, person_type='ADULT').order_by('order')
+
+        if len(previous_names) == 0 and len(previous_addresses) == 0:
             return None
 
         summary_table = [
             {"title": "{}'s previous names and addresses".format(self.get_full_name()),
              "id": self.pk}
         ]
-        for i, name in enumerate(previous_names):
-            summary_table.extend([
-                {"name": "Previous name {}".format(i + 1),
-                 "value": name.name},
-                {"name": "Start date",
-                 "value": name.start_date.strftime("%d %B %Y") if name.start_date else ''},
-                {"name": "End date",
-                 "value": name.end_date.strftime("%d %B %Y") if name.end_date else ''},
-            ])
+
+        if len(previous_names) != 0:
+            for i, name in enumerate(previous_names):
+                summary_table.extend(render_previous_name(name, i + 1))
+
+        if len(previous_addresses) != 0:
+            for i, address in enumerate(previous_addresses):
+                summary_table.extend(render_previous_address(address, i + 1))
+
         return summary_table
 
     def show_enhanced_check(self):
