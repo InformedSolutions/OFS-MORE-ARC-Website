@@ -443,8 +443,6 @@ def create_childminder_application(user_id=None):
         postcode='WA14 4PX',
         current_address=True,
         childcare_address=True,
-        move_in_month=0,
-        move_in_year=0
     )
 
     ApplicantName.objects.create(
