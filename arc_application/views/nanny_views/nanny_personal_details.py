@@ -37,7 +37,7 @@ class NannyPersonalDetailsSummary(NannyARCFormView):
         if isinstance(date_or_iso_str, datetime.date):
             the_date = date_or_iso_str
         else:
-            the_date = datetime.datetime.strptime(date_or_iso_str, '%Y-%M-%d').date()
+            the_date = datetime.datetime.strptime(date_or_iso_str, '%Y-%m-%d').date()
         return the_date.strftime('%d/%m/%Y')
 
     @staticmethod
@@ -283,31 +283,47 @@ class NannyPersonalDetailsSummary(NannyARCFormView):
                 for form_class in self.get_form_class(application_id=application_id)]
 
     def get_success_url(self):
-        self.__handle_previous_name_dates()
+        self.__handle_previous_name_and_address_dates()
         return 'nanny_childcare_address_summary'
 
-    def __handle_previous_name_dates(self):
+    def __handle_previous_name_and_address_dates(self):
         """
-        Function to get start_date for current name and update start and end date for current name in db
+        Sets start and end dates for current name and address in db
         """
         actions = NannyGatewayActions()
-        previous_names = self.list_records(actions, 'previous-name', {'application_id': self.application_id})
+        end_date = datetime.date.today()
         personal_details = self.read_record(actions, 'applicant-personal-details',
                                             {'application_id': self.application_id})
-        end_date = datetime.date.today()
+        date_of_birth = datetime.datetime.strptime(personal_details['date_of_birth'], '%Y-%m-%d').date()
 
+        previous_names = self.list_records(actions, 'previous-name', {'application_id': self.application_id})
         if previous_names is not None and len(previous_names) > 0:
             for name in previous_names:
                 name['end_date'] = datetime.date(name['end_year'], name['end_month'], name['end_day'])
             sorted_previous_names = sorted(previous_names, key=itemgetter('end_date'), reverse=True)
-            start_date = sorted_previous_names[0]['end_date']
+            name_start_date = sorted_previous_names[0]['end_date']
         else:
-            start_date = datetime.datetime.strptime(personal_details['date_of_birth'], "%Y-%m-%d")
+            name_start_date = date_of_birth
 
-        personal_details['name_start_day'] = start_date.day
-        personal_details['name_start_month'] = start_date.month
-        personal_details['name_start_year'] = start_date.year
+        personal_details['name_start_day'] = name_start_date.day
+        personal_details['name_start_month'] = name_start_date.month
+        personal_details['name_start_year'] = name_start_date.year
         personal_details['name_end_day'] = end_date.day
         personal_details['name_end_month'] = end_date.month
         personal_details['name_end_year'] = end_date.year
-        NannyGatewayActions().put('applicant-personal-details', params=personal_details)
+
+        previous_addresses = self.list_records(actions, 'previous-address',
+                                               {'person_id': self.application_id, 'person_type': 'APPLICANT'})
+        if previous_addresses is not None and len(previous_addresses) > 0:
+            # moved_out_date is a string but due to iso format, lexicographical order will be
+            # equivalent to chronological
+            sorted_previous_addresses = sorted(previous_addresses, key=itemgetter('moved_out_date'), reverse=True)
+            address_start_date = datetime.datetime.strptime(sorted_previous_addresses[0]['moved_out_date'],
+                                                            '%Y-%m-%d').date()
+        else:
+            address_start_date = date_of_birth
+
+        personal_details['moved_in_date'] = address_start_date
+        personal_details['moved_out_date'] = end_date
+
+        actions.put('applicant-personal-details', params=personal_details)

@@ -142,12 +142,12 @@ class PreviousAddressManualForm(GOVUKForm):
     ERROR_MESSAGE_STREET_LINE_1_TOO_LONG = 'The first line of your address must be under 50 characters long'
     ERROR_MESSAGE_STREET_LINE_2_TOO_LONG = 'The second line of your address must be under 50 characters long'
     ERROR_MESSAGE_TOWN_BLANK = 'Please enter the name of the town or city'
-    ERROR_MESSAGE_TOWN_INVALID = 'Please spell out the name of the town or city using letters'
+    ERROR_MESSAGE_TOWN_INVALID = 'Spell out the name of the town or city using letters'
     ERROR_MESSAGE_TOWN_TOO_LONG = 'The name of the town or city must be under 50 characters long'
-    ERROR_MESSAGE_COUNTY_INVALID = 'Please spell out the name of the county using letters'
+    ERROR_MESSAGE_COUNTY_INVALID = 'Spell out the name of the county using letters'
     ERROR_MESSAGE_COUNTY_TOO_LONG = 'The name of the county must be under 50 characters long'
     ERROR_MESSAGE_POSTCODE_BLANK = 'Please enter your postcode'
-    ERROR_MESSAGE_POSTCODE_INVALID = 'Please enter a valid postcode'
+    ERROR_MESSAGE_POSTCODE_INVALID = 'Enter a real postcode'
 
     # Moved in/out date validation messages
     ERROR_MESSAGE_DATE_BLANK = 'Enter the full date, including the day, month and year'
