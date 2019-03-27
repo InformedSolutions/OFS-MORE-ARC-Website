@@ -4,6 +4,8 @@ from django.urls import reverse
 from django.views import View
 from django.shortcuts import render
 from django.utils.http import urlencode
+from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
 
 from ...forms.childminder_forms.form_helper import initial_data_filler, data_saver
 from ...forms.update_detail_forms.update_contact_details import UpdateEmail, UpdatePhoneNumber, UpdateAddPhoneNumber
@@ -11,7 +13,9 @@ from ...models import UserDetails, Application
 from ..base import has_group
 
 
+@method_decorator(login_required, name='dispatch')
 class ChangeDetails(View):
+
     form = None
     page_title = None
     pre_text = ''

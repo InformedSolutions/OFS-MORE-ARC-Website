@@ -32,10 +32,19 @@ def user_assigned_application(function):
     :param function: callback to inner function (located below decorator)
     """
     def wrap(request, *args, **kwargs):
+
         if request.method == 'GET':
             application_id = request.GET["id"]
         else:
-            application_id = request.POST["id"]
+            url_app_id = request.GET.get("id", '')
+            posted_app_id = request.POST.get("id", '')
+
+            # if id specified in both places, ensure they are the same before performing auth check
+            if url_app_id and posted_app_id and url_app_id != posted_app_id:
+                raise PermissionDenied('GET and POST application IDs differ')
+
+            # allow fall back to GET parameter if not in POST body
+            application_id = posted_app_id or url_app_id
 
         arc_user_binding = Arc.objects.get(pk=application_id)
 

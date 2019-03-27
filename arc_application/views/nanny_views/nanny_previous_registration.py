@@ -1,13 +1,20 @@
 from django.conf import settings
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import never_cache
+from django.contrib.auth.decorators import login_required
 
-from arc_application.forms.nanny_forms.nanny_previous_registration_form import PreviousRegistrationDetailsForm
-from arc_application.services.db_gateways import NannyGatewayActions
+from ...forms.nanny_forms.nanny_previous_registration_form import PreviousRegistrationDetailsForm
+from ...services.db_gateways import NannyGatewayActions
 from .nanny_form_view import FormView
+from ...decorators import group_required, user_assigned_application
 
 
+@method_decorator((never_cache, login_required, group_required(settings.ARC_GROUP), user_assigned_application),
+                  name='dispatch')
 class NannyPreviousRegistrationView(FormView):
+
     form_class = PreviousRegistrationDetailsForm
     template_name = 'nanny_add_previous_registration.html'
 
