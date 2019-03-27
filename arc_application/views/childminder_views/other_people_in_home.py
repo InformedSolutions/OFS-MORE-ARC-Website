@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.forms import formset_factory
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
-
+import logging
 from ...childminder_task_util import get_show_references
 from ...decorators import group_required, user_assigned_application
 from ...forms.childminder_forms.form import AdultInYourHomeForm, ChildInYourHomeForm, OtherPeopleInYourHomeForm, \
@@ -17,6 +17,8 @@ from ...models.previous_name import PreviousName
 from ...review_util import request_to_comment, save_comments, redirect_selection
 from .review import other_people_initial_population, children_initial_population, children_address_initial_population
 
+# Initiate logging
+log = logging.getLogger('')
 
 @login_required
 @group_required(settings.ARC_GROUP)
@@ -206,6 +208,7 @@ def other_people_summary(request):
             'providing_care_in_own_home': providing_care_in_own_home,
             'childcare_type_zero_to_five': childcare_type.zero_to_five,
         }
+        log.debug("Rendering people in the home page")
         return render(request, 'childminder_templates/other-people-summary.html', variables)
 
     elif request.method == 'POST':
@@ -248,6 +251,7 @@ def other_people_summary(request):
 
             # Only add comments for known_to_social_services_pith if questions are applicable.
             if providing_care_in_own_home:
+                log.debug("Add known to social services questions")
                 review_sections_to_process.update(
                     {
                         'known_to_social_services_pith': {
@@ -287,7 +291,9 @@ def other_people_summary(request):
                 application.people_in_home_status = section_status
                 application.save()
             successful = save_comments(request, static_form_comments)
+            log.debug("Handling submissions for people in the home page - save successful")
             if not successful:
+                log.debug("Handling submissions for people in the home page - save unsuccessful")
                 return render(request, '500.html')
 
             # calculate start and end dates for each adult's current name
@@ -318,8 +324,9 @@ def other_people_summary(request):
             show_references = get_show_references(application_id_local)
 
             default = '/references/summary/' if show_references else '/review/'
+            log.debug("Redirect to references or review")
             redirect_link = redirect_selection(request, default)
-
+            log.debug("Handling submissions for people in the home page")
             return HttpResponseRedirect(settings.URL_PREFIX + redirect_link + '?id=' + application_id_local)
 
         else:
@@ -371,6 +378,7 @@ def other_people_summary(request):
                 'providing_care_in_own_home': providing_care_in_own_home,
                 'childcare_type_zero_to_five': childcare_type.zero_to_five,
             }
+            log.debug("Render people in the home page")
             return render(request, 'childminder_templates/other-people-summary.html', variables)
 
 

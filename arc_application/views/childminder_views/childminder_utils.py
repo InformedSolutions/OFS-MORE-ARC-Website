@@ -1,7 +1,11 @@
 from django.urls import reverse
+import logging
 
 from ...models import *
 from ...summary_page_data import link_dict
+
+# Initiate logging
+log = logging.getLogger('')
 
 name_field_dict = {
     'Your email': 'email_address',
@@ -219,6 +223,7 @@ def load_json(application_id_local, ordered_models, recurse, apply_filtering_for
                 ])
 
                 if own_children:
+                    log.debug("Add known to social services questions")
                     table_list.append([
                         {"title": "Your children", "id": application_id_local},
                         {"name": "Known to council social services?", "value": get_bool_as_string(own_children),
@@ -227,6 +232,7 @@ def load_json(application_id_local, ordered_models, recurse, apply_filtering_for
                          'pk': application_id_local, "index": 2}
                     ])
                 else:
+                    log.debug("Add known to social services question - not including tell us why")
                     table_list.append([
                         {"title": "Your children", "id": application_id_local},
                         {"name": "Known to council social services?", "value": get_bool_as_string(own_children),
@@ -245,6 +251,7 @@ def load_json(application_id_local, ordered_models, recurse, apply_filtering_for
 
             # Only show People in the home tables when applicant is not working in another childminder's home
             if application.working_in_other_childminder_home is False:
+                log.debug("Conditional logic: Show people in the home table")
                 table_list.append([
                     {"title": "Adults in the home", "id": application_id_local},
                     {"name": "Does anyone aged 16 or over live or work in your home?",
@@ -255,16 +262,19 @@ def load_json(application_id_local, ordered_models, recurse, apply_filtering_for
 
             # Only show People in the home tables when applicant is not working in another childminder's home
             if application.working_in_other_childminder_home is False:
+                log.debug("Conditional logic: Show people in the home table")
                 table_list.append(application.get_summary_table_child())
 
             # Only show People in the home tables when applicant is not working in another childminder's home
             if application.working_in_other_childminder_home is False:
+                log.debug("Conditional logic: Show people in the home table")
                 reasons_known_to_social_services_pith = Application.objects.get(
                     application_id=application_id_local).reasons_known_to_social_services_pith
                 known_to_social_services_pith = Application.objects.get(
                     application_id=application_id_local).known_to_social_services_pith
                 if application.own_children is False:
                     if known_to_social_services_pith is True:
+                        log.debug("Add known to social services questions")
                         table_list.append([
                             {"title": "Your own children", "id": application_id_local},
                             {"name": "Known to council social services in regards to your own children?",
@@ -273,6 +283,7 @@ def load_json(application_id_local, ordered_models, recurse, apply_filtering_for
                              'pk': application_id_local, "index": 2}
                         ])
                     else:
+                        log.debug("Add known to social services question - not tell us why")
                         table_list.append([
                             {"title": "Your own children", "id": application_id_local},
                             {"name": "Known to council social services in regards to your own children?",
@@ -282,6 +293,7 @@ def load_json(application_id_local, ordered_models, recurse, apply_filtering_for
         elif model == PreviousName:
             records = model.objects.filter(person_id=application.pk, other_person_type='APPLICANT')
             if len(records) != 0:
+                log.debug("Conditional logic: Show previous names")
                 previous_names = [{"title": "Previous names", "id": application_id_local}]
                 for i, record in enumerate(records):
                     previous_names.extend(render_previous_name(record, i + 1))
@@ -292,6 +304,7 @@ def load_json(application_id_local, ordered_models, recurse, apply_filtering_for
             records = sorted(unsorted_addresses, key=lambda addr: addr.order if addr.order else 0)
 
             if len(records) != 0:
+                log.debug("Conditional logic: Show previous addresses")
                 previous_addresses = [{"title": "Previous addresses", "id": application_id_local}]
                 for index, record in enumerate(records):
                     previous_addresses.extend(render_previous_address(record, index + 1))
@@ -372,12 +385,14 @@ def get_application_summary_variables(application_id, apply_filtering_for_eyc=Fa
     application = Application.objects.get(application_id=application_id)
 
     if application.working_in_other_childminder_home is False:
+        log.debug("Conditional logic: Show people in the home tables")
         ordered_models.append(AdultInHome)
         ordered_models.append(Application)
         ordered_models.append(ChildInHome)
     zero_to_five = ChildcareType.objects.get(application_id=application_id).zero_to_five
 
     if zero_to_five:
+        log.debug("Conditional logic: Show health declaration and reference")
         ordered_models.insert(7, HealthDeclarationBooklet)
         ordered_models.append(Reference)
     json = load_json(application_id, ordered_models, False, apply_filtering_for_eyc=apply_filtering_for_eyc)

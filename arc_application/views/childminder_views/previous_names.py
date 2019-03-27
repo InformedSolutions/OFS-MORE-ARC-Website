@@ -1,4 +1,5 @@
 import datetime
+import logging
 
 from django.conf import settings
 from django.forms import formset_factory
@@ -10,6 +11,8 @@ from ...forms.previous_names import PersonPreviousNameForm
 from ...models import PreviousName
 from ...review_util import build_url
 
+# Initiate logging
+log = logging.getLogger('')
 
 @group_required(settings.ARC_GROUP)
 @user_assigned_application
@@ -51,16 +54,16 @@ def add_previous_name(request):
 
         # perform appropriate redirect according to action and person type
         if request.POST['action'] == "Add another name":
-
+            log.debug("Redirect to Add another name")
             # redirect back to page, with 'show_extra' parameter so that empty form is displayed
             return _previous_names_page_redirect(app_id, person_id, person_type, show_extra=True)
 
         elif person_type in ('ADULT', 'CHILD'):
-
+            log.debug("Conditional logic: Redirect to other people summary")
             return HttpResponseRedirect(build_url('other_people_summary', get={'id': app_id}))
 
         else:
-
+            log.debug("Conditional logic: Redirect to personal details summary")
             return HttpResponseRedirect(build_url('personal_details_summary', get={'id': app_id}))
 
     elif request.method == "GET":
@@ -87,7 +90,7 @@ def _previous_names_page_render(request, app_id, person_id, person_type, formset
         'person_id': person_id,
         'person_type': person_type,
     }
-
+    log.debug("Render previous name page")
     return render(request, 'childminder_templates/add-previous-names.html', context)
 
 

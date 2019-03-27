@@ -4,12 +4,15 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 from timeline_logger.models import TimelineLog
+import logging
 
 from ...decorators import group_required, user_assigned_application
 from ...models import *
 from ...utils import has_group
 from .childminder_utils import get_application_summary_variables, load_json
 
+# Initiate logging
+log = logging.getLogger('')
 
 @login_required
 @group_required(settings.ARC_GROUP)
@@ -18,6 +21,7 @@ def arc_summary(request):
     if request.method == 'GET':
         application_id_local = request.GET["id"]
         variables = get_application_summary_variables(application_id_local)
+        log.debug("Rendering arc summary page")
         return render(request, 'childminder_templates/arc-summary.html', variables)
 
     elif request.method == 'POST':
@@ -25,6 +29,7 @@ def arc_summary(request):
         status = Arc.objects.get(pk=application_id_local)
         status.declaration_review = 'COMPLETED'
         status.save()
+        log.debug("Handling submissions for arc summary page")
         return HttpResponseRedirect(
             reverse('review') + '?id=' + application_id_local
         )
@@ -41,6 +46,7 @@ def cc_summary(request):
         # Only display People in your Home tables if the applicant does not work in another childminder's home
         application = Application.objects.get(application_id=application_id_local)
         if application.working_in_other_childminder_home is False:
+            log.debug("Conditional logic: Show people in the home tables")
             ordered_models.append(AdultInHome)
             ordered_models.append(Application)
             ordered_models.append(ChildInHome)
@@ -49,6 +55,8 @@ def cc_summary(request):
         if zero_to_five:
             ordered_models.insert(6, HealthDeclarationBooklet)
             ordered_models.append(Reference)
+            log.debug("Conditional logic: Show health declarations and references tables")
+
         json = load_json(application_id_local, ordered_models, False)
         json[0][1]['link'] = (reverse('update_email') + '?id=' + str(application_id_local))
         json[0][2]['link'] = (reverse('update_phone_number') + '?id=' + str(application_id_local))
@@ -70,6 +78,7 @@ def cc_summary(request):
             'cc_user': cc_user,
             'publish_details': publish_details
         }
+        log.debug("Rendering search summary page")
         return render(request, 'childminder_templates/search-summary.html', variables)
 
     elif request.method == 'POST':
@@ -77,4 +86,5 @@ def cc_summary(request):
         status = Arc.objects.get(pk=application_id_local)
         status.declaration_review = 'COMPLETED'
         status.save()
+        log.debug("Handling submissions for arc summary")
         return HttpResponseRedirect(settings.URL_PREFIX + '/comments?id=' + application_id_local)
