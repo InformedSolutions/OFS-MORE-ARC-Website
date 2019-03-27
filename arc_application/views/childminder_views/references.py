@@ -2,12 +2,15 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
+import logging
 
 from ...forms.childminder_forms.form import ReferencesForm, ReferencesForm2
 from ...models import Application, Arc, Reference
 from ...review_util import redirect_selection, request_to_comment, save_comments
 from ...decorators import group_required, user_assigned_application
 
+# Initiate logging
+log = logging.getLogger('')
 
 @login_required
 @group_required(settings.ARC_GROUP)
@@ -65,10 +68,10 @@ def references_summary(request):
                 status.save()
                 default = '/review'
                 redirect_link = redirect_selection(request, default)
-
+                log.debug("Handling submissions for references page - save successful")
                 return HttpResponseRedirect(settings.URL_PREFIX + redirect_link + '?id=' + application_id_local)
             else:
-
+                log.debug("Handling submissions for references page - save unsuccessful")
                 return render(request, '500.html')
 
     first_reference_record = Reference.objects.get(application_id=application_id_local, reference=1)
@@ -137,4 +140,5 @@ def references_summary(request):
         'references_status': application.references_status
     }
 
+    log.debug("Render references page")
     return render(request, 'childminder_templates/references-summary.html', variables)
