@@ -13,10 +13,15 @@
 
 <form method="post" novalidate>
     {% csrf_token %}
+
     {{ form.as_div }}
-    <input type="submit" class="hidden-link-2" name="delete" value="Remove this address" />
-    <br /><br />
-    <input type="submit" class="button" value="Save and continue" />
+
+    <p>
+        <input type="submit" class="hidden-link-2" name="delete" value="Remove this address" />
+    </p>
+    <p>
+        <input type="submit" class="button" value="Save and continue" />
+    </p>
 </form>
 
 {% include 'nanny_templates/nanny_return_to_list.html' %}

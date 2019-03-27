@@ -3,15 +3,22 @@ from urllib.parse import urlencode
 
 from django.http import HttpResponseRedirect
 from django.urls import reverse
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import never_cache
+from django.contrib.auth.decorators import login_required
+from django.conf import settings
 
 from .nanny_form_view import FormView
 from ...forms.previous_addresses import PreviousAddressEntryForm, PreviousAddressSelectForm, PreviousAddressManualForm
 from ...services.db_gateways import NannyGatewayActions
 from ...address_helper import AddressHelper
+from ...decorators import group_required, user_assigned_application
 
 
 # noinspection PyMethodMayBeStatic
-class _NannyPreviousAddressViewMixin:
+@method_decorator((never_cache, login_required, group_required(settings.ARC_GROUP), user_assigned_application),
+                  name='dispatch')
+class _NannyPreviousAddressViewBase(FormView):
 
     # noinspection SpellCheckingInspection
     def _addr_record_to_context_data(self, rec):
@@ -89,7 +96,7 @@ class _NannyPreviousAddressViewMixin:
         NannyGatewayActions().delete('previous-address', {'previous_address_id': previous_address_id})
 
 
-class NannyChangePreviousAddressView(FormView, _NannyPreviousAddressViewMixin):
+class NannyChangePreviousAddressView(_NannyPreviousAddressViewBase):
 
     form_class = PreviousAddressManualForm
     template_name = 'nanny_change_previous_address.html'
@@ -131,7 +138,7 @@ class NannyChangePreviousAddressView(FormView, _NannyPreviousAddressViewMixin):
         return HttpResponseRedirect(self.get_success_url())
 
 
-class NannyAddPreviousAddressSearchView(FormView, _NannyPreviousAddressViewMixin):
+class NannyAddPreviousAddressSearchView(_NannyPreviousAddressViewBase):
 
     form_class = PreviousAddressEntryForm
     template_name = 'nanny_add_previous_address_search.html'
@@ -180,7 +187,7 @@ class NannyAddPreviousAddressSearchView(FormView, _NannyPreviousAddressViewMixin
         return urlencode({'id': application_id, 'person_id': person_id, 'type': person_type, 'postcode': postcode})
 
 
-class NannyAddPreviousAddressSelectView(FormView, _NannyPreviousAddressViewMixin):
+class NannyAddPreviousAddressSelectView(_NannyPreviousAddressViewBase):
 
     form_class = PreviousAddressSelectForm
     template_name = 'nanny_add_previous_address_select.html'
@@ -269,7 +276,7 @@ class NannyAddPreviousAddressSelectView(FormView, _NannyPreviousAddressViewMixin
         return urlencode(params)
 
 
-class NannyAddPreviousAddressManualView(FormView, _NannyPreviousAddressViewMixin):
+class NannyAddPreviousAddressManualView(_NannyPreviousAddressViewBase):
 
     form_class = PreviousAddressManualForm
     template_name = 'nanny_add_previous_address_manual.html'

@@ -1,5 +1,7 @@
 from django.conf import settings
 from django.views.generic import FormView
+from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
 
 from ...forms.update_detail_forms.update_contact_details import NannyUpdateEmail, NannyUpdatePhoneNumber, \
     NannyUpdateAddPhoneNumber
@@ -8,7 +10,9 @@ from ...services.db_gateways import IdentityGatewayActions
 from ...views.base import has_group
 
 
+@method_decorator(login_required, name='dispatch')
 class NannyChangeDetails(FormView):
+
     form_class = None
     page_title = None
     pre_text = ''

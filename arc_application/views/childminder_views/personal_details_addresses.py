@@ -227,6 +227,9 @@ def postcode_submission(request):
             return postcode_entry(request)
 
 
+@login_required
+@group_required(settings.ARC_GROUP)
+@user_assigned_application
 def personal_details_previous_address_change(request):
     """
     Function to allow the user to update an entry to the address table from the other people summary page
