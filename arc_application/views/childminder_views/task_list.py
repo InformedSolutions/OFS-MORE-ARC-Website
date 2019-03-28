@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
+import logging
 
 from ...childminder_task_util import get_show_people_in_the_home, get_number_of_tasks, \
     __get_flagged_fields_to_check_no_db, all_complete, __get_review_fields_to_check_no_db, get_show_references
@@ -9,6 +10,8 @@ from ...models import ApplicantName, ApplicantPersonalDetails, Application, Arc,
 
 decorators = [login_required, group_required(settings.ARC_GROUP), user_assigned_application]
 
+# Initiate logging
+log = logging.getLogger('')
 
 @login_required
 @group_required(settings.ARC_GROUP)
@@ -76,4 +79,5 @@ def task_list(request):
             'show_references': show_references
         }
 
+    log.debug("Render task-list")
     return render(request, 'childminder_templates/task-list.html', application_status_context)

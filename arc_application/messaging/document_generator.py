@@ -1,5 +1,5 @@
 import base64
-
+import logging
 from django.http import HttpResponse
 from django_xhtml2pdf.utils import generate_pdf
 
@@ -9,6 +9,8 @@ from ..models import Application, AdultInHome, \
 from ..views.childminder_views.childminder_utils import get_application_summary_variables
 from ..views.nanny_views.nanny_utils import get_nanny_summary_variables
 
+# Initiate logging
+log = logging.getLogger()
 
 class DocumentGenerator:
     """
@@ -25,6 +27,7 @@ class DocumentGenerator:
         variables = get_application_summary_variables(application_id, apply_filtering_for_eyc=True)
         result = generate_pdf('childminder-pdf-summary.html', file_object=resp, context=variables)
         base64_string = str(base64.b64encode(result.content).decode("utf-8"))
+        log.debug("Generating PDF and base64 representation for Childminder Application Summary")
         return base64_string
 
     @staticmethod
@@ -80,6 +83,7 @@ class DocumentGenerator:
 
         result = generate_pdf('childminder-pdf-summary.html', file_object=resp, context=variables)
         base64_string = str(base64.b64encode(result.content).decode("utf-8"))
+        log.debug("Generating PDF and base64 representation for Childminder Adult Details Summary")
         return base64_string
 
     @staticmethod
@@ -95,4 +99,5 @@ class DocumentGenerator:
         }
         result = generate_pdf('nanny-pdf-summary.html', file_object=resp, context=variables)
         base64_string = str(base64.b64encode(result.content).decode("utf-8"))
+        log.debug("Generating PDF and base64 representation for Nanny Application Summary")
         return base64_string

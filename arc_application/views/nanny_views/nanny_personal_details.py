@@ -1,3 +1,4 @@
+import logging
 import datetime
 from urllib.parse import urlencode
 
@@ -7,6 +8,8 @@ from ...services.db_gateways import NannyGatewayActions
 from operator import itemgetter
 from ...utils import spatial_ordinal
 
+# Initiate logging
+log = logging.getLogger()
 
 class NannyPersonalDetailsSummary(NannyARCFormView):
 
@@ -101,6 +104,7 @@ class NannyPersonalDetailsSummary(NannyARCFormView):
         home_address_form = forms[1]
 
         if previous_registration_details is not None:
+            log.debug("Conditional logic: Show nanny previous registration")
             previous_registration_record_exists = True
             previous_registration_details = nanny_actions.read('previous-registration-details',
                                                                params={'application_id': application_id}).record
@@ -124,6 +128,7 @@ class NannyPersonalDetailsSummary(NannyARCFormView):
         ]
 
         if previous_names is not None and len(previous_names) > 0:
+            log.debug("Conditional logic: Show nanny previous names")
             for i, name in enumerate(previous_names):
                 full_name = self.format_name(name['first_name'], name['middle_names'], name['last_name'])
                 start_date = datetime.date(name['start_year'], name['start_month'], name['start_day'])
@@ -176,6 +181,7 @@ class NannyPersonalDetailsSummary(NannyARCFormView):
             },
         ])
         for i, prev_addr in enumerate(previous_addresses or []):
+            log.debug("Conditional logic: Show nanny previous address")
             addr_change_view = 'nanny_change_previous_address'
             addr_change_params = urlencode({'previous_address_id': prev_addr['previous_address_id']})
             rows.extend([

@@ -1,3 +1,4 @@
+import logging
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
@@ -11,6 +12,8 @@ from ...services.arc_comments_handler import update_arc_review_status, \
     update_application_arc_flagged_status, \
     ARCCommentsProcessor
 
+# Initiate logging
+log = logging.getLogger()
 
 @method_decorator(never_cache, name='dispatch')
 @method_decorator(login_required, name='dispatch')
@@ -27,11 +30,15 @@ class NannyARCFormView(FormView):
     def get(self, request, *args, **kwargs):
         self.application_id = request.GET['id']
         context = self.get_context_data(self.application_id)
+        page_name = self.verbose_task_name
+        log.debug("Rendering nanny %s page" % page_name)
         return render(request, self.template_name, context=context)
 
     def post(self, request, *args, **kwargs):
         self.application_id = request.GET['id']
         self.__handle_post_data()
+        page_name = self.verbose_task_name
+        log.debug("Handling submissions for nanny %s page" % page_name)
         return HttpResponseRedirect(build_url(self.get_success_url(), get={'id': request.GET['id']}))
 
     def __handle_post_data(self):

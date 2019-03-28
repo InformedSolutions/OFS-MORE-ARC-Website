@@ -1,11 +1,14 @@
 import boto3
 import logging
 import json
+import logging
 
 from django.conf import settings
 
 logger = logging.getLogger()
 
+# Initiate logging
+log = logging.getLogger()
 
 class SQSHandler:
     """
@@ -45,6 +48,7 @@ class SQSHandler:
         """
         try:
             response = self.queue.send_message(MessageBody=json.dumps(body))
+            log.debug("Service pushing to Amazon SQS queue")
             return response
         except Exception as e:
             self.logger.debug(e)

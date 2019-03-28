@@ -2,11 +2,14 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
+import logging
 
 from ...models import Application, Arc, UserDetails
 from ...review_util import redirect_selection
 from ...decorators import group_required, user_assigned_application
 
+# Initiate logging
+log = logging.getLogger('')
 
 @login_required
 @group_required(settings.ARC_GROUP)
@@ -34,6 +37,7 @@ def contact_summary(request):
             'login_details_status': application.login_details_status,
             'childcare_type_status': application.childcare_type_status
         }
+        log.debug("Rendering contact details page")
         return render(request, 'childminder_templates/contact-summary.html', variables)
 
     elif request.method == 'POST':
@@ -47,6 +51,8 @@ def contact_summary(request):
         section_status = 'COMPLETED'
         status.login_details_review = section_status
         status.save()
+
+        log.debug("Handling submissions for contact details page")
 
         default = '/childcare/age-groups'
         redirect_link = redirect_selection(request, default)

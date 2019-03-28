@@ -1,3 +1,4 @@
+import logging
 from django.conf import settings
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
@@ -10,6 +11,8 @@ from ...services.db_gateways import NannyGatewayActions
 from .nanny_form_view import FormView
 from ...decorators import group_required, user_assigned_application
 
+# Initiate logging
+log = logging.getLogger()
 
 @method_decorator((never_cache, login_required, group_required(settings.ARC_GROUP), user_assigned_application),
                   name='dispatch')
@@ -58,6 +61,7 @@ class NannyPreviousRegistrationView(FormView):
                 previous_registration_record['five_years_in_UK'] = self.request.POST['five_years_in_UK']
 
                 NannyGatewayActions().put('previous-registration-details', params=previous_registration_record)
+                log.debug("Handling submissions for nanny previous registration page - updating details")
             else:
                 previous_registration_new = {}
                 previous_registration_new['application_id'] = application_id
@@ -67,6 +71,7 @@ class NannyPreviousRegistrationView(FormView):
 
                 NannyGatewayActions().create('previous-registration-details',
                                                         params=previous_registration_new)
+                log.debug("Handling submissions for nanny previous registration page - new details")
 
             redirect_link = '/nanny/personal-details/review/'
             return HttpResponseRedirect(settings.URL_PREFIX + redirect_link + '?id=' + application_id)
@@ -76,5 +81,5 @@ class NannyPreviousRegistrationView(FormView):
                 'form': form,
                 'application_id': application_id,
             }
-
+            log.debug("Rendering nanny previous registration page")
             return render(request, 'nanny_add_previous_registration.html', context=variables)

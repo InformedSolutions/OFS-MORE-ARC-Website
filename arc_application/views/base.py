@@ -1,5 +1,5 @@
 import json
-
+import logging
 from datetime import datetime
 
 from django import forms
@@ -19,6 +19,8 @@ from ..review_util import reset_declaration
 from ..models import Application, Arc
 from ..services.db_gateways import NannyGatewayActions
 
+# Initiate logging
+log = logging.getLogger()
 
 def custom_login(request):
     """
@@ -43,7 +45,7 @@ def custom_login(request):
             username = form.cleaned_data.get('username')
             password = form.cleaned_data.get('password')
             user = authenticate(username=username, password=password)
-
+            log.debug("Handing submissions for login page")
             if user is not None and has_group(user, settings.ARC_GROUP) and not has_group(user,
                                                                                           settings.CONTACT_CENTRE):
                 auth_login(request, user)
@@ -63,6 +65,7 @@ def custom_login(request):
     variables = {
         'form': form
     }
+    log.debug("Rendering arc login page")
     return render(request, 'registration/login.html', variables)
 
 

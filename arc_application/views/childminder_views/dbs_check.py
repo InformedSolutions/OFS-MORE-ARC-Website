@@ -1,3 +1,4 @@
+import logging
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
@@ -9,6 +10,8 @@ from ...models import Application, Arc, CriminalRecordCheck
 from ...review_util import redirect_selection, request_to_comment, save_comments
 from ...decorators import group_required, user_assigned_application
 
+# Initiate logging
+log = logging.getLogger('')
 
 @login_required
 @group_required(settings.ARC_GROUP)
@@ -25,8 +28,8 @@ def dbs_check_summary(request):
     if request.method == 'GET':
         application_id_local = request.GET["id"]
         criminal_record_id = CriminalRecordCheck.objects.get(application_id=application_id_local).criminal_record_id
-
         form = DBSCheckForm(table_keys=[criminal_record_id])
+
     elif request.method == 'POST':
         application_id_local = request.POST["id"]
         criminal_record_id = CriminalRecordCheck.objects.get(application_id=application_id_local).criminal_record_id
@@ -56,15 +59,20 @@ def dbs_check_summary(request):
 
                 if show_people_in_the_home:
                     default = '/people/summary'
+                    log.debug("Conditional logic - Direct to people in the home task next")
                 elif show_references:
                     default = '/references/summary'
+                    log.debug("Conditional logic - Direct to references task next")
                 else:
                     default = '/review'
+                    log.debug("Conditional logic - Direct to review task next")
 
                 redirect_link = redirect_selection(request, default)
 
+                log.debug("Handling submissions for criminal record check page - save successful")
                 return HttpResponseRedirect(settings.URL_PREFIX + redirect_link + '?id=' + application_id_local)
             else:
+                log.debug("Handling submissions for criminal record check page - save unsuccessful")
                 return render(request, '500.html')
 
     criminal_record_check = CriminalRecordCheck.objects.get(application_id=application_id_local)
@@ -93,4 +101,5 @@ def dbs_check_summary(request):
         'enhanced_check': enhanced_check,
     }
 
+    log.debug("Rendering criminal record check page")
     return render(request, 'childminder_templates/dbs-check-summary.html', variables)

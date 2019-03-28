@@ -1,4 +1,5 @@
 import time
+import logging
 from datetime import datetime
 
 from django.conf import settings
@@ -22,6 +23,8 @@ from ...models import ApplicantName, ApplicantPersonalDetails, Application, Arc,
 
 decorators = [login_required, group_required(settings.ARC_GROUP), user_assigned_application]
 
+# Initiate logging
+log = logging.getLogger('')
 
 @group_required(settings.ARC_GROUP)
 def review(request):
@@ -259,7 +262,7 @@ class PreviousRegistrationDetailsView(View):
             'form': form,
             'application_id': application_id_local,
         }
-
+        log.debug("Render previous registration page")
         return render(request, 'childminder_templates/add-previous-registration.html', variables)
 
     def post(self, request):
@@ -283,6 +286,7 @@ class PreviousRegistrationDetailsView(View):
             previous_reg_details.save()
 
             redirect_link = '/personal-details/summary'
+            log.debug("Handling submissions for previous registrations")
             return HttpResponseRedirect(settings.URL_PREFIX + redirect_link + '?id=' + application_id_local)
 
         else:
@@ -290,7 +294,7 @@ class PreviousRegistrationDetailsView(View):
                 'form': form,
                 'application_id': application_id_local,
             }
-
+            log.debug("Render previous registration page")
             return render(request, 'childminder_templates/add-previous-registration.html', context=variables)
 
 
@@ -306,7 +310,7 @@ class OtherPersonPreviousRegistrationDetailsView(View):
             'application_id': application_id_local,
             'person_id': person_id,
         }
-
+        log.debug("Render other people previous registration page")
         return render(request, 'childminder_templates/add-previous-registration.html', context=variables)
 
     def post(self, request):
@@ -332,6 +336,7 @@ class OtherPersonPreviousRegistrationDetailsView(View):
             previous_reg_details.save()
 
             redirect_link = '/people/summary'
+            log.debug("Handling submissions for other people previous registration page")
             return HttpResponseRedirect(settings.URL_PREFIX + redirect_link + '?id=' + application_id_local)
 
         else:
@@ -340,5 +345,5 @@ class OtherPersonPreviousRegistrationDetailsView(View):
                 'application_id': application_id_local,
                 'person_id': person_id,
             }
-
+            log.debug("Render other people previous registration page")
             return render(request, 'childminder_templates/add-previous-registration.html', context=variables)

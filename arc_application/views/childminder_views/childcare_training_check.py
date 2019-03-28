@@ -4,12 +4,15 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.utils.decorators import method_decorator
 from django.views import View
+import logging
 
 from ...forms.childminder_forms.form import EYFSTrainingCheckForm, TypeOfChildcareTrainingCheckForm
 from ...models import Application, Arc, ChildcareTraining, ChildcareType
 from ...review_util import redirect_selection, request_to_comment, save_comments
 from ...decorators import group_required, user_assigned_application
 
+# Initiate logging
+log = logging.getLogger('')
 
 decorators = [login_required, group_required(settings.ARC_GROUP), user_assigned_application]
 
@@ -27,10 +30,13 @@ class ChildcareTrainingCheckSummaryView(View):
         if ChildcareType.objects.get(application_id=application_id_local).zero_to_five:
             childcare_register_only = False
             form = EYFSTrainingCheckForm(table_keys=[eyfs_id])
+            log.debug("Conditional Logic: Render page using Early years training check form")
         else:
             childcare_register_only = True
             form = TypeOfChildcareTrainingCheckForm(table_keys=[eyfs_id])
+            log.debug("Conditional Logic: Render page using childcare register training check form")
 
+        log.debug("Rendering childcare training page")
         return self.render_summary_with_context(request, form=form, app_id_local=application_id_local, childcare_register_only=childcare_register_only)
 
     def post(self, request):
@@ -40,9 +46,11 @@ class ChildcareTrainingCheckSummaryView(View):
         if ChildcareType.objects.get(application_id=application_id_local).zero_to_five:
             childcare_register_only = False
             form = EYFSTrainingCheckForm(request.POST, table_keys=[eyfs_id])
+            log.debug("Conditional Logic: Use Early Years training check form")
         else:
             childcare_register_only = True
             form = TypeOfChildcareTrainingCheckForm(request.POST, table_keys=[eyfs_id])
+            log.debug("Conditional Logic: Use childcare register training check form")
 
         if form.is_valid():
             comment_list = request_to_comment(eyfs_id, self.table_name, form.cleaned_data)
@@ -66,8 +74,10 @@ class ChildcareTrainingCheckSummaryView(View):
                 childcare_type = ChildcareType.objects.get(application_id=application_id_local)
                 default = '/health/check-answers' if childcare_type.zero_to_five else '/dbs-check/summary'
                 redirect_link = redirect_selection(request, default)
+                log.debug("Handling submissions for childcare training page - save successful")
                 return HttpResponseRedirect(settings.URL_PREFIX + redirect_link + '?id=' + application_id_local)
             else:
+                log.debug("Handling submissions for childcare training page - save unsuccessful")
                 return render(request, '500.html')
 
         else:
