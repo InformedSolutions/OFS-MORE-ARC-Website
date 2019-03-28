@@ -1,3 +1,4 @@
+import logging
 from django.http import HttpResponseRedirect
 from django.conf import settings
 from django.urls import reverse
@@ -12,6 +13,8 @@ from ...forms.update_detail_forms.update_contact_details import UpdateEmail, Upd
 from ...models import UserDetails, Application
 from ..base import has_group
 
+# Initiate logging
+log = logging.getLogger()
 
 @method_decorator(login_required, name='dispatch')
 class ChangeDetails(View):
@@ -33,6 +36,7 @@ class ChangeDetails(View):
             'form': self.form(id=UserDetails.objects.get(application_id=app_id)),
             'cc_user': has_group(request.user, settings.CONTACT_CENTRE)
         }
+        log.debug("Rendering update details page")
         return render(request, 'update_details/update_field.html', context)
 
     def post(self, request):
@@ -55,8 +59,10 @@ class ChangeDetails(View):
         initial_data_filler(output_form, UserDetails, contact_record.pk)
         if output_form.is_valid():
             data_saver(output_form, UserDetails, contact_record.pk)
+            log.debug("Handling submissions for update details page - form valid")
             return HttpResponseRedirect(self.build_url('search_summary', get={'id': app_id, 'app_type': 'Childminder'}))
         else:
+            log.debug("Handling submissions for update details page - form invalid")
             return render(request, 'update_details/update_field.html', context)
 
     def build_url(self, *args, **kwargs):
