@@ -1,5 +1,5 @@
 import json
-
+import logging
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
@@ -10,6 +10,8 @@ from ...views import NannyArcSummary, get_nanny_summary_functions
 from ..base import has_group
 from ...services.db_gateways import NannyGatewayActions
 
+# Initiate logging
+log = logging.getLogger()
 
 @method_decorator(login_required, name='get')
 class NannySearchSummary(View):
@@ -23,6 +25,7 @@ class NannySearchSummary(View):
         application_id = request.GET["id"]
         context = self.create_context(application_id)
         log_user_opened_application(request, application_id)
+        log.debug("Rendering nanny search summary")
         return render(request, self.TEMPLATE_NAME, context=context)
 
     def create_context(self, application_id):

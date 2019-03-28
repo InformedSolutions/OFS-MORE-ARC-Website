@@ -1,4 +1,5 @@
 import datetime
+import logging
 from urllib.parse import urlencode
 
 from django.http import HttpResponseRedirect
@@ -9,6 +10,8 @@ from ...forms.previous_addresses import PreviousAddressEntryForm, PreviousAddres
 from ...services.db_gateways import NannyGatewayActions
 from ...address_helper import AddressHelper
 
+# Initiate logging
+log = logging.getLogger()
 
 # noinspection PyMethodMayBeStatic
 class _NannyPreviousAddressViewMixin:
@@ -98,7 +101,7 @@ class NannyChangePreviousAddressView(FormView, _NannyPreviousAddressViewMixin):
 
         if request.POST.get('delete', None):
             return self._do_delete()
-
+        log.debug("Handling submissions for nanny previous address - address view - delete address")
         return super().post(request, *args, **kwargs)
 
     def get_initial(self):
@@ -142,9 +145,11 @@ class NannyAddPreviousAddressSearchView(FormView, _NannyPreviousAddressViewMixin
         if delete:
             delete_id = delete[len('delete-'):]
             self._remove_address(delete_id)
+            log.debug("Handling submissions for nanny previous address - search view - delete address")
             return HttpResponseRedirect(reverse('nanny_add_previous_address_search') + '?' + self._redirect_params())
 
         elif request.POST.get('manual', None):
+            log.debug("Handling submissions for nanny previous address - search view - manual entry")
             return HttpResponseRedirect(reverse('nanny_add_previous_address_manual') + '?' + self._redirect_params())
 
         return super().post(request, *args, **kwargs)
@@ -191,10 +196,12 @@ class NannyAddPreviousAddressSelectView(FormView, _NannyPreviousAddressViewMixin
         if delete:
             delete_id = delete[len('delete-'):]
             self._remove_address(delete_id)
+            log.debug("Handling submissions for nanny previous address - select view - delete address")
             return HttpResponseRedirect(reverse('nanny_add_previous_address_select') + '?'
                                         + self._preserve_form_redirect_params())
 
         elif request.POST.get('manual', None):
+            log.debug("Handling submissions for nanny previous address - select view - manual entry")
             return HttpResponseRedirect(reverse('nanny_add_previous_address_manual') + '?'
                                         + self._preserve_form_redirect_params())
 
@@ -280,10 +287,12 @@ class NannyAddPreviousAddressManualView(FormView, _NannyPreviousAddressViewMixin
         if delete:
             delete_id = delete[len('delete-'):]
             self._remove_address(delete_id)
+            log.debug("Handling submissions for nanny previous address manual view - delete address")
             return HttpResponseRedirect(reverse('nanny_add_previous_address_manual') + '?'
                                         + self._preserve_form_redirect_params())
 
         elif request.POST.get('search', None):
+            log.debug("Handling submissions for nanny previous address manual view - search address")
             return HttpResponseRedirect(reverse('nanny_add_previous_address_search') + '?'
                                         + self._preserve_form_redirect_params())
 

@@ -1,5 +1,5 @@
 from datetime import date
-
+import logging
 from django.conf import settings
 from django.forms import formset_factory
 from django.http import HttpResponseRedirect
@@ -10,6 +10,8 @@ from ...forms.previous_names import PersonPreviousNameForm
 from ...review_util import build_url
 from ...services.db_gateways import NannyGatewayActions
 
+# Initiate logging
+log = logging.getLogger()
 
 @group_required(settings.ARC_GROUP)
 @user_assigned_application
@@ -51,12 +53,12 @@ def nanny_add_previous_name(request):
 
         # perform appropriate redirect according to action and person type
         if request.POST['action'] == "Add another name":
-
+            log.debug("Handling submissions for nanny previous names page - add another name")
             # redirect back to page, with 'show_extra' parameter so that empty form is displayed
             return _previous_names_page_redirect(app_id, show_extra=True)
 
         else:
-
+            log.debug("Handling submissions for nanny previous names page - save and continue")
             return HttpResponseRedirect(build_url('nanny_personal_details_summary', get={'id': app_id}))
 
     elif request.method == "GET":
@@ -79,7 +81,7 @@ def _previous_names_page_render(request, app_id, formset=None, show_extra=True):
         'formset': formset,
         'application_id': app_id,
     }
-
+    log.debug("Rendering nanny previous name page")
     return render(request, 'nanny_templates/nanny-add-previous-names.html', context)
 
 
