@@ -1,3 +1,4 @@
+import logging
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from django.views import View
@@ -5,6 +6,8 @@ from django.utils.decorators import method_decorator
 
 from ...services.db_gateways import NannyGatewayActions
 
+# Initiate logging
+log = logging.getLogger()
 
 @method_decorator(login_required, name='get')
 class NannyArcSummaryConfirmation(View):
@@ -18,7 +21,7 @@ class NannyArcSummaryConfirmation(View):
 
         # Choose which template to display
         template = self.get_template(application_id)
-
+        log.debug("Rendering nanny arc review confirmation page")
         # Render chosen template
         return render(request, template)
 
