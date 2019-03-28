@@ -30,10 +30,6 @@ class NannyDbsCheckSummary(NannyARCFormView):
         within_three_months = dbs_record['within_three_months']
         dbs_number = dbs_record['dbs_number']
 
-        lived_abroad = dbs_record['lived_abroad']
-        is_ofsted_dbs = dbs_record['is_ofsted_dbs']
-        on_dbs_update_service = dbs_record['on_dbs_update_service']
-        dbs_number = dbs_record['dbs_number']
         form = self.get_form()
 
         context = {

@@ -181,8 +181,8 @@
 
     {% csrf_token %}
 
-    <input type="submit" class="button" value="Confirm and continue"/>
     <input type="hidden" value="{{application_id}}" name="id"/>
+    <input type="submit" class="button" value="Confirm and continue"/>
 
     {% include 'nanny_templates/nanny_return_to_list.html' %}
 

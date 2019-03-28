@@ -20,11 +20,15 @@ class NannyPersonalDetailsSummary(NannyARCFormView):
         Handles POST requests, instantiating a form instance with the passed
         POST variables and then checked for validity.
         """
-        form = self.get_form()
-        if form.is_valid():
-            return self.form_valid(form)
+        app_id = request.GET['id']
+        forms = self.get_forms(app_id)
+        if all(form.is_valid() for form in forms):
+            return self.form_valid(forms[0])
         else:
-            return self.form_invalid(form)
+            return self.forms_invalid(forms)
+
+    def forms_invalid(self, form):
+        return self.render_to_response(self.get_context_data_form_invalid(form=form))
 
     def get_form_class(self, **kwargs):
         if hasattr(self, 'request'):
@@ -291,6 +295,7 @@ class NannyPersonalDetailsSummary(NannyARCFormView):
         return context
 
     def get_forms(self, application_id):
+        self.application_id = application_id
         return [self.get_form(form_class=form_class)
                 for form_class in self.get_form_class(application_id=application_id)]
 
