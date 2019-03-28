@@ -1,3 +1,4 @@
+import logging
 from django.conf import settings
 from django.views.generic import FormView
 
@@ -7,6 +8,8 @@ from ...review_util import build_url
 from ...services.db_gateways import IdentityGatewayActions
 from ...views.base import has_group
 
+# Initiate logging
+log = logging.getLogger()
 
 class NannyChangeDetails(FormView):
     form_class = None
@@ -46,7 +49,7 @@ class NannyChangeDetails(FormView):
         updates = {'application_id': app_id,
                    self.field: form.cleaned_data[self.field]}
         patch_response = identity_actions.patch('user', updates)
-
+        log.debug("Handling submissions for nanny change details page")
         return super().form_valid(form)
 
     def get_success_url(self):
@@ -58,6 +61,7 @@ class NannyUpdateEmailView(NannyChangeDetails):
     field = NannyChangeDetails.field[0]
     form_class = NannyUpdateEmail
     page_title = "Update the applicant's email"
+    log.debug("Rendering update personal details - change email")
 
 
 class NannyUpdatePhoneNumberView(NannyChangeDetails):
