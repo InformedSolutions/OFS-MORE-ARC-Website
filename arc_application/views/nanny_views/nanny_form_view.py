@@ -31,14 +31,14 @@ class NannyARCFormView(FormView):
         self.application_id = request.GET['id']
         context = self.get_context_data(self.application_id)
         page_name = self.verbose_task_name
-        log.debug("Rendering %s page" % page_name)
+        log.debug("Rendering nanny %s page" % page_name)
         return render(request, self.template_name, context=context)
 
     def post(self, request, *args, **kwargs):
         self.application_id = request.GET['id']
         self.__handle_post_data()
         page_name = self.verbose_task_name
-        log.debug("Handling submissions for %s page" % page_name)
+        log.debug("Handling submissions for nanny %s page" % page_name)
         return HttpResponseRedirect(build_url(self.get_success_url(), get={'id': request.GET['id']}))
 
     def __handle_post_data(self):
