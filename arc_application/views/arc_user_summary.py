@@ -1,3 +1,4 @@
+import logging
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.contrib.auth.decorators import login_required
@@ -8,6 +9,8 @@ from django.utils.decorators import method_decorator
 from ..services.application_handler import ChildminderApplicationHandler, GenericApplicationHandler, \
     NannyApplicationHandler
 
+# Initiate logging
+log = logging.getLogger()
 
 @method_decorator(login_required, name='get')
 @method_decorator(login_required, name='post')
@@ -16,12 +19,14 @@ class ARCUserSummaryView(View):
 
     def get(self, request):
         context = self.get_context_data()
+        log.debug("Rendering arc user summary")
         return render(request, self.template_name, context=context)
 
     def post(self, request):
 
         if settings.ENABLE_NANNIES:
             if 'add_nanny_application' in request.POST:
+                log.debug("Conditional logic: show nanny arc")
                 app_handler = NannyApplicationHandler(arc_user=request.user)
         else:
             context = self.get_context_data()
@@ -48,6 +53,7 @@ class ARCUserSummaryView(View):
             context['error_title'] = 'You have reached the limit'
             context['error_text'] = 'You have already reached the maximum (' + str(settings.APPLICATION_LIMIT) + ') applications'
 
+        log.debug("Rendering arc user summary")
         return render(request, self.template_name, context=context)
 
     def get_context_data(self):

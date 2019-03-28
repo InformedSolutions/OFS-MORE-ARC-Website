@@ -1,3 +1,4 @@
+import logging
 from django.contrib.auth.decorators import login_required
 from django.views import View
 from django.utils.decorators import method_decorator
@@ -5,12 +6,16 @@ from django.shortcuts import render
 from ..models import Application
 from .. services.db_gateways import NannyGatewayActions
 
+# Initiate logging
+log = logging.getLogger()
+
 @method_decorator(login_required, name='get')
 class ApplicationsSummaryView(View):
     template_name = "applications_summary.html"
 
     def get(self, request):
         context = self.get_context_data()
+        log.debug("Rendering applications summary (Reporting)")
         return render(request, self.template_name, context=context)
 
     def get_childminder_data(self):
