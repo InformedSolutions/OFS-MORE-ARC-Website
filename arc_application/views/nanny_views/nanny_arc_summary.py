@@ -1,8 +1,10 @@
+import logging
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.utils.decorators import method_decorator
 from django.views import View
+
 
 from ...services.arc_comments_handler import update_returned_application_statuses
 from ...services.nanny_email_helpers import send_accepted_email, send_returned_email
@@ -13,6 +15,8 @@ from ...review_util import build_url
 from ...services.db_gateways import NannyGatewayActions, IdentityGatewayActions
 from .nanny_utils import get_nanny_summary_variables
 
+# Initiate logging
+log = logging.getLogger()
 
 @method_decorator(login_required, name='get')
 @method_decorator(login_required, name='post')
@@ -25,6 +29,7 @@ class NannyArcSummary(View):
     def get(self, request):
         application_id = request.GET["id"]
         context = self.create_context(application_id)
+        log.debug("Rendering nanny arc summary page")
         return render(request, self.TEMPLATE_NAME, context=context)
 
     def post(self, request):
@@ -51,7 +56,7 @@ class NannyArcSummary(View):
             release_application(request, application_id, 'FURTHER_INFORMATION')
 
         update_returned_application_statuses(application_id)
-
+        log.debug("Handling submissions for nanny arc summary page")
         return HttpResponseRedirect(redirect_address)
 
     def create_context(self, application_id):
