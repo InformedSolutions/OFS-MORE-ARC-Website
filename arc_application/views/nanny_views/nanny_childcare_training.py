@@ -1,4 +1,5 @@
-from ...forms.nanny_forms.nanny_form_builder import ChildcareTrainingForm
+from ...forms.nanny_forms.nanny_forms import ChildcareTrainingForm
+from ...forms.nanny_forms.form_data import CHILDCARE_TRAINING_DATA
 from ...services.db_gateways import NannyGatewayActions
 from .nanny_form_view import NannyARCFormView
 
@@ -41,7 +42,7 @@ class NannyChildcareTrainingSummary(NannyARCFormView):
             'rows': [
                 {
                     'id': 'childcare_training',
-                    'name': 'What type of childcare course have you completed?',
+                    'name': CHILDCARE_TRAINING_DATA['childcare_training'],
                     'info': childcare_training,
                     # Prevent checkbox appearing if summary page is calling get_context_data.
                     'declare': form['childcare_training_declare'] if hasattr(self, 'request') else '',

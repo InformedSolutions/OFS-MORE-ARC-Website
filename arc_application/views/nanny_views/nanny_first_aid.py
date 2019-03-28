@@ -1,4 +1,5 @@
-from ...forms.nanny_forms.nanny_form_builder import FirstAidForm
+from ...forms.nanny_forms.nanny_forms import FirstAidForm
+from ...forms.nanny_forms.form_data import FIRST_AID_TRAINING_DATA
 from ...services.db_gateways import NannyGatewayActions
 from .nanny_form_view import NannyARCFormView
 
@@ -37,7 +38,7 @@ class NannyFirstAidTrainingSummary(NannyARCFormView):
             'rows': [
                 {
                     'id': 'training_organisation',
-                    'name': 'Training organisation',
+                    'name': FIRST_AID_TRAINING_DATA['training_organisation'],
                     'info': training_organisation,
                     # Prevent checkbox appearing if summary page is calling get_context_data.
                     'declare': form['training_organisation_declare'] if hasattr(self, 'request') else '',
@@ -45,14 +46,14 @@ class NannyFirstAidTrainingSummary(NannyARCFormView):
                 },
                 {
                     'id': 'course_title',
-                    'name': 'Title of training course',
+                    'name': FIRST_AID_TRAINING_DATA['course_title'],
                     'info': training_course_title,
                     'declare': form['course_title_declare'] if hasattr(self, 'request') else '',
                     'comments': form['course_title_comments']
                 },
                 {
                     'id': 'course_date',
-                    'name': 'Date you completed course',
+                    'name': FIRST_AID_TRAINING_DATA['course_date'],
                     'info': date_course_completed_formatted,
                     'declare': form['course_date_declare'] if hasattr(self, 'request') else '',
                     'comments': form['course_date_comments']

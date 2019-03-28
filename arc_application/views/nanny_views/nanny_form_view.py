@@ -18,10 +18,10 @@ class NannyARCFormView(FormView):
     """
     Parent FormView class from which all subsequent FormViews will inherit.
     """
-    template_name     = None
-    success_url       = None
-    task_for_review   = None
-    application_id    = None
+    template_name = None
+    success_url = None
+    task_for_review = None
+    application_id = None
     verbose_task_name = None
 
     def get(self, request, *args, **kwargs):
@@ -32,7 +32,10 @@ class NannyARCFormView(FormView):
     def post(self, request, *args, **kwargs):
         self.application_id = request.GET['id']
         self.__handle_post_data()
-        return HttpResponseRedirect(build_url(self.get_success_url(), get={'id': request.GET['id']}))
+        return super().post(request, *args, **kwargs)
+
+    def get_success_url(self):
+        return build_url(super().get_success_url(), get={'id': self.request.GET['id']})
 
     def __handle_post_data(self):
         # Cast self.form_class to a list if not already a list. Then iterate over list.
@@ -56,7 +59,7 @@ class NannyARCFormView(FormView):
         if form_class is None:
             form_class = self.get_form_class()
         initial = get_form_initial_values(form_class, application_id=self.application_id)
-        return form_class(initial=initial)
+        return form_class(initial=initial, data=self.request.POST)
 
     def get_forms(self):
         return [self.get_form(form_class=form_class) for form_class in self.get_form_class()]
@@ -69,3 +72,14 @@ class NannyARCFormView(FormView):
             raise NotImplementedError('You must supply the name of the task being reviewed.')
         else:
             return self.task_for_review
+
+    def form_invalid(self, form):
+        return self.render_to_response(self.get_context_data_form_invalid(form=form))
+
+    def get_context_data_form_invalid(self, form=None):
+        context = self.get_context_data(self.application_id)
+
+        if form is not None:
+            context['form'] = form
+
+        return context

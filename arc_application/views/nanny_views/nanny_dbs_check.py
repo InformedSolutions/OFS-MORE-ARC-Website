@@ -1,10 +1,10 @@
 from .nanny_form_view import NannyARCFormView
-from ...forms.nanny_forms.nanny_form_builder import DBSForm
+from ...forms.nanny_forms.nanny_forms import DBSForm
+from ...forms.nanny_forms.form_data import DBS_CHECK_DATA
 from ...services.db_gateways import NannyGatewayActions
 
 
 class NannyDbsCheckSummary(NannyARCFormView):
-
     template_name = 'nanny_general_template.html'
     success_url = 'nanny_insurance_cover_summary'
     task_for_review = 'dbs_review'
@@ -44,7 +44,7 @@ class NannyDbsCheckSummary(NannyARCFormView):
             'rows': [
                 {
                     'id': 'lived_abroad',
-                    'name': 'Have you lived outside of the UK in the last 5 years?',
+                    'name': DBS_CHECK_DATA['lived_abroad'],
                     'info': lived_abroad,
                     # Prevent checkbox appearing if summary page is calling get_context_data.
                     'declare': form['lived_abroad_declare'] if hasattr(self, 'request') else '',
@@ -63,7 +63,7 @@ class NannyDbsCheckSummary(NannyARCFormView):
                 },
                 {
                     'id': 'dbs_number',
-                    'name': 'DBS certificate number',
+                    'name': DBS_CHECK_DATA['dbs_number'],
                     'info': dbs_number,
                     # Prevent checkbox appearing if summary page is calling get_context_data.
                     'declare': form['dbs_number_declare'] if hasattr(self, 'request') else '',
@@ -71,7 +71,7 @@ class NannyDbsCheckSummary(NannyARCFormView):
                 },
                 {
                     'id': 'enhanced_check',
-                    'name': 'Do you have an enhanced DBS check for home-based childcare?',
+                    'name': DBS_CHECK_DATA['enhanced_check'],
                     'info': enhanced_check,
                     # Prevent checkbox appearing if summary page is calling get_context_data.
                     'declare': form['enhanced_check_declare'] if hasattr(self, 'request') else '',
@@ -80,7 +80,7 @@ class NannyDbsCheckSummary(NannyARCFormView):
                 },
                 {
                     'id': 'on_dbs_update_service',
-                    'name': 'Are you on the DBS update service?',
+                    'name': DBS_CHECK_DATA['on_dbs_update_service'],
                     'info': on_dbs_update_service,
                     # Prevent checkbox appearing if summary page is calling get_context_data.
                     'declare': form['on_dbs_update_service_declare'] if hasattr(self, 'request') else '',

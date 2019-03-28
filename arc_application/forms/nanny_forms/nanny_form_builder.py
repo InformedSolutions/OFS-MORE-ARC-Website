@@ -1,8 +1,14 @@
 from django import forms
 from django.forms import formset_factory
 from django.utils.functional import cached_property
+from govuk_forms.forms import GOVUKForm
 
 from arc_application.widgets import CustomCheckboxInput, Textarea
+
+
+def get_declare_comments_tuples_list(cleaned_data):
+    return [(key, f'{key[:-8]}_comments') for key, val in cleaned_data.items() if
+            key.endswith('_declare')]
 
 
 class NannyFormBuilder:
@@ -11,8 +17,10 @@ class NannyFormBuilder:
     :return: form with a {{field_name}}_declare and {{field_name}}_comments field for each field in the list passed.
              These are the fields for flagging and commenting upon a field of submitted data.
     """
-    def __init__(self, field_names, api_endpoint_name=None):
-        self.field_names = field_names
+
+    def __init__(self, field_data, api_endpoint_name=None):
+        self.field_data = field_data
+        self.field_names, self.label_names = zip(*field_data.items())
         self.form_fields = dict()
         self._api_endpoint_name = api_endpoint_name
 
@@ -20,17 +28,39 @@ class NannyFormBuilder:
         if self._api_endpoint_name is not None:
             return self._api_endpoint_name
         else:
-            raise AttributeError('You must supply the api endpoint of the table for which the ArcComment will be saved.')
+            raise AttributeError(
+                'You must supply the api endpoint of the table for which the ArcComment will be saved.')
 
     def create_form(self):
         self.get_form_fields()
         self.update_checkbox_field_widgets()
 
-        class NannyARCForm(forms.Form):
-            __name__ = 'NannyARCForm'
+        class NannyARCForm(GOVUKForm):
+            # __name__ = 'NannyARCForm'
             auto_replace_widgets = True
             field_names = self.field_names
             api_endpoint_name = self.get_api_endpoint_name()
+            field_label_classes = 'form-label-bold'
+
+            ERROR_MESSAGE_BLANK_COMMENT = 'You must give reasons'
+
+            def clean(self):
+                """
+                Cleans _comment fields to raise validation message if their corresponding _declare
+                field is set to True and the comment is blank.
+                :return: cleaned_data
+                """
+                cleaned_data = self.cleaned_data
+
+                declare_comments_fields = get_declare_comments_tuples_list(cleaned_data)
+                for declare_field_name, comment_field_name in declare_comments_fields:
+                    declare_value = cleaned_data.get(declare_field_name, None)
+                    comment_value = cleaned_data.get(comment_field_name, None)
+
+                    if declare_value is True and comment_value is not None and comment_value == '':
+                        self.add_error(declare_field_name, self.ERROR_MESSAGE_BLANK_COMMENT)
+
+                return super().clean()
 
         for field_name, field in self.form_fields.items():
             NannyARCForm.base_fields[field_name] = field
@@ -61,19 +91,19 @@ class NannyFormBuilder:
         return Formset
 
     def get_form_fields(self):
-        for field in self.field_names:
-            self.form_fields[field + '_declare'] = forms.BooleanField(
-                                                        label='This information is correct',
-                                                        widget=CustomCheckboxInput,
-                                                        required=False
-                                                    )
-            self.form_fields[field + '_comments'] = forms.CharField(
-                                                        label='Enter your reasoning',
-                                                        help_text='(Tip: be clear and concise)',
-                                                        widget=Textarea,
-                                                        required=False,
-                                                        max_length=500
-                                                    )
+        for field_name, field_label in self.field_data.items():
+            self.form_fields[field_name + '_declare'] = forms.BooleanField(
+                label=field_label,
+                widget=CustomCheckboxInput,
+                required=False
+            )
+            self.form_fields[field_name + '_comments'] = forms.CharField(
+                label='Enter your reasoning',
+                help_text='(Tip: be clear and concise)',
+                widget=Textarea,
+                required=False,
+                max_length=500
+            )
 
     def update_checkbox_field_widgets(self):
         checkboxes = [(field, name[:-8]) for name, field in self.form_fields.items() if name[-8:] == '_declare']
@@ -88,73 +118,9 @@ class NannyFormBuilder:
                 }
             )
 
+# children_living_with_you_fields = [
+# 'children_living_with_applicant_selection',
+# ]
 
-sign_in_form_fields = [
-    'email',
-    'mobile_phone',
-    'other_phone',
-]
-
-personal_details_fields = [
-    'name',
-    'date_of_birth',
-    'known_to_social_services',
-    'reasons_known_to_social_services'
-]
-
-home_address_fields = [
-    'home_address',
-]
-
-previous_registration_fields = [
-    'previous_registration',
-    'individual_id',
-    'five_years_in_UK'
-]
-
-where_you_will_work_fields = [
-    'address_to_be_provided',
-    'both_work_and_home_address'
-]
-
-childcare_address_fields = [
-    'childcare_address'
-]
-
-first_aid_training_fields = [
-    'training_organisation',
-    'course_title',
-    'course_date',
-]
-
-childcare_training_fields = [
-    'childcare_training',
-]
-
-dbs_check_fields = [
-    'lived_abroad',
-    'on_dbs_update_service',
-    'dbs_number',
-    'enhanced_check',
-    'within_three_months'
-]
-
-insurance_cover_fields = [
-    'public_liability',
-]
-
-children_living_with_you_fields = [
-    'children_living_with_applicant_selection',
-]
-
-
-PersonalDetailsForm       = NannyFormBuilder(personal_details_fields, api_endpoint_name='applicant-personal-details').create_form()
-HomeAddressForm           = NannyFormBuilder(home_address_fields, api_endpoint_name='applicant-home-address').create_form()
-PreviousRegistrationForm  = NannyFormBuilder(previous_registration_fields, api_endpoint_name='previous-registration-details').create_form()
-WhereYouWillWorkForm      = NannyFormBuilder(where_you_will_work_fields, api_endpoint_name='application').create_form()
-ChildcareAddressFormset   = NannyFormBuilder(childcare_address_fields, api_endpoint_name='childcare-address').create_formset()
-FirstAidForm              = NannyFormBuilder(first_aid_training_fields, api_endpoint_name='first-aid').create_form()
-ChildcareTrainingForm     = NannyFormBuilder(childcare_training_fields, api_endpoint_name='childcare-training').create_form()
-DBSForm                   = NannyFormBuilder(dbs_check_fields, api_endpoint_name='dbs-check').create_form()
-InsuranceCoverForm        = NannyFormBuilder(insurance_cover_fields, api_endpoint_name='insurance-cover').create_form()
-ChildrenLivingWithYouForm = NannyFormBuilder(children_living_with_you_fields, api_endpoint_name='application').create_form()
+# ChildrenLivingWithYouForm = NannyFormBuilder(children_living_with_you_fields,
+# api_endpoint_name = 'application').create_form()

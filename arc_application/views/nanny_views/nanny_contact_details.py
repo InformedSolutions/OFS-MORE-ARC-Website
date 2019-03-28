@@ -4,6 +4,7 @@ from django.shortcuts import render
 from django.utils.decorators import method_decorator
 from django.views import View
 
+from arc_application.forms.nanny_forms.form_data import SIGN_IN_DATA
 from ...models import Arc
 from ...review_util import build_url
 from ...services.db_gateways import IdentityGatewayActions
@@ -62,17 +63,17 @@ class NannyContactDetailsSummary(View):
             'rows': [
                 {
                     'id': 'email',
-                    'name': 'Your email',
+                    'name': SIGN_IN_DATA['email'],
                     'info': email
                 },
                 {
                     'id': 'mobile_phone_number',
-                    'name': 'Your mobile number',
+                    'name': SIGN_IN_DATA['mobile_phone'],
                     'info': mobile_phone_number
                 },
                 {
-                    'id': 'mobile_phone_number',
-                    'name': 'Other phone number',
+                    'id': 'other_phone_number',
+                    'name': SIGN_IN_DATA['other_phone'],
                     'info': other_phone_number
                 }
             ]

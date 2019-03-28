@@ -2,7 +2,8 @@ import datetime
 from urllib.parse import urlencode
 
 from .nanny_form_view import NannyARCFormView
-from ...forms.nanny_forms.nanny_form_builder import HomeAddressForm, PersonalDetailsForm, PreviousRegistrationForm
+from ...forms.nanny_forms.nanny_forms import HomeAddressForm, PersonalDetailsForm, PreviousRegistrationForm
+from ...forms.nanny_forms.form_data import PERSONAL_DETAILS_DATA, HOME_ADDRESS_DATA, PREVIOUS_REGISTRATION_DATA
 from ...services.db_gateways import NannyGatewayActions
 from operator import itemgetter
 from ...utils import spatial_ordinal
@@ -13,6 +14,17 @@ class NannyPersonalDetailsSummary(NannyARCFormView):
     template_name = 'nanny_personal_details_summary.html'
     task_for_review = 'personal_details_review'
     verbose_task_name = 'Your personal details'
+
+    def post(self, request, *args, **kwargs):
+        """
+        Handles POST requests, instantiating a form instance with the passed
+        POST variables and then checked for validity.
+        """
+        form = self.get_form()
+        if form.is_valid():
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
 
     def get_form_class(self, **kwargs):
         if hasattr(self, 'request'):
@@ -115,7 +127,7 @@ class NannyPersonalDetailsSummary(NannyARCFormView):
         rows = [
             {
                 'id': 'name',
-                'name': 'Your name',
+                'name': PERSONAL_DETAILS_DATA['name'],
                 'info': current_full_name,
                 # Prevent checkbox appearing if summary page is calling get_context_data.
                 'declare': personal_details_form['name_declare'] if hasattr(self, 'request') else '',
@@ -156,14 +168,14 @@ class NannyPersonalDetailsSummary(NannyARCFormView):
         rows.extend([
             {
                 'id': 'date_of_birth',
-                'name': 'Date of birth',
+                'name': PERSONAL_DETAILS_DATA['date_of_birth'],
                 'info': dob_string_with_month,
                 'declare': personal_details_form['date_of_birth_declare'] if hasattr(self, 'request') else '',
                 'comments': personal_details_form['date_of_birth_comments'],
             },
             {
                 'id': 'home_address',
-                'name': 'Your home address',
+                'name': HOME_ADDRESS_DATA['home_address'],
                 'declare': home_address_form['home_address_declare'] if hasattr(self, 'request') else '',
                 'comments': home_address_form['home_address_comments'],
                 'info': {
@@ -216,7 +228,7 @@ class NannyPersonalDetailsSummary(NannyARCFormView):
         rows.append(
             {
                 'id': 'known_to_social_services',
-                'name': 'Known to council social Services?',
+                'name': PERSONAL_DETAILS_DATA['known_to_social_services'],
                 'info': known_to_social_services,
                 'declare': personal_details_form['known_to_social_services_declare']
                            if hasattr(self, 'request') else '',
@@ -227,7 +239,7 @@ class NannyPersonalDetailsSummary(NannyARCFormView):
             rows.append(
                 {
                     'id': 'reasons_known_to_social_services',
-                    'name': 'Tell us why',
+                    'name': PERSONAL_DETAILS_DATA['reasons_known_to_social_services'],
                     'info': reasons_known_to_social_services,
                     'declare': personal_details_form['reasons_known_to_social_services_declare']
                                if hasattr(self, 'request') else '',
@@ -239,7 +251,7 @@ class NannyPersonalDetailsSummary(NannyARCFormView):
             rows.append(
                 {
                     'id': 'previous_registration',
-                    'name': 'Previously registered with Ofsted?',
+                    'name': PREVIOUS_REGISTRATION_DATA['previous_registration'],
                     'info': previous_registration,
                     'declare': previous_registration_form['previous_registration_declare']
                                if hasattr(self, 'request') else '',
@@ -250,7 +262,7 @@ class NannyPersonalDetailsSummary(NannyARCFormView):
                 rows.append(
                     {
                         'id': 'individual_id',
-                        'name': 'Individual ID',
+                        'name': PREVIOUS_REGISTRATION_DATA['individual_id'],
                         'info': individual_id,
                         'declare': previous_registration_form['individual_id_declare']
                                    if hasattr(self, 'request') else '',
@@ -259,7 +271,7 @@ class NannyPersonalDetailsSummary(NannyARCFormView):
             rows.append(
                 {
                     'id': 'five_years_in_UK',
-                    'name': 'Lived in England for more than 5 years?',
+                    'name': PREVIOUS_REGISTRATION_DATA['five_years_in_UK'],
                     'info': five_years_in_UK,
                     'declare': previous_registration_form['five_years_in_UK_declare']
                                if hasattr(self, 'request') else '',

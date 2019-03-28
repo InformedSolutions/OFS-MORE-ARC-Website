@@ -1,4 +1,5 @@
-from ...forms.nanny_forms.nanny_form_builder import InsuranceCoverForm
+from ...forms.nanny_forms.form_data import INSURANCE_COVER_DATA
+from ...forms.nanny_forms.nanny_forms import InsuranceCoverForm
 from ...services.db_gateways import NannyGatewayActions
 from .nanny_form_view import NannyARCFormView
 
@@ -33,7 +34,7 @@ class NannyInsuranceCoverSummary(NannyARCFormView):
             'rows': [
                 {
                     'id': 'public_liability',
-                    'name': 'Do you have public liability insurance?',
+                    'name': INSURANCE_COVER_DATA['public_liability'],
                     'info': insurance_bool,
                     # Prevent checkbox appearing if summary page is calling get_context_data.
                     'declare': form['public_liability_declare'] if hasattr(self, 'request') else '',

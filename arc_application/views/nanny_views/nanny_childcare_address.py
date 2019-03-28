@@ -1,7 +1,7 @@
-from ...forms.nanny_forms.nanny_form_builder import ChildcareAddressFormset, WhereYouWillWorkForm
-from ...services.db_gateways import NannyGatewayActions
-
 from .nanny_form_view import NannyARCFormView
+from ...forms.nanny_forms.form_data import WHERE_YOU_WILL_WORK_DATA, CHILDCARE_ADDRESS_DATA
+from ...forms.nanny_forms.nanny_forms import ChildcareAddressFormset, WhereYouWillWorkForm
+from ...services.db_gateways import NannyGatewayActions
 
 
 class NannyChildcareAddressSummary(NannyARCFormView):
@@ -30,9 +30,10 @@ class NannyChildcareAddressSummary(NannyARCFormView):
                 'rows': [
                     {
                         'id': 'address_to_be_provided',
-                        'name': "Do you know where you'll be working?",
+                        'name': WHERE_YOU_WILL_WORK_DATA['address_to_be_provided'],
                         'info': work_location_bool,
-                        'declare': where_you_will_work_form['address_to_be_provided_declare'] if hasattr(self, 'request') else '',
+                        'declare': where_you_will_work_form['address_to_be_provided_declare'] if hasattr(self,
+                                                                                                         'request') else '',
                         'comments': where_you_will_work_form['address_to_be_provided_comments']
                     },
                 ]
@@ -44,8 +45,8 @@ class NannyChildcareAddressSummary(NannyARCFormView):
                                                params={'application_id': application_id,
                                                        'current_address': True}).record
         childcare_address_info = nanny_actions.read('applicant-home-address',
-                                               params={'application_id': application_id,
-                                                       'childcare_address': True}).record
+                                                    params={'application_id': application_id,
+                                                            'childcare_address': True}).record
 
         if home_address_info == childcare_address_info:
             work_at_home_bool = 'Yes'
@@ -67,21 +68,23 @@ class NannyChildcareAddressSummary(NannyARCFormView):
             'rows': [
                 {
                     'id': 'address_to_be_provided',
-                    'name': "Do you know where you'll be working?",
+                    'name': WHERE_YOU_WILL_WORK_DATA['address_to_be_provided'],
                     'info': work_location_bool,
-                    'declare': where_you_will_work_form['address_to_be_provided_declare'] if hasattr(self, 'request') else '',
+                    'declare': where_you_will_work_form['address_to_be_provided_declare'] if hasattr(self,
+                                                                                                     'request') else '',
                     'comments': where_you_will_work_form['address_to_be_provided_comments']
                 },
                 {
                     'id': 'both_work_and_home_address',
-                    'name': 'Do you currently live and work at the same address?',
+                    'name': WHERE_YOU_WILL_WORK_DATA['both_work_and_home_address'],
                     'info': work_at_home_bool,
-                    'declare': where_you_will_work_form['both_work_and_home_address_declare'] if hasattr(self, 'request') else '',
+                    'declare': where_you_will_work_form['both_work_and_home_address_declare'] if hasattr(self,
+                                                                                                         'request') else '',
                     'comments': where_you_will_work_form['both_work_and_home_address_comments']
                 },
                 {
                     'id': 'home_address_locations',
-                    'name': 'Childcare address',
+                    'name': CHILDCARE_ADDRESS_DATA['childcare_address'],
                     'info': home_address_locations,
                     'formset': childcare_address_formset
                 }
