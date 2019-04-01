@@ -2418,3 +2418,6 @@ class ReviewSummaryAndConfirmationFunctionalTests(TestCase):
             self.assertEqual(ARC_STATUS_FLAGGED, getattr(refetched_arc, '{}_review'.format(task)))
         for task in ARC_TASKS_UNFLAGGED:
             self.assertEqual(ARC_STATUS_COMPLETED, getattr(refetched_arc, '{}_review'.format(task)))
+
+    def test_submit_releases_application_once_if_submitted_twice(self):
+        self.skipTest("testNotImplemented")

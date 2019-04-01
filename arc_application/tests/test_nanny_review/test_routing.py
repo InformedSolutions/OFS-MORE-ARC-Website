@@ -233,7 +233,6 @@ class ReviewPersonalDetailsTests(NannyReviewFuncTestsBase):
         self.assertEqual(response.status_code, 302)
 
     def test_shows_Add_Previous_Names_button(self):
-
         # GET request to personal details summary
         response = self.client.get(reverse('nanny_personal_details_summary') + '?id=' + self.test_app_id)
 
@@ -242,7 +241,6 @@ class ReviewPersonalDetailsTests(NannyReviewFuncTestsBase):
             url=reverse('nanny_previous_names'), app_id=self.test_app_id))
 
     def test_shows_previous_names_in_creation_order(self):
-
         self.nanny_gateway.previous_name_list_response = self.nanny_gateway.make_response(record=[
             self.nanny_gateway.previous_name_record,
             {
@@ -378,9 +376,9 @@ class NannyPreviousNamesTests(NannyReviewFuncTestsBase):
                 'application_id': '998fd8ec-b96b-4a71-a1a1-a7a3ae186729',
                 'previous_name_id': '9935bf3b-8ba9-4162-a25b-4c55e7d33d67',
                 'first_name': 'Buffy',
-                'middle_names':'',
+                'middle_names': '',
                 'last_name': 'Summers',
-                'start_day':3,
+                'start_day': 3,
                 'start_month': 12,
                 'start_year': 2004,
                 'end_day': 7,
@@ -400,19 +398,19 @@ class NannyPreviousNamesTests(NannyReviewFuncTestsBase):
             self.assertEqual(200, response.status_code)
 
             for field, ftype, value in [
-                    ('form-0-first_name', 'text', 'Robin'), ('form-1-first_name', 'text', 'Buffy'),
-                    ('form-0-middle_names', 'text', ''), ('form-1-middle_names', 'text', ''),
-                    ('form-0-last_name', 'text', 'Hood'), ('form-1-last_name', 'text', 'Summers'),
-                    ('form-0-start_date_0', 'number', '1'), ('form-1-start_date_0', 'number', '3'),
-                    ('form-0-start_date_1', 'number', '12'), ('form-1-start_date_1', 'number', '12'),
-                    ('form-0-start_date_2', 'number', '2003'), ('form-1-start_date_2', 'number', '2004'),
-                    ('form-0-end_date_0', 'number', '3'), ('form-1-end_date_0', 'number', '7'),
-                    ('form-0-end_date_1', 'number', '12'), ('form-1-end_date_1', 'number', '12'),
-                    ('form-0-end_date_2', 'number', '2004'), ('form-1-end_date_2', 'number', '2004')]:
+                ('form-0-first_name', 'text', 'Robin'), ('form-1-first_name', 'text', 'Buffy'),
+                ('form-0-middle_names', 'text', ''), ('form-1-middle_names', 'text', ''),
+                ('form-0-last_name', 'text', 'Hood'), ('form-1-last_name', 'text', 'Summers'),
+                ('form-0-start_date_0', 'number', '1'), ('form-1-start_date_0', 'number', '3'),
+                ('form-0-start_date_1', 'number', '12'), ('form-1-start_date_1', 'number', '12'),
+                ('form-0-start_date_2', 'number', '2003'), ('form-1-start_date_2', 'number', '2004'),
+                ('form-0-end_date_0', 'number', '3'), ('form-1-end_date_0', 'number', '7'),
+                ('form-0-end_date_1', 'number', '12'), ('form-1-end_date_1', 'number', '12'),
+                ('form-0-end_date_2', 'number', '2004'), ('form-1-end_date_2', 'number', '2004')]:
                 utils.assertXPathValue(
                     response,
                     'string(//input[normalize-space(@type)="{ftype}" and normalize-space(@name)="{field}"]/@value)'
-                    .format(field=field, ftype=ftype),
+                        .format(field=field, ftype=ftype),
                     value,
                     strip=True
                 )
@@ -449,7 +447,7 @@ class NannyPreviousNamesTests(NannyReviewFuncTestsBase):
                                   'end_month': 12,
                                   'end_year': 2004,
                                   'order': 1}
-            nanny_api_list.return_value.record = [ prev_name_record_2]
+            nanny_api_list.return_value.record = [prev_name_record_2]
 
             nanny_api_list.return_value.status_code = 200
             application_id = self.test_app_id
@@ -509,10 +507,9 @@ class NannyPreviousNamesTests(NannyReviewFuncTestsBase):
 
     def test_submit_confirm_calls_create_on_data_inputted(self):
 
-        with patch.object(NannyGatewayActions, 'list') as nanny_api_list,\
+        with patch.object(NannyGatewayActions, 'list') as nanny_api_list, \
                 patch.object(NannyGatewayActions, 'create') as nanny_api_create:
-
-            url = '{0}?id={1}'.format(reverse('nanny_previous_names'), self.test_app_id )
+            url = '{0}?id={1}'.format(reverse('nanny_previous_names'), self.test_app_id)
 
             data = self._make_post_data(2, 'Confirm and continue', last_is_new=True)
             data.update(self.valid_previous_name_data[0])
@@ -995,3 +992,9 @@ class ReviewSummaryAndConfirmationFunctionalTests(NannyReviewFuncTestsBase):
             self.assertEqual(ARC_STATUS_FLAGGED, getattr(refetched_arc, '{}_review'.format(task)))
         for task in ARC_TASKS_UNFLAGGED:
             self.assertEqual(ARC_STATUS_COMPLETED, getattr(refetched_arc, '{}_review'.format(task)))
+
+    @patch('arc_application.messaging.application_exporter.ApplicationExporter.export_childminder_application')
+    @patch('arc_application.messaging.application_exporter.ApplicationExporter.export_nanny_application')
+    @patch('datetime.datetime', new=MockDatetime)
+    def test_submit_releases_application_once_if_submitted_twice(self, mock_datetime, mock_export_nanny_application, _):
+        self.skipTest("testNotImplemented")
