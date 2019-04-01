@@ -49,10 +49,12 @@ class NannyArcSummary(View):
         no_flags_exist = nanny_all_completed(arc_application, application_id)
 
         if no_flags_exist:
-            send_accepted_email(**email_personalisation)
+            if nanny_application['application_status'] != 'ACCEPTED':
+                send_accepted_email(**email_personalisation)
             release_application(request, application_id, 'ACCEPTED')
         else:
-            send_returned_email(application_id, **email_personalisation)
+            if nanny_application['application_status'] != 'FURTHER_INFORMATION':
+                send_returned_email(application_id, **email_personalisation)
             release_application(request, application_id, 'FURTHER_INFORMATION')
 
         update_returned_application_statuses(application_id)

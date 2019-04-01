@@ -13,6 +13,8 @@ from django.shortcuts import render
 from django.utils.http import urlsafe_base64_decode
 from django.utils.text import capfirst
 
+import copy
+
 from govuk_forms.forms import GOVUKForm
 from timeline_logger.models import TimelineLog
 from ..review_util import reset_declaration
@@ -111,16 +113,20 @@ def release_application(request, application_id, status):
     if Application.objects.filter(application_id=application_id).exists():
 
         app = Application.objects.get(application_id=application_id)
+        APP_ORIGINAL = copy.deepcopy(app)
 
         if status == 'FURTHER_INFORMATION':
             reset_declaration(app)
-        elif status == 'ACCEPTED':
+        elif status == 'ACCEPTED' and not APP_ORIGINAL.application_status == 'ACCEPTED':
             app.date_accepted = datetime.now()
 
         app.application_status = status
         app.save()
 
-        if status == 'ACCEPTED':
+        # If the application is being set to 'ACCEPTED' but has already been accepted, skip this.
+        if status == 'ACCEPTED' and not APP_ORIGINAL.application_status == 'ACCEPTED':
+            app.date_accepted = datetime.now()
+
             # Import used here explicitly to prevent circular import
             from ..messaging import ApplicationExporter
 
@@ -132,19 +138,23 @@ def release_application(request, application_id, status):
     else:
         nanny_api_response = NannyGatewayActions().read('application', params={'application_id': application_id})
         app = nanny_api_response.record
+        APP_ORIGINAL = app.copy()
 
         if status == 'FURTHER_INFORMATION':
             app['declarations_status'] = 'NOT_STARTED'
-        elif status == 'ACCEPTED':
+        elif status == 'ACCEPTED' and not APP_ORIGINAL['application_status'] == 'ACCEPTED':
             app['date_accepted'] = datetime.now()
 
         app['application_status'] = status
         NannyGatewayActions().put('application', params=app)
 
-        if status == 'ACCEPTED':
+        if status == 'ACCEPTED' and not APP_ORIGINAL['application_status'] == 'ACCEPTED':
+            app['date_accepted'] = datetime.now()
+
             from ..messaging import ApplicationExporter
             application_reference = app['application_reference']
             ApplicationExporter.export_nanny_application(application_id, application_reference)
+
 
     # keep arc record but un-assign user from it
     if Arc.objects.filter(application_id=application_id).exists():

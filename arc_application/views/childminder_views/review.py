@@ -52,15 +52,18 @@ def review(request):
 
     if all_complete(application_id_local, True):
 
-        # Get fresh version of application as it will have been updated in method call
-        if Application.objects.filter(application_id=application_id_local).exists():
-            application = Application.objects.get(application_id=application_id_local)
-            application.date_accepted = datetime.now()
-            application.save()
+        # If the application has not already been accepted.
+        if application.application_status != 'ACCEPTED':
 
-        personalisation = {'first_name': first_name, 'ref': app_ref}
-        accepted_email(email, first_name, app_ref, application_id_local)
-        send_survey_email(email, personalisation, application)
+            # Get fresh version of application as it will have been updated in method call
+            if Application.objects.filter(application_id=application_id_local).exists():
+                application = Application.objects.get(application_id=application_id_local)
+                application.date_accepted = datetime.now()
+                application.save()
+
+            personalisation = {'first_name': first_name, 'ref': app_ref}
+            accepted_email(email, first_name, app_ref, application_id_local)
+            send_survey_email(email, personalisation, application)
 
         # If successful
         release_application(request, application_id_local, 'ACCEPTED')
@@ -72,29 +75,31 @@ def review(request):
         return render(request, 'review-confirmation.html', variables)
 
     else:
-        release_application(request, application_id_local, 'FURTHER_INFORMATION')
-        magic_link = generate_magic_link()
-        expiry = int(time.time())
-        user_details.email_expiry_date = expiry
-        user_details.magic_link_email = magic_link
-        user_details.save()
-        link = settings.CHILDMINDER_EMAIL_VALIDATION_URL + '/' + magic_link
-        returned_email(email, first_name, app_ref, link)
+        if application.application_status != 'FURTHER_INFORMATION':
+            magic_link = generate_magic_link()
+            expiry = int(time.time())
+            user_details.email_expiry_date = expiry
+            user_details.magic_link_email = magic_link
+            user_details.save()
+            link = settings.CHILDMINDER_EMAIL_VALIDATION_URL + '/' + magic_link
+            returned_email(email, first_name, app_ref, link)
 
-        # Copy Arc status' to Childminder App
-        if Arc.objects.filter(pk=application_id_local):
-            arc = Arc.objects.get(pk=application_id_local)
-            app = Application.objects.get(pk=application_id_local)
-            app.login_details_status = arc.login_details_review
-            app.personal_details_status = arc.personal_details_review
-            app.childcare_type_status = arc.childcare_type_review
-            app.first_aid_training_status = arc.first_aid_review
-            app.health_status = arc.health_review
-            app.childcare_training_status = arc.childcare_training_review
-            app.criminal_record_check_status = arc.dbs_review
-            app.references_status = arc.references_review
-            app.people_in_home_status = arc.people_in_home_review
-            app.save()
+            # Copy Arc status' to Childminder App
+            if Arc.objects.filter(pk=application_id_local):
+                arc = Arc.objects.get(pk=application_id_local)
+                app = Application.objects.get(pk=application_id_local)
+                app.login_details_status = arc.login_details_review
+                app.personal_details_status = arc.personal_details_review
+                app.childcare_type_status = arc.childcare_type_review
+                app.first_aid_training_status = arc.first_aid_review
+                app.health_status = arc.health_review
+                app.childcare_training_status = arc.childcare_training_review
+                app.criminal_record_check_status = arc.dbs_review
+                app.references_status = arc.references_review
+                app.people_in_home_status = arc.people_in_home_review
+                app.save()
+
+            release_application(request, application_id_local, 'FURTHER_INFORMATION')
 
         variables = {
             'application_id': application_id_local,
