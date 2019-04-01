@@ -996,5 +996,5 @@ class ReviewSummaryAndConfirmationFunctionalTests(NannyReviewFuncTestsBase):
     @patch('arc_application.messaging.application_exporter.ApplicationExporter.export_childminder_application')
     @patch('arc_application.messaging.application_exporter.ApplicationExporter.export_nanny_application')
     @patch('datetime.datetime', new=MockDatetime)
-    def test_submit_releases_application_once_if_submitted_twice(self, mock_datetime, mock_export_nanny_application, _):
+    def test_submit_releases_application_once_if_submitted_twice(self, mock_datetime, mock_export_nanny_application):
         self.skipTest("testNotImplemented")

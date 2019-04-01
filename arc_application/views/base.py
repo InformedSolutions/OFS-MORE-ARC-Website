@@ -13,6 +13,8 @@ from django.shortcuts import render
 from django.utils.http import urlsafe_base64_decode
 from django.utils.text import capfirst
 
+import copy
+
 from govuk_forms.forms import GOVUKForm
 from timeline_logger.models import TimelineLog
 from ..review_util import reset_declaration
@@ -111,7 +113,7 @@ def release_application(request, application_id, status):
     if Application.objects.filter(application_id=application_id).exists():
 
         app = Application.objects.get(application_id=application_id)
-        APP_ORIGINAL = app.copy()
+        APP_ORIGINAL = copy.deepcopy(app)
 
         if status == 'FURTHER_INFORMATION':
             reset_declaration(app)

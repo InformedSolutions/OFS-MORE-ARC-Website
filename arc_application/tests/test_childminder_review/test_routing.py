@@ -1,8 +1,9 @@
 import logging
 from datetime import datetime, timezone, date
-from unittest.mock import patch
 from unittest import skip
+from unittest.mock import patch
 
+import pytz
 from django.test import TestCase, tag
 from django.urls import reverse
 
@@ -306,19 +307,19 @@ class ApplicantPreviousNamesFunctionalTests(TestCase):
         self.assertEqual(200, response.status_code)
 
         for field, ftype, value in [
-                ('form-1-first_name', 'text', 'Clark'), ('form-0-first_name', 'text', 'Super'),
-                ('form-1-middle_names', 'text', 'S'), ('form-0-middle_names', 'text', ''),
-                ('form-1-last_name', 'text', 'Kent'), ('form-0-last_name', 'text', 'Man'),
-                ('form-1-start_date_0', 'number', '1'), ('form-0-start_date_0', 'number', '2'),
-                ('form-1-start_date_1', 'number', '1'), ('form-0-start_date_1', 'number', '2'),
-                ('form-1-start_date_2', 'number', '2018'), ('form-0-start_date_2', 'number', '2015'),
-                ('form-1-end_date_0', 'number', '1'), ('form-0-end_date_0', 'number', '1'),
-                ('form-1-end_date_1', 'number', '1'), ('form-0-end_date_1', 'number', '1'),
-                ('form-1-end_date_2', 'number', '2019'), ('form-0-end_date_2', 'number', '2017')]:
+            ('form-1-first_name', 'text', 'Clark'), ('form-0-first_name', 'text', 'Super'),
+            ('form-1-middle_names', 'text', 'S'), ('form-0-middle_names', 'text', ''),
+            ('form-1-last_name', 'text', 'Kent'), ('form-0-last_name', 'text', 'Man'),
+            ('form-1-start_date_0', 'number', '1'), ('form-0-start_date_0', 'number', '2'),
+            ('form-1-start_date_1', 'number', '1'), ('form-0-start_date_1', 'number', '2'),
+            ('form-1-start_date_2', 'number', '2018'), ('form-0-start_date_2', 'number', '2015'),
+            ('form-1-end_date_0', 'number', '1'), ('form-0-end_date_0', 'number', '1'),
+            ('form-1-end_date_1', 'number', '1'), ('form-0-end_date_1', 'number', '1'),
+            ('form-1-end_date_2', 'number', '2019'), ('form-0-end_date_2', 'number', '2017')]:
             utils.assertXPathValue(
                 response,
                 'string(//input[normalize-space(@type)="{ftype}" and normalize-space(@name)="{field}"]/@value)'
-                .format(field=field, ftype=ftype),
+                    .format(field=field, ftype=ftype),
                 value,
                 strip=True
             )
@@ -577,7 +578,7 @@ class ApplicantPreviousNamesFunctionalTests(TestCase):
         data.update(self.valid_previous_name_data[1])
         data['form-0-previous_name_id'] = name1.pk
         data['form-1-previous_name_id'] = name2.pk
-        data['delete-'+str(name1.pk)] = 'Remove this name'
+        data['delete-' + str(name1.pk)] = 'Remove this name'
 
         # Follow redirects to land on target page
         response = self.client.post(url, data, follow=True)
@@ -647,7 +648,7 @@ class ApplicantPreviousNamesFunctionalTests(TestCase):
         data.update(self.valid_previous_name_data[1])
         data['form-0-previous_name_id'] = name1.pk
         data['form-1-previous_name_id'] = name2.pk
-        data['delete-'+str(name1.pk)] = 'Remove this name'
+        data['delete-' + str(name1.pk)] = 'Remove this name'
 
         url = '{0}?id={1}&person_id={1}&type=APPLICANT'.format(reverse('personal_details_previous_names'),
                                                                self.application.pk)
@@ -679,13 +680,14 @@ class ApplicantPreviousNamesFunctionalTests(TestCase):
             'person_id': self.application.pk,
             'type': 'APPLICANT',
             'form-TOTAL_FORMS': num_names,
-            'form-INITIAL_FORMS': num_names-1 if last_is_new else num_names,
+            'form-INITIAL_FORMS': num_names - 1 if last_is_new else num_names,
             'form-MIN_NUM_FORMS': 0,
             'form-MAX_NUM_FORMS': 1000,
         }
         if action is not None:
             data['action'] = action
         return data
+
 
 @skip('functionalityNotImplemented')
 @tag('http')
@@ -751,7 +753,7 @@ class ApplicantPreviousAddressesFunctionalTests(TestCase):
             person_id=application_id,
             other_person_type='APPLICANT',
             street_line1='Informed', street_line2='Manchester Road', town='Altrincham',
-            county = 'Greater Manchester', postcode = 'WA14 4PA',
+            county='Greater Manchester', postcode='WA14 4PA',
             moved_in_day=1, moved_in_month=1, moved_in_year=2018,
             moved_out_day=1, moved_out_month=1, moved_out_year=2019
         )
@@ -759,7 +761,7 @@ class ApplicantPreviousAddressesFunctionalTests(TestCase):
             person_id=application_id,
             other_person_type='APPLICANT',
             street_line1='Fortis', street_line2='Manchester Road', town='Altrincham',
-            county = 'Greater Manchester', postcode = 'WA14 4PA',
+            county='Greater Manchester', postcode='WA14 4PA',
             moved_in_day=1, moved_in_month=1, moved_in_year=2019,
             moved_out_day=15, moved_out_month=3, moved_out_year=2019
         )
@@ -772,12 +774,17 @@ class ApplicantPreviousAddressesFunctionalTests(TestCase):
         self.assertEqual(200, response.status_code)
 
         for addresses in [
-            ('Informed', 'Manchester Road', 'Altrincham', 'Greater Manchester', 'WA14 4PA' '1', '1', '2018', '1', '1', '2019'),
-            ('Fortis', 'Manchester Road', 'Altrincham', 'Greater Manchester', 'WA14 4PA' '1', '1', '2019', '15', '3', '2019')]:
-            for field, address in [('street_line1', addresses[0]), ('street_line2', addresses[1]), ('town', addresses[2]),
-                                     ('county', addresses[3]), ('postcode', addresses[4]),
-                                ('moved_in_date_0', addresses[5]), ('moved_in_date_1', addresses[6]), ('moved_in_date_2', addresses[7]),
-                                ('moved_out_date_0', addresses[8]), ('moved_out_date_1', addresses[9]), ('moved_out_date_2', addresses[10])]:
+            ('Informed', 'Manchester Road', 'Altrincham', 'Greater Manchester', 'WA14 4PA' '1', '1', '2018', '1', '1',
+             '2019'),
+            ('Fortis', 'Manchester Road', 'Altrincham', 'Greater Manchester', 'WA14 4PA' '1', '1', '2019', '15', '3',
+             '2019')]:
+            for field, address in [('street_line1', addresses[0]), ('street_line2', addresses[1]),
+                                   ('town', addresses[2]),
+                                   ('county', addresses[3]), ('postcode', addresses[4]),
+                                   ('moved_in_date_0', addresses[5]), ('moved_in_date_1', addresses[6]),
+                                   ('moved_in_date_2', addresses[7]),
+                                   ('moved_out_date_0', addresses[8]), ('moved_out_date_1', addresses[9]),
+                                   ('moved_out_date_2', addresses[10])]:
                 utils.assertXPath(
                     response,
                     ('//input[normalize-space(@type)="text" and contains(normalize-space(@address), "{field}") '
@@ -1583,19 +1590,19 @@ class AdultPreviousNamesFunctionalTests(TestCase):
         self.assertEqual(200, response.status_code)
 
         for field, ftype, value in [
-                ('form-1-first_name', 'text', 'Fresh'), ('form-0-first_name', 'text', 'Will'),
-                ('form-1-middle_names', 'text', 'Prince'), ('form-0-middle_names', 'text', ''),
-                ('form-1-last_name', 'text', 'Belair'), ('form-0-last_name', 'text', 'Smith'),
-                ('form-1-start_date_0', 'number', '1'), ('form-0-start_date_0', 'number', '9'),
-                ('form-1-start_date_1', 'number', '10'), ('form-0-start_date_1', 'number', '4'),
-                ('form-1-start_date_2', 'number', '1999'), ('form-0-start_date_2', 'number', '2015'),
-                ('form-1-end_date_0', 'number', '10'), ('form-0-end_date_0', 'number', '3'),
-                ('form-1-end_date_1', 'number', '11'), ('form-0-end_date_1', 'number', '12'),
-                ('form-1-end_date_2', 'number', '2007'), ('form-0-end_date_2', 'number', '2016')]:
+            ('form-1-first_name', 'text', 'Fresh'), ('form-0-first_name', 'text', 'Will'),
+            ('form-1-middle_names', 'text', 'Prince'), ('form-0-middle_names', 'text', ''),
+            ('form-1-last_name', 'text', 'Belair'), ('form-0-last_name', 'text', 'Smith'),
+            ('form-1-start_date_0', 'number', '1'), ('form-0-start_date_0', 'number', '9'),
+            ('form-1-start_date_1', 'number', '10'), ('form-0-start_date_1', 'number', '4'),
+            ('form-1-start_date_2', 'number', '1999'), ('form-0-start_date_2', 'number', '2015'),
+            ('form-1-end_date_0', 'number', '10'), ('form-0-end_date_0', 'number', '3'),
+            ('form-1-end_date_1', 'number', '11'), ('form-0-end_date_1', 'number', '12'),
+            ('form-1-end_date_2', 'number', '2007'), ('form-0-end_date_2', 'number', '2016')]:
             utils.assertXPathValue(
                 response,
                 'normalize-space(//input[normalize-space(@type)="{ftype}" and normalize-space(@name)="{field}"]/@value)'
-                .format(field=field, ftype=ftype),
+                    .format(field=field, ftype=ftype),
                 value,
             )
 
@@ -1628,7 +1635,7 @@ class AdultPreviousNamesFunctionalTests(TestCase):
         )
 
         url = reverse('other-people-previous-names') \
-            + '?id={}&person_id={}&type={}'.format(self.application.pk, self.adult.pk, 'ADULT')
+              + '?id={}&person_id={}&type={}'.format(self.application.pk, self.adult.pk, 'ADULT')
 
         data = self._make_post_data(2, 'Confirm and continue', last_is_new=True)
         data.update(self.valid_names_post_data[0])
@@ -1657,7 +1664,7 @@ class AdultPreviousNamesFunctionalTests(TestCase):
         )
 
         url = reverse('other-people-previous-names') \
-            + '?id={}&person_id={}&type={}'.format(self.application.pk, self.adult.pk, 'ADULT')
+              + '?id={}&person_id={}&type={}'.format(self.application.pk, self.adult.pk, 'ADULT')
 
         data = self._make_post_data(2, 'Confirm and continue', last_is_new=True)
         data.update(self.valid_names_post_data[0])
@@ -1683,7 +1690,7 @@ class AdultPreviousNamesFunctionalTests(TestCase):
         )
 
         url = reverse('other-people-previous-names') \
-            + '?id={}&person_id={}&type={}'.format(self.application.pk, self.adult.pk, 'ADULT')
+              + '?id={}&person_id={}&type={}'.format(self.application.pk, self.adult.pk, 'ADULT')
 
         data = self._make_post_data(2, 'Confirm and continue', last_is_new=True)
         data.update(self.valid_names_post_data[0])
@@ -1728,7 +1735,7 @@ class AdultPreviousNamesFunctionalTests(TestCase):
         )
 
         url = reverse('other-people-previous-names') \
-            + '?id={}&person_id={}&type={}'.format(self.application.pk, self.adult.pk, 'ADULT')
+              + '?id={}&person_id={}&type={}'.format(self.application.pk, self.adult.pk, 'ADULT')
         data = self._make_post_data(1, 'Add another name')
         data.update(self.valid_names_post_data[0])
 
@@ -1830,14 +1837,14 @@ class AdultPreviousNamesFunctionalTests(TestCase):
         )
 
         url = reverse('other-people-previous-names') \
-            + '?id={}&person_id={}&type={}'.format(self.application.pk, self.adult.pk, 'ADULT')
+              + '?id={}&person_id={}&type={}'.format(self.application.pk, self.adult.pk, 'ADULT')
 
         data = self._make_post_data(2)
         data.update(self.valid_names_post_data[0])
         data.update(self.valid_names_post_data[1])
         data['form-0-previous_name_id'] = name1.pk
         data['form-1-previous_name_id'] = name2.pk
-        data['delete-'+str(name1.pk)] = 'Remove this name'
+        data['delete-' + str(name1.pk)] = 'Remove this name'
 
         # follow redirects to land on target page
         response = self.client.post(url, data, follow=True)
@@ -1906,7 +1913,7 @@ class AdultPreviousNamesFunctionalTests(TestCase):
         data.update(self.valid_names_post_data[1])
         data['form-0-previous_name_id'] = name1.pk
         data['form-1-previous_name_id'] = name2.pk
-        data['delete-'+str(name1.pk)] = 'Remove this name'
+        data['delete-' + str(name1.pk)] = 'Remove this name'
 
         url = reverse('other-people-previous-names') \
               + '?id={}&person_id={}&type={}'.format(self.application.pk, self.adult.pk, 'ADULT')
@@ -1939,7 +1946,7 @@ class AdultPreviousNamesFunctionalTests(TestCase):
             'person_id': self.adult.pk,
             'type': 'ADULT',
             'form-TOTAL_FORMS': num_names,
-            'form-INITIAL_FORMS': num_names-1 if last_is_new else num_names,
+            'form-INITIAL_FORMS': num_names - 1 if last_is_new else num_names,
             'form-MIN_NUM_FORMS': 0,
             'form-MAX_NUM_FORMS': 1000,
         }
@@ -2284,7 +2291,7 @@ class ReviewSummaryAndConfirmationFunctionalTests(TestCase):
             other_person_type='ADULT',
             first_name='Tina', middle_names='T', last_name='Tuna',
             start_day=8, start_month=9, start_year=2001,
-            end_day=1,  end_month=1, end_year=2002,
+            end_day=1, end_month=1, end_year=2002,
             order=0,
         )
 
@@ -2309,7 +2316,7 @@ class ReviewSummaryAndConfirmationFunctionalTests(TestCase):
     class MockDatetime(datetime):
         @classmethod
         def now(cls):
-            return datetime(2019, 2, 27, 17, 30, 5)
+            return datetime(2019, 2, 27, 17, 30, 5, tzinfo=pytz.UTC)
 
     @patch('arc_application.messaging.application_exporter.ApplicationExporter.export_childminder_application')
     @patch('arc_application.messaging.application_exporter.ApplicationExporter.export_nanny_application')
