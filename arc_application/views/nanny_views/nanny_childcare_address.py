@@ -46,10 +46,10 @@ class NannyChildcareAddressSummary(NannyARCFormView):
         home_address_info = nanny_actions.read('applicant-home-address',
                                                params={'application_id': application_id,
                                                        'current_address': True}).record
-        childcare_address_info = nanny_actions.read('applicant-home-address',
+        childcare_address_status = nanny_actions.read('applicant-home-address',
                                                params={'application_id': application_id}).record
 
-        if childcare_address_info['childcare_address']:
+        if childcare_address_status['childcare_address']:
             work_at_home_bool = 'Yes'
         else:
             work_at_home_bool = 'No'
