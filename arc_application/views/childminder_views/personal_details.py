@@ -114,7 +114,7 @@ def personal_details_summary(request):
             if not all((birthdate_save_successful, name_save_successful, home_address_save_successful,
                         childcare_address_save_successful, working_in_other_childminder_home_save_successful,
                         own_children_save_successful, reasons_known_to_social_services_save_successful)):
-                log.denug("Handling submissions for personal details - save unsuccessful")
+                log.debug("Handling submissions for personal details - save unsuccessful")
                 return render(request, '500.html')
 
             # update application status
@@ -179,7 +179,7 @@ def personal_details_summary(request):
         'town': home_address_record.town,
         'county': home_address_record.county,
         'postcode': home_address_record.postcode,
-        'location_of_childcare': childcare_address_record.childcare_address,
+        'location_of_childcare': childcare_address_record.current_address,
         'childcare_street_line1': childcare_address_record.street_line1,
         'childcare_street_line2': childcare_address_record.street_line2,
         'childcare_town': childcare_address_record.town,
