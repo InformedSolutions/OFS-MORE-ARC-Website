@@ -179,7 +179,7 @@ def personal_details_summary(request):
         'town': home_address_record.town,
         'county': home_address_record.county,
         'postcode': home_address_record.postcode,
-        'location_of_childcare': childcare_address_record.childcare_address,
+        'location_of_childcare': childcare_address_record.current_address,
         'childcare_street_line1': childcare_address_record.street_line1,
         'childcare_street_line2': childcare_address_record.street_line2,
         'childcare_town': childcare_address_record.town,
