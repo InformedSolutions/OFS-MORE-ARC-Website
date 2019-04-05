@@ -64,7 +64,7 @@ class ApplicationExporter:
         applicant_personal_details = ApplicantPersonalDetails.objects.filter(application_id=application_id)
         export['applicant_personal_details'] = serializers.serialize('json', list(applicant_personal_details))
 
-        applicant_home_address = ApplicantHomeAddress.objects.filter(application_id=application_id, current_address=True)
+        applicant_home_address = ApplicantHomeAddress.objects.filter(application_id=application_id)
         export['applicant_home_address'] = serializers.serialize('json', list(applicant_home_address))
 
         ApplicationExporter.set_moved_in_dates_on_childminder_applicant_home_address(export)
@@ -74,10 +74,6 @@ class ApplicationExporter:
 
         applicant_previous_addresses = PreviousAddress.objects.filter(person_type='APPLICANT', person_id=application_id)
         export['applicant_previous_addresses'] = serializers.serialize('json', list(applicant_previous_addresses))
-
-        childcare_address = ApplicantHomeAddress.objects.filter(personal_detail_id=applicant_personal_details.first(),
-                                                                    childcare_address=True)
-        export['childcare_address'] = serializers.serialize('json', list(childcare_address))
 
         child_in_home = ChildInHome.objects.filter(application_id=application_id)
         export['child_in_home'] = serializers.serialize('json', list(child_in_home))
@@ -224,20 +220,12 @@ class ApplicationExporter:
         :param export_object: The export object to be sent to SQS
         """
         try:
-            decoded_home_addresses = json.loads(export_object['applicant_home_address'])
-
-            decoded_home_address = None
-
-            # Find current address
-            for address in decoded_home_addresses:
-                if address['fields']['current_address']:
-                    decoded_home_address = address
-
+            decoded_home_address = json.loads(export_object['applicant_home_address'])[0]
             decoded_personal_details = json.loads(export_object['applicant_personal_details'])[0]
             decoded_home_address['fields']['moved_in_day'] = decoded_personal_details['fields']['moved_in_day']
             decoded_home_address['fields']['moved_in_month'] = decoded_personal_details['fields']['moved_in_month']
             decoded_home_address['fields']['moved_in_year'] = decoded_personal_details['fields']['moved_in_year']
-            export_object['applicant_home_address'] = json.dumps(decoded_home_addresses)
+            export_object['applicant_home_address'] = json.dumps([decoded_home_address])
         except:
             pass
 
