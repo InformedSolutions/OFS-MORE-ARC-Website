@@ -11,25 +11,12 @@ from .. import form_fields
 class PreviousAddressEntryForm(GOVUKForm):
 
     ERROR_MESSAGE_POSTCODE_NOT_ENTERED = 'Please enter your postcode'
-    ERROR_MESSAGE_POSTCODE_INVALID = 'Please enter a valid postcode'
 
     field_label_classes = 'form-label-bold'
     auto_replace_widgets = True
     error_summary_title = 'There was a problem'
 
     postcode = forms.CharField(label='Postcode', error_messages={'required': 'Please enter your postcode'})
-
-    def clean_postcode(self):
-        """
-        Postcode validation
-        :return: string
-        """
-        postcode = self.cleaned_data['postcode']
-        postcode_no_space = postcode.replace(" ", "")
-        postcode_uppercase = postcode_no_space.upper()
-        if re.match(settings.REGEX['POSTCODE_UPPERCASE'], postcode_uppercase) is None:
-            raise forms.ValidationError(self.ERROR_MESSAGE_POSTCODE_INVALID)
-        return postcode_uppercase
 
 
 class PreviousAddressSelectForm(GOVUKForm):
@@ -314,15 +301,3 @@ class PreviousAddressManualForm(GOVUKForm):
             if len(county) > 50:
                 raise forms.ValidationError(self.ERROR_MESSAGE_COUNTY_TOO_LONG)
         return county
-
-    def clean_postcode(self):
-        """
-        Postcode validation
-        :return: string
-        """
-        postcode = self.cleaned_data['postcode']
-        postcode_no_space = postcode.replace(" ", "")
-        postcode_uppercase = postcode_no_space.upper()
-        if re.match(settings.REGEX['POSTCODE_UPPERCASE'], postcode_uppercase) is None:
-            raise forms.ValidationError(self.ERROR_MESSAGE_POSTCODE_INVALID)
-        return postcode_uppercase
