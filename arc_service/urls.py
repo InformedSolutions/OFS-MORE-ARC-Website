@@ -54,7 +54,6 @@ from django.contrib.auth.views import logout
 
 from arc_application.views.childminder_views.personal_details_addresses import personal_details_previous_address, personal_details_previous_address_change
 
-
 urlpatterns = [
 
     url(r'^admin/', admin.site.urls),

@@ -11,24 +11,34 @@
 
         {% for row in section.rows %}
             {% if not row.hidden %}
-            <tr class="response-row">
-                <td class="question-label">
-                    {{row.name}}
-                </td>
-                 <td>
-                     {% if row.info|template_is_instance:'str' %}
-                        {{row.info|default:"Not answered"}}
-                     {% elif row.info|template_is_instance:'bool' %}
-                        {% if row.info %}
-                            Yes
-                        {% else %}
-                            No
-                        {% endif %}
-                    {% elif row.info|template_is_instance:'dict' %}
-                        {% include 'nanny_general_address_template.html' %}
-                    {% endif %}
-                 </td>
-            </tr>
+                {% if row.id == 'home_address_locations' %}
+                    {{ row.formset.management_form }}
+
+                    {% for home_address in row.info %}
+                        {% with form=row.formset|return_item_by_index:forloop.counter0 %}
+                            {% include 'nanny-childcare-address-pdf-template.html' %}
+                        {% endwith %}
+                    {% endfor %}
+                {% else %}
+                    <tr class="response-row">
+                        <td class="question-label">
+                            {{row.name}}
+                        </td>
+                         <td>
+                             {% if row.info|template_is_instance:'str' %}
+                                {{row.info|default:"Not answered"}}
+                             {% elif row.info|template_is_instance:'bool' %}
+                                {% if row.info %}
+                                    Yes
+                                {% else %}
+                                    No
+                                {% endif %}
+                            {% elif row.info|template_is_instance:'dict' %}
+                                {% include 'nanny_general_address_template.html' %}
+                            {% endif %}
+                         </td>
+                    </tr>
+                 {% endif %}
             {% endif %}
         {% endfor %}
 </table>
