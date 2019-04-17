@@ -12,6 +12,7 @@ from ..views.nanny_views.nanny_utils import get_nanny_summary_variables
 # Initiate logging
 log = logging.getLogger()
 
+
 class DocumentGenerator:
     """
     A utility class for generating PDF documents used in application submissions
