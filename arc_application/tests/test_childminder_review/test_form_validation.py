@@ -339,7 +339,6 @@ class PersonalDetailsPreviousAddressEnterPostCodeFormValidationTests(TestCase):
     form = PreviousAddressEntryForm
 
     ERROR_MESSAGE_POSTCODE_NOT_ENTERED = 'Please enter your postcode'
-    ERROR_MESSAGE_POSTCODE_INVALID = 'Please enter a valid postcode'
 
     def test_invalid_when_no_postcode_entered(self):
         data = {
@@ -353,88 +352,6 @@ class PersonalDetailsPreviousAddressEnterPostCodeFormValidationTests(TestCase):
         self.assertEqual(form.errors, {
             'postcode': [self.ERROR_MESSAGE_POSTCODE_NOT_ENTERED]
         })
-
-    def test_invalid_when_postcode_random_characters(self):
-        data = {
-            'postcode': 'wEdsaKJ'
-        }
-        form = self.form(data)
-
-        self.assertFalse(form.is_valid())
-
-        # Check error messages
-        self.assertEqual(form.errors, {
-            'postcode': [self.ERROR_MESSAGE_POSTCODE_INVALID]
-        })
-
-    def test_invalid_when_postcode_numeric(self):
-        data = {
-            'postcode': '12468123'
-        }
-        form = self.form(data)
-
-        self.assertFalse(form.is_valid())
-
-        # Check error messages
-        self.assertEqual(form.errors, {
-            'postcode': [self.ERROR_MESSAGE_POSTCODE_INVALID]
-        })
-
-    def test_invalid_when_postcode_too_long(self):
-        data = {
-            'postcode': 'WA141RFD'
-        }
-        form = self.form(data)
-
-        self.assertFalse(form.is_valid())
-
-        # Check error messages
-        self.assertEqual(form.errors, {
-            'postcode': [self.ERROR_MESSAGE_POSTCODE_INVALID]
-        })
-
-    def test_invalid_when_postcode_too_short(self):
-        data = {
-            'postcode': 'WA1'
-        }
-        form = self.form(data)
-
-        self.assertFalse(form.is_valid())
-
-        # Check error messages
-        self.assertEqual(form.errors, {
-            'postcode': [self.ERROR_MESSAGE_POSTCODE_INVALID]
-        })
-
-    def test_valid_when_postcode_has_space_in_invalid_positions(self):
-        data = {
-            'postcode': 'WA1 41 R  F'
-        }
-        form = self.form(data)
-
-        self.assertTrue(form.is_valid())
-
-        # Assert that the cleaned postcode does not contain spaces
-        self.assertEqual(form.cleaned_data['postcode'], 'WA141RF')
-
-    def test_valid_when_postcode_entered_without_space(self):
-        data = {
-            'postcode': 'WA141RF'
-        }
-        form = self.form(data)
-
-        self.assertTrue(form.is_valid())
-
-    def test_valid_when_postcode_entered_lowercase(self):
-        data = {
-            'postcode': 'wa14 1rf'
-        }
-        form = self.form(data)
-
-        self.assertTrue(form.is_valid())
-
-        # Assert that the cleaned postcode is stored uppercase
-        self.assertEqual(form.cleaned_data['postcode'], 'WA141RF')
 
 
 @tag('unit')
