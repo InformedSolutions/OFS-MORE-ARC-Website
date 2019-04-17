@@ -92,7 +92,6 @@ def arc_summary(request):
             ordered_models.append(AdultInHome)
             ordered_models.append(Application)
             ordered_models.append(ChildInHome)
-            ordered_models.append(Child)
         zero_to_five = ChildcareType.objects.get(application_id=application_id_local).zero_to_five
 
         if zero_to_five:
@@ -134,7 +133,6 @@ def cc_summary(request):
             ordered_models.append(AdultInHome)
             ordered_models.append(Application)
             ordered_models.append(ChildInHome)
-            ordered_models.append(Child)
         zero_to_five = ChildcareType.objects.get(application_id=application_id_local).zero_to_five
         if zero_to_five:
             ordered_models.insert(6, HealthDeclarationBooklet)
