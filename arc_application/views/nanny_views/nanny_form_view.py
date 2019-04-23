@@ -1,4 +1,6 @@
 import logging
+
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
@@ -11,12 +13,16 @@ from ...services.arc_comments_handler import update_arc_review_status, \
     get_form_initial_values, \
     update_application_arc_flagged_status, \
     ARCCommentsProcessor
+from ...decorators import group_required, user_assigned_application
 
 # Initiate logging
 log = logging.getLogger()
 
+
 @method_decorator(never_cache, name='dispatch')
 @method_decorator(login_required, name='dispatch')
+@method_decorator(user_assigned_application, name='dispatch')
+@method_decorator(group_required(settings.ARC_GROUP), name='dispatch')
 class NannyARCFormView(FormView):
     """
     Parent FormView class from which all subsequent FormViews will inherit.
