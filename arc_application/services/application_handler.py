@@ -7,7 +7,7 @@ from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from timeline_logger.models import TimelineLog
 
 from ..models import Arc, Application, ApplicantName
-from ..services.db_gateways import NannyGatewayActions
+from ..services.db_gateways import NannyGatewayActions, HMGatewayActions
 
 
 class GenericApplicationHandler:
@@ -41,6 +41,9 @@ class GenericApplicationHandler:
         for assigned_application in assigned_applications:
             if assigned_application.app_type == 'Childminder':
                 table_data.append(self.__get_childminder_table_data(assigned_application.application_id))
+
+            if assigned_application.app_type == 'Adult update':
+                table_data.append(self.__get_adult_update_table_data(assigned_application.application_id))
                 
             if settings.ENABLE_NANNIES:
                 if assigned_application.app_type == 'Nanny':
@@ -85,6 +88,23 @@ class GenericApplicationHandler:
         applicant_name = ApplicantName.objects.get(application_id=application_id)
 
         row_data['applicant_name'] = applicant_name.first_name + ' ' + applicant_name.last_name
+
+        return row_data
+
+    def __get_adult_update_table_data(self, application_id):
+        row_data = dict()
+
+        application_record = HMGatewayActions().read('application',
+                                                        params={'token_id': str(application_id)}).record
+        row_data['application_id'] = application_record['token_id']
+        row_data['date_submitted'] = datetime.strptime(application_record['date_submitted'][:10], '%Y-%m-%d').strftime(
+            '%d/%m/%Y')
+        row_data['last_accessed'] = datetime.strptime(application_record['date_updated'][:10], '%Y-%m-%d').strftime(
+            '%d/%m/%Y')
+        row_data['app_type'] = 'Adult update'
+
+
+        row_data['applicant_name'] = '-'
 
         return row_data
 
@@ -207,4 +227,70 @@ class NannyApplicationHandler(GenericApplicationHandler):
 
     def _list_tasks_for_review(self):
         example_application = NannyGatewayActions().list('application', params={}).record[0]
+        return [i[:-12] for i in example_application.keys() if i[-12:] == '_arc_flagged']
+
+
+class AdultUpdateApplicationHandler(GenericApplicationHandler):
+
+    def _get_oldest_app_id(self):
+        response = HMGatewayActions().list(
+            'application', params={'application_status': 'SUBMITTED'})
+
+        if response.status_code == 200:
+            resubmitted_apps = []
+            submitted_apps = response.record
+            for app in submitted_apps:
+                if app['date_resubmitted'] is not None:
+                    resubmitted_apps.append(app)
+
+            if any(resubmitted_apps):
+                resubmitted_apps = sorted(resubmitted_apps, key=lambda i: i['date_resubmitted'])
+                return resubmitted_apps[0]['token_id']
+            else:
+                submitted_apps = sorted(submitted_apps, key=lambda i: i['date_submitted'])
+                return submitted_apps[0]['token_id']
+
+        else:
+            raise ObjectDoesNotExist('No applications available.')
+
+    def _assign_app_to_user(self, application_id):
+        app_record = HMGatewayActions().read('application', params={'token_id': application_id}).record
+        app_record['application_status'] = 'ARC_REVIEW'
+        HMGatewayActions().put('application', params=app_record)
+
+        if not Arc.objects.filter(pk=application_id).exists():
+            app_review = Arc.objects.create(application_id=application_id)
+
+            for field in self._list_tasks_for_review():
+                setattr(app_review, field, 'NOT_STARTED')
+
+            app_review.app_type = 'Adult update'
+            app_review.last_accessed = app_record['date_updated']
+            app_review.user_id = self.arc_user.id
+            app_review.save()
+
+        else:
+            arc_user = Arc.objects.get(pk=application_id)
+            arc_user.last_accessed = app_record['date_updated']
+            arc_user.user_id = self.arc_user.id
+            arc_user.save()
+
+        # Log assigning application to ARC user.
+        extra_data = {
+            'user_type': 'reviewer',
+            'action': 'assigned to',
+            'entity': 'application'
+        }
+
+        log_data = {
+            'object_id': app_record['application_id'],
+            'template': 'timeline_logger/application_action.txt',
+            'user': self.arc_user.username,
+            'extra_data': json.dumps(extra_data)
+        }
+
+        HMGatewayActions().create('timeline-log', params=log_data)
+
+    def _list_tasks_for_review(self):
+        example_application = HMGatewayActions().list('application', params={}).record[0]
         return [i[:-12] for i in example_application.keys() if i[-12:] == '_arc_flagged']

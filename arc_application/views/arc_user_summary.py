@@ -7,7 +7,7 @@ from django.views import View
 from django.utils.decorators import method_decorator
 
 from ..services.application_handler import ChildminderApplicationHandler, GenericApplicationHandler, \
-    NannyApplicationHandler
+    NannyApplicationHandler, AdultUpdateApplicationHandler
 
 # Initiate logging
 log = logging.getLogger()
@@ -36,6 +36,9 @@ class ARCUserSummaryView(View):
 
         if 'add_childminder_application' in request.POST:
             app_handler = ChildminderApplicationHandler(arc_user=request.user)
+
+        elif 'add_adult_update_application' in request.POST:
+            app_handler = AdultUpdateApplicationHandler(arc_user=request.user)
 
         try:
             app_handler.add_application_from_pool()
