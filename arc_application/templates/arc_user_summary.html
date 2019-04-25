@@ -63,6 +63,8 @@
                 <a href="{% url 'nanny_task_list' %}?id={{entry.application_id}}">
                 {% elif entry.app_type == 'Childminder' %}
                 <a href="{% url 'task_list' %}?id={{entry.application_id}}">
+                    {% elif entry.app_type == 'Adult update' %}
+                <a href="{% url 'new_adults_summary' %}?id={{entry.application_id}}">
                 {% else %}
                 <a href="{% url 'task_list' %}/404">
                 {% endif %}

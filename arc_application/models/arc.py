@@ -29,6 +29,8 @@ class Arc(models.Model):
     insurance_cover_review = models.CharField(choices=TASK_STATUS, max_length=50, default='NOT_STARTED', blank=True,
                                               null=True)
 
+    #
+
     @classmethod
     def get_id(cls, app_id):
         return cls.objects.get(application_id=app_id)

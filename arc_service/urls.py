@@ -35,6 +35,7 @@ from arc_application.views.contact_centre.nanny_change_details import NannyUpdat
 from arc_application.views.search_router import SearchRouter
 from arc_application.views import upload_capita_dbs
 from arc_application.views.applications_summary import ApplicationsSummaryView
+from arc_application.views.adult_update_views.adult_update_view import new_adults_summary
 
 # Nanny Views
 
@@ -108,6 +109,8 @@ urlpatterns = [
         name='nanny_update_add_number'),
     url(r'^personal-details/previous-registration', PreviousRegistrationDetailsView.as_view(),
         name='previous_registration_details'),
+    url(r'^review/new-adults', new_adults_summary,
+        name='new_adults_summary'),
 ]
 
 # nanny application review
