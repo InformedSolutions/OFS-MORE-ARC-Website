@@ -29,7 +29,9 @@ class Arc(models.Model):
     insurance_cover_review = models.CharField(choices=TASK_STATUS, max_length=50, default='NOT_STARTED', blank=True,
                                               null=True)
 
-    #
+    # Adult update field
+    adult_update_review = models.CharField(choices=TASK_STATUS, max_length=50, default='NOT_STARTED', blank=True,
+                                              null=True)
 
     @classmethod
     def get_id(cls, app_id):

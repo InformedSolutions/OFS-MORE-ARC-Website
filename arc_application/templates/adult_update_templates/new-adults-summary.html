@@ -521,9 +521,9 @@
         </table>
         {% endif %}
 
-        <a href="{% url 'other-people-previous-names' %}?id={{ application_id }}&person_id={{ id }}&type=ADULT" class="button button-secondary">Add previous names</a>
+        <a href="" class="button button-secondary">Add previous names</a>
         <br>
-        <a href="{% url 'other-people-previous-addresses' %}?id={{ application_id }}&state=entry&person_id={{id}}&person_type=ADULT" class="button button-secondary">Add previous addresses</a>
+        <a href="" class="button button-secondary">Add previous addresses</a>
 
         <table class="check-your-answers form-group">
             <thead>
@@ -639,7 +639,7 @@
 
         <br>
 
-        <a href="{% url 'other-people-previous-registration' %}?id={{ application_id }}&person_id={{ id }}" class="button button-secondary">Add previous registration details</a>
+        <a href="" class="button button-secondary">Add previous registration details</a>
         {% endfor %}
 
         {% for id, name, previous_names, previous_addresses in adult_ebulk_lists %}

@@ -183,7 +183,8 @@ class HMGatewayActions(DBGatewayActions):
         'application': 'token_id',
         'adult': 'adult_id',
         'dpa-auth': 'token_id',
-        'arc-comments': 'table_pk'
+        'arc-comments': 'review_id',
+        'timeline-log': 'object_id'
     }
 
     target_url_prefix = os.environ.get("APP_HM_GATEWAY_URL") + '/api/v1/'
