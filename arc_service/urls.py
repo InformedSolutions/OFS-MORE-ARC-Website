@@ -36,6 +36,7 @@ from arc_application.views.search_router import SearchRouter
 from arc_application.views import upload_capita_dbs
 from arc_application.views.applications_summary import ApplicationsSummaryView
 from arc_application.views.adult_update_views.adult_update_view import new_adults_summary
+from arc_application.views.adult_update_views.adult_update_summary import arc_summary as adult_arc_summary
 
 # Nanny Views
 
@@ -111,6 +112,8 @@ urlpatterns = [
         name='previous_registration_details'),
     url(r'^review/new-adults', new_adults_summary,
         name='new_adults_summary'),
+    url(r'^review/new-adult-summary', adult_arc_summary,
+        name='new_adults'),
 ]
 
 # nanny application review

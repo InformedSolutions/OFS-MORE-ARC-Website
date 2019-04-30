@@ -20,7 +20,7 @@
         {% csrf_token %}
         {{ formset_adult.management_form }}
 
-        {% for record, id, health_check_status, name, day, month, year, relationship, email, dbs_certificate_number, dbs_on_capita, dbs_is_recent, enhanced_check, on_update, lived_abroad, military_base, formsetadult, reasons_known_to_council_health_check in adult_lists %}
+        {% for record, id, health_check_status, name, day, month, year, relationship, email, dbs_certificate_number, dbs_on_capita, dbs_is_recent, enhanced_check, on_update, lived_abroad, military_base, formsetadult, current_illness_set, serious_illness_set, hospital_admission_set, reasons_known_to_council_health_check in adult_lists %}
 
         <table class="check-your-answers form-group">
             <thead>
@@ -273,6 +273,7 @@
             </tr>
 
             {# ================================== #}
+            {% if enhanced_check %}
             <tr>
                 <td style="word-wrap: break-word">
                     {{ formsetadult.capita_comments.label }}
@@ -323,6 +324,7 @@
                     </div>
                 </td>
             </tr>
+            {% endif %}
             {# ================================== #}
             {% if enhanced_check is not None %}
             <tr>

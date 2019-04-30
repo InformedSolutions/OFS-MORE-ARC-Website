@@ -5,6 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.forms import formset_factory
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
+from django.urls import reverse
 import logging
 from ...decorators import group_required, user_assigned_application
 from ...forms.adult_update_forms.adult_update_form import NewAdultForm
@@ -33,7 +34,7 @@ def new_adults_summary(request):
     application = HMGatewayActions().read('application', {'token_id': application_id_local})
 
     # Adult data
-    adults = HMGatewayActions().list('adult', {'token_id': application_id_local}).record
+    adults = HMGatewayActions().list('adult', params={'token_id': application_id_local}).record
     adult_record_list = []
     adult_id_list = []
     adult_health_check_status_list = []
@@ -86,14 +87,21 @@ def new_adults_summary(request):
         adult_lived_abroad.append(adult['lived_abroad'])
         adult_military_base.append(adult['military_base'])
         #health check fields
-        #if adult['currently_being_treated']:
-           # current_illnesses.append(adult)
-        # serious_illnesses_response = HMGatewayActions().list('adult_serious_illness',{'adult_id':adult_id})
-        # if serious_illnesses_response.status_code == 200:
-        #     serious_illnesses.append(serious_illnesses_response.record)
-        # hospital_admissions_response = HMGatewayActions().list('adult_hospital_admission', {'adult_id': adult_id})
-        # if hospital_admissions_response.status_code == 200:
-        #    hospital_admissions.append(hospital_admissions_response.record)
+        if adult['currently_being_treated']:
+           current_illnesses.append(adult["illness_details"])
+        else:
+            current_illnesses.append(None)
+
+        serious_illnesses_response = HMGatewayActions().list('adult_serious_illness',{'adult_id':adult_id})
+        if serious_illnesses_response.status_code == 200:
+            serious_illnesses.append(serious_illnesses_response.record)
+        else:
+            serious_illnesses.append(None)
+        hospital_admissions_response = HMGatewayActions().list('adult_hospital_admission', {'adult_id': adult_id})
+        if hospital_admissions_response.status_code == 200:
+            hospital_admissions.append(hospital_admissions_response.record)
+        else:
+            hospital_admissions.append(None)
         local_authorities.append(adult['reasons_known_to_council_health_check'])
 
         #previous_registration_querysets.append(
@@ -118,7 +126,7 @@ def new_adults_summary(request):
         adult_lists = list(zip(adult_record_list, adult_id_list, adult_health_check_status_list, adult_name_list, adult_birth_day_list,\
                       adult_birth_month_list, adult_birth_year_list, adult_relationship_list, adult_email_list,\
                       adult_dbs_cert_numbers, adult_dbs_on_capitas, adult_dbs_is_recents, adult_dbs_is_enhanceds,\
-                      adult_dbs_on_updates, adult_lived_abroad, adult_military_base, formset_adult, local_authorities))
+                      adult_dbs_on_updates, adult_lived_abroad, adult_military_base, formset_adult, current_illnesses, serious_illnesses, hospital_admissions, local_authorities))
                 #current_illnesses, serious_illnesses, hospital_admissions, adult_previous_name_lists_list, adult_previous_address_lists_list))
 
 
@@ -159,15 +167,15 @@ def new_adults_summary(request):
 
             for section in review_sections_to_process.values():
                 for adult_post_data, adult in zip(section['POST_data'], section['models']):
-                    adult_comments = request_to_comment(adult_id, '', adult_post_data)
+                    adult_comments = request_to_comment(adult_id, '', adult_post_data, application_id_local)
                     save_comments(request, adult_comments, application_id_local)
 
                     adult['cygnum_relationship_to_childminder'] = adult_post_data['cygnum_relationship']
                     HMGatewayActions().put('adult', params=adult)
 
                     #do we get a field to say if anything flagged?
-                  # if adult_comments:
-                   #    application = HMGatewayActions
+                    if adult_comments:
+                        HMGatewayActions().put('application', params={'token_id': application_id_local, 'arc_flagged': True})
 
 
             # # calculate start and end dates for each adult's current name
@@ -197,9 +205,9 @@ def new_adults_summary(request):
 
 
             log.debug("Redirect to summary")
-            redirect_link = '/adultsummary/'
+            redirect_link = reverse('new_adults')
             log.debug("Handling submissions for new adult review page")
-            return HttpResponseRedirect(settings.URL_PREFIX + redirect_link + '?id=' + application_id_local)
+            return HttpResponseRedirect(redirect_link + '?id=' + application_id_local)
 
         else:
 
@@ -209,7 +217,7 @@ def new_adults_summary(request):
                                    adult_birth_day_list, adult_birth_month_list, adult_birth_year_list,
                                    adult_relationship_list, adult_email_list, adult_dbs_cert_numbers,
                                    adult_dbs_on_capitas, adult_dbs_is_recents, adult_dbs_is_enhanceds,
-                                   adult_dbs_on_updates, adult_lived_abroad, adult_military_base, adult_formset,
+                                   adult_dbs_on_updates, adult_lived_abroad, adult_military_base, adult_formset, current_illnesses, serious_illnesses, hospital_admissions,
                                    local_authorities))
 
                                    #add these lists back in when possible - also add to for loop in tempalte

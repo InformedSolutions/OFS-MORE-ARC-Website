@@ -36,7 +36,7 @@ def new_adults_initial_population(adult_list):
 
     return initial_data
 
-def request_to_comment(table_key, table_name, user_request):
+def request_to_comment(table_key, table_name, user_request, application_id):
     """
     Function for creating a ARC review comment from a page submission
     :param request: The inbound HTTP request from which the user will be extracted
@@ -55,7 +55,6 @@ def request_to_comment(table_key, table_name, user_request):
                 if existing_comment_response.status_code == 200:
                     review_id = existing_comment_response.record[0]['review_id']
                     HMGatewayActions().delete('arc-comments',params={'review_id': review_id})
-
 
             # Grabs the existing comment if it exists, returns None otherwise
             # Checkboxes set to on when they are ticked, param will always be the name of a field
@@ -121,6 +120,7 @@ def redirect_selection(request, default):
     elif 'previous_registration_details' in request.POST.keys():
         redirect_link = request.POST['previous_registration_details']
     return redirect_link
+
 
 def log_arc_flag_action(application_id, arc_user, flagged_field, verbose_task_name):
     extra_data = {
