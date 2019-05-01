@@ -81,25 +81,27 @@ def new_adults_summary(request):
         adult_email_list.append(adult['email'])
         adult_dbs_is_enhanceds.append(adult['enhanced_check'])
         adult_dbs_cert_numbers.append(adult['dbs_certificate_number'] if adult['enhanced_check'] else None)
-        adult_dbs_on_capitas.append(adult['is_ofsted_dbs'] if adult['enhanced_check'] else None)
+        adult_dbs_on_capitas.append(adult['capita'] if adult['enhanced_check'] else None)
         adult_dbs_is_recents.append(adult['within_three_months'] if adult['enhanced_check'] else None)
         adult_dbs_on_updates.append(adult['on_update'] if not adult['within_three_months'] else None)
         adult_lived_abroad.append(adult['lived_abroad'])
         adult_military_base.append(adult['military_base'])
         #health check fields
-        if adult['currently_being_treated']:
-           current_illnesses.append(adult["illness_details"])
-        else:
-            current_illnesses.append(None)
 
-        serious_illnesses_response = HMGatewayActions().list('adult_serious_illness',{'adult_id':adult_id})
+        serious_illnesses_response = HMGatewayActions().list('serious-illness',{'adult_id':adult_id})
         if serious_illnesses_response.status_code == 200:
-            serious_illnesses.append(serious_illnesses_response.record)
+            record = serious_illness_response.record
+            record["start_date"] = datetime.date(record["start_year"], record["start_month"], record["start_day"])
+            record["end_date"] = datetime.date(record["end_year"], record["end_month"], record["end_day"])
+            serious_illnesses.append(record)
         else:
             serious_illnesses.append(None)
-        hospital_admissions_response = HMGatewayActions().list('adult_hospital_admission', {'adult_id': adult_id})
+        hospital_admissions_response = HMGatewayActions().list('hospital-admissions', {'adult_id': adult_id})
         if hospital_admissions_response.status_code == 200:
-            hospital_admissions.append(hospital_admissions_response.record)
+            record = hospital_admissions_response.record
+            record["start_date"] = datetime.date(record["start_year"], record["start_month"], record["start_day"])
+            record["end_date"] = datetime.date(record["end_year"], record["end_month"], record["end_day"])
+            hospital_admissions.append(record)
         else:
             hospital_admissions.append(None)
         local_authorities.append(adult['reasons_known_to_council_health_check'])
@@ -126,8 +128,8 @@ def new_adults_summary(request):
         adult_lists = list(zip(adult_record_list, adult_id_list, adult_health_check_status_list, adult_name_list, adult_birth_day_list,\
                       adult_birth_month_list, adult_birth_year_list, adult_relationship_list, adult_email_list,\
                       adult_dbs_cert_numbers, adult_dbs_on_capitas, adult_dbs_is_recents, adult_dbs_is_enhanceds,\
-                      adult_dbs_on_updates, adult_lived_abroad, adult_military_base, formset_adult, current_illnesses, serious_illnesses, hospital_admissions, local_authorities))
-                #current_illnesses, serious_illnesses, hospital_admissions, adult_previous_name_lists_list, adult_previous_address_lists_list))
+                      adult_dbs_on_updates, adult_lived_abroad, adult_military_base, formset_adult, serious_illnesses, hospital_admissions, local_authorities))
+                # adult_previous_name_lists_list, adult_previous_address_lists_list))
 
 
         variables = {

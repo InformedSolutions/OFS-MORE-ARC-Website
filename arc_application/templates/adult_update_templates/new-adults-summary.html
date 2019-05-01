@@ -20,7 +20,7 @@
         {% csrf_token %}
         {{ formset_adult.management_form }}
 
-        {% for record, id, health_check_status, name, day, month, year, relationship, email, dbs_certificate_number, dbs_on_capita, dbs_is_recent, enhanced_check, on_update, lived_abroad, military_base, formsetadult, current_illness_set, serious_illness_set, hospital_admission_set, reasons_known_to_council_health_check in adult_lists %}
+        {% for record, id, health_check_status, name, day, month, year, relationship, email, dbs_certificate_number, dbs_on_capita, dbs_is_recent, enhanced_check, on_update, lived_abroad, military_base, formsetadult, serious_illness_set, hospital_admission_set, reasons_known_to_council_health_check in adult_lists %}
 
         <table class="check-your-answers form-group">
             <thead>
@@ -568,15 +568,15 @@
             <tbody>
                 <tr>
                     <td class=summary-column> Are you currently being treated by your GP, another doctor or a hospital?</td>
-                    <td class=summary-column> {{ record.current_treatment|yesno:"Yes,No" }} </td>
+                    <td class=summary-column> {{ record.currently_being_treated|yesno:"Yes,No" }} </td>
                 </tr>
 
-                {% for record in current_illness_set %}
+                {% if record.currently_being_treated %}
                 <tr>
                     <td class=summary-column>Details of the illness or condition</td>
                     <td class=summary-column>{{ record.illness_details }}</td>
                 </tr>
-                {% endfor %}
+                {% endif %}
             </tbody>
         </table>
 
@@ -596,13 +596,13 @@
             <tbody>
                 <tr>
                     <td class=summary-column>Have you had any serious illnesses within the last five years?</td>
-                    <td class=summary-column>{{ record.serious_illness|yesno:"Yes,No" }}</td>
+                    <td class=summary-column>{{ record.has_serious_illness|yesno:"Yes,No" }}</td>
                 </tr>
-                {% if record.serious_illness %}
+                {% if record.has_serious_illness %}
                 {% for illness in serious_illness_set %}
                 <tr>
                     <td class=summary-column>{{ illness.description }}</td>
-                    <td class=summary-column>{{ illness.start_date|date:"d/m/Y" }} to {{ illness.end_date|date:"d/m/Y" }}</td>
+                    <td class=summary-column>{{ illness.start_date}} to {{ illness.end_date}}</td>
                 </tr>
                 {% endfor %}
                 {% endif %}
@@ -625,13 +625,13 @@
             <tbody>
                 <tr>
                     <td>Have you been admitted to hospital in the last 2 years?</td>
-                    <td>{{ record.hospital_admission|yesno:"Yes,No" }}</td>
+                    <td>{{ record.has_hospital_admissions|yesno:"Yes,No" }}</td>
                 </tr>
-                {% if record.hospital_admission %}
+                {% if record.has_hospital_admissions %}
                 {% for illness in hospital_admission_set %}
                 <tr>
                     <td>{{ illness.description }}</td>
-                    <td>{{ illness.start_date|date:"d/m/Y" }} to {{ illness.end_date|date:"d/m/Y" }}</td>
+                    <td>{{ illness.start_date}} to {{ illness.end_date}}</td>
                 </tr>
                 {% endfor %}
                 {% endif %}

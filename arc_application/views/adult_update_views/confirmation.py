@@ -76,10 +76,9 @@ def review(request):
             # # returned_email(email, first_name, app_ref, link)
 
             # TODO
-            # if Arc.objects.filter(pk=application_id_local):
-            #     arc = Arc.objects.get(pk=application_id_local)
-            #     app = Application.objects.get(pk=application_id_local)
-            #     app.save()
+            application_record['application_status'] = "FURTHER_INFORMATION"
+            HMGatewayActions().put('application', params=application_record)
+
 
             release_application(request, application_id_local, 'FURTHER_INFORMATION')
 

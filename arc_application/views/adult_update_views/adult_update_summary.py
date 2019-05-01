@@ -119,7 +119,7 @@ def load_json(application_id_local):
 
         summary_table += [
             {"name": "Enhanced DBS check for home-based childcare?",
-             "value": record['enhanced_check'],
+             "value": "Yes" if record['enhanced_check'] else "No",
              "field": 'enhanced_check'}
         ]
 
@@ -174,9 +174,12 @@ def load_json(application_id_local):
             response = HMGatewayActions().list("serious-illness", params={'adult_id': adult_id})
             if response.status_code == 200:
                 for serious_illness in response.record:
+                    start_date = datetime.date(serious_illness["start_year"], serious_illness["start_month"],
+                                               serious_illness["start_day"])
+                    end_date = datetime.date(serious_illness["end_year"], serious_illness["end_month"], serious_illness["end_day"])
                     serious_illness_table.append(
                     {"name": serious_illness["description"],
-                    "value": serious_illness["start_date"] + " to " + serious_illness["end_date"]}
+                    "value": start_date + " to " + end_date}
             )
 
         hospital_admission_table = [
@@ -190,9 +193,11 @@ def load_json(application_id_local):
             response = HMGatewayActions().list("hospital-admissions", params={'adult_id': adult_id})
             if response.status_code == 200:
                 for admission in response.record:
+                    start_date = datetime.date(admission["start_year"], admission["start_month"], admission["start_day"])
+                    end_date = datetime.date(admission["end_year"], admission["end_month"], admission["end_day"])
                     hospital_admission_table.append(
                         {"name": admission["description"],
-                         "value": admission["start_date"] + " to " + admission["end_date"]}
+                         "value": start_date + " to " + end_date}
                     )
 
         table_list.append(current_treatment_table)
