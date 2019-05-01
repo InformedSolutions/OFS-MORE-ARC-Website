@@ -385,7 +385,6 @@
             {% endif %}
 
             {# ================================== #}
-            {% if record.known_to_council is not None %}
             <tr>
                 <td style="word-wrap: break-word">
                     Known to council social Services in regards to their own children?
@@ -397,7 +396,7 @@
                     {{ formsetadult.known_to_council_declare }}
                 </td>
             </tr>
-            {% endif %}
+
 
             {% if record.known_to_council is True %}
             <tr>

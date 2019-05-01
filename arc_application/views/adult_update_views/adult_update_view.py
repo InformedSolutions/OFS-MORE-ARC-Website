@@ -176,6 +176,10 @@ def new_adults_summary(request):
                     #do we get a field to say if anything flagged?
                     if adult_comments:
                         HMGatewayActions().put('application', params={'token_id': application_id_local, 'arc_flagged': True})
+                    else:
+                        HMGatewayActions().put('application',
+                                               params={'token_id': application_id_local, 'arc_flagged': False})
+
 
 
             # # calculate start and end dates for each adult's current name

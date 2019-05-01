@@ -26,11 +26,11 @@ def arc_summary(request):
     elif request.method == 'POST':
         application_id_local = request.POST["id"]
         status = Arc.objects.get(pk=application_id_local)
-        status.declaration_review = 'COMPLETED'
+        status.adult_update_review = 'COMPLETED'
         status.save()
         log.debug("Handling submissions for arc summary page")
         return HttpResponseRedirect(
-            reverse('review') + '?id=' + application_id_local
+            reverse('adults-confirmation') + '?id=' + application_id_local
         )
 
 def get_application_summary_variables(application_id):
@@ -43,15 +43,16 @@ def get_application_summary_variables(application_id):
     (and similarly EYC form contents).
     """
 
-    application = HMGatewayActions().read('application', params={'token_id': application_id})
+    dpa_auth = HMGatewayActions().read('dpa-auth', params={'token_id': application_id})
 
     json = load_json(application_id)
 
-    #application_reference = application['application_reference']
+    ey_number = dpa_auth.record['URN']
 
     variables = {
         'json': json,
         'application_id': application_id,
+        'ey_number': ey_number
     }
 
     return variables
@@ -127,6 +128,19 @@ def load_json(application_id_local):
                 {"name": "On the update service?",
                  "value": record['on_update'],
                  'field': "on_update"}
+            ]
+
+        summary_table += [
+            {"name": "Known to council social Services in regards to their own children?",
+             "value": "Yes" if record['known_to_council'] else "No",
+             'field': "known_to_council"}
+        ]
+
+        if record['known_to_council']:
+            summary_table += [
+                {"name": "Tell us why",
+                 "value": record['reasons_known_to_council_health_check'],
+                 'field': "reasons_known_to_council_health_check"}
             ]
 
 
