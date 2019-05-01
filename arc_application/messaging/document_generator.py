@@ -102,3 +102,15 @@ class DocumentGenerator:
         base64_string = str(base64.b64encode(result.content).decode("utf-8"))
         log.debug("Generating PDF and base64 representation for Nanny Application Summary")
         return base64_string
+
+    @staticmethod
+    def get_additional_adult_application_summary(application_id, adult_id):
+        resp = HttpResponse(content_type='application/pdf')
+
+        # Build application code
+        variables = get_application_summary_variables
+
+        result = generate_pdf('childminder-pdf-summary.html', file_object=resp, context=variables)
+        base64_string = str(base64.b64encode(result.content).decode("utf-8"))
+        log.debug("Generating PDF and base64 representation for Childminder Adult Details Summary")
+        return base64_string

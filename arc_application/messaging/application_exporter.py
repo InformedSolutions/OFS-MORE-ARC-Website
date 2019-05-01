@@ -10,12 +10,13 @@ from ..models import Application, ApplicantName, ApplicantHomeAddress, Applicant
 
 from .document_generator import DocumentGenerator
 
-from ..services.db_gateways import NannyGatewayActions, IdentityGatewayActions
+from ..services.db_gateways import NannyGatewayActions, IdentityGatewayActions, HMGatewayActions
 
 from . import SQSHandler
 
 cm_application_sqs_handler = SQSHandler(settings.CM_APPLICATION_QUEUE_NAME)
 na_application_sqs_handler = SQSHandler(settings.NA_APPLICATION_QUEUE_NAME)
+additional_adult_application_sqs_handler = SQSHandler(settings.ADDITIONAL_ADULT_APPLICATION_QUEUE_NAME)
 
 
 class ApplicationExporter:
@@ -213,3 +214,88 @@ class ApplicationExporter:
         export['documents'] = json.dumps(documents)
 
         na_application_sqs_handler.send_message(export)
+        export = {}
+
+        application = Application.objects.filter(application_id=application_id)
+        export['application'] = serializers.serialize('json', list(application))
+
+        adults_in_home = AdultInHome.objects.filter(application_id=application_id).order_by('adult')
+        adults_in_home_export = []
+        export['adults_in_home'] = serializers.serialize('json', list(adults_in_home))
+
+        # Iterate adults in home, appending prior names and addresses
+
+        for adult_in_home in adults_in_home:
+            previous_name = PreviousName.objects.filter(person_id=adult_in_home.pk)
+            previous_address = PreviousAddress.objects.filter(person_id=adult_in_home.pk)
+            serious_illness = HealthCheckSerious.objects.filter(person_id=adult_in_home.pk)
+            hospital_admissions = HealthCheckHospital.objects.filter(person_id=adult_in_home.pk)
+            current_illnesses = HealthCheckCurrent.objects.filter(person_id=adult_in_home.pk)
+            previous_registrations = OtherPersonPreviousRegistrationDetails.objects.filter(person_id_id=adult_in_home.pk)
+
+            adults_in_home_export.append({
+                'adult': adult_in_home.adult,
+                'previous_names': serializers.serialize('json', list(previous_name)),
+                'previous_address': serializers.serialize('json', list(previous_address)),
+                'previous_registrations': serializers.serialize('json', list(previous_registrations)),
+                'serious_illness': serializers.serialize('json', list(serious_illness)),
+                'hospital_admissions': serializers.serialize('json', list(hospital_admissions)),
+                'current_illnesses': serializers.serialize('json', list(current_illnesses))
+            })
+
+        export['additional_adult_details'] = json.dumps(adults_in_home_export)
+
+        additional_adult_application_sqs_handler.send_message(export)
+
+    @staticmethod
+    def export_additional_household_member_application(application_id):
+
+        export = {}
+
+        # Fetch adults
+        #new_adults = ... get adults from gateway
+
+        new_adults = HMGatewayActions().list('adult', params={'token_id': application_id}).record
+
+        new_adults = []
+        new_adults_export = []
+        documents = []
+
+        # This needs to fetch in the same way nannies currently does
+        for adult_in_home in new_adults:
+            previous_name = PreviousName.objects.filter(person_id=adult_in_home.pk)
+            previous_address = PreviousAddress.objects.filter(person_id=adult_in_home.pk)
+            serious_illness = HealthCheckSerious.objects.filter(person_id=adult_in_home.pk)
+            hospital_admissions = HealthCheckHospital.objects.filter(person_id=adult_in_home.pk)
+            current_illnesses = HealthCheckCurrent.objects.filter(person_id=adult_in_home.pk)
+            previous_registrations = OtherPersonPreviousRegistrationDetails.objects.filter(person_id_id=adult_in_home.pk)
+
+            new_adults_export.append({
+                'adult': adult_in_home.adult,
+                'previous_names': serializers.serialize('json', list(previous_name)),
+                'previous_address': serializers.serialize('json', list(previous_address)),
+                'previous_registrations': serializers.serialize('json', list(previous_registrations)),
+                'serious_illness': serializers.serialize('json', list(serious_illness)),
+                'hospital_admissions': serializers.serialize('json', list(hospital_admissions)),
+                'current_illnesses': serializers.serialize('json', list(current_illnesses))
+            })
+
+        export['additional_adult_details'] = json.dumps(new_adults_export)
+
+        new_adult_documents = []
+
+        for adult in new_adults:
+            base64_string = DocumentGenerator.get_adult_details_summary(application_id, adult.adult_id)
+
+            adult_document_object = {
+                "adult_id": str(adult.adult_id),
+                "document": base64_string,
+            }
+
+            new_adult_documents.append(adult_document_object)
+
+        documents['EY2'] = new_adult_documents
+
+        export['documents'] = json.dumps(documents)
+
+        additional_adult_application_sqs_handler.send_message(export)

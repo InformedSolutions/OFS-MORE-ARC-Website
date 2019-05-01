@@ -4,6 +4,7 @@ import os
 from unittest.mock import MagicMock
 
 import requests
+from django.conf import settings
 
 logger = logging.getLogger()
 
@@ -187,4 +188,4 @@ class HMGatewayActions(DBGatewayActions):
         'timeline-log': 'object_id'
     }
 
-    target_url_prefix = os.environ.get("APP_HM_GATEWAY_URL") + '/api/v1/'
+    target_url_prefix = settings.HM_GATEWAY_URL + '/api/v1/'
