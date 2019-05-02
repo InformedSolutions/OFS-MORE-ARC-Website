@@ -16,7 +16,7 @@ from . import SQSHandler
 
 cm_application_sqs_handler = SQSHandler(settings.CM_APPLICATION_QUEUE_NAME)
 na_application_sqs_handler = SQSHandler(settings.NA_APPLICATION_QUEUE_NAME)
-additional_adult_application_sqs_handler = SQSHandler(settings.ADDITIONAL_ADULT_APPLICATION_QUEUE_NAME)
+adult_update_application_sqs_handler = SQSHandler(settings.ADDITIONAL_ADULT_APPLICATION_QUEUE_NAME)
 
 
 class ApplicationExporter:
@@ -214,88 +214,46 @@ class ApplicationExporter:
         export['documents'] = json.dumps(documents)
 
         na_application_sqs_handler.send_message(export)
-        export = {}
-
-        application = Application.objects.filter(application_id=application_id)
-        export['application'] = serializers.serialize('json', list(application))
-
-        adults_in_home = AdultInHome.objects.filter(application_id=application_id).order_by('adult')
-        adults_in_home_export = []
-        export['adults_in_home'] = serializers.serialize('json', list(adults_in_home))
-
-        # Iterate adults in home, appending prior names and addresses
-
-        for adult_in_home in adults_in_home:
-            previous_name = PreviousName.objects.filter(person_id=adult_in_home.pk)
-            previous_address = PreviousAddress.objects.filter(person_id=adult_in_home.pk)
-            serious_illness = HealthCheckSerious.objects.filter(person_id=adult_in_home.pk)
-            hospital_admissions = HealthCheckHospital.objects.filter(person_id=adult_in_home.pk)
-            current_illnesses = HealthCheckCurrent.objects.filter(person_id=adult_in_home.pk)
-            previous_registrations = OtherPersonPreviousRegistrationDetails.objects.filter(person_id_id=adult_in_home.pk)
-
-            adults_in_home_export.append({
-                'adult': adult_in_home.adult,
-                'previous_names': serializers.serialize('json', list(previous_name)),
-                'previous_address': serializers.serialize('json', list(previous_address)),
-                'previous_registrations': serializers.serialize('json', list(previous_registrations)),
-                'serious_illness': serializers.serialize('json', list(serious_illness)),
-                'hospital_admissions': serializers.serialize('json', list(hospital_admissions)),
-                'current_illnesses': serializers.serialize('json', list(current_illnesses))
-            })
-
-        export['additional_adult_details'] = json.dumps(adults_in_home_export)
-
-        additional_adult_application_sqs_handler.send_message(export)
 
     @staticmethod
-    def export_additional_household_member_application(application_id):
-
+    def export_adult_update_application(application_id, adult_id):
         export = {}
+        adult_update_export = {}
 
-        # Fetch adults
-        #new_adults = ... get adults from gateway
+        adult_record = HMGatewayActions().read('adult', params={'adult_id': adult_id}).record
 
-        new_adults = HMGatewayActions().list('adult', params={'token_id': application_id}).record
+        adult_update_export['adult'] = adult_record
+        adult_update_export['previous_address'] = None
+        adult_update_export['previous_names'] = None
+        adult_update_export['previous_registrations'] = None
 
-        new_adults = []
-        new_adults_export = []
-        documents = []
+        if adult_record["currently_being_treated"]:
+            current_illnesses = adult_record["illness_details"]
+        else:
+            current_illnesses = False
 
-        # This needs to fetch in the same way nannies currently does
-        for adult_in_home in new_adults:
-            previous_name = PreviousName.objects.filter(person_id=adult_in_home.pk)
-            previous_address = PreviousAddress.objects.filter(person_id=adult_in_home.pk)
-            serious_illness = HealthCheckSerious.objects.filter(person_id=adult_in_home.pk)
-            hospital_admissions = HealthCheckHospital.objects.filter(person_id=adult_in_home.pk)
-            current_illnesses = HealthCheckCurrent.objects.filter(person_id=adult_in_home.pk)
-            previous_registrations = OtherPersonPreviousRegistrationDetails.objects.filter(person_id_id=adult_in_home.pk)
+        adult_update_export['current_illnesses'] = current_illnesses
 
-            new_adults_export.append({
-                'adult': adult_in_home.adult,
-                'previous_names': serializers.serialize('json', list(previous_name)),
-                'previous_address': serializers.serialize('json', list(previous_address)),
-                'previous_registrations': serializers.serialize('json', list(previous_registrations)),
-                'serious_illness': serializers.serialize('json', list(serious_illness)),
-                'hospital_admissions': serializers.serialize('json', list(hospital_admissions)),
-                'current_illnesses': serializers.serialize('json', list(current_illnesses))
-            })
+        if adult_record["has_serious_illness"]:
+            serious_illnesses = HMGatewayActions().list("serious-illness", params={'adult_id': adult_id}).record
+        else:
+            serious_illnesses = {}
 
-        export['additional_adult_details'] = json.dumps(new_adults_export)
+        adult_update_export['serious_illness'] = serious_illnesses
 
-        new_adult_documents = []
+        if adult_record["has_hospital_admissions"]:
+            hospital_admissions = HMGatewayActions().list("hospital-admissions", params={'adult_id': adult_id}).record
+        else:
+            hospital_admissions = {}
 
-        for adult in new_adults:
-            base64_string = DocumentGenerator.get_adult_update_application_summary(application_id, adult.adult_id)
+        adult_update_export['hospital_admissions'] = hospital_admissions
 
-            adult_document_object = {
-                "adult_id": str(adult.adult_id),
-                "document": base64_string,
-            }
+        adult_document_object = {
+            "adult_id": str(adult_id),
+            "document": DocumentGenerator.get_adult_update_application_summary(application_id, adult_id),
+        }
 
-            new_adult_documents.append(adult_document_object)
+        export['adult_update_details'] = json.dumps(adult_update_export)
+        export['documents'] = json.dumps({'EY2': adult_document_object})
 
-        documents['EY2'] = new_adult_documents
-
-        export['documents'] = json.dumps(documents)
-
-        additional_adult_application_sqs_handler.send_message(export)
+        adult_update_application_sqs_handler.send_message(export)
