@@ -105,7 +105,7 @@ class DocumentGenerator:
         return base64_string
 
     @staticmethod
-    def get_additional_adult_application_summary(application_id, adult_id):
+    def get_adult_update_application_summary(application_id, adult_id):
         """
         Generates a full adult update summary in a PDF format that has been base64 encoded
         """
