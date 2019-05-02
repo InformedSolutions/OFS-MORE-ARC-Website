@@ -110,14 +110,17 @@ def new_adults_summary(request):
             hospital_admissions.append(None)
         local_authorities.append(adult['reasons_known_to_council_health_check'])
 
-        #previous_registration_querysets.append(
-         #   OtherPersonPreviousRegistrationDetails.objects.filter(person_id_id=adult.pk))
+        previous_registration_response = HMGatewayActions().list('previous-registration', {'adult_id': adult_id})
+        if previous_registration_response.status_code == 200:
+            previous_registration_record = previous_registration_response.record
+            previous_registration_querysets.append(previous_registration_record)
+
         #adult_previous_name_lists_list.append(
          #   PreviousName.objects.filter(person_id=adult.pk, other_person_type='ADULT').order_by('order'))
         #adult_previous_address_lists_list.append(
          #   PreviousAddress.objects.filter(person_id=adult.pk, person_type='ADULT'))
 
-    #previous_registration_lists = list(zip(adult_id_list, adult_name_list, previous_registration_querysets))
+    previous_registration_lists = list(zip(adult_id_list, adult_name_list, previous_registration_querysets))
 
     if request.method == 'GET':
         # Defines the static form at the top of the page
@@ -132,7 +135,7 @@ def new_adults_summary(request):
         adult_lists = list(zip(adult_record_list, adult_id_list, adult_health_check_status_list, adult_name_list, adult_birth_day_list,\
                       adult_birth_month_list, adult_birth_year_list, adult_relationship_list, adult_email_list,\
                       adult_dbs_cert_numbers, adult_dbs_on_capitas, adult_dbs_is_recents, adult_dbs_is_enhanceds,\
-                      adult_dbs_on_updates, adult_lived_abroad, adult_military_base, formset_adult, serious_illnesses, hospital_admissions, local_authorities))
+                      adult_dbs_on_updates, adult_lived_abroad, adult_military_base, formset_adult, serious_illnesses, hospital_admissions, local_authorities, previous_registration_lists))
                 # adult_previous_name_lists_list, adult_previous_address_lists_list))
 
 
@@ -242,9 +245,9 @@ def new_adults_summary(request):
             variables = {
                 'formset_adult': adult_formset,
                 'application_id': application_id_local,
-                'adult_lists': adult_lists}
-        #         #'previous_registration_lists': previous_registration_lists,
-        #
+                'adult_lists': adult_lists,
+                'previous_registration_lists': previous_registration_lists}
+
             log.debug("Render new adult review page")
             return render(request, 'adult_update_templates/new-adults-summary.html', variables)
 

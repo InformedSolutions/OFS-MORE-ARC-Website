@@ -206,6 +206,9 @@ def load_json(application_id_local):
                          "value": admission["start_date"] + " to " + admission["end_date"]}
                     )
 
+
+
+
         table_list.append(current_treatment_table)
         table_list.append(serious_illness_table)
         table_list.append(hospital_admission_table)
