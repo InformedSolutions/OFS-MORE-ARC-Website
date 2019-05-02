@@ -1,3 +1,4 @@
+from datetime import datetime
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
@@ -174,12 +175,10 @@ def load_json(application_id_local):
             response = HMGatewayActions().list("serious-illness", params={'adult_id': adult_id})
             if response.status_code == 200:
                 for serious_illness in response.record:
-                    serious_illness["start-date"] = datetime.date(serious_illness['start_year'], serious_illness['start_month'],
-                                                            serious_illness['start_day']).strftime(
-                        '%d/%m/%Y')
-                    serious_illness["end-date"] = datetime.date(serious_illness['end_year'], serious_illness['end_month'],
-                                                          serious_illness['end_day']).strftime(
-                        '%d/%m/%Y')
+                    serious_illness["start_date"] = datetime.date(serious_illness['start_date'], '%Y-%m-%d').strftime(
+            '%d/%m/%Y')
+                    serious_illness["end_date"] = datetime.strptime(serious_illness['end_date'], '%Y-%m-%d').strftime(
+            '%d/%m/%Y')
                     serious_illness_table.append(
                     {"name": serious_illness["description"],
                     "value": serious_illness["start_date"] + " to " + serious_illness["end_date"]}
@@ -196,11 +195,10 @@ def load_json(application_id_local):
             response = HMGatewayActions().list("hospital-admissions", params={'adult_id': adult_id})
             if response.status_code == 200:
                 for admission in response.record:
-                    admission["start-date"] = datetime.date(admission['start_year'], admission['start_month'], admission['start_day']).strftime(
-                    '%d/%m/%Y')
-                    admission["end-date"] = datetime.date(admission['end_year'], admission['end_month'],
-                                                            admission['end_day']).strftime(
-                        '%d/%m/%Y')
+                    admission["start_date"] = datetime.strptime(admission['start_date'], '%Y-%m-%d').strftime(
+            '%d/%m/%Y')
+                    admission["end_date"] = datetime.strptime(admission['end_date'], '%Y-%m-%d').strftime(
+            '%d/%m/%Y')
                     hospital_admission_table.append(
                         {"name": admission["description"],
                          "value": admission["start_date"] + " to " + admission["end_date"]}

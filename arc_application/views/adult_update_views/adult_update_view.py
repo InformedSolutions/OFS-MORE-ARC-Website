@@ -1,5 +1,4 @@
-import datetime
-
+from datetime import datetime
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.forms import formset_factory
@@ -91,19 +90,19 @@ def new_adults_summary(request):
         serious_illnesses_response = HMGatewayActions().list('serious-illness',{'adult_id':adult_id})
         if serious_illnesses_response.status_code == 200:
             for record in serious_illnesses_response.record:
-                record["start_date"] = datetime.date(record["start_year"], record["start_month"], record["start_day"]).strftime(
-                '%d/%m/%Y')
-                record["end_date"] = datetime.date(record["end_year"], record["end_month"], record["end_day"]).strftime(
-                '%d/%m/%Y')
+                record["start_date"] = datetime.strptime(record['start_date'], '%Y-%m-%d').strftime(
+            '%d/%m/%Y')
+                record["end_date"] = datetime.strptime(record['end_date'], '%Y-%m-%d').strftime(
+            '%d/%m/%Y')
             serious_illnesses.append(serious_illnesses_response.record)
         else:
             serious_illnesses.append(None)
         hospital_admissions_response = HMGatewayActions().list('hospital-admissions', {'adult_id': adult_id})
         if hospital_admissions_response.status_code == 200:
             for record in hospital_admissions_response.record:
-                record["start_date"] = datetime.date(record["start_year"], record["start_month"], record["start_day"]).strftime(
+                record["start_date"] = datetime.strptime(record['start_date'], '%Y-%m-%d').strftime(
             '%d/%m/%Y')
-                record["end_date"] = datetime.date(record["end_year"], record["end_month"], record["end_day"]).strftime(
+                record["end_date"] = datetime.strptime(record['end_date'], '%Y-%m-%d').strftime(
             '%d/%m/%Y')
             hospital_admissions.append(hospital_admissions_response.record)
         else:
