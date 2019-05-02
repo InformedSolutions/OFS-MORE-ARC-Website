@@ -285,7 +285,7 @@ class ApplicationExporter:
         new_adult_documents = []
 
         for adult in new_adults:
-            base64_string = DocumentGenerator.get_adult_details_summary(application_id, adult.adult_id)
+            base64_string = DocumentGenerator.get_adult_update_application_summary(application_id, adult.adult_id)
 
             adult_document_object = {
                 "adult_id": str(adult.adult_id),
