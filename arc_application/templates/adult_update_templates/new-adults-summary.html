@@ -640,7 +640,7 @@
 
         <br>
 
-        <a href="{% url 'adults-previous-registration' %}?id={{ application_id }}&person_id={{id}}" class="button button-secondary">Add previous registration details</a>
+        <a href="{% url 'adults-previous-registration' %}?id={{id}}" class="button button-secondary">Add previous registration details</a>
         {% endfor %}
 
         {% for id, name, previous_names, previous_addresses in adult_ebulk_lists %}

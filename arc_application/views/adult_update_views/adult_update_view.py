@@ -16,9 +16,9 @@ from ...models import Arc
 # Initiate logging
 log = logging.getLogger('')
 
-@login_required
-@group_required(settings.ARC_GROUP)
-@user_assigned_application
+#@login_required
+#@group_required(settings.ARC_GROUP)
+#@user_assigned_application
 def new_adults_summary(request):
     """
     Method returning the template for the People in your home: summary page (for a given application)

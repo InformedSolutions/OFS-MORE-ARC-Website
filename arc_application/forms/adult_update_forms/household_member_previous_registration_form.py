@@ -7,7 +7,7 @@ from govuk_forms.widgets import InlineRadioSelect, NumberInput
 from ...widgets import ConditionalPostInlineRadioSelect
 
 
-class HMPreviousRegistrationDetailsForm(GOVUKForm):
+class AdultPreviousRegistrationDetailsForm(GOVUKForm):
     """
     GOV.UK form for adding details of previous registration
     """

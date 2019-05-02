@@ -15,12 +15,10 @@
     {% csrf_token %}
     {{ form.as_div }}
     <input type="submit" class="button" value="Save and continue">
-    <input type="hidden" value="{{application_id}}" name="id"/>
-    {% if person_id %}
-        <input type="hidden" value="{{person_id}}" name="person_id">
+    <input type="hidden" value="{{token_id}}" name="id"/>
+    {% if adult_id %}
+        <input type="hidden" value="{{adult_id}}" name="adult_id">
     {% endif %}
 </form>
-
-{% include 'nanny_templates/nanny_return_to_list.html' %}
 
 {% endblock %}
