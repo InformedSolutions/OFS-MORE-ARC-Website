@@ -186,7 +186,7 @@ def load_json(application_id_local):
         table_list.append(hospital_admission_table)
 
 
-        return table_list
+    return table_list
 
 def add_comment(id, field, row):
     comment_response = HMGatewayActions().list('arc-comments', params={'table_pk':id, 'field_name':field})
