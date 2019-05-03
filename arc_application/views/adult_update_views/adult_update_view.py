@@ -69,7 +69,6 @@ def new_adults_summary(request):
             name = adult['first_name'] + ' ' + adult['last_name']
 
         adult_id = adult['adult_id']
-        adult_id = "978dd169-7ba5-470a-8840-82ee635379ea"
 
         adult_record_list.append(adult)
         adult_id_list.append(adult['adult_id'])
