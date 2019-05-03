@@ -10,6 +10,7 @@ from timeline_logger.models import TimelineLog
 from ...decorators import group_required, user_assigned_application
 from ...models import *
 from ...services.db_gateways import HMGatewayActions
+from .confirmation import review
 
 # Initiate logging
 log = logging.getLogger('')
@@ -30,9 +31,8 @@ def arc_summary(request):
         status.adult_update_review = 'COMPLETED'
         status.save()
         log.debug("Handling submissions for arc summary page")
-        return HttpResponseRedirect(
-            reverse('adults-confirmation') + '?id=' + application_id_local
-        )
+        return review(request, application_id_local)
+
 
 def get_application_summary_variables(application_id):
     """
@@ -44,7 +44,9 @@ def get_application_summary_variables(application_id):
     (and similarly EYC form contents).
     """
 
-    dpa_auth = HMGatewayActions().read('dpa-auth', params={'token_id': application_id})
+    adult = HMGatewayActions().read('adult', params={'adult_id': application_id})
+    token_id = adult.record['token_id']
+    dpa_auth = HMGatewayActions().read('dpa-auth', params={'token_id': token_id})
 
     json = load_json(application_id)
 
@@ -172,9 +174,9 @@ def load_json(adult_id):
         response = HMGatewayActions().list("serious-illness", params={'adult_id': adult_id})
         if response.status_code == 200:
             for serious_illness in response.record:
-                serious_illness["start_date"] = datetime.datetime.strptime(record['start_date'], '%Y-%m-%d').strftime(
+                serious_illness["start_date"] = datetime.datetime.strptime(serious_illness['start_date'], '%Y-%m-%d').strftime(
             '%d/%m/%Y')
-                serious_illness["end_date"] = datetime.datetime.strptime(record['end_date'], '%Y-%m-%d').strftime(
+                serious_illness["end_date"] = datetime.datetime.strptime(serious_illness['end_date'], '%Y-%m-%d').strftime(
             '%d/%m/%Y')
                 serious_illness_table.append(
                     {"name": serious_illness["description"],

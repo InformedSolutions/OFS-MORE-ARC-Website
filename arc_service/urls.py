@@ -37,7 +37,7 @@ from arc_application.views import upload_capita_dbs
 from arc_application.views.applications_summary import ApplicationsSummaryView
 from arc_application.views.adult_update_views.adult_update_view import new_adults_summary
 from arc_application.views.adult_update_views.adult_update_summary import arc_summary as adult_arc_summary
-from arc_application.views.adult_update_views.confirmation import review as adult_review
+from arc_application.views.adult_update_views.confirmation import returned_adult, accepted_adult
 
 # Nanny Views
 
@@ -117,9 +117,9 @@ urlpatterns = [
         name='new_adults_summary'),
     url(r'^review/new-adult-summary', adult_arc_summary,
         name='new_adults'),
-    url(r'^review/approved', adult_review,
+    url(r'^review/approved', accepted_adult,
         name='adults-confirmation'),
-    url(r'^review/returned', adult_review,
+    url(r'^review/returned', returned_adult,
         name='adults-returned'),
 ]
 
