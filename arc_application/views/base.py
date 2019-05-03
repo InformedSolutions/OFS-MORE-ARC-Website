@@ -164,6 +164,13 @@ def release_application(request, application_id, status):
             app['declarations_status'] = 'NOT_STARTED'
         elif status == 'ACCEPTED' and not APP_ORIGINAL['application_status'] == 'ACCEPTED':
             app['date_accepted'] = datetime.now()
+
+            # Import used here explicitly to prevent circular import
+            from ..messaging import ApplicationExporter
+
+            # TODO: Add call to export function.
+            # ApplicationExporter.export_adult_update_application(application_id, adult_id)
+
         elif status == 'ARC REVIEW':
             app['application_status'] = 'SUBMITTED'
 
