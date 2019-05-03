@@ -117,8 +117,10 @@ urlpatterns = [
         name='new_adults_summary'),
     url(r'^review/new-adult-summary', adult_arc_summary,
         name='new_adults'),
-    url(r'^review/confirmation', adult_review,
+    url(r'^review/approved', adult_review,
         name='adults-confirmation'),
+    url(r'^review/returned', adult_review,
+        name='adults-returned'),
 ]
 
 # nanny application review

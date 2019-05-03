@@ -94,12 +94,12 @@ class GenericApplicationHandler:
     def __get_adult_update_table_data(self, application_id):
         row_data = dict()
 
-        application_record = HMGatewayActions().read('application',
-                                                        params={'token_id': str(application_id)}).record
-        row_data['application_id'] = application_record['token_id']
-        row_data['date_submitted'] = datetime.strptime(application_record['date_submitted'][:10], '%Y-%m-%d').strftime(
+        adult_record = HMGatewayActions().read('adult',
+                                                        params={'adult_id': str(application_id)}).record
+        row_data['application_id'] = adult_record['adult_id']
+        row_data['date_submitted'] = datetime.strptime(adult_record['date_submitted'][:10], '%Y-%m-%d').strftime(
             '%d/%m/%Y')
-        row_data['last_accessed'] = datetime.strptime(application_record['date_updated'][:10], '%Y-%m-%d').strftime(
+        row_data['last_accessed'] = datetime.strptime(adult_record['date_updated'][:10], '%Y-%m-%d').strftime(
             '%d/%m/%Y')
         row_data['app_type'] = 'Adult update'
 
@@ -253,12 +253,12 @@ class AdultUpdateApplicationHandler(GenericApplicationHandler):
         else:
             raise ObjectDoesNotExist('No applications available.')
 
-    def _assign_app_to_user(self, application_id):
+    def _assign_app_to_user(self, adult_id):
         app_record = HMGatewayActions().read('adult', params={'adult_id': adult_id}).record
         app_record['adult_status'] = 'ARC_REVIEW'
         HMGatewayActions().put('adult', params=app_record)
 
-        if not Arc.objects.filter(pk=application_id).exists():
+        if not Arc.objects.filter(pk=adult_id).exists():
             app_review = Arc.objects.create(application_id=adult_id)
 
             for field in self._list_tasks_for_review():
@@ -270,7 +270,7 @@ class AdultUpdateApplicationHandler(GenericApplicationHandler):
             app_review.save()
 
         else:
-            arc_user = Arc.objects.get(pk=application_id)
+            arc_user = Arc.objects.get(pk=adult_id)
             arc_user.last_accessed = app_record['date_updated']
             arc_user.user_id = self.arc_user.id
             arc_user.save()
