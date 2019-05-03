@@ -1,10 +1,16 @@
 import datetime
+import time
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
-from ...services.db_gateways import HMGatewayActions
+
 from django.http import HttpResponseRedirect
+
+from application.services.notify import send_email
+from ...magic_link import generate_magic_link
+from ...services.db_gateways import HMGatewayActions, IdentityGatewayActions
+
 from ...models.arc import Arc
 from ...views.base import release_application
 from django.urls import reverse
@@ -19,22 +25,14 @@ def review(request, application_id_local):
     :return: an HttpResponse object with the rendered Your App Review Confirmation template
     """
 
-    adult_record = HMGatewayActions().read('adult', params={'adult_id': application_id_local}).record
-    #TODO email to applicant
+    application_id_local = request.GET["id"]]
+    identity_gateway_response = HMGatewayActions().read('user', params={'application_id': application_id_local})
 
-    # account = UserDetails.objects.get(application_id=application)
-    # login_id = account.pk
-    # first_name = ''
-    #
-    # # Get Application's related email and first_name to send an email.
-    # if UserDetails.objects.filter(login_id=login_id).exists():
-    #     user_details = UserDetails.objects.get(login_id=login_id)
-    #     email = user_details.email
-    #
-    #     if ApplicantPersonalDetails.objects.filter(application_id=application_id_local).exists():
-    #         personal_details = ApplicantPersonalDetails.objects.get(application_id=application_id_local)
-    #         applicant_name = ApplicantName.objects.get(personal_detail_id=personal_details.personal_detail_id)
-    #         first_name = applicant_name.first_name
+    if identity_gateway_response.status_code == 200:
+        identity_record = identity_gateway_response.record
+        email = identity_record['email']
+    first_name = 'An applicant'
+
 
     status = Arc.objects.get(pk=application_id_local)
     if status.adult_update_review == 'COMPLETED' and not adult_record['arc_flagged']:
@@ -46,9 +44,8 @@ def review(request, application_id_local):
             adult_record['date_accepted'] = datetime.datetime.now()
             HMGatewayActions().put('application', params=adult_record)
 
-            # personalisation = {'first_name': first_name, 'ref': app_ref}
-            # accepted_email(email, first_name, app_ref, application_id_local)
-            # send_survey_email(email, personalisation, application)
+            #personalisation = {'first_name': first_name}
+            accepted_email(email, first_name, app_ref, application_id_local)
 
 
 
@@ -59,14 +56,14 @@ def review(request, application_id_local):
     else:
         if adult_record["adult_status"] != 'FURTHER_INFORMATION':
 
-            # TODO: email to applicant
-            # magic_link = generate_magic_link()
-            # expiry = int(time.time())
-            # # user_details.email_expiry_date = expiry
-            # # user_details.magic_link_email = magic_link
-            # # user_details.save()
-            # # link = settings.CHILDMINDER_EMAIL_VALIDATION_URL + '/' + magic_link
-            # # returned_email(email, first_name, app_ref, link)
+            identity_record = identity_gateway_response.record
+            magic_link = generate_magic_link()
+            expiry = int(time.time())
+            identity_record['email_expiry_date'] = expiry
+            identity_record['magic_link_email'] = magic_link
+            IdentityGatewayActions().put('user', params=identity_record)
+            link = settings.CHILDMINDER_EMAIL_VALIDATION_URL + '/' + magic_link
+            returned_email(email, first_name, app_ref, link)
 
             # TODO
             adult_record['adult_status'] = "FURTHER_INFORMATION"
@@ -85,7 +82,7 @@ def returned_adult(request):
     variables = {
         'application_id': application_id_local
     }
-    return render(request, 'review-returned.html', variables)
+    return render(request, 'review-sent-back.html', variables)
 
 
 @login_required
@@ -98,3 +95,38 @@ def accepted_adult(request):
         'application_id': application_id_local
     }
     return render(request, 'review-confirmation.html', variables)
+
+
+# Add personalisation and create template
+def accepted_email(email, first_name, ref, application_id):
+    """
+    Method to send an email using the Notify Gateway API
+    :param email: string containing the e-mail address to send the e-mail to
+    :param first_name: string first name
+    :param ref: string ref
+    :param application_id: application ID
+    :return: HTTP response
+    """
+    if hasattr(settings, 'NOTIFY_URL'):
+        email = str(email)
+
+        template_id = '6af4d98f-a67e-4291-af15-74862d231493'
+
+        personalisation = {'first_name': first_name}
+        return send_email(email, personalisation, template_id)
+
+# Add personalisation and create template
+def returned_email(email, first_name, ref, link):
+    """
+    Method to send an email using the Notify Gateway API
+    :param email: string containing the e-mail address to send the e-mail to
+    :param first_name: string first name
+    :param ref: string ref
+    :return: HTTP response
+    """
+    if hasattr(settings, 'NOTIFY_URL'):
+        email = str(email)
+        template_id = '7e605128-909e-4203-a40a-15d397a0f7f0'
+        personalisation = {'first_name': first_name, 'link': link}
+        return send_email(email, personalisation, template_id)
+
