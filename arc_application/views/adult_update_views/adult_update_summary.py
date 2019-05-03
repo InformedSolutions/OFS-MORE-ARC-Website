@@ -214,6 +214,29 @@ def load_json(application_id_local):
         table_list.append(hospital_admission_table)
 
 
+        # previous_registration_response = HMGatewayActions().list("serious-illness", params={'adult_id': adult_id})
+        # if previous_registration_response.record == 200:
+        #     previous_registration_table = [
+        #         {"title": "Previous Registration",
+        #          "id": record['adult_id']},
+        #         {"name": "Has the applicant previously registered with Ofsted?",
+        #          "value": 'Yes' if record["previous_registration"] else 'No'}
+        #     ]
+        #
+        #     if record["previous_registration"]:
+        #         previous_registration_table.append(
+        #             {"name": "Individual ID",
+        #              "value": record["individual_id"]}
+        #         )
+        #
+        #     previous_registration_table.append(
+        #         {"name": "Has the applicant lived in England for more than 5 years?",
+        #          "value": record["five_years_in_UK"]}
+        #     )
+        #
+        #     table_list.append(previous_registration_table)
+
+
     return table_list
 
 def add_comment(id, field, row):
