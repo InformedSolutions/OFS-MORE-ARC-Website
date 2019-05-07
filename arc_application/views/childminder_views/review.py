@@ -26,6 +26,7 @@ decorators = [login_required, group_required(settings.ARC_GROUP), user_assigned_
 # Initiate logging
 log = logging.getLogger('')
 
+
 @group_required(settings.ARC_GROUP)
 def review(request):
     """

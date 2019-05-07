@@ -1,3 +1,4 @@
+from datetime import datetime
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
@@ -26,11 +27,11 @@ def arc_summary(request):
     elif request.method == 'POST':
         application_id_local = request.POST["id"]
         status = Arc.objects.get(pk=application_id_local)
-        status.declaration_review = 'COMPLETED'
+        status.adult_update_review = 'COMPLETED'
         status.save()
         log.debug("Handling submissions for arc summary page")
         return HttpResponseRedirect(
-            reverse('review') + '?id=' + application_id_local
+            reverse('adults-confirmation') + '?id=' + application_id_local
         )
 
 def get_application_summary_variables(application_id):
@@ -43,15 +44,16 @@ def get_application_summary_variables(application_id):
     (and similarly EYC form contents).
     """
 
-    application = HMGatewayActions().read('application', params={'token_id': application_id})
+    dpa_auth = HMGatewayActions().read('dpa-auth', params={'token_id': application_id})
 
     json = load_json(application_id)
 
-    #application_reference = application['application_reference']
+    ey_number = dpa_auth.record['URN']
 
     variables = {
         'json': json,
         'application_id': application_id,
+        'ey_number': ey_number
     }
 
     return variables
@@ -129,6 +131,19 @@ def load_json(application_id_local):
                  'field': "on_update"}
             ]
 
+        summary_table += [
+            {"name": "Known to council social Services in regards to their own children?",
+             "value": "Yes" if record['known_to_council'] else "No",
+             'field': "known_to_council"}
+        ]
+
+        if record['known_to_council']:
+            summary_table += [
+                {"name": "Tell us why",
+                 "value": record['reasons_known_to_council_health_check'],
+                 'field': "reasons_known_to_council_health_check"}
+            ]
+
 
         for row in summary_table:
             field = row["field"] if row.get("field") else ''
@@ -160,6 +175,10 @@ def load_json(application_id_local):
             response = HMGatewayActions().list("serious-illness", params={'adult_id': adult_id})
             if response.status_code == 200:
                 for serious_illness in response.record:
+                    serious_illness["start_date"] = datetime.date(serious_illness['start_date'], '%Y-%m-%d').strftime(
+            '%d/%m/%Y')
+                    serious_illness["end_date"] = datetime.strptime(serious_illness['end_date'], '%Y-%m-%d').strftime(
+            '%d/%m/%Y')
                     serious_illness_table.append(
                     {"name": serious_illness["description"],
                     "value": serious_illness["start_date"] + " to " + serious_illness["end_date"]}
@@ -176,6 +195,10 @@ def load_json(application_id_local):
             response = HMGatewayActions().list("hospital-admissions", params={'adult_id': adult_id})
             if response.status_code == 200:
                 for admission in response.record:
+                    admission["start_date"] = datetime.strptime(admission['start_date'], '%Y-%m-%d').strftime(
+            '%d/%m/%Y')
+                    admission["end_date"] = datetime.strptime(admission['end_date'], '%Y-%m-%d').strftime(
+            '%d/%m/%Y')
                     hospital_admission_table.append(
                         {"name": admission["description"],
                          "value": admission["start_date"] + " to " + admission["end_date"]}

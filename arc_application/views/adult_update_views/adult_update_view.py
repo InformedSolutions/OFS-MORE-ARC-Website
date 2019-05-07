@@ -1,5 +1,4 @@
-import datetime
-
+from datetime import datetime
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.forms import formset_factory
@@ -81,24 +80,30 @@ def new_adults_summary(request):
         adult_email_list.append(adult['email'])
         adult_dbs_is_enhanceds.append(adult['enhanced_check'])
         adult_dbs_cert_numbers.append(adult['dbs_certificate_number'] if adult['enhanced_check'] else None)
-        adult_dbs_on_capitas.append(adult['is_ofsted_dbs'] if adult['enhanced_check'] else None)
+        adult_dbs_on_capitas.append(adult['capita'] if adult['enhanced_check'] else None)
         adult_dbs_is_recents.append(adult['within_three_months'] if adult['enhanced_check'] else None)
         adult_dbs_on_updates.append(adult['on_update'] if not adult['within_three_months'] else None)
         adult_lived_abroad.append(adult['lived_abroad'])
         adult_military_base.append(adult['military_base'])
         #health check fields
-        if adult['currently_being_treated']:
-           current_illnesses.append(adult["illness_details"])
-        else:
-            current_illnesses.append(None)
 
-        serious_illnesses_response = HMGatewayActions().list('adult_serious_illness',{'adult_id':adult_id})
+        serious_illnesses_response = HMGatewayActions().list('serious-illness',{'adult_id':adult_id})
         if serious_illnesses_response.status_code == 200:
+            for record in serious_illnesses_response.record:
+                record["start_date"] = datetime.strptime(record['start_date'], '%Y-%m-%d').strftime(
+            '%d/%m/%Y')
+                record["end_date"] = datetime.strptime(record['end_date'], '%Y-%m-%d').strftime(
+            '%d/%m/%Y')
             serious_illnesses.append(serious_illnesses_response.record)
         else:
             serious_illnesses.append(None)
-        hospital_admissions_response = HMGatewayActions().list('adult_hospital_admission', {'adult_id': adult_id})
+        hospital_admissions_response = HMGatewayActions().list('hospital-admissions', {'adult_id': adult_id})
         if hospital_admissions_response.status_code == 200:
+            for record in hospital_admissions_response.record:
+                record["start_date"] = datetime.strptime(record['start_date'], '%Y-%m-%d').strftime(
+            '%d/%m/%Y')
+                record["end_date"] = datetime.strptime(record['end_date'], '%Y-%m-%d').strftime(
+            '%d/%m/%Y')
             hospital_admissions.append(hospital_admissions_response.record)
         else:
             hospital_admissions.append(None)
@@ -126,8 +131,8 @@ def new_adults_summary(request):
         adult_lists = list(zip(adult_record_list, adult_id_list, adult_health_check_status_list, adult_name_list, adult_birth_day_list,\
                       adult_birth_month_list, adult_birth_year_list, adult_relationship_list, adult_email_list,\
                       adult_dbs_cert_numbers, adult_dbs_on_capitas, adult_dbs_is_recents, adult_dbs_is_enhanceds,\
-                      adult_dbs_on_updates, adult_lived_abroad, adult_military_base, formset_adult, current_illnesses, serious_illnesses, hospital_admissions, local_authorities))
-                #current_illnesses, serious_illnesses, hospital_admissions, adult_previous_name_lists_list, adult_previous_address_lists_list))
+                      adult_dbs_on_updates, adult_lived_abroad, adult_military_base, formset_adult, serious_illnesses, hospital_admissions, local_authorities))
+                # adult_previous_name_lists_list, adult_previous_address_lists_list))
 
 
         variables = {
@@ -176,6 +181,10 @@ def new_adults_summary(request):
                     #do we get a field to say if anything flagged?
                     if adult_comments:
                         HMGatewayActions().put('application', params={'token_id': application_id_local, 'arc_flagged': True})
+                    else:
+                        HMGatewayActions().put('application',
+                                               params={'token_id': application_id_local, 'arc_flagged': False})
+
 
 
             # # calculate start and end dates for each adult's current name
@@ -217,7 +226,7 @@ def new_adults_summary(request):
                                    adult_birth_day_list, adult_birth_month_list, adult_birth_year_list,
                                    adult_relationship_list, adult_email_list, adult_dbs_cert_numbers,
                                    adult_dbs_on_capitas, adult_dbs_is_recents, adult_dbs_is_enhanceds,
-                                   adult_dbs_on_updates, adult_lived_abroad, adult_military_base, adult_formset, current_illnesses, serious_illnesses, hospital_admissions,
+                                   adult_dbs_on_updates, adult_lived_abroad, adult_military_base, adult_formset, serious_illnesses, hospital_admissions,
                                    local_authorities))
 
                                    #add these lists back in when possible - also add to for loop in tempalte
