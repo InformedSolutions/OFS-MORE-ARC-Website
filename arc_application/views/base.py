@@ -19,7 +19,7 @@ from govuk_forms.forms import GOVUKForm
 from timeline_logger.models import TimelineLog
 from ..review_util import reset_declaration
 from ..models import Application, Arc
-from ..services.db_gateways import NannyGatewayActions
+from ..services.db_gateways import NannyGatewayActions, HMGatewayActions
 
 # Initiate logging
 log = logging.getLogger()
@@ -135,7 +135,7 @@ def release_application(request, application_id, status):
                 ApplicationExporter.export_childminder_application(application_id)
 
     # If application_id doesn't correspond to a Childminder application, it must be a Nanny one.
-    else:
+    elif NannyGatewayActions().read('application', params={'application_id': application_id}).status_code == 200:
         nanny_api_response = NannyGatewayActions().read('application', params={'application_id': application_id})
         app = nanny_api_response.record
         APP_ORIGINAL = app.copy()
@@ -154,6 +154,21 @@ def release_application(request, application_id, status):
             from ..messaging import ApplicationExporter
             application_reference = app['application_reference']
             ApplicationExporter.export_nanny_application(application_id, application_reference)
+
+    else:
+        hm_api_response = HMGatewayActions().read('adult', params={'adult_id': application_id})
+        app = hm_api_response.record
+        APP_ORIGINAL = app.copy()
+
+        if status == 'FURTHER_INFORMATION':
+            app['declarations_status'] = 'NOT_STARTED'
+        elif status == 'ACCEPTED' and not APP_ORIGINAL['adult_status'] == 'ACCEPTED':
+            app['date_accepted'] = datetime.now()
+        elif status == 'ARC REVIEW':
+            app['adult_status'] = 'SUBMITTED'
+
+        app['adult_status'] = status
+        HMGatewayActions().put('adult', params=app)
 
 
     # keep arc record but un-assign user from it
@@ -189,8 +204,10 @@ def log_application_release(request, arc_object, app, status):
                 'entity': 'application'
             }
 
+        id = app['application_id'] if app.get('application_id') else app['adult_id']
+
         log_data = {
-            'object_id': app['application_id'],
+            'object_id': id,
             'template': 'timeline_logger/application_action.txt',
             'user': request.user.username,
             'extra_data': json.dumps(extra_data)
