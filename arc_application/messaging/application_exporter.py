@@ -250,7 +250,7 @@ class ApplicationExporter:
 
         adult_document_object = {
             "adult_id": str(adult_id),
-            "document": DocumentGenerator.get_adult_update_application_summary(application_id, adult_id),
+            "document": DocumentGenerator.get_adult_update_application_summary(adult_id),
         }
 
         export['adult_update_details'] = json.dumps(adult_update_export)

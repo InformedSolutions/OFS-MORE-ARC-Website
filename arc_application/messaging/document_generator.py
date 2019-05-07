@@ -105,12 +105,12 @@ class DocumentGenerator:
         return base64_string
 
     @staticmethod
-    def get_adult_update_application_summary(application_id, adult_id):
+    def get_adult_update_application_summary(adult_id):
         """
         Generates a full adult update summary in a PDF format that has been base64 encoded
         """
         resp = HttpResponse(content_type='application/pdf')
-        variables = get_adult_update_summary_variables(application_id, adult_id)
+        variables = get_adult_update_summary_variables(adult_id)
         result = generate_pdf('adult-update-pdf-summary.html', file_object=resp, context=variables)
         base64_string = str(base64.b64encode(result.content).decode("utf-8"))
         log.debug("Generating PDF and base64 representation for Adult Update Details Summary")
