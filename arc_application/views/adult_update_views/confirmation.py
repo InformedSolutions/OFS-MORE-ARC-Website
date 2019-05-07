@@ -1,5 +1,6 @@
 import datetime
 import time
+import os
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
@@ -7,7 +8,7 @@ from django.utils.decorators import method_decorator
 
 from django.http import HttpResponseRedirect
 
-from application.services.notify import send_email
+from ...notify import send_email
 from ...magic_link import generate_magic_link
 from ...services.db_gateways import HMGatewayActions, IdentityGatewayActions
 
@@ -24,9 +25,10 @@ def review(request, application_id_local):
     :param request: a request object used to generate the HttpResponse
     :return: an HttpResponse object with the rendered Your App Review Confirmation template
     """
-
-    application_id_local = request.GET["id"]]
-    identity_gateway_response = HMGatewayActions().read('user', params={'application_id': application_id_local})
+    adult_record = HMGatewayActions().read('adult', params={'adult_id': application_id_local}).record
+    token_id = adult_record['token_id']
+    identity_gateway_response = IdentityGatewayActions().read('user', params={'application_id': token_id})
+    app_ref = HMGatewayActions().read('dpa-auth', params={'token_id': token_id}).record['URN']
 
     if identity_gateway_response.status_code == 200:
         identity_record = identity_gateway_response.record
@@ -42,9 +44,7 @@ def review(request, application_id_local):
 
             adult_record['adult_status'] = "ACCEPTED"
             adult_record['date_accepted'] = datetime.datetime.now()
-            HMGatewayActions().put('application', params=adult_record)
-
-            #personalisation = {'first_name': first_name}
+            HMGatewayActions().put('adult', params=adult_record)
             accepted_email(email, first_name, app_ref, application_id_local)
 
 
@@ -62,12 +62,12 @@ def review(request, application_id_local):
             identity_record['email_expiry_date'] = expiry
             identity_record['magic_link_email'] = magic_link
             IdentityGatewayActions().put('user', params=identity_record)
-            link = settings.CHILDMINDER_EMAIL_VALIDATION_URL + '/' + magic_link
+            link = os.environ.get('APP_HM_URL') + '/validate/' + magic_link
             returned_email(email, first_name, app_ref, link)
 
             # TODO
             adult_record['adult_status'] = "FURTHER_INFORMATION"
-            HMGatewayActions().put('application', params=adult_record)
+            HMGatewayActions().put('adult', params=adult_record)
 
         return HttpResponseRedirect(
             reverse('adults-returned') + '?id=' + application_id_local
@@ -113,7 +113,7 @@ def accepted_email(email, first_name, ref, application_id):
         template_id = '6af4d98f-a67e-4291-af15-74862d231493'
 
         personalisation = {'first_name': first_name}
-        return send_email(email, personalisation, template_id)
+        return send_email(email, personalisation, template_id, hm_email=True)
 
 # Add personalisation and create template
 def returned_email(email, first_name, ref, link):
@@ -128,5 +128,5 @@ def returned_email(email, first_name, ref, link):
         email = str(email)
         template_id = '7e605128-909e-4203-a40a-15d397a0f7f0'
         personalisation = {'first_name': first_name, 'link': link}
-        return send_email(email, personalisation, template_id)
+        return send_email(email, personalisation, template_id, hm_email=True)
 
