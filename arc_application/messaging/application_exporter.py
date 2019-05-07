@@ -257,7 +257,7 @@ class ApplicationExporter:
             'document': DocumentGenerator.get_adult_update_application_summary(adult_id),
         }
 
-        export['adults_in_home'] = json.dumps(adult_details_export)
+        export['adults_in_home'] = json.dumps([adult_details_export])
         export['documents'] = json.dumps({'EY2': adult_document_object})
 
         adult_update_application_sqs_handler.send_message(export)
