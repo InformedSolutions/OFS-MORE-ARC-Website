@@ -178,8 +178,7 @@ def new_adults_summary(request):
                     adult_comments = request_to_comment(adult_id, '', adult_post_data, adult_id_local)
                     save_comments(request, adult_comments, adult_id_local)
 
-                    adult['cygnum_relationship_to_childminder'] = adult_post_data['cygnum_relationship']
-                    HMGatewayActions().put('adult', params=adult)
+                    HMGatewayActions().put('adult', params={'cygnum_relationship_to_childminder': adult_post_data['cygnum_relationship'], 'adult_id':adult_id_local,'token_id': adult['token_id']})
 
                     #do we get a field to say if anything flagged?
                     if adult_comments:
