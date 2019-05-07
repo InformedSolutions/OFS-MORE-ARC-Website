@@ -29,11 +29,10 @@ def new_adults_summary(request):
     # Defines the formset using formset factory
     AdultFormSet = formset_factory(NewAdultForm, extra=0)
 
-    application_id_local = request.GET.get('id') or request.POST.get('id')
-    application = HMGatewayActions().read('application', {'token_id': application_id_local})
+    adult_id_local = request.GET.get('id') or request.POST.get('id')
 
     # Adult data
-    adults = HMGatewayActions().list('adult', params={'token_id': application_id_local}).record
+    adults = HMGatewayActions().list('adult', params={'adult_id': adult_id_local}).record
     adult_record_list = []
     adult_id_list = []
     adult_health_check_status_list = []
@@ -137,7 +136,7 @@ def new_adults_summary(request):
 
         variables = {
             'formset_adult': formset_adult,
-            'application_id': application_id_local,
+            'application_id': adult_id_local,
             'adult_lists': adult_lists
         }
         log.debug("Rendering new adults in the home page")
@@ -172,18 +171,18 @@ def new_adults_summary(request):
 
             for section in review_sections_to_process.values():
                 for adult_post_data, adult in zip(section['POST_data'], section['models']):
-                    adult_comments = request_to_comment(adult_id, '', adult_post_data, application_id_local)
-                    save_comments(request, adult_comments, application_id_local)
+                    adult_comments = request_to_comment(adult_id, '', adult_post_data, adult_id_local)
+                    save_comments(request, adult_comments, adult_id_local)
 
                     adult['cygnum_relationship_to_childminder'] = adult_post_data['cygnum_relationship']
                     HMGatewayActions().put('adult', params=adult)
 
                     #do we get a field to say if anything flagged?
                     if adult_comments:
-                        HMGatewayActions().put('application', params={'token_id': application_id_local, 'arc_flagged': True})
+                        HMGatewayActions().put('adult', params={'adult_id': adult_id_local, 'arc_flagged': True, 'token_id': adult['token_id']})
                     else:
-                        HMGatewayActions().put('application',
-                                               params={'token_id': application_id_local, 'arc_flagged': False})
+                        HMGatewayActions().put('adult',
+                                               params={'adult_id': adult_id_local, 'arc_flagged': False, 'token_id': adult['token_id']})
 
 
 
@@ -208,7 +207,7 @@ def new_adults_summary(request):
             #     adult.name_end_year = today.year
             #     adult.save()
 
-            status = Arc.objects.get(pk=application_id_local)
+            status = Arc.objects.get(pk=adult_id_local)
             status.adult_update_review = section_status
             status.save()
 
@@ -216,7 +215,7 @@ def new_adults_summary(request):
             log.debug("Redirect to summary")
             redirect_link = reverse('new_adults')
             log.debug("Handling submissions for new adult review page")
-            return HttpResponseRedirect(redirect_link + '?id=' + application_id_local)
+            return HttpResponseRedirect(redirect_link + '?id=' + adult_id_local)
 
         else:
 
@@ -240,7 +239,7 @@ def new_adults_summary(request):
 
             variables = {
                 'formset_adult': adult_formset,
-                'application_id': application_id_local,
+                'application_id': adult_id_local,
                 'adult_lists': adult_lists}
         #         #'previous_registration_lists': previous_registration_lists,
         #
