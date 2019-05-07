@@ -94,12 +94,12 @@ class GenericApplicationHandler:
     def __get_adult_update_table_data(self, application_id):
         row_data = dict()
 
-        application_record = HMGatewayActions().read('application',
-                                                        params={'token_id': str(application_id)}).record
-        row_data['application_id'] = application_record['token_id']
-        row_data['date_submitted'] = datetime.strptime(application_record['date_submitted'][:10], '%Y-%m-%d').strftime(
+        adult_record = HMGatewayActions().read('adult',
+                                                        params={'adult_id': str(application_id)}).record
+        row_data['application_id'] = adult_record['adult_id']
+        row_data['date_submitted'] = datetime.strptime(adult_record['date_submitted'][:10], '%Y-%m-%d').strftime(
             '%d/%m/%Y')
-        row_data['last_accessed'] = datetime.strptime(application_record['date_updated'][:10], '%Y-%m-%d').strftime(
+        row_data['last_accessed'] = datetime.strptime(adult_record['date_updated'][:10], '%Y-%m-%d').strftime(
             '%d/%m/%Y')
         row_data['app_type'] = 'Adult update'
 
@@ -234,7 +234,7 @@ class AdultUpdateApplicationHandler(GenericApplicationHandler):
 
     def _get_oldest_app_id(self):
         response = HMGatewayActions().list(
-            'application', params={'application_status': 'SUBMITTED'})
+            'adult', params={'adult_status': 'SUBMITTED'})
 
         if response.status_code == 200:
             resubmitted_apps = []
@@ -245,21 +245,21 @@ class AdultUpdateApplicationHandler(GenericApplicationHandler):
 
             if any(resubmitted_apps):
                 resubmitted_apps = sorted(resubmitted_apps, key=lambda i: i['date_resubmitted'])
-                return resubmitted_apps[0]['token_id']
+                return resubmitted_apps[0]['adult_id']
             else:
                 submitted_apps = sorted(submitted_apps, key=lambda i: i['date_submitted'])
-                return submitted_apps[0]['token_id']
+                return submitted_apps[0]['adult_id']
 
         else:
             raise ObjectDoesNotExist('No applications available.')
 
-    def _assign_app_to_user(self, application_id):
-        app_record = HMGatewayActions().read('application', params={'token_id': application_id}).record
-        app_record['application_status'] = 'ARC_REVIEW'
-        HMGatewayActions().put('application', params=app_record)
+    def _assign_app_to_user(self, adult_id):
+        app_record = HMGatewayActions().read('adult', params={'adult_id': adult_id}).record
+        app_record['adult_status'] = 'ARC_REVIEW'
+        HMGatewayActions().put('adult', params=app_record)
 
-        if not Arc.objects.filter(pk=application_id).exists():
-            app_review = Arc.objects.create(application_id=application_id)
+        if not Arc.objects.filter(pk=adult_id).exists():
+            app_review = Arc.objects.create(application_id=adult_id)
 
             for field in self._list_tasks_for_review():
                 setattr(app_review, field, 'NOT_STARTED')
@@ -270,7 +270,7 @@ class AdultUpdateApplicationHandler(GenericApplicationHandler):
             app_review.save()
 
         else:
-            arc_user = Arc.objects.get(pk=application_id)
+            arc_user = Arc.objects.get(pk=adult_id)
             arc_user.last_accessed = app_record['date_updated']
             arc_user.user_id = self.arc_user.id
             arc_user.save()
@@ -283,7 +283,7 @@ class AdultUpdateApplicationHandler(GenericApplicationHandler):
         }
 
         log_data = {
-            'object_id': app_record['application_id'],
+            'object_id': app_record['adult_id'],
             'template': 'timeline_logger/application_action.txt',
             'user': self.arc_user.username,
             'extra_data': json.dumps(extra_data)
@@ -292,5 +292,5 @@ class AdultUpdateApplicationHandler(GenericApplicationHandler):
         HMGatewayActions().create('timeline-log', params=log_data)
 
     def _list_tasks_for_review(self):
-        example_application = HMGatewayActions().list('application', params={}).record[0]
+        example_application = HMGatewayActions().list('adult', params={}).record[0]
         return [i[:-12] for i in example_application.keys() if i[-12:] == '_arc_flagged']

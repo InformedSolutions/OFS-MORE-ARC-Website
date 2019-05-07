@@ -1,5 +1,4 @@
-import datetime
-
+from datetime import datetime
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.forms import formset_factory
@@ -30,11 +29,10 @@ def new_adults_summary(request):
     # Defines the formset using formset factory
     AdultFormSet = formset_factory(NewAdultForm, extra=0)
 
-    application_id_local = request.GET.get('id') or request.POST.get('id')
-    application = HMGatewayActions().read('application', {'token_id': application_id_local})
+    adult_id_local = request.GET.get('id') or request.POST.get('id')
 
     # Adult data
-    adults = HMGatewayActions().list('adult', params={'token_id': application_id_local}).record
+    adults = HMGatewayActions().list('adult', params={'adult_id': adult_id_local}).record
     adult_record_list = []
     adult_id_list = []
     adult_health_check_status_list = []
@@ -91,19 +89,19 @@ def new_adults_summary(request):
         serious_illnesses_response = HMGatewayActions().list('serious-illness',{'adult_id':adult_id})
         if serious_illnesses_response.status_code == 200:
             for record in serious_illnesses_response.record:
-                record["start_date"] = datetime.date(record["start_year"], record["start_month"], record["start_day"]).strftime(
-                '%d/%m/%Y')
-                record["end_date"] = datetime.date(record["end_year"], record["end_month"], record["end_day"]).strftime(
-                '%d/%m/%Y')
+                record["start_date"] = datetime.strptime(record['start_date'], '%Y-%m-%d').strftime(
+            '%d/%m/%Y')
+                record["end_date"] = datetime.strptime(record['end_date'], '%Y-%m-%d').strftime(
+            '%d/%m/%Y')
             serious_illnesses.append(serious_illnesses_response.record)
         else:
             serious_illnesses.append(None)
         hospital_admissions_response = HMGatewayActions().list('hospital-admissions', {'adult_id': adult_id})
         if hospital_admissions_response.status_code == 200:
             for record in hospital_admissions_response.record:
-                record["start_date"] = datetime.date(record["start_year"], record["start_month"], record["start_day"]).strftime(
+                record["start_date"] = datetime.strptime(record['start_date'], '%Y-%m-%d').strftime(
             '%d/%m/%Y')
-                record["end_date"] = datetime.date(record["end_year"], record["end_month"], record["end_day"]).strftime(
+                record["end_date"] = datetime.strptime(record['end_date'], '%Y-%m-%d').strftime(
             '%d/%m/%Y')
             hospital_admissions.append(hospital_admissions_response.record)
         else:
@@ -141,7 +139,7 @@ def new_adults_summary(request):
 
         variables = {
             'formset_adult': formset_adult,
-            'application_id': application_id_local,
+            'application_id': adult_id_local,
             'adult_lists': adult_lists
         }
         log.debug("Rendering new adults in the home page")
@@ -176,18 +174,18 @@ def new_adults_summary(request):
 
             for section in review_sections_to_process.values():
                 for adult_post_data, adult in zip(section['POST_data'], section['models']):
-                    adult_comments = request_to_comment(adult_id, '', adult_post_data, application_id_local)
-                    save_comments(request, adult_comments, application_id_local)
+                    adult_comments = request_to_comment(adult_id, '', adult_post_data, adult_id_local)
+                    save_comments(request, adult_comments, adult_id_local)
 
                     adult['cygnum_relationship_to_childminder'] = adult_post_data['cygnum_relationship']
                     HMGatewayActions().put('adult', params=adult)
 
                     #do we get a field to say if anything flagged?
                     if adult_comments:
-                        HMGatewayActions().put('application', params={'token_id': application_id_local, 'arc_flagged': True})
+                        HMGatewayActions().put('adult', params={'adult_id': adult_id_local, 'arc_flagged': True, 'token_id': adult['token_id']})
                     else:
-                        HMGatewayActions().put('application',
-                                               params={'token_id': application_id_local, 'arc_flagged': False})
+                        HMGatewayActions().put('adult',
+                                               params={'adult_id': adult_id_local, 'arc_flagged': False, 'token_id': adult['token_id']})
 
 
 
@@ -212,7 +210,7 @@ def new_adults_summary(request):
             #     adult.name_end_year = today.year
             #     adult.save()
 
-            status = Arc.objects.get(pk=application_id_local)
+            status = Arc.objects.get(pk=adult_id_local)
             status.adult_update_review = section_status
             status.save()
 
@@ -220,7 +218,7 @@ def new_adults_summary(request):
             log.debug("Redirect to summary")
             redirect_link = reverse('new_adults')
             log.debug("Handling submissions for new adult review page")
-            return HttpResponseRedirect(redirect_link + '?id=' + application_id_local)
+            return HttpResponseRedirect(redirect_link + '?id=' + adult_id_local)
 
         else:
 
@@ -244,7 +242,7 @@ def new_adults_summary(request):
 
             variables = {
                 'formset_adult': adult_formset,
-                'application_id': application_id_local,
+                'application_id': adult_id_local,
                 'adult_lists': adult_lists,
                 'previous_registration_lists': previous_registration_lists}
 
