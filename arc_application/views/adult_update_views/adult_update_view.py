@@ -15,9 +15,9 @@ from ...models import Arc
 # Initiate logging
 log = logging.getLogger('')
 
-@login_required
-@group_required(settings.ARC_GROUP)
-@user_assigned_application
+#@login_required
+#@group_required(settings.ARC_GROUP)
+#@user_assigned_application
 def new_adults_summary(request):
     """
     Method returning the template for the People in your home: summary page (for a given application)
@@ -108,14 +108,17 @@ def new_adults_summary(request):
             hospital_admissions.append(None)
         local_authorities.append(adult['reasons_known_to_council_health_check'])
 
-        #previous_registration_querysets.append(
-         #   OtherPersonPreviousRegistrationDetails.objects.filter(person_id_id=adult.pk))
+        previous_registration_response = HMGatewayActions().read('previous-registration', {'adult_id': adult_id})
+        if previous_registration_response.status_code == 200:
+            previous_registration_record = previous_registration_response.record
+            previous_registration_querysets.append(previous_registration_record)
+
         #adult_previous_name_lists_list.append(
          #   PreviousName.objects.filter(person_id=adult.pk, other_person_type='ADULT').order_by('order'))
         #adult_previous_address_lists_list.append(
          #   PreviousAddress.objects.filter(person_id=adult.pk, person_type='ADULT'))
 
-    #previous_registration_lists = list(zip(adult_id_list, adult_name_list, previous_registration_querysets))
+    previous_registration_lists = list(zip(adult_id_list, adult_name_list, previous_registration_querysets))
 
     if request.method == 'GET':
         # Defines the static form at the top of the page
@@ -137,7 +140,8 @@ def new_adults_summary(request):
         variables = {
             'formset_adult': formset_adult,
             'application_id': adult_id_local,
-            'adult_lists': adult_lists
+            'adult_lists': adult_lists,
+            'previous_registration_lists': previous_registration_lists
         }
         log.debug("Rendering new adults in the home page")
         return render(request, 'adult_update_templates/new-adults-summary.html', variables)
@@ -240,9 +244,9 @@ def new_adults_summary(request):
             variables = {
                 'formset_adult': adult_formset,
                 'application_id': adult_id_local,
-                'adult_lists': adult_lists}
-        #         #'previous_registration_lists': previous_registration_lists,
-        #
+                'adult_lists': adult_lists,
+                'previous_registration_lists': previous_registration_lists}
+
             log.debug("Render new adult review page")
             return render(request, 'adult_update_templates/new-adults-summary.html', variables)
 
