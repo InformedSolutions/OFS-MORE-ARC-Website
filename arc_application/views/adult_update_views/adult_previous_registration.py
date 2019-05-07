@@ -23,7 +23,7 @@ log = logging.getLogger()
 def adult_previous_registration_view(request):
 
     template_name = 'adult_update_templates/adult-add-previous-registration.html'
-    success_url = 'new_adults'
+    success_url = 'new_adults_summary'
     form_class = AdultPreviousRegistrationDetailsForm
 
     if request.method == 'GET':

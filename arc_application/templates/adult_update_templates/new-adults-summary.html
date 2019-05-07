@@ -20,7 +20,7 @@
         {% csrf_token %}
         {{ formset_adult.management_form }}
 
-        {% for record, id, health_check_status, name, day, month, year, relationship, email, dbs_certificate_number, dbs_on_capita, dbs_is_recent, enhanced_check, on_update, lived_abroad, military_base, formsetadult, serious_illness_set, hospital_admission_set, reasons_known_to_council_health_check, previous_registration_lists in adult_lists %}
+        {% for record, id, health_check_status, name, day, month, year, relationship, email, dbs_certificate_number, dbs_on_capita, dbs_is_recent, enhanced_check, on_update, lived_abroad, military_base, formsetadult, serious_illness_set, hospital_admission_set, reasons_known_to_council_health_check in adult_lists %}
 
         <table class="check-your-answers form-group">
             <thead>
@@ -640,13 +640,16 @@
 
         <br>
 
+        {% if previous_registrations in previous_registration_lists %}
         <a href="{% url 'adults-previous-registration' %}?id={{id}}" class="button button-secondary">Add previous registration details</a>
+        {% endif %}
         {% endfor %}
 
         {% for id, name, previous_names, previous_addresses in adult_ebulk_lists %}
 
         {% endfor %}
 
+        {% for id, name, previous_registrations in previous_registration_lists %}
         <table class="check-your-answers form-group">
             <thead>
             <tr>
@@ -660,23 +663,24 @@
             <tbody>
             <tr>
                 <td>Has the applicant previously registered with Ofsted?</td>
-                <td>{{ previous_registration.previous_registration|yesno:"Yes,No" }}</td>
-                <td><a href="{% url 'other-people-previous-registration' %}?id={{ application_id }}&person_id={{id}}">Change</a></td>
+                <td>{{ previous_registrations.previous_registration|yesno:"Yes,No" }}</td>
+                <td><a href="{% url 'adults-previous-registration' %}?id={{ id }}">Change</a></td>
             </tr>
-            {% if previous_registration.previous_registration %}
+            {% if previous_registrations.previous_registration %}
             <tr>
                 <td>Individual ID</td>
-                <td>{{ previous_registration.individual_id }}</td>
-                <td><a href="{% url 'other-people-previous-registration' %}?id={{ application_id }}&person_id={{id}}">Change</a></td>
+                <td>{{ previous_registrations.individual_id }}</td>
+                <td><a href="{% url 'adults-previous-registration' %}?id={{ id }}}">Change</a></td>
             </tr>
             {% endif %}
             <tr>
                 <td>Has the applicant lived in England for more than 5 years</td>
-                <td>{{ previous_registration.five_years_in_UK|yesno:"Yes,No" }}</td>
-                <td><a href="{% url 'other-people-previous-registration' %}?id={{ application_id }}&person_id={{id}}">Change</a></td>
+                <td>{{ previous_registrations.five_years_in_UK|yesno:"Yes,No" }}</td>
+                <td><a href="{% url 'adults-previous-registration' %}?id={{ id }}">Change</a></td>
             </tr>
             </tbody>
         </table>
+        {% endfor %}
 
         <br>
 

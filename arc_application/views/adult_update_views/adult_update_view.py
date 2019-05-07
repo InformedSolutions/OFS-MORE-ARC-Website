@@ -133,14 +133,15 @@ def new_adults_summary(request):
         adult_lists = list(zip(adult_record_list, adult_id_list, adult_health_check_status_list, adult_name_list, adult_birth_day_list,\
                       adult_birth_month_list, adult_birth_year_list, adult_relationship_list, adult_email_list,\
                       adult_dbs_cert_numbers, adult_dbs_on_capitas, adult_dbs_is_recents, adult_dbs_is_enhanceds,\
-                      adult_dbs_on_updates, adult_lived_abroad, adult_military_base, formset_adult, serious_illnesses, hospital_admissions, local_authorities, previous_registration_lists))
+                      adult_dbs_on_updates, adult_lived_abroad, adult_military_base, formset_adult, serious_illnesses, hospital_admissions, local_authorities))
                 # adult_previous_name_lists_list, adult_previous_address_lists_list))
 
 
         variables = {
             'formset_adult': formset_adult,
             'application_id': adult_id_local,
-            'adult_lists': adult_lists
+            'adult_lists': adult_lists,
+            'previous_registration_lists': previous_registration_lists
         }
         log.debug("Rendering new adults in the home page")
         return render(request, 'adult_update_templates/new-adults-summary.html', variables)
