@@ -183,10 +183,10 @@ def new_adults_summary(request):
 
                     #do we get a field to say if anything flagged?
                     if adult_comments:
-                        HMGatewayActions().put('adult', params={'adult_id': adult_id_local, 'arc_flagged': True, 'token_id': adult['token_id']})
+                        HMGatewayActions().put('adult', params={'adult_id': adult_id_local, 'arc_flagged': True, 'token_id': token_id})
                     else:
                         HMGatewayActions().put('adult',
-                                               params={'adult_id': adult_id_local, 'arc_flagged': False, 'token_id': adult['token_id']})
+                                               params={'adult_id': adult_id_local, 'arc_flagged': False, 'token_id': token_id})
 
 
 
