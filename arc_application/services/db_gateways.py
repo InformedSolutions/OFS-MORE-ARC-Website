@@ -185,7 +185,10 @@ class HMGatewayActions(DBGatewayActions):
         'adult': 'adult_id',
         'dpa-auth': 'token_id',
         'arc-comments': 'review_id',
-        'timeline-log': 'object_id'
+        'timeline-log': 'object_id',
+        'previous-registration': 'adult_id',
+        'previous-address': 'previous_address_id',
+        'previous-name': 'previous_name_id'
     }
 
     target_url_prefix = settings.HM_GATEWAY_URL + '/api/v1/'

@@ -1,0 +1,58 @@
+{% extends 'govuk_template.html' %}
+{% block page_title %}Previous addresses{% endblock %}
+{% load static %}
+{% load govuk_template_base %}
+
+{% block inner_content %}
+
+{% include "back-button.html" %}
+
+<!-- Initialise error summary for page -->
+{{form.error_summary}}
+
+<h1 class="form-title heading-large">
+    Previous home address {{order}}
+</h1>
+{% include 'adult_update_templates/previous-address-snippet.html' with queryset=previous_addresses %}
+
+<form method="post" novalidate {% if form.is_multipart %}enctype="multipart/form-data" {% endif %}>
+    <div class="form-group">
+
+        {% for field in form %}
+
+        <div id='{{ field.auto_id }}-label'
+             class="form-group-required form-group {% if field.errors %} form-group-error {% endif %}">
+
+            <div id="{{ field.id_for_label }}" class="form-label-bold">{{ field.label }}</div>
+            {% for error in field.errors %}
+            <span class="error-message">{{ error }}</span>
+            {% endfor %}
+            <span class="form-hint">{{ field.help_text }}</span>
+            {{ field }}
+        </div>
+
+        {% if field.id_for_label == 'id_postcode' %}
+        <p>
+            {% csrf_token %}
+            <a href="{{ entry_url }}" name="manual" id="manual">Use postcode search</a>
+        </p>
+        {% endif %}
+
+        {% endfor %}
+
+    </div>
+    <div class="form-group">
+        <input type="hidden" id="id" name="id" value="{{id}}"/>
+        <input type="hidden" name="state" value="manual"/>
+        <input type="hidden" name="person_id" value="{{ person_id }}"/>
+        <input type="hidden" name="person_type" value="{{ person_type }}"/>
+        <input type="hidden" name="postcode2" value="{{ postcode }}"/>
+        <input type="submit" class="button" name="save-and-continue" value="Save and continue">
+    </div>
+
+</form>
+
+
+{% include 'childminder_templates/return-to-list.html' %}
+
+{% endblock %}

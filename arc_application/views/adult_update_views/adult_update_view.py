@@ -15,9 +15,9 @@ from ...models import Arc
 # Initiate logging
 log = logging.getLogger('')
 
-@login_required
-@group_required(settings.ARC_GROUP)
-@user_assigned_application
+#@login_required
+#@group_required(settings.ARC_GROUP)
+#@user_assigned_application
 def new_adults_summary(request):
     """
     Method returning the template for the People in your home: summary page (for a given application)
@@ -108,14 +108,17 @@ def new_adults_summary(request):
             hospital_admissions.append(None)
         local_authorities.append(adult['reasons_known_to_council_health_check'])
 
-        #previous_registration_querysets.append(
-         #   OtherPersonPreviousRegistrationDetails.objects.filter(person_id_id=adult.pk))
+        previous_registration_response = HMGatewayActions().read('previous-registration', params={'adult_id': adult_id})
+        if previous_registration_response.status_code == 200:
+            previous_registration_record = previous_registration_response.record
+            previous_registration_querysets.append(previous_registration_record)
+
         #adult_previous_name_lists_list.append(
          #   PreviousName.objects.filter(person_id=adult.pk, other_person_type='ADULT').order_by('order'))
-        #adult_previous_address_lists_list.append(
-         #   PreviousAddress.objects.filter(person_id=adult.pk, person_type='ADULT'))
+        adult_previous_address_lists_list.append(
+            PreviousAddress.objects.filter(person_id=adult.pk, person_type='ADULT'))
 
-    #previous_registration_lists = list(zip(adult_id_list, adult_name_list, previous_registration_querysets))
+    previous_registration_lists = list(zip(adult_id_list, adult_name_list, previous_registration_querysets))
 
     if request.method == 'GET':
         # Defines the static form at the top of the page
@@ -137,7 +140,8 @@ def new_adults_summary(request):
         variables = {
             'formset_adult': formset_adult,
             'application_id': adult_id_local,
-            'adult_lists': adult_lists
+            'adult_lists': adult_lists,
+            'previous_registration_lists': previous_registration_lists
         }
         log.debug("Rendering new adults in the home page")
         return render(request, 'adult_update_templates/new-adults-summary.html', variables)
@@ -172,17 +176,17 @@ def new_adults_summary(request):
             for section in review_sections_to_process.values():
                 for adult_post_data, adult in zip(section['POST_data'], section['models']):
                     adult_comments = request_to_comment(adult_id, '', adult_post_data, adult_id_local)
-                    save_comments(request, adult_comments, adult_id_local)
+                    token_id = adult['token_id']
+                    save_comments(request, adult_comments, adult_id_local, token_id)
 
-                    adult['cygnum_relationship_to_childminder'] = adult_post_data['cygnum_relationship']
-                    HMGatewayActions().put('adult', params=adult)
+                    HMGatewayActions().put('adult', params={'cygnum_relationship_to_childminder': adult_post_data['cygnum_relationship'], 'adult_id':adult_id_local,'token_id': adult['token_id']})
 
                     #do we get a field to say if anything flagged?
                     if adult_comments:
-                        HMGatewayActions().put('adult', params={'adult_id': adult_id_local, 'arc_flagged': True, 'token_id': adult['token_id']})
+                        HMGatewayActions().put('adult', params={'adult_id': adult_id_local, 'arc_flagged': True, 'token_id': token_id})
                     else:
                         HMGatewayActions().put('adult',
-                                               params={'adult_id': adult_id_local, 'arc_flagged': False, 'token_id': adult['token_id']})
+                                               params={'adult_id': adult_id_local, 'arc_flagged': False, 'token_id': token_id})
 
 
 
@@ -240,9 +244,9 @@ def new_adults_summary(request):
             variables = {
                 'formset_adult': adult_formset,
                 'application_id': adult_id_local,
-                'adult_lists': adult_lists}
-        #         #'previous_registration_lists': previous_registration_lists,
-        #
+                'adult_lists': adult_lists,
+                'previous_registration_lists': previous_registration_lists}
+
             log.debug("Render new adult review page")
             return render(request, 'adult_update_templates/new-adults-summary.html', variables)
 
