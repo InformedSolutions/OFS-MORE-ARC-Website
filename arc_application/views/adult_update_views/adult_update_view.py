@@ -115,8 +115,8 @@ def new_adults_summary(request):
 
         #adult_previous_name_lists_list.append(
          #   PreviousName.objects.filter(person_id=adult.pk, other_person_type='ADULT').order_by('order'))
-        #adult_previous_address_lists_list.append(
-         #   PreviousAddress.objects.filter(person_id=adult.pk, person_type='ADULT'))
+        adult_previous_address_lists_list.append(
+            PreviousAddress.objects.filter(person_id=adult.pk, person_type='ADULT'))
 
     previous_registration_lists = list(zip(adult_id_list, adult_name_list, previous_registration_querysets))
 
