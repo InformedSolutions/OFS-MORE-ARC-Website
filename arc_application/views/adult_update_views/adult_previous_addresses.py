@@ -33,7 +33,7 @@ def adult_update_previous_address(request):
     remove = request_data.get('remove', False)
     if remove:
         remove_address_pk = get_remove_address_pk(request_data)
-        remove_previous_address(previous_name_id=remove_address_pk)
+        remove_previous_address(remove_address_pk)
 
     if state == 'entry':
         return postcode_entry(request, remove=remove)
@@ -235,7 +235,7 @@ def postcode_submission(request):
 @login_required
 @group_required(settings.ARC_GROUP)
 @user_assigned_application
-def people_in_the_home_previous_address_change(request):
+def adults_previous_address_change(request):
     """
     Function to allow the user to update an entry to the address table from the other people summary page
     :param request: Standard Httprequest object
@@ -246,7 +246,7 @@ def people_in_the_home_previous_address_change(request):
     remove_address_pk = get_remove_address_pk(request_data)
 
     if remove_address_pk is not None:
-        remove_previous_address(previous_name_id=remove_address_pk)
+        remove_previous_address(remove_address_pk)
         log.debug("Remove other people previous address")
         return HttpResponseRedirect(build_url('new_adults_summary', get={'id': context['id']}))
 
