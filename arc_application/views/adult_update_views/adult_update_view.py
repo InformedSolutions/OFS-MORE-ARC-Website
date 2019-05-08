@@ -113,10 +113,33 @@ def new_adults_summary(request):
             previous_registration_record = previous_registration_response.record
             previous_registration_querysets.append(previous_registration_record)
 
-        #adult_previous_name_lists_list.append(
-         #   PreviousName.objects.filter(person_id=adult.pk, other_person_type='ADULT').order_by('order'))
-        adult_previous_address_lists_list.append(
-            PreviousAddress.objects.filter(person_id=adult.pk, person_type='ADULT'))
+        previous_name_response = HMGatewayActions().list('previous-name', params={'adult_id': adult_id})
+        if previous_name_response.status_code == 200:
+            for prev_name in previous_name_response.record:
+                if prev_name['middle_names'] != '' or prev_name['middle_names'] is not None:
+                    prev_name['name'] = prev_name['first_name'] + " " + prev_name['middle_names'] + " " + prev_name['last_name']
+                else:
+                    prev_name['name'] = prev_name['first_name'] + " "  + prev_name['last_name']
+
+                prev_name['start_date'] = datetime(prev_name['start_year'], prev_name['start_month'], prev_name['start_day']).strftime(
+            '%d %m %Y')
+                prev_name['end_date'] = datetime(prev_name['end_year'], prev_name['end_month'],
+                                                        prev_name['end_day']).strftime(
+                    '%d %m %Y')
+            adult_previous_name_lists_list.append(previous_name_response.record)
+        else:
+            adult_previous_name_lists_list.append(None)
+
+        previous_address_response = HMGatewayActions().list('previous-address', params={'adult_id':adult_id})
+        if previous_address_response.status_code == 200:
+            for prev_address in previous_address_response.record:
+                prev_address['moved_in_date'] = datetime.strptime(prev_address['moved_in_date'], '%Y-%m-%d').strftime(
+            '%d %m %Y')
+                prev_address['moved_out_date'] = datetime.strptime(prev_address['moved_out_date'], '%Y-%m-%d').strftime(
+                    '%d %m %Y')
+            adult_previous_address_lists_list.append(previous_address_response.record)
+        else:
+            adult_previous_address_lists_list.append(None)
 
     previous_registration_lists = list(zip(adult_id_list, adult_name_list, previous_registration_querysets))
 
@@ -133,8 +156,8 @@ def new_adults_summary(request):
         adult_lists = list(zip(adult_record_list, adult_id_list, adult_health_check_status_list, adult_name_list, adult_birth_day_list,\
                       adult_birth_month_list, adult_birth_year_list, adult_relationship_list, adult_email_list,\
                       adult_dbs_cert_numbers, adult_dbs_on_capitas, adult_dbs_is_recents, adult_dbs_is_enhanceds,\
-                      adult_dbs_on_updates, adult_lived_abroad, adult_military_base, formset_adult, serious_illnesses, hospital_admissions, local_authorities))
-                # adult_previous_name_lists_list, adult_previous_address_lists_list))
+                      adult_dbs_on_updates, adult_lived_abroad, adult_military_base, formset_adult, serious_illnesses, hospital_admissions, local_authorities,
+                               adult_previous_name_lists_list, adult_previous_address_lists_list))
 
 
         variables = {
