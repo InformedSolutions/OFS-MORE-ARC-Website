@@ -172,16 +172,17 @@ def new_adults_summary(request):
             for section in review_sections_to_process.values():
                 for adult_post_data, adult in zip(section['POST_data'], section['models']):
                     adult_comments = request_to_comment(adult_id, '', adult_post_data, adult_id_local)
-                    save_comments(request, adult_comments, adult_id_local)
+                    token_id = adult['token_id']
+                    save_comments(request, adult_comments, adult_id_local, token_id)
 
                     HMGatewayActions().put('adult', params={'cygnum_relationship_to_childminder': adult_post_data['cygnum_relationship'], 'adult_id':adult_id_local,'token_id': adult['token_id']})
 
                     #do we get a field to say if anything flagged?
                     if adult_comments:
-                        HMGatewayActions().put('adult', params={'adult_id': adult_id_local, 'arc_flagged': True, 'token_id': adult['token_id']})
+                        HMGatewayActions().put('adult', params={'adult_id': adult_id_local, 'arc_flagged': True, 'token_id': token_id})
                     else:
                         HMGatewayActions().put('adult',
-                                               params={'adult_id': adult_id_local, 'arc_flagged': False, 'token_id': adult['token_id']})
+                                               params={'adult_id': adult_id_local, 'arc_flagged': False, 'token_id': token_id})
 
 
 
