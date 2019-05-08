@@ -127,7 +127,7 @@ urlpatterns = [
     url(r'^review/returned', returned_adult,
         name='adults-returned'),
     url(r'^review/new-adult/previous-addresses', adult_update_previous_address,
-        name='adult_add_previous_address')
+        name='adult_add_previous_address'),
     url(r'^review/new-adult/previous-names', adult_update_add_previous_name, name='adult-update-previous-names')
 
 ]
