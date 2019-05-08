@@ -219,45 +219,69 @@ class ApplicationExporter:
     def export_adult_update_application(adult_id):
         export = {}
         adult_details_export = {}
+        additional_adult_details_export = {}
 
         adult_record = HMGatewayActions().read('adult', params={'adult_id': adult_id}).record
 
         dpa_auth_id = adult_record['token_id']
         urn = HMGatewayActions().read('dpa-auth', params={'token_id': dpa_auth_id}).record['URN']
 
-        export['application'] = json.dumps({'application_reference': urn})
-        adult_details_export['adult'] = json.dumps(adult_record)
-        adult_details_export['previous_address'] = json.dumps({})
-        adult_details_export['previous_names'] = json.dumps({})
-        adult_details_export['previous_registrations'] = json.dumps({})
+        adult_details_export['fields'] = json.dumps(adult_record)
+
+        additional_adult_details_export['adult'] = json.dumps(adult_record['order'])
 
         if adult_record['currently_being_treated']:
             current_illnesses = adult_record['illness_details']
         else:
-            current_illnesses = False
+            current_illnesses = []
 
-        adult_details_export['current_illnesses'] = json.dumps(current_illnesses)
+        additional_adult_details_export['current_illnesses'] = json.dumps(current_illnesses)
 
         if adult_record['has_serious_illness']:
             serious_illnesses = HMGatewayActions().list('serious-illness', params={'adult_id': adult_id}).record
         else:
-            serious_illnesses = {}
+            serious_illnesses = []
 
-        adult_details_export['serious_illness'] = json.dumps(serious_illnesses)
+        additional_adult_details_export['serious_illness'] = json.dumps(serious_illnesses)
 
         if adult_record['has_hospital_admissions']:
             hospital_admissions = HMGatewayActions().list("hospital-admissions", params={'adult_id': adult_id}).record
         else:
-            hospital_admissions = {}
+            hospital_admissions = []
 
-        adult_details_export['hospital_admissions'] = json.dumps(hospital_admissions)
+        additional_adult_details_export['hospital_admissions'] = json.dumps(hospital_admissions)
+
+        previous_names_response = HMGatewayActions().list('previous-name', params={'adult_id': adult_id})
+
+        if previous_names_response.status_code == 200:
+            additional_adult_details_export['previous_names'] = json.dumps([{'fields': r} for r in previous_names_response.record])
+        else:
+            additional_adult_details_export['previous_names'] = json.dumps([])
+
+        previous_address_response = HMGatewayActions().list('previous-address', params={'adult_id': adult_id})
+
+        if previous_address_response.status_code == 200:
+            additional_adult_details_export['previous_address'] = json.dumps([{'fields': r} for r in previous_address_response.record])
+        else:
+            additional_adult_details_export['previous_address'] = json.dumps([])
+
+        additional_adult_details_export['previous_address'] = json.dumps([])
+
+        previous_reg_response = HMGatewayActions().list('previous-registration', params={'adult_id': adult_id})
+
+        if previous_reg_response.status_code == 200:
+            additional_adult_details_export['previous_registrations'] = json.dumps([{'fields': r} for r in previous_reg_response.record])
+        else:
+            additional_adult_details_export['previous_registrations'] = json.dumps([])
 
         adult_document_object = {
             'adult_id': str(adult_id),
             'document': DocumentGenerator.get_adult_update_application_summary(adult_id),
         }
 
+        export['application'] = json.dumps([{'fields': {'application_reference': urn}}])
         export['adults_in_home'] = json.dumps([adult_details_export])
-        export['documents'] = json.dumps({'EY2': adult_document_object})
+        export['additional_adult_details'] = json.dumps([additional_adult_details_export])
+        export['documents'] = json.dumps({'EY2': [adult_document_object]})
 
         adult_update_application_sqs_handler.send_message(export)
