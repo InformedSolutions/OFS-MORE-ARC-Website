@@ -1,5 +1,5 @@
 {% extends 'govuk_template.html' %}
-{% block page_title %}Previous home addresses{% endblock %}
+{% block page_title %}Previous addresses{% endblock %}
 {% load static %}
 {% load govuk_template_base %}
 
@@ -12,9 +12,9 @@
 {{form.error_summary}}
 
 <h1 class="form-title heading-large">
-    Previous home addresses
+    Previous address {{order}}
 </h1>
-{% include 'childminder_templates/previous-address-snippet.html' with queryset=previous_addresses %}
+{% include 'adult_update_templates/previous-address-snippet.html' with queryset=previous_addresses %}
 
 <!-- Form -->
 <form method="post" novalidate {% if form.is_multipart %}enctype="multipart/form-data" {% endif %}>

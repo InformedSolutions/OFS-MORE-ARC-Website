@@ -29,7 +29,7 @@ Previous address {{ forloop.counter }}: <br/>
            id="remove-{{address.previous_name_id}}"/>
 </form>
 {% else %}
-<form action="{% url 'other-people-previous-addresses' %}">
+<form action="{% url 'adult_add_previous_address' %}">
     {% csrf_token %}
     <input type="hidden" name="id" value="{{id}}"/>
     <input type="hidden" name="person_id" value="{{id}}"/>

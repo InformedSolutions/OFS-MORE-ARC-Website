@@ -213,19 +213,16 @@ def postcode_submission(request):
 
         # Actual saving is the same regardless of lookup, so done beneath
         previous_address_record = create_previous_address(
-            person_id=request.POST['person_id'],
+            adult_id=request.POST['id'],
             street_line1=line1,
             street_line2=line2,
             town=town,
             county=county,
             country='United Kingdom',
-            postcode=postcode
+            postcode=postcode,
+            moved_in_date=moved_in_date,
+            moved_out_date=moved_out_date,
         )
-
-        # Update previous address moved in/out dates
-        previous_address_record.moved_in_date = moved_in_date
-        previous_address_record.moved_out_date = moved_out_date
-        previous_address_record.save()
 
         if 'save-and-continue' in request.POST:
             log.debug("Handling submissions for other people previous addresses page - save and continue")
@@ -288,16 +285,16 @@ def people_in_the_home_previous_address_change(request):
         return render(request, 'adult_update_templates/previous-address-change.html', context)
 
 
-def get_stored_addresses(person_id):
+def get_stored_addresses(adult_id):
     """
     A utility function to get the addresses already stored in the previous address table for the current person
-    :param person_id: The id of the person involved (adult or child)
+    :param adult_id: The id of the person involved (adult or child)
     :return:
     """
-    unsorted_addresses = filter_previous_address(person_id=person_id)
+    unsorted_addresses = filter_previous_address(adult_id=adult_id)
 
     # If an address does not have an order associated with it, display these addresses first.
-    return sorted(unsorted_addresses, key=lambda address: address.order if address.order else 0)
+    return sorted(unsorted_addresses, key=lambda address: address['order'] if address['order'] else 0)
 
 
 def get_context(request):
@@ -310,9 +307,15 @@ def get_context(request):
     :param request: HttpResponse object from which to grab the data.
     :return: context: dict containing all the information required by the views.
     """
+    adult_id = request.GET.get('id')
     context = get_url_data(request)
     context.update(get_link_urls(context))
     context.update(get_post_data(request))
+    response = HMGatewayActions().list('previous-address', params={'adult_id':adult_id})
+    if response.status_code == 200:
+        context['order'] = len(response.record) + 1
+    else:
+        context['order'] = 1
     return context
 
 
@@ -325,7 +328,7 @@ def get_url_data(request):
     url_variables_to_check = [
         'id',
         'state',
-        'person_id'
+        'adult_id'
     ]
 
     return dict((var, getattr(request, request.method).get(var, None)) for var in url_variables_to_check)
@@ -351,6 +354,7 @@ def get_post_data(request):
 
     url_vars = get_url_data(request)
     post_data_vars['previous_addresses'] = get_stored_addresses(url_vars['id'])
+
 
     return post_data_vars
 
@@ -405,27 +409,24 @@ def create_previous_address(**kwargs):
         order = kwargs.pop('order')
     else:
         # Calculate order
-        person_id = kwargs.get('person_id')
+        adult_id = kwargs.get('adult_id')
 
-        stored_address = get_stored_addresses(person_id)
+        stored_address = get_stored_addresses(adult_id)
         order = len(stored_address) + 1
 
-    HMGatewayActions().create(**kwargs)
+    params = kwargs
+    params['country'] = country
+    params['order'] = order
+    create_response = HMGatewayActions().create('previous-address', params=params)
 
-    return previous_address_record
-
+    return create_response.record
 
 def remove_previous_address(pk):
     """
     :param kwargs: kwargs for getting the PreviousAddress record, must contain information to select exactly one record.
     :return: None
     """
-    try:
-        previous_address_record = HMGatewayActions().delete('previous-addres', params={'previous_address_id': pk})
-        previous_address_record.delete()
-    except ObjectDoesNotExist:
-        # If the address cannot be found, we assume that the user has already deleted the address.
-        pass
+    HMGatewayActions().delete('previous-address', params={'previous_address_id': pk})
 
 
 def get_remove_address_pk(request_data):
