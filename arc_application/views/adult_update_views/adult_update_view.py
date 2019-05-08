@@ -176,7 +176,8 @@ def new_adults_summary(request):
             for section in review_sections_to_process.values():
                 for adult_post_data, adult in zip(section['POST_data'], section['models']):
                     adult_comments = request_to_comment(adult_id, '', adult_post_data, adult_id_local)
-                    save_comments(request, adult_comments, adult_id_local)
+                    token_id = adult['token_id']
+                    save_comments(request, adult_comments, adult_id_local, token_id)
 
                     HMGatewayActions().put('adult', params={'cygnum_relationship_to_childminder': adult_post_data['cygnum_relationship'], 'adult_id':adult_id_local,'token_id': adult['token_id']})
 

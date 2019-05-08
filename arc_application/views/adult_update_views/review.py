@@ -67,7 +67,7 @@ def request_to_comment(table_key, table_name, user_request, application_id):
 
     return comment_list
 
-def save_comments(request, comment_list, application_id):
+def save_comments(request, comment_list, application_id, token_id):
     """
     Generic function for saving comments to database, once formatted by request_to_comments
     :param comment_list: List of comments as returned by request_to_comments
@@ -76,7 +76,7 @@ def save_comments(request, comment_list, application_id):
     for single_comment in comment_list:
         defaults = {"table_pk": single_comment[0], "table_name": single_comment[1],
                     "field_name": single_comment[2], "comment": single_comment[3],
-                    "flagged": single_comment[4], 'token_id': application_id, 'endpoint_name': 'adult'
+                    "flagged": single_comment[4], 'token_id': token_id, 'endpoint_name': 'adult'
                     }
 
         existing_comment_present = False
