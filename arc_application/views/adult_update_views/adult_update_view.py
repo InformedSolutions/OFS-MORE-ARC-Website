@@ -108,7 +108,7 @@ def new_adults_summary(request):
             hospital_admissions.append(None)
         local_authorities.append(adult['reasons_known_to_council_health_check'])
 
-        previous_registration_response = HMGatewayActions().read('previous-registration', {'adult_id': adult_id})
+        previous_registration_response = HMGatewayActions().read('previous-registration', params={'adult_id': adult_id})
         if previous_registration_response.status_code == 200:
             previous_registration_record = previous_registration_response.record
             previous_registration_querysets.append(previous_registration_record)
