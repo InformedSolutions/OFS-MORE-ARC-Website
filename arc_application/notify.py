@@ -40,7 +40,7 @@ def send_email(email, personalisation, template_id, nanny_email=False, hm_email=
         notification_request['service_name'] = 'Nannies'
 
     elif hm_email:
-        notification_request['service_name'] = 'Change Personal Details'
+        notification_request['service_name'] = 'New adults in the home'
 
     r = requests.post(base_request_url + '/api/v1/notifications/email/',
                       json.dumps(notification_request),
