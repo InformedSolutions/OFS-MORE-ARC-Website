@@ -244,11 +244,11 @@ def load_json(adult_id):
         if address_record is not None:
             for i in range(0, len(address_record)):
                 address = address_record[i]
-                full_address = marksafe(address['street_line1'] + "<br> " + address['street_line2'] + "<br>" + address['town'])
+                full_address = address['street_line1'] + ", " + address['street_line2'] + ", " + address['town']
                 link = reverse("adult_add_previous_address_change") + '?id=' + adult_id + '&previous_address_id' + address['previous_address_id']
                 if address['county'] != '':
-                    full_address = full_address + "<br> " + address['county']
-                full_address = full_address + "<br> " +address['country'] + '<br> ' + address['postcode']
+                    full_address = full_address + ", " + address['county']
+                full_address = full_address + ", " +address['country'] + ', ' + address['postcode']
 
                 previous_names_address_table.append({"name": "Previous address " + str(i+1),
                                                      "value": full_address,
