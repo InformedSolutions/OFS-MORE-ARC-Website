@@ -230,12 +230,6 @@ def new_adults_summary(request):
                       adult_dbs_on_updates, adult_lived_abroad, adult_military_base, adult_formset, serious_illnesses, hospital_admissions, local_authorities,
                                adult_previous_name_lists_list, adult_previous_address_lists_list))
 
-                                   #add these lists back in when possible - also add to for loop in tempalte
-
-                                   #current_illnesses, serious_illnesses, hospital_admissions,
-                               # adult_previous_name_lists_list,
-                             #      adult_previous_address_lists_list))
-
             for adult_form, adult_name in zip(adult_formset, adult_name_list):
                 adult_form.error_summary_title = 'There was a problem (' + adult_name + ')'
 
