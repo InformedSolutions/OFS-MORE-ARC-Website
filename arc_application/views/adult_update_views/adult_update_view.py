@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, date
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.forms import formset_factory
@@ -11,6 +11,7 @@ from ...forms.adult_update_forms.adult_update_form import NewAdultForm
 from .review import new_adults_initial_population, request_to_comment, save_comments
 from ...services.db_gateways import HMGatewayActions
 from ...models import Arc
+from operator import itemgetter
 
 # Initiate logging
 log = logging.getLogger('')
@@ -212,32 +213,7 @@ def new_adults_summary(request):
                                                params={'adult_id': adult_id_local, 'arc_flagged': False, 'token_id': token_id})
 
 
-
-            # # calculate start and end dates for each adult's current name
-            # for adult in AdultInHome.objects.filter(application_id=application_id_local):
-            #     # find most recent previous name
-            #     try:
-            #         # fetch previous name with most recent end date (must actually have an end date)
-            #         prev_name = PreviousName.objects.filter(person_id=adult.pk, other_person_type='ADULT',
-            #                                                 end_day__isnull=False, end_month__isnull=False,
-            #                                                 end_year__isnull=False)\
-            #                         .order_by('-end_year', '-end_month', '-end_day')[0]
-            #     except IndexError:
-            #         prev_name = None
-            #
-            #     today = datetime.date.today()
-            #     adult.name_start_day = prev_name.end_day if prev_name else adult.birth_day
-            #     adult.name_start_month = prev_name.end_month if prev_name else adult.birth_month
-            #     adult.name_start_year = prev_name.end_year if prev_name else adult.birth_year
-            #     adult.name_end_day = today.day
-            #     adult.name_end_month = today.month
-            #     adult.name_end_year = today.year
-            #     adult.save()
-
-            status = Arc.objects.get(pk=adult_id_local)
-            status.adult_update_review = section_status
-            status.save()
-
+            handle_previous_name_and_address_dates(adult_id_local, adults[0])
 
             log.debug("Redirect to summary")
             redirect_link = reverse('new_adults')
@@ -274,3 +250,43 @@ def new_adults_summary(request):
             return render(request, 'adult_update_templates/new-adults-summary.html', variables)
 
 
+def handle_previous_name_and_address_dates(adult_id, adult_record):
+    """
+    Sets start and end dates for current name and address in db
+    """
+    actions = HMGatewayActions()
+    end_date = date.today()
+    date_of_birth = datetime.strptime(adult_record['date_of_birth'], '%Y-%m-%d')
+
+    previous_names = actions.list('previous-name', params={'adult_id': adult_id})
+    if previous_names.status_code == 200:
+        for name in previous_names.record:
+            name['end_date'] = datetime(name['end_year'], name['end_month'], name['end_day'])
+        sorted_previous_names = sorted(previous_names.record, key=itemgetter('end_date'), reverse=True)
+        name_start_date = sorted_previous_names[0]['end_date']
+    else:
+        name_start_date = date_of_birth
+
+    adult_record['name_start_day'] = name_start_date.day
+    adult_record['name_start_month'] = name_start_date.month
+    adult_record['name_start_year'] = name_start_date.year
+    adult_record['name_end_day'] = end_date.day
+    adult_record['name_end_month'] = end_date.month
+    adult_record['name_end_year'] = end_date.year
+
+    actions.put('adult', params=adult_record)
+
+    previous_addresses_response = actions.list('previous-address', params={'adult_id': adult_id})
+    if previous_addresses_response.status_code == 200:
+        previous_addresses = previous_addresses_response.record
+        # moved_out_date is a string but due to iso format, lexicographical order will be
+        # equivalent to chronological
+        sorted_previous_addresses = sorted(previous_addresses, key=itemgetter('moved_out_date'), reverse=True)
+        address_start_date = datetime.strptime(sorted_previous_addresses[0]['moved_out_date'],'%Y-%m-%d').date()
+    else:
+        address_start_date = date_of_birth
+
+    adult_record['moved_in_date'] = address_start_date
+    adult_record['moved_out_date'] = end_date
+
+    actions.put('adult', params=adult_record)
