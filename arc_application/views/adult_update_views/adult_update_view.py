@@ -224,12 +224,11 @@ def new_adults_summary(request):
 
             # Zips the formset into the list of adults
             # Converts it to a list, there was trouble parsing the form objects when it was in a zip object
-            adult_lists = list(zip(adult_record_list, adult_id_list, adult_health_check_status_list, adult_name_list,
-                                   adult_birth_day_list, adult_birth_month_list, adult_birth_year_list,
-                                   adult_relationship_list, adult_email_list, adult_dbs_cert_numbers,
-                                   adult_dbs_on_capitas, adult_dbs_is_recents, adult_dbs_is_enhanceds,
-                                   adult_dbs_on_updates, adult_lived_abroad, adult_military_base, adult_formset, serious_illnesses, hospital_admissions,
-                                   local_authorities))
+            adult_lists = list(zip(adult_record_list, adult_id_list, adult_health_check_status_list, adult_name_list, adult_birth_day_list,\
+                      adult_birth_month_list, adult_birth_year_list, adult_relationship_list, adult_email_list,\
+                      adult_dbs_cert_numbers, adult_dbs_on_capitas, adult_dbs_is_recents, adult_dbs_is_enhanceds,\
+                      adult_dbs_on_updates, adult_lived_abroad, adult_military_base, formset_adult, serious_illnesses, hospital_admissions, local_authorities,
+                               adult_previous_name_lists_list, adult_previous_address_lists_list))
 
                                    #add these lists back in when possible - also add to for loop in tempalte
 
