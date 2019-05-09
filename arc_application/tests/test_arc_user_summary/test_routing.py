@@ -172,19 +172,3 @@ class ArcUserSummaryPageFunctionalTests(TestCase):
 
             self.assertTrue(arc_filter_query.exists())
             self.assertEqual(str(arc_filter_query[0].application_id), mock_nanny_application['application_id'])
-
-    def test_cannot_assign_more_than_five_applications(self):
-        self.skipTest('testNotImplemented')
-
-        # with mock.patch('django.db.models.query.QuerySet.count') as mock_count:
-        #     mock_count.return_value = 5
-        #
-        #     response = self.client.post(reverse('summary'), data={'add_nanny_application': 'add_nanny_application'})
-        #     self.assertContains(response, 'You have already reached the maximum (' + str(settings.APPLICATION_LIMIT) + ') applications', html=True)
-        #
-        #     response = self.client.post(
-        #         reverse('summary'), data={'add_childminder_application': 'add_childminder_application'}
-        #     )
-        #     self.assertContains(response, 'You have already reached the maximum (' + str(settings.APPLICATION_LIMIT) + ') applications', html=True)
-
-
