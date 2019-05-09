@@ -110,7 +110,7 @@ def accepted_email(email, first_name, ref, application_id):
     if hasattr(settings, 'NOTIFY_URL'):
         email = str(email)
 
-        template_id = '6af4d98f-a67e-4291-af15-74862d231493'
+        template_id = '8c469301-de23-44ac-8305-257c8125a121'
 
         personalisation = {'first_name': first_name}
         return send_email(email, personalisation, template_id, hm_email=True)
@@ -126,7 +126,7 @@ def returned_email(email, first_name, ref, link):
     """
     if hasattr(settings, 'NOTIFY_URL'):
         email = str(email)
-        template_id = '7e605128-909e-4203-a40a-15d397a0f7f0'
+        template_id = '77e4d1da-bcd2-4246-85b4-23916a993c58'
         personalisation = {'first_name': first_name, 'link': link}
         return send_email(email, personalisation, template_id, hm_email=True)
 
