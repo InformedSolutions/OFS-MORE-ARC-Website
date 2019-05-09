@@ -221,32 +221,43 @@ def load_json(adult_id):
         previous_names_address_table = [{"title": full_name + "'s previous names and addresses", "id": record['adult_id']}
                                        ]
         if name_record is not None:
-            for name in name_record:
+            link = reverse("adult-update-previous-names") + '?id=' + adult_id
+            for i in range(0, len(name_record)):
+                name = name_record[i]
                 if name['middle_names'] != '' or name['middle_names'] is not None:
                     adult_name = name['first_name'] + " " + name['middle_names'] + " " + name['last_name']
                 else:
                     name['name'] = name['first_name'] + " " + name['last_name']
-                previous_names_address_table.append({"name":"Previous name " + str(name['order']), "value": adult_name})
-                previous_names_address_table.append({"name": 'Start date', "value": datetime.datetime(name['start_year'], name['start_month'],
-                                                                                             name['start_day']).strftime('%d %m %Y')})
-                previous_names_address_table.append(
-                    {"name": 'End date', "value": datetime.datetime(name['end_year'], name['end_month'],
-                                                             name['end_day']).strftime('%d %m %Y')})
+                previous_names_address_table.append({"name":"Previous name " + str(i+1),
+                                                     "value": adult_name,
+                                                     'link': link})
+                previous_names_address_table.append({"name": 'Start date',
+                                                     "value": datetime.datetime(name['start_year'], name['start_month'],
+                                                                                             name['start_day']).strftime('%d %m %Y'),
+                                                     'link': link})
+                previous_names_address_table.append({"name": 'End date',
+                                                     "value": datetime.datetime(name['end_year'], name['end_month'],
+                                                             name['end_day']).strftime('%d %m %Y'),
+                                                     'link': link})
 
         if address_record is not None:
-            for address in address_record:
+            for i in range(0, len(address_record)):
+                address = address_record[i]
                 full_address = address['street_line1'] + ", " + address['street_line2'] + ", " + address['town']
+                link = reverse("adult_add_previous_address_change") + '?id=' + adult_id + '&previous_address_id' + address['previous_address_id']
                 if address['county'] != '':
                     full_address = full_address + ", " + address['county']
-
                 full_address = full_address + ", " +address['country'] + ', ' + address['postcode']
-                previous_names_address_table.append({"name": "Previous address " + str(address['order']), "value": full_address})
-                previous_names_address_table.append(
-                    {"name": 'Moved in', "value": datetime.datetime.strptime(address['moved_in_date'], '%Y-%m-%d').strftime(
-                    '%d %m %Y')})
-                previous_names_address_table.append(
-                    {"name": 'Moved out', "value": datetime.datetime.strptime(address['moved_out_date'], '%Y-%m-%d').strftime(
-                    '%d %m %Y')})
+
+                previous_names_address_table.append({"name": "Previous address " + str(i+1),
+                                                     "value": full_address,
+                                                     'link': link})
+                previous_names_address_table.append({"name": 'Moved in',
+                                                     "value": datetime.datetime.strptime(address['moved_in_date'], '%Y-%m-%d').strftime('%d %m %Y'),
+                                                     'link': link})
+                previous_names_address_table.append({"name": 'Moved out',
+                                                     "value": datetime.datetime.strptime(address['moved_out_date'], '%Y-%m-%d').strftime('%d %m %Y'),
+                                                     "link": link })
 
         table_list.append(previous_names_address_table)
 
