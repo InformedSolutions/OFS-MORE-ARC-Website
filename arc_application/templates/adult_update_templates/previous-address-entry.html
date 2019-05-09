@@ -67,6 +67,10 @@
     </div>
 </form>
 
-{% include 'childminder_templates/return-to-list.html' %}
+<div class="top-padded">
+            <a href="{% url 'new_adults_summary' %}?id={{application_id}}">
+                Return to list
+            </a>
+        </div>
 
 {% endblock %}
