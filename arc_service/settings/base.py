@@ -4,8 +4,7 @@ import os
 SERVER_LABEL = 'Test_1'
 
 ARC_GROUP = 'arc'
-CONTACT_CENTRE= 'contact-centre'
-APPLICATION_LIMIT = 5
+CONTACT_CENTRE = 'contact-centre'
 
 DBS_URL = os.environ.get('APP_DBS_URL')
 
