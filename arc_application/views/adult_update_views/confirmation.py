@@ -28,12 +28,13 @@ def review(request, application_id_local):
     adult_record = HMGatewayActions().read('adult', params={'adult_id': application_id_local}).record
     token_id = adult_record['token_id']
     identity_gateway_response = IdentityGatewayActions().read('user', params={'application_id': token_id})
-    app_ref = HMGatewayActions().read('dpa-auth', params={'token_id': token_id}).record['URN']
+    response = HMGatewayActions().read('dpa-auth', params={'token_id': token_id})
+    app_ref = response.record['URN']
 
     if identity_gateway_response.status_code == 200:
         identity_record = identity_gateway_response.record
         email = identity_record['email']
-    first_name = 'An applicant'
+    first_name = response.record['first_name']
 
 
     status = Arc.objects.get(pk=application_id_local)
