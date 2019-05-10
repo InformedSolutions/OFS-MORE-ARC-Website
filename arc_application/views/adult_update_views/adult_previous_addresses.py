@@ -1,5 +1,5 @@
 import logging
-from datetime import date
+from datetime import date, datetime
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
@@ -252,7 +252,9 @@ def adults_previous_address_change(request):
 
     if request.method == 'GET':
         record = get_previous_address(pk=request.GET['address_id'])
-        context['form'] = PreviousAddressManualForm(record=record)
+        record['moved_in_date'] = datetime.strptime(record['moved_in_date'], '%Y-%m-%d')
+        record['moved_out_date'] = datetime.strptime(record['moved_out_date'], '%Y-%m-%d')
+        context['form'] = PreviousAddressManualForm(initial=record)
         log.debug("Rendering other people previous address - change address page")
         return render(request, 'adult_update_templates/previous-address-change.html', context)
 
@@ -266,18 +268,18 @@ def adults_previous_address_change(request):
         if current_form.is_valid():
             # For ease of use, update saving is done here rather than in submission section, adding it would make it
             # harder to understand
-            address_record.street_line1 = current_form.cleaned_data['street_line1']
-            address_record.street_line2 = current_form.cleaned_data['street_line2']
-            address_record.town = current_form.cleaned_data['town']
-            address_record.county = current_form.cleaned_data['county']
-            address_record.country = 'United Kingdom'
-            address_record.postcode = current_form.cleaned_data['postcode']
+            address_record['street_line1'] = current_form.cleaned_data['street_line1']
+            address_record['street_line2'] = current_form.cleaned_data['street_line2']
+            address_record['town'] = current_form.cleaned_data['town']
+            address_record['county'] = current_form.cleaned_data['county']
+            address_record['country'] = 'United Kingdom'
+            address_record['postcode'] = current_form.cleaned_data['postcode']
 
             # Update previous address moved in/out dates
-            address_record.moved_in_date = current_form.cleaned_data['moved_in_date']
-            address_record.moved_out_date = current_form.cleaned_data['moved_out_date']
+            address_record['moved_in_date'] = current_form.cleaned_data['moved_in_date']
+            address_record['moved_out_date'] = current_form.cleaned_data['moved_out_date']
 
-            address_record.save()
+            HMGatewayActions().put('previous-address', params=address_record)
             log.debug("Handling submissions for other people previous address - change address page - save successful")
             return HttpResponseRedirect(build_url('new_adults_summary', get={'id': context['id']}))
 

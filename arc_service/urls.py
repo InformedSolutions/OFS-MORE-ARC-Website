@@ -41,6 +41,7 @@ from arc_application.views.adult_update_views.adult_update_summary import arc_su
 from arc_application.views.adult_update_views.confirmation import returned_adult, accepted_adult
 from arc_application.views.adult_update_views.adult_previous_addresses import adult_update_previous_address
 from arc_application.views.adult_update_views.add_previous_names import adult_update_add_previous_name
+from arc_application.views.adult_update_views.adult_previous_addresses import adults_previous_address_change
 
 # Nanny Views
 
@@ -128,6 +129,8 @@ urlpatterns = [
         name='adults-returned'),
     url(r'^review/new-adult/previous-addresses', adult_update_previous_address,
         name='adult_add_previous_address'),
+    url(r'^review/new-adult/previous-address', adults_previous_address_change,
+        name='adult_add_previous_address_change'),
     url(r'^review/new-adult/previous-names', adult_update_add_previous_name, name='adult-update-previous-names')
 
 ]
