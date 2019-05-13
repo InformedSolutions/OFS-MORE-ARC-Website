@@ -188,7 +188,8 @@ class HMGatewayActions(DBGatewayActions):
         'timeline-log': 'object_id',
         'previous-registration': 'adult_id',
         'previous-address': 'previous_address_id',
-        'previous-name': 'previous_name_id'
+        'previous-name': 'previous_name_id',
+        'setting-address': 'token_id'
     }
 
     target_url_prefix = settings.HM_GATEWAY_URL + '/api/v1/'
