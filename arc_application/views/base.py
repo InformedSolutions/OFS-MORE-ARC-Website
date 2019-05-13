@@ -135,7 +135,7 @@ def release_application(request, application_id, status):
                 ApplicationExporter.export_childminder_application(application_id)
 
     # If application_id doesn't correspond to a Childminder application, it must be a Nanny one.
-    elif NannyGatewayActions().read('application', params={'application_id': application_id}).status_code == 200:
+    elif settings.ENABLE_NANNIES and NannyGatewayActions().read('application', params={'application_id': application_id}).status_code == 200:
         nanny_api_response = NannyGatewayActions().read('application', params={'application_id': application_id})
         app = nanny_api_response.record
         APP_ORIGINAL = app.copy()
@@ -204,7 +204,7 @@ def log_application_release(request, arc_object, app, status):
             extra_data={'user_type': 'reviewer', 'action': log_action[status], 'entity': 'application'}
         )
 
-    elif isinstance(app, dict):  # If handling a Nanny application.
+    elif settings.ENABLE_NANNIES and isinstance(app, dict):  # If handling a Nanny application.
         extra_data = {
                 'user_type': 'reviewer',
                 'action': log_action[status],
