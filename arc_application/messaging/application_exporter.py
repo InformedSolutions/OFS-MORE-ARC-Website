@@ -233,10 +233,10 @@ class ApplicationExporter:
         adult_details_export['pk'] = adult_id
         adult_details_export['fields'] = adult_record
 
-        additional_adult_details_export['adult'] = json.dumps(adult_record['order'])
+        additional_adult_details_export['adult'] = int(adult_record['order'])
 
         if adult_record['currently_being_treated']:
-            current_illnesses = json.dumps([{'fields': r} for r in adult_record['illness_details']])
+            current_illnesses = json.dumps(adult_record['illness_details'])
         else:
             current_illnesses = json.dumps([])
 
@@ -250,7 +250,7 @@ class ApplicationExporter:
             serious_illnesses = json.dumps([])
 
         adult_details_export['fields']['serious_illness'] = adult_record['has_serious_illness']
-        additional_adult_details_export['serious_illnesses'] = serious_illnesses
+        additional_adult_details_export['serious_illness'] = serious_illnesses
 
         if adult_record['has_hospital_admissions']:
             hospital_admissions_record = HMGatewayActions().list("hospital-admissions", params={'adult_id': adult_id}).record
