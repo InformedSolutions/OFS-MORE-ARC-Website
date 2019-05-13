@@ -82,7 +82,7 @@ def returned_adult(request):
     variables = {
         'application_id': application_id_local
     }
-    return render(request, 'review-sent-back.html', variables)
+    return render(request, 'adult_update_templates/review-sent-back.html', variables)
 
 
 @login_required
@@ -94,7 +94,7 @@ def accepted_adult(request):
     variables = {
         'application_id': application_id_local
     }
-    return render(request, 'review-confirmation.html', variables)
+    return render(request, 'adult_update_templates/review-confirmation.html', variables)
 
 
 # Add personalisation and create template
