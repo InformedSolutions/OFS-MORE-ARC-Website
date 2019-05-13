@@ -8,6 +8,7 @@ from ..models import Application, AdultInHome, \
 
 from ..views.childminder_views.childminder_utils import get_application_summary_variables
 from ..views.nanny_views.nanny_utils import get_nanny_summary_variables
+from ..views.adult_update_views.adult_update_utils import get_adult_update_summary_variables
 
 # Initiate logging
 log = logging.getLogger()
@@ -101,4 +102,16 @@ class DocumentGenerator:
         result = generate_pdf('nanny-pdf-summary.html', file_object=resp, context=variables)
         base64_string = str(base64.b64encode(result.content).decode("utf-8"))
         log.debug("Generating PDF and base64 representation for Nanny Application Summary")
+        return base64_string
+
+    @staticmethod
+    def get_adult_update_application_summary(adult_id):
+        """
+        Generates a full adult update summary in a PDF format that has been base64 encoded
+        """
+        resp = HttpResponse(content_type='application/pdf')
+        variables = get_adult_update_summary_variables(adult_id)
+        result = generate_pdf('adult-update-pdf-summary.html', file_object=resp, context=variables)
+        base64_string = str(base64.b64encode(result.content).decode("utf-8"))
+        log.debug("Generating PDF and base64 representation for Adult Update Details Summary")
         return base64_string

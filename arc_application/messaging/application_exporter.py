@@ -10,12 +10,13 @@ from ..models import Application, ApplicantName, ApplicantHomeAddress, Applicant
 
 from .document_generator import DocumentGenerator
 
-from ..services.db_gateways import NannyGatewayActions, IdentityGatewayActions
+from ..services.db_gateways import NannyGatewayActions, IdentityGatewayActions, HMGatewayActions
 
 from . import SQSHandler
 
 cm_application_sqs_handler = SQSHandler(settings.CM_APPLICATION_QUEUE_NAME)
 na_application_sqs_handler = SQSHandler(settings.NA_APPLICATION_QUEUE_NAME)
+adult_update_application_sqs_handler = SQSHandler(settings.ADDITIONAL_ADULT_APPLICATION_QUEUE_NAME)
 
 
 class ApplicationExporter:
@@ -213,3 +214,82 @@ class ApplicationExporter:
         export['documents'] = json.dumps(documents)
 
         na_application_sqs_handler.send_message(export)
+
+    @staticmethod
+    def export_adult_update_application(adult_id):
+        export = {}
+        adult_details_export = {}
+        additional_adult_details_export = {}
+
+        adult_record = HMGatewayActions().read('adult', params={'adult_id': adult_id}).record
+
+        dpa_auth_id = adult_record['token_id']
+        dpa_record = HMGatewayActions().read('dpa-auth', params={'token_id': dpa_auth_id}).record
+
+        urn = dpa_record['URN']
+        registration_id = dpa_record['registration_id']
+        date_accepted = adult_record['date_accepted']
+
+        adult_details_export['pk'] = adult_id
+        adult_details_export['fields'] = adult_record
+
+        additional_adult_details_export['adult'] = int(adult_record['order'])
+
+        if adult_record['currently_being_treated']:
+            current_illnesses = json.dumps(adult_record['illness_details'])
+        else:
+            current_illnesses = json.dumps([])
+
+        adult_details_export['fields']['current_treatment'] = adult_record['currently_being_treated']
+        additional_adult_details_export['current_treatments'] = current_illnesses
+
+        if adult_record['has_serious_illness']:
+            serious_illnesses_record = HMGatewayActions().list('serious-illness', params={'adult_id': adult_id}).record
+            serious_illnesses = json.dumps([{'fields': r} for r in serious_illnesses_record])
+        else:
+            serious_illnesses = json.dumps([])
+
+        adult_details_export['fields']['serious_illness'] = adult_record['has_serious_illness']
+        additional_adult_details_export['serious_illness'] = serious_illnesses
+
+        if adult_record['has_hospital_admissions']:
+            hospital_admissions_record = HMGatewayActions().list("hospital-admissions", params={'adult_id': adult_id}).record
+            hospital_admissions = json.dumps([{'fields': r} for r in hospital_admissions_record])
+        else:
+            hospital_admissions = json.dumps([])
+
+        adult_details_export['fields']['hospital_admission'] = adult_record['has_hospital_admissions']
+        additional_adult_details_export['hospital_admissions'] = hospital_admissions
+
+        previous_names_response = HMGatewayActions().list('previous-name', params={'adult_id': adult_id})
+
+        if previous_names_response.status_code == 200:
+            additional_adult_details_export['previous_names'] = json.dumps([{'fields': r} for r in previous_names_response.record])
+        else:
+            additional_adult_details_export['previous_names'] = json.dumps([])
+
+        previous_address_response = HMGatewayActions().list('previous-address', params={'adult_id': adult_id})
+
+        if previous_address_response.status_code == 200:
+            additional_adult_details_export['previous_address'] = json.dumps([{'fields': r} for r in previous_address_response.record])
+        else:
+            additional_adult_details_export['previous_address'] = json.dumps([])
+
+        previous_reg_response = HMGatewayActions().list('previous-registration', params={'adult_id': adult_id})
+
+        if previous_reg_response.status_code == 200:
+            additional_adult_details_export['previous_registrations'] = json.dumps([{'fields': r} for r in previous_reg_response.record])
+        else:
+            additional_adult_details_export['previous_registrations'] = json.dumps([])
+
+        adult_document_object = {
+            'adult_id': str(adult_id),
+            'document': DocumentGenerator.get_adult_update_application_summary(adult_id),
+        }
+
+        export['application'] = json.dumps([{'fields': {'application_reference': urn, 'registration_id': registration_id, 'date_accepted': date_accepted}}])
+        export['adults_in_home'] = json.dumps([adult_details_export])
+        export['additional_adult_details'] = json.dumps([additional_adult_details_export])
+        export['documents'] = json.dumps({'EY2': [adult_document_object]})
+
+        adult_update_application_sqs_handler.send_message(export)

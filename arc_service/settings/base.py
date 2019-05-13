@@ -7,8 +7,6 @@ ARC_GROUP = 'arc'
 CONTACT_CENTRE = 'contact-centre'
 APPLICATION_LIMIT = 5
 
-DBS_URL = os.environ.get('APP_DBS_URL')
-
 NOTIFY_URL = os.environ.get('APP_NOTIFY_URL')
 
 # Base URL of addressing-service gateway
@@ -24,6 +22,8 @@ DBS_URL = os.environ.get('APP_DBS_URL')
 # Bool to determine whether to enable or disable nanny applications showing
 # Default: False
 ENABLE_NANNIES = os.environ.get('ENABLE_NANNIES') in ['true', True, 'True']
+
+HM_GATEWAY_URL = os.environ.get("APP_HM_GATEWAY_URL")
 
 # Address of Childminder application
 CHILDMINDER_EMAIL_VALIDATION_URL = os.environ.get('CHILDMINDER_EMAIL_VALIDATION_URL')
@@ -227,5 +227,7 @@ LOGGING = {
 
 CM_APPLICATION_QUEUE_NAME = os.environ.get('SQS_QUEUE_PREFIX') + "_CM_APPLICATION_QUEUE"
 NA_APPLICATION_QUEUE_NAME = os.environ.get('SQS_QUEUE_PREFIX') + "_NA_APPLICATION_QUEUE"
+ADDITIONAL_ADULT_APPLICATION_QUEUE_NAME = os.environ.get('SQS_QUEUE_PREFIX') + "_ADDITIONAL_ADULT_APPLICATION_QUEUE"
+
 AWS_SQS_ACCESS_KEY_ID = os.environ.get('AWS_SQS_ACCESS_KEY_ID')
 AWS_SQS_SECRET_ACCESS_KEY = os.environ.get('AWS_SQS_SECRET_ACCESS_KEY')
