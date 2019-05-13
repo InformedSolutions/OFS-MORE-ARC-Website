@@ -122,6 +122,12 @@ def postcode_selection(request, remove=False):
             moved_out_year = request_data['moved_out_date_2']
 
             address = {
+                'start_day': moved_in_day,
+                'start_month': moved_in_month,
+                'start_year': moved_in_year,
+                'end_day': moved_out_day,
+                'end_month': moved_out_month,
+                'end_year': moved_out_year,
                 'postcode': postcode,
                 'moved_in_date': [moved_in_day, moved_in_month, moved_in_year],
                 'moved_out_date': [moved_out_day, moved_out_month, moved_out_year]
@@ -222,6 +228,12 @@ def postcode_submission(request):
             postcode=postcode,
             moved_in_date=moved_in_date,
             moved_out_date=moved_out_date,
+            start_day=moved_in_day,
+            start_month=moved_in_month,
+            start_year=moved_in_year,
+            end_day=moved_out_day,
+            end_month=moved_out_month,
+            end_year=moved_out_year
         )
 
         if 'save-and-continue' in request.POST:
@@ -278,6 +290,17 @@ def adults_previous_address_change(request):
             # Update previous address moved in/out dates
             address_record['moved_in_date'] = current_form.cleaned_data['moved_in_date']
             address_record['moved_out_date'] = current_form.cleaned_data['moved_out_date']
+
+            # moved_in_date_object = datetime.strptime(current_form.cleaned_data['moved_in_date'], '%Y-%m-%d')
+            # moved_out_date_object = datetime.strptime(current_form.cleaned_data['moved_out_date'], '%Y-%m-%d')
+
+            address_record['moved_in_day'] = current_form.cleaned_data['moved_in_date'].day
+            address_record['moved_in_month'] = current_form.cleaned_data['moved_in_date'].month
+            address_record['moved_in_year'] = current_form.cleaned_data['moved_in_date'].year
+
+            address_record['moved_out_day'] = current_form.cleaned_data['moved_out_date'].day
+            address_record['moved_out_month'] = current_form.cleaned_data['moved_out_date'].month
+            address_record['moved_out_year'] = current_form.cleaned_data['moved_out_date'].year
 
             HMGatewayActions().put('previous-address', params=address_record)
             log.debug("Handling submissions for other people previous address - change address page - save successful")
