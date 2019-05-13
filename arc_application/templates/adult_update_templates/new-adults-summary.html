@@ -638,7 +638,7 @@
 
         <br>
 
-        {% if previous_registrations in previous_registration_lists %}
+        {% if not previous_registrations in previous_registration_lists %}
         <a href="{% url 'adults-previous-registration' %}?id={{id}}" class="button button-secondary">Add previous registration details</a>
         {% endif %}
         {% endfor %}
