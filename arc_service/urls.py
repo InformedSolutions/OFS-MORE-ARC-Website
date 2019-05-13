@@ -124,7 +124,7 @@ urlpatterns = [
         name='new_adults'),
     url(r'^review/approved', accepted_adult,
         name='adults-confirmation'),
-    url(r'^new-adult/previous-registration', adult_previous_registration_view,
+    url(r'^review/new-adult/previous-registration', adult_previous_registration_view,
         name='adults-previous-registration'),
     url(r'^review/returned', returned_adult,
         name='adults-returned'),
