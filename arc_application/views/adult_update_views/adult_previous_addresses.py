@@ -291,16 +291,13 @@ def adults_previous_address_change(request):
             address_record['moved_in_date'] = current_form.cleaned_data['moved_in_date']
             address_record['moved_out_date'] = current_form.cleaned_data['moved_out_date']
 
-            # moved_in_date_object = datetime.strptime(current_form.cleaned_data['moved_in_date'], '%Y-%m-%d')
-            # moved_out_date_object = datetime.strptime(current_form.cleaned_data['moved_out_date'], '%Y-%m-%d')
+            address_record['start_day'] = current_form.cleaned_data['moved_in_date'].day
+            address_record['start_month'] = current_form.cleaned_data['moved_in_date'].month
+            address_record['start_year'] = current_form.cleaned_data['moved_in_date'].year
 
-            address_record['moved_in_day'] = current_form.cleaned_data['moved_in_date'].day
-            address_record['moved_in_month'] = current_form.cleaned_data['moved_in_date'].month
-            address_record['moved_in_year'] = current_form.cleaned_data['moved_in_date'].year
-
-            address_record['moved_out_day'] = current_form.cleaned_data['moved_out_date'].day
-            address_record['moved_out_month'] = current_form.cleaned_data['moved_out_date'].month
-            address_record['moved_out_year'] = current_form.cleaned_data['moved_out_date'].year
+            address_record['end_day'] = current_form.cleaned_data['moved_out_date'].day
+            address_record['end_month'] = current_form.cleaned_data['moved_out_date'].month
+            address_record['end_year'] = current_form.cleaned_data['moved_out_date'].year
 
             HMGatewayActions().put('previous-address', params=address_record)
             log.debug("Handling submissions for other people previous address - change address page - save successful")
