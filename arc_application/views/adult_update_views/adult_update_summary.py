@@ -100,34 +100,34 @@ def load_json(adult_id):
 
         summary_table += [
                 {"name": "Did they get their DBS check from the Ofsted DBS application website?",
-                 "value": record['capita'],
+                 "value": 'Yes' if record['capita'] else 'No',
                 'field':'capita'},
             ]
 
         if record['capita']:
             summary_table += [
                     {"name": "Is it dated within the last 3 months?",
-                     "value": record['within_three_months'],
+                     "value": 'Yes' if record['within_three_months'] else 'No',
                      'field': "capita"}
                 ]
 
         summary_table += [
                 {"name": "DBS certificate number",
-                "value": record['dbs_certificate_number'],
+                "value": 'Yes' if record['dbs_certificate_number'] else 'No',
                  "field": 'dbs_certificate_number'},
             ]
 
 
     summary_table += [
             {"name": "Enhanced DBS check for home-based childcare?",
-             "value": record['enhanced_check'],
+             "value": 'Yes' if record['enhanced_check'] else 'No',
              "field": 'enhanced_check'}
         ]
 
     if record['enhanced_check'] and not (record['capita'] or record['within_three_months']):
         summary_table += [
                 {"name": "On the update service?",
-                 "value": record['on_update'],
+                 "value": 'Yes' if record['on_update'] else 'No',
                  'field': "on_update"}
             ]
 

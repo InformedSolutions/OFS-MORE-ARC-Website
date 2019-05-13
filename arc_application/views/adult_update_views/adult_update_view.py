@@ -202,7 +202,6 @@ def new_adults_summary(request):
                     adult_comments = request_to_comment(adult_id, '', adult_post_data, adult_id_local)
                     token_id = adult['token_id']
                     save_comments(request, adult_comments, adult_id_local, token_id)
-
                     HMGatewayActions().put('adult', params={'cygnum_relationship_to_childminder': adult_post_data['cygnum_relationship'], 'adult_id':adult_id_local,'token_id': adult['token_id']})
 
                     #do we get a field to say if anything flagged?
@@ -250,6 +249,7 @@ def handle_previous_name_and_address_dates(adult_id, adult_record):
     actions = HMGatewayActions()
     end_date = date.today()
     date_of_birth = datetime.strptime(adult_record['date_of_birth'], '%Y-%m-%d')
+    new_adult_record = {'adult_id':adult_id,'token_id': adult_record['token_id']}
 
     previous_names = actions.list('previous-name', params={'adult_id': adult_id})
     if previous_names.status_code == 200:
@@ -260,12 +260,12 @@ def handle_previous_name_and_address_dates(adult_id, adult_record):
     else:
         name_start_date = date_of_birth
 
-    adult_record['name_start_day'] = name_start_date.day
-    adult_record['name_start_month'] = name_start_date.month
-    adult_record['name_start_year'] = name_start_date.year
-    adult_record['name_end_day'] = end_date.day
-    adult_record['name_end_month'] = end_date.month
-    adult_record['name_end_year'] = end_date.year
+    new_adult_record['name_start_day'] = name_start_date.day
+    new_adult_record['name_start_month'] = name_start_date.month
+    new_adult_record['name_start_year'] = name_start_date.year
+    new_adult_record['name_end_day'] = end_date.day
+    new_adult_record['name_end_month'] = end_date.month
+    new_adult_record['name_end_year'] = end_date.year
 
     actions.put('adult', params=adult_record)
 
@@ -279,7 +279,7 @@ def handle_previous_name_and_address_dates(adult_id, adult_record):
     else:
         address_start_date = date_of_birth
 
-    adult_record['moved_in_date'] = address_start_date
-    adult_record['moved_out_date'] = end_date
+    new_adult_record['moved_in_date'] = address_start_date
+    new_adult_record['moved_out_date'] = end_date
 
-    actions.put('adult', params=adult_record)
+    actions.put('adult', params=new_adult_record)
