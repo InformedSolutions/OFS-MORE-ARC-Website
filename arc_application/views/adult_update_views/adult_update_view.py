@@ -267,8 +267,6 @@ def handle_previous_name_and_address_dates(adult_id, adult_record):
     new_adult_record['name_end_month'] = end_date.month
     new_adult_record['name_end_year'] = end_date.year
 
-    actions.put('adult', params=adult_record)
-
     previous_addresses_response = actions.list('previous-address', params={'adult_id': adult_id})
     if previous_addresses_response.status_code == 200:
         previous_addresses = previous_addresses_response.record
