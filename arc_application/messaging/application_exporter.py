@@ -68,6 +68,8 @@ class ApplicationExporter:
                                                                      current_address=True)
         export['applicant_home_address'] = serializers.serialize('json', list(applicant_home_address))
 
+        ApplicationExporter.set_moved_in_dates_on_childminder_applicant_home_address(export)
+
         applicant_previous_names = PreviousName.objects.filter(other_person_type='APPLICANT', person_id=application_id)
         export['applicant_previous_names'] = serializers.serialize('json', list(applicant_previous_names))
 
@@ -161,6 +163,8 @@ class ApplicationExporter:
                                                             params={'application_id': application_id}).record
         export['applicant_home_address'] = json.dumps(applicant_home_address)
 
+        ApplicationExporter.set_moved_in_dates_on_nanny_home_address(export)
+
         childcare_training = NannyGatewayActions().read('childcare-training',
                                                         params={'application_id': application_id}).record
         export['childcare_training'] = json.dumps(childcare_training)
@@ -213,3 +217,41 @@ class ApplicationExporter:
         export['documents'] = json.dumps(documents)
 
         na_application_sqs_handler.send_message(export)
+
+    @staticmethod
+    def set_moved_in_dates_on_childminder_applicant_home_address(export_object):
+        """
+        Helper method for setting move in dates on an applicant's current address
+        :param export_object: The export object to be sent to SQS
+        """
+        try:
+            decoded_home_addresses = json.loads(export_object['applicant_home_address'])
+
+            decoded_home_address = None
+
+            # Find current address
+            for address in decoded_home_addresses:
+                if address['fields']['current_address']:
+                    decoded_home_address = address
+
+            decoded_personal_details = json.loads(export_object['applicant_personal_details'])[0]
+            decoded_home_address['fields']['moved_in_day'] = decoded_personal_details['fields']['moved_in_day']
+            decoded_home_address['fields']['moved_in_month'] = decoded_personal_details['fields']['moved_in_month']
+            decoded_home_address['fields']['moved_in_year'] = decoded_personal_details['fields']['moved_in_year']
+            export_object['applicant_home_address'] = json.dumps(decoded_home_addresses)
+        except:
+            pass
+
+    @staticmethod
+    def set_moved_in_dates_on_nanny_home_address(export_object):
+        """
+        Helper method for setting move in dates on an applicant's current address
+        :param export_object: The export object to be sent to SQS
+        """
+        try:
+            decoded_home_address = json.loads(export_object['applicant_home_address'])
+            decoded_personal_details = json.loads(export_object['applicant_personal_details'])
+            decoded_home_address['moved_in_date'] = decoded_personal_details['moved_in_date']
+            export_object['applicant_home_address'] = json.dumps(decoded_home_address)
+        except:
+            pass
