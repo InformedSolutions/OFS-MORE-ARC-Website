@@ -228,6 +228,7 @@ class ApplicationExporter:
         urn = dpa_record['URN']
         registration_id = dpa_record['registration_id']
 
+        adult_details_export['pk'] = adult_id
         adult_details_export['fields'] = adult_record
 
         additional_adult_details_export['adult'] = json.dumps(adult_record['order'])
