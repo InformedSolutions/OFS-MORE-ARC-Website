@@ -158,11 +158,10 @@ def release_application(request, application_id, status):
     else:
         hm_api_response = HMGatewayActions().read('adult', params={'adult_id': application_id})
         app = hm_api_response.record
-        APP_ORIGINAL = app.copy()
 
         if status == 'FURTHER_INFORMATION':
             app['declarations_status'] = 'NOT_STARTED'
-        elif status == 'ACCEPTED' and not APP_ORIGINAL['adult_status'] == 'ACCEPTED':
+        elif status == 'ACCEPTED':
             app['date_accepted'] = datetime.now()
 
             # Import used here explicitly to prevent circular import
