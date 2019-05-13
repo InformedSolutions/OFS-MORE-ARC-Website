@@ -225,8 +225,10 @@ class ApplicationExporter:
 
         dpa_auth_id = adult_record['token_id']
         dpa_record = HMGatewayActions().read('dpa-auth', params={'token_id': dpa_auth_id}).record
+
         urn = dpa_record['URN']
         registration_id = dpa_record['registration_id']
+        date_accepted = adult_record['date_accepted']
 
         adult_details_export['pk'] = adult_id
         adult_details_export['fields'] = adult_record
@@ -282,7 +284,7 @@ class ApplicationExporter:
             'document': DocumentGenerator.get_adult_update_application_summary(adult_id),
         }
 
-        export['application'] = json.dumps([{'fields': {'application_reference': urn, 'registration_id': registration_id}}])
+        export['application'] = json.dumps([{'fields': {'application_reference': urn, 'registration_id': registration_id, 'date_accepted': date_accepted}}])
         export['adults_in_home'] = json.dumps([adult_details_export])
         export['additional_adult_details'] = json.dumps([additional_adult_details_export])
         export['documents'] = json.dumps({'EY2': [adult_document_object]})
