@@ -240,7 +240,7 @@ class ApplicationExporter:
         else:
             current_illnesses = json.dumps([])
 
-        adult_details_export['fields']['current_illness'] = current_illnesses
+        adult_details_export['fields']['current_treatment'] = current_illnesses
 
         if adult_record['has_serious_illness']:
             serious_illnesses = HMGatewayActions().list('serious-illness', params={'adult_id': adult_id}).record
