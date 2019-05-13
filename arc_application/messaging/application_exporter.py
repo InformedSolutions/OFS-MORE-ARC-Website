@@ -236,25 +236,30 @@ class ApplicationExporter:
         additional_adult_details_export['adult'] = json.dumps(adult_record['order'])
 
         if adult_record['currently_being_treated']:
-            current_illnesses = adult_record['illness_details']
+            current_illnesses = json.dumps([{'fields': r} for r in adult_record['illness_details']])
         else:
             current_illnesses = json.dumps([])
 
-        adult_details_export['fields']['current_treatment'] = current_illnesses
+        adult_details_export['fields']['current_treatment'] = adult_record['currently_being_treated']
+        additional_adult_details_export['current_treatments'] = current_illnesses
 
         if adult_record['has_serious_illness']:
-            serious_illnesses = HMGatewayActions().list('serious-illness', params={'adult_id': adult_id}).record
+            serious_illnesses_record = HMGatewayActions().list('serious-illness', params={'adult_id': adult_id}).record
+            serious_illnesses = json.dumps([{'fields': r} for r in serious_illnesses_record])
         else:
             serious_illnesses = json.dumps([])
 
-        adult_details_export['fields']['serious_illness'] = serious_illnesses
+        adult_details_export['fields']['serious_illness'] = adult_record['has_serious_illness']
+        additional_adult_details_export['serious_illnesses'] = serious_illnesses
 
         if adult_record['has_hospital_admissions']:
-            hospital_admissions = HMGatewayActions().list("hospital-admissions", params={'adult_id': adult_id}).record
+            hospital_admissions_record = HMGatewayActions().list("hospital-admissions", params={'adult_id': adult_id}).record
+            hospital_admissions = json.dumps([{'fields': r} for r in hospital_admissions_record])
         else:
             hospital_admissions = json.dumps([])
 
-        adult_details_export['fields']['hospital_admission'] = hospital_admissions
+        adult_details_export['fields']['hospital_admission'] = adult_record['has_hospital_admissions']
+        additional_adult_details_export['hospital_admissions'] = hospital_admissions
 
         previous_names_response = HMGatewayActions().list('previous-name', params={'adult_id': adult_id})
 
