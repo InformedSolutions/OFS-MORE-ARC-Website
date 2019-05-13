@@ -168,8 +168,7 @@ def release_application(request, application_id, status):
             # Import used here explicitly to prevent circular import
             from ..messaging import ApplicationExporter
 
-            # TODO: Add call to export function.
-            # ApplicationExporter.export_adult_update_application(application_id, adult_id)
+            ApplicationExporter.export_adult_update_application(application_id)
 
         elif status == 'ARC REVIEW':
             app['adult_status'] = 'SUBMITTED'
