@@ -236,27 +236,25 @@ class ApplicationExporter:
         additional_adult_details_export['adult'] = json.dumps(adult_record['order'])
 
         if adult_record['currently_being_treated']:
-            current_illnesses = json.dumps(adult_record['illness_details'])
+            current_illnesses = adult_record['illness_details']
         else:
             current_illnesses = json.dumps([])
 
-        additional_adult_details_export['current_illnesses'] = current_illnesses
+        adult_details_export['fields']['current_illnesses'] = current_illnesses
 
         if adult_record['has_serious_illness']:
             serious_illnesses = HMGatewayActions().list('serious-illness', params={'adult_id': adult_id}).record
-            serious_illnesses = json.dumps([{'fields': r} for r in serious_illnesses])
         else:
             serious_illnesses = json.dumps([])
 
-        additional_adult_details_export['serious_illness'] = serious_illnesses
+        adult_details_export['fields']['serious_illness'] = serious_illnesses
 
         if adult_record['has_hospital_admissions']:
             hospital_admissions = HMGatewayActions().list("hospital-admissions", params={'adult_id': adult_id}).record
-            hospital_admissions = json.dumps([{'fields': r} for r in hospital_admissions])
         else:
             hospital_admissions = json.dumps([])
 
-        additional_adult_details_export['hospital_admissions'] = hospital_admissions
+        adult_details_export['fields']['hospital_admissions'] = hospital_admissions
 
         previous_names_response = HMGatewayActions().list('previous-name', params={'adult_id': adult_id})
 
