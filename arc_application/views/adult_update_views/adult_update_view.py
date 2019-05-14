@@ -248,7 +248,6 @@ def handle_previous_name_and_address_dates(adult_id, adult_record):
     """
     actions = HMGatewayActions()
     end_date = date.today()
-    date_of_birth = datetime.strptime(adult_record['date_of_birth'], '%Y-%m-%d')
     new_adult_record = {'adult_id':adult_id,'token_id': adult_record['token_id']}
 
     previous_names = actions.list('previous-name', params={'adult_id': adult_id})
@@ -258,7 +257,7 @@ def handle_previous_name_and_address_dates(adult_id, adult_record):
         sorted_previous_names = sorted(previous_names.record, key=itemgetter('end_date'), reverse=True)
         name_start_date = sorted_previous_names[0]['end_date']
     else:
-        name_start_date = date_of_birth
+        name_start_date = datetime.strptime(adult_record['date_of_birth'], '%Y-%m-%d')
 
     new_adult_record['name_start_day'] = name_start_date.day
     new_adult_record['name_start_month'] = name_start_date.month
@@ -273,9 +272,9 @@ def handle_previous_name_and_address_dates(adult_id, adult_record):
         # moved_out_date is a string but due to iso format, lexicographical order will be
         # equivalent to chronological
         sorted_previous_addresses = sorted(previous_addresses, key=itemgetter('moved_out_date'), reverse=True)
-        address_start_date = datetime.strptime(sorted_previous_addresses[0]['moved_out_date'],'%Y-%m-%d').date()
+        address_start_date = sorted_previous_addresses[0]['moved_out_date']
     else:
-        address_start_date = date_of_birth
+        address_start_date = adult_record['date_of_birth']
 
     new_adult_record['moved_in_date'] = address_start_date
     new_adult_record['moved_out_date'] = end_date
