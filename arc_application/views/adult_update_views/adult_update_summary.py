@@ -245,7 +245,7 @@ def load_json(adult_id):
             for i in range(0, len(address_record)):
                 address = address_record[i]
                 full_address = address['street_line1'] + ", " + address['street_line2'] + ", " + address['town']
-                link = reverse("adult_add_previous_address_change") + '?id=' + adult_id + '&previous_address_id' + address['previous_address_id']
+                link = reverse("adult_add_previous_address_change") + '?id=' + adult_id + '&previous_address_id=' + address['previous_address_id']
                 if address['county'] != '':
                     full_address = full_address + ", " + address['county']
                 full_address = full_address + ", " +address['country'] + ', ' + address['postcode']
