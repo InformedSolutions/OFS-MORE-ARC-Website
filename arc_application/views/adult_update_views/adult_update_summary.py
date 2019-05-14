@@ -278,7 +278,7 @@ def load_json(adult_id):
                                          "index": 1,
                                          "link": reverse("adults-previous-registration") + '?id=' + adult_id},
                                         {"name": "Has the applicant lived in England for more than 5 years?",
-                                         "value": 'Yes' if record['five_years_in_uk'] else 'No',
+                                         "value": 'Yes' if record['five_years_in_UK'] else 'No',
                                          "index": 2,
                                          "link": reverse("adults-previous-registration") + '?id=' + adult_id}
                                         ]
