@@ -3,7 +3,6 @@ from datetime import date, datetime
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 
@@ -14,8 +13,9 @@ from ...forms.previous_addresses import PreviousAddressEntryForm, PreviousAddres
 from ...services.db_gateways import HMGatewayActions
 from ...review_util import build_url
 
-# Initiate logging
+
 log = logging.getLogger('')
+
 
 @login_required
 @group_required(settings.ARC_GROUP)
@@ -236,6 +236,7 @@ def postcode_submission(request):
             moved_out_year=moved_out_year
         )
 
+
         if 'save-and-continue' in request.POST:
             log.debug("Handling submissions for other people previous addresses page - save and continue")
             return HttpResponseRedirect(build_url('new_adults_summary', get={'id': request.POST['id']}))
@@ -377,7 +378,6 @@ def get_post_data(request):
     url_vars = get_url_data(request)
     post_data_vars['previous_addresses'] = get_stored_addresses(url_vars['id'])
 
-
     return post_data_vars
 
 
@@ -442,6 +442,7 @@ def create_previous_address(**kwargs):
     create_response = HMGatewayActions().create('previous-address', params=params)
 
     return create_response.record
+
 
 def remove_previous_address(pk):
     """
