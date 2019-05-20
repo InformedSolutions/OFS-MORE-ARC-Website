@@ -27,6 +27,7 @@ def review(request, application_id_local):
     """
     adult_record = HMGatewayActions().read('adult', params={'adult_id': application_id_local}).record
     token_id = adult_record['token_id']
+    new_adult_name = adult_record['first_name'] + ' ' + adult_record['last_name']
     identity_gateway_response = IdentityGatewayActions().read('user', params={'application_id': token_id})
     response = HMGatewayActions().read('dpa-auth', params={'token_id': token_id})
     app_ref = response.record['URN']
@@ -46,7 +47,7 @@ def review(request, application_id_local):
             adult_record['adult_status'] = "ACCEPTED"
             adult_record['date_accepted'] = datetime.datetime.now()
             HMGatewayActions().put('adult', params=adult_record)
-            accepted_email(email, first_name, app_ref, application_id_local)
+            accepted_email(email, first_name, app_ref, new_adult_name, application_id_local)
 
 
 
@@ -99,7 +100,7 @@ def accepted_adult(request):
 
 
 # Add personalisation and create template
-def accepted_email(email, first_name, ref, application_id):
+def accepted_email(email, first_name, ref, new_adult_name, application_id):
     """
     Method to send an email using the Notify Gateway API
     :param email: string containing the e-mail address to send the e-mail to
@@ -113,7 +114,9 @@ def accepted_email(email, first_name, ref, application_id):
 
         template_id = '8c469301-de23-44ac-8305-257c8125a121'
 
-        personalisation = {'first_name': first_name}
+        personalisation = {'first_name': first_name,
+                           'new_adult_name': new_adult_name,
+                           'ref': ref}
         return send_email(email, personalisation, template_id, hm_email=True)
 
 # Add personalisation and create template
