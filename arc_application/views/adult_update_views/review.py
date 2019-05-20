@@ -85,6 +85,9 @@ def save_comments(request, comment_list, application_id, token_id):
 
         if existing_comment_response.status_code == 200:
             existing_comment_present = True
+            existing_record = existing_comment_response.record[0]
+            review_id = existing_record['review_id']
+            comment = single_comment[3]
 
         if single_comment[2] == 'health_check_status':
             adult = HMGatewayActions().read('adult', {'adult_id':single_comment[0]})
@@ -93,11 +96,16 @@ def save_comments(request, comment_list, application_id, token_id):
             adult_record['email_resent'] = 0
             HMGatewayActions().put('adult', adult_record)
 
-        # If a field already has a comment, this will update it, otherwise it will use the 'default' dictionary
-        response = HMGatewayActions().list('arc-comments', params={'table_pk':single_comment[0],
-                                                                       'field_name':single_comment[2]})
+        if existing_comment_present:
+            update_comment = {
+                'review_id': review_id,
+                'comment': comment,
+                'flagged': True
+            }
 
-        if response.status_code == 404:
+            HMGatewayActions().put('arc-comments', params=update_comment)
+
+        else:
             HMGatewayActions().create('arc-comments', params=defaults)
 
         #Audit field level change if not already tracked
