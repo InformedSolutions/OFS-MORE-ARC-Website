@@ -99,7 +99,8 @@ def save_comments(request, comment_list, application_id, token_id):
         if existing_comment_present:
             update_comment = {
                 'review_id': review_id,
-                'comment': comment
+                'comment': comment,
+                'flagged': True
             }
 
             HMGatewayActions().put('arc-comments', params=update_comment)
