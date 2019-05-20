@@ -85,6 +85,9 @@ def save_comments(request, comment_list, application_id, token_id):
 
         if existing_comment_response.status_code == 200:
             existing_comment_present = True
+            existing_record = existing_comment_response.record[0]
+            review_id = existing_record['review_id']
+            comment = single_comment[3]
 
         if single_comment[2] == 'health_check_status':
             adult = HMGatewayActions().read('adult', {'adult_id':single_comment[0]})
@@ -99,6 +102,13 @@ def save_comments(request, comment_list, application_id, token_id):
 
         if response.status_code == 404:
             HMGatewayActions().create('arc-comments', params=defaults)
+        else:
+            update_comment = {
+                'review_id': review_id,
+                'comment': comment
+            }
+
+            HMGatewayActions().put('arc-comments', params=update_comment)
 
         #Audit field level change if not already tracked
         if not existing_comment_present:
