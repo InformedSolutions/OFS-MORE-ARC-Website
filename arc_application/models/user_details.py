@@ -39,7 +39,7 @@ class UserDetails(models.Model):
             'add_phone_number',
         )
 
-    def get_summary_table(self):
+    def get_summary_table(self, apply_filtering_for_eyc=False):
         return [
             {"title": "Your sign in details", "id": self.pk},
             {"name": "Your email", "value": self.email},

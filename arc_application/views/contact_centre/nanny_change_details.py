@@ -1,13 +1,21 @@
+import logging
+
 from django.conf import settings
+from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
 from django.views.generic import FormView
 
-from arc_application.forms.update_detail_forms.update_contact_details import NannyUpdateEmail, NannyUpdatePhoneNumber, \
+from ...forms.update_detail_forms.update_contact_details import NannyUpdateEmail, NannyUpdatePhoneNumber, \
     NannyUpdateAddPhoneNumber
-from arc_application.review_util import build_url
-from arc_application.services.db_gateways import IdentityGatewayActions
-from arc_application.views import has_group
+from ...review_util import build_url
+from ...services.db_gateways import IdentityGatewayActions
+from ...views.base import has_group
+
+# Initiate logging
+log = logging.getLogger()
 
 
+@method_decorator(login_required, name='dispatch')
 class NannyChangeDetails(FormView):
     form_class = None
     page_title = None
@@ -46,7 +54,7 @@ class NannyChangeDetails(FormView):
         updates = {'application_id': app_id,
                    self.field: form.cleaned_data[self.field]}
         patch_response = identity_actions.patch('user', updates)
-
+        log.debug("Handling submissions for nanny change details page")
         return super().form_valid(form)
 
     def get_success_url(self):
@@ -58,6 +66,7 @@ class NannyUpdateEmailView(NannyChangeDetails):
     field = NannyChangeDetails.field[0]
     form_class = NannyUpdateEmail
     page_title = "Update the applicant's email"
+    log.debug("Rendering update personal details - change email")
 
 
 class NannyUpdatePhoneNumberView(NannyChangeDetails):

@@ -1,0 +1,31 @@
+h1 {
+    font-size: 2em;
+}
+
+h2 {
+   font-size: 1.5em;
+}
+
+th {
+   font-size: 1.5em;
+   text-align: left;
+}
+
+tr {
+   font-size: 1em;
+}
+
+.question-label {
+   font-weight: bold;
+}
+
+.response-table {
+   margin-top: 3em;
+}
+
+.response-row {
+    padding-top: 3px;
+    padding-left: 2px;
+    border-bottom: 1px solid black;
+    border-top: 1px solid black;
+}

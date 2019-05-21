@@ -1,0 +1,32 @@
+<tr class="response-row">
+    <td class="question-label">
+        Childcare address {{ forloop.counter }}
+    </td>
+    <td>
+
+        {% if home_address.street_line1 %}
+            {{ home_address.street_line1 }}
+            <br/>
+        {% endif %}
+
+        {% if home_address.street_line2 %}
+            {{home_address.street_line2}}
+            <br/>
+        {% endif %}
+
+        {% if home_address.town %}
+            {{home_address.town}}
+            <br/>
+        {% endif %}
+
+        {% if home_address.county %}
+            {{home_address.county}}
+            <br/>
+        {% endif %}
+
+        {% if home_address.postcode %}
+            {{home_address.postcode}}
+            <br/>
+        {% endif %}
+    </td>
+</tr>

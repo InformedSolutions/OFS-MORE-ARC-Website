@@ -1,242 +1,291 @@
 import datetime
+import unittest
 
+import django
 from lxml import etree
 from django.http import HttpResponse
 from django.conf import settings
 from django.contrib.auth.models import User, Group
 
-from arc_application import models
+from ..models import *
 
 
-mock_nanny_application = {
-    'application_status': 'DRAFTING',
-    'application_id': '998fd8ec-b96b-4a71-a1a1-a7a3ae186729',
-    'date_submitted': '2018-07-31 17:20:46.011717+00',
-    'date_updated': '2018-07-31 17:20:46.011717+00',
-    'childcare_training_status': 'NOT_STARTED',
-    'login_details_status': 'COMPLETED',
-    'personal_details_status': 'NOT_STARTED',
-    'criminal_record_check_status': 'NOT_STARTED',
-    'address_to_be_provided': True,
-    'login_details_arc_flagged': False,
-    'personal_details_arc_flagged': False,
-    'childcare_address_status': 'COMPLETED',
-    'childcare_address_arc_flagged': False,
-    'first_aid_training_status': 'COMPLETED',
-    'first_aid_training_arc_flagged': False,
-    'childcare_training_arc_flagged': False,
-    'criminal_record_check_arc_flagged': False,
-    'insurance_cover_status': 'COMPLETED',
-    'insurance_cover_arc_flagged': False,
-    'application_reference': 'NA',
-    'share_info_declare': True
-}
+class StubIdentityGatewayActions:
+    """
+    Stub that returns static data for identity gateway endpoints. Can be instantiated, tweaked and discarded for
+    each test
+    """
+    def __init__(self):
+        self.identity_record = {
+            'email': 'test@informed.com',
+            'application_id': 'a4e6633f-5339-4de5-ae03-69c71fd008b3',
+            'magic_link_sms': '12345',
+            'sms_resend_attempts': 0,
+            'mobile_number': '000000000012',
+            'magic_link_email': 'ABCDEFGHIJKL',
+            'add_phone_number': '',
+        }
+        self.identity_read_response = self.make_ok_response(self.identity_record)
+        self.identity_list_response = self.make_ok_response()
+        self.identity_create_response = self.make_ok_response()
+        self.identity_patch_response = self.make_ok_response()
+        self.identity_put_response = self.make_ok_response()
+        self.identity_delete_response = self.make_ok_response()
 
-mock_personal_details_record = {
-    'application_id': '998fd8ec-b96b-4a71-a1a1-a7a3ae186729',
-    'personal_detail_id': '9835bf4b-9ba9-4162-a25b-4c56e7d33d67',
-    'first_name': 'The Dark Lord',
-    'middle_names': '',
-    'last_name': 'Selenium',
-    'date_of_birth': '2000-01-01',
-    'lived_abroad': True,
-    'known_to_social_services': True,
-    'reasons_known_to_social_services': 'An IMPORTANT reason'
-}
+    def list(self, *args, **kwargs):
+        return self.identity_list_response
 
-mock_childcare_training_record = {
-    'application_id': '998fd8ec-b96b-4a71-a1a1-a7a3ae186729',
-    'childcare_training_id': '9835bf3b-8ba9-4162-a25b-4c55e7d33d69',
-    'level_2_training': False,
-    'common_core_training': False,
-    'no_training': False
-}
+    def read(self, *args, **kwargs):
+        return self.identity_read_response
 
-mock_dbs_record = {
-    'application_id': '998fd8ec-b96b-4a71-a1a1-a7a3ae186729',
-    'dbs_id': '9835bf3b-8ba9-4162-a25b-4c55e7d33d77',
-    'lived_abroad': True,
-    'is_ofsted_dbs': True,
-    'on_dbs_update_service': True,
-    'dbs_number': '000000000012',
-    'within_three_months':False,
-    'enhanced_check':None,
-    'convictions': None,
-}
+    def create(self, *args, **kwargs):
+        return self.identity_create_response
 
-mock_home_address = {
-    'application_id': '998fd8ec-b96b-4a71-a1a1-a7a3ae186729',
-    'home_address_id': '9935bf3b-8ba9-4162-a25b-4c55e7d33d67',
-    'street_line1': 'Test',
-    'street_line2': None,
-    'town': 'Middle Earth',
-    'county': None,
-    'postcode': 'WA14 4PA',
-    'childcare_address': False,
-}
+    def patch(self, *args, **kwargs):
+        return self.identity_patch_response
 
-mock_childcare_address_record = [
-    {
-        'application_id': '998fd8ec-b96b-4a71-a1a1-a7a3ae186729',
-        'childcare_address_id': '9835bf3b-8aa9-4162-a25b-4c55e7d33d67',
-        'street_line1': 'Test',
-        'street_line2': None,
-        'town': 'New New York',
-        'county': None,
-        'postcode': 'WA14 4PA',
-    },
-    {
-        'application_id': '998fd8ec-b96b-4a71-a1a1-a7a3ae186729',
-        'childcare_address_id': '9835bf3b-8aa9-4162-a25b-4c55e7d33d68',
-        'street_line1': 'Buckingham Palace',
-        'street_line2': None,
-        'town': 'London',
-        'county': None,
-        'postcode': 'SW1 1AA',
-    }
-]
+    def put(self, *args, **kwargs):
+        return self.identity_put_response
 
-mock_first_aid_record = {
-    'application_id': '998fd8ec-b96b-4a71-a1a1-a7a3ae186729',
-    'first_aid_id': '9835bf3b-8ba9-4162-a25b-4c56e7d33d67',
-    'training_organisation': 'St Johns Ambulance',
-    'course_title': 'Pediatric First Aid',
-    'course_date': '2016-03-31'
-}
+    def delete(self, *args, **kwargs):
+        return self.identity_delete_response
 
-mock_insurance_cover_record = {
-    'application_id': '998fd8ec-b96b-4a71-a1a1-a7a3ae186729',
-    'insurance_cover_id': '9835bf3b-9ba9-4162-a25b-4c56e7d33d67',
-    'public_liability': True
-}
-
-mock_identity_record = {
-    'email': 'test@informed.com',
-    'application_id': 'a4e6633f-5339-4de5-ae03-69c71fd008b3',
-    'magic_link_sms': '12345',
-    'sms_resend_attempts': 0,
-    'mobile_number': '000000000012',
-    'magic_link_email': 'ABCDEFGHIJKL',
-    'add_phone_number': '',
-}
-
-mock_your_children_record = [
-  {
-    "child_id": "ea55fae9-5f9f-421b-8adc-19aaad37016d",
-    "child": 1,
-    "lives_with_applicant": True,
-    "first_name": "Mr",
-    "middle_names": "",
-    "last_name": "Bump",
-    "birth_day": 1,
-    "birth_month": 1,
-    "birth_year": 2008,
-    "date_created": "2018-10-31T13:44:58.948231Z",
-    "street_line1": "FORTIS DEVELOPMENTS LTD, BANK HOUSE",
-    "street_line2": "OLD MARKET PLACE",
-    "town": "ALTRINCHAM",
-    "county": "",
-    "country": None,
-    "postcode": "WA14 4PA",
-    'application_id': '998fd8ec-b96b-4a71-a1a1-a7a3ae186729',
-  },
-  {
-    "child_id": "d02691ff-4050-4e42-bae8-c17c12ff0f27",
-    "child": 2,
-    "lives_with_applicant": False,
-    "first_name": "Mr",
-    "middle_names": "MIDDLE",
-    "last_name": "Happy",
-    "birth_day": 1,
-    "birth_month": 1,
-    "birth_year": 2010,
-    "date_created": "2018-10-31T13:45:16.802325Z",
-    "street_line1": "Palace",
-    "street_line2": "",
-    "town": "London",
-    "county": "",
-    "country": None,
-    "postcode": "SW1 1AA",
-    'application_id': '998fd8ec-b96b-4a71-a1a1-a7a3ae186729',
-  }
-]
-
-mock_declaration_record = {
-    'application_id': '998fd8ec-b96b-4a71-a1a1-a7a3ae186729',
-    'follow_rules': True,
-    'share_info_declare': True,
-    'information_correct_declare': True,
-    'change_declare': True,
-}
-
-mock_timeline_log_record = {}
-
-nanny_application_response = HttpResponse()
-nanny_application_response.status_code = 200
-nanny_application_response.record = mock_nanny_application
-
-personal_details_response = HttpResponse()
-personal_details_response.status_code = 200
-personal_details_response.record = mock_personal_details_record
-
-childcare_training_response = HttpResponse()
-childcare_training_response.status_code = 200
-childcare_training_response.record = mock_childcare_training_record
-
-home_address_response = HttpResponse()
-home_address_response.status_code = 200
-home_address_response.record = mock_home_address
-
-dbs_check_response = HttpResponse()
-dbs_check_response.status_code = 200
-dbs_check_response.record = mock_dbs_record
-
-first_aid_response = HttpResponse()
-first_aid_response.status_code = 200
-first_aid_response.record = mock_first_aid_record
-
-insurance_cover_response = HttpResponse()
-insurance_cover_response.status_code = 200
-insurance_cover_response.record = mock_insurance_cover_record
-
-childcare_address_response = HttpResponse()
-childcare_address_response.status_code = 200
-childcare_address_response.record = mock_childcare_address_record
-
-declaration_response = HttpResponse()
-declaration_response.status_code = 200
-declaration_response.record = mock_declaration_record
-
-identity_response = HttpResponse()
-identity_response.status_code = 200
-identity_response.record = mock_identity_record
-
-arc_comments_response = HttpResponse()
-arc_comments_response.status_code = 404
-
-timeline_log_response = HttpResponse()
-timeline_log_response.status_code = 200
-timeline_log_response.record = mock_timeline_log_record
+    def make_ok_response(self, record=None):
+        resp = HttpResponse()
+        resp.status_code = 200
+        resp.record = record if record is not None else {}
+        return resp
 
 
-mock_endpoint_return_values = {
-    'application': nanny_application_response,
-    'applicant-personal-details': personal_details_response,
-    'childcare-training': childcare_training_response,
-    'childcare-address': childcare_address_response,
-    'applicant-home-address': home_address_response,
-    'dbs-check': dbs_check_response,
-    'first-aid': first_aid_response,
-    'insurance-cover': insurance_cover_response,
-    'declaration': declaration_response,
-    'user': identity_response,
-    'arc-comments': arc_comments_response,
-    'timeline-log': timeline_log_response,
-}
+class StubNannyGatewayActions:
+    """
+    Stub that returns static data for nanny gateway endpoints. Can be instantiated, tweaked and discarded for
+    each test
+    """
 
+    def __init__(self):
+        self.nanny_application = {
+            'application_status': 'DRAFTING',
+            'application_id': '998fd8ec-b96b-4a71-a1a1-a7a3ae186729',
+            'application_type': '',
+            'cygnum_urn': '',
+            'login_details_status': 'COMPLETED',
+            'login_details_arc_flagged': False,
+            'personal_details_status': 'NOT_STARTED',
+            'personal_details_arc_flagged': False,
+            'childcare_address_status': 'COMPLETED',
+            'childcare_address_arc_flagged': False,
+            'first_aid_status': 'COMPLETED',
+            'first_aid_arc_flagged': False,
+            'childcare_training_status': 'NOT_STARTED',
+            'childcare_training_arc_flagged': False,
+            'dbs_status': 'NOT_STARTED',
+            'dbs_arc_flagged': False,
+            'insurance_cover_status': 'COMPLETED',
+            'insurance_cover_arc_flagged': False,
+            'declarations_status': 'NOT STARTED',
+            'share_info_declare': True,
+            'follow_rules': None,
+            'information_correct_declare': None,
+            'change_declare': None,
+            'date_created': None,
+            'date_updated': '2018-07-31 17:20:46.011717+00',
+            'date_accepted': None,
+            'date_submitted': '2018-07-31 17:20:46.011717+00',
+            'application_reference': 'NA',
+            'ofsted_visit_email_sent': None,
+            'address_to_be_provided': True,
+        }
+        self.nanny_application_read_response = self.make_response(record=self.nanny_application)
 
-def side_effect(endpoint_name, *args, **kwargs):
-    return mock_endpoint_return_values[endpoint_name]
+        self.personal_details_record = {
+            'application_id': '998fd8ec-b96b-4a71-a1a1-a7a3ae186729',
+            'personal_detail_id': '9835bf4b-9ba9-4162-a25b-4c56e7d33d67',
+            'first_name': 'The Dark Lord',
+            'middle_names': '',
+            'last_name': 'Selenium',
+            'date_of_birth': '2000-01-01',
+            'known_to_social_services': True,
+            'reasons_known_to_social_services': 'An IMPORTANT reason'
+        }
+        self.personal_details_read_response = self.make_response(record=self.personal_details_record)
+
+        self.previous_registration_record = {
+            'application_id': '998fd8ec-b96b-4a71-a1a1-a7a3ae186729',
+            'previous_registration_id': '9835bf3b-8ba9-4162-a25b-4c55e7d33d69',
+            'previous_registration': True,
+            'individual_id': '12345567',
+            'five_years_in_UK': True
+        }
+        self.previous_registration_read_response = self.make_response(record=self.previous_registration_record)
+
+        self.childcare_training_record = {
+            'application_id': '998fd8ec-b96b-4a71-a1a1-a7a3ae186729',
+            'childcare_training_id': '9835bf3b-8ba9-4162-a25b-4c55e7d33d69',
+            'level_2_training': False,
+            'common_core_training': False,
+            'no_training': False
+        }
+        self.childcare_training_read_response = self.make_response(record=self.childcare_training_record)
+
+        self.dbs_record = {
+            'application_id': '998fd8ec-b96b-4a71-a1a1-a7a3ae186729',
+            'dbs_id': '9835bf3b-8ba9-4162-a25b-4c55e7d33d77',
+            'lived_abroad': True,
+            'is_ofsted_dbs': True,
+            'within_three_months': False,
+            'enhanced_check': None,
+            'on_dbs_update_service': True,
+            'dbs_number': '000000000012',
+        }
+        self.dbs_check_read_response = self.make_response(record=self.dbs_record)
+
+        self.previous_name_record = {
+            'application_id': '998fd8ec-b96b-4a71-a1a1-a7a3ae186729',
+            'previous_name_id': '9935bf3b-8ba9-4162-a25b-4c55e7d33d67',
+            'first_name': 'Robin',
+            'middle_names': '',
+            'last_name': 'Hood',
+            'start_day': 1,
+            'start_month': 12,
+            'start_year': 2003,
+            'end_day': 3,
+            'end_month': 12,
+            'end_year': 2004,
+            'order': 0
+        }
+        self.previous_name_read_response = self.make_response(record=self.previous_name_record)
+
+        self.home_address_record = {
+            'application_id': '998fd8ec-b96b-4a71-a1a1-a7a3ae186729',
+            'home_address_id': '9935bf3b-8ba9-4162-a25b-4c55e7d33d67',
+            'street_line1': 'Test',
+            'street_line2': None,
+            'town': 'Middle Earth',
+            'county': None,
+            'postcode': 'WA14 4PA',
+            'childcare_address': False,
+        }
+        self.home_address_read_response = self.make_response(record=self.home_address_record)
+
+        self.previous_address_record = {
+            'previous_address_id': '88888888-4444-4444-4444-121212121212',
+            'person_id': '998fd8ec-b96b-4a71-a1a1-a7a3ae186729',
+            'person_type': 'APPLICANT',
+            'street_line1': '1 Street Road',
+            'street_line2': '',
+            'town': 'Cityston',
+            'county': 'Greater Countyshire',
+            'country': '',
+            'postcode': 'M9 9MP',
+            'moved_in_date': '2016-06-02',
+            'moved_out_date': '2018-02-23',
+            'order': 0,
+        }
+        self.previous_address_read_response = self.make_response(record=self.previous_address_record)
+        self.previous_address_list_response = self.make_response(record=[self.previous_address_record])
+
+        self.childcare_address_record = [
+            {
+                'application_id': '998fd8ec-b96b-4a71-a1a1-a7a3ae186729',
+                'childcare_address_id': '9835bf3b-8aa9-4162-a25b-4c55e7d33d67',
+                'street_line1': 'Test',
+                'street_line2': None,
+                'town': 'New New York',
+                'county': None,
+                'postcode': 'WA14 4PA',
+            },
+            {
+                'application_id': '998fd8ec-b96b-4a71-a1a1-a7a3ae186729',
+                'childcare_address_id': '9835bf3b-8aa9-4162-a25b-4c55e7d33d68',
+                'street_line1': 'Buckingham Palace',
+                'street_line2': None,
+                'town': 'London',
+                'county': None,
+                'postcode': 'SW1 1AA',
+            }
+        ]
+        self.childcare_address_read_response = self.make_response(record=self.childcare_address_record)
+
+        self.first_aid_record = {
+            'application_id': '998fd8ec-b96b-4a71-a1a1-a7a3ae186729',
+            'first_aid_id': '9835bf3b-8ba9-4162-a25b-4c56e7d33d67',
+            'training_organisation': 'St Johns Ambulance',
+            'course_title': 'Pediatric First Aid',
+            'course_date': '2016-03-31'
+        }
+        self.first_aid_read_response = self.make_response(record=self.first_aid_record)
+
+        self.insurance_cover_record = {
+            'application_id': '998fd8ec-b96b-4a71-a1a1-a7a3ae186729',
+            'insurance_cover_id': '9835bf3b-9ba9-4162-a25b-4c56e7d33d67',
+            'public_liability': True
+        }
+        self.insurance_cover_read_response = self.make_response(record=self.insurance_cover_record)
+
+        self.declaration_record = {
+            'application_id': '998fd8ec-b96b-4a71-a1a1-a7a3ae186729',
+            'follow_rules': True,
+            'share_info_declare': True,
+            'information_correct_declare': True,
+            'change_declare': True,
+        }
+        self.declaration_read_response = self.make_response(record=self.declaration_record)
+
+        self.arc_comments_read_response = self.make_response(404)
+        self.arc_comments_list_response = self.make_response(404)
+
+        self.timeline_log_record = {}
+        self.timeline_log_read_response = self.make_response(record=self.timeline_log_record)
+
+        self.default_list_response = self.make_response()
+        self.default_read_response = self.make_response()
+        self.default_create_response = self.make_response()
+        self.default_patch_response = self.make_response()
+        self.default_put_response = self.make_response()
+        self.default_delete_response = self.make_response()
+
+        self.endpoint_mapping = {
+            'application': 'nanny_application',
+            'applicant-personal-details': 'personal_details',
+            'previous-registration-details': 'previous_registration',
+            'childcare-training': 'childcare_training',
+            'childcare-address': 'childcare_address',
+            'applicant-home-address': 'home_address',
+            'dbs-check': 'dbs_check',
+            'first-aid': 'first_aid',
+            'insurance-cover': 'insurance_cover',
+            'declaration': 'declaration',
+            'arc-comments': 'arc_comments',
+            'timeline-log': 'timeline_log',
+            'previous-name': 'previous_name',
+            'previous-address': 'previous_address',
+        }
+
+    def list(self, endpoint, *_, **__):
+        return getattr(self, '{}_list_response'.format(self.endpoint_mapping[endpoint]), self.default_list_response)
+
+    def read(self, endpoint, *_, **__):
+        return getattr(self, '{}_read_response'.format(self.endpoint_mapping[endpoint]), self.default_read_response)
+
+    def create(self, endpoint, *_, **__):
+        return getattr(self, '{}_create_response'.format(self.endpoint_mapping[endpoint]), self.default_create_response)
+
+    def patch(self, endpoint, *_, **__):
+        return getattr(self, '{}_patch_response'.format(self.endpoint_mapping[endpoint]), self.default_patch_response)
+
+    def put(self, endpoint, *_, **__):
+        return getattr(self, '{}_put_response'.format(self.endpoint_mapping[endpoint]), self.default_put_response)
+
+    def delete(self, endpoint, *_, **__):
+        return getattr(self, '{}_delete_response'.format(self.endpoint_mapping[endpoint]), self.default_delete_response)
+
+    # noinspection PyMethodMayBeStatic
+    def make_response(self, status=200, record=None):
+        resp = HttpResponse()
+        resp.status_code = status
+        resp.record = record if record is not None else {}
+        return resp
 
 
 # CamelCase naming to match unittest module
@@ -264,16 +313,34 @@ def assertNotXPath(response, xpath):
         raise AssertionError('"{}" evaluated to {} but no content expected'.format(xpath, repr(result)))
 
 
-def assertXPathValue(response, xpath, expected_value):
+def assertXPathValue(response, xpath, expected_value, strip=False):
     """
     Asserts that the given value can be found at the given xpath in the response's HTML
 
     :param response: The http response object
     :param xpath: An XPath expression to test for
     :param expected_value: The content expected to be found
+    :param strip: (optional) Run results through str.strip to trim whitespace
     """
+    if strip and not isinstance(expected_value, str):
+        raise ValueError('strip parameter only applies to expected str type')
+
     result = _do_xpath(response, xpath)
-    if expected_value not in result:
+
+    if strip:
+        if isinstance(result, str):
+            result = result.strip()
+        elif isinstance(result, list):
+            result = list(map(str.strip, result))
+        else:
+            raise AssertionError('Expected str or list to strip at "{}", but found {}'.format(xpath, repr(result)))
+
+    if isinstance(result, list):
+        found = expected_value in result
+    else:
+        found = result == expected_value
+
+    if not found:
         raise AssertionError('Expected {} at "{}", but found {}'.format(repr(expected_value), xpath, repr(result)))
 
 
@@ -287,7 +354,7 @@ def assertXPathCount(response, xpath, expected_quantity):
     """
     result = _do_xpath(response, xpath)
     if len(result) != expected_quantity:
-        raise AssertionError('Expected {} instances of "{}", found {}', expected_quantity, xpath, len(result))
+        raise AssertionError('Expected {} instances of "{}", found {}'.format(expected_quantity, xpath, len(result)))
 
 
 def _do_xpath(response, xpath):
@@ -302,9 +369,19 @@ def assertView(response, expected_view_obj):
         raise AssertionError('Expected view "{}", found view "{}"'.format(expected_name, actual_name))
 
 
+def assertRedirectView(response, expected_view_obj):
+    expected_name = expected_view_obj if isinstance(expected_view_obj, str) else expected_view_obj.__name__
+    try:
+        actual_name = django.urls.resolve(response.url).func.__name__
+    except django.urls.exceptions.Resolver404:
+        raise AssertionError('Redirect url "{}" did not resolve to a view'.format(response.url))
+    if actual_name != expected_name:
+        raise AssertionError('Expected redirect to view "{}", found view "{}"'.format(expected_name, actual_name))
+
+
 def create_childminder_application(user_id=None):
 
-    application = models.Application.objects.create(
+    application = Application.objects.create(
         application_type='CHILDMINDER',
         application_id='da2265c2-2d65-4214-bfef-abcfe59b75aa',
         application_status='DRAFTING',
@@ -338,7 +415,7 @@ def create_childminder_application(user_id=None):
         reasons_known_to_social_services_pith=None,
     )
 
-    details = models.ApplicantPersonalDetails.objects.create(
+    details = ApplicantPersonalDetails.objects.create(
         personal_detail_id='da2265c2-2d65-4214-bfef-abcfe59b75aa',
         application_id=application,
         birth_day='01',
@@ -346,7 +423,7 @@ def create_childminder_application(user_id=None):
         birth_year='2001'
     )
 
-    models.ChildcareType.objects.create(
+    ChildcareType.objects.create(
         application_id=application,
         zero_to_five=True,
         five_to_eight=True,
@@ -354,7 +431,7 @@ def create_childminder_application(user_id=None):
         overnight_care=True
     )
 
-    models.ApplicantHomeAddress.objects.create(
+    ApplicantHomeAddress.objects.create(
         home_address_id='da2265c2-2d65-4214-bfef-abcfe59b75aa',
         personal_detail_id=details,
         application_id=application,
@@ -366,11 +443,9 @@ def create_childminder_application(user_id=None):
         postcode='WA14 4PX',
         current_address=True,
         childcare_address=True,
-        move_in_month=0,
-        move_in_year=0
     )
 
-    models.ApplicantName.objects.create(
+    ApplicantName.objects.create(
         name_id='da2265c2-2d65-4214-bfef-abcfe59b75aa',
         personal_detail_id=details,
         application_id=application,
@@ -380,13 +455,13 @@ def create_childminder_application(user_id=None):
         last_name='Odense'
     )
 
-    models.UserDetails.objects.create(
+    UserDetails.objects.create(
         login_id='8362d470-ecc9-4069-876b-9b3ddc2cae07',
         application_id=application,
         email='test@test.com',
     )
 
-    models.FirstAidTraining.objects.create(
+    FirstAidTraining.objects.create(
         first_aid_id='da2265c2-2d65-4214-bfef-abcfe59b75aa',
         application_id=application,
         training_organisation='Test First Aid',
@@ -398,7 +473,7 @@ def create_childminder_application(user_id=None):
         renew_certificate=True
     )
 
-    models.ChildcareTraining.objects.create(
+    ChildcareTraining.objects.create(
         eyfs_id='da2265c2-2d65-4214-bfef-abcfe59b75aa',
         application_id=application,
         eyfs_course_name='Test Childcare Training',
@@ -407,20 +482,20 @@ def create_childminder_application(user_id=None):
         eyfs_course_date_year=2018,
     )
 
-    models.HealthDeclarationBooklet.objects.create(
+    HealthDeclarationBooklet.objects.create(
         hdb_id='da2265c2-2d65-4214-bfef-abcfe59b75aa',
         application_id=application,
         send_hdb_declare=True,
     )
 
-    models.CriminalRecordCheck.objects.create(
+    CriminalRecordCheck.objects.create(
         criminal_record_id='da2265c2-2d65-4214-bfef-abcfe59b75aa',
         application_id=application,
         dbs_certificate_number='123456654321',
         cautions_convictions=True
     )
 
-    models.AdultInHome.objects.create(
+    AdultInHome.objects.create(
         adult_id='da2265c2-2d65-4214-bfef-abcfe59b75aa',
         application_id=application,
         adult=1,
@@ -434,7 +509,7 @@ def create_childminder_application(user_id=None):
         dbs_certificate_number='123456789012',
     )
 
-    models.ChildInHome.objects.create(
+    ChildInHome.objects.create(
         child_id='da2265c2-2d65-4214-bfef-abcfe59b75aa',
         application_id=application,
         child='1',
@@ -447,7 +522,7 @@ def create_childminder_application(user_id=None):
         relationship='Test'
     )
 
-    models.Reference.objects.create(
+    Reference.objects.create(
         reference_id='da2265c2-2d65-4214-bfef-abcfe59b75aa',
         application_id=application,
         reference='1',
@@ -466,7 +541,7 @@ def create_childminder_application(user_id=None):
         email='test@informed.com'
     )
 
-    models.Reference.objects.create(
+    Reference.objects.create(
         reference_id='da2265c2-2d65-4214-bfef-abcfe59b75ab',
         application_id=application,
         reference='2',
@@ -485,14 +560,28 @@ def create_childminder_application(user_id=None):
         email='test@informed.com'
     )
 
-    # assign to a user
-    if user_id is not None:
-        models.Arc.objects.create(
-            application_id=application.application_id,
-            user_id=user_id,
-        )
+    # create arc record and assign to specified user
+    create_childminder_review(application.application_id, user_id)
 
     return application
+
+
+def create_childminder_review(application_id, user_id=None):
+    return Arc.objects.create(
+        application_id=application_id,
+        # user_id field is non-null and uses empty string when no user is assigned
+        user_id=user_id if user_id is not None else '',
+        app_type='Childminder',
+    )
+
+
+def create_nanny_review(application_id, user_id=None):
+    return Arc.objects.create(
+        application_id=application_id,
+        # user_id field is non-null and uses empty string when no user is assigned
+        user_id=user_id if user_id is not None else '',
+        app_type='Nanny',
+    )
 
 
 def create_arc_user():
@@ -523,7 +612,7 @@ def assertSummaryField(response, label, value, heading=None):
         assertXPath(response, _heading_xpath(heading))
 
     assertXPath(response, _field_xpath(label, heading))
-    assertXPathValue(response, _field_value_xpath(label, heading), value)
+    assertXPathValue(response, _field_value_xpath(label, heading), value, strip=True)
 
 
 def assertNotSummaryField(response, label, heading=None):
@@ -556,4 +645,33 @@ def _field_xpath(label, heading=None):
 def _field_value_xpath(label, heading=None):
     xpath = _field_xpath(label, heading)
     xpath += "/following-sibling::td[1]/text()"
-    return 'normalize-space({})'.format(xpath)
+    return xpath
+
+
+def patch_for_setUp(test_case, *args, **kwargs):
+    """
+    Performs a unittest.mock.patch such that it will remain in place for the duration of a single test in the given
+    TestCase before being undone. Suitable for invoking in a TestCase.setUp method.
+    :param test_case: The TestCase instance
+    :param args: positional arguments to pass to patch
+    :param kwargs: keyword arguments to pass to patch
+    :return: The result of the patch call, i.e. either a MagicMock or None
+    """
+    patcher = unittest.mock.patch(*args, **kwargs)
+    test_case.addCleanup(patcher.stop)
+    return patcher.start()
+
+
+def patch_object_for_setUp(test_case, *args, **kwargs):
+    """
+    Performs a unittest.mock.patch.object such that it will remain in place for the duration of a single test in the
+    given TestCase before being undone. Suitable for invoking in a TestCase.setUp method.
+    :param test_case: The TestCase instance
+    :param args: positional arguments to pass to patch.object
+    :param kwargs: keyword arguments to pass to patch.object
+    :return: The result of the patch.object call, i.e. either a MagicMock or None
+    """
+    patcher = unittest.mock.patch.object(*args, **kwargs)
+    test_case.addCleanup(patcher.stop)
+    return patcher.start()
+

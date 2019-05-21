@@ -1,13 +1,19 @@
+import logging
+import sys
+from time import asctime
+
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 
 from ...forms.childminder_forms.form import FirstAidTrainingForm
-from arc_application.models import Application, Arc, FirstAidTraining
-from arc_application.review_util import redirect_selection, request_to_comment, save_comments
-from arc_application.decorators import group_required, user_assigned_application
+from ...models import Application, Arc, FirstAidTraining
+from ...review_util import redirect_selection, request_to_comment, save_comments
+from ...decorators import group_required, user_assigned_application
 
+# Initiate logging
+log = logging.getLogger()
 
 @login_required
 @group_required(settings.ARC_GROUP)
@@ -52,8 +58,10 @@ def first_aid_training_summary(request):
                 default = '/childcare-training-check/summary'
                 redirect_link = redirect_selection(request, default)
 
+                log.debug("Handling submissions for first aid training page - save successful")
                 return HttpResponseRedirect(settings.URL_PREFIX + redirect_link + '?id=' + application_id_local)
             else:
+                log.debug("Handling submissions for contact details page - save unsuccessful")
                 return render(request, '500.html')
 
     training_organisation = FirstAidTraining.objects.get(application_id=application_id_local).training_organisation
@@ -76,4 +84,5 @@ def first_aid_training_summary(request):
         'first_aid_training_status': application.first_aid_training_status
     }
 
+    log.debug("Rendering first aid training page")
     return render(request, 'childminder_templates/first-aid-summary.html', variables)

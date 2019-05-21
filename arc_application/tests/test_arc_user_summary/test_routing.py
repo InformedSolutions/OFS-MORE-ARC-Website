@@ -1,5 +1,4 @@
-from unittest import mock
-from uuid import uuid4
+from unittest import mock, skipUnless
 
 from django.conf import settings
 from django.contrib.auth.models import Group, User
@@ -7,12 +6,10 @@ from django.http import HttpResponse
 from django.test import tag, TestCase
 from django.urls import reverse
 
-from arc_application.models import Arc
-from arc_application.services.application_handler import NannyApplicationHandler
-from arc_application.services.db_gateways import NannyGatewayActions
-from arc_application.views.arc_user_summary import ARCUserSummaryView
-from arc_application.services.db_gateways import NannyGatewayActions
-from arc_application.services.application_handler import NannyApplicationHandler
+from ...models import Arc
+from ...views.arc_user_summary import ARCUserSummaryView
+from ...services.db_gateways import NannyGatewayActions
+from ...services.application_handler import NannyApplicationHandler
 
 
 mock_nanny_application = {
@@ -71,6 +68,7 @@ class ArcUserSummaryPageFunctionalTests(TestCase):
     # ----------------------- #
 
     @tag('integration')
+    @skipUnless(settings.ENABLE_NANNIES, 'Skipping test as Nanny feature toggle equated to False')
     def test_list_nanny_tasks_to_review(self):
         """
         Test that the _list_tasks_for_review() method returns a complete list of tasks for review.
@@ -131,6 +129,7 @@ class ArcUserSummaryPageFunctionalTests(TestCase):
 
             self.assertNotContains(response, '<table class="table table-hover" id="request-table">', html=True)
 
+    @skipUnless(settings.ENABLE_NANNIES, 'Skipping test as Nanny feature toggle equated to False')
     def test_page_renders_with_error_if_no_nanny_apps_available(self):
         with mock.patch('arc_application.services.db_gateways.NannyGatewayActions.list') as mock_nanny_list:
 
@@ -158,6 +157,7 @@ class ArcUserSummaryPageFunctionalTests(TestCase):
     def test_assigns_childminder_app_if_one_available(self):
         self.skipTest('testNotImplemented')
 
+    @skipUnless(settings.ENABLE_NANNIES, 'Skipping test as Nanny feature toggle equated to False')
     def test_assigns_nanny_app_if_one_available(self):
         with mock.patch('arc_application.services.db_gateways.NannyGatewayActions.list') as mock_nanny_list, \
                 mock.patch('arc_application.services.db_gateways.NannyGatewayActions.read') as mock_nanny_read:
@@ -172,3 +172,85 @@ class ArcUserSummaryPageFunctionalTests(TestCase):
 
             self.assertTrue(arc_filter_query.exists())
             self.assertEqual(str(arc_filter_query[0].application_id), mock_nanny_application['application_id'])
+
+    @skipUnless(settings.ENABLE_NANNIES, 'Skipping test as Nanny feature toggle equated to False')
+    def test_assigns_resubmitted_nanny_app_first(self):
+        """
+        Test to check resubmitted nanny app is assigned first
+        """
+        with mock.patch('arc_application.services.db_gateways.NannyGatewayActions.list') as mock_nanny_list, \
+                mock.patch('arc_application.services.db_gateways.NannyGatewayActions.read') as mock_nanny_read:
+
+            mock_nanny_app_2 = {
+                'application_status': 'SUBMITTED',
+                'application_id': '998fd8ec-b96b-4a71-a1a1-a7a3ae186728',
+                'date_submitted': '2018-07-31 17:20:46.011717+00',
+                'date_updated': '2018-10-31 17:20:46.011717+00',
+            }
+
+            mock_nanny_list.return_value.status_code = 200
+            mock_nanny_list.return_value.record = [mock_nanny_application, mock_nanny_app_2]
+            mock_nanny_read.side_effect = side_effect
+
+            self.client.post(reverse('summary'), data={'add_nanny_application': 'add_nanny_application'})
+
+            arc_filter_query = Arc.objects.filter(user_id=self.user.id)
+
+            self.assertTrue(arc_filter_query.exists())
+            self.assertEqual(str(arc_filter_query[0].application_id), mock_nanny_app_2['application_id'])
+
+    @skipUnless(settings.ENABLE_NANNIES, 'Skipping test as Nanny feature toggle equated to False')
+    def test_assigns_oldest_submitted_nanny_app_first(self):
+        """
+        Test to check oldest submitted nanny app is assigned first if no resubmitted apps
+        """
+        with mock.patch('arc_application.services.db_gateways.NannyGatewayActions.list') as mock_nanny_list, \
+                mock.patch('arc_application.services.db_gateways.NannyGatewayActions.read') as mock_nanny_read:
+            mock_nanny_app_2 = {
+                'application_status': 'SUBMITTED',
+                'application_id': '998fd8ec-b96b-4a71-a1a1-a7a3ae186728',
+                'date_submitted': '2018-06-31 17:20:46.011717+00',
+                'date_updated': '2018-06-31 17:20:46.011717+00',
+            }
+
+            mock_nanny_list.return_value.status_code = 200
+            mock_nanny_list.return_value.record = [mock_nanny_application, mock_nanny_app_2]
+            mock_nanny_read.side_effect = side_effect
+
+            self.client.post(reverse('summary'), data={'add_nanny_application': 'add_nanny_application'})
+
+            arc_filter_query = Arc.objects.filter(user_id=self.user.id)
+
+            self.assertTrue(arc_filter_query.exists())
+            self.assertEqual(str(arc_filter_query[0].application_id), mock_nanny_app_2['application_id'])
+
+    @skipUnless(settings.ENABLE_NANNIES, 'Skipping test as Nanny feature toggle equated to False')
+    def test_assigns_oldest_resubmitted_nanny_app_first(self):
+        """
+        Test to check oldest submitted nanny app is assigned first if no resubmitted apps
+        """
+        with mock.patch('arc_application.services.db_gateways.NannyGatewayActions.list') as mock_nanny_list, \
+                mock.patch('arc_application.services.db_gateways.NannyGatewayActions.read') as mock_nanny_read:
+            mock_nanny_app = {
+                'application_status': 'SUBMITTED',
+                'application_id': '998fd8ec-b96b-4a71-a1a1-a7a3ae186728',
+                'date_submitted': '2018-06-31 17:20:46.011717+00',
+                'date_updated': '2018-07-31 17:20:46.011717+00',
+            }
+            mock_nanny_app_2 = {
+                'application_status': 'SUBMITTED',
+                'application_id': '998fd8ec-b96b-4a71-a1a1-a7a3ae186729',
+                'date_submitted': '2018-06-31 17:20:46.011717+00',
+                'date_updated': '2018-08-31 17:20:46.011717+00',
+            }
+
+            mock_nanny_list.return_value.status_code = 200
+            mock_nanny_list.return_value.record = [mock_nanny_application, mock_nanny_app, mock_nanny_app_2]
+            mock_nanny_read.side_effect = side_effect
+
+            self.client.post(reverse('summary'), data={'add_nanny_application': 'add_nanny_application'})
+
+            arc_filter_query = Arc.objects.filter(user_id=self.user.id)
+
+            self.assertTrue(arc_filter_query.exists())
+            self.assertEqual(str(arc_filter_query[0].application_id), mock_nanny_app['application_id'])

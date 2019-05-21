@@ -1,13 +1,16 @@
+import logging
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.utils.decorators import method_decorator
 from django.views import View
 
-from arc_application.models import Arc
-from arc_application.review_util import build_url
-from arc_application.services.db_gateways import IdentityGatewayActions
+from ...models import Arc
+from ...review_util import build_url
+from ...services.db_gateways import IdentityGatewayActions
 
+# Initiate logging
+log = logging.getLogger()
 
 @method_decorator(login_required, name='get')
 @method_decorator(login_required, name='post')
@@ -21,7 +24,7 @@ class NannyContactDetailsSummary(View):
         application_id = request.GET["id"]
 
         context = self.create_context(application_id)
-
+        log.debug("Render nanny contact details")
         return render(request, self.TEMPLATE_NAME, context=context)
 
     def post(self, request):
@@ -34,7 +37,7 @@ class NannyContactDetailsSummary(View):
         arc_application.save()
 
         redirect_address = build_url(self.REDIRECT_NAME, get={'id': application_id})
-
+        log.debug("Handling submissions for nanny contact details")
         return HttpResponseRedirect(redirect_address)
 
     @staticmethod

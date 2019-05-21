@@ -10,8 +10,8 @@ from django.shortcuts import HttpResponseRedirect
 
 from timeline_logger.models import TimelineLog
 
-from arc_application.services.db_gateways import NannyGatewayActions
-from arc_application.models import Application
+from ..services.db_gateways import NannyGatewayActions
+from ..models import Application
 from .base import has_group
 
 

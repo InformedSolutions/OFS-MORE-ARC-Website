@@ -1,11 +1,12 @@
 import csv
+import logging
 from datetime import datetime
 import json
 
-from arc_application.decorators import group_required
-from arc_application.models import CapitaDBSFile
-from arc_application.services import dbs_api
-from arc_application.forms import UploadCapitaDBSForm
+from ..decorators import group_required
+from ..models import CapitaDBSFile
+from ..services import dbs_api
+from ..forms import UploadCapitaDBSForm
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
@@ -13,6 +14,8 @@ from django.core.exceptions import ValidationError
 from django.db import InternalError
 from django.shortcuts import render
 
+# Initiate logging
+log = logging.getLogger()
 
 def __format_last_upload():
     try:
@@ -73,6 +76,7 @@ def upload_capita_dbs(request):
     if request.method == 'GET':
         form = UploadCapitaDBSForm()
 
+
     elif request.method == 'POST':
         form = UploadCapitaDBSForm(request.POST, request.FILES)
 
@@ -80,6 +84,7 @@ def upload_capita_dbs(request):
             try:
                 __handle_file_upload(request.FILES)
                 __update_last_upload(request.FILES['capita_list_file'].name)
+                log.debug("Handling submissions for upload DBS page - success")
             except ValidationError:
                 form.add_error('capita_list_file', 'There was an error with the file you tried to upload. Check the file and try again')
             except InternalError:
@@ -89,5 +94,5 @@ def upload_capita_dbs(request):
         'form': form,
         'formatted_last_upload': __format_last_upload()
     }
-
+    log.debug("Rendering upload DBS page")
     return render(request, template_name='upload-capita-dbs.html', context=context)

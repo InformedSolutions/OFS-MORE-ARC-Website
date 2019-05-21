@@ -21,7 +21,7 @@
         <tr>
             <th colspan="3">
                 <div class="heading-medium">
-                    Your name and date of birth
+                    Name and date of birth
                 </div>
             </th>
         </tr>
@@ -31,15 +31,9 @@
             <td>
                 Your name
             </td>
-            {% if middle_names %}
             <td style="word-wrap: break-word">
-                {{first_name}} {{middle_names}} {{last_name}}
+                {{ full_name }}
             </td>
-            {% elif not middle_names %}
-            <td style="word-wrap: break-word">
-                {{first_name}} {{last_name}}
-            </td>
-            {% endif %}
             <td class="change-answer">
                 {{ form.name_declare }}
             </td>
@@ -59,60 +53,51 @@
                 </div>
             </td>
         </tr>
-
+        {% for prev_name in previous_names %}
+        <tr>
+            <td>
+                Previous name {{ forloop.counter }}
+            </td>
+            <td style="word-wrap: break-word">
+                {{ prev_name.name }}
+            </td>
+            <td class="change-answer">
+                <a href="{% url 'personal_details_previous_names' %}?id={{ application_id }}&person_id={{ application_id }}&type=APPLICANT"
+                   alt="Change the {{ forloop.counter|inflect }} previous name">Change</a>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Start date
+            </td>
+            <td style="word-wrap: break-word">
+                {{ prev_name.start_date|date:"d/m/Y" }}
+            </td>
+            <td class="change-answer">
+                <a href="{% url 'personal_details_previous_names' %}?id={{ application_id }}&person_id={{ application_id }}&type=APPLICANT"
+                   alt="Change the start date for the {{ forloop.counter|inflect }} previous name">Change</a>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                End date
+            </td>
+            <td style="word-wrap: break-word">
+                {{ prev_name.end_date|date:"d/m/Y" }}
+            </td>
+            <td class="change-answer">
+                <a href="{% url 'personal_details_previous_names' %}?id={{ application_id }}&person_id={{ application_id }}&type=APPLICANT"
+                   alt="Change the end date for the {{ forloop.counter|inflect }} previous name">Change</a>
+            </td>
+        </tr>
+        {% endfor %}
         <tr>
             <td>
                 Date of birth
             </td>
-            {% if birth_month == 1 %}
             <td style="word-wrap: break-word">
-                {{birth_day}} January {{birth_year}}
+                {{ date_of_birth|date:"j F Y" }}
             </td>
-            {% elif birth_month == 2 %}
-            <td style="word-wrap: break-word">
-                {{birth_day}} February {{birth_year}}
-            </td>
-            {% elif birth_month == 3 %}
-            <td style="word-wrap: break-word">
-                {{birth_day}} March {{birth_year}}
-            </td>
-            {% elif birth_month == 4 %}
-            <td style="word-wrap: break-word">
-                {{birth_day}} April {{birth_year}}
-            </td>
-            {% elif birth_month == 5 %}
-            <td style="word-wrap: break-word">
-                {{birth_day}} May {{birth_year}}
-            </td>
-            {% elif birth_month == 6 %}
-            <td style="word-wrap: break-word">
-                {{birth_day}} June {{birth_year}}
-            </td>
-            {% elif birth_month == 7 %}
-            <td style="word-wrap: break-word">
-                {{birth_day}} July {{birth_year}}
-            </td>
-            {% elif birth_month == 8 %}
-            <td style="word-wrap: break-word">
-                {{birth_day}} August {{birth_year}}
-            </td>
-            {% elif birth_month == 9 %}
-            <td>
-                {{birth_day}} September {{birth_year}}
-            </td>
-            {% elif birth_month == 10 %}
-            <td>
-                {{birth_day}} October {{birth_year}}
-            </td>
-            {% elif birth_month == 11 %}
-            <td style="word-wrap: break-word">
-                {{birth_day}} November {{birth_year}}
-            </td>
-            {% elif birth_month == 12 %}
-            <td style="word-wrap: break-word">
-                {{birth_day}} December {{birth_year}}
-            </td>
-            {% endif %}
             <td class="change-answer">
                 {{ form.date_of_birth_declare }}
             </td>
@@ -135,7 +120,8 @@
         </tbody>
     </table>
 
-    <a href="{% url 'personal_details_previous_names' %}?id={{ application_id }}&person_id={{ application_id }}&type=APPLICANT" class="button button-secondary">Add previous names</a>
+    <a href="{% url 'personal_details_previous_names' %}?id={{ application_id }}&amp;person_id={{ application_id }}&amp;type=APPLICANT"
+       class="button button-secondary">Add previous names</a>
 
 
     <table class="check-your-answers form-group">
@@ -143,7 +129,7 @@
         <tr>
             <th colspan="3">
                 <div class="heading-medium">
-                    Your home and childcare address
+                    Home and childcare address
                 </div>
             </th>
         </tr>
@@ -153,47 +139,23 @@
             <td>
                 Your home address
             </td>
-            {% if street_line2 and county %}
             <td style="word-wrap: break-word">
-                {{street_line1}}
-                </br>
-                {{street_line2}}
-                </br>
-                {{town}}
-                </br>
-                {{county}}
-                </br>
-                {{postcode}}
+                {% if street_line1 %}
+                {{ street_line1 }}<br/>
+                {% endif %}
+                {% if street_line2 %}
+                {{ street_line2 }}<br/>
+                {% endif %}
+                {% if town %}
+                {{ town }}<br/>
+                {% endif %}
+                {% if county %}
+                {{ county }}<br/>
+                {% endif %}
+                {% if postcode %}
+                {{ postcode }}<br/>
+                {% endif %}
             </td>
-            {% elif street_line2 and not county %}
-            <td style="word-wrap: break-word">
-                {{street_line1}}
-                </br>
-                {{street_line2}}
-                </br>
-                {{town}}
-                </br>
-                {{postcode}}
-            </td>
-            {% elif not street_line2 and county %}
-            <td style="word-wrap: break-word">
-                {{street_line1}}
-                </br>
-                {{town}}
-                </br>
-                {{county}}
-                </br>
-                {{postcode}}
-            </td>
-            {% elif not street_line2 and not county %}
-            <td style="word-wrap: break-word">
-                {{street_line1}}
-                </br>
-                {{town}}
-                </br>
-                {{postcode}}
-            </td>
-            {% endif %}
             <td class="change-answer">
                 {{ form.home_address_declare }}
             </td>
@@ -213,61 +175,59 @@
                 </div>
             </td>
         </tr>
+
+        {% for address in previous_addresses %}
         <tr>
             <td>
-                Childcare address
+                Your previous home address {{ forloop.counter }}
             </td>
-            {% if location_of_childcare == True %}
-            <td style="word-wrap: break-word">
-                Same as home address
+            <td>
+                {{address.street_line1}}{% if address.street_line1 %}<br/>{% endif %}
+                {{address.street_line2}}{% if address.street_line2 %}<br/>{% endif %}
+                {{address.town}}{% if address.town %}<br/>{% endif %}
+                {{address.county}}{% if address.county %}<br/>{% endif %}
+                {{address.country}}{% if address.country %}<br/>{% endif %}
+                {{address.postcode}}{% if address.postcode %}<br/>{% endif %}
             </td>
-            {% elif location_of_childcare == False %}
-                {% if childcare_street_line2 and childcare_county %}
-                <td style="word-wrap: break-word">
-                    {{childcare_street_line1}}
-                    </br>
-                    {{childcare_street_line2}}
-                    </br>
-                    {{childcare_town}}
-                    </br>
-                    {{childcare_county}}
-                    </br>
-                    {{childcare_postcode}}
-                </td>
-                {% elif childcare_street_line2 and not childcare_county %}
-                <td style="word-wrap: break-word">
-                    {{childcare_street_line1}}
-                    </br>
-                    {{childcare_street_line2}}
-                    </br>
-                    {{childcare_town}}
-                    </br>
-                    {{childcare_postcode}}
-                </td>
-                {% elif not childcare_street_line2 and childcare_county %}
-                <td style="word-wrap: break-word">
-                    {{childcare_street_line1}}
-                    </br>
-                    {{childcare_town}}
-                    </br>
-                    {{childcare_county}}
-                    </br>
-                    {{childcare_postcode}}
-                </td>
-                {% elif not childcare_street_line2 and not childcare_county %}
-                <td style="word-wrap: break-word">
-                    {{childcare_street_line1}}
-                    </br>
-                    {{childcare_town}}
-                    </br>
-                    {{childcare_postcode}}
-                </td>
-                {% endif %}
-            {% endif %}
             <td class="change-answer">
-                {{ form.childcare_address_declare }}
+                <a href="{% url 'personal_details_previous_addresses_change' %}?id={{ application_id }}&state=change&person_id={{ application_id }}&person_type=APPLICANT&address_id={{address.pk}}"
+                   alt="Change the {{ forloop.counter|inflect }} previous address">Change</a>
             </td>
         </tr>
+
+        {% if address.moved_in_date %}
+        <tr>
+            <td>
+                Moved in
+            </td>
+            <td>
+                {{ address.moved_in_date|date:"d F Y" }}
+            </td>
+            <td class="change-answer">
+                <a href="{% url 'personal_details_previous_addresses_change' %}?id={{ application_id }}&state=change&person_id={{ application_id }}&person_type=APPLICANT&address_id={{address.pk}}"
+                   alt="Change the move in date for {{ forloop.counter|inflect }} previous address">Change</a>
+            </td>
+
+        </tr>
+        {% endif %}
+
+        {% if address.moved_out_date %}
+        <tr>
+            <td>
+                Moved out
+            </td>
+            <td>
+                {{ address.moved_out_date|date:"d F Y" }}
+            </td>
+            <td class="change-answer">
+                <a href="{% url 'personal_details_previous_addresses_change' %}?id={{ application_id }}&state=change&person_id={{ application_id }}&person_type=APPLICANT&address_id={{address.pk}}"
+                   alt="Change the move out date for {{ forloop.counter|inflect }} previous address">Change</a>
+            </td>
+        </tr>
+        {% endif %}
+
+        {% endfor %}
+
         <tr class="js-hidden" id="childcare_address">
             <td colspan="1">
                 <div>
@@ -283,19 +243,48 @@
                 </div>
             </td>
         </tr>
+
+        <tr>
+            <td>
+                Childcare address
+            </td>
+            <td style="word-wrap: break-word">
+                {% if location_of_childcare %}
+
+                Same as home address
+
+                {% else %}
+
+                {% if childcare_street_line1 %}
+                {{ childcare_street_line1 }}<br/>
+                {% endif %}
+                {% if childcare_street_line2 %}
+                {{ childcare_street_line2 }}<br/>
+                {% endif %}
+                {% if childcare_town %}
+                {{ childcare_town }}<br/>
+                {% endif %}
+                {% if childcare_county %}
+                {{ childcare_county }}<br/>
+                {% endif %}
+                {% if childcare_postcode %}
+                {{ childcare_postcode }}<br/>
+                {% endif %}
+
+                {% endif %}
+            </td>
+            <td class="change-answer">
+                {{ form.childcare_address_declare }}
+            </td>
+        </tr>
+
         <tr>
             <td>
                 Is this another childminder's home?
             </td>
-            {% if working_in_other_childminder_home %}
             <td style="word-wrap: break-word">
-                Yes
+                {{ working_in_other_childminder_home|yesno:"Yes,No" }}
             </td>
-            {% else %}
-            <td style="word-wrap: break-word">
-                No
-            </td>
-            {% endif %}
             <td class="change-answer">
                 {{ form.working_in_other_childminder_home_declare }}
             </td>
@@ -318,8 +307,10 @@
         </tbody>
     </table>
 
-    <a href="{% url 'personal_details_previous_addresses' %}?id={{ application_id }}&state=entry&person_id={{ application_id }}&person_type=APPLICANT" class = "button button-secondary">Add previous addresses</a>
- {% if show_your_children_table %}
+    <a href="{% url 'personal_details_previous_addresses' %}?id={{ application_id }}&state=entry&person_id={{ application_id }}&person_type=APPLICANT"
+       class="button button-secondary">Add previous addresses</a>
+
+    {% if show_your_children_table %}
     <table class="check-your-answers form-group">
         <thead>
         <tr>
@@ -335,15 +326,9 @@
             <td>
                 Known to council social services?
             </td>
-            {% if own_children %}
             <td style="word-wrap: break-word">
-                Yes
+                {{ own_children|yesno:"Yes,No" }}
             </td>
-            {% else %}
-            <td style="word-wrap: break-word">
-                No
-            </td>
-            {% endif %}
             <td class="change-answer">
                 {{ form.own_children_declare }}
             </td>
@@ -363,14 +348,13 @@
                 </div>
             </td>
         </tr>
-         {% if own_children %}
+        {% if own_children %}
         <tr>
-
             <td>
                 Tell us why
             </td>
             <td style="word-wrap: break-word">
-                {{reasons_known_to_social_services}}
+                {{ reasons_known_to_social_services }}
             </td>
             <td class="change-answer">
                 {{ form.reasons_known_to_social_services_declare }}
@@ -395,149 +379,69 @@
         {% endif %}
         </tbody>
     </table>
-{% endif %}
-    <br>
-
-    {% if previous_names %}
-    <table class="check-your-answers form-group">
-        <thead>
-        <tr>
-            <th colspan="3">
-                <div class="heading-medium">
-                    Previous names
-                </div>
-            </th>
-        </tr>
-        </thead>
-        <tbody>
-        {% for name in previous_names %}
-            <tr>
-                <td>
-                    Your previous name {{ forloop.counter }}
-                </td>
-                <td>
-                    {{ name.first_name }}  {{ name.middle_names }} {{ name.last_name }}
-                </td>
-                <td class="change-answer">
-                    <a href="{% url 'personal_details_previous_names' %}?id={{ application_id }}&person_id={{ application_id }}&type=APPLICANT&referrer=list" alt="Change the {{ forloop.counter|inflect }} previous name">Change</a>
-                </td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
     {% endif %}
-
-    {% if previous_addresses %}
-    <table class="check-your-answers form-group">
-        <thead>
-        <tr>
-            <th colspan="3">
-                <div class="heading-medium">
-                    Previous home addresses
-                </div>
-            </th>
-        </tr>
-        </thead>
-        <tbody>
-        {% for address in previous_addresses %}
-        <tr>
-            <td>
-                Your previous home address {{ forloop.counter }}
-            </td>
-            <td>
-                {{address.street_line1}}{% if address.street_line1 %}<br />{% endif %}
-                {{address.street_line2}}{% if address.street_line2 %}<br />{% endif %}
-                {{address.town}}{% if address.town %}<br />{% endif %}
-                {{address.county}}{% if address.county %}<br />{% endif %}
-                {{address.country}}{% if address.country %}<br />{% endif %}
-                {{address.postcode}}{% if address.postcode %}<br />{% endif %}
-            </td>
-            <td class="change-answer">
-                <a href="{% url 'personal_details_previous_addresses' %}?id={{ application_id }}&state=update&person_id={{ application_id }}&person_type=APPLICANT&address_id={{address.pk}}" alt="Change the {{ forloop.counter|inflect }} previous address">Change</a>
-            </td>
-        </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-    {% endif %}
-
-
-
-
-
+    <br/>
 
     {% block has_previously_applied %}
-        {% if has_previously_applied %}
-            <table class="check-your-answers form-group">
-                <tr>
-                    <th colspan="3">
-                        <div class="heading-medium">
-                            Previous registration
-                        </div>
-                    </th>
-                </tr>
-                <tbody>
-                <tr>
-                    <td>
-                        Has the applicant previously registered with Ofsted?
-                    </td>
-                    <td>
-                        {% if previous_registration %}
-                            Yes
-                        {% else %}
-                            No
-                        {% endif %}
-                    </td>
-                    <td class="change-answer">
-                        <a href="{% url 'previous_registration_details' %}/?id={{application_id}}">Change</a>
-                    </td>
-                </tr>
-                {% if individual_id != 'None' %}
-                <tr>
-                    <td>
-                        Individual ID
-                    </td>
-                    <td>
-                        {% if individual_id %}
-                            {{ individual_id }}
-                        {% else %}
-                            None
-                        {% endif %}
-                    </td>
-                    <td class="change-answer">
-                        <a href="{% url 'previous_registration_details' %}/?id={{application_id}}">Change</a>
-                    </td>
-                </tr>
-                {% endif %}
-                <tr>
-                    <td>
-                        Has the applicant lived in England for more than 5 years?
-                    </td>
-                    <td>
-                        {% if five_years_in_UK %}
-                            Yes
-                        {% else %}
-                            No
-                        {% endif %}
-                    </td>
-                    <td class="change-answer">
-                        <a href="{% url 'previous_registration_details' %}/?id={{application_id}}">Change</a>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
+    {% if has_previously_applied %}
+    <table class="check-your-answers form-group">
+        <tr>
+            <th colspan="3">
+                <div class="heading-medium">
+                    Previous registration
+                </div>
+            </th>
+        </tr>
+        <tbody>
+        <tr>
+            <td>
+                Has the applicant previously registered with Ofsted?
+            </td>
+            <td>
+                {{ previous_registration|yesno:"Yes,No" }}
+            </td>
+            <td class="change-answer">
+                <a href="{% url 'previous_registration_details' %}/?id={{application_id}}">Change</a>
+            </td>
+        </tr>
+        {% if individual_id != 'None' %}
+        <tr>
+            <td>
+                Individual ID
+            </td>
+            <td>
+                {{ individual_id|default:"None" }}
+            </td>
+            <td class="change-answer">
+                <a href="{% url 'previous_registration_details' %}/?id={{application_id}}">Change</a>
+            </td>
+        </tr>
         {% endif %}
+        <tr>
+            <td>
+                Has the applicant lived in England for more than 5 years?
+            </td>
+            <td>
+                {{ five_years_in_UK|yesno:"Yes,No" }}
+            </td>
+            <td class="change-answer">
+                <a href="{% url 'previous_registration_details' %}/?id={{application_id}}">Change</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    {% endif %}
     {% endblock %}
     {% csrf_token %}
 
-    <button type="submit" name="previous_registration_details" class="button button-secondary button-add-another" value="/personal-details/previous-registration/">
+    <button type="submit" name="previous_registration_details" class="button button-secondary button-add-another"
+            value="/personal-details/previous-registration/">
         Add previous registration
     </button>
     <br>
 
     <input type="submit" class="button" value="Confirm and continue"/>
     <input type="hidden" value="{{application_id}}" name="id"/>
-
 
 
     {% include 'childminder_templates/return-to-list.html' %}

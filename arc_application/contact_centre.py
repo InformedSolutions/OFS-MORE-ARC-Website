@@ -3,8 +3,8 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 
-from arc_application.services.search_service import SearchService
-from arc_application.views import has_group
+from .services.search_service import SearchService
+from .views.base import has_group
 from .forms.childminder_forms.form import SearchForm
 from .models import ApplicantName, ApplicantPersonalDetails, Application
 
@@ -28,18 +28,6 @@ def search(request):
     }
 
     if (cc_user or arc_user) and request.user.is_authenticated():
-
-        # Display all applications on search page
-        if settings.ENABLE_NANNIES:
-            application_type = 'All'
-        else:
-            application_type = 'Childminder'
-
-        results = SearchService.search("", "", "", "", "", application_type)
-
-        if results is not None and len(results) > 0:
-            context['empty'] = False
-            context['app'] = results
 
         if request.method == 'GET':
             context['form'] = SearchForm()
@@ -73,6 +61,7 @@ def search(request):
                                                       application_type)
 
                 if search_results is not None and len(search_results) > 0:
+                    context['empty'] = False
                     context['app'] = search_results
 
                 else:

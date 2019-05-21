@@ -1,0 +1,30 @@
+{% extends 'govuk_template.html' %}
+{% block page_title %}Previous registration{% endblock %}
+{% load static %}
+{% load govuk_template_base %}
+{% block inner_content %}
+{% include 'back-button.html' %}
+
+{{ form.error_summary }}
+
+<h1 class="form-title heading-large">
+    Previous registration
+</h1>
+
+<form method="post" novalidate>
+    {% csrf_token %}
+    {{ form.as_div }}
+    <input type="submit" class="button" value="Save and continue">
+    <input type="hidden" value="{{token_id}}" name="id"/>
+    {% if adult_id %}
+    <input type="hidden" value="{{adult_id}}" name="adult_id">
+    {% endif %}
+</form>
+
+<div class="top-padded">
+    <a href="{% url 'new_adults_summary' %}?id={{adult_id}}">
+        Return to list
+    </a>
+</div>
+
+{% endblock %}

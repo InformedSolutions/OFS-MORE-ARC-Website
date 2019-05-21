@@ -1,14 +1,17 @@
 import unittest
 
+from django.conf import settings
 from django.test import TestCase, tag
 from django.forms import Form
+from unittest import skipUnless
 
-from arc_application.models import Arc
-from arc_application.services.nanny_view_helpers import *
-from arc_application.forms.nanny_forms.nanny_form_builder import NannyFormBuilder
+from ...models import Arc
+from ...services.nanny_view_helpers import *
+from ...forms.nanny_forms.nanny_form_builder import NannyFormBuilder
 
 
 @tag('unit')
+@skipUnless(settings.ENABLE_NANNIES, 'Skipping test as Nanny feature toggle equated to False')
 class NannyFlaggingUnitTests(unittest.TestCase):
 
     def test_form_builder(self):
@@ -33,6 +36,7 @@ class NannyFlaggingUnitTests(unittest.TestCase):
 
 
 @tag('unit')
+@skipUnless(settings.ENABLE_NANNIES, 'Skipping test as Nanny feature toggle equated to False')
 class NannyHelperUnitTests(TestCase):
     """
     Test suite for testing nanny helper functions

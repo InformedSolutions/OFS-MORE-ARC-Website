@@ -412,6 +412,14 @@
   width: 66%;
 }
 
+.col-indent {
+  text-indent: 60px;
+}
+
+.col-center {
+ text-align: center;
+}
+
 @media (max-width: 640px) {
     .two-thirds {
       width: 100%;

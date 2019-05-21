@@ -1,13 +1,16 @@
+import logging
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 
 from ...forms.childminder_forms.form import HealthForm
-from arc_application.models import Application, Arc, HealthDeclarationBooklet
-from arc_application.review_util import redirect_selection, request_to_comment, save_comments
-from arc_application.decorators import group_required, user_assigned_application
+from ...models import Application, Arc, HealthDeclarationBooklet
+from ...review_util import redirect_selection, request_to_comment, save_comments
+from ...decorators import group_required, user_assigned_application
 
+# Initiate logging
+log = logging.getLogger('')
 
 @login_required
 @group_required(settings.ARC_GROUP)
@@ -47,9 +50,11 @@ def health_check_answers(request):
                 default = '/dbs-check/summary'
                 redirect_link = redirect_selection(request, default)
 
+                log.debug("Handling submissions for health declaration page - save successful")
                 return HttpResponseRedirect(settings.URL_PREFIX + redirect_link + '?id=' + application_id_local)
 
             else:
+                log.debug("Handling submissions for health declaration page - save successful")
                 return render(request, '500.html')
 
     send_hdb_declare = HealthDeclarationBooklet.objects.get(application_id=application_id_local).send_hdb_declare
@@ -61,4 +66,5 @@ def health_check_answers(request):
         'health_status': application.health_status,
     }
 
+    log.debug("Rendering health declaration page")
     return render(request, 'childminder_templates/health-check-answers.html', variables)

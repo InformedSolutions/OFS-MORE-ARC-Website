@@ -1,28 +1,30 @@
 import time
+import logging
 from datetime import datetime
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import Group
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.utils.decorators import method_decorator
 from django.views import View
 
-from arc_application.childminder_task_util import all_complete
-from arc_application.decorators import group_required, user_assigned_application
-from arc_application.forms.childminder_forms.form import AdultInYourHomeForm, ChildInYourHomeForm, \
+from ...childminder_task_util import all_complete
+from ...decorators import group_required, user_assigned_application
+from ...forms.childminder_forms.form import AdultInYourHomeForm, ChildInYourHomeForm, \
     OtherPersonPreviousRegistrationDetailsForm
-from arc_application.forms.childminder_forms.form import PreviousRegistrationDetailsForm, ChildForm, ChildAddressForm
-from arc_application.magic_link import generate_magic_link
-from arc_application.models import AdultInHome
-from arc_application.models import ApplicantName, ApplicantPersonalDetails, Application, Arc, ArcComments, \
-    ChildcareType, UserDetails
-from arc_application.models import PreviousRegistrationDetails, OtherPersonPreviousRegistrationDetails
-from arc_application.notify import send_email
-from arc_application.views.base import release_application
+from ...forms.childminder_forms.form import PreviousRegistrationDetailsForm, ChildForm, ChildAddressForm
+from ...magic_link import generate_magic_link
+from ...notify import send_email
+from ...views.base import release_application
+
+from ...models import ApplicantName, ApplicantPersonalDetails, Application, Arc, ArcComments, ChildcareType, \
+    UserDetails, OtherPersonPreviousRegistrationDetails, PreviousRegistrationDetails, AdultInHome
 
 decorators = [login_required, group_required(settings.ARC_GROUP), user_assigned_application]
+
+# Initiate logging
+log = logging.getLogger('')
 
 
 @group_required(settings.ARC_GROUP)
@@ -50,18 +52,22 @@ def review(request):
             first_name = applicant_name.first_name
 
     if all_complete(application_id_local, True):
-        personalisation = {'first_name': first_name, 'ref': app_ref}
-        accepted_email(email, first_name, app_ref, application_id_local)
-        send_survey_email(email, personalisation, application)
+
+        # If the application has not already been accepted.
+        if application.application_status != 'ACCEPTED':
+
+            # Get fresh version of application as it will have been updated in method call
+            if Application.objects.filter(application_id=application_id_local).exists():
+                application = Application.objects.get(application_id=application_id_local)
+                application.date_accepted = datetime.now()
+                application.save()
+
+            personalisation = {'first_name': first_name, 'ref': app_ref}
+            accepted_email(email, first_name, app_ref, application_id_local)
+            send_survey_email(email, personalisation, application)
 
         # If successful
         release_application(request, application_id_local, 'ACCEPTED')
-
-        # Get fresh version of application as it will have been updated in method call
-        if Application.objects.filter(application_id=application_id_local).exists():
-            application = Application.objects.get(application_id=application_id_local)
-            application.date_accepted = datetime.now()
-            application.save()
 
         variables = {
             'application_id': application_id_local,
@@ -70,45 +76,37 @@ def review(request):
         return render(request, 'review-confirmation.html', variables)
 
     else:
-        release_application(request, application_id_local, 'FURTHER_INFORMATION')
-        magic_link = generate_magic_link()
-        expiry = int(time.time())
-        user_details.email_expiry_date = expiry
-        user_details.magic_link_email = magic_link
-        user_details.save()
-        link = settings.CHILDMINDER_EMAIL_VALIDATION_URL + '/' + magic_link
-        returned_email(email, first_name, app_ref, link)
+        if application.application_status != 'FURTHER_INFORMATION':
+            magic_link = generate_magic_link()
+            expiry = int(time.time())
+            user_details.email_expiry_date = expiry
+            user_details.magic_link_email = magic_link
+            user_details.save()
+            link = settings.CHILDMINDER_EMAIL_VALIDATION_URL + '/' + magic_link
+            returned_email(email, first_name, app_ref, link)
 
-        # Copy Arc status' to Childminder App
-        if Arc.objects.filter(pk=application_id_local):
-            arc = Arc.objects.get(pk=application_id_local)
-            app = Application.objects.get(pk=application_id_local)
-            app.login_details_status = arc.login_details_review
-            app.personal_details_status = arc.personal_details_review
-            app.childcare_type_status = arc.childcare_type_review
-            app.first_aid_training_status = arc.first_aid_review
-            app.health_status = arc.health_review
-            app.childcare_training_status = arc.childcare_training_review
-            app.criminal_record_check_status = arc.dbs_review
-            app.references_status = arc.references_review
-            app.people_in_home_status = arc.people_in_home_review
-            app.save()
+            # Copy Arc status' to Childminder App
+            if Arc.objects.filter(pk=application_id_local):
+                arc = Arc.objects.get(pk=application_id_local)
+                app = Application.objects.get(pk=application_id_local)
+                app.login_details_status = arc.login_details_review
+                app.personal_details_status = arc.personal_details_review
+                app.childcare_type_status = arc.childcare_type_review
+                app.first_aid_training_status = arc.first_aid_review
+                app.health_status = arc.health_review
+                app.childcare_training_status = arc.childcare_training_review
+                app.criminal_record_check_status = arc.dbs_review
+                app.references_status = arc.references_review
+                app.people_in_home_status = arc.people_in_home_review
+                app.save()
+
+            release_application(request, application_id_local, 'FURTHER_INFORMATION')
 
         variables = {
             'application_id': application_id_local,
         }
 
         return render(request, 'review-sent-back.html', variables)
-
-
-def has_group(user, group_name):
-    """
-    Check if user is in group
-    :return: True if user is in group, else false
-    """
-    group = Group.objects.get(name=group_name)
-
-    return True if group in user.groups.all() else False
 
 
 def send_survey_email(email, personalisation, application):
@@ -195,6 +193,9 @@ def other_people_initial_population(adult, person_list):
                     checkbox = (ArcComments.objects.filter(table_pk=table_id).get(field_name=field_name_local)).flagged
                     temp_dict[field] = True
 
+                if adult and field == 'cygnum_relationship':
+                    temp_dict[field] = person.cygnum_relationship_to_childminder
+
             except ArcComments.DoesNotExist:
                 pass
 
@@ -267,7 +268,7 @@ class PreviousRegistrationDetailsView(View):
             'form': form,
             'application_id': application_id_local,
         }
-
+        log.debug("Render previous registration page")
         return render(request, 'childminder_templates/add-previous-registration.html', variables)
 
     def post(self, request):
@@ -291,6 +292,7 @@ class PreviousRegistrationDetailsView(View):
             previous_reg_details.save()
 
             redirect_link = '/personal-details/summary'
+            log.debug("Handling submissions for previous registrations")
             return HttpResponseRedirect(settings.URL_PREFIX + redirect_link + '?id=' + application_id_local)
 
         else:
@@ -298,7 +300,7 @@ class PreviousRegistrationDetailsView(View):
                 'form': form,
                 'application_id': application_id_local,
             }
-
+            log.debug("Render previous registration page")
             return render(request, 'childminder_templates/add-previous-registration.html', context=variables)
 
 
@@ -314,7 +316,7 @@ class OtherPersonPreviousRegistrationDetailsView(View):
             'application_id': application_id_local,
             'person_id': person_id,
         }
-
+        log.debug("Render other people previous registration page")
         return render(request, 'childminder_templates/add-previous-registration.html', context=variables)
 
     def post(self, request):
@@ -340,6 +342,7 @@ class OtherPersonPreviousRegistrationDetailsView(View):
             previous_reg_details.save()
 
             redirect_link = '/people/summary'
+            log.debug("Handling submissions for other people previous registration page")
             return HttpResponseRedirect(settings.URL_PREFIX + redirect_link + '?id=' + application_id_local)
 
         else:
@@ -348,5 +351,5 @@ class OtherPersonPreviousRegistrationDetailsView(View):
                 'application_id': application_id_local,
                 'person_id': person_id,
             }
-
+            log.debug("Render other people previous registration page")
             return render(request, 'childminder_templates/add-previous-registration.html', context=variables)

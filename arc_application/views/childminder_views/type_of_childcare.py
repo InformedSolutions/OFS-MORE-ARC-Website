@@ -2,10 +2,13 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
-from arc_application.models import Arc, ChildcareType
-from arc_application.review_util import redirect_selection
-from arc_application.decorators import group_required, user_assigned_application
+import logging
+from ...models import Arc, ChildcareType
+from ...review_util import redirect_selection
+from ...decorators import group_required, user_assigned_application
 
+# Initiate logging
+log = logging.getLogger('')
 
 @login_required
 @group_required(settings.ARC_GROUP)
@@ -29,6 +32,7 @@ def type_of_childcare_age_groups(request):
         status.save()
         default = '/personal-details/summary'
         redirect_link = redirect_selection(request, default)
+        log.debug("Handling submissions for type of childcare")
         return HttpResponseRedirect(settings.URL_PREFIX + redirect_link + '?id=' + application_id_local)
 
     application_id_local = request.GET["id"]
@@ -42,7 +46,7 @@ def type_of_childcare_age_groups(request):
         'register': register_name,
         'overnight_care': childcare_type.overnight_care
     }
-
+    log.debug("Render type of childcare page")
     return render(request, 'childminder_templates/childcare-age-groups.html', variables)
 
 
@@ -57,17 +61,24 @@ def get_register_name(childcare_type):
     eight_plus = childcare_type.eight_plus
     register = ''
     if zero_to_five and five_to_eight and eight_plus:
+        log.debug("zero_to_five and five_to_eight and eight_plus")
         register = 'Early Years Register and Childcare Register (both parts)'
     if not zero_to_five and five_to_eight and eight_plus:
+        log.debug("five_to_eight and eight_plus only")
         register = 'Childcare Register (both parts)'
     if zero_to_five and not five_to_eight and not eight_plus:
+        log.debug("zero_to_five only")
         register = 'Early Years Register'
     if zero_to_five and five_to_eight and not eight_plus:
+        log.debug("zero_to_five and five_to_eight only")
         register = 'Early Years Register and Childcare Register (compulsory part)'
     if zero_to_five and not five_to_eight and eight_plus:
+        log.debug("zero_to_five and eight_plus only")
         register = 'Early Years Register and Childcare Register (voluntary part)'
     if not zero_to_five and five_to_eight and not eight_plus:
+        log.debug("five_to_eight only")
         register = 'Childcare Register (compulsory part)'
     if not zero_to_five and not five_to_eight and eight_plus:
+        log.debug("eight_plus only")
         register = 'Childcare Register (voluntary part)'
     return register

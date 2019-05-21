@@ -1,0 +1,22 @@
+<table class="response-table">
+    {% for row in section %}
+        {% if row.title %}
+            <thead>
+                <tr>
+                    <th>
+                        {{row.title}}
+                    </th>
+                </tr>
+            </thead>
+        {% else %}
+            <tr class="response-row">
+                <td class="question-label">
+                    {{row.name}}
+                </td>
+                 <td>
+                    {{row.value|default:"Not answered"}}
+                 </td>
+            </tr>
+        {% endif %}
+    {% endfor %}
+</table>

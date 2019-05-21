@@ -1,0 +1,14 @@
+{% load static %}
+<link href="{% static 'stylesheets/pdf.css' %}" media="print" rel="stylesheet" />
+
+<h1>
+    Application summary
+</h1>
+
+<h2>
+    Application number: {{ application_reference }}
+</h2>
+
+{% for section in json %}
+    {% include 'adult-update-pdf-summary-table.html' %}
+{% endfor %}

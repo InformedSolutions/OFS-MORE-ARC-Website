@@ -4,6 +4,7 @@ import os
 from unittest.mock import MagicMock
 
 import requests
+from django.conf import settings
 
 logger = logging.getLogger()
 
@@ -56,14 +57,16 @@ class DBGatewayActions:
 
                 if func.__name__ == 'list':
                     logger.error(
-                        '!GATEWAY ERROR! "{}" request to API endpoint "{}" with {}: {} returned {} status code - see the Gateway logs for traceback'.format(
+                        ('!GATEWAY ERROR! "{}" request to API endpoint "{}" with {}: {} returned {} status code '
+                         '- see the Gateway logs for traceback').format(
                             verb_name, endpoint_name, list(kwargs['params'].keys()), list(kwargs['params'].values()),
                             response.status_code)
                     )
 
                 else:
                     logger.error(
-                        '!GATEWAY ERROR! "{}" request to API endpoint "{}" with {}: {} returned {} status code - see the Gateway logs for traceback'.format(
+                        ('!GATEWAY ERROR! "{}" request to API endpoint "{}" with {}: {} returned {} status code '
+                         '- see the Gateway logs for traceback').format(
                             verb_name, args[0], endpoint_lookup_field, kwargs['params'][endpoint_lookup_field],
                             response.status_code)
                     )
@@ -154,7 +157,10 @@ class NannyGatewayActions(DBGatewayActions):
         'childcare-address': 'childcare_address_id',
         'arc-comments': 'review_id',
         'applicant-home-address': 'application_id',
+        'previous-address': 'previous_address_id',
         'applicant-personal-details': 'application_id',
+        'previous-registration-details': 'application_id',
+        'previous-name': 'previous_name_id',
         'application': 'application_id',
         'childcare-training': 'application_id',
         'dbs-check': 'application_id',
@@ -168,3 +174,22 @@ class NannyGatewayActions(DBGatewayActions):
     }
 
     target_url_prefix = os.environ.get('APP_NANNY_GATEWAY_URL') + '/api/v1/'
+
+
+class HMGatewayActions(DBGatewayActions):
+    """
+    Class for handling all requests to the Household Member Gateway service.
+    """
+    _endpoint_pk_dict = {
+        'application': 'token_id',
+        'adult': 'adult_id',
+        'dpa-auth': 'token_id',
+        'arc-comments': 'review_id',
+        'timeline-log': 'object_id',
+        'previous-registration': 'adult_id',
+        'previous-address': 'previous_address_id',
+        'previous-name': 'previous_name_id',
+        'setting-address': 'token_id'
+    }
+
+    target_url_prefix = settings.HM_GATEWAY_URL + '/api/v1/'
