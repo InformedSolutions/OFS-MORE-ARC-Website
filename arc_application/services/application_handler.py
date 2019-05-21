@@ -22,13 +22,8 @@ class GenericApplicationHandler:
         return Arc.objects.filter(user_id=self.arc_user.id)
 
     def add_application_from_pool(self):
-        if self.__get_assigned_applications().count() <= (settings.APPLICATION_LIMIT-1):
-
-            app_id = self._get_oldest_app_id()
-            self._assign_app_to_user(app_id)
-
-        else:
-            raise PermissionDenied('Maximum applications reached.')
+        app_id = self._get_oldest_app_id()
+        self._assign_app_to_user(app_id)
 
     def get_all_table_data(self):
         assigned_applications = self.__get_assigned_applications()

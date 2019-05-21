@@ -5,7 +5,6 @@ SERVER_LABEL = 'Test_1'
 
 ARC_GROUP = 'arc'
 CONTACT_CENTRE = 'contact-centre'
-APPLICATION_LIMIT = 5
 
 NOTIFY_URL = os.environ.get('APP_NOTIFY_URL')
 

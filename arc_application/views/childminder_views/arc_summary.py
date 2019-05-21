@@ -22,6 +22,7 @@ def arc_summary(request):
         application_id_local = request.GET["id"]
         variables = get_application_summary_variables(application_id_local)
         log.debug("Rendering arc summary page")
+
         return render(request, 'childminder_templates/arc-summary.html', variables)
 
     elif request.method == 'POST':
@@ -50,7 +51,6 @@ def cc_summary(request):
             ordered_models.append(AdultInHome)
             ordered_models.append(Application)
             ordered_models.append(ChildInHome)
-            ordered_models.append(Child)
         zero_to_five = ChildcareType.objects.get(application_id=application_id_local).zero_to_five
         if zero_to_five:
             ordered_models.insert(6, HealthDeclarationBooklet)
