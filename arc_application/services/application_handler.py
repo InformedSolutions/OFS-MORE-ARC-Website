@@ -97,9 +97,10 @@ class GenericApplicationHandler:
         row_data['last_accessed'] = datetime.strptime(adult_record['date_updated'][:10], '%Y-%m-%d').strftime(
             '%d/%m/%Y')
         row_data['app_type'] = 'Adult update'
+        applicant_name = adult_record['first_name'] + " " + adult_record['last_name']
 
-        dpa_auth_record = HMGatewayActions().read('dpa-auth', params={'token_id': adult_record['token_id']}).record
-        applicant_name = dpa_auth_record['first_name'] + " " + dpa_auth_record['last_name']
+        # dpa_auth_record = HMGatewayActions().read('dpa-auth', params={'token_id': adult_record['token_id']}).record
+        # applicant_name = dpa_auth_record['first_name'] + " " + dpa_auth_record['last_name']
 
         row_data['applicant_name'] = applicant_name
 
