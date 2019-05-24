@@ -113,7 +113,7 @@ def load_json(adult_id):
 
         summary_table += [
                 {"name": "DBS certificate number",
-                "value": 'Yes' if record['dbs_certificate_number'] else 'No',
+                "value": record['dbs_certificate_number'],
                  "field": 'dbs_certificate_number'},
             ]
 
