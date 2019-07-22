@@ -141,6 +141,7 @@ class Migration(migrations.Migration):
                 ('reasons_known_to_social_services', models.TextField(default='', null=True)),
                 ('known_to_social_services_pith', models.NullBooleanField(default=None)),
                 ('reasons_known_to_social_services_pith', models.TextField(default='', null=True)),
+                ('application_expiry_email_sent', models.NullBooleanField(blank=True, null=True, default=False)),
             ],
             options={
                 'db_table': 'APPLICATION',
