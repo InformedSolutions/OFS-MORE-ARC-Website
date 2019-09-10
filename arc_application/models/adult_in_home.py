@@ -16,6 +16,7 @@ class AdultInHome(models.Model):
     application_id = models.ForeignKey(
         Application, on_delete=models.CASCADE, db_column='application_id')
     adult = models.IntegerField(null=True, blank=True)
+    title = models.CharField(max_length=100, blank=True)
     first_name = models.CharField(max_length=100, blank=True)
     middle_names = models.CharField(max_length=100, blank=True)
     last_name = models.CharField(max_length=100, blank=True)
@@ -118,6 +119,8 @@ class AdultInHome(models.Model):
              "id": self.pk},
             {"name": "Health questions status",
              "value": self.health_check_status},
+            {"name": "Title",
+             "value": self.title},
             {"name": "Name",
              "value": self.get_full_name()},
             {"name": "Date of birth",

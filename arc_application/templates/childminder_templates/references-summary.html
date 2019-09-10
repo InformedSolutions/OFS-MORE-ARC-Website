@@ -27,6 +27,7 @@
         </tr>
         </thead>
         <tbody>
+        {% if first_reference_title is not None %}
         <tr>
             <td>
                 Title
@@ -38,6 +39,7 @@
             </td>
         </tr>
         <tr>
+            {% endif %}
             <td>
                 Full name
             </td>
@@ -252,6 +254,7 @@
         </tr>
         </thead>
         <tbody>
+        {% if second_reference_title is not None %}
         <tr>
             <td>
                 Title
@@ -262,6 +265,7 @@
             <td class="change-answer">
             </td>
         </tr>
+        {% endif %}
         <tr>
             <td>
                 Full name
