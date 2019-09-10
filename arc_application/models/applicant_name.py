@@ -53,15 +53,21 @@ class ApplicantName(models.Model):
         return self.first_name + ' ' + ((self.middle_names+' ') if self.middle_names else '') + self.last_name
 
     def get_summary_table(self):
-        return [
-            {"name": "Title",
-            "value": self.title,
-             'pk':self.pk, "index": 1
-        },
-            {"name": "Your name",
-             "value": self.full_name,
-             'pk': self.pk, "index": 1},
-        ]
+        if self.title is not none:
+            return [
+                {"name": "Title",
+                "value": self.title,
+                'pk':self.pk, "index": 1
+            },
+                {"name": "Your name",
+                "value": self.full_name,
+                'pk': self.pk, "index": 1},
+            ]
+        else:
+            return [ {"name": "Your name",
+                "value": self.full_name,
+                'pk': self.pk, "index": 1},
+            ]
 
     class Meta:
         db_table = 'APPLICANT_NAME'
