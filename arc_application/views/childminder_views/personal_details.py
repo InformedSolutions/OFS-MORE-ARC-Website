@@ -194,6 +194,9 @@ def personal_details_summary(request):
         'show_your_children_table': show_your_children_table(home_address_record, childcare_address_record),
     }
 
+    if name_record.title != '':
+        variables.update({'title': name_record.title})
+
     if previous_reg_details is not None:
         log.debug("Conditional logic: Show previous registration details")
         variables.update({
