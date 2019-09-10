@@ -54,6 +54,10 @@ class ApplicantName(models.Model):
 
     def get_summary_table(self):
         return [
+            {"name": "Title",
+            "value": self.title,
+             'pk':self.pk, "index": 1
+        },
             {"name": "Your name",
              "value": self.full_name,
              'pk': self.pk, "index": 1},
