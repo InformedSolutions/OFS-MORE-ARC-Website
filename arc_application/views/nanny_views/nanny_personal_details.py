@@ -79,6 +79,7 @@ class NannyPersonalDetailsSummary(NannyARCFormView):
         previous_registration_details = self.read_record(nanny_actions, 'previous-registration-details',
                                                          {'application_id': application_id})
 
+        title = personal_details['title']
         first_name = personal_details['first_name']
         middle_names = personal_details['middle_names']
         last_name = personal_details['last_name']
@@ -116,7 +117,22 @@ class NannyPersonalDetailsSummary(NannyARCFormView):
             if previous_registration is True:
                 show_individual_id = True
 
-        rows = [
+        if title != '':
+
+            rows = [
+                {
+                    'id': 'title',
+                    'name': 'Title',
+                    'info': title,
+                    # Prevent checkbox appearing if summary page is calling get_context_data.
+                    'declare': '',
+                    'comments': personal_details_form['name_comments'],
+                }
+            ]
+        else:
+            rows = []
+
+        rows.extend([
             {
                 'id': 'name',
                 'name': 'Your name',
@@ -125,7 +141,7 @@ class NannyPersonalDetailsSummary(NannyARCFormView):
                 'declare': personal_details_form['name_declare'] if hasattr(self, 'request') else '',
                 'comments': personal_details_form['name_comments'],
             }
-        ]
+        ])
 
         if previous_names is not None and len(previous_names) > 0:
             log.debug("Conditional logic: Show nanny previous names")
