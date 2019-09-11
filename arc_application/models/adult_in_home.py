@@ -119,8 +119,6 @@ class AdultInHome(models.Model):
              "id": self.pk},
             {"name": "Health questions status",
              "value": self.health_check_status},
-            {"name": "Title",
-             "value": self.title},
             {"name": "Name",
              "value": self.get_full_name()},
             {"name": "Date of birth",
@@ -130,8 +128,12 @@ class AdultInHome(models.Model):
             {"name": "Email",
              "value": self.email},
             {"name": "Lived abroad in the last 5 years?",
-             "value": self.bool_to_string(self.lived_abroad)},
+             "value": self.bool_to_string(self.lived_abroad)}
         ]
+
+        if self.title is not None:
+            summary_table.insert(2, {"name": "Title",
+             "value": self.title})
 
         if ChildcareType.objects.get(application_id=self.application_id).zero_to_five:
             summary_table += [

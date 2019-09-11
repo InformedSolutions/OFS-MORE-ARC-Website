@@ -108,7 +108,6 @@ def references_summary(request):
 
     form.error_summary_title = 'There was a problem (first reference)'
     form2.error_summary_title = 'There was a problem (second reference)'
-
     variables = {
         'form': form,
         'form2': form2,

@@ -53,7 +53,7 @@ class ApplicantName(models.Model):
         return self.first_name + ' ' + ((self.middle_names+' ') if self.middle_names else '') + self.last_name
 
     def get_summary_table(self):
-        if self.title is not none:
+        if self.title is not None:
             return [
                 {"name": "Title",
                 "value": self.title,
