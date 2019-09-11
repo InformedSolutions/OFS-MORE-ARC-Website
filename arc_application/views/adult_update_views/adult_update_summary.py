@@ -73,9 +73,17 @@ def load_json(adult_id):
     summary_table = [
             {"title": full_name,
              "id": record['adult_id']},
-            {"name": "Health questions status",
-             "value": record['health_check_status'],
-            "field": 'health_check_status'},
+        {"name": "Health questions status",
+         "value": record['health_check_status'],
+         "field": 'health_check_status'},
+    ]
+
+    if record['title'] != '':
+        summary_table.extend([{"name": "Title",
+                              "value": record['title'],
+                              "field": "title"}])
+
+    summary_table.extend([
             {"name": "Name",
              "value": full_name,
              'field': "full_name"},
@@ -94,7 +102,7 @@ def load_json(adult_id):
             {"name": "Lived or worked on British military base in the last 5 years?",
             "value": 'Yes' if record['military_base'] else 'No',
              'field': 'military_base'}
-            ]
+            ])
 
     if record['enhanced_check']:
 
