@@ -1068,6 +1068,7 @@ class PeopleInTheHomeFunctionalTests(TestCase):
         self.application.save()
 
         adult = models.AdultInHome.objects.get(application_id=self.application.pk)
+        adult.title =  'Mr'
         adult.first_name = 'Joe'
         adult.middle_names = 'Anthony'
         adult.last_name = 'Bloggs'
@@ -1085,7 +1086,7 @@ class PeopleInTheHomeFunctionalTests(TestCase):
 
         utils.assertSummaryField(response, 'Does anyone aged 16 or over live or work in the home?', 'Yes',
                                  heading='Adults in the home')
-
+        utils.assertSummaryField(response, 'Title', 'Mr', heading='Joe Anthony Bloggs')
         utils.assertSummaryField(response, 'Name', 'Joe Anthony Bloggs', heading='Joe Anthony Bloggs')
         # TODO: display of months on this page are inconsistent with other pages
         utils.assertSummaryField(response, 'Date of birth', '28 February 1972', heading='Joe Anthony Bloggs')
@@ -1163,6 +1164,7 @@ class PeopleInTheHomeFunctionalTests(TestCase):
         self.application.save()
 
         adult1 = models.AdultInHome.objects.get(application_id=self.application.pk)
+        adult1.title='Mr'
         adult1.first_name = 'Joe'
         adult1.middle_names = 'Anthony'
         adult1.last_name = 'Bloggs'
@@ -1198,6 +1200,7 @@ class PeopleInTheHomeFunctionalTests(TestCase):
         self.application.save()
 
         adult1 = models.AdultInHome.objects.get(application_id=self.application.pk)
+        adult1.title='Mr'
         adult1.first_name = 'Joe'
         adult1.middle_names = 'Anthony'
         adult1.last_name = 'Bloggs'
@@ -1208,7 +1211,7 @@ class PeopleInTheHomeFunctionalTests(TestCase):
         adult1.save()
 
         models.AdultInHome.objects.create(
-            application_id=self.application,
+            application_id=self.application, title='Miss',
             first_name='Freda', middle_names='Annabel', last_name='Smith',
             birth_day=1, birth_month=2, birth_year=1983,
             dbs_certificate_number='123456789013',
@@ -1220,7 +1223,7 @@ class PeopleInTheHomeFunctionalTests(TestCase):
         )
 
         models.AdultInHome.objects.create(
-            application_id=self.application,
+            application_id=self.application, title='Mr',
             first_name='Jim', middle_names='Bob', last_name='Robertson',
             birth_day=1, birth_month=3, birth_year=1985,
             dbs_certificate_number='123456789014',
