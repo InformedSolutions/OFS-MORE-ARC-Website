@@ -11,6 +11,7 @@ from ..models import Application, ApplicantName, ApplicantHomeAddress, Applicant
 from .document_generator import DocumentGenerator
 
 from ..services.db_gateways import NannyGatewayActions, IdentityGatewayActions, HMGatewayActions
+from ..utils import get_title_data
 
 from . import SQSHandler
 
@@ -60,7 +61,7 @@ class ApplicationExporter:
         export['additional_adult_details'] = json.dumps(adults_in_home_export)
 
         applicant_name = ApplicantName.objects.filter(application_id=application_id)
-        export['applicant_name'] = serializers.serialize('json', applicant_name)
+        export['applicant_name'] = serializers.serialize('json', list(applicant_name))
 
         applicant_personal_details = ApplicantPersonalDetails.objects.filter(application_id=application_id)
         export['applicant_personal_details'] = serializers.serialize('json', list(applicant_personal_details))
@@ -156,6 +157,7 @@ class ApplicationExporter:
 
         applicant_personal_details = NannyGatewayActions().read('applicant-personal-details',
                                                                 params={'application_id': application_id}).record
+        applicant_personal_details = get_title_data(applicant_personal_details)
         export['applicant_personal_details'] = json.dumps(applicant_personal_details)
 
         applicant_home_address = NannyGatewayActions().read('applicant-home-address',
@@ -233,7 +235,7 @@ class ApplicationExporter:
         date_accepted = adult_record['date_accepted']
 
         adult_details_export['pk'] = adult_id
-        adult_details_export['fields'] = adult_record
+        adult_details_export['fields'] = get_title_data(adult_record)
 
         additional_adult_details_export['adult'] = int(adult_record['order'])
 

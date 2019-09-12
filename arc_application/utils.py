@@ -21,3 +21,21 @@ def spatial_ordinal(value):
     Returns the word representing the spatial ordinal for the given value e.g. 2 -> "second"
     """
     return inflect_engine.number_to_words(inflect_engine.ordinal(int(value)))
+
+def get_title_data(dict):
+    """
+    Function to determine if title is one of the options or an 'other' title
+    :param details_dict: dictionary of the adult/applicant's  details
+    :return: a dictionary with the title and other_title set correctly
+    """
+    title = dict['title']
+    if title not in TITLE_OPTIONS:
+        dict['title'] = 'Other'
+        dict['other_title']=title
+    else:
+        dict['title'] = title
+        dict['other_title'] = ''
+    return dict
+
+
+TITLE_OPTIONS = ['Mr', 'Miss', 'Ms', 'Mrs']
