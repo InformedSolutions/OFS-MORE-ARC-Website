@@ -30,10 +30,8 @@ def get_title_data(dict):
     """
     title = dict['title']
     if title not in TITLE_OPTIONS:
-        dict['title'] = 'Other'
         dict['other_title']=title
-    else:
-        dict['title'] = title
+        dict['title'] = 'Other'
     return dict
 
 
