@@ -101,7 +101,8 @@ class StubNannyGatewayActions:
         self.personal_details_record = {
             'application_id': '998fd8ec-b96b-4a71-a1a1-a7a3ae186729',
             'personal_detail_id': '9835bf4b-9ba9-4162-a25b-4c56e7d33d67',
-            'first_name': 'The Dark Lord',
+            'title': 'The'
+            'first_name': 'Dark Lord',
             'middle_names': '',
             'last_name': 'Selenium',
             'date_of_birth': '2000-01-01',
