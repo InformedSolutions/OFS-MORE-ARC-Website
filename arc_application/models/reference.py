@@ -12,6 +12,7 @@ class Reference(models.Model):
     first_name = models.CharField(max_length=100, blank=True)
     last_name = models.CharField(max_length=100, blank=True)
     title = models.CharField(max_length=100, blank=True)
+    other_title = models.CharField(max_length=100, blank=True, null=True)
     relationship = models.CharField(max_length=100, blank=True)
     years_known = models.IntegerField(blank=True)
     months_known = models.IntegerField(blank=True)

@@ -34,7 +34,6 @@ def get_title_data(dict):
         dict['other_title']=title
     else:
         dict['title'] = title
-        dict['other_title'] = ''
     return dict
 
 

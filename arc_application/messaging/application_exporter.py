@@ -11,7 +11,7 @@ from ..models import Application, ApplicantName, ApplicantHomeAddress, Applicant
 from .document_generator import DocumentGenerator
 
 from ..services.db_gateways import NannyGatewayActions, IdentityGatewayActions, HMGatewayActions
-from ..utils import get_title_data
+from ..utils import get_title_data, TITLE_OPTIONS
 
 from . import SQSHandler
 
@@ -41,6 +41,12 @@ class ApplicationExporter:
         # Iterate adults in home, appending prior names and addresses
 
         for adult_in_home in adults_in_home:
+            if adult_in_home.title not in TITLE_OPTIONS:
+                adult_in_home.other_title= adult_in_home.title
+                adult_in_home.title = 'Other'
+                adult_in_home.save()
+                adults_in_home = AdultInHome.objects.filter(application_id=application_id).order_by('adult')
+                export['adults_in_home'] = serializers.serialize('json', list(adults_in_home))
             previous_name = PreviousName.objects.filter(person_id=adult_in_home.pk)
             previous_address = PreviousAddress.objects.filter(person_id=adult_in_home.pk)
             serious_illness = HealthCheckSerious.objects.filter(person_id=adult_in_home.pk)
@@ -60,7 +66,12 @@ class ApplicationExporter:
 
         export['additional_adult_details'] = json.dumps(adults_in_home_export)
 
-        applicant_name = ApplicantName.objects.filter(application_id=application_id)
+        applicant_name = ApplicantName.objects.get(application_id=application_id)
+        if applicant_name.title not in TITLE_OPTIONS:
+            applicant_name.other_title = applicant_name.title
+            applicant_name.title = 'Other'
+            applicant_name.save()
+            applicant_name = ApplicantName.objects.filter(application_id=application_id)
         export['applicant_name'] = serializers.serialize('json', list(applicant_name))
 
         applicant_personal_details = ApplicantPersonalDetails.objects.filter(application_id=application_id)
@@ -102,6 +113,12 @@ class ApplicationExporter:
         export['previous_registration'] = serializers.serialize('json', list(previous_registration_details))
 
         references = Reference.objects.filter(application_id=application_id)
+        for reference in references:
+            if reference.title not in TITLE_OPTIONS:
+                reference.other_title = reference.title
+                reference.title = 'Other'
+                reference.save()
+                references = Reference.objects.filter(application_id=application_id)
         export['references'] = serializers.serialize('json', list(references))
 
         user_details = UserDetails.objects.filter(application_id=application_id)
@@ -157,7 +174,7 @@ class ApplicationExporter:
 
         applicant_personal_details = NannyGatewayActions().read('applicant-personal-details',
                                                                 params={'application_id': application_id}).record
-        applicant_personal_details = get_title_data(applicant_personal_details)
+        applicant_personal_details  = get_title_data(applicant_personal_details)
         export['applicant_personal_details'] = json.dumps(applicant_personal_details)
 
         applicant_home_address = NannyGatewayActions().read('applicant-home-address',
