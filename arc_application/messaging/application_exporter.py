@@ -241,6 +241,7 @@ class ApplicationExporter:
         additional_adult_details_export = {}
 
         adult_record = HMGatewayActions().read('adult', params={'adult_id': adult_id}).record
+        adult_record = get_title_data(adult_record)
 
         dpa_auth_id = adult_record['token_id']
         dpa_record = HMGatewayActions().read('dpa-auth', params={'token_id': dpa_auth_id}).record
