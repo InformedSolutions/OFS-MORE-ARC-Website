@@ -72,7 +72,9 @@ class ApplicationExporter:
             applicant_name.title = 'Other'
             applicant_name.save()
             applicant_name = ApplicantName.objects.filter(application_id=application_id)
-        export['applicant_name'] = serializers.serialize('json', list(applicant_name))
+            export['applicant_name'] = serializers.serialize('json', list(applicant_name))
+        else:
+            export['applicant_name'] = serializers.serialize('json', applicant_name)
 
         applicant_personal_details = ApplicantPersonalDetails.objects.filter(application_id=application_id)
         export['applicant_personal_details'] = serializers.serialize('json', list(applicant_personal_details))
