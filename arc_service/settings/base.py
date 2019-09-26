@@ -27,6 +27,8 @@ HM_GATEWAY_URL = os.environ.get("APP_HM_GATEWAY_URL")
 # Address of Childminder application
 CHILDMINDER_EMAIL_VALIDATION_URL = os.environ.get('CHILDMINDER_EMAIL_VALIDATION_URL')
 
+INTEGRATION_ADAPTER_URL = os.environ.get('APP_INTEGRATION_ADAPTER')
+
 # Address of Nanny application
 NANNY_PUBLIC_URL = os.environ.get('NANNY_PUBLIC_URL')
 
