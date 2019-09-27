@@ -45,7 +45,7 @@ def get_individual_search_results(query_params):
 class IndividualSearchResponse:
     """
     Response class for getting individuals
-    if the response is successfull and individuals are found it will contain a list of individuals
+    if the response is successful and individuals are found it will contain a list of individuals
     matching the search criteria
     """
     def __init__(self, successful=None, found=None, individuals=None):
