@@ -5,6 +5,7 @@ from django.utils.decorators import method_decorator
 from django.shortcuts import render
 from ..models import Application
 from .. services.db_gateways import NannyGatewayActions
+from .. services.integration_service import get_individual_search_results
 
 # Initiate logging
 log = logging.getLogger()

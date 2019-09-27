@@ -6,14 +6,14 @@ from django.conf import settings
 from requests import RequestException
 from django.utils.http import urlencode
 
-
 logger = logging.getLogger(__name__)
 
 
 def get_individual_search_results(query_params):
     """
-    Integration method for getting information about specified individual
+    Integration method for getting list of individuals which match search criteria
     :param query_params: dictionary of search criteria
+    :return IndividualSearchResponse object containing results of the search
     """
     logger.debug(f"Getting individuals from integration-adapter")
 
@@ -35,7 +35,7 @@ def get_individual_search_results(query_params):
                 individuals = deserialized_response['Individual']
                 found = True
         else:
-            logger.debug(f"Problem with received URN from adapter")
+            logger.debug(f"Problem with received results from adapter")
     except (AttributeError, RequestException):
         logger.debug("Problem with connection with integration adapter")
 
@@ -46,7 +46,6 @@ class IndividualSearchResponse:
     """
     Response class for getting individuals
     """
-
     def __init__(self, successful=None, found=None, individuals=None):
         self.individuals = individuals
         self.successful = successful
