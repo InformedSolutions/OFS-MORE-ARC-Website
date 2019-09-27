@@ -21,6 +21,7 @@ DBS_URL = os.environ.get('APP_DBS_URL')
 # Bool to determine whether to enable or disable nanny applications showing
 # Default: False
 ENABLE_NANNIES = os.environ.get('ENABLE_NANNIES') in ['true', True, 'True']
+ENABLE_HM = os.environ.get('ENABLE_HM') in ['true', True, 'True']
 
 HM_GATEWAY_URL = os.environ.get("APP_HM_GATEWAY_URL")
 

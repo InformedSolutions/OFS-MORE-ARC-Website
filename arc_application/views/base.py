@@ -155,7 +155,7 @@ def release_application(request, application_id, status):
             application_reference = app['application_reference']
             ApplicationExporter.export_nanny_application(application_id, application_reference)
 
-    else:
+    elif settings.ENABLE_HM:
         hm_api_response = HMGatewayActions().read('adult', params={'adult_id': application_id})
         app = hm_api_response.record
 

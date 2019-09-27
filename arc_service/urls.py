@@ -118,9 +118,12 @@ urlpatterns = [
     url(r'^contact-centre/nanny/contact-details/add-phone-number', NannyUpdateAddPhoneNumberView.as_view(),
         name='nanny_update_add_number'),
     url(r'^personal-details/previous-registration', PreviousRegistrationDetailsView.as_view(),
-        name='previous_registration_details'),
+        name='previous_registration_details')]
 
+
+if settings.ENABLE_HM:
     # adult update urls
+    urlpatterns += [
     url(r'^review/new-adult$', new_adults_summary,
         name='new_adults_summary'),
     url(r'^review/new-adult-summary', adult_arc_summary,

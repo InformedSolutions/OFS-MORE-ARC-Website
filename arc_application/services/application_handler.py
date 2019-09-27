@@ -37,7 +37,7 @@ class GenericApplicationHandler:
             if assigned_application.app_type == 'Childminder':
                 table_data.append(self.__get_childminder_table_data(assigned_application.application_id))
 
-            if assigned_application.app_type == 'Adult update':
+            if SETTINGS.ENABLE_HM  and assigned_application.app_type == 'Adult update':
                 table_data.append(self.__get_adult_update_table_data(assigned_application.application_id))
                 
             if settings.ENABLE_NANNIES:

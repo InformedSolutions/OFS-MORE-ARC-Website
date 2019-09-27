@@ -37,7 +37,7 @@ class ARCUserSummaryView(View):
         if 'add_childminder_application' in request.POST:
             app_handler = ChildminderApplicationHandler(arc_user=request.user)
 
-        elif 'add_adult_update_application' in request.POST:
+        elif settings.ENABLE_HM  and 'add_adult_update_application' in request.POST:
             app_handler = AdultUpdateApplicationHandler(arc_user=request.user)
 
         try:
@@ -72,5 +72,6 @@ class ARCUserSummaryView(View):
             context['empty'] = 'true'
 
         context['enable_nannies'] = settings.ENABLE_NANNIES
+        context['enable_hm'] = settings.ENABLE_HM
 
         return context
