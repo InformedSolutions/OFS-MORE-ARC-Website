@@ -1,0 +1,126 @@
+{% extends 'govuk_template.html' %}
+{% block page_title %}Personal details - Individual Lookup{% endblock %}
+{% load static %}
+{% load govuk_template_base %}
+{% load alt_text_extras %}
+
+{% block inner_content %}
+{% include 'back-button.html' %}
+
+
+<div class="individual-lookup-wrapper">
+    <div class="individual-lookup-applicants-details">
+        <h2 class="font-large">Applicant's details</h1>
+         <br><br>
+        <table>
+            <tr>
+                <td>Firstname</td>
+                <td>{{ first_name }}</td>
+            </tr>
+            <tr>
+                <td>Middle names</td>
+                <td>{{ middle_names }}</td>
+            </tr>
+            <tr>
+                <td>Lastname</td>
+                <td>{{ last_name }}</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>Date Of Birth</td>
+                <td>{{ date_of_birth }}</td>
+            </tr>
+            <tr>
+                <td>Line 1</td>
+                <td class="wordwrap">{{ street_line1 }}</td>
+            </tr>
+            <tr>
+                <td>Line 2</td>
+                <td>{{ street_line2 }}</td>
+            </tr>
+            <tr>
+                <td>Town</td>
+                <td>{{ town }}</td>
+            </tr>
+            <tr>
+                <td>Postcode</td>
+                <td>{{ postcode }}</td>
+            </tr>
+            <tr>
+                    <td></td>
+                    <td></td>
+            </tr>
+        </table>
+        <input id="individual-lookup-applicants-button" type="button" class="button button-secondary" value="Not known to Ofsted"></input>
+    </div>
+    <div class="individual-lookup-search">
+        <h2 class="font-large">Search</h1>
+        <p class="individual-lookup-warning">'%' can be used as a wildcard. The training manual has more details.</p>
+        <form>
+            <table>
+                <tr>
+                    <td>Forenames</td>
+                    <td><input class="form-control" type="text"/></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td></td>    
+                </tr>
+                <tr>
+                    <td>Last name</td>
+                    <td><input class="form-control" type="text"/></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>
+                        <div class="date-form-label-wrapper">
+                            <span id="date_form_day">Day</span>
+                            <span id="date_form_month">Month</span>
+                            <span id="date_form_year">Year</span> 
+                        </div> 
+                    </td>
+                </tr>
+                <tr>
+                    <td>Date Of Birth</td>
+                    <td>
+                        <div class="date-form-wrapper">
+                            <input type="number" id="date_form_day" class="form-control" min="1" max="31">
+                            <input type="number" id="date_form_month" class="form-control">
+                            <input type="number" id="date_form_year" class="form-control"> 
+                        </div>         
+                    </td>
+                </tr>
+                <tr>
+                    <td>Street</td>
+                    <td><input class="form-control" type="text"/></td>  
+                </tr>
+                <tr>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>Town</td>
+                    <td><input class="form-control" type="text"/></td>
+                </tr>
+                <tr>
+                    <td>Postcode</td>
+                    <td><input class="form-control" type="text"/></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td></td>
+                </tr>
+            </table>
+        </form>
+        
+        
+        <button id="individual_lookup_search_button" type="button" class="button button-primary">Search</button>
+        
+    </div>
+</div>
+
+
+{% endblock %}
