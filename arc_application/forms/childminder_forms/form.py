@@ -453,7 +453,7 @@ class DBSCheckForm(GOVUKForm):
 
     on_update_declare = forms.BooleanField(label='This information is correct',
                                            widget=widgets.CustomCheckboxInput, required=False)
-    on_update_comments = forms.CharField(label='Are you on the DBS update service?',
+    on_update_comments = forms.CharField(label='Are you on the DBS Update Service?',
                                          help_text='(Tip: be clear and concise)',
                                          widget=widgets.Textarea, required=False,
                                          max_length=500)
