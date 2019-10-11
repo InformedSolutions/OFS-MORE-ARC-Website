@@ -7,6 +7,7 @@
 {% block inner_content %}
 {% include 'back-button.html' %}
 
+
 {{form.error_summary}}
 
 <form method="post" novalidate>
@@ -135,6 +136,86 @@
     <a href="{% url 'personal_details_previous_names' %}?id={{ application_id }}&amp;person_id={{ application_id }}&amp;type=APPLICANT"
        class="button button-secondary">Add previous names</a>
 
+    <table>
+        <thead>
+        <tr>
+            <th colspan="3">
+                <div class="heading-medium">
+                    Individual lookup
+                </div>
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>
+                Individual ID
+            </td>
+            <td style="display: none;" id="individual_search_id_value">            
+                Not known to Ofsted
+            </td>          
+            <td><a href="{% url 'personal_details_individual_lookup' %}/?id={{application_id}}" id="amend_search" style="display:none;">Amend search</a></td>
+            <td></td>
+        </tr>
+        </tbody>
+    </table>
+    <button id="button_individual_search" type="button" class="button button-secondary button-add-another">Search for individual</button>
+
+    {% block has_previously_applied %}
+    {% if has_previously_applied %}
+    <table class="check-your-answers form-group">
+        <tr>
+            <th colspan="3">
+                <div class="heading-medium">
+                    Previous registration
+                </div>
+            </th>
+        </tr>
+        <tbody>
+        <tr>
+            <td>
+                Has the applicant previously registered with Ofsted?
+            </td>
+            <td>
+                {{ previous_registration|yesno:"Yes,No" }}
+            </td>
+            <td class="change-answer">
+                <a href="{% url 'previous_registration_details' %}/?id={{application_id}}">Change</a>
+            </td>
+        </tr>
+        {% if individual_id != 'None' %}
+        <tr>
+            <td>
+                Individual ID
+            </td>
+            <td>
+                {{ individual_id|default:"None" }}
+            </td>
+            <td class="change-answer">
+                <a href="{% url 'previous_registration_details' %}/?id={{application_id}}">Change</a>
+            </td>
+        </tr>
+        {% endif %}
+        <tr>
+            <td>
+                Has the applicant lived in England for more than 5 years?
+            </td>
+            <td>
+                {{ five_years_in_UK|yesno:"Yes,No" }}
+            </td>
+            <td class="change-answer">
+                <a href="{% url 'previous_registration_details' %}/?id={{application_id}}">Change</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    {% endif %}
+    {% endblock %}
+
+    <button type="submit" name="previous_registration_details" class="button button-secondary button-add-another"
+            value="/personal-details/previous-registration/">
+        Add previous registration
+    </button>
 
     <table class="check-your-answers form-group">
         <thead>
@@ -392,65 +473,9 @@
         </tbody>
     </table>
     {% endif %}
-    <br/>
 
-    {% block has_previously_applied %}
-    {% if has_previously_applied %}
-    <table class="check-your-answers form-group">
-        <tr>
-            <th colspan="3">
-                <div class="heading-medium">
-                    Previous registration
-                </div>
-            </th>
-        </tr>
-        <tbody>
-        <tr>
-            <td>
-                Has the applicant previously registered with Ofsted?
-            </td>
-            <td>
-                {{ previous_registration|yesno:"Yes,No" }}
-            </td>
-            <td class="change-answer">
-                <a href="{% url 'previous_registration_details' %}/?id={{application_id}}">Change</a>
-            </td>
-        </tr>
-        {% if individual_id != 'None' %}
-        <tr>
-            <td>
-                Individual ID
-            </td>
-            <td>
-                {{ individual_id|default:"None" }}
-            </td>
-            <td class="change-answer">
-                <a href="{% url 'previous_registration_details' %}/?id={{application_id}}">Change</a>
-            </td>
-        </tr>
-        {% endif %}
-        <tr>
-            <td>
-                Has the applicant lived in England for more than 5 years?
-            </td>
-            <td>
-                {{ five_years_in_UK|yesno:"Yes,No" }}
-            </td>
-            <td class="change-answer">
-                <a href="{% url 'previous_registration_details' %}/?id={{application_id}}">Change</a>
-            </td>
-        </tr>
-        </tbody>
-    </table>
-    {% endif %}
-    {% endblock %}
+    
     {% csrf_token %}
-
-    <button type="submit" name="previous_registration_details" class="button button-secondary button-add-another"
-            value="/personal-details/previous-registration/">
-        Add previous registration
-    </button>
-    <br>
 
     <input type="submit" class="button" value="Confirm and continue"/>
     <input type="hidden" value="{{application_id}}" name="id"/>
@@ -459,5 +484,15 @@
     {% include 'childminder_templates/return-to-list.html' %}
 
 </form>
+
+<script type="text/javascript">
+    document.getElementById("button_individual_search").addEventListener("click", showAmendSearch);
+    
+    function showAmendSearch() {
+        document.getElementById("button_individual_search").style.display = "none";
+        document.getElementById("individual_search_id_value").style.display = "block";
+        document.getElementById("amend_search").style.display = "block";
+    }
+</script>
 
 {% endblock %}
