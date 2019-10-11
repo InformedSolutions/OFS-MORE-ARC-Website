@@ -3,13 +3,10 @@ import datetime
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponseRedirect
 from django.shortcuts import render
 
 from ...decorators import group_required, user_assigned_application
-from ...models import ApplicantPersonalDetails, ApplicantName, ApplicantHomeAddress, Arc, Application, PreviousName
-from ...review_util import request_to_comment, save_comments, redirect_selection
-from ...forms.childminder_forms.form import PersonalDetailsForm, PreviousRegistrationDetails
+from ...models import ApplicantPersonalDetails, ApplicantName, ApplicantHomeAddress, Application, PreviousName
 
 log = logging.getLogger()
 
@@ -20,13 +17,9 @@ log = logging.getLogger()
 def personal_details_individual_lookup(request):
 
     application_id_local = request.GET["id"]
-    application_record = Application.objects.get(application_id=application_id_local)
     personal_details_record = ApplicantPersonalDetails.objects.get(application_id=application_id_local)
     name_record = ApplicantName.objects.get(personal_detail_id=personal_details_record)
-    home_address_record = ApplicantHomeAddress.objects.get(personal_detail_id=personal_details_record,
-                                                           current_address=True)
-    childcare_address_record = ApplicantHomeAddress.objects.get(personal_detail_id=personal_details_record,
-                                                                childcare_address=True)
+    home_address_record = ApplicantHomeAddress.objects.get(personal_detail_id=personal_details_record, current_address=True)
 
     variables = {
         'first_name': name_record.first_name,
