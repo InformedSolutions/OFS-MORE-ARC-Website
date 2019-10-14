@@ -1,12 +1,11 @@
 import logging
-import datetime
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 
 from ...decorators import group_required, user_assigned_application
-from ...models import ApplicantPersonalDetails, ApplicantName, ApplicantHomeAddress, Application, PreviousName
+from ...models import ApplicantPersonalDetails, ApplicantName, ApplicantHomeAddress
 
 log = logging.getLogger()
 
