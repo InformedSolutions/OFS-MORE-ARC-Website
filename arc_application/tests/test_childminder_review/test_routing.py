@@ -2431,3 +2431,19 @@ class ReviewSummaryAndConfirmationFunctionalTests(TestCase):
 
     def test_submit_releases_application_once_if_submitted_twice(self):
         self.skipTest("testNotImplemented")
+
+@tag('http')
+class ApplicantIndividualLookup(TestCase):
+    
+    def setUp(self):
+        self.arc_user = create_arc_user()
+        self.application = create_childminder_application(self.arc_user.pk)
+        self.client.login(username='arc_test', password='my_secret')
+
+    def test_can_render_page(self):
+        url = reverse('personal_details_individual_lookup')+ '?id={}'.format(self.application.pk)
+        
+        response = self.client.get(url)
+
+        self.assertEqual(200, response.status_code)
+        utils.assertView(response, 'personal_details_individual_lookup')

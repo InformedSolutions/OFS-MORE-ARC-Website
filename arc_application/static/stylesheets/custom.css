@@ -442,16 +442,16 @@
 
 .individual-lookup-warning {
   color: #6f777b;
-  margin-top:0px;
+  margin-top: 0px;
 }
 
 #individual-lookup-applicants-button {
-  margin-top: 0.526315em;
+  margin-top: 10px;
 }
 
 .individual-lookup-wrapper tr td {
   height: 40px;
-  padding:5px;
+  padding: 5px;
   border: 0px;
   width: 90px;
   line-height: 20px;
@@ -465,7 +465,6 @@
 
 .individual-lookup-wrapper table {
   margin-top: 30px;
-  margin-left: 0.5rem;
 }
 
 .individual-lookup-search {
@@ -475,7 +474,8 @@
 }
 
 .individual-lookup-search .button {
-  margin-top: 0.526315em;
+  margin-top: 10px;
+  margin-bottom: 15px;
 }
 
 .individual-lookup-search .form-control {
@@ -492,7 +492,7 @@
   justify-content: space-between;
 }
 
-.date-form-label-wrapper span{
+.date-form-label-wrapper span {
   text-align: center; 
   color: gray;
 }
@@ -500,12 +500,12 @@
 .individual-lookup-search #date_form_day, 
 .individual-lookup-search #date_form_year {
   flex-basis: 30%;
-  min-width:0; 
+  min-width: 0; 
 }
 
 .individual-lookup-search #date_form_month {
   flex-basis: 35%;
-  min-width:0;
+  min-width: 0;
 }
 
 @media (max-width: 1000px) {
@@ -514,7 +514,7 @@
   }
 
   .individual-lookup-search {
-    margin-top:10px;
+    margin-top: 10px;
   }
 
   .individual-lookup-wrapper h2 {
