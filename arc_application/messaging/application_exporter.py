@@ -30,7 +30,7 @@ class ApplicationExporter:
         """
 
         export = {}
-        export['application_type'] = json.dumps('Childminder')
+        export['application_type'] = json.dumps({'app_type':'Childminder'})
         application = Application.objects.filter(application_id=application_id)
         export['application'] = serializers.serialize('json', list(application))
 
@@ -163,6 +163,7 @@ class ApplicationExporter:
         application = NannyGatewayActions().read('application', params={'application_id': application_id}).record
 
         export['application'] = json.dumps(application)
+        export['application_type'] = json.dumps({'app_type':'Nanny'})
 
         # Try fetch childcare address if it exists
         childcare_addresses = NannyGatewayActions().list('childcare-address',
