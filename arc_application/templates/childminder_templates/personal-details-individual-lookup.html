@@ -11,7 +11,7 @@
 <div class="individual-lookup-wrapper">
     <div class="individual-lookup-applicants-details">
         <h2 class="font-large">Applicant's details</h2>
-        <br><br>
+        <br><br><br>
         <table>
             <tr>
                 <td>Firstname</td>
@@ -26,8 +26,8 @@
                 <td>{{ last_name }}</td>
             </tr>
             <tr>
-                <td></td>
-                <td></td>
+                <td class="date-form-label-tuple"></td>
+                <td class="date-form-label-tuple"></td>    
             </tr>
             <tr>
                 <td>Date Of Birth</td>
@@ -35,7 +35,7 @@
             </tr>
             <tr>
                 <td>Line 1</td>
-                <td class="wordwrap">{{ street_line1 }}</td>
+                <td>{{ street_line1 }}</td>
             </tr>
             <tr>
                 <td>Line 2</td>
@@ -48,10 +48,6 @@
             <tr>
                 <td>Postcode</td>
                 <td>{{ postcode }}</td>
-            </tr>
-            <tr>
-                <td></td>
-                <td></td>
             </tr>
         </table>
         <input id="individual-lookup-applicants-button" type="button" class="button button-secondary" value="Not known to Ofsted"></input>
@@ -74,23 +70,23 @@
                     <td><input class="form-control" type="text"/></td>
                 </tr>
                 <tr>
-                    <td></td>
-                    <td>
+                    <td class="date-form-label-tuple"></td>
+                    <td class="date-form-label-tuple">
                         <div class="date-form-label-wrapper">
                             <span id="date_form_day">Day</span>
                             <span id="date_form_month">Month</span>
                             <span id="date_form_year">Year</span> 
-                        </div> 
-                    </td>
+                        </div>
+                    </td>    
                 </tr>
                 <tr>
                     <td>Date Of Birth</td>
-                    <td>
+                    <td> 
                         <div class="date-form-wrapper">
                             <input type="number" id="date_form_day" class="form-control" min="1" max="31">
                             <input type="number" id="date_form_month" class="form-control" min="1" max="31">
                             <input type="number" id="date_form_year" class="form-control" min="1900"> 
-                        </div>         
+                        </div>          
                     </td>
                 </tr>
                 <tr>
@@ -105,13 +101,10 @@
                     <td>Town</td>
                     <td><input class="form-control" type="text"/></td>
                 </tr>
+                
                 <tr>
                     <td>Postcode</td>
                     <td><input class="form-control" type="text"/></td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td></td>
                 </tr>
             </table>
         </form>  
