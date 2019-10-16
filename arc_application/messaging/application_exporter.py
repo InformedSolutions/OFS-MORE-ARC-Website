@@ -30,7 +30,7 @@ class ApplicationExporter:
         """
 
         export = {}
-        export['application_type'] = json.dumps({'app_type':'Childminder'})
+        export['application_type'] = json.dumps([{'app_type':'Childminder'}])
         application = Application.objects.filter(application_id=application_id)
         export['application'] = serializers.serialize('json', list(application))
 
