@@ -56,6 +56,7 @@ name_field_dict = {
     'Date of birth': 'date_of_birth',
     'Relationship': 'relationship',
     'Email': 'email',
+    'Phone Number': 'PITH_mobile_number',
     'Lived abroad in the last 5 years?': 'lived_abroad',
     'Lived or worked in British military base in the last 5 years?': 'military_base',
     'Did they get their DBS check from the Ofsted DBS application website?': 'capita',
