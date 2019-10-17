@@ -29,6 +29,7 @@ class AdultInHome(models.Model):
     cygnum_relationship_to_childminder = models.CharField(max_length=100, blank=True)
 
     email = models.CharField(max_length=100, blank=True, null=True)
+    PITH_mobile_number = models.CharField(max_length=20, blank=True)
     dbs_certificate_number = models.CharField(max_length=50, blank=True)
     token = models.CharField(max_length=100, blank=True, null=True)
     validated = models.BooleanField(default=False)
@@ -79,6 +80,7 @@ class AdultInHome(models.Model):
             'birth_year',
             'relationship',
             'email',
+            'PITH_mobile_number',
             'dbs_certificate_number',
             'health_check_status',
         )
@@ -128,6 +130,8 @@ class AdultInHome(models.Model):
              "value": self.relationship},
             {"name": "Email",
              "value": self.email},
+            {"name": "Phone Number",
+             "value": self.PITH_mobile_number},
             {"name": "Lived abroad in the last 5 years?",
              "value": self.bool_to_string(self.lived_abroad)}
         ]
