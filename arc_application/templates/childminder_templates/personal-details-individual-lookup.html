@@ -1,4 +1,5 @@
 {% extends 'govuk_template.html' %}
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.css">
 {% block page_title %}Personal details - Individual Lookup{% endblock %}
 {% load static %}
 {% load govuk_template_base %}
@@ -11,7 +12,7 @@
 <div class="individual-lookup-wrapper">
     <div class="individual-lookup-applicants-details">
         <h2 class="font-large">Applicant's details</h2>
-        <br><br><br>
+        <br><br>
         <table>
             <tr>
                 <td>First name</td>
@@ -54,63 +55,362 @@
     </div>
     <div class="individual-lookup-search">
         <h2 class="font-large">Search</h2>
-        <p class="individual-lookup-warning">'%' can be used as a wildcard. The training manual has more details.</p>
-        <form>
-            <table>
-                <tr>
-                    <td>Forenames</td>
-                    <td><input class="form-control" type="text"/></td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td></td>    
-                </tr>
-                <tr>
-                    <td>Last name</td>
-                    <td><input class="form-control" type="text"/></td>
-                </tr>
-                <tr>
-                    <td class="date-form-label-tuple"></td>
-                    <td class="date-form-label-tuple">
-                        <div class="date-form-label-wrapper">
-                            <span id="date_form_day">Day</span>
-                            <span id="date_form_month">Month</span>
-                            <span id="date_form_year">Year</span> 
-                        </div>
-                    </td>    
-                </tr>
-                <tr>
-                    <td>Date of Birth</td>
-                    <td> 
-                        <div class="date-form-wrapper">
-                            <input type="number" id="date_form_day" class="form-control" min="1" max="31">
-                            <input type="number" id="date_form_month" class="form-control" min="1" max="31">
-                            <input type="number" id="date_form_year" class="form-control" min="1900"> 
-                        </div>          
-                    </td>
-                </tr>
-                <tr>
-                    <td>Street</td>
-                    <td><input class="form-control" type="text"/></td>  
-                </tr>
-                <tr>
-                    <td></td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td>Town</td>
-                    <td><input class="form-control" type="text"/></td>
-                </tr>
-                
-                <tr>
-                    <td>Postcode</td>
-                    <td><input class="form-control" type="text"/></td>
-                </tr>
-            </table>
-        </form>  
-        <button type="button" class="button button-primary">Search</button> 
+        <div class="individual-lookup-warning">'%' can be used as a wildcard. The training manual has more details.</div>
+        
+        <div class="invidual-lookup-search-wrapper">
+            <form>
+                <table>
+                    <tr>
+                        <td>Forenames</td>
+                        <td><input class="form-control" type="text" name="forenames"/></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>    
+                    </tr>
+                    <tr>
+                        <td>Last name</td>
+                        <td><input class="form-control" type="text" name="lastname"/></td>
+                    </tr>
+                    <tr>
+                        <td class="date-form-label-tuple"></td>
+                        <td class="date-form-label-tuple">
+                            <div class="date-form-label-wrapper">
+                                <span id="date_form_day">Day</span>
+                                <span id="date_form_month">Month</span>
+                                <span id="date_form_year">Year</span> 
+                            </div>
+                        </td>    
+                    </tr>
+                    <tr>
+                        <td>Date of Birth</td>
+                        <td> 
+                            <div class="date-form-wrapper">
+                                <input type="number" id="date_form_day" class="form-control" min="1" max="31" name='day'>
+                                <input type="number" id="date_form_month" class="form-control" min="1" max="31" name='month'>
+                                <input type="number" id="date_form_year" class="form-control" min="1900" name='year'> 
+                            </div>          
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Street</td>
+                        <td><input class="form-control" type="text" name="street"/></td>  
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>Town</td>
+                        <td><input class="form-control" type="text" name="town"/></td>
+                    </tr>
+                    
+                    <tr>
+                        <td>Postcode</td>
+                        <td><input class="form-control" type="text" name="postcode"/></td>
+                    </tr>
+                </table>
+            </form>  
+            <button id="search_with_criteria" type="button" class="button button-primary">Search</button>
+        </div> 
     </div>
 </div>
+<div class="individual-table-wrapper">
+</div>
+
+
+<script type="text/javascript">
+
+    var jsonDb = {
+            "Individual":[
+                {
+                    "IndividualID":"2438299",
+                    "Surname":"Michael",
+                    "Forenames":"Paulos",
+                    "IndividualAddress":"32 Gosterwood Street",
+                    "IndividualPostCode":"SE8 5NX",
+                    "AssociationType":"Household > 16",
+                    "DateFrom":"2015-07-13",
+                    "SettingName":"Fre, Whbet Werie",
+                    "SettingAddress":"48 Westmoreland Avenue",
+                    "SettingPostCode":"DA16 2QD",
+                    "DOB":"1966-02-02",
+                    "Disqualified":"No",
+                    "Deceased":"No",
+                    "ISARegistrationNo":"001490051466",
+                    "URN":"EY288339"
+                },
+                {
+                    "IndividualID":"1011484",
+                    "Surname":"Michael",
+                    "Forenames":"Michalakis Nicholas",
+                    "IndividualAddress":"240 Colney Hatch Lane",
+                    "IndividualPostCode":"N10 1BD",
+                    "AssociationType":"NP/RI",
+                    "DateFrom":"2007-05-01",
+                    "SettingName":"Hillview Fostering Agency",
+                    "SettingAddress":"601 High Road",
+                    "SettingPostCode":"E11 4PA",
+                    "DOB":"1956-05-15",
+                    "Disqualified":"No",
+                    "Deceased":"No",
+                    "URN":"SC356793"
+                },
+                {
+                    "IndividualID":"1011484",
+                    "Surname":"Michael",
+                    "Forenames":"Michalakis Nicholas",
+                    "IndividualAddress":"240 Colney Hatch Lane",
+                    "IndividualPostCode":"N10 1BD",
+                    "AssociationType":"NP/RI",
+                    "DateFrom":"2007-05-01",
+                    "SettingName":"Hillview Fostering Agency",
+                    "SettingAddress":"601 High Road",
+                    "SettingPostCode":"E11 4PA",
+                    "DOB":"1956-05-15",
+                    "Disqualified":"No",
+                    "Deceased":"No",
+                    "URN":"SC356793"
+                },
+                {
+                    "IndividualID":"2438299",
+                    "Surname":"Michael",
+                    "Forenames":"Paulos",
+                    "IndividualAddress":"32 Gosterwood Street",
+                    "IndividualPostCode":"SE8 5NX",
+                    "AssociationType":"Household > 16",
+                    "DateFrom":"2015-07-13",
+                    "SettingName":"Fre, Whbet Werie",
+                    "SettingAddress":"48 Westmoreland Avenue",
+                    "SettingPostCode":"DA16 2QD",
+                    "DOB":"1966-02-02",
+                    "Disqualified":"No",
+                    "Deceased":"No",
+                    "ISARegistrationNo":"001490051466",
+                    "URN":"EY288339"
+                }
+            ]
+        }
+    
+    jsonDb = jsonDb['Individual'];
+    var searchData = {}
+    var userCanSearch = true;
+    var container = document.getElementsByClassName("individual-table-wrapper")[0];
+    var table = document.createElement('table');
+    var tbody = document.createElement('tbody');
+    var thead = document.createElement('thead');
+    var tr;
+    var th;
+    var td;
+    var thNames = ['Forenames', 'Last name', 'Date of birth', 'Street', 'Postcode', 'Cygnum id', 'Compare'];
+    var choices;
+    var compareDiv;
+    var warningBox;
+    var buttonConfirm;
+    var buttonBackToSearch;
+
+
+    const BASE_URL = "http://0.0.0.0:8004/integration-adapter/api/v1/individuals-search/?surname=smith"
+
+    document.getElementById("search_with_criteria").addEventListener("click", function(){
+        searchWithCriteria();
+    });
+
+    function searchWithCriteria() {
+        if (userCanSearch == true) {
+            getData()
+            generateTableWithIdividuals(jsonDb)
+            userCanSearch = false;
+            addEventListenersToRadios(choices)
+        }
+    }
+
+    /*
+    function buildUrlForRequest(search_items) {
+        for(var key in search_items){
+            if(search_items.hasOwnProperty(key)) {
+                console.log(search_items[key])
+            }
+        }
+    } 
+    */
+
+    // Fetch data from inputs
+    function getData() {
+        searchData['forenames'] = document.getElementsByName("forenames")[0].value;
+        searchData['lastname'] = document.getElementsByName("lastname")[0].value;
+        searchData['dob'] = combineDateFromInputs()
+        searchData['street'] = document.getElementsByName("street")[0].value;
+        searchData['town'] = document.getElementsByName("town")[0].value;
+        searchData['postcode'] = document.getElementsByName("postcode")[0].value;
+    }
+
+    // Format date from inputs to format YYYY-MM-DD
+    function combineDateFromInputs() {
+        var dateCombined = document.getElementsByName("year")[0].value + '-' + document.getElementsByName("month")[0].value + '-' + document.getElementsByName("day")[0].value;
+        return dateCombined;
+    }
+    
+    // Create a table at the bottom of the page
+    function generateTableWithIdividuals(dictOfIndividuals) {
+
+        for (var i in dictOfIndividuals) {
+            tr = document.createElement('tr');
+
+            td = document.createElement('td');
+            td.appendChild(document.createTextNode(dictOfIndividuals[i]["Forenames"]))
+            tr.appendChild(td)
+
+            td = document.createElement('td');
+            td.appendChild(document.createTextNode(dictOfIndividuals[i]["Surname"]))
+            tr.appendChild(td)
+
+            td = document.createElement('td');
+            td.appendChild(document.createTextNode(dictOfIndividuals[i]["DOB"]))
+            tr.appendChild(td)
+
+            td = document.createElement('td');
+            td.appendChild(document.createTextNode(dictOfIndividuals[i]["IndividualAddress"]))
+            tr.appendChild(td)
+
+            td = document.createElement('td');
+            td.appendChild(document.createTextNode(dictOfIndividuals[i]["IndividualPostCode"]))
+            tr.appendChild(td)
+
+            td = document.createElement('td');
+            td.appendChild(document.createTextNode(dictOfIndividuals[i]["IndividualID"]))
+            tr.appendChild(td)
+            
+            td = document.createElement('td')
+            tr.appendChild(createMultipleChoice(td, i))
+
+            tbody.appendChild(tr)  
+        }
+        table.appendChild(createTableHead(thead, thNames))
+        table.appendChild(tbody)
+        container.appendChild(table)
+    }
+
+    // Create radio button
+    function createMultipleChoice(choiceCell, value) {
+        var choiceInput;
+        var choiceLabel;
+        var choiceWrapper;
+
+        choiceWrapper = document.createElement('div');
+        choiceWrapper.classList.add("multiple-choice")
+        choiceInput = document.createElement('input');
+        choiceInput.setAttribute("type", "radio")
+        choiceInput.setAttribute("name", "choice")
+        choiceInput.setAttribute("value", value)
+        choiceInput.style.position = "relative";
+        choiceInput.style.left = "-22px";
+        choiceLabel = document.createElement('label');
+        choiceLabel.style.position = "relative";
+        choiceWrapper.appendChild(choiceInput)
+        choiceWrapper.appendChild(choiceLabel)
+        choiceCell.appendChild(choiceWrapper)
+        
+        return choiceCell;
+        
+    }
+
+    // Create table head
+    function createTableHead(tableHead, listOfHeadNames) {
+        tr = document.createElement('tr');
+        for(var i in listOfHeadNames) {
+            th = document.createElement('th');
+            th.innerText = listOfHeadNames[i];
+            tr.appendChild(th)
+        }
+
+        tableHead.appendChild(tr)
+        return tableHead;
+    }
+
+    // Add radio 
+    function addEventListenersToRadios(radios) {
+        radios = document.getElementsByName('choice');
+        for (radio in radios) {
+            radios[radio].onclick = function(){
+                showResultToCompare(this.value)
+                addBackToSearchButton()
+            }
+        }
+    }
+
+    function showResultToCompare(value) {
+        compareDiv = document.getElementsByClassName('invidual-lookup-search-wrapper')[0];
+        while(compareDiv.firstChild) {
+            compareDiv.removeChild(compareDiv.firstChild); 
+        }
+        generateIndividualToCompare(value, compareDiv)
+    }
+
+    // Generate comparision table
+    function generateIndividualToCompare(radioValue, compareContainer) {
+
+        tbody = document.createElement('tbody');
+        table = document.createElement('table');
+        
+        // Row 1
+        tbody.appendChild(createRow('Forenames', jsonDb[radioValue]["Forenames"]))
+        tbody.appendChild(createRow('', ''))
+        tbody.appendChild(createRow('Last name', jsonDb[radioValue]["Surname"]))
+        tr = createRow('', '');
+        tr.children[0].classList.add('date-form-label-tuple')
+        tr.children[1].classList.add('date-form-label-tuple')
+        tbody.appendChild(tr)
+        tbody.appendChild(createRow('Date of Birth', jsonDb[radioValue]["DOB"]))
+        tbody.appendChild(createRow('Street', jsonDb[radioValue]["IndividualAddress"]))
+        tbody.appendChild(createRow('Postcode', jsonDb[radioValue]["IndividualPostCode"]))
+        tbody.appendChild(createRow('', ''))
+        tbody.appendChild(createRow('Cygnum id', jsonDb[radioValue]["IndividualID"]))
+        
+
+        // Add table to DOM wrapper
+        table.appendChild(tbody)
+        compareContainer.appendChild(table)
+
+        // Add button to DOM wrapper
+        buttonConfirm = document.createElement('button')
+        buttonConfirm.classList.add('button')
+        buttonConfirm.classList.add('button-primary')
+        buttonConfirm.innerText = "Confirm";
+        compareContainer.appendChild(buttonConfirm)
+    }
+
+    // Create row for table of individuals
+    function createRow(titleField, dbField) {
+        tr = document.createElement('tr');
+        td = document.createElement('td');
+        td.appendChild(document.createTextNode(titleField))
+        tr.appendChild(td)
+
+        td = document.createElement('td');
+        td.appendChild(document.createTextNode(dbField))
+        tr.appendChild(td)
+        
+        return tr;
+    }
+
+    function addBackToSearchButton(){
+        warningBox = document.getElementsByClassName('individual-lookup-warning')[0];
+        warningBox.innerText = '';
+        buttonBackToSearch = document.createElement('a');
+        buttonBackToSearch.setAttribute('href', './?id={{application_id}}')
+        buttonBackToSearch.innerText = '< Back to search'
+        buttonBackToSearch.innerHTML += '<br><br>'
+        buttonBackToSearch.style.float = "right";
+        warningBox.appendChild(buttonBackToSearch)
+        
+    } 
+
+</script>
+  
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.js"></script>
+
+
 
 
 {% endblock %}

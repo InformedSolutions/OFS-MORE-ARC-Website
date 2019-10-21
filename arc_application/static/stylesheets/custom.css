@@ -448,7 +448,7 @@
 }
 
 #individual-lookup-applicants-button {
-  margin-bottom: 8px;
+  margin-top: 20px;
 }
 
 
@@ -520,4 +520,18 @@
   .individual-lookup-wrapper h2 {
     text-align: center;
   }
+}
+
+.individual-table-wrapper {
+  margin-top: 10px;
+}
+
+.individual-table-wrapper th {
+  background-color: black;
+  color: white;
+}
+
+.back-to-search-button {
+  display: none;
+  margin-left: auto;
 }

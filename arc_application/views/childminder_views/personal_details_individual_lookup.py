@@ -28,7 +28,7 @@ def personal_details_individual_lookup(request):
         'street_line2': home_address_record.street_line2,
         'town': home_address_record.town,
         'postcode': home_address_record.postcode,
-        'application_id': application_id_local,
+        'application_id': application_id_local
     }
 
     return render(request, 'childminder_templates/personal-details-individual-lookup.html', variables)
