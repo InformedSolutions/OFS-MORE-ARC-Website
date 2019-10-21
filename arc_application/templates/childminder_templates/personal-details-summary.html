@@ -160,7 +160,7 @@
         </tr>
         </tbody>
     </table>
-    <button id="button_individual_search" type="button" class="button button-secondary button-add-another">Search for individual</button>
+    <a id="button_individual_search" type="button" href="{% url 'personal_details_individual_lookup' %}/?id={{application_id}}" class="button button-secondary button-add-another">Search for individual</a>
 
     {% block has_previously_applied %}
     {% if has_previously_applied %}
@@ -212,11 +212,6 @@
     </table>
     {% endif %}
     {% endblock %}
-
-    <button type="submit" name="previous_registration_details" class="button button-secondary button-add-another"
-            value="/personal-details/previous-registration/">
-        Add previous registration
-    </button>
 
     <table class="check-your-answers form-group">
         <thead>
@@ -485,15 +480,5 @@
     {% include 'childminder_templates/return-to-list.html' %}
 
 </form>
-
-<script type="text/javascript">
-    document.getElementById("button_individual_search").addEventListener("click", showAmendSearch);
-    
-    function showAmendSearch() {
-        document.getElementById("button_individual_search").classList.add("js-hidden");
-        document.getElementById("individual_search_id_value").classList.remove("js-hidden");
-        document.getElementById("amend_search").classList.remove("js-hidden");
-    }
-</script>
 
 {% endblock %}
