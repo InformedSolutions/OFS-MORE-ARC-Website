@@ -425,3 +425,99 @@
       width: 100%;
     }
 }
+
+/** Individual lookup **/
+
+.individual-lookup-wrapper {
+  display: flex;
+  justify-content: space-between;
+  flex-direction: row;
+}
+
+.individual-lookup-applicants-details {
+  flex-basis: 450px;
+  border: 3px solid black;
+  padding: 10px;
+  margin-bottom: 0px;
+  padding-bottom: 0px;
+}
+
+.individual-lookup-warning {
+  color: #6f777b;
+  margin-top: 0px;
+}
+
+#individual-lookup-applicants-button {
+  margin-bottom: 8px;
+}
+
+
+.individual-lookup-wrapper .date-form-label-tuple {
+  height: 20px;
+}
+
+.individual-lookup-wrapper tr td {
+  height: 40px;
+  padding: 2px;
+  border: 0px;
+  width: 90px;
+  line-height: 16px;
+  font-size: 20px;
+}
+
+.individual-lookup-wrapper tr td:first-child {
+  font-weight: bold;
+  width: 30%;
+}
+
+.individual-lookup-search {
+  flex-basis: 450px;
+  border: 3px solid black;
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-top: 10px;
+  padding-bottom: 0px;
+}
+
+.individual-lookup-search .button {
+  margin-top: 20px;
+}
+
+.individual-lookup-search .form-control {
+  width: 100%;
+}
+
+.date-form-wrapper, .date-form-label-wrapper {
+  display: flex;
+  justify-content: space-between;
+}
+
+.date-form-label-wrapper span {
+  text-align: center; 
+  color: gray;
+}
+
+.individual-lookup-search #date_form_day, 
+.individual-lookup-search #date_form_month {
+  flex-basis: 30%;
+  min-width: 0; 
+}
+
+.individual-lookup-search #date_form_year {
+  flex-basis: 35%;
+  min-width: 0;
+}
+
+@media (max-width: 1000px) {
+  .individual-lookup-wrapper {
+    flex-direction: column;
+  }
+
+  .individual-lookup-search {
+    margin-top: 10px;
+  }
+
+  .individual-lookup-wrapper h2 {
+    text-align: center;
+  }
+}
