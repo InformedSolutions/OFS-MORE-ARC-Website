@@ -1077,6 +1077,7 @@ class PeopleInTheHomeFunctionalTests(TestCase):
         adult.birth_year = 1972
         adult.relationship = 'Uncle'
         adult.email = 'foo@example.com'
+        adult.PITH_mobile_number='07700 9000400'
         adult.lived_abroad = False
         adult.dbs_certificate_number = '123456789012'
         adult.capita = True
@@ -1092,6 +1093,7 @@ class PeopleInTheHomeFunctionalTests(TestCase):
         utils.assertSummaryField(response, 'Date of birth', '28 February 1972', heading='Joe Anthony Bloggs')
         utils.assertSummaryField(response, 'Relationship', 'Uncle', heading='Joe Anthony Bloggs')
         utils.assertSummaryField(response, 'Email', 'foo@example.com', heading='Joe Anthony Bloggs')
+        utils.assertSummaryField(response, 'Phone number', '07700 900040', heading='Joe Anthony Bloggs')
         utils.assertSummaryField(response, 'Lived abroad in the last 5 years?', 'No', heading='Joe Anthony Bloggs')
         # military base field is conditional
         utils.assertSummaryField(response, 'Did they get their DBS check from the Ofsted DBS application website?',
@@ -2084,6 +2086,7 @@ class ReviewSummaryAndConfirmationFunctionalTests(TestCase):
         adult.birth_year = 1972
         adult.relationship = 'Uncle'
         adult.email = 'foo@example.com'
+        adult.PITH_mobile_number='07700 9000040'
         adult.lived_abroad = False
         adult.dbs_certificate_number = '123456789012'
         adult.capita = True
@@ -2099,6 +2102,7 @@ class ReviewSummaryAndConfirmationFunctionalTests(TestCase):
         utils.assertSummaryField(response, 'Date of birth', '28 02 1972', heading='Joe Anthony Bloggs')
         utils.assertSummaryField(response, 'Relationship', 'Uncle', heading='Joe Anthony Bloggs')
         utils.assertSummaryField(response, 'Email', 'foo@example.com', heading='Joe Anthony Bloggs')
+        utils.assertSummaryField(response, 'Phone number', '07700 900040', heading='Joe Anthony Bloggs')
         utils.assertSummaryField(response, 'Lived abroad in the last 5 years?', 'No', heading='Joe Anthony Bloggs')
         # military base field is conditional
         utils.assertSummaryField(response, 'Did they get their DBS check from the Ofsted DBS application website?',
