@@ -1236,9 +1236,9 @@ class PeopleInTheHomeFunctionalTests(TestCase):
 
         response = self.client.get(reverse('other_people_summary'), data={'id': self.application.pk})
 
-        utils.assertSummaryField(response, 'On the update service?', 'Yes', heading='Joe Anthony Bloggs')
-        utils.assertSummaryField(response, 'On the update service?', 'No', heading='Freda Annabel Smith')
-        utils.assertNotSummaryField(response, 'On the update service?', heading='Jim Bob Robertson')
+        utils.assertSummaryField(response, 'On the DBS Update Service?', 'Yes', heading='Joe Anthony Bloggs')
+        utils.assertSummaryField(response, 'On the DBS Update Service?', 'No', heading='Freda Annabel Smith')
+        utils.assertNotSummaryField(response, 'On the DBS Update Service?', heading='Jim Bob Robertson')
 
     # TODO: adult known-to-council-services-field
 
@@ -2246,9 +2246,9 @@ class ReviewSummaryAndConfirmationFunctionalTests(TestCase):
 
         response = self.client.get(reverse('arc-summary'), data={'id': self.application.pk})
 
-        utils.assertSummaryField(response, 'On the update service?', 'Yes', heading='Joe Anthony Bloggs')
-        utils.assertSummaryField(response, 'On the update service?', 'No', heading='Freda Annabel Smith')
-        utils.assertNotSummaryField(response, 'On the update service?', heading='Jim Bob Robertson')
+        utils.assertSummaryField(response, 'On the DBS Update Service?', 'Yes', heading='Joe Anthony Bloggs')
+        utils.assertSummaryField(response, 'On the DBS Update Service?', 'No', heading='Freda Annabel Smith')
+        utils.assertNotSummaryField(response, 'On the DBS Update Service?', heading='Jim Bob Robertson')
 
     def test_displays_adult_previous_names(self):
 

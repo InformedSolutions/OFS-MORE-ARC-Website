@@ -61,7 +61,7 @@ name_field_dict = {
     'Lived or worked in British military base in the last 5 years?': 'military_base',
     'Did they get their DBS check from the Ofsted DBS application website?': 'capita',
     'Enhanced DBS check for home-based childcare?': 'enhanced_check',
-    'On the update service?': 'on_update',
+    'On the DBS Update Service': 'on_update',
     'known_pith': 'known_to_social_services_pith',
     'reasons_known_pith': 'reasons_known_to_social_services_pith',
 

@@ -137,7 +137,7 @@ def load_json(adult_id):
 
     if record['enhanced_check'] and not (record['capita'] or record['within_three_months']):
         summary_table += [
-                {"name": "On the update service?",
+                {"name": "DBS Update Service?",
                  "value": 'Yes' if record['on_update'] else 'No',
                  'field': "on_update"}
             ]
