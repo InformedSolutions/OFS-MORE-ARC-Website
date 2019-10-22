@@ -79,7 +79,7 @@ class CriminalRecordCheck(models.Model):
                                        "value": self.get_bool_as_string(self.enhanced_check)})
 
         if self.on_update is not None:
-            summary_table_dict.append({"name": "Are you on the DBS update service?",
+            summary_table_dict.append({"name": "Are you on the DBS Update Service?",
                                        "value": self.get_bool_as_string(self.on_update)})
 
         return summary_table_dict
