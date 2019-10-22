@@ -96,7 +96,7 @@ def load_json(adult_id):
             {"name": "Email",
              "value": record['email'],
              'field': "email"},
-            {"name": "Phone Number",
+            {"name": "Phone number",
              "value": record['PITH_mobile_number'],
              'field': "PITH_mobile_number"},
             {"name": "Lived abroad in the last 5 years?",
@@ -137,7 +137,7 @@ def load_json(adult_id):
 
     if record['enhanced_check'] and not (record['capita'] or record['within_three_months']):
         summary_table += [
-                {"name": "DBS Update Service?",
+                {"name": "On the DBS Update Service?",
                  "value": 'Yes' if record['on_update'] else 'No',
                  'field': "on_update"}
             ]
