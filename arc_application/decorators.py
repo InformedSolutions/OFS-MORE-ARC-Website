@@ -4,6 +4,7 @@ Custom decorators for authentication testing purposes
 from django.contrib.auth.decorators import user_passes_test
 from django.core.exceptions import PermissionDenied
 from django.utils import six
+from django.utils.datastructures import MultiValueDictKeyError
 from .models import Arc
 
 
@@ -34,7 +35,10 @@ def user_assigned_application(function):
     def wrap(request, *args, **kwargs):
 
         if request.method == 'GET':
-            application_id = request.GET["id"]
+            try:
+                application_id = request.GET["id"]
+            except MultiValueDictKeyError:
+                raise PermissionDenied
         else:
             url_app_id = request.GET.get("id", '')
             posted_app_id = request.POST.get("id", '')

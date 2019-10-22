@@ -38,6 +38,31 @@
         </tbody>
     </table>
 
+    <table class="check-your-answers form-group">
+        <thead>
+        <tr>
+            <th colspan="3">
+                <div class="heading-medium">
+                    Individual lookup
+                </div>
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>
+                Individual ID
+            </td>
+            <td>
+                {{ individual_id|default:"Not known to Ofsted" }}
+            </td>
+            <td>
+                <a href="{% url 'personal_details_individual_lookup' %}/?id={{application_id}}&referrer=nanny">Amend search</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
     {% for row in rows %}
             {% if row.id == 'name' %}
             {% if not row.id|template_string_in_list:'previous_names' %}

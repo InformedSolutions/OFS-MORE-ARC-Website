@@ -151,11 +151,11 @@
             <td>
                 Individual ID
             </td>
-            <td class="js-hidden" id="individual_search_id_value">            
+            <td class="js-hidden" id="individual_search_id_value">
                 {{ individual_id|default:"Not known to Ofsted" }}
-            </td>          
+            </td>
             <td>
-                <a class="js-hidden" id="amend_search" href="{% url 'personal_details_individual_lookup' %}/?id={{application_id}}">Amend search</a>
+                <a class="js-hidden" id="amend_search" href="{% url 'personal_details_individual_lookup' %}/?id={{application_id}}&referrer=childminder">Amend search</a>
             </td>
         </tr>
         </tbody>
@@ -475,7 +475,6 @@
     </table>
     {% endif %}
 
-    
     {% csrf_token %}
 
     <input type="submit" class="button" value="Confirm and continue"/>
@@ -488,7 +487,7 @@
 
 <script type="text/javascript">
     document.getElementById("button_individual_search").addEventListener("click", showAmendSearch);
-    
+
     function showAmendSearch() {
         document.getElementById("button_individual_search").classList.add("js-hidden");
         document.getElementById("individual_search_id_value").classList.remove("js-hidden");
