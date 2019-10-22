@@ -166,7 +166,7 @@ class AdultInHome(models.Model):
 
         if self.show_on_update():
             summary_table += [
-                {"name": "On the update service?",
+                {"name": "On the pdate service?",
                  "value": self.bool_to_string(self.on_update)}
             ]
 
