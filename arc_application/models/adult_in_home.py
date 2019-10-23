@@ -130,7 +130,7 @@ class AdultInHome(models.Model):
              "value": self.relationship},
             {"name": "Email",
              "value": self.email},
-            {"name": "Phone Number",
+            {"name": "Phone number",
              "value": self.PITH_mobile_number},
             {"name": "Lived abroad in the last 5 years?",
              "value": self.bool_to_string(self.lived_abroad)}
