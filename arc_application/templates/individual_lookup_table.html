@@ -1,0 +1,29 @@
+<table class="check-your-answers form-group">
+    <thead>
+    <tr>
+        <th colspan="3">
+            <div class="heading-medium">
+                Individual lookup
+            </div>
+        </th>
+    </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+                Individual ID
+            </td>
+            <td>
+                {{ individual_id|default:"" }}
+            </td>
+            <td class="amend-search">
+                {% if individual_id %}
+                    <a href="{% url 'personal_details_individual_lookup' %}/?id={{ application_id }}&referrer={{ referrer }}">Amend search</a>
+                {% endif %}
+            </td>
+        </tr>
+    </tbody>
+</table>
+{% if individual_id == None %}
+    <a href="{% url 'personal_details_individual_lookup' %}/?id={{ application_id }}&referrer={{ referrer }}" class="button button-secondary">Search for individual</a>
+{% endif %}
