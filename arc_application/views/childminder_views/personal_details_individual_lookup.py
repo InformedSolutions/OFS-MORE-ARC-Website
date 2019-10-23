@@ -2,6 +2,8 @@ import logging
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
+from django.db import models
+from django.forms.models import model_to_dict
 from django.shortcuts import render
 
 from ...decorators import group_required, user_assigned_application
@@ -41,6 +43,15 @@ def fetch_nanny_data(app_id):
     return personal_details, personal_details, home_address_record
 
 
+def standardize_data_source(*args):
+    """Convert each argument to dict if it a Django model, otherwise return each object"""
+    for obj in args:
+        if isinstance(obj, models.Model):
+            yield model_to_dict(obj)
+        else:
+            yield obj
+
+
 @login_required
 @group_required(settings.ARC_GROUP, raise_exception=True)
 @user_assigned_application
@@ -57,7 +68,9 @@ def personal_details_individual_lookup(request):
     if not application_id or referrer_type not in data_fetcher_mapping.keys():
         context = {}
     else:
-        name_record, personal_details_record, home_address_record = data_fetcher_mapping[referrer_type](application_id)
+        name_record, personal_details_record, home_address_record = standardize_data_source(
+            *data_fetcher_mapping[referrer_type](application_id)
+        )
         context = {
             'first_name': name_record.get('first_name'),
             'last_name': name_record.get('last_name'),

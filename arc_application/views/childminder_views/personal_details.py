@@ -202,7 +202,7 @@ def personal_details_summary(request):
         variables.update({
             'has_previously_applied': True,
             'previous_registration': previous_reg_details.previous_registration,
-            'individual_id': str(previous_reg_details.individual_id),
+            'individual_id': previous_reg_details.individual_id,
             'five_years_in_UK': previous_reg_details.five_years_in_UK,
         })
 

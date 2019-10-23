@@ -70,7 +70,7 @@ class NannyPersonalDetailsSummary(NannyARCFormView):
         nanny_actions = NannyGatewayActions()
         personal_details = self.read_record(nanny_actions, 'applicant-personal-details',
                                             {'application_id': application_id})
-        previous_names = self.list_records(nanny_actions, 'previous-name', 
+        previous_names = self.list_records(nanny_actions, 'previous-name',
                                            {'application_id': application_id})
         home_address = self.read_record(nanny_actions, 'applicant-home-address',
                                         {'application_id': application_id})
@@ -99,6 +99,7 @@ class NannyPersonalDetailsSummary(NannyARCFormView):
 
         previous_registration_record_exists = False
         show_individual_id = False
+        individual_id = None
 
         forms = self.get_forms(application_id)
         personal_details_form = forms[0]
@@ -110,7 +111,7 @@ class NannyPersonalDetailsSummary(NannyARCFormView):
             previous_registration_details = nanny_actions.read('previous-registration-details',
                                                                params={'application_id': application_id}).record
             previous_registration = previous_registration_details['previous_registration']
-            individual_id = str(previous_registration_details['individual_id'])
+            individual_id = previous_registration_details['individual_id']
             five_years_in_UK = previous_registration_details['five_years_in_UK']
             previous_registration_form = forms[2]
 
@@ -273,7 +274,7 @@ class NannyPersonalDetailsSummary(NannyARCFormView):
                     {
                         'id': 'individual_id',
                         'name': 'Individual ID',
-                        'info': individual_id,
+                        'info': str(individual_id),
                         'declare': previous_registration_form['individual_id_declare']
                                    if hasattr(self, 'request') else '',
                         'comments': previous_registration_form['individual_id_comments'],
@@ -294,6 +295,7 @@ class NannyPersonalDetailsSummary(NannyARCFormView):
             'show_previous_registration':  previous_registration_record_exists,
             # used for conditional reveal of individual_id on summary page
             'show_individual_id': show_individual_id,
+            'individual_id': individual_id,
             'change_link': 'nanny_personal_details_summary',
             'rows': rows,
         }

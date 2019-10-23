@@ -38,6 +38,16 @@
         </tbody>
     </table>
 
+    {% for row in rows %}
+        {% if row.id == 'name' %}
+            {% if not row.id|template_string_in_list:'previous_names' %}
+                <a href="{% url 'nanny_previous_names' %}?id={{ application_id }}"
+                    class="button button-secondary">Add previous names</a>
+                <br>
+            {% endif %}
+        {% endif %}
+    {% endfor %}
+
     <table class="check-your-answers form-group">
         <thead>
         <tr>
@@ -49,29 +59,24 @@
         </tr>
         </thead>
         <tbody>
-        <tr>
-            <td>
-                Individual ID
-            </td>
-            <td>
-                {{ individual_id|default:"Not known to Ofsted" }}
-            </td>
-            <td>
-                <a href="{% url 'personal_details_individual_lookup' %}/?id={{application_id}}&referrer=nanny">Amend search</a>
-            </td>
-        </tr>
+            <tr>
+                <td>
+                    Individual ID
+                </td>
+                <td>
+                    {{ individual_id|default:"" }}
+                </td>
+                <td class="amend-search">
+                    {% if individual_id %}
+                        <a href="{% url 'personal_details_individual_lookup' %}/?id={{application_id}}&referrer=nanny">Amend search</a>
+                    {% endif %}
+                </td>
+            </tr>
         </tbody>
     </table>
-
-    {% for row in rows %}
-            {% if row.id == 'name' %}
-            {% if not row.id|template_string_in_list:'previous_names' %}
-            <a href="{% url 'nanny_previous_names' %}?id={{ application_id }}"
-               class="button button-secondary">Add previous names</a>
-            <br>
-            {% endif %}
-            {% endif %}
-        {% endfor %}
+    {% if individual_id == None %}
+        <a href="{% url 'personal_details_individual_lookup' %}/?id={{application_id}}&referrer=nanny" class="button button-secondary">Search for individual</a>
+    {% endif %}
 
     <table class="check-your-answers form-group">
         <thead>
@@ -157,7 +162,7 @@
                         Individual ID
                     </td>
                     <td>
-                            {{ row.info }}
+                        {{ row.info }}
                     </td>
                     <td class="change-answer">
                         <a href="{% url 'nanny_previous_registration' %}/?id={{application_id}}"

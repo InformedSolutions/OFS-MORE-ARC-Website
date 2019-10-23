@@ -365,7 +365,8 @@
   padding: 15px;
 }
 
-.change-answer {
+.change-answer,
+.amend-search {
     text-align: right;
     font-weight: bold;
 }
@@ -493,14 +494,14 @@
 }
 
 .date-form-label-wrapper span {
-  text-align: center; 
+  text-align: center;
   color: gray;
 }
 
-.individual-lookup-search #date_form_day, 
+.individual-lookup-search #date_form_day,
 .individual-lookup-search #date_form_month {
   flex-basis: 30%;
-  min-width: 0; 
+  min-width: 0;
 }
 
 .individual-lookup-search #date_form_year {
