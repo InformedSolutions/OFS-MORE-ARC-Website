@@ -1077,6 +1077,7 @@ class PeopleInTheHomeFunctionalTests(TestCase):
         adult.birth_year = 1972
         adult.relationship = 'Uncle'
         adult.email = 'foo@example.com'
+        adult.PITH_mobile_number='07700 900040'
         adult.lived_abroad = False
         adult.dbs_certificate_number = '123456789012'
         adult.capita = True
@@ -1092,6 +1093,7 @@ class PeopleInTheHomeFunctionalTests(TestCase):
         utils.assertSummaryField(response, 'Date of birth', '28 February 1972', heading='Joe Anthony Bloggs')
         utils.assertSummaryField(response, 'Relationship', 'Uncle', heading='Joe Anthony Bloggs')
         utils.assertSummaryField(response, 'Email', 'foo@example.com', heading='Joe Anthony Bloggs')
+        utils.assertSummaryField(response, 'Phone number', '07700 900040', heading='Joe Anthony Bloggs')
         utils.assertSummaryField(response, 'Lived abroad in the last 5 years?', 'No', heading='Joe Anthony Bloggs')
         # military base field is conditional
         utils.assertSummaryField(response, 'Did they get their DBS check from the Ofsted DBS application website?',
@@ -1236,9 +1238,9 @@ class PeopleInTheHomeFunctionalTests(TestCase):
 
         response = self.client.get(reverse('other_people_summary'), data={'id': self.application.pk})
 
-        utils.assertSummaryField(response, 'On the update service?', 'Yes', heading='Joe Anthony Bloggs')
-        utils.assertSummaryField(response, 'On the update service?', 'No', heading='Freda Annabel Smith')
-        utils.assertNotSummaryField(response, 'On the update service?', heading='Jim Bob Robertson')
+        utils.assertSummaryField(response, 'On the DBS Update Service?', 'Yes', heading='Joe Anthony Bloggs')
+        utils.assertSummaryField(response, 'On the DBS Update Service?', 'No', heading='Freda Annabel Smith')
+        utils.assertNotSummaryField(response, 'On the DBS Update Service?', heading='Jim Bob Robertson')
 
     # TODO: adult known-to-council-services-field
 
@@ -2084,6 +2086,7 @@ class ReviewSummaryAndConfirmationFunctionalTests(TestCase):
         adult.birth_year = 1972
         adult.relationship = 'Uncle'
         adult.email = 'foo@example.com'
+        adult.PITH_mobile_number = '07700 900040'
         adult.lived_abroad = False
         adult.dbs_certificate_number = '123456789012'
         adult.capita = True
@@ -2099,6 +2102,7 @@ class ReviewSummaryAndConfirmationFunctionalTests(TestCase):
         utils.assertSummaryField(response, 'Date of birth', '28 02 1972', heading='Joe Anthony Bloggs')
         utils.assertSummaryField(response, 'Relationship', 'Uncle', heading='Joe Anthony Bloggs')
         utils.assertSummaryField(response, 'Email', 'foo@example.com', heading='Joe Anthony Bloggs')
+        utils.assertSummaryField(response, 'Phone number', '07700 900040', heading='Joe Anthony Bloggs')
         utils.assertSummaryField(response, 'Lived abroad in the last 5 years?', 'No', heading='Joe Anthony Bloggs')
         # military base field is conditional
         utils.assertSummaryField(response, 'Did they get their DBS check from the Ofsted DBS application website?',
@@ -2246,9 +2250,9 @@ class ReviewSummaryAndConfirmationFunctionalTests(TestCase):
 
         response = self.client.get(reverse('arc-summary'), data={'id': self.application.pk})
 
-        utils.assertSummaryField(response, 'On the update service?', 'Yes', heading='Joe Anthony Bloggs')
-        utils.assertSummaryField(response, 'On the update service?', 'No', heading='Freda Annabel Smith')
-        utils.assertNotSummaryField(response, 'On the update service?', heading='Jim Bob Robertson')
+        utils.assertSummaryField(response, 'On the DBS Update Service?', 'Yes', heading='Joe Anthony Bloggs')
+        utils.assertSummaryField(response, 'On the DBS Update Service?', 'No', heading='Freda Annabel Smith')
+        utils.assertNotSummaryField(response, 'On the DBS Update Service?', heading='Jim Bob Robertson')
 
     def test_displays_adult_previous_names(self):
 

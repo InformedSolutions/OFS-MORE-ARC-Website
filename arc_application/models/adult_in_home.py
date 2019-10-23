@@ -130,7 +130,7 @@ class AdultInHome(models.Model):
              "value": self.relationship},
             {"name": "Email",
              "value": self.email},
-            {"name": "Phone Number",
+            {"name": "Phone number",
              "value": self.PITH_mobile_number},
             {"name": "Lived abroad in the last 5 years?",
              "value": self.bool_to_string(self.lived_abroad)}
@@ -170,7 +170,7 @@ class AdultInHome(models.Model):
 
         if self.show_on_update():
             summary_table += [
-                {"name": "On the update service?",
+                {"name": "On the DBS Update Service?",
                  "value": self.bool_to_string(self.on_update)}
             ]
 
