@@ -1077,7 +1077,7 @@ class PeopleInTheHomeFunctionalTests(TestCase):
         adult.birth_year = 1972
         adult.relationship = 'Uncle'
         adult.email = 'foo@example.com'
-        adult.PITH_mobile_number='07700 9000400'
+        adult.PITH_mobile_number='07700 900040'
         adult.lived_abroad = False
         adult.dbs_certificate_number = '123456789012'
         adult.capita = True
