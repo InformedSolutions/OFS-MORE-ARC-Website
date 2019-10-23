@@ -2086,11 +2086,7 @@ class ReviewSummaryAndConfirmationFunctionalTests(TestCase):
         adult.birth_year = 1972
         adult.relationship = 'Uncle'
         adult.email = 'foo@example.com'
-<<<<<<< HEAD
         adult.PITH_mobile_number = '07700 900040'
-=======
-        adult.PITH_mobile_number='07700 9000040'
->>>>>>> 2b3b419889bb7d76a075ae6e9b910eebaffc7f3c
         adult.lived_abroad = False
         adult.dbs_certificate_number = '123456789012'
         adult.capita = True
