@@ -2,8 +2,7 @@ import logging
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.db import models
-from django.forms.models import model_to_dict
+from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import render
 
 from ...decorators import group_required, user_assigned_application
@@ -21,14 +20,27 @@ def read_record(actions, endpoint, params):
 
 
 def fetch_childminder_data(app_id):
-    personal_details_record = ApplicantPersonalDetails.objects.get(application_id=app_id)
-    name_record = ApplicantName.objects.get(personal_detail_id=personal_details_record)
-    home_address_record = ApplicantHomeAddress.objects.get(
-        personal_detail_id=personal_details_record,
-        current_address=True
-    )
+    try:
+        personal_details = ApplicantPersonalDetails.objects.get(application_id=app_id)
+        name_record = ApplicantName.objects.get(personal_detail_id=personal_details)
+        home_address = ApplicantHomeAddress.objects.get(
+            personal_detail_id=personal_details,
+            current_address=True
+        )
+    except ObjectDoesNotExist:
+        return {}
 
-    return name_record, personal_details_record, home_address_record
+    return {
+        'first_name': name_record.first_name,
+        'middle_names': name_record.middle_names,
+        'last_name': name_record.last_name,
+        'date_of_birth': personal_details.date_of_birth,
+        'street_line1': home_address.street_line1,
+        'street_line2': home_address.street_line2,
+        'town': home_address.town,
+        'postcode': home_address.postcode,
+        'application_id': app_id,
+    }
 
 
 def fetch_nanny_data(app_id):
@@ -40,16 +52,17 @@ def fetch_nanny_data(app_id):
         nanny_actions, 'applicant-home-address', {'application_id': app_id}
     )
 
-    return personal_details, personal_details, home_address_record
-
-
-def standardize_data_source(*args):
-    """Convert each argument to dict if it a Django model, otherwise return each object"""
-    for obj in args:
-        if isinstance(obj, models.Model):
-            yield model_to_dict(obj)
-        else:
-            yield obj
+    return {
+        'first_name': personal_details.get('first_name', ''),
+        'middle_names': personal_details.get('middle_names', ''),
+        'last_name': personal_details.get('last_name', ''),
+        'date_of_birth': personal_details.get('date_of_birth', ''),
+        'street_line1': home_address_record.get('street_line1', ''),
+        'street_line2': home_address_record.get('street_line2', ''),
+        'town': home_address_record.get('town', ''),
+        'postcode': home_address_record.get('postcode', ''),
+        'application_id': app_id,
+    }
 
 
 @login_required
@@ -65,21 +78,9 @@ def personal_details_individual_lookup(request):
         'nanny': fetch_nanny_data
     }
 
-    if not application_id or referrer_type not in data_fetcher_mapping.keys():
+    if not application_id or referrer_type not in data_fetcher_mapping:
         context = {}
     else:
-        name_record, personal_details_record, home_address_record = standardize_data_source(
-            *data_fetcher_mapping[referrer_type](application_id)
-        )
-        context = {
-            'first_name': name_record.get('first_name'),
-            'last_name': name_record.get('last_name'),
-            'date_of_birth': personal_details_record.get('date_of_birth'),
-            'street_line1': home_address_record.get('street_line1'),
-            'street_line2': home_address_record.get('street_line2'),
-            'town': home_address_record.get('town'),
-            'postcode': home_address_record.get('postcode'),
-            'application_id': application_id,
-        }
+        context = data_fetcher_mapping[referrer_type](application_id)
 
     return render(request, 'childminder_templates/personal-details-individual-lookup.html', context)
