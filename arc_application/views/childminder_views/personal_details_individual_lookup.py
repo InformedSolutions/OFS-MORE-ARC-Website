@@ -156,11 +156,9 @@ def personal_details_individual_lookup_search_result(request):
             form = IndividualLookupSearchForm(search_cached_data)
 
             # Request to IntegrationAdapter API
-            try:
-                api_response = _fetch_individuals_from_integration_adapter(form_data.copy())
-                individuals_list = _extract_json_to_list(api_response)
-            except requests.exceptions.RequestException as e:
-                log.debug(e)
+            api_response = _fetch_individuals_from_integration_adapter(form_data.copy())
+            individuals_list = _extract_json_to_list(api_response.individuals)
+
 
             # Set a paginator if there are invdividuals
             if individuals_list:
@@ -200,11 +198,8 @@ def personal_details_individual_lookup_search_result(request):
                 cache.add(application_id, form_data)
             
             # Request to IntegrationAdapter API
-            try:
-                api_response = _fetch_individuals_from_integration_adapter(form_data.copy())
-                individuals_list = _extract_json_to_list(api_response)
-            except requests.exceptions.RequestException as e:
-                log.debug(e)
+            api_response = _fetch_individuals_from_integration_adapter(form_data.copy())
+            individuals_list = _extract_json_to_list(api_response.individuals)
 
             # Set a paginator if there are invdividuals
             if individuals_list:
@@ -250,12 +245,10 @@ def personal_details_individual_lookup_search_choice(request):
 
     if request.method == 'GET':
             form_data = cache.get(application_id)
+            
             # Request to cygnum database
-            try:
-                api_response = _fetch_individuals_from_integration_adapter(form_data.copy())
-                individuals_list = _extract_json_to_list(api_response)
-            except requests.exceptions.RequestException as e:
-                log.debug(e)
+            api_response = _fetch_individuals_from_integration_adapter(form_data.copy())
+            individuals_list = _extract_json_to_list(api_response.individuals)
 
             # Set a paginator if 'individuals_list' is setted
             if individuals_list:
@@ -290,17 +283,20 @@ def personal_details_individual_lookup_search_choice(request):
     return render(request, 'childminder_templates/personal-detials-individual-lookup-search-choice.html', context)
 
 def _fetch_individuals_from_integration_adapter(form_values):
-    form_values['dob'] = '{0}-{1}-{2}'.format(form_values.pop("year"), form_values.pop("month"), form_values.pop("day"))
-    return get_individual_search_results(form_values)
+    url_params = {}
+    if form_values['year'] and form_values['month'] and form_values['day']:
+        url_params['dob'] = '{0}-{1}-{2}'.format(form_values.pop("year"), form_values.pop("month"), form_values.pop("day"))
+    for key, value in form_values.items():
+        if value:
+           url_params[key] = value
+    return get_individual_search_results(url_params)
 
 def _extract_json_to_list(response):
-    response = response.json()
-    if 'Individual' in response:
-        if type(response['Individual']) is list:
-            return response['Individual']
-        if type(response['Individual']) is dict:
-            item = [response['Individual']]
-            return item
+    if type(response) is list:
+        return response
+    if type(response) is dict:
+        item = [response]
+        return item
 
 def _rewrite_keys_for_search_fields(form_values):
     form_values['forenames'] = form_values.pop('forename')

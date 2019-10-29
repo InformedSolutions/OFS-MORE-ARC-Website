@@ -119,7 +119,7 @@
                 <td>
                     
                         <a href="{% url 'personal_details_individual_lookup_search_choice' %}?id={{ application_id }}&page={{page}}&compare={{ individual.IndividualID }}&referrer={{referrer_type}}" class="multiple-choice">
-                            {% if object.IndividualID == compare %}
+                            {% if individual.IndividualID == compare %}
                                 <input type="radio" name="individual-choice" checked>
                             {% else %}
                                 <input type="radio" name="individual-choice">
