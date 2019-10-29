@@ -227,6 +227,12 @@ LOGGING = {
     },
 }
 
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+    }
+}
+
 CM_APPLICATION_QUEUE_NAME = os.environ.get('SQS_QUEUE_PREFIX') + "_CM_APPLICATION_QUEUE"
 NA_APPLICATION_QUEUE_NAME = os.environ.get('SQS_QUEUE_PREFIX') + "_NA_APPLICATION_QUEUE"
 ADDITIONAL_ADULT_APPLICATION_QUEUE_NAME = os.environ.get('SQS_QUEUE_PREFIX') + "_ADULT_UPDATE_APPLICATION_QUEUE"

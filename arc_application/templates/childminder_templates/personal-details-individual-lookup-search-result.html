@@ -1,5 +1,5 @@
 {% extends 'govuk_template.html' %}
-{% block page_title %}Personal details - Individual Lookup{% endblock %}
+{% block page_title %}Personal details - Individual Results{% endblock %}
 {% load static %}
 {% load govuk_template_base %}
 {% load alt_text_extras %}
@@ -28,8 +28,14 @@
         <table>
             <tr>
                 <td>First name</td>
-                <td>{{ first_name }} {% if middle_names %}{{ middle_names }}{% endif %}</td>
+                <td>{{ first_name }}</td>
             </tr>
+            {% if middle_names %}
+            <tr>
+                <td>Middle names</td>
+                <td>{{ middle_names }}</td>
+            </tr>
+            {% endif %}
             <tr>
                 <td>Last name</td>
                 <td>{{ last_name }}</td>
@@ -53,14 +59,14 @@
             <tr>
                 <td>Town</td>
                 <td>{{ town }}</td>
-            </tr>  
+            </tr>
         </table>
         <input id="individual-lookup-applicants-button" type="button" class="button button-secondary" value="Not known to Ofsted">
     </div>
     <div class="individual-lookup-search">
         <div class="individual-warning-box">
             <h2 class="font-large">Search</h2>
-            <p class="individual-lookup-warning">'%' can be used as a wildcard. The training manual has more details.</p>   
+            <p class="individual-lookup-warning">'%' can be used as a wildcard. The training manual has more details.</p>
         </div>
         {% if form.errors %}
             <div class="error-summary">
@@ -80,8 +86,14 @@
                 <table>
                     <tr>
                         <td>{{ form.forenames.label }}</td>
-                        <td>{{ form.forenames }} </td>
+                        <td>{{ form.forenames }}</td>
                     </tr>
+                    {% if middle_names %}
+                    <tr>
+                        <td></td>
+                        <td></td>    
+                    </tr>
+                    {% endif %}
                     <tr>
                         <td>{{ form.last_name.label }}</td>
                         <td>{{ form.last_name }}</td>
@@ -117,11 +129,61 @@
                     <tr>
                         <td>{{ form.town.label }}</td>
                         <td>{{ form.town }}</td>
-                    </tr>
+                    </tr> 
                 </table>
                 <input type="submit" class="button button-primary" value="Search">
             </form>
         </div> 
     </div>
+</div>
+<div class="individual-table-wrapper">
+{% if individuals %}
+    <table>
+        <thead>
+            <tr>
+                <th>Forenames</th>
+                <th>Last name</th>
+                <th>Date of birth</th>
+                <th>Street</th>
+                <th>Postcode</th>
+                <th>Cygnum id</th>
+                <th>Compare</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for object in individuals %}
+            <tr>
+                <td>{{ object.Forenames }}</td>
+                <td>{{ object.Surname }}</td>
+                <td>{{ object.DOB }}</td>
+                <td>{{ object.IndividualAddress }}</td>
+                <td>{{ object.IndividualPostCode }}</td>
+                <td>{{ object.IndividualID }}</td>
+                <td>
+                    <a href="{% url 'personal_details_individual_lookup_search_choice' %}?id={{ application_id }}&page={{page}}&compare={{ object.IndividualID }}&referrer={{ referrer_type }}" class="multiple-choice">
+                        <input type="radio" name="individual-choice">
+                        <label ::before>
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+        <div class="individual-table-wrapper-pages">
+            {% if individuals.has_previous %}
+            <a href="?id={{application_id}}&page={{individuals.previous_page_number}}&referrer={{referrer_type}}">Previous page</a>
+            {% endif %}
+            <span>{{ individuals }}</span>
+            {% if individuals.has_next %}
+            <a href="?id={{application_id}}&page={{individuals.next_page_number}}&referrer={{referrer_type}}">Next page</a>
+            {% endif %}
+        </div>
+{% else %}
+    <div class="individual-not-found-warning">
+        <span class="font-medium"> No results found. </span><br>
+        <span class="font-medium"> Either amend the details you have entered to search again, or select ‘Not known to Ofsted’ to start a new person record</span>
+    </div>
+{% endif %}
+
 </div>
 {% endblock %}
