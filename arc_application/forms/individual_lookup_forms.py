@@ -48,19 +48,15 @@ class IndividualLookupSearchForm(GOVUKForm):
         year = self.cleaned_data.get("year")
         error_messages = {}
 
-        if year:
-            if year < 1900:
-                error_messages['invalid_date'] = self.ERROR_MESSAGE_INVALID_DATE
+        if year and year < 1900:
+            error_messages['invalid_date'] = self.ERROR_MESSAGE_INVALID_DATE
         
-        if month:
-            if month < 1 or month > 12:
+        if month and (month < 1 or month > 12):
                 error_messages['invalid_date'] = self.ERROR_MESSAGE_INVALID_DATE
 
-        if day:
-            if day < 1 or day > 31:
+        if day and (day < 1 or day > 31):
                 error_messages['invalid_date'] = self.ERROR_MESSAGE_INVALID_DATE
         
         if error_messages:
-            raise ValidationError(''.join(['%s' % (value) for (key, value) in error_messages.items()]))
-    
-        
+            raise ValidationError(''.join([f'{value}' for value in error_messages.values()]))
+               

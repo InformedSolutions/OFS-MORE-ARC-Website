@@ -28,7 +28,7 @@
         <table>
             <tr>
                 <td>First name</td>
-                <td>{{ first_name }} {% if middle_names %}{{ middle_names }}{% endif %}</td>
+                <td>{{ first_name }}{% if middle_names %} {{ middle_names }}{% endif %}</td>
             </tr>
             <tr>
                 <td>Last name</td>
@@ -43,8 +43,8 @@
                 <td>{{ date_of_birth }}</td>
             </tr>
             <tr>
-                <td>Line 1</td>
-                <td>{{ street_line1 }} {% if street_line2 %},{{ street_line2 }}{% endif %}</td>
+                <td>Street</td>
+                <td>{{ street_line1 }}{% if street_line2 %} {{ street_line2 }}{% endif %}</td>
             </tr>
             <tr>
                 <td>Postcode</td>

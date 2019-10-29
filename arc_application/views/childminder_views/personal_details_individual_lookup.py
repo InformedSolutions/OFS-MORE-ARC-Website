@@ -1,4 +1,5 @@
 import logging
+import os
 
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
@@ -12,11 +13,9 @@ from ...decorators import group_required, user_assigned_application
 from ...models import ApplicantPersonalDetails, ApplicantName, ApplicantHomeAddress
 from ...forms.individual_lookup_forms import IndividualLookupSearchForm
 from ...services.db_gateways import NannyGatewayActions
+from ...services.integration_service import get_individual_search_results
 
 log = logging.getLogger()
-
-BASE_CYGNUM_URL = 'https://build-lb-779835042.eu-west-2.elb.amazonaws.com/integration-adapter/api/v1/individuals-search/?'
-
 
 def read_record(actions, endpoint, params):
     response = getattr(actions, 'read')(endpoint, params=params)
@@ -88,6 +87,8 @@ def personal_details_individual_lookup(request):
     referrer_type = request.GET.get('referrer')
     form = None
     if request.method == 'GET':
+
+        # Check if form values are in cache
         if application_id in cache:
             form_data = cache.get(application_id)
             search_cached_data = _rewrite_keys_for_search_fields(form_data.copy())
@@ -111,14 +112,17 @@ def personal_details_individual_lookup(request):
                     'town': form.cleaned_data['town'],
                     'postcode': form.cleaned_data['postcode']
                 }
-
-            if application_id not in cache:
-                cache.add(application_id, form_data)
+            
+            # Check if form values are in cache
             if application_id in cache:
                 cache.set(application_id, form_data)
+            else:
+                cache.add(application_id, form_data)
+            
 
             return redirect('././results/?id='+application_id+'&referrer='+referrer_type)
     
+    # Fetch context from a referrer app for 'Applicant's data' box
     if not application_id or referrer_type not in DATA_FETCHER_MAPPING:
         context = {}
     else:
@@ -151,14 +155,14 @@ def personal_details_individual_lookup_search_result(request):
             
             form = IndividualLookupSearchForm(search_cached_data)
 
-            # Request to cygnum database
+            # Request to IntegrationAdapter API
             try:
-                api_response = _fetch_data_from_cygnum(form_data.copy())
-                individuals_list = _extract_json_data_to_dict(api_response)
+                api_response = _fetch_individuals_from_integration_adapter(form_data.copy())
+                individuals_list = _extract_json_to_list(api_response)
             except requests.exceptions.RequestException as e:
-                print(e)
+                log.debug(e)
 
-            # Set a paginator if 'individuals_list' is setted
+            # Set a paginator if there are invdividuals
             if individuals_list:
                 paginator = Paginator(individuals_list, 10)
                 page = request.GET.get('page')
@@ -189,17 +193,20 @@ def personal_details_individual_lookup_search_result(request):
                     'postcode': form.cleaned_data['postcode']
                 }
 
-            if application_id not in cache:
-                cache.add(application_id, form_data)
+            # Get a data from search fields stored in cache
             if application_id in cache:
                 cache.set(application_id, form_data)
+            else:
+                cache.add(application_id, form_data)
             
+            # Request to IntegrationAdapter API
             try:
-                api_response = _fetch_data_from_cygnum(form_data.copy())
-                individuals_list = _extract_json_data_to_dict(api_response)
+                api_response = _fetch_individuals_from_integration_adapter(form_data.copy())
+                individuals_list = _extract_json_to_list(api_response)
             except requests.exceptions.RequestException as e:
-                print(e)
+                log.debug(e)
 
+            # Set a paginator if there are invdividuals
             if individuals_list:
                 paginator = Paginator(individuals_list, 10)
                 page = 1
@@ -215,7 +222,7 @@ def personal_details_individual_lookup_search_result(request):
 
             page = request.GET.get(page)
 
-    
+    # Fetch context from a referrer app for 'Applicant's data' box
     if not application_id or referrer_type not in DATA_FETCHER_MAPPING:
         context = {}
     else:
@@ -245,10 +252,10 @@ def personal_details_individual_lookup_search_choice(request):
             form_data = cache.get(application_id)
             # Request to cygnum database
             try:
-                api_response = _fetch_data_from_cygnum(form_data.copy())
-                individuals_list = _extract_json_data_to_dict(api_response)
+                api_response = _fetch_individuals_from_integration_adapter(form_data.copy())
+                individuals_list = _extract_json_to_list(api_response)
             except requests.exceptions.RequestException as e:
-                print(e)
+                log.debug(e)
 
             # Set a paginator if 'individuals_list' is setted
             if individuals_list:
@@ -266,6 +273,7 @@ def personal_details_individual_lookup_search_choice(request):
 
             compare = request.GET.get('compare')
     
+    # Fetch context from a referrer app for 'Applicant's data' box
     if not application_id or referrer_type not in DATA_FETCHER_MAPPING:
         context = {}
     else:
@@ -281,18 +289,11 @@ def personal_details_individual_lookup_search_choice(request):
 
     return render(request, 'childminder_templates/personal-detials-individual-lookup-search-choice.html', context)
 
-def _fetch_data_from_cygnum(form_values):
-    build_request = BASE_CYGNUM_URL + ''
+def _fetch_individuals_from_integration_adapter(form_values):
     form_values['dob'] = '{0}-{1}-{2}'.format(form_values.pop("year"), form_values.pop("month"), form_values.pop("day"))
-    for key, value in form_values.items():
-        if value:
-            build_request = build_request + '{0}={1}&'.format(key, value)
-    build_request = build_request[0:-1]
-    print(build_request)
-    
-    return requests.get(build_request, verify=False, auth=('beta', 'accept'))
+    return get_individual_search_results(form_values)
 
-def _extract_json_data_to_dict(response):
+def _extract_json_to_list(response):
     response = response.json()
     if 'Individual' in response:
         if type(response['Individual']) is list:
