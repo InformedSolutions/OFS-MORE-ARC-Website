@@ -301,6 +301,7 @@ def personal_details_individual_lookup_search_choice(request):
     '''
     individuals = None
     application_id = request.GET['id']
+    adult_id = request.GET.get('id')
     referrer_type = request.GET.get('referrer')
 
     if request.method == 'GET':
@@ -334,7 +335,6 @@ def personal_details_individual_lookup_search_choice(request):
         context = fetch_childminder_pith_data(adult_id, application_id)
     else:
         context = DATA_FETCHER_MAPPING[referrer_type](application_id)
-        adult_id =  ''
 
     context.update({
         'individuals': individuals,
