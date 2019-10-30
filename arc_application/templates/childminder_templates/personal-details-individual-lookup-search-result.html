@@ -152,7 +152,7 @@
                 <td>{{ individual.IndividualPostCode }}</td>
                 <td>{{ individual.IndividualID }}</td>
                 <td>
-                    <a href="{% url 'personal_details_individual_lookup_search_choice' %}?id={{ application_id }}&page={{page}}&compare={{ individual.IndividualID }}&referrer={{ referrer_type }}" class="multiple-choice">
+                    <a href="{% url 'personal_details_individual_lookup_search_choice' %}?id={{ application_id }}&adult_id={{adult_id}}&page={{page}}&compare={{ individual.IndividualID }}&referrer={{ referrer_type }}" class="multiple-choice">
                         <input type="radio" name="individual-choice">
                         <label ::before>
                     </a>
