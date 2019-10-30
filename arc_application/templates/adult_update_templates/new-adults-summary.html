@@ -546,6 +546,8 @@
         <a href="{% url 'adult-update-previous-names' %}/?id={{application_id}}" class="button button-secondary">Add previous names</a><br>
         <a href="{% url 'adult_add_previous_address' %}?id={{ application_id }}&state=entry" class="button button-secondary">Add previous addresses</a>
 
+        {% include "individual_lookup_table.html" with referrer="household_member" %}
+
         <table class="check-your-answers form-group">
             <thead>
             <tr>
