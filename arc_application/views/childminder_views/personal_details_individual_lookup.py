@@ -12,10 +12,11 @@ import requests
 from ...decorators import group_required, user_assigned_application
 from ...models import ApplicantPersonalDetails, ApplicantName, ApplicantHomeAddress
 from ...forms.individual_lookup_forms import IndividualLookupSearchForm
-from ...services.db_gateways import NannyGatewayActions
+from ...services.db_gateways import HMGatewayActions, NannyGatewayActions
 from ...services.integration_service import get_individual_search_results
 
 log = logging.getLogger()
+
 
 def read_record(actions, endpoint, params):
     response = getattr(actions, 'read')(endpoint, params=params)
@@ -69,9 +70,33 @@ def fetch_nanny_data(app_id):
         'application_id': app_id,
     }
 
+
+def fetch_household_member_data(app_id):
+    hm_gateway = HMGatewayActions()
+    adult_record = read_record(
+        hm_gateway, 'adult', {'adult_id': app_id}
+    )
+    dpa_record = read_record(
+        hm_gateway, 'dpa-auth', {'token_id': adult_record['token_id']}
+    )
+
+    return {
+        'first_name': adult_record.get('first_name', ''),
+        'middle_names': adult_record.get('middle_names', ''),
+        'last_name': adult_record.get('last_name', ''),
+        'date_of_birth': adult_record.get('date_of_birth', ''),
+        'street_line1': '',
+        'street_line2': '',
+        'town': '',
+        'postcode': dpa_record.get('postcode', ''),
+        'application_id': app_id,
+    }
+
+
 DATA_FETCHER_MAPPING = {
     'childminder': fetch_childminder_data,
-    'nanny': fetch_nanny_data
+    'nanny': fetch_nanny_data,
+    'household_member': fetch_household_member_data,
 }
 
 
@@ -80,7 +105,7 @@ DATA_FETCHER_MAPPING = {
 @user_assigned_application
 def personal_details_individual_lookup(request):
     '''
-    Search for individual and redirect to view with results 
+    Search for individual and redirect to view with results
     '''
 
     application_id = request.GET.get('id')
@@ -92,15 +117,15 @@ def personal_details_individual_lookup(request):
         if application_id in cache:
             form_data = cache.get(application_id)
             search_cached_data = _rewrite_keys_for_search_fields(form_data.copy())
-            form = IndividualLookupSearchForm(search_cached_data)  
-        else: 
+            form = IndividualLookupSearchForm(search_cached_data)
+        else:
             form = IndividualLookupSearchForm()
 
     # Validate form and redirect to view with results
     elif request.method == 'POST':
         form = IndividualLookupSearchForm(request.POST)
 
-        
+
         if form.is_valid():
             form_data = {
                     'forename': form.cleaned_data['forenames'],
@@ -112,22 +137,22 @@ def personal_details_individual_lookup(request):
                     'town': form.cleaned_data['town'],
                     'postcode': form.cleaned_data['postcode']
                 }
-            
+
             # Check if form values are in cache
             if application_id in cache:
                 cache.set(application_id, form_data)
             else:
                 cache.add(application_id, form_data)
-            
+
 
             return redirect('././results/?id='+application_id+'&referrer='+referrer_type)
-    
+
     # Fetch context from a referrer app for 'Applicant's data' box
     if not application_id or referrer_type not in DATA_FETCHER_MAPPING:
         context = {}
     else:
         context = DATA_FETCHER_MAPPING[referrer_type](application_id)
-    
+
     context['form'] = form
 
     return render(request, 'childminder_templates/personal-details-individual-lookup.html', context)
@@ -152,7 +177,7 @@ def personal_details_individual_lookup_search_result(request):
         if application_id in cache:
             form_data = cache.get(application_id)
             search_cached_data = _rewrite_keys_for_search_fields(form_data.copy())
-            
+
             form = IndividualLookupSearchForm(search_cached_data)
 
             # Request to IntegrationAdapter API
@@ -170,12 +195,12 @@ def personal_details_individual_lookup_search_result(request):
                 except PageNotAnInteger:
                     individuals = paginator.page(1)
                 except EmptyPage:
-                    individuals = paginator.page(paginator.num_pages) 
+                    individuals = paginator.page(paginator.num_pages)
             else:
                 individuals = None
         else:
             form = IndividualLookupSearchForm()
-    
+
     # Search in results view
     if request.method == 'POST':
         form = IndividualLookupSearchForm(request.POST)
@@ -197,7 +222,7 @@ def personal_details_individual_lookup_search_result(request):
                 cache.set(application_id, form_data)
             else:
                 cache.add(application_id, form_data)
-            
+
             # Request to IntegrationAdapter API
             api_response = _fetch_individuals_from_integration_adapter(form_data.copy())
             individuals_list = _extract_json_to_list(api_response.individuals)
@@ -209,10 +234,10 @@ def personal_details_individual_lookup_search_result(request):
 
                 try:
                     individuals = paginator.page(page)
-                except PageNotAnInteger: 
+                except PageNotAnInteger:
                     individuals = paginator.page(1)
                 except EmptyPage:
-                    individuals = paginator.page(paginator.num_pages) 
+                    individuals = paginator.page(paginator.num_pages)
             else:
                 individuals = None
 
@@ -223,7 +248,7 @@ def personal_details_individual_lookup_search_result(request):
         context = {}
     else:
         context = DATA_FETCHER_MAPPING[referrer_type](application_id)
-    
+
     context.update({
         'form': form,
         'individuals': individuals,
@@ -246,7 +271,7 @@ def personal_details_individual_lookup_search_choice(request):
 
     if request.method == 'GET':
             form_data = cache.get(application_id)
-            
+
             # Request to cygnum database
             api_response = _fetch_individuals_from_integration_adapter(form_data.copy())
             individuals_list = _extract_json_to_list(api_response.individuals)
@@ -261,18 +286,18 @@ def personal_details_individual_lookup_search_choice(request):
                 except PageNotAnInteger:
                     individuals = paginator.page(1)
                 except EmptyPage:
-                    individuals = paginator.page(paginator.num_pages) 
+                    individuals = paginator.page(paginator.num_pages)
             else:
                 individuals = None
 
             compare = request.GET.get('compare')
-    
+
     # Fetch context from a referrer app for 'Applicant's data' box
     if not application_id or referrer_type not in DATA_FETCHER_MAPPING:
         context = {}
     else:
         context = DATA_FETCHER_MAPPING[referrer_type](application_id)
-    
+
     context.update({
         'individuals': individuals,
         'compare': compare,
