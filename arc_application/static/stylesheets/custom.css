@@ -445,11 +445,12 @@
 
 .individual-lookup-warning {
   color: #6f777b;
-  margin-top: 0px;
+  margin: 0px;
 }
 
 #individual-lookup-applicants-button {
-  margin-bottom: 8px;
+  margin-top: 5px;
+  margin-bottom: 10px;
 }
 
 
@@ -458,12 +459,12 @@
 }
 
 .individual-lookup-wrapper tr td {
-  height: 40px;
-  padding: 2px;
+  padding: 0px;
   border: 0px;
   width: 90px;
-  line-height: 16px;
   font-size: 20px;
+  height: 46px;
+  line-height: 16px;
 }
 
 .individual-lookup-wrapper tr td:first-child {
@@ -481,7 +482,7 @@
 }
 
 .individual-lookup-search .button {
-  margin-top: 20px;
+  margin-top: 5px;
 }
 
 .individual-lookup-search .form-control {
@@ -498,13 +499,13 @@
   color: gray;
 }
 
-.individual-lookup-search #date_form_day,
-.individual-lookup-search #date_form_month {
+.individual-lookup-search #id_day, 
+.individual-lookup-search #id_month {
   flex-basis: 30%;
   min-width: 0;
 }
 
-.individual-lookup-search #date_form_year {
+.individual-lookup-search #id_year {
   flex-basis: 35%;
   min-width: 0;
 }
@@ -521,4 +522,78 @@
   .individual-lookup-wrapper h2 {
     text-align: center;
   }
+}
+
+.individual-table-wrapper {
+  margin-top: 5px;
+}
+
+.individual-table-wrapper td, th{
+  font-size: 16px;
+}
+
+.individual-table-wrapper th {
+  background-color: black;
+  color: white;
+  padding: 5px;
+}
+
+.individual-table-wrapper td {
+  padding-left: 5px;
+}
+
+.individual-table-wrapper-pages {
+  padding-top: 3px;
+  text-align: center;
+}
+
+#date-form-label-row {
+  height: 20px;
+}
+
+.individual-table-wrapper .multiple-choice {
+  top: -12px;
+  right: -18px;
+}
+.individual-warning-box {
+  min-height: 90px;
+}
+
+#back_to_search_button {
+  float: right;
+}
+
+.individual-table-wrapper tbody a {
+  color: black;
+}
+
+.individual-lookup-wrapper .error-summary {
+  margin: 0;
+  padding: 5px;
+}
+
+.individual-lookup-applicants-details .error-summary {
+  visibility: hidden;
+}
+
+.individual-table-wrapper .multiple-choice [type="radio"] + label::before {
+  width: 30px;
+  height: 30px;
+}
+
+.individual-table-wrapper .multiple-choice [type="radio"] + label::after {
+  border: 8px solid black;
+}
+
+.individual-table-wrapper .multiple-choice input {
+  width: 35px;
+  height: 35px;
+}
+
+.individual-not-found-warning {
+  text-align: center;
+}
+
+.individual-not-found-warning span:nth-last-child(1) {
+  color: gray;
 }
