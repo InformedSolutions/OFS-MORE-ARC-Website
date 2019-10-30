@@ -599,6 +599,9 @@
         <br>
         <a href="{% url 'other-people-previous-addresses' %}?id={{ application_id }}&state=entry&person_id={{id}}&person_type=ADULT" class="button button-secondary">Add previous addresses</a>
 
+
+        {% include "individual_lookup_table.html" with referrer="childminder_pith"  adult_id=id %}
+
         <table class="check-your-answers form-group">
             <thead>
             <tr>
@@ -711,7 +714,6 @@
             </tbody>
         </table>
 
-        <a href="{% url 'other-people-previous-registration' %}?id={{ application_id }}&person_id={{ id }}" class="button button-secondary">Add previous registration details</a>
         {% endfor %}
 
         <table class="check-your-answers form-group">
@@ -1130,41 +1132,6 @@
 
         {% endfor %}
 
-
-        {% for id, name, previous_registrations in previous_registration_lists %}
-        {% for previous_registration in previous_registrations %}
-                <table class="check-your-answers form-group">
-                    <thead>
-                    <tr>
-                        <th colspan="3">
-                            <div class="heading-medium">
-                                {{name}} previous registration
-                            </div>
-                        </th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr>
-                        <td>Has the applicant previously registered with Ofsted?</td>
-                        <td>{{ previous_registration.previous_registration|yesno:"Yes,No" }}</td>
-                        <td><a href="{% url 'other-people-previous-registration' %}?id={{ application_id }}&person_id={{id}}">Change</a></td>
-                    </tr>
-                    {% if previous_registration.previous_registration %}
-                    <tr>
-                        <td>Individual ID</td>
-                        <td>{{ previous_registration.individual_id }}</td>
-                        <td><a href="{% url 'other-people-previous-registration' %}?id={{ application_id }}&person_id={{id}}">Change</a></td>
-                    </tr>
-                    {% endif %}
-                    <tr>
-                        <td>Has the applicant lived in England for more than 5 years</td>
-                        <td>{{ previous_registration.five_years_in_UK|yesno:"Yes,No" }}</td>
-                        <td><a href="{% url 'other-people-previous-registration' %}?id={{ application_id }}&person_id={{id}}">Change</a></td>
-                    </tr>
-                    </tbody>
-                </table>
-                    {% endfor %}
-        {% endfor %}
 
         <input type="submit" class="button" value="Confirm and continue"/>
         <input type="hidden" value="{{application_id}}" name="id"/>

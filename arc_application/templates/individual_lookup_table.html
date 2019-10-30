@@ -19,12 +19,12 @@
             </td>
             <td class="amend-search">
                 {% if individual_id >= 0 %}
-                    <a href="{% url 'personal_details_individual_lookup' %}?id={{ application_id }}&referrer={{ referrer }}">Amend search</a>
+                    <a href="{% url 'personal_details_individual_lookup' %}?id={{ application_id }}&referrer={{ referrer }}&adult_id={{ adult_id }}">Amend search</a>
                 {% endif %}
             </td>
         </tr>
     </tbody>
 </table>
 {% if individual_id == None %}
-    <a href="{% url 'personal_details_individual_lookup' %}?id={{ application_id }}&referrer={{ referrer }}" class="button button-secondary">Search for individual</a>
+    <a href="{% url 'personal_details_individual_lookup' %}?id={{ application_id }}&referrer={{ referrer }}&adult_id={{ adult_id }}" class="button button-secondary">Search for individual</a>
 {% endif %}

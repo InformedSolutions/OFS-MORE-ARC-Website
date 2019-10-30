@@ -12,7 +12,8 @@ from django.urls import reverse
 import requests
 
 from ...decorators import group_required, user_assigned_application
-from ...models import ApplicantPersonalDetails, ApplicantName, ApplicantHomeAddress, PreviousRegistrationDetails, Application
+from ...models import ApplicantPersonalDetails, ApplicantName, ApplicantHomeAddress, PreviousRegistrationDetails, \
+    Application, AdultInHome
 from ...forms.individual_lookup_forms import IndividualLookupSearchForm
 from ...services.db_gateways import HMGatewayActions, NannyGatewayActions
 from ...services.integration_service import get_individual_search_results
@@ -95,11 +96,36 @@ def fetch_household_member_data(app_id):
         'application_id': app_id,
     }
 
+def fetch_childminder_pith_data(adult_id, application_id):
+    try:
+        adult_personal_details = AdultInHome.objects.get(adult_id=adult_id)
+        applicant_personal_details = ApplicantPersonalDetails.objects.get(application_id=application_id)
+        home_address = ApplicantHomeAddress.objects.get(
+            personal_detail_id=applicant_personal_details,
+            current_address=True
+        )
+    except ObjectDoesNotExist:
+        return {}
+
+    return {
+        'first_name': adult_personal_details.first_name,
+        'middle_names': adult_personal_details.middle_names,
+        'last_name': adult_personal_details.last_name,
+        'date_of_birth': adult_personal_details.date_of_birth,
+        'street_line1': home_address.street_line1,
+        'street_line2': home_address.street_line2,
+        'town': home_address.town,
+        'postcode': home_address.postcode,
+        'application_id': application_id,
+        'adult_id': adult_id
+    }
+
 
 DATA_FETCHER_MAPPING = {
     'childminder': fetch_childminder_data,
     'nanny': fetch_nanny_data,
     'household_member': fetch_household_member_data,
+    'childminder_pith': fetch_childminder_pith_data,
 }
 
 
@@ -112,6 +138,7 @@ def personal_details_individual_lookup(request):
     '''
 
     application_id = request.GET.get('id')
+    adult_id = request.GET.get('adult_id')
     referrer_type = request.GET.get('referrer')
     form = None
     if request.method == 'GET':
@@ -153,11 +180,14 @@ def personal_details_individual_lookup(request):
                 cache.add(application_id, form_data)
 
 
-            return redirect('././results/?id='+application_id+'&referrer='+referrer_type)
+            return redirect('././results/?id='+application_id+'&referrer='+referrer_type+'&adult_id='+adult_id)
 
     # Fetch context from a referrer app for 'Applicant's data' box
     if not application_id or referrer_type not in DATA_FETCHER_MAPPING:
         context = {}
+    elif referrer_type == 'childminder_pith':
+        adult_id = request.GET.get('adult_id')
+        context = fetch_childminder_pith_data(adult_id, application_id)
     else:
         context = DATA_FETCHER_MAPPING[referrer_type](application_id)
 
@@ -260,14 +290,19 @@ def personal_details_individual_lookup_search_result(request):
     # Fetch context from a referrer app for 'Applicant's data' box
     if not application_id or referrer_type not in DATA_FETCHER_MAPPING:
         context = {}
+    elif referrer_type == 'childminder_pith':
+        adult_id = request.GET.get('adult_id')
+        context = fetch_childminder_pith_data(adult_id, application_id)
     else:
         context = DATA_FETCHER_MAPPING[referrer_type](application_id)
+        adult_id = ''
 
     context.update({
         'form': form,
         'individuals': individuals,
         'page': page,
-        'referrer_type': referrer_type
+        'referrer_type': referrer_type,
+        'adult_id': adult_id
     })
 
     return render(request, 'childminder_templates/personal-details-individual-lookup-search-result.html', context)
@@ -317,15 +352,20 @@ def personal_details_individual_lookup_search_choice(request):
     # Fetch context from a referrer app for 'Applicant's data' box
     if not application_id or referrer_type not in DATA_FETCHER_MAPPING:
         context = {}
+    elif referrer_type == 'childminder_pith':
+        adult_id = request.GET.get('adult_id')
+        context = fetch_childminder_pith_data(adult_id, application_id)
     else:
         context = DATA_FETCHER_MAPPING[referrer_type](application_id)
+        adult_id =  ''
 
     context.update({
         'individuals': individuals,
         'compare': compare,
         'referrer_type': referrer_type,
         'individuals_list': individuals_list,
-        'page': page
+        'page': page,
+        'adult_id': adult_id
     })
 
     return render(request, 'childminder_templates/personal-detials-individual-lookup-search-choice.html', context)

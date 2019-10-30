@@ -163,11 +163,11 @@
     </table>
         <div class="individual-table-wrapper-pages">
             {% if individuals.has_previous %}
-            <a href="?id={{application_id}}&page={{individuals.previous_page_number}}&referrer={{referrer_type}}">Previous page</a>
+            <a href="?id={{application_id}}&page={{individuals.previous_page_number}}&adult_id={{adult_id}}&referrer={{referrer_type}}">Previous page</a>
             {% endif %}
             <span>{{ individuals }}</span>
             {% if individuals.has_next %}
-            <a href="?id={{application_id}}&page={{individuals.next_page_number}}&referrer={{referrer_type}}">Next page</a>
+            <a href="?id={{application_id}}&page={{individuals.next_page_number}}&adult_id={{adult_id}}&referrer={{referrer_type}}">Next page</a>
             {% endif %}
         </div>
 {% else %}
