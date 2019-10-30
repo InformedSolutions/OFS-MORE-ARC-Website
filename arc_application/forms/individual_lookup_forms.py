@@ -8,7 +8,7 @@ from .. import form_fields
 
 
 class IndividualLookupSearchForm(GOVUKForm):
-    ERROR_MESSAGE_INVALID_DATE = 'Enter a real date'
+    ERROR_MESSAGE_INVALID_DATE = 'Enter a valid date'
     
     auto_replace_widgets = True
     field_label_classes = 'form-label-bold'
@@ -59,4 +59,4 @@ class IndividualLookupSearchForm(GOVUKForm):
         
         if error_messages:
             raise ValidationError(''.join([f'{value}' for value in error_messages.values()]))
-               
+            

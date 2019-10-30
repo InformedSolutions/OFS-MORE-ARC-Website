@@ -96,11 +96,11 @@ def personal_details_individual_lookup(request):
         else: 
             form = IndividualLookupSearchForm()
 
+    # Validate form and redirect to view with results
     elif request.method == 'POST':
         form = IndividualLookupSearchForm(request.POST)
 
         
-
         if form.is_valid():
             form_data = {
                     'forename': form.cleaned_data['forenames'],
@@ -176,6 +176,7 @@ def personal_details_individual_lookup_search_result(request):
         else:
             form = IndividualLookupSearchForm()
     
+    # Search in results view
     if request.method == 'POST':
         form = IndividualLookupSearchForm(request.POST)
 
