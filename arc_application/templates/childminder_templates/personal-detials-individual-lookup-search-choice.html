@@ -48,7 +48,7 @@
     <div class="individual-lookup-search">
         <div class="individual-warning-box">
             <h2 class="font-large">Search</h2>
-            <a href="{% url 'personal_details_individual_lookup' %}?id={{application_id}}&referrer={{referrer_type}}" class="font-medium" id="back_to_search_button">&lt Back to search</a> 
+            <a href="{% url 'personal_details_individual_lookup' %}?id={{application_id}}&referrer={{referrer_type}}&adult_id={{adult_id}}" class="font-medium" id="back_to_search_button">&lt Back to search</a>
         </div>
         <div class="invidual-lookup-search-wrapper">
             <form method="post">
@@ -118,7 +118,7 @@
                 <td>{{ individual.IndividualID }}</td>
                 <td>
                     
-                        <a href="{% url 'personal_details_individual_lookup_search_choice' %}?id={{ application_id }}&page={{page}}&compare={{ individual.IndividualID }}&referrer={{referrer_type}}" class="multiple-choice">
+                        <a href="{% url 'personal_details_individual_lookup_search_choice' %}?id={{ application_id }}&adult_id={{adult_id}}&page={{page}}&compare={{ individual.IndividualID }}&referrer={{referrer_type}}" class="multiple-choice">
                             {% if individual.IndividualID == compare %}
                                 <input type="radio" name="individual-choice" checked>
                             {% else %}
@@ -134,11 +134,11 @@
     </table>
         <div class="individual-table-wrapper-pages">
             {% if individuals.has_previous %}
-            <a href="?id={{application_id}}&page={{individuals.previous_page_number}}&compare={{compare}}&referrer={{referrer_type}}">Previous page</a>
+            <a href="?id={{application_id}}&page={{individuals.previous_page_number}}&adult_id={{adult_id}}&compare={{compare}}&referrer={{referrer_type}}">Previous page</a>
             {% endif %}
             <span>{{ individuals }}</span>
             {% if individuals.has_next %}
-            <a href="?id={{application_id}}&page={{individuals.next_page_number}}&compare={{compare}}&referrer={{referrer_type}}">Next page</a>
+            <a href="?id={{application_id}}&page={{individuals.next_page_number}}&adult_id={{adult_id}}&compare={{compare}}&referrer={{referrer_type}}">Next page</a>
             {% endif %}
         </div>
 {% else %}
