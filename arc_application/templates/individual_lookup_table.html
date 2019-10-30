@@ -14,10 +14,11 @@
                 Individual ID
             </td>
             <td>
-                {{ individual_id|default:"" }}
+                {% if individual_id == 0 %}Not known to Ofsted{% endif %}
+                {% if individual_id > 0 %}{{ individual_id }}{% endif %}
             </td>
             <td class="amend-search">
-                {% if individual_id %}
+                {% if individual_id >= 0 %}
                     <a href="{% url 'personal_details_individual_lookup' %}?id={{ application_id }}&referrer={{ referrer }}">Amend search</a>
                 {% endif %}
             </td>
