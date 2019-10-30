@@ -311,17 +311,6 @@ class PreviousRegistrationTests(NannyReviewFuncTestsBase):
         self.assertEqual(response.status_code, 200)
         utils.assertView(response, NannyPreviousRegistrationView.as_view())
 
-    def test_previous_registration_appears_on_review_page(self):
-        """
-        Testing previous registration appears on the review page when there is a previous registration record
-        """
-        response = self.client.get(reverse('nanny_personal_details_summary') + '?id=' + self.test_app_id)
-
-        self.assertContains(response, "Previous registration", status_code=200)
-        self.assertContains(response, "Previously registered with Ofsted?", status_code=200)
-        self.assertContains(response, "Individual ID", status_code=200)
-        self.assertContains(response, "Lived in England for more than 5 years?", status_code=200)
-
 
 class NannyPreviousNamesTests(NannyReviewFuncTestsBase):
 
