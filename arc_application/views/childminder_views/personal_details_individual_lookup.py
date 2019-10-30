@@ -72,8 +72,12 @@ def fetch_nanny_data(app_id):
 
 
 def fetch_household_member_data(app_id):
+    hm_gateway = HMGatewayActions()
     adult_record = read_record(
-        HMGatewayActions(), 'adult', {'adult_id': app_id}
+        hm_gateway, 'adult', {'adult_id': app_id}
+    )
+    dpa_record = read_record(
+        hm_gateway, 'dpa-auth', {'token_id': adult_record['token_id']}
     )
 
     return {
@@ -84,7 +88,7 @@ def fetch_household_member_data(app_id):
         'street_line1': '',
         'street_line2': '',
         'town': '',
-        'postcode': '',
+        'postcode': dpa_record.get('postcode', ''),
         'application_id': app_id,
     }
 
