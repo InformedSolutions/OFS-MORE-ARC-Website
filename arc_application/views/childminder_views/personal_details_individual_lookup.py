@@ -144,7 +144,7 @@ def personal_details_individual_lookup_search_result(request):
     individuals = None
     individuals_list = None
     page = None
-    application_id = request.GET["id"]
+    application_id = request.GET['id']
     referrer_type = request.GET.get('referrer')
 
     if request.method == 'GET':
@@ -241,7 +241,7 @@ def personal_details_individual_lookup_search_choice(request):
     Choose one record and decide whether it has to be confirmed or marked as 'None to the Ofsted'
     '''
     individuals = None
-    application_id = request.GET["id"]
+    application_id = request.GET['id']
     referrer_type = request.GET.get('referrer')
 
     if request.method == 'GET':
@@ -286,7 +286,7 @@ def personal_details_individual_lookup_search_choice(request):
 def _fetch_individuals_from_integration_adapter(form_values):
     url_params = {}
     if form_values['year'] and form_values['month'] and form_values['day']:
-        url_params['dob'] = '{0}-{1}-{2}'.format(form_values.pop("year"), form_values.pop("month"), form_values.pop("day"))
+        url_params['dob'] = '{0}-{1}-{2}'.format(form_values.pop('year'), form_values.pop('month'), form_values.pop('day'))
     for key, value in form_values.items():
         if value:
            url_params[key] = value
