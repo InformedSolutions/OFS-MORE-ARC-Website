@@ -5,6 +5,7 @@ link_dict = {
     'Your sign in details': 'contact_summary',
     'Type of childcare': 'type_of_childcare_age_groups',
     'Your name and date of birth': 'personal_details_summary',
+    'Individual lookup': 'personal_details_summary',
     'Previous names': 'personal_details_summary',
     'Your home and childcare address': 'personal_details_summary',
     'Previous addresses': 'personal_details_summary',

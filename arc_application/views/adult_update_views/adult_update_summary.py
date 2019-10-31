@@ -155,6 +155,19 @@ def load_json(adult_id):
                  'field': "reasons_known_to_council_health_check"}
             ]
 
+    previous_registration_response = HMGatewayActions().read("previous-registration", params={'adult_id': adult_id})
+    if previous_registration_response.status_code == 200:
+        record = previous_registration_response.record
+        previous_registration_table = [{"title": "Individual lookup", "id": record['adult_id']},
+                                       {"name": "Individual ID",
+                                        "value": record["individual_id"] if record[
+                                            "previous_registration"] else 'Not known to Ofsted',
+                                        "index": 1,
+                                        "link": reverse("adults-previous-registration") + '?id=' + adult_id},
+                                       ]
+
+        table_list.append(previous_registration_table)
+
 
     for row in summary_table:
         field = row["field"] if row.get("field") else ''
@@ -274,38 +287,7 @@ def load_json(adult_id):
         table_list.append(previous_names_address_table)
 
 
-    previous_registration_response = HMGatewayActions().read("previous-registration", params={'adult_id': adult_id})
-    if previous_registration_response.status_code == 200:
-        record = previous_registration_response.record
 
-        if record["previous_registration"]:
-            previous_registration_table = [{"title": "Previous Registration", "id": record['adult_id']},
-                                        {"name": "Has the applicant previously registered with Ofsted?",
-                                         "value": 'Yes' if record["previous_registration"] else 'No',
-                                         "index": 0,
-                                         "link": reverse("adults-previous-registration") + '?id=' + adult_id},
-                                        {"name": "Individual ID",
-                                         "value": record["individual_id"],
-                                         "index": 1,
-                                         "link": reverse("adults-previous-registration") + '?id=' + adult_id},
-                                        {"name": "Has the applicant lived in England for more than 5 years?",
-                                         "value": 'Yes' if record['five_years_in_UK'] else 'No',
-                                         "index": 2,
-                                         "link": reverse("adults-previous-registration") + '?id=' + adult_id}
-                                        ]
-        else:
-            previous_registration_table = [{"title": "Previous Registration", "id": record['adult_id']},
-                                           {"name": "Has the applicant previously registered with Ofsted?",
-                                            "value": 'Yes' if record["previous_registration"] else 'No',
-                                            "index": 0,
-                                            "link": reverse("adults-previous-registration") + '?id=' + adult_id},
-                                           {"name": "Has the applicant lived in England for more than 5 years?",
-                                            "value": 'Yes' if record["five_years_in_UK"] else 'No',
-                                            "index": 1,
-                                            "link": reverse("adults-previous-registration") + '?id=' + adult_id}
-                                           ]
-
-        table_list.append(previous_registration_table)
 
 
     return table_list

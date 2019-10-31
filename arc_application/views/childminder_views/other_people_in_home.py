@@ -68,7 +68,7 @@ def other_people_summary(request):
     adult_military_base = []
     adult_name_querysets = []
     adult_address_querysets = []
-    previous_registration_querysets = []
+    adult_previous_registrations = []
     adult_enhanced_checks = []
     adult_previous_name_lists_list = []
     adult_previous_address_lists_list = []
@@ -127,12 +127,16 @@ def other_people_summary(request):
         hospital_admissions.append(HealthCheckHospital.objects.filter(person_id=adult.pk))
         local_authorities.append(adult.reasons_known_to_council_health_check)
         adult_enhanced_checks.append(adult.enhanced_check)
-        previous_registration_querysets.append(
-            OtherPersonPreviousRegistrationDetails.objects.filter(person_id_id=adult.pk))
         adult_previous_name_lists_list.append(
             PreviousName.objects.filter(person_id=adult.pk, other_person_type='ADULT').order_by('order'))
         adult_previous_address_lists_list.append(
             PreviousAddress.objects.filter(person_id=adult.pk, person_type='ADULT'))
+        if OtherPersonPreviousRegistrationDetails.objects.filter(person_id=adult.pk).exists():
+            adult_prev_reg = OtherPersonPreviousRegistrationDetails.objects.get(person_id=adult.pk)
+        else:
+            adult_prev_reg = {'individual_id': None}
+        adult_previous_registrations.append({'adult_id': adult.adult_id, 'prev_reg': adult_prev_reg})
+
 
     for child in children:
         if child.middle_names and child.middle_names != '':
@@ -153,7 +157,7 @@ def other_people_summary(request):
             name = child.first_name + ' ' + child.last_name
         own_child_name_list.append(name)
 
-    previous_registration_lists = list(zip(adult_id_list, adult_name_list, previous_registration_querysets))
+
 
     form.error_summary_title = 'There was a problem'
 
@@ -208,7 +212,7 @@ def other_people_summary(request):
             'adult_lists': adult_lists,
             'child_lists': child_lists,
             'own_child_lists': own_child_lists,
-            'previous_registration_lists': previous_registration_lists,
+            'previous_registration_lists': adult_previous_registrations,
             'providing_care_in_own_home': providing_care_in_own_home,
             'childcare_type_zero_to_five': childcare_type.zero_to_five,
         }
@@ -378,7 +382,7 @@ def other_people_summary(request):
                 'adult_lists': adult_lists,
                 'child_lists': child_lists,
                 'own_child_lists': own_child_lists,
-                'previous_registration_lists': previous_registration_lists,
+                'previous_registration_lists': adult_previous_registrations,
                 'providing_care_in_own_home': providing_care_in_own_home,
                 'childcare_type_zero_to_five': childcare_type.zero_to_five,
             }
