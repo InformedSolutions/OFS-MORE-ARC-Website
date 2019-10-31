@@ -157,10 +157,10 @@ def load_json(adult_id):
 
     previous_registration_response = HMGatewayActions().read("previous-registration", params={'adult_id': adult_id})
     if previous_registration_response.status_code == 200:
-        record = previous_registration_response.record
-        previous_registration_table = [{"title": "Individual lookup", "id": record['adult_id']},
+        prev_reg_record = previous_registration_response.record
+        previous_registration_table = [{"title": "Individual lookup", "id": prev_reg_record['adult_id']},
                                        {"name": "Individual ID",
-                                        "value": record["individual_id"] if record[
+                                        "value": prev_reg_record["individual_id"] if prev_reg_record[
                                             "previous_registration"] else 'Not known to Ofsted',
                                         "index": 1,
                                         "link": reverse("adults-previous-registration") + '?id=' + adult_id},
@@ -179,8 +179,8 @@ def load_json(adult_id):
         {"title": "Current treatment",
          "id": record['adult_id']},
            {"name": "Are you currently being treated by your GP, another doctor or a hospital?",
-         "value": 'Yes' if record["currently_being_treated"] else 'No'}
-    ]
+            "value": 'Yes' if record["currently_being_treated"] else 'No'}
+        ]
 
     if record["currently_being_treated"]:
         current_treatment_table.append(
