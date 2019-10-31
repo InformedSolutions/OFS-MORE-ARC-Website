@@ -68,6 +68,11 @@
                <span class="task-name">Your personal details</span>
                <strong class="task-finished task-to-do">To do</strong>
                </a>
+               {% elif personal_details_status == 'IN PROGRESS' %}
+               <a href="{% url 'personal_details_summary' %}?id={{application_id}}">
+               <span class="task-name">Your personal details</span>
+               <strong class="task-finished task-flagged">Started</strong>
+               </a>
                {% elif personal_details_status == 'FLAGGED' %}
                <a href="{% url 'personal_details_summary' %}?id={{application_id}}">
                <span class="task-name">Your personal details</span>
