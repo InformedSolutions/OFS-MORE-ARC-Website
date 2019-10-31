@@ -548,7 +548,7 @@
 
         {% for dict in previous_registration_lists %}
         {% if dict.adult_id == id %}
-        {% include "individual_lookup_table.html" with referrer="childminder_pith"  adult_id=id individual_id=dict.prev_reg.individual_id %}
+        {% include "individual_lookup_table.html" with referrer="household_member"  adult_id=id individual_id=dict.prev_reg.individual_id %}
         {% endif %}
         {% endfor %}
 
