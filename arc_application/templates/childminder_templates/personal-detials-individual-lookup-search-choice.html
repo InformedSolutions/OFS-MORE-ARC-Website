@@ -43,7 +43,11 @@
                 <td>{{ town }}</td>
             </tr>
         </table>
-        <input id="individual-lookup-applicants-button" type="button" class="button button-secondary" value="Not known to Ofsted">
+        <form method="post">
+            {% csrf_token %}
+            <input id="not-known" name="not-known" type="hidden" value="true">
+            <input id="individual-lookup-applicants-button" type="submit" class="button button-secondary" value="Not known to Ofsted">
+        </form>
     </div>
     <div class="individual-lookup-search">
         <div class="individual-warning-box">
