@@ -257,16 +257,17 @@ class NannyPersonalDetailsSummary(NannyARCFormView):
                 }
             )
 
-        rows.append(
-            {
-                'id': 'individual lookup',
-                'name': 'Individual ID',
-                'info': individual_id if previous_registration else 'Not known to Ofsted',
-                'declare': previous_registration_form['previous_registration_declare']
+        if previous_registration_details is not None:
+            rows.append(
+                {
+                    'id': 'individual lookup',
+                    'name': 'Individual ID',
+                    'info': individual_id if previous_registration else 'Not known to Ofsted',
+                    'declare': previous_registration_form['previous_registration_declare']
                            if hasattr(self, 'request') else '',
-                'comments': previous_registration_form['previous_registration_comments'],
-            })
-            # required for conditional reveal of individual_id on master summary
+                    'comments': previous_registration_form['previous_registration_comments'],
+                })
+                # required for conditional reveal of individual_id on master summary
 
 
         context = {
