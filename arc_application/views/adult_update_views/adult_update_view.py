@@ -62,6 +62,9 @@ def new_adults_summary(request):
     adult_previous_name_lists_list = []
     adult_previous_address_lists_list = []
 
+    # Set up bool to track whether linking has been completed for all adults in this application
+    linking_complete = True
+
     for adult in adults:
 
         if adult['middle_names'] is not None and adult['middle_names'] != '':
@@ -117,6 +120,9 @@ def new_adults_summary(request):
         if previous_registration_response.status_code == 200:
             previous_registration_record = previous_registration_response.record
             previous_registration_querysets.append(previous_registration_record)
+        else:
+            # If no previous registration data found then linking hasn't been attempted for this adult
+            linking_complete = False
 
         previous_name_response = HMGatewayActions().list('previous-name', params={'adult_id': adult_id})
         if previous_name_response.status_code == 200:
@@ -169,7 +175,8 @@ def new_adults_summary(request):
             'formset_adult': formset_adult,
             'application_id': adult_id_local,
             'adult_lists': adult_lists,
-            'previous_registration_lists': previous_registration_lists
+            'previous_registration_lists': previous_registration_lists,
+            'linking_complete': linking_complete
         }
         log.debug("Rendering new adults in the home page")
         return render(request, 'adult_update_templates/new-adults-summary.html', variables)
