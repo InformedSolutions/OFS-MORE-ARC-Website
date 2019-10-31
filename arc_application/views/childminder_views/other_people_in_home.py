@@ -382,7 +382,7 @@ def other_people_summary(request):
                 'adult_lists': adult_lists,
                 'child_lists': child_lists,
                 'own_child_lists': own_child_lists,
-                'previous_registration_lists': previous_registration_lists,
+                'previous_registration_lists': adult_previous_registrations,
                 'providing_care_in_own_home': providing_care_in_own_home,
                 'childcare_type_zero_to_five': childcare_type.zero_to_five,
             }

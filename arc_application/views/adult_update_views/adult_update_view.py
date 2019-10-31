@@ -58,7 +58,7 @@ def new_adults_summary(request):
     adult_military_base = []
     adult_name_querysets = []
     adult_address_querysets = []
-    previous_registration_querysets = []
+    adult_previous_registrations = []
     adult_previous_name_lists_list = []
     adult_previous_address_lists_list = []
 
@@ -115,8 +115,10 @@ def new_adults_summary(request):
 
         previous_registration_response = HMGatewayActions().read('previous-registration', params={'adult_id': adult_id})
         if previous_registration_response.status_code == 200:
-            previous_registration_record = previous_registration_response.record
-            previous_registration_querysets.append(previous_registration_record)
+            adult_prev_reg = previous_registration_response.record
+        else:
+            adult_prev_reg = {'individual_id': None}
+        adult_previous_registrations.append({'adult_id': adult_id, 'prev_reg': adult_prev_reg})
 
         previous_name_response = HMGatewayActions().list('previous-name', params={'adult_id': adult_id})
         if previous_name_response.status_code == 200:
@@ -146,7 +148,6 @@ def new_adults_summary(request):
         else:
             adult_previous_address_lists_list.append(None)
 
-    previous_registration_lists = list(zip(adult_id_list, adult_name_list, previous_registration_querysets))
 
     if request.method == 'GET':
         # Defines the static form at the top of the page
@@ -169,7 +170,7 @@ def new_adults_summary(request):
             'formset_adult': formset_adult,
             'application_id': adult_id_local,
             'adult_lists': adult_lists,
-            'previous_registration_lists': previous_registration_lists
+            'previous_registration_lists': adult_previous_registrations
         }
         log.debug("Rendering new adults in the home page")
         return render(request, 'adult_update_templates/new-adults-summary.html', variables)
@@ -240,7 +241,7 @@ def new_adults_summary(request):
                 'formset_adult': adult_formset,
                 'application_id': adult_id_local,
                 'adult_lists': adult_lists,
-                'previous_registration_lists': previous_registration_lists}
+                'previous_registration_lists': adult_previous_registrations}
 
             log.debug("Render new adult review page")
             return render(request, 'adult_update_templates/new-adults-summary.html', variables)
