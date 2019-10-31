@@ -112,7 +112,6 @@ class NannyPersonalDetailsSummary(NannyARCFormView):
                                                                params={'application_id': application_id}).record
             previous_registration = previous_registration_details['previous_registration']
             individual_id = previous_registration_details['individual_id']
-            five_years_in_UK = previous_registration_details['five_years_in_UK']
             previous_registration_form = forms[2]
 
             if previous_registration is True:
@@ -279,15 +278,6 @@ class NannyPersonalDetailsSummary(NannyARCFormView):
                                    if hasattr(self, 'request') else '',
                         'comments': previous_registration_form['individual_id_comments'],
                     })
-            rows.append(
-                {
-                    'id': 'five_years_in_UK',
-                    'name': 'Lived in England for more than 5 years?',
-                    'info': five_years_in_UK,
-                    'declare': previous_registration_form['five_years_in_UK_declare']
-                               if hasattr(self, 'request') else '',
-                    'comments': previous_registration_form['five_years_in_UK_comments'],
-                })
 
         context = {
             'application_id': application_id,
