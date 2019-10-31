@@ -8,11 +8,13 @@ from django.utils.decorators import method_decorator
 from django.views.generic import FormView
 from django.views.decorators.cache import never_cache
 
+from ...models import Arc
 from ...review_util import build_url
 from ...services.arc_comments_handler import update_arc_review_status, \
     get_form_initial_values, \
     update_application_arc_flagged_status, \
     ARCCommentsProcessor
+from ...services.db_gateways import NannyGatewayActions
 from ...decorators import group_required, user_assigned_application
 
 # Initiate logging
@@ -62,6 +64,10 @@ class NannyARCFormView(FormView):
         reviewed_task = self.get_task_for_review()
         update_arc_review_status(self.application_id, flagged_fields, reviewed_task=reviewed_task)
 
+        # If a personal details review check whether linking complete
+        if reviewed_task == 'personal_details_review':
+            self.update_linking_review_status(self.application_id, reviewed_task)
+
         # Update {{task}}_arc_flagged status for NannyApplication table.
         update_application_arc_flagged_status(flagged_fields, self.application_id, reviewed_task)
 
@@ -82,3 +88,22 @@ class NannyARCFormView(FormView):
             raise NotImplementedError('You must supply the name of the task being reviewed.')
         else:
             return self.task_for_review
+
+    def update_linking_review_status(self, application_id, reviewed_task):
+        linking_complete = False
+
+        # Get data to find out if an individual_id is saved
+        api_response = NannyGatewayActions().read('previous-registration-details',
+                                                  params={'application_id': application_id})
+
+        if api_response.status_code == 200:
+            previous_registration_record = api_response.record
+            individual_id = previous_registration_record['individual_id']
+            if individual_id is not None:
+                linking_complete = True
+
+        # If not saved, then linking incomplete - further update to review status
+        if not linking_complete:
+            arc_application = Arc.objects.get(application_id=application_id)
+            setattr(arc_application, reviewed_task, 'IN PROGRESS')
+            arc_application.save()

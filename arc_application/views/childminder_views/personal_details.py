@@ -117,15 +117,24 @@ def personal_details_summary(request):
                 log.debug("Handling submissions for personal details - save unsuccessful")
                 return render(request, '500.html')
 
+            # Determine whether linking has been completed
+            linking_complete = False
+            if PreviousRegistrationDetails.objects.filter(application_id=application_id_local).exists():
+                previous_reg_details = PreviousRegistrationDetails.objects.get(application_id=application_id_local)
+                if previous_reg_details.individual_id is not None:
+                    linking_complete = True
+
             # update application status
-            if not any((birthdate_comments, name_comments, home_address_comments, childcare_address_comments,
-                        working_in_other_childminder_home_comments, own_children_comments,
-                        reasons_known_to_social_services_comments)):
-                section_status = 'COMPLETED'
-                application_record.personal_details_arc_flagged = False
-            else:
+            if any((birthdate_comments, name_comments, home_address_comments, childcare_address_comments,
+                    working_in_other_childminder_home_comments, own_children_comments,
+                    reasons_known_to_social_services_comments)):
                 section_status = 'FLAGGED'
                 application_record.personal_details_arc_flagged = True
+            elif not linking_complete:
+                section_status = 'IN PROGRESS'
+            else:
+                section_status = 'COMPLETED'
+                application_record.personal_details_arc_flagged = False
 
             application_record.save()
 

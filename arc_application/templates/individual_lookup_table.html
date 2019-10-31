@@ -18,6 +18,7 @@
                 {% if individual_id > 0 %}{{ individual_id }}{% endif %}
             </td>
             <td class="amend-search">
+
                 {% if individual_id >= 0 %}
                     <a href="{% url 'personal_details_individual_lookup' %}?id={{ application_id }}&referrer={{ referrer }}&adult_id={{ adult_id }}">Amend search</a>
                 {% endif %}

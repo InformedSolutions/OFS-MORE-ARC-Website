@@ -12,8 +12,10 @@ from django.urls import reverse
 import requests
 
 from ...decorators import group_required, user_assigned_application
+
 from ...models import ApplicantPersonalDetails, ApplicantName, ApplicantHomeAddress, PreviousRegistrationDetails, \
     Application, AdultInHome, OtherPersonPreviousRegistrationDetails
+
 from ...forms.individual_lookup_forms import IndividualLookupSearchForm
 from ...services.db_gateways import HMGatewayActions, NannyGatewayActions
 from ...services.integration_service import get_individual_search_results
@@ -318,6 +320,7 @@ def personal_details_individual_lookup_search_choice(request):
     individuals = None
     application_id = request.GET['id']
     adult_id = request.GET.get('adult_id')
+
     referrer_type = request.GET.get('referrer')
 
     # Check if a match has been confirmed or if the user has marked not known to Ofsted

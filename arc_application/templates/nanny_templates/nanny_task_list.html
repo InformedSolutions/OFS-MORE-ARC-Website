@@ -39,6 +39,8 @@
                   <strong class="task-finished task-to-do">To do</strong>
                   {% elif personal_details_status == 'FLAGGED' %}
                   <strong class="task-finished task-flagged">Flagged</strong>
+                  {% elif personal_details_status == 'IN PROGRESS' %}
+                  <strong class="task-finished task-flagged">Started</strong>
                   {% elif personal_details_status == 'COMPLETED' %}
                   <strong class="task-finished">Reviewed</strong>
                   {% endif %}

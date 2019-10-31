@@ -674,7 +674,11 @@
 
         <br>
 
-        <input type="submit" class="button" value="Confirm and continue"/>
+        {% if linking_complete %}
+            <input type="submit" class="button" value="Confirm and continue"/>
+        {% else %}
+            <input type="submit" class="button" value="Confirm and continue" disabled/>
+        {% endif %}
         <input type="hidden" value="{{application_id}}" name="id"/>
     </form>
 

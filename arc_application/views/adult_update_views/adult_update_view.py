@@ -16,9 +16,9 @@ from operator import itemgetter
 # Initiate logging
 log = logging.getLogger('')
 
-#@login_required
-#@group_required(settings.ARC_GROUP)
-#@user_assigned_application
+@login_required
+@group_required(settings.ARC_GROUP)
+@user_assigned_application
 def new_adults_summary(request):
     """
     Method returning the template for the People in your home: summary page (for a given application)
@@ -61,6 +61,9 @@ def new_adults_summary(request):
     adult_previous_registrations = []
     adult_previous_name_lists_list = []
     adult_previous_address_lists_list = []
+
+    # Set up bool to track whether linking has been completed for all adults in this application
+    linking_complete = True
 
     for adult in adults:
 
@@ -118,7 +121,10 @@ def new_adults_summary(request):
             adult_prev_reg = previous_registration_response.record
         else:
             adult_prev_reg = {'individual_id': None}
+            linking_complete = False
         adult_previous_registrations.append({'adult_id': adult_id, 'prev_reg': adult_prev_reg})
+            
+
 
         previous_name_response = HMGatewayActions().list('previous-name', params={'adult_id': adult_id})
         if previous_name_response.status_code == 200:
@@ -170,7 +176,9 @@ def new_adults_summary(request):
             'formset_adult': formset_adult,
             'application_id': adult_id_local,
             'adult_lists': adult_lists,
-            'previous_registration_lists': adult_previous_registrations
+            'previous_registration_lists': adult_previous_registrations,
+            'linking_complete': linking_complete
+
         }
         log.debug("Rendering new adults in the home page")
         return render(request, 'adult_update_templates/new-adults-summary.html', variables)
