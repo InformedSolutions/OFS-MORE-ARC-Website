@@ -12,7 +12,7 @@ from django.urls import reverse
 import requests
 
 from ...decorators import group_required, user_assigned_application
-from ...models import ApplicantPersonalDetails, ApplicantName, ApplicantHomeAddress, PreviousRegistrationDetails
+from ...models import Application, ApplicantPersonalDetails, ApplicantName, ApplicantHomeAddress, AdultInHome, PreviousRegistrationDetails
 from ...forms.individual_lookup_forms import IndividualLookupSearchForm
 from ...services.db_gateways import HMGatewayActions, NannyGatewayActions
 from ...services.integration_service import get_individual_search_results
@@ -381,7 +381,8 @@ def save_childminder_not_known_to_ofsted(application_id):
     if PreviousRegistrationDetails.objects.filter(application_id=application_id).exists():
         previous_reg_details = PreviousRegistrationDetails.objects.get(application_id=application_id)
     else:
-        previous_reg_details = PreviousRegistrationDetails(application_id=application_id)
+        application = Application.objects.get(application_id=application_id)
+        previous_reg_details = PreviousRegistrationDetails(application_id=application)
 
     previous_reg_details.previous_registration = False
     previous_reg_details.individual_id = 0
