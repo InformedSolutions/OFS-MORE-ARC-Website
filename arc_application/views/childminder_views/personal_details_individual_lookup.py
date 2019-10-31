@@ -12,7 +12,7 @@ from django.urls import reverse
 import requests
 
 from ...decorators import group_required, user_assigned_application
-from ...models import ApplicantPersonalDetails, ApplicantName, ApplicantHomeAddress, AdultInHome, PreviousRegistrationDetails
+from ...models import ApplicantPersonalDetails, ApplicantName, ApplicantHomeAddress, PreviousRegistrationDetails, Application, AdultInHome
 from ...forms.individual_lookup_forms import IndividualLookupSearchForm
 from ...services.db_gateways import HMGatewayActions, NannyGatewayActions
 from ...services.integration_service import get_individual_search_results
@@ -311,17 +311,20 @@ def personal_details_individual_lookup_search_result(request):
 @user_assigned_application
 def personal_details_individual_lookup_search_choice(request):
     '''
-    Choose one record and decide whether it has to be confirmed or marked as 'None to the Ofsted'
+    Choose one record and decide whether it has to be confirmed or marked as not known to Ofsted
     '''
     individuals = None
     application_id = request.GET['id']
     adult_id = request.GET.get('id')
     referrer_type = request.GET.get('referrer')
 
-    # Check if not known to Ofsted
-    if request.method == 'POST' and request.POST.get('not-known') is not None:
-        # Save not known to Ofsted data and redirect to personal details page for given type
-        return mark_not_known_to_ofsted(referrer_type, application_id)
+    # Check if a match has been confirmed or if the user has marked not known to Ofsted
+    if request.method == 'POST':
+        if request.POST.get('not-known') is not None:
+            # Save not known to Ofsted data and redirect to personal details page for given type
+            return mark_not_known_to_ofsted(referrer_type, application_id)
+        if request.POST.get('individual-id') is not None:
+            return mark_individual_known_to_ofsted(referrer_type, application_id, request.POST.get('individual-id'))
 
     if request.method == 'GET':
             form_data = cache.get(application_id)
@@ -330,7 +333,7 @@ def personal_details_individual_lookup_search_choice(request):
             api_response = _fetch_individuals_from_integration_adapter(form_data.copy())
             individuals_list = _extract_json_to_list(api_response.individuals)
 
-            # Set a paginator if 'individuals_list' is setted
+            # Set a paginator if 'individuals_list' is set
             if individuals_list:
                 paginator = Paginator(individuals_list, 10)
                 page = request.GET.get('page')
@@ -375,17 +378,37 @@ def mark_not_known_to_ofsted(referrer_type, application_id):
     :return:
     '''
     if referrer_type == 'nanny':
-        return save_nanny_not_known_to_ofsted(application_id)
+        return save_nanny_known_to_ofsted(application_id, None)
     elif referrer_type == 'childminder':
-        return save_childminder_not_known_to_ofsted(application_id)
+        return save_childminder_known_to_ofsted(application_id, None)
     elif referrer_type == 'household_member':
-        return save_household_member_not_known_to_ofsted(application_id)
+        return save_household_member_known_to_ofsted(application_id, None)
 
 
-def save_nanny_not_known_to_ofsted(application_id):
+def mark_individual_known_to_ofsted(referrer_type, application_id, individual_id_str):
     '''
-    Mark a nanny applicant as being unknown to Ofsted
+    For the given application type save an individual id that has been matched against the application
+    :param referrer_type: the applicant or individual type
+    :param application_id: the id of the application or individual
+    :param individual_id_str: the matched individual id to be saved for this matched person
+    :return:
+    '''
+    # Individual id comes from a form input so it will be a string at first, we need an int
+    individual_id = int(individual_id_str)
+
+    if referrer_type == 'nanny':
+        return save_nanny_known_to_ofsted(application_id, individual_id)
+    elif referrer_type == 'childminder':
+        return save_childminder_known_to_ofsted(application_id, individual_id)
+    elif referrer_type == 'household_member':
+        return save_household_member_known_to_ofsted(application_id, individual_id)
+
+
+def save_nanny_known_to_ofsted(application_id, individual_id):
+    '''
+    Mark a nanny applicant as being known or unknown to Ofsted
     :param application_id: the application to update
+    :param individual_id: the existing Ofsted id for this person if known
     :return: redirect to the application's personal details review
     '''
     api_response = NannyGatewayActions().read('previous-registration-details',
@@ -393,69 +416,74 @@ def save_nanny_not_known_to_ofsted(application_id):
 
     if api_response.status_code == 200:
         previous_registration_record = api_response.record
-        previous_registration_record['previous_registration'] = False
-        previous_registration_record['individual_id'] = 0
+        previous_registration_record['previous_registration'] = False if individual_id is None else True
+        previous_registration_record['individual_id'] = 0 if individual_id is None else individual_id
 
         NannyGatewayActions().put('previous-registration-details', params=previous_registration_record)
-        log.debug("Handling submissions for nanny without previous registration details - updating details")
+        log.debug("Handling submissions for nanny previous registration details - updating details")
     else:
         previous_registration_new = {}
         previous_registration_new['application_id'] = application_id
-        previous_registration_new['previous_registration'] = False
-        previous_registration_new['individual_id'] = 0
+        previous_registration_new['previous_registration'] = False if individual_id is None else True
+        previous_registration_new['individual_id'] = 0 if individual_id is None else individual_id
 
         NannyGatewayActions().create('previous-registration-details',
                                      params=previous_registration_new)
-        log.debug("Handling submissions for nanny without previous registration details - new details")
+        log.debug("Handling submissions for nanny previous registration details - new details")
 
     return HttpResponseRedirect(build_url('nanny_personal_details_summary', get={'id': application_id}))
 
 
-def save_childminder_not_known_to_ofsted(application_id):
+def save_childminder_known_to_ofsted(application_id, individual_id):
     '''
-    Mark a childminder applicant as being unknown to Ofsted
+    Mark a childminder applicant as being known or unknown to Ofsted
     :param application_id: the application to update
+    :param individual_id: the existing Ofsted id for this person if known
     :return: redirect to the application's personal details review
     '''
     if PreviousRegistrationDetails.objects.filter(application_id=application_id).exists():
         previous_reg_details = PreviousRegistrationDetails.objects.get(application_id=application_id)
     else:
-        previous_reg_details = PreviousRegistrationDetails(application_id=application_id)
+        application = Application.objects.get(application_id=application_id)
+        previous_reg_details = PreviousRegistrationDetails(application_id=application)
 
-    previous_reg_details.previous_registration = False
-    previous_reg_details.individual_id = 0
+    previous_reg_details.previous_registration = False if individual_id is None else True
+    previous_reg_details.individual_id = 0 if individual_id is None else individual_id
     previous_reg_details.save()
 
-    log.debug("Handling submissions for childminder without previous registration details")
+    log.debug("Handling submissions for childminder registration details")
     return HttpResponseRedirect(build_url('personal_details_summary', get={'id': application_id}))
 
 
-def save_household_member_not_known_to_ofsted(adult_id):
+def save_household_member_known_to_ofsted(adult_id, individual_id):
     '''
-    Mark a household member applicant as being unknown to Ofsted
+    Mark a household member applicant as being known or unknown to Ofsted
     :param adult_id: the adult to update
+    :param individual_id: the existing Ofsted id for this person if known
     :return: redirect to the adult's personal details review
     '''
     previous_registration_response = HMGatewayActions().list('previous-registration', params={'adult_id': adult_id})
+    prev_reg = False if individual_id is None else True
+    ind_id = 0 if individual_id is None else individual_id
 
     if previous_registration_response.status_code == 200:
         previous_registration_record = {
             'adult_id': adult_id,
-            'previous_registration': False,
-            'individual_id': 0,
+            'previous_registration': prev_reg,
+            'individual_id': ind_id,
         }
 
         HMGatewayActions().put('previous-registration', params=previous_registration_record)
     else:
         previous_registration_record = {
-            'previous_registration': False,
-            'individual_id': 0,
+            'previous_registration': prev_reg,
+            'individual_id': ind_id,
             'adult_id': adult_id
         }
 
         HMGatewayActions().create('previous-registration', params=previous_registration_record)
 
-    log.debug("Handling submissions for household members without previous registration details")
+    log.debug("Handling submissions for household member previous registration details")
     return HttpResponseRedirect(build_url('new_adults_summary', get={'id': adult_id}))
 
 
