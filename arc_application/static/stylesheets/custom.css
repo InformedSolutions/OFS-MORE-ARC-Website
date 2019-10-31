@@ -499,7 +499,7 @@
   color: gray;
 }
 
-.individual-lookup-search #id_day, 
+.individual-lookup-search #id_day,
 .individual-lookup-search #id_month {
   flex-basis: 30%;
   min-width: 0;
@@ -563,11 +563,7 @@
   float: right;
 }
 
-.compare-link a {
-  color: #005ea5;
-}
-
-.individual-table-wrapper tbody {
+.individual-table-wrapper tbody a {
   color: black;
 }
 

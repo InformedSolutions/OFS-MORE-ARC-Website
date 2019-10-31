@@ -20,7 +20,7 @@
                         <span>{{error}}</span>
                     {% endfor %}
                 {% endfor %}
-                {% for error in form.non_field_errors %}     
+                {% for error in form.non_field_errors %}
                     <span>{{error}}</span>
                 {% endfor %}
             </div>
@@ -73,7 +73,7 @@
                         <span>{{error}}</span>
                     {% endfor %}
                 {% endfor %}
-                {% for error in form.non_field_errors %}     
+                {% for error in form.non_field_errors %}
                     <span>{{error}}</span>
                 {% endfor %}
             </div>
@@ -105,14 +105,14 @@
                         <td>
                             <div class="date-form-wrapper">
                                 {{ form.day }}
-                                {{ form.month }}     
+                                {{ form.month }}
                                 {{ form.year }}
-                            </div>      
+                            </div>
                         </td>
                     </tr>
                     <tr>
                         <td>{{ form.street.label }}</td>
-                        <td>{{ form.street }}</td>  
+                        <td>{{ form.street }}</td>
                     </tr>
                     <tr>
                         <td>{{ form.postcode.label }}</td>
@@ -121,11 +121,11 @@
                     <tr>
                         <td>{{ form.town.label }}</td>
                         <td>{{ form.town }}</td>
-                    </tr> 
+                    </tr>
                 </table>
                 <input type="submit" class="button button-primary" value="Search">
             </form>
-        </div> 
+        </div>
     </div>
 </div>
 <div class="individual-table-wrapper">
@@ -152,11 +152,10 @@
                 <td>{{ individual.IndividualPostCode }}</td>
                 <td>{{ individual.IndividualID }}</td>
                 <td>
-                    <div class="compare-link">
-                        <a href="{% url 'personal_details_individual_lookup_search_choice' %}?id={{ application_id }}&adult_id={{adult_id}}&page={{page}}&compare={{ individual.IndividualID }}&referrer={{ referrer_type }}">
-                            Compare
-                        </a>
-                    </div>
+                    <a href="{% url 'personal_details_individual_lookup_search_choice' %}?id={{ application_id }}&adult_id={{adult_id}}&page={{page}}&compare={{ individual.IndividualID }}&referrer={{ referrer_type }}" class="multiple-choice">
+                        <input type="radio" name="individual-choice" onclick="window.location.href='{% url 'personal_details_individual_lookup_search_choice' %}?id={{ application_id }}&adult_id={{adult_id}}&page={{page}}&compare={{ individual.IndividualID }}&referrer={{ referrer_type }}'">
+                        <label ::before></label>
+                    </a>
                 </td>
             </tr>
             {% endfor %}

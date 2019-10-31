@@ -339,9 +339,9 @@ def personal_details_individual_lookup_search_choice(request):
             individuals_list = _extract_json_to_list(api_response.individuals)
 
             # Set a paginator if 'individuals_list' is set
+            page = request.GET.get('page', 1)
             if individuals_list:
                 paginator = Paginator(individuals_list, 10)
-                page = request.GET.get('page')
 
                 try:
                     individuals = paginator.page(page)

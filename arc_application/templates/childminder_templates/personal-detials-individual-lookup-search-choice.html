@@ -79,7 +79,7 @@
                         </tr>
                         <tr>
                             <td>Street</td>
-                            <td>{{ individual.IndividualAddress }}</td>  
+                            <td>{{ individual.IndividualAddress }}</td>
                         </tr>
                         <tr>
                             <td>Postcode</td>
@@ -95,7 +95,7 @@
                 </table>
                 <input type="submit" class="button button-primary" value="Confirm">
             </form>
-        </div> 
+        </div>
     </div>
 </div>
 <div class="individual-table-wrapper">
@@ -123,13 +123,15 @@
                 <td>{{ individual.IndividualID }}</td>
                 <td>
                     {% if individual.IndividualID == compare %}
-                        <strong class="form-label-bold">Comparing</strong>
+                        <a href="{% url 'personal_details_individual_lookup_search_choice' %}?id={{ application_id }}&adult_id={{adult_id}}&page={{page}}&compare={{ individual.IndividualID }}&referrer={{referrer_type}}" class="multiple-choice">
+                            <input type="radio" checked name="individual-choice" onclick="window.location.href='{% url 'personal_details_individual_lookup_search_choice' %}?id={{ application_id }}&adult_id={{adult_id}}&page={{page}}&compare={{ individual.IndividualID }}&referrer={{referrer_type}}'">
+                            <label ::before></label>
+                        </a>
                     {% else %}
-                        <div class="compare-link">
-                            <a href="{% url 'personal_details_individual_lookup_search_choice' %}?id={{ application_id }}&adult_id={{adult_id}}&page={{page}}&compare={{ individual.IndividualID }}&referrer={{referrer_type}}">
-                                Compare
-                            </a>
-                        </div>
+                        <a href="{% url 'personal_details_individual_lookup_search_choice' %}?id={{ application_id }}&adult_id={{adult_id}}&page={{page}}&compare={{ individual.IndividualID }}&referrer={{referrer_type}}" class="multiple-choice">
+                            <input type="radio" name="individual-choice" onclick="window.location.href='{% url 'personal_details_individual_lookup_search_choice' %}?id={{ application_id }}&adult_id={{adult_id}}&page={{page}}&compare={{ individual.IndividualID }}&referrer={{referrer_type}}'">
+                            <label ::before></label>
+                        </a>
                     {% endif %}
                 </td>
             </tr>
