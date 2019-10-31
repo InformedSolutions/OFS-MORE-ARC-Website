@@ -563,7 +563,11 @@
   float: right;
 }
 
-.individual-table-wrapper tbody a {
+.compare-link a {
+  color: #005ea5;
+}
+
+.individual-table-wrapper tbody {
   color: black;
 }
 
