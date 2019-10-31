@@ -105,17 +105,7 @@ class NannyPersonalDetailsSummary(NannyARCFormView):
         personal_details_form = forms[0]
         home_address_form = forms[1]
 
-        if previous_registration_details is not None:
-            log.debug("Conditional logic: Show nanny previous registration")
-            previous_registration_record_exists = True
-            previous_registration_details = nanny_actions.read('previous-registration-details',
-                                                               params={'application_id': application_id}).record
-            previous_registration = previous_registration_details['previous_registration']
-            individual_id = previous_registration_details['individual_id']
-            previous_registration_form = forms[2]
 
-            if previous_registration is True:
-                show_individual_id = True
 
         if title != '':
 
@@ -258,11 +248,21 @@ class NannyPersonalDetailsSummary(NannyARCFormView):
             )
 
         if previous_registration_details is not None:
+            log.debug("Conditional logic: Show nanny previous registration")
+            previous_registration_record_exists = True
+            previous_registration_details = nanny_actions.read('previous-registration-details',
+                                                               params={'application_id': application_id}).record
+            previous_registration = previous_registration_details['previous_registration']
+            individual_id = previous_registration_details['individual_id']
+            previous_registration_form = forms[2]
+
+            if previous_registration is True:
+                show_individual_id = True
             rows.append(
                 {
                     'id': 'individual lookup',
                     'name': 'Individual ID',
-                    'info': individual_id if previous_registration else 'Not known to Ofsted',
+                    'info': str(individual_id)if previous_registration else 'Not known to Ofsted',
                     'declare': previous_registration_form['previous_registration_declare']
                            if hasattr(self, 'request') else '',
                     'comments': previous_registration_form['previous_registration_comments'],
