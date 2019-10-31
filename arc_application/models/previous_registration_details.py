@@ -19,10 +19,8 @@ class PreviousRegistrationDetails(models.Model):
 
     def get_summary_table(self):
         return [
-            {"title": "Previous Registration", "id": self.pk},
-            {"name": "Previous Registration", "value": ("Yes" if self.previous_registration == True else "No")},
-            {"name": "Individual Id", "value": self.individual_id},
-            {"name": "Five years in UK", "value": ("Yes" if self.five_years_in_UK == True else "No")}
+            {"title": "Individual lookup", "id": self.pk},
+            {"name": "Individual Id", "value": self.individual_id if self.previous_registration else 'Not known to Ofsted'},
         ]
 
     class Meta:

@@ -599,8 +599,11 @@
         <br>
         <a href="{% url 'other-people-previous-addresses' %}?id={{ application_id }}&state=entry&person_id={{id}}&person_type=ADULT" class="button button-secondary">Add previous addresses</a>
 
-
-        {% include "individual_lookup_table.html" with referrer="childminder_pith"  adult_id=id %}
+        {% for dict in previous_registration_lists %}
+        {% if dict.adult_id == id %}
+        {% include "individual_lookup_table.html" with referrer="childminder_pith"  adult_id=id individual_id=dict.prev_reg.individual_id %}
+        {% endif %}
+        {% endfor %}
 
         <table class="check-your-answers form-group">
             <thead>
