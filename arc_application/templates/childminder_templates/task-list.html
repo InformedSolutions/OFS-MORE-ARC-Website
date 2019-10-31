@@ -63,27 +63,18 @@
          </tr>
          <tr id="personal_details">
             <td class="task">
+               <a href="{% url 'personal_details_summary' %}?id={{application_id}}">
+               <span class="task-name">Your personal details</span>
                {% if personal_details_status == 'NOT_STARTED' %}
-               <a href="{% url 'personal_details_summary' %}?id={{application_id}}">
-               <span class="task-name">Your personal details</span>
                <strong class="task-finished task-to-do">To do</strong>
-               </a>
                {% elif personal_details_status == 'IN PROGRESS' %}
-               <a href="{% url 'personal_details_summary' %}?id={{application_id}}">
-               <span class="task-name">Your personal details</span>
                <strong class="task-finished task-flagged">Started</strong>
-               </a>
                {% elif personal_details_status == 'FLAGGED' %}
-               <a href="{% url 'personal_details_summary' %}?id={{application_id}}">
-               <span class="task-name">Your personal details</span>
                <strong class="task-finished task-flagged">Flagged</strong>
-               </a>
                {% elif personal_details_status == 'COMPLETED' %}
-               <a href="{% url 'personal_details_summary' %}?id={{application_id}}">
-               <span class="task-name">Your personal details</span>
                <strong class="task-finished">Reviewed</strong>
-               </a>
                {% endif %}
+               </a>
             </td>
          </tr>
          {% if show_your_children %}
@@ -195,22 +186,18 @@
          {% if show_people_in_the_home %}
          <tr id="other_people">
             <td class="task">
+               <a href="{% url 'other_people_summary' %}?id={{application_id}}">
+               <span class="task-name">People in the home</span>
                {% if people_in_home_status == 'NOT_STARTED' %}
-               <a href="{% url 'other_people_summary' %}?id={{application_id}}">
-               <span class="task-name">People in the home</span>
                <strong class="task-finished task-to-do">To do</strong>
-               </a>
                {% elif people_in_home_status == 'FLAGGED' %}
-               <a href="{% url 'other_people_summary' %}?id={{application_id}}">
-               <span class="task-name">People in the home</span>
                <strong class="task-finished task-flagged">Flagged</strong>
-               </a>
+               {% elif people_in_home_status == 'IN PROGRESS' %}
+               <strong class="task-finished task-flagged">Started</strong>
                {% elif people_in_home_status == 'COMPLETED' %}
-               <a href="{% url 'other_people_summary' %}?id={{application_id}}">
-               <span class="task-name">People in the home</span>
                <strong class="task-finished">Reviewed</strong>
-               </a>
                {% endif %}
+               </a>
             </td>
          </tr>
          {% endif %}

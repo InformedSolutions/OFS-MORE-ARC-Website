@@ -97,6 +97,9 @@ def other_people_summary(request):
         ChildAddress.objects.get(application_id=application_id_local, child=child.child) for child in own_children
     ]
 
+    # Set up bool to track whether linking has been completed for all adults in this application
+    linking_complete = True
+
     for adult in adults:
 
         if adult.middle_names and adult.middle_names != '':
@@ -134,6 +137,7 @@ def other_people_summary(request):
         if OtherPersonPreviousRegistrationDetails.objects.filter(person_id=adult.pk).exists():
             adult_prev_reg = OtherPersonPreviousRegistrationDetails.objects.get(person_id=adult.pk)
         else:
+            linking_complete = False
             adult_prev_reg = {'individual_id': None}
         adult_previous_registrations.append({'adult_id': adult.adult_id, 'prev_reg': adult_prev_reg})
 
@@ -233,7 +237,7 @@ def other_people_summary(request):
             own_child_data_list = own_child_formset.cleaned_data
             own_child_address_data_list = own_child_address_formset.cleaned_data
 
-            section_status = 'COMPLETED'
+            section_status = 'COMPLETED' if linking_complete else 'IN PROGRESS'
 
             # ======================================================================================================== #
             # To explain the below:
