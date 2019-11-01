@@ -234,6 +234,16 @@ def personal_details_individual_lookup_search_result(request):
             else:
                 individuals_list = cache_data['results']
 
+            # Prepare data for cache - writing search results in
+            cache_data = {'form_data': form_data,
+                          'results': individuals_list
+                          }
+
+            # Check if form values are in cache
+            if application_id in cache:
+                cache.set(application_id, cache_data)
+            else:
+                cache.add(application_id, cache_data)
 
             # Set a paginator if there are invdividuals
             if individuals_list:
