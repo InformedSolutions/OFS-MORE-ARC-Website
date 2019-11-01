@@ -147,7 +147,7 @@ def personal_details_individual_lookup(request):
 
         # Check if form values are in cache
         if application_id in cache:
-            form_data = cache.get(application_id)
+            form_data = cache.get(application_id)['form_data']
             search_cached_data = _rewrite_keys_for_search_fields(form_data.copy())
             form = IndividualLookupSearchForm(search_cached_data)
         else:
@@ -175,11 +175,16 @@ def personal_details_individual_lookup(request):
                     'postcode': form.cleaned_data['postcode']
                 }
 
+            # Prepare data for cache
+            cache_data = {'form_data': form_data,
+                          'results': None
+                          }
+
             # Check if form values are in cache
             if application_id in cache:
-                cache.set(application_id, form_data)
+                cache.set(application_id, cache_data)
             else:
-                cache.add(application_id, form_data)
+                cache.add(application_id, cache_data)
 
 
             return redirect('././results/?id='+application_id+'&referrer='+referrer_type+'&adult_id='+adult_id)
@@ -216,15 +221,29 @@ def personal_details_individual_lookup_search_result(request):
     if request.method == 'GET':
         # Check if form values are in cache
         if application_id in cache:
-            form_data = cache.get(application_id)
+            cache_data = cache.get(application_id)
+            form_data = cache_data['form_data']
             search_cached_data = _rewrite_keys_for_search_fields(form_data.copy())
 
             form = IndividualLookupSearchForm(search_cached_data)
 
-            # Request to IntegrationAdapter API
-            api_response = _fetch_individuals_from_integration_adapter(form_data.copy())
-            individuals_list = _extract_json_to_list(api_response.individuals)
+            # Request to IntegrationAdapter API if results aren't available in cache
+            if cache_data['results'] is None:
+                api_response = _fetch_individuals_from_integration_adapter(form_data.copy())
+                individuals_list = _extract_json_to_list(api_response.individuals)
+            else:
+                individuals_list = cache_data['results']
 
+            # Prepare data for cache - writing search results in
+            cache_data = {'form_data': form_data,
+                          'results': individuals_list
+                          }
+
+            # Check if form values are in cache
+            if application_id in cache:
+                cache.set(application_id, cache_data)
+            else:
+                cache.add(application_id, cache_data)
 
             # Set a paginator if there are invdividuals
             if individuals_list:
@@ -264,15 +283,20 @@ def personal_details_individual_lookup_search_result(request):
                     'postcode': form.cleaned_data['postcode']
                 }
 
-            # Get a data from search fields stored in cache
-            if application_id in cache:
-                cache.set(application_id, form_data)
-            else:
-                cache.add(application_id, form_data)
-
             # Request to IntegrationAdapter API
             api_response = _fetch_individuals_from_integration_adapter(form_data.copy())
             individuals_list = _extract_json_to_list(api_response.individuals)
+
+            # Prepare data for cache - writing search results in
+            cache_data = {'form_data': form_data,
+                          'results': individuals_list
+                          }
+
+            # Check if form values are in cache
+            if application_id in cache:
+                cache.set(application_id, cache_data)
+            else:
+                cache.add(application_id, cache_data)
 
             # Set a paginator if there are invdividuals
             if individuals_list:
@@ -332,27 +356,31 @@ def personal_details_individual_lookup_search_choice(request):
             return mark_individual_known_to_ofsted(referrer_type, application_id, request.POST.get('individual-id'), adult_id=adult_id)
 
     if request.method == 'GET':
-            form_data = cache.get(application_id)
+        cache_data = cache.get(application_id)
+        form_data = cache_data['form_data']
 
-            # Request to cygnum database
+        # Request to IntegrationAdapter API if results aren't available in cache
+        if cache_data['results'] is None:
             api_response = _fetch_individuals_from_integration_adapter(form_data.copy())
             individuals_list = _extract_json_to_list(api_response.individuals)
+        else:
+            individuals_list = cache_data['results']
 
-            # Set a paginator if 'individuals_list' is set
-            page = request.GET.get('page', 1)
-            if individuals_list:
-                paginator = Paginator(individuals_list, 10)
+        # Set a paginator if 'individuals_list' is set
+        if individuals_list:
+            paginator = Paginator(individuals_list, 10)
+            page = request.GET.get('page')
 
-                try:
-                    individuals = paginator.page(page)
-                except PageNotAnInteger:
-                    individuals = paginator.page(1)
-                except EmptyPage:
-                    individuals = paginator.page(paginator.num_pages)
-            else:
-                individuals = None
+            try:
+                individuals = paginator.page(page)
+            except PageNotAnInteger:
+                individuals = paginator.page(1)
+            except EmptyPage:
+                individuals = paginator.page(paginator.num_pages)
+        else:
+            individuals = None
 
-            compare = request.GET.get('compare')
+        compare = request.GET.get('compare')
 
     # Fetch context from a referrer app for 'Applicant's data' box
     if not application_id or referrer_type not in DATA_FETCHER_MAPPING:
@@ -382,6 +410,9 @@ def mark_not_known_to_ofsted(referrer_type, application_id, adult_id=None):
     :param application_id: the id of the application or individual
     :return:
     '''
+    # The user will be returned to the personal details screen now, clear the cache of any form data or results
+    cache.delete(application_id)
+
     if referrer_type == 'nanny':
         return save_nanny_known_to_ofsted(application_id, None)
     elif referrer_type == 'childminder':
@@ -400,6 +431,9 @@ def mark_individual_known_to_ofsted(referrer_type, application_id, individual_id
     :param individual_id_str: the matched individual id to be saved for this matched person
     :return:
     '''
+    # The user will be returned to the personal details screen now, clear the cache of any form data or results
+    cache.delete(application_id)
+
     # Individual id comes from a form input so it will be a string at first, we need an int
     individual_id = int(individual_id_str)
 
