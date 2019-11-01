@@ -557,11 +557,23 @@ def _fetch_individuals_from_integration_adapter(form_values):
 
 
 def _extract_json_to_list(response):
+    list_results = []
     if type(response) is list:
-        return response
+        list_results = response
     if type(response) is dict:
-        item = [response]
-        return item
+        list_results = [response]
+
+    # Remove any duplicates in the data
+    clean_results = []
+    for item in list_results:
+        duplicate = False
+        for result in clean_results:
+            if result['IndividualID'] == item['IndividualID']:
+                duplicate = True
+        if not duplicate:
+            clean_results.append(item)
+
+    return clean_results
 
 
 def _rewrite_keys_for_search_fields(form_values):
