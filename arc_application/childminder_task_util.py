@@ -281,6 +281,7 @@ def all_complete(app_id, flag):
     """
     Check the status of all sections
     :param app_id: Application Id
+    :param flag: Indicating whether anything is flagged for review - not currently used in logic
     :return: True or False depending on whether all sections have been reviewed
     """
     review_fields_to_check = get_review_fields_to_check(app_id)
@@ -288,9 +289,10 @@ def all_complete(app_id, flag):
 
     task_status_list = [getattr(arc, task_arc_flagged_str) for task_arc_flagged_str in review_fields_to_check]
 
-    # TODO Refactor me to more intuitively explain the existence of flag
+    # If any tasks have not been started or are unfinished, review is not complete
     for i in task_status_list:
-        if (i == 'NOT_STARTED' and not flag) or (i != 'COMPLETED' and flag):
+        # Tasks which are FLAGGED or COMPLETED are considered done for the purposes of submitting a review
+        if i == 'NOT_STARTED' or i == 'IN PROGRESS':
             return False
 
     return True
