@@ -291,8 +291,11 @@ def all_complete(app_id, flag):
 
     # If any tasks have not been started or are unfinished, review is not complete
     for i in task_status_list:
-        # Tasks which are FLAGGED or COMPLETED are considered done for the purposes of submitting a review
+        # Tasks which are clearly not done mean review is incomplete
         if i == 'NOT_STARTED' or i == 'IN PROGRESS':
+            return False
+        # Tasks which are flagged and there is an active flag mean review is incomplete
+        if i == 'FLAGGED' and flag:
             return False
 
     return True
