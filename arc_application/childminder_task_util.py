@@ -277,11 +277,13 @@ def get_number_of_tasks(application, childcare_type_record):
     return len(flagged_fields_to_check)
 
 
-def all_complete(app_id, flag):
+def all_complete(app_id, completed_only):
     """
-    Check the status of all sections
+    Check the status of all sections - used for determining whether an application can be considered reviewed
+    In the context of proceeding from the task list, flagged tasks are considered to be reviewed
+    For submitting an app to Cygnum flagged tasks will not be accepted
     :param app_id: Application Id
-    :param flag: Indicating whether anything is flagged for review
+    :param completed_only: Boolean indicating whether to only accept COMPLETED tasks, or allow tasks that are flagged
     :return: True or False depending on whether all sections have been reviewed
     """
     review_fields_to_check = get_review_fields_to_check(app_id)
@@ -291,11 +293,11 @@ def all_complete(app_id, flag):
 
     # If any tasks have not been started or are unfinished, review is not complete
     for i in task_status_list:
-        # Tasks which are clearly not done mean review is incomplete
-        if i == 'NOT_STARTED' or i == 'IN PROGRESS':
+        # If only accepting COMPLETED tasks, return false for any other status
+        if completed_only and i != 'COMPLETED':
             return False
-        # Tasks which are flagged and there is an active flag mean review is incomplete
-        if i == 'FLAGGED' and flag:
+        # Just check that all tasks have been reviewed, even if some may be flagged
+        if i == 'NOT_STARTED' or i == 'IN PROGRESS':
             return False
 
     return True
