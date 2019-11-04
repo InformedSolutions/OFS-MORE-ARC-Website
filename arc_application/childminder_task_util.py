@@ -281,7 +281,7 @@ def all_complete(app_id, flag):
     """
     Check the status of all sections
     :param app_id: Application Id
-    :param flag: Indicating whether anything is flagged for review - not currently used in logic
+    :param flag: Indicating whether anything is flagged for review
     :return: True or False depending on whether all sections have been reviewed
     """
     review_fields_to_check = get_review_fields_to_check(app_id)
