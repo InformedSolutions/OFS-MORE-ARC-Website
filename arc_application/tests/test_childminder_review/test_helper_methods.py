@@ -173,7 +173,7 @@ class PersonalDetailsLinkingTests(TestCase):
 
     def test_convert_invalid_dob(self):
         """
-        Tests that a valid raw indate is returned in its original format
+        Tests that a valid raw invalid date is returned in its original format
         """
         dob = '1-1-2001'
         result = personal_details_individual_lookup._format_date_of_birth(dob)
