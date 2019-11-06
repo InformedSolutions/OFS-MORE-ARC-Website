@@ -1,3 +1,4 @@
+import datetime
 import logging
 import os
 
@@ -98,6 +99,7 @@ def fetch_household_member_data(app_id):
         'application_id': app_id,
     }
 
+
 def fetch_childminder_pith_data(adult_id, application_id):
     try:
         adult_personal_details = AdultInHome.objects.get(adult_id=adult_id)
@@ -135,9 +137,9 @@ DATA_FETCHER_MAPPING = {
 @group_required(settings.ARC_GROUP, raise_exception=True)
 @user_assigned_application
 def personal_details_individual_lookup(request):
-    '''
+    """
     Search for individual and redirect to view with results
-    '''
+    """
 
     application_id = request.GET.get('id')
     adult_id = request.GET.get('adult_id')
@@ -186,7 +188,6 @@ def personal_details_individual_lookup(request):
             else:
                 cache.add(application_id, cache_data)
 
-
             return redirect('././results/?id='+application_id+'&referrer='+referrer_type+'&adult_id='+adult_id)
 
     # Fetch context from a referrer app for 'Applicant's data' box
@@ -207,9 +208,9 @@ def personal_details_individual_lookup(request):
 @group_required(settings.ARC_GROUP, raise_exception=True)
 @user_assigned_application
 def personal_details_individual_lookup_search_result(request):
-    '''
+    """
     Search for individual and show results
-    '''
+    """
 
     individuals = None
     individuals_list = None
@@ -338,9 +339,9 @@ def personal_details_individual_lookup_search_result(request):
 @group_required(settings.ARC_GROUP, raise_exception=True)
 @user_assigned_application
 def personal_details_individual_lookup_search_choice(request):
-    '''
+    """
     Choose one record and decide whether it has to be confirmed or marked as not known to Ofsted
-    '''
+    """
     individuals = None
     application_id = request.GET['id']
     adult_id = request.GET.get('adult_id')
@@ -353,7 +354,8 @@ def personal_details_individual_lookup_search_choice(request):
             # Save not known to Ofsted data and redirect to personal details page for given type
             return mark_not_known_to_ofsted(referrer_type, application_id, adult_id=adult_id)
         if request.POST.get('individual-id') is not None:
-            return mark_individual_known_to_ofsted(referrer_type, application_id, request.POST.get('individual-id'), adult_id=adult_id)
+            return mark_individual_known_to_ofsted(referrer_type, application_id, request.POST.get('individual-id'),
+                                                   adult_id=adult_id)
 
     if request.method == 'GET':
         cache_data = cache.get(application_id)
@@ -404,12 +406,12 @@ def personal_details_individual_lookup_search_choice(request):
 
 
 def mark_not_known_to_ofsted(referrer_type, application_id, adult_id=None):
-    '''
+    """
     For the given application type call the correct method to mark that the individual is not known
     :param referrer_type: the applicant or individual type
     :param application_id: the id of the application or individual
     :return:
-    '''
+    """
     # The user will be returned to the personal details screen now, clear the cache of any form data or results
     cache.delete(application_id)
 
@@ -424,13 +426,13 @@ def mark_not_known_to_ofsted(referrer_type, application_id, adult_id=None):
 
 
 def mark_individual_known_to_ofsted(referrer_type, application_id, individual_id_str, adult_id=None):
-    '''
+    """
     For the given application type save an individual id that has been matched against the application
     :param referrer_type: the applicant or individual type
     :param application_id: the id of the application or individual
     :param individual_id_str: the matched individual id to be saved for this matched person
     :return:
-    '''
+    """
     # The user will be returned to the personal details screen now, clear the cache of any form data or results
     cache.delete(application_id)
 
@@ -448,12 +450,12 @@ def mark_individual_known_to_ofsted(referrer_type, application_id, individual_id
 
 
 def save_nanny_known_to_ofsted(application_id, individual_id):
-    '''
+    """
     Mark a nanny applicant as being known or unknown to Ofsted
     :param application_id: the application to update
     :param individual_id: the existing Ofsted id for this person if known
     :return: redirect to the application's personal details review
-    '''
+    """
     api_response = NannyGatewayActions().read('previous-registration-details',
                                               params={'application_id': application_id})
 
@@ -478,12 +480,12 @@ def save_nanny_known_to_ofsted(application_id, individual_id):
 
 
 def save_childminder_known_to_ofsted(application_id, individual_id):
-    '''
+    """
     Mark a childminder applicant as being known or unknown to Ofsted
     :param application_id: the application to update
     :param individual_id: the existing Ofsted id for this person if known
     :return: redirect to the application's personal details review
-    '''
+    """
     if PreviousRegistrationDetails.objects.filter(application_id=application_id).exists():
         previous_reg_details = PreviousRegistrationDetails.objects.get(application_id=application_id)
     else:
@@ -499,12 +501,12 @@ def save_childminder_known_to_ofsted(application_id, individual_id):
 
 
 def save_household_member_known_to_ofsted(adult_id, individual_id):
-    '''
+    """
     Mark a household member applicant as being known or unknown to Ofsted
     :param adult_id: the adult to update
     :param individual_id: the existing Ofsted id for this person if known
     :return: redirect to the adult's personal details review
-    '''
+    """
     previous_registration_response = HMGatewayActions().list('previous-registration', params={'adult_id': adult_id})
     prev_reg = False if individual_id is None else True
     ind_id = 0 if individual_id is None else individual_id
@@ -531,13 +533,13 @@ def save_household_member_known_to_ofsted(adult_id, individual_id):
 
 
 def save_childminder_pith_known_to_ofsted(application_id, individual_id, adult_id):
-    '''
+    """
     Mark a childminder adult in the home as being known or unknown to Ofsted
     :param application_id: the application to update
     :param individual_id: the existing Ofsted id for this person if known
     :param adult_id: the adult to update
     :return: redirect to the application's personal details review
-    '''
+    """
     adult_record = AdultInHome.objects.get(adult_id=adult_id)
     prev_reg = False if individual_id is None else True
     ind_id = 0 if individual_id is None else individual_id
@@ -562,11 +564,16 @@ def _fetch_individuals_from_integration_adapter(form_values):
         url_params['dob'] = '{0}-{1}-{2}'.format(form_values.pop('year'), form_values.pop('month'), form_values.pop('day'))
     for key, value in form_values.items():
         if value:
-           url_params[key] = value
+            url_params[key] = value
     return get_individual_search_results(url_params)
 
 
 def _extract_json_to_list(response):
+    """
+    Extracts a set of individuals from search into a cleansed list, removing duplicates and formatting data.
+    :param response: the set of individuals that was returned from the search
+    :return: a list of individuals with duplicates removed and some data formattinig applied
+    """
     list_results = []
     if type(response) is list:
         list_results = response
@@ -581,6 +588,8 @@ def _extract_json_to_list(response):
             if result['IndividualID'] == item['IndividualID']:
                 duplicate = True
         if not duplicate:
+            if 'DOB'in item and len(item['DOB']) == 10:
+                item['DOB'] = _format_date_of_birth(item['DOB'])
             clean_results.append(item)
 
     return clean_results
@@ -593,3 +602,16 @@ def _rewrite_keys_for_search_fields(form_values):
 
     return form_values
 
+
+def _format_date_of_birth(original_dob):
+    """
+    Formats a date (in this case date of birth) as DD MMM YYYY
+    :param original_dob: date formatted YYYY-MM-DD
+    :return: screen-friendly date format
+    """
+    try:
+        dob = datetime.datetime.strptime(original_dob, '%Y-%m-%d')
+        return dob.strftime("%d %b %Y").lstrip("0")
+    except ValueError:
+        log.debug("Date of birth '" + original_dob + "' not in expected format, returning original value")
+        return original_dob

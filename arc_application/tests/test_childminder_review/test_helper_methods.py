@@ -5,6 +5,7 @@ from ...models import ChildcareType
 from ...tests.utils import create_childminder_application, create_arc_user
 from ...childminder_task_util import get_number_of_tasks
 from ...views.childminder_views.type_of_childcare import get_register_name
+from ...views.childminder_views import personal_details_individual_lookup
 
 
 @tag('unit')
@@ -157,3 +158,62 @@ class ChildminderTypeOfChildcareHelperUnitTests(TestCase):
 
         register = get_register_name(childcare_type)
         self.assertEqual('Childcare Register (voluntary part)', register)
+
+
+@tag('unit')
+class PersonalDetailsLinkingTests(TestCase):
+
+    def test_convert_valid_dob(self):
+        """
+        Tests that a valid raw date can be formatted for display
+        """
+        dob = '1990-12-08'
+        result = personal_details_individual_lookup._format_date_of_birth(dob)
+        self.assertEqual(result, '8 Dec 1990')
+
+    def test_convert_invalid_dob(self):
+        """
+        Tests that a valid raw indate is returned in its original format
+        """
+        dob = '1-1-2001'
+        result = personal_details_individual_lookup._format_date_of_birth(dob)
+        self.assertEqual(result, dob)
+
+    def test_remove_duplicates(self):
+        """
+        Tests that an input list with duplicates can be returned without duplicates.
+        Duplicates are removed based on a shared id only, not other properties
+        """
+        source_list = [
+            {
+                'IndividualID': '1234',
+                'DOB': '1990-02-21',
+                'Dummy': 'Sausage'
+            },
+            {
+                'IndividualID': '1234',
+                'DOB': '1990-02-21',
+                'Dummy': 'Chips'
+            },
+            {
+                'IndividualID': '5678',
+                'DOB': '1990-02-21',
+                'Dummy': 'Beans'
+            }
+        ]
+
+        expected_list = [
+            {
+                'IndividualID': '1234',
+                'DOB': '21 Feb 1990',
+                'Dummy': 'Sausage'
+            },
+            {
+                'IndividualID': '5678',
+                'DOB': '21 Feb 1990',
+                'Dummy': 'Beans'
+            }
+        ]
+
+        result_list = personal_details_individual_lookup._extract_json_to_list(source_list)
+        self.assertEqual(expected_list, result_list)
