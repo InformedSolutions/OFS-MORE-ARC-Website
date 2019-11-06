@@ -7,7 +7,6 @@ from django.db import models
 from .application import Application
 from .childcare_type import ChildcareType
 
-
 class AdultInHome(models.Model):
     """
     Model for ADULT_IN_HOME table
@@ -30,6 +29,7 @@ class AdultInHome(models.Model):
 
     email = models.CharField(max_length=100, blank=True, null=True)
     PITH_mobile_number = models.CharField(max_length=20, blank=True)
+    PITH_same_address = models.NullBooleanField(blank=True, default=True)
     dbs_certificate_number = models.CharField(max_length=50, blank=True)
     token = models.CharField(max_length=100, blank=True, null=True)
     validated = models.BooleanField(default=False)
@@ -81,6 +81,7 @@ class AdultInHome(models.Model):
             'relationship',
             'email',
             'PITH_mobile_number',
+            'PITH_same_address',
             'dbs_certificate_number',
             'health_check_status',
         )
@@ -135,7 +136,6 @@ class AdultInHome(models.Model):
             {"name": "Lived abroad in the last 5 years?",
              "value": self.bool_to_string(self.lived_abroad)}
         ]
-
         if self.title is not None:
             summary_table.insert(2, {"name": "Title",
              "value": self.title})

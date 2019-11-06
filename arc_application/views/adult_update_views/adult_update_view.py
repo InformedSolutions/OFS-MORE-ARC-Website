@@ -10,7 +10,7 @@ from ...decorators import group_required, user_assigned_application
 from ...forms.adult_update_forms.adult_update_form import NewAdultForm
 from .review import new_adults_initial_population, request_to_comment, save_comments
 from ...services.db_gateways import HMGatewayActions
-from ...models import Arc
+from ...models import Arc, AdultInHomeAddress
 from operator import itemgetter
 
 # Initiate logging
@@ -44,6 +44,7 @@ def new_adults_summary(request):
     adult_birth_year_list = []
     adult_relationship_list = []
     adult_email_list = []
+    adult_same_address_list = []
     adult_mobile_number_list = []
     adult_dbs_cert_numbers = []
     adult_dbs_on_capitas = []
@@ -67,12 +68,27 @@ def new_adults_summary(request):
 
     for adult in adults:
 
+        adult_id = adult['adult_id']
+        app_id = adult['application_id']
+
         if adult['middle_names'] is not None and adult['middle_names'] != '':
             name = adult['first_name'] + ' ' + adult['middle_names'] + ' ' + adult['last_name']
         else:
             name = adult['first_name'] + ' ' + adult['last_name']
 
-        adult_id = adult['adult_id']
+        if not adult.PITH_same_address:
+            adult_address_string = ' '.join([AdultInHomeAddress.objects.get(application_id=app_id,
+                                                                            adult_id=adult_id).street_line1,
+                                             (AdultInHomeAddress.objects.get(application_id=app_id,
+                                                                             adult_id=adult_id).street_line2 or ''),
+                                             AdultInHomeAddress.objects.get(application_id=app_id,
+                                                                            adult_id=adult_id).town,
+                                             (AdultInHomeAddress.objects.get(application_id=app_id,
+                                                                             adult_id=adult_id).county or ''),
+                                             AdultInHomeAddress.objects.get(application_id=adult_id,
+                                                                            adult_id=adult.pk).postcode])
+        else:
+            adult_address_string = 'Same as home address'
 
         adult_record_list.append(adult)
         adult_id_list.append(adult['adult_id'])
@@ -85,6 +101,7 @@ def new_adults_summary(request):
         adult_relationship_list.append(adult['relationship'])
         adult_email_list.append(adult['email'])
         adult_mobile_number_list.append(adult['PITH_mobile_number'])
+        adult_same_address_list.append(adult_address_string)
         adult_dbs_is_enhanceds.append(adult['enhanced_check'])
         adult_dbs_cert_numbers.append(adult['dbs_certificate_number'] if adult['enhanced_check'] else None)
         adult_dbs_on_capitas.append(adult['capita'] if adult['enhanced_check'] else None)
@@ -165,11 +182,13 @@ def new_adults_summary(request):
 
         # Zips the formset into the list of adults
         # Converts it to a list, there was trouble parsing the form objects when it was in a zip object
-        adult_lists = list(zip(adult_record_list, adult_id_list, adult_health_check_status_list, adult_title_list, adult_name_list, adult_birth_day_list,\
-                      adult_birth_month_list, adult_birth_year_list, adult_relationship_list, adult_email_list, adult_mobile_number_list,\
-                      adult_dbs_cert_numbers, adult_dbs_on_capitas, adult_dbs_is_recents, adult_dbs_is_enhanceds,\
-                      adult_dbs_on_updates, adult_lived_abroad, adult_military_base, formset_adult, serious_illnesses, hospital_admissions, local_authorities,
-                               adult_previous_name_lists_list, adult_previous_address_lists_list))
+        adult_lists = list(zip(adult_record_list, adult_id_list, adult_health_check_status_list, adult_title_list,
+                               adult_name_list, adult_birth_day_list,adult_birth_month_list, adult_birth_year_list,
+                               adult_relationship_list, adult_email_list, adult_mobile_number_list,
+                               adult_same_address_list,adult_dbs_cert_numbers, adult_dbs_on_capitas,
+                               adult_dbs_is_recents, adult_dbs_is_enhanceds,adult_dbs_on_updates, adult_lived_abroad,
+                               adult_military_base, formset_adult, serious_illnesses, hospital_admissions,
+                               local_authorities,adult_previous_name_lists_list, adult_previous_address_lists_list))
 
 
         variables = {
@@ -215,7 +234,8 @@ def new_adults_summary(request):
                     adult_comments = request_to_comment(adult_id, '', adult_post_data, adult_id_local)
                     token_id = adult['token_id']
                     save_comments(request, adult_comments, adult_id_local, token_id)
-                    HMGatewayActions().put('adult', params={'cygnum_relationship_to_childminder': adult_post_data['cygnum_relationship'], 'adult_id':adult_id_local,'token_id': adult['token_id']})
+                    HMGatewayActions().put('adult', params={'cygnum_relationship_to_childminder': adult_post_data[
+                        'cygnum_relationship'], 'adult_id':adult_id_local,'token_id': adult['token_id']})
 
                     #do we get a field to say if anything flagged?
                     if adult_comments:
@@ -236,11 +256,14 @@ def new_adults_summary(request):
 
             # Zips the formset into the list of adults
             # Converts it to a list, there was trouble parsing the form objects when it was in a zip object
-            adult_lists = list(zip(adult_record_list, adult_id_list, adult_health_check_status_list, adult_title_list, adult_name_list, adult_birth_day_list,\
-                      adult_birth_month_list, adult_birth_year_list, adult_relationship_list, adult_email_list, adult_mobile_number_list,\
-                      adult_dbs_cert_numbers, adult_dbs_on_capitas, adult_dbs_is_recents, adult_dbs_is_enhanceds,\
-                      adult_dbs_on_updates, adult_lived_abroad, adult_military_base, adult_formset, serious_illnesses, hospital_admissions, local_authorities,
-                               adult_previous_name_lists_list, adult_previous_address_lists_list))
+            adult_lists = list(zip(adult_record_list, adult_id_list, adult_health_check_status_list, adult_title_list,
+                                   adult_name_list, adult_birth_day_list, adult_birth_month_list, adult_birth_year_list,
+                                   adult_relationship_list, adult_email_list, adult_mobile_number_list,
+                                   adult_same_address_list, adult_dbs_cert_numbers, adult_dbs_on_capitas,
+                                   adult_dbs_is_recents, adult_dbs_is_enhanceds, adult_dbs_on_updates,
+                                   adult_lived_abroad, adult_military_base, adult_formset, serious_illnesses,
+                                   hospital_admissions, local_authorities, adult_previous_name_lists_list,
+                                   adult_previous_address_lists_list))
 
             for adult_form, adult_name in zip(adult_formset, adult_name_list):
                 adult_form.error_summary_title = 'There was a problem (' + adult_name + ')'

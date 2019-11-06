@@ -2,6 +2,7 @@ from django.urls import reverse
 import logging
 
 from ...models import *
+from arc_application.models import AdultInHomeAddress
 from ...summary_page_data import link_dict
 
 # Initiate logging
@@ -57,6 +58,7 @@ name_field_dict = {
     'Relationship': 'relationship',
     'Email': 'email',
     'Phone number': 'PITH_mobile_number',
+    'Address': 'PITH_same_address',
     'Lived abroad in the last 5 years?': 'lived_abroad',
     'Lived or worked in British military base in the last 5 years?': 'military_base',
     'Did they get their DBS check from the Ofsted DBS application website?': 'capita',
@@ -316,6 +318,25 @@ def load_json(application_id_local, ordered_models, recurse, apply_filtering_for
             records = model.objects.filter(application_id=application.pk)
             for record in records:
                 table = record.get_summary_table(apply_filtering_for_eyc=apply_filtering_for_eyc)
+                if not record.PITH_same_address:
+                    adult_address_string = ' '.join([AdultInHomeAddress.objects.get(application_id=application.pk,
+                                                                                    adult_id=record.pk).street_line1,
+                                                     (AdultInHomeAddress.objects.get(application_id=application.pk,
+                                                                                     adult_id=record.pk).street_line2 or ''),
+                                                     AdultInHomeAddress.objects.get(application_id=application.pk,
+                                                                                    adult_id=record.pk).town,
+                                                     (AdultInHomeAddress.objects.get(application_id=application.pk,
+                                                                                     adult_id=record.pk).county or ''),
+                                                     AdultInHomeAddress.objects.get(application_id=application.pk,
+                                                                                    adult_id=record.pk).postcode])
+                    table.insert(8,
+                        {"name": "Address", "value": adult_address_string},
+                    )
+                else:
+                    adult_address_string = 'Same as home address'
+                    table.insert(8,
+                        {"name": "Address", "value": adult_address_string},
+                    )
                 if recurse:
                     table_list = table_list + table
                 else:

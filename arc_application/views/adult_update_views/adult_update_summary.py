@@ -99,11 +99,14 @@ def load_json(adult_id):
             {"name": "Phone number",
              "value": record['PITH_mobile_number'],
              'field': "PITH_mobile_number"},
+            {"name": "Address",
+             "value": record['PITH_same_address'],
+             'field': "PITH_same_address"},
             {"name": "Lived abroad in the last 5 years?",
              "value": 'Yes' if record['lived_abroad'] else 'No',
              'field': "lived_abroad"},
             {"name": "Lived or worked on British military base in the last 5 years?",
-            "value": 'Yes' if record['military_base'] else 'No',
+             "value": 'Yes' if record['military_base'] else 'No',
              'field': 'military_base'}
             ])
 

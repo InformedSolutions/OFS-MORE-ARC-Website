@@ -12,7 +12,7 @@ from ...forms.childminder_forms.form import AdultInYourHomeForm, ChildInYourHome
     ChildForm, ChildAddressForm
 from ...models import ChildInHome, AdultInHome, Arc, Application, PreviousAddress, ChildAddress, \
     OtherPersonPreviousRegistrationDetails, HealthCheckCurrent, HealthCheckSerious, HealthCheckHospital, \
-    ChildcareType, Child, ApplicantHomeAddress
+    ChildcareType, Child, ApplicantHomeAddress, AdultInHomeAddress
 from ...models.previous_name import PreviousName
 from ...review_util import request_to_comment, save_comments, redirect_selection
 from .review import other_people_initial_population, children_initial_population, children_address_initial_population
@@ -55,6 +55,7 @@ def other_people_summary(request):
     adult_relationship_list = []
     adult_email_list = []
     adult_mobile_number_list = []
+    adult_same_address_list = []
     adult_dbs_cert_numbers = []
     adult_dbs_on_capitas = []
     adult_dbs_is_recents = []
@@ -107,6 +108,20 @@ def other_people_summary(request):
         else:
             name = adult.first_name + ' ' + adult.last_name
 
+        if not adult.PITH_same_address:
+            adult_address_string = ' '.join([AdultInHomeAddress.objects.get(application_id=application,
+                                                                            adult_id=adult.pk).street_line1,
+                                             (AdultInHomeAddress.objects.get(application_id=application,
+                                                                             adult_id=adult.pk).street_line2 or ''),
+                                             AdultInHomeAddress.objects.get(application_id=application,
+                                                                            adult_id=adult.pk).town,
+                                             (AdultInHomeAddress.objects.get(application_id=application,
+                                                                             adult_id=adult.pk).county or ''),
+                                             AdultInHomeAddress.objects.get(application_id=application,
+                                                                            adult_id=adult.pk).postcode])
+        else:
+            adult_address_string = 'Same as home address'
+
         adult_record_list.append(adult)
         adult_id_list.append(adult.adult_id)
         adult_health_check_status_list.append(adult.health_check_status)
@@ -118,6 +133,7 @@ def other_people_summary(request):
         adult_relationship_list.append(adult.relationship)
         adult_email_list.append(adult.email)
         adult_mobile_number_list.append(adult.PITH_mobile_number)
+        adult_same_address_list.append(adult_address_string)
         adult_dbs_cert_numbers.append(adult.dbs_certificate_number)
         adult_dbs_on_capitas.append(adult.capita)
         adult_dbs_is_recents.append(adult.within_three_months)
@@ -176,10 +192,11 @@ def other_people_summary(request):
         # Zips the formset into the list of adults
         # Converts it to a list, there was trouble parsing the form objects when it was in a zip object
         adult_lists = list(
-            zip(adult_record_list, adult_id_list, adult_health_check_status_list, adult_title_list, adult_name_list, adult_birth_day_list,
-                adult_birth_month_list, adult_birth_year_list, adult_relationship_list, adult_email_list, adult_mobile_number_list,
-                adult_dbs_cert_numbers, adult_dbs_on_capitas, adult_dbs_is_recents, adult_dbs_is_enhanceds,
-                adult_dbs_on_updates, adult_lived_abroad, adult_military_base, formset_adult, current_illnesses,
+            zip(adult_record_list, adult_id_list, adult_health_check_status_list, adult_title_list, adult_name_list,
+                adult_birth_day_list, adult_birth_month_list, adult_birth_year_list, adult_relationship_list,
+                adult_email_list, adult_mobile_number_list, adult_same_address_list, adult_dbs_cert_numbers,
+                adult_dbs_on_capitas, adult_dbs_is_recents, adult_dbs_is_enhanceds, adult_dbs_on_updates,
+                adult_lived_abroad, adult_military_base, formset_adult, current_illnesses,
                 serious_illnesses, hospital_admissions, local_authorities, adult_enhanced_checks,
                 adult_previous_name_lists_list, adult_previous_address_lists_list))
 
@@ -345,14 +362,14 @@ def other_people_summary(request):
 
             # Zips the formset into the list of adults
             # Converts it to a list, there was trouble parsing the form objects when it was in a zip object
-            adult_lists = list(zip(adult_record_list, adult_id_list, adult_health_check_status_list, adult_title_list, adult_name_list,
-                                   adult_birth_day_list, adult_birth_month_list, adult_birth_year_list,
-                                   adult_relationship_list, adult_email_list, adult_mobile_number_list, adult_dbs_cert_numbers,
-                                   adult_dbs_on_capitas, adult_dbs_is_recents, adult_dbs_is_enhanceds,
-                                   adult_dbs_on_updates, adult_lived_abroad, adult_military_base, adult_formset,
-                                   current_illnesses, serious_illnesses, hospital_admissions, local_authorities,
-                                   adult_enhanced_checks, adult_previous_name_lists_list,
-                                   adult_previous_address_lists_list))
+            adult_lists = list(zip(adult_record_list, adult_id_list, adult_health_check_status_list, adult_title_list,
+                                   adult_name_list,  adult_birth_day_list, adult_birth_month_list, adult_birth_year_list,
+                                   adult_relationship_list, adult_email_list, adult_mobile_number_list,
+                                   adult_same_address_list, adult_dbs_cert_numbers, adult_dbs_on_capitas,
+                                   adult_dbs_is_recents, adult_dbs_is_enhanceds, adult_dbs_on_updates,
+                                   adult_lived_abroad, adult_military_base, adult_formset, current_illnesses,
+                                   serious_illnesses, hospital_admissions, local_authorities, adult_enhanced_checks,
+                                   adult_previous_name_lists_list, adult_previous_address_lists_list))
 
             child_lists = zip(child_id_list, child_name_list, child_birth_day_list, child_birth_month_list,
                               child_birth_year_list,

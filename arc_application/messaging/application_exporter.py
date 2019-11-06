@@ -6,7 +6,7 @@ from django.core import serializers
 from ..models import Application, ApplicantName, ApplicantHomeAddress, ApplicantPersonalDetails, AdultInHome, \
     ChildInHome, PreviousName, PreviousAddress, HealthCheckHospital, HealthCheckSerious, HealthCheckCurrent, \
     CriminalRecordCheck, ChildcareType, ChildcareTraining, FirstAidTraining, HealthDeclarationBooklet, \
-    PreviousRegistrationDetails, Reference, UserDetails, OtherPersonPreviousRegistrationDetails
+    PreviousRegistrationDetails, Reference, UserDetails, OtherPersonPreviousRegistrationDetails, AdultInHomeAddress
 
 from .document_generator import DocumentGenerator
 
@@ -49,6 +49,7 @@ class ApplicationExporter:
                 export['adults_in_home'] = serializers.serialize('json', list(adults_in_home))
             previous_name = PreviousName.objects.filter(person_id=adult_in_home.pk)
             previous_address = PreviousAddress.objects.filter(person_id=adult_in_home.pk)
+            current_address = AdultInHomeAddress.objects.filter(adult_id=adult_in_home.pk)
             serious_illness = HealthCheckSerious.objects.filter(person_id=adult_in_home.pk)
             hospital_admissions = HealthCheckHospital.objects.filter(person_id=adult_in_home.pk)
             current_illnesses = HealthCheckCurrent.objects.filter(person_id=adult_in_home.pk)
@@ -58,6 +59,7 @@ class ApplicationExporter:
                 'adult': adult_in_home.adult,
                 'previous_names': serializers.serialize('json', list(previous_name)),
                 'previous_address': serializers.serialize('json', list(previous_address)),
+                'current_address': serializers.serialize('json', list(current_address)),
                 'previous_registrations': serializers.serialize('json', list(previous_registrations)),
                 'serious_illness': serializers.serialize('json', list(serious_illness)),
                 'hospital_admissions': serializers.serialize('json', list(hospital_admissions)),

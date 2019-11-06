@@ -1,6 +1,7 @@
 from .base import *
 from .application import *
 from .adult_in_home import *
+from .adult_in_home_address import *
 from .applicant_personal_details import *
 from .applicant_home_address import *
 from .applicant_name import *

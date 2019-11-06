@@ -72,7 +72,7 @@
             </tbody>
         </table>
 
-        {% for record, id, health_check_status, title, name, day, month, year, relationship, email, PITH_mobile_number,dbs_certificate_number, dbs_on_capita, dbs_is_recent, enhanced_check, on_update, lived_abroad, military_base, formsetadult, current_illness_set, serious_illness_set, hospital_admission_set, reasons_known_to_council_health_check, enhanced_check, previous_names, previous_addresses in adult_lists %}
+        {% for record, id, health_check_status, title, name, day, month, year, relationship, email, PITH_mobile_number,PITH_same_address, dbs_certificate_number, dbs_on_capita, dbs_is_recent, enhanced_check, on_update, lived_abroad, military_base, formsetadult, current_illness_set, serious_illness_set, hospital_admission_set, reasons_known_to_council_health_check, enhanced_check, previous_names, previous_addresses in adult_lists %}
 
         <table class="check-your-answers form-group">
             <thead>
@@ -287,6 +287,33 @@
                 </td>
                 <td style="word-wrap: break-word" colspan="2">
                     {{PITH_mobile_number}}
+                </td>
+            </tr>
+            {# ================================== #}
+            <tr>
+                <td style="word-wrap: break-word">
+                    Address
+                </td>
+                <td style="word-wrap: break-word">
+                    {{PITH_same_address}}
+                </td>
+                <td class="change-answer">
+                    {{ formsetadult.PITH_same_address_declare }}
+                </td>
+            </tr>
+            <tr class="js-hidden" id="PITH_same_address{{formsetadult.instance_id.initial}}">
+                <td colspan="1">
+                    <div>
+                        Enter your reasoning
+                    </div>
+                    <div>
+                        {{ formsetadult.PITH_same_address_comments.help_text}}
+                    </div>
+                </td>
+                <td colspan="2">
+                    <div>
+                        {{ formsetadult.PITH_same_address_comments}}
+                    </div>
                 </td>
             </tr>
             {# ================================== #}
