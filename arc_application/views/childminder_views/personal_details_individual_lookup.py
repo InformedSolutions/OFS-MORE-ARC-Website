@@ -15,7 +15,7 @@ import requests
 from ...decorators import group_required, user_assigned_application
 
 from ...models import ApplicantPersonalDetails, ApplicantName, ApplicantHomeAddress, PreviousRegistrationDetails, \
-    Application, AdultInHome, OtherPersonPreviousRegistrationDetails
+    Application, AdultInHome, OtherPersonPreviousRegistrationDetails, AdultInHomeAddress
 
 from ...forms.individual_lookup_forms import IndividualLookupSearchForm
 from ...services.db_gateways import HMGatewayActions, NannyGatewayActions
@@ -104,9 +104,8 @@ def fetch_childminder_pith_data(adult_id, application_id):
     try:
         adult_personal_details = AdultInHome.objects.get(adult_id=adult_id)
         applicant_personal_details = ApplicantPersonalDetails.objects.get(application_id=application_id)
-        home_address = ApplicantHomeAddress.objects.get(
-            personal_detail_id=applicant_personal_details,
-            current_address=True
+        home_address = AdultInHomeAddress.objects.get(
+            adult_id=adult_personal_details.adult_id,
         )
     except ObjectDoesNotExist:
         return {}
@@ -572,7 +571,7 @@ def _extract_json_to_list(response):
     """
     Extracts a set of individuals from search into a cleansed list, removing duplicates and formatting data.
     :param response: the set of individuals that was returned from the search
-    :return: a list of individuals with duplicates removed and some data formattinig applied
+    :return: a list of individuals with duplicates removed and some data formatting applied
     """
     list_results = []
     if type(response) is list:
