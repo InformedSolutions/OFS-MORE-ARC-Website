@@ -69,6 +69,19 @@ def load_json(adult_id):
         full_name = record['first_name'] + " " +record['middle_names'] + " " + record['last_name']
     else:
         full_name = record['first_name'] + " " + record['last_name']
+
+    #get adults address
+    adult_address_response = HMGatewayActions().read('adult-in-home-address',
+                                                     params={'adult_id': record['adult_id']})
+    if adult_address_response.status_code == 200:
+        adult_address_record = adult_address_response.record
+        address_string = ' '.join([adult_address_record['street_line1'], adult_address_record['street_line2'],
+                                         adult_address_record['town'],
+                                         adult_address_record['county'], adult_address_record['postcode']])
+    else:
+        address_string = ''
+
+
     link = reverse("new_adults_summary") + '?id=' + adult_id
     summary_table = [
             {"title": full_name,
@@ -100,8 +113,8 @@ def load_json(adult_id):
              "value": record['PITH_mobile_number'],
              'field': "PITH_mobile_number"},
             {"name": "Address",
-             "value": record['PITH_same_address'],
-             'field': "PITH_same_address"},
+             "value": address_string,
+             'field': "address"},
             {"name": "Lived abroad in the last 5 years?",
              "value": 'Yes' if record['lived_abroad'] else 'No',
              'field': "lived_abroad"},
