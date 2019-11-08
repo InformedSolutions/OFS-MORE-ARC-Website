@@ -44,9 +44,9 @@ class NewAdultForm(GOVUKForm):
     email_comments = forms.CharField(label='Email', help_text='(Tip: be clear and concise)',
                                      widget=widgets.Textarea,
                                      required=False, max_length=250)
-    address_declare = forms.BooleanField(label='This information is correct',
+    PITH_same_address_declare = forms.BooleanField(label='This information is correct',
                                        widget=widgets.CustomCheckboxInput, required=False)
-    address_comments = forms.CharField(label='Address', help_text='(Tip: be clear and concise)',
+    PITH_same_address_comments = forms.CharField(label='Address', help_text='(Tip: be clear and concise)',
                                      widget=widgets.Textarea,
                                      required=False, max_length=250)
 
@@ -185,7 +185,7 @@ class NewAdultForm(GOVUKForm):
             ((self.fields['date_of_birth_declare']), 'date_of_birth' + id_value),
             ((self.fields['relationship_declare']), 'relationship' + id_value),
             ((self.fields['email_declare']), 'email' + id_value),
-            ((self.fields['address_declare']), 'address' + id_value),
+            ((self.fields['PITH_same_address_declare']), 'PITH_same_address' + id_value),
             ((self.fields['dbs_certificate_number_declare']), 'dbs_certificate_number' + id_value),
             ((self.fields['enhanced_check_declare']), 'enhanced_check' + id_value),
             ((self.fields['on_update_declare']), 'on_update' + id_value),

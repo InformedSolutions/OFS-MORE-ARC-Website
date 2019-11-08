@@ -240,27 +240,27 @@
             {# ================================== #}
             <tr>
                 <td style="word-wrap: break-word">
-                    {{ formsetadult.address_comments.label }}
+                    {{ formsetadult.PITH_same_address_comments.label }}
                 </td>
                 <td style="word-wrap: break-word">
                     {{same_address}}
                 </td>
                 <td class="change-answer">
-                    {{ formsetadult.address_declare }}
+                    {{ formsetadult.PITH_same_address_declare }}
                 </td>
             </tr>
-            <tr class="js-hidden" id="address{{formsetadult.instance_id.initial}}">
+            <tr class="js-hidden" id="PITH_same_address{{formsetadult.instance_id.initial}}">
                 <td colspan="1">
                     <div>
                         Enter your reasoning
                     </div>
                     <div>
-                        {{ formsetadult.address_comments.help_text}}
+                        {{ formsetadult.PITH_same_address_comments.help_text}}
                     </div>
                 </td>
                 <td colspan="2">
                     <div>
-                        {{ formsetadult.address_comments}}
+                        {{ formsetadult.PITH_same_address_comments}}
                     </div>
                 </td>
             </tr>

@@ -276,6 +276,9 @@ class ApplicationExporter:
         adult_details_export['fields']['serious_illness'] = adult_record['has_serious_illness']
         additional_adult_details_export['serious_illness'] = serious_illnesses
 
+        home_address_record = HMGatewayActions().read('adult-in-home-address', params={'adult_id': adult_id}).record
+        additional_adult_details_export['current_address'] = home_address_record
+
         if adult_record['has_hospital_admissions']:
             hospital_admissions_record = HMGatewayActions().list("hospital-admissions", params={'adult_id': adult_id}).record
             hospital_admissions = json.dumps([{'fields': r} for r in hospital_admissions_record])
