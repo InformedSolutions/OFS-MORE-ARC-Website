@@ -114,7 +114,7 @@ def load_json(adult_id):
              'field': "PITH_mobile_number"},
             {"name": "Address",
              "value": address_string,
-             'field': "address"},
+             'field': "PITH_same_address"},
             {"name": "Lived abroad in the last 5 years?",
              "value": 'Yes' if record['lived_abroad'] else 'No',
              'field': "lived_abroad"},
