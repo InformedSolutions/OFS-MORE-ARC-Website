@@ -69,26 +69,22 @@ def new_adults_summary(request):
     for adult in adults:
 
         adult_id = adult['adult_id']
-        app_id = adult['application_id']
+        app_id = adult['token_id']
 
         if adult['middle_names'] is not None and adult['middle_names'] != '':
             name = adult['first_name'] + ' ' + adult['middle_names'] + ' ' + adult['last_name']
         else:
             name = adult['first_name'] + ' ' + adult['last_name']
 
-        if not adult.PITH_same_address:
-            adult_address_string = ' '.join([AdultInHomeAddress.objects.get(application_id=app_id,
-                                                                            adult_id=adult_id).street_line1,
-                                             (AdultInHomeAddress.objects.get(application_id=app_id,
-                                                                             adult_id=adult_id).street_line2 or ''),
-                                             AdultInHomeAddress.objects.get(application_id=app_id,
-                                                                            adult_id=adult_id).town,
-                                             (AdultInHomeAddress.objects.get(application_id=app_id,
-                                                                             adult_id=adult_id).county or ''),
-                                             AdultInHomeAddress.objects.get(application_id=adult_id,
-                                                                            adult_id=adult.pk).postcode])
+        adult_address_response = HMGatewayActions().read('adult-in-home-address',
+                                                             params={'adult_id': adult['adult_id']})
+        if adult_address_response.status_code == 200:
+            adult_address_record = adult_address_response.record
+            adult_address_string = ' '.join([adult_address_record['street_line1'], adult_address_record['street_line2'],
+                                          adult_address_record['town'],
+                                          adult_address_record['county'], adult_address_record['postcode']])
         else:
-            adult_address_string = 'Same as home address'
+            adult_address_string = ''
 
         adult_record_list.append(adult)
         adult_id_list.append(adult['adult_id'])
