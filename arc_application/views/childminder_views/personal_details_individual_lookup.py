@@ -47,7 +47,7 @@ def fetch_childminder_data(app_id):
         'first_name': name_record.first_name,
         'middle_names': name_record.middle_names,
         'last_name': name_record.last_name,
-        'date_of_birth': personal_details.date_of_birth,
+        'date_of_birth': _format_date_of_birth(personal_details.date_of_birth)[1],
         'street_line1': home_address.street_line1,
         'street_line2': home_address.street_line2,
         'town': home_address.town,
@@ -69,7 +69,7 @@ def fetch_nanny_data(app_id):
         'first_name': personal_details.get('first_name', ''),
         'middle_names': personal_details.get('middle_names', ''),
         'last_name': personal_details.get('last_name', ''),
-        'date_of_birth': personal_details.get('date_of_birth', ''),
+        'date_of_birth': _format_date_of_birth(personal_details.get('date_of_birth', ''))[1],
         'street_line1': home_address_record.get('street_line1', ''),
         'street_line2': home_address_record.get('street_line2', ''),
         'town': home_address_record.get('town', ''),
@@ -91,7 +91,7 @@ def fetch_household_member_data(app_id):
         'first_name': adult_record.get('first_name', ''),
         'middle_names': adult_record.get('middle_names', ''),
         'last_name': adult_record.get('last_name', ''),
-        'date_of_birth': adult_record.get('date_of_birth', ''),
+        'date_of_birth': _format_date_of_birth(adult_record.get('date_of_birth', ''))[1],
         'street_line1': '',
         'street_line2': '',
         'town': '',
@@ -103,18 +103,18 @@ def fetch_household_member_data(app_id):
 def fetch_childminder_pith_data(adult_id, application_id):
     try:
         adult_personal_details = AdultInHome.objects.get(adult_id=adult_id)
-        applicant_personal_details = ApplicantPersonalDetails.objects.get(application_id=application_id)
         home_address = AdultInHomeAddress.objects.get(
             adult_id=adult_personal_details.adult_id,
         )
+    # In older records adults might not have separately saved addresses, use that of the applicant
     except ObjectDoesNotExist:
-        return {}
+        home_address = ApplicantHomeAddress.objects.get(application_id=application_id, current_address=True)
 
     return {
         'first_name': adult_personal_details.first_name,
         'middle_names': adult_personal_details.middle_names,
         'last_name': adult_personal_details.last_name,
-        'date_of_birth': adult_personal_details.date_of_birth,
+        'date_of_birth': _format_date_of_birth(adult_personal_details.date_of_birth)[1],
         'street_line1': home_address.street_line1,
         'street_line2': home_address.street_line2,
         'town': home_address.town,
@@ -588,7 +588,9 @@ def _extract_json_to_list(response):
                 duplicate = True
         if not duplicate:
             if 'DOB'in item and len(item['DOB']) == 10:
-                item['DOB'] = _format_date_of_birth(item['DOB'])
+                formatted_dobs = _format_date_of_birth(item['DOB'])
+                item['DOB'] = formatted_dobs[0]
+                item['DOB_pretty'] = formatted_dobs[1]
             clean_results.append(item)
 
     return clean_results
@@ -606,11 +608,11 @@ def _format_date_of_birth(original_dob):
     """
     Formats a date (in this case date of birth) as DD MMM YYYY
     :param original_dob: date formatted YYYY-MM-DD
-    :return: screen-friendly date format
+    :return: tuple of screen-friendly date formats, the first one with a leading 0 if applicable
     """
     try:
-        dob = datetime.datetime.strptime(original_dob, '%Y-%m-%d')
-        return dob.strftime("%d %b %Y").lstrip("0")
+        dob = datetime.datetime.strptime(str(original_dob), '%Y-%m-%d')
+        return dob.strftime("%d %b %Y"), dob.strftime("%d %b %Y").lstrip("0")
     except ValueError:
         log.debug("Date of birth '" + original_dob + "' not in expected format, returning original value")
         return original_dob
