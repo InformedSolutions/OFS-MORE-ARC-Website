@@ -318,25 +318,23 @@ def load_json(application_id_local, ordered_models, recurse, apply_filtering_for
             records = model.objects.filter(application_id=application.pk)
             for record in records:
                 table = record.get_summary_table(apply_filtering_for_eyc=apply_filtering_for_eyc)
-                if not record.PITH_same_address:
-                    adult_address_string = ' '.join([AdultInHomeAddress.objects.get(application_id=application.pk,
-                                                                                    adult_id=record.pk).street_line1,
-                                                     (AdultInHomeAddress.objects.get(application_id=application.pk,
-                                                                                     adult_id=record.pk).street_line2 or ''),
-                                                     AdultInHomeAddress.objects.get(application_id=application.pk,
-                                                                                    adult_id=record.pk).town,
-                                                     (AdultInHomeAddress.objects.get(application_id=application.pk,
-                                                                                     adult_id=record.pk).county or ''),
-                                                     AdultInHomeAddress.objects.get(application_id=application.pk,
-                                                                                    adult_id=record.pk).postcode])
-                    table.insert(8,
-                        {"name": "Address", "value": adult_address_string},
-                    )
+                if record.PITH_same_address is None:
+                    adult_address_string = 'N/A'
+                elif not record.PITH_same_address:
+                    adult_address = AdultInHomeAddress.objects.filter(application_id=application_id_local,
+                                                                           adult_id=record.pk)
+                    if adult_address.count() > 0:
+                        adult_address = AdultInHomeAddress.objects.get(application_id=application_id_local,
+                                                          adult_id=record.pk)
+                        adult_address_string = ' '.join([adult_address.street_line1,
+                                                         adult_address.street_line2 or '',
+                                                         adult_address.town, adult_address.county or '',
+                                                         adult_address.postcode])
+                    else:
+                        adult_address_string = 'N/A'
                 else:
                     adult_address_string = 'Same as home address'
-                    table.insert(8,
-                        {"name": "Address", "value": adult_address_string},
-                    )
+                table.insert(8, {"name": "Address", "value": adult_address_string})
                 if recurse:
                     table_list = table_list + table
                 else:

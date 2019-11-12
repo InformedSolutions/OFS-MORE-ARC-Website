@@ -100,7 +100,6 @@ def other_people_summary(request):
 
     # Set up bool to track whether linking has been completed for all adults in this application
     linking_complete = True
-
     for adult in adults:
 
         if adult.middle_names and adult.middle_names != '':
@@ -108,19 +107,22 @@ def other_people_summary(request):
         else:
             name = adult.first_name + ' ' + adult.last_name
 
-        if not adult.PITH_same_address:
-            adult_address_string = ' '.join([AdultInHomeAddress.objects.get(application_id=application,
-                                                                            adult_id=adult.pk).street_line1,
-                                             (AdultInHomeAddress.objects.get(application_id=application,
-                                                                             adult_id=adult.pk).street_line2 or ''),
-                                             AdultInHomeAddress.objects.get(application_id=application,
-                                                                            adult_id=adult.pk).town,
-                                             (AdultInHomeAddress.objects.get(application_id=application,
-                                                                             adult_id=adult.pk).county or ''),
-                                             AdultInHomeAddress.objects.get(application_id=application,
-                                                                            adult_id=adult.pk).postcode])
+        if adult.PITH_same_address is None:
+                adult_address_string = 'N/A'
+        elif not adult.PITH_same_address:
+            adult_address = AdultInHomeAddress.objects.filter(application_id=application_id_local,
+                                                                   adult_id=adult.pk)
+            if adult_address.count() > 0:
+                adult_address = AdultInHomeAddress.objects.get(application_id=application_id_local,
+                                                  adult_id=adult.pk)
+                adult_address_string = ' '.join([adult_address.street_line1,
+                                                 adult_address.street_line2 or '',
+                                                 adult_address.town, adult_address.county or '',
+                                                 adult_address.postcode])
+            else:
+                adult_address_string = 'N/A'
         else:
-            adult_address_string = 'Same as home address'
+                adult_address_string = 'Same as home address'
 
         adult_record_list.append(adult)
         adult_id_list.append(adult.adult_id)

@@ -44,6 +44,7 @@ class NewAdultForm(GOVUKForm):
     email_comments = forms.CharField(label='Email', help_text='(Tip: be clear and concise)',
                                      widget=widgets.Textarea,
                                      required=False, max_length=250)
+
     PITH_same_address_declare = forms.BooleanField(label='This information is correct',
                                        widget=widgets.CustomCheckboxInput, required=False)
     PITH_same_address_comments = forms.CharField(label='Address', help_text='(Tip: be clear and concise)',
