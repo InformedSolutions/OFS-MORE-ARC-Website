@@ -319,7 +319,7 @@ def load_json(application_id_local, ordered_models, recurse, apply_filtering_for
             for record in records:
                 table = record.get_summary_table(apply_filtering_for_eyc=apply_filtering_for_eyc)
                 if record.PITH_same_address is None:
-                    adult_address_string = 'N'
+                    adult_address_string = 'N/A'
                     table.insert(8,
                                  {"name": "Address", "value": adult_address_string},
                                  )
