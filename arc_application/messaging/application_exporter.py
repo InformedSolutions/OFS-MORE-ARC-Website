@@ -279,10 +279,10 @@ class ApplicationExporter:
         home_address_response = HMGatewayActions().list('adult-in-home-address', params={'adult_id': adult_id})
 
         if home_address_response.status_code == 200:
-            additional_adult_details_export['current_names'] = json.dumps(
+            additional_adult_details_export['current_address'] = json.dumps(
                 [{'fields': r} for r in home_address_response.record])
         else:
-            additional_adult_details_export['current_names'] = json.dumps([])
+            additional_adult_details_export['current_address'] = json.dumps([])
 
         if adult_record['has_hospital_admissions']:
             hospital_admissions_record = HMGatewayActions().list("hospital-admissions", params={'adult_id': adult_id}).record
