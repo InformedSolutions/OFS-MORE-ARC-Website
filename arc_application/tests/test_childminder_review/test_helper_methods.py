@@ -169,7 +169,8 @@ class PersonalDetailsLinkingTests(TestCase):
         """
         dob = '1990-12-08'
         result = personal_details_individual_lookup._format_date_of_birth(dob)
-        self.assertEqual(result, '8 Dec 1990')
+        self.assertEqual(result[0], '08 Dec 1990')
+        self.assertEqual(result[1], '8 Dec 1990')
 
     def test_convert_invalid_dob(self):
         """
@@ -187,17 +188,17 @@ class PersonalDetailsLinkingTests(TestCase):
         source_list = [
             {
                 'IndividualID': '1234',
-                'DOB': '1990-02-21',
+                'DOB': '1990-02-07',
                 'Dummy': 'Sausage'
             },
             {
                 'IndividualID': '1234',
-                'DOB': '1990-02-21',
+                'DOB': '1990-02-07',
                 'Dummy': 'Chips'
             },
             {
                 'IndividualID': '5678',
-                'DOB': '1990-02-21',
+                'DOB': '1990-02-07',
                 'Dummy': 'Beans'
             }
         ]
@@ -205,12 +206,14 @@ class PersonalDetailsLinkingTests(TestCase):
         expected_list = [
             {
                 'IndividualID': '1234',
-                'DOB': '21 Feb 1990',
+                'DOB': '07 Feb 1990',
+                'DOB_pretty': '7 Feb 1990',
                 'Dummy': 'Sausage'
             },
             {
                 'IndividualID': '5678',
-                'DOB': '21 Feb 1990',
+                'DOB': '07 Feb 1990',
+                'DOB_pretty': '7 Feb 1990',
                 'Dummy': 'Beans'
             }
         ]
