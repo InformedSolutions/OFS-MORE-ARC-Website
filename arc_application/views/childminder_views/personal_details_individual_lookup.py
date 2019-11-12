@@ -83,19 +83,21 @@ def fetch_household_member_data(app_id):
     adult_record = read_record(
         hm_gateway, 'adult', {'adult_id': app_id}
     )
-    dpa_record = read_record(
-        hm_gateway, 'dpa-auth', {'token_id': adult_record['token_id']}
+    address_record = read_record(
+        hm_gateway, 'adult-in-home-address', {'adult_id': app_id}
     )
+    if address_record == {}:
+        address_record = read_record(hm_gateway, 'setting-address', {'token_id': adult_record['token_id']})
 
     return {
         'first_name': adult_record.get('first_name', ''),
         'middle_names': adult_record.get('middle_names', ''),
         'last_name': adult_record.get('last_name', ''),
         'date_of_birth': _format_date_of_birth(adult_record.get('date_of_birth', ''))[1],
-        'street_line1': '',
-        'street_line2': '',
-        'town': '',
-        'postcode': dpa_record.get('postcode', ''),
+        'street_line1': address_record.get('street_line1', ''),
+        'street_line2': address_record.get('street_line2', ''),
+        'town': address_record.get('town', ''),
+        'postcode': address_record.get('postcode', ''),
         'application_id': app_id,
     }
 

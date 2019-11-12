@@ -135,6 +135,7 @@ def new_adults_summary(request):
         else:
             adult_prev_reg = {'individual_id': None}
             linking_complete = False
+
         adult_previous_registrations.append({'adult_id': adult_id, 'prev_reg': adult_prev_reg})
             
 
@@ -268,7 +269,8 @@ def new_adults_summary(request):
                 'formset_adult': adult_formset,
                 'application_id': adult_id_local,
                 'adult_lists': adult_lists,
-                'previous_registration_lists': adult_previous_registrations}
+                'previous_registration_lists': adult_previous_registrations,
+                'linking_complete': linking_complete}
 
             log.debug("Render new adult review page")
             return render(request, 'adult_update_templates/new-adults-summary.html', variables)
