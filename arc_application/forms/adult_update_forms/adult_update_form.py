@@ -233,12 +233,12 @@ class NewAdultForm(GOVUKForm):
         """
         return self.helper_clean('email')
 
-    def clean_address_comments(self):
+    def clean_PITH_same_address_comments(self):
         """
         Email comment validation
         :return: string
         """
-        return self.helper_clean('address')
+        return self.helper_clean('PITH_same_address')
 
     def clean_dbs_certificate_number_comments(self):
         """
