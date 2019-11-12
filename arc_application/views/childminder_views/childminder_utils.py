@@ -318,7 +318,12 @@ def load_json(application_id_local, ordered_models, recurse, apply_filtering_for
             records = model.objects.filter(application_id=application.pk)
             for record in records:
                 table = record.get_summary_table(apply_filtering_for_eyc=apply_filtering_for_eyc)
-                if not record.PITH_same_address:
+                if record.PITH_same_address is None:
+                    adult_address_string = 'N'
+                    table.insert(8,
+                                 {"name": "Address", "value": adult_address_string},
+                                 )
+                elif not record.PITH_same_address:
                     adult_address_string = ' '.join([AdultInHomeAddress.objects.get(application_id=application.pk,
                                                                                     adult_id=record.pk).street_line1,
                                                      (AdultInHomeAddress.objects.get(application_id=application.pk,

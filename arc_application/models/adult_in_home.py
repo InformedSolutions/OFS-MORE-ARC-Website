@@ -29,7 +29,7 @@ class AdultInHome(models.Model):
 
     email = models.CharField(max_length=100, blank=True, null=True)
     PITH_mobile_number = models.CharField(max_length=20, blank=True)
-    PITH_same_address = models.NullBooleanField(blank=True, default=True)
+    PITH_same_address = models.NullBooleanField(blank=True)
     dbs_certificate_number = models.CharField(max_length=50, blank=True)
     token = models.CharField(max_length=100, blank=True, null=True)
     validated = models.BooleanField(default=False)
