@@ -124,7 +124,7 @@ class ChildcareType(models.Model):
             {"name": "Looking after 8 year olds and older? ", "value": self.get_bool_as_string(self.eight_plus)},
             {"name": "Registers", "value": self.get_register_name()},
             {"name": "Number of childcare places", "value": self.childcare_places},
-            {"name": "When will the childcare occur", "value": self.get_timings()},
+            {"name": "When will the childcare be provided", "value": self.get_timings()},
             {"name": "Looking after children overnight?", "value": self.get_bool_as_string(self.overnight_care)}
         ]
 
