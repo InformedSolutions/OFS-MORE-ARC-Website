@@ -12,6 +12,15 @@ class ChildcareType(models.Model):
     zero_to_five = models.BooleanField()
     five_to_eight = models.BooleanField()
     eight_plus = models.BooleanField()
+    childcare_places = models.IntegerField(blank=True, null=True)
+    weekday_before_school = models.NullBooleanField(blank=True, null=True)
+    weekday_after_school = models.NullBooleanField(blank=True, null=True)
+    weekday_am = models.NullBooleanField(blank=True, null=True)
+    weekday_pm = models.NullBooleanField(blank=True, null=True)
+    weekday_all_day = models.NullBooleanField(blank=True, null=True)
+    weekend_am = models.NullBooleanField(blank=True, null=True)
+    weekend_pm = models.NullBooleanField(blank=True, null=True)
+    weekend_all_day = models.NullBooleanField(blank=True, null=True)
     overnight_care = models.NullBooleanField()
 
     @property
@@ -31,6 +40,15 @@ class ChildcareType(models.Model):
             'zero_to_five',
             'five_to_eight',
             'eight_plus',
+            'childcare_places',
+            'weekday_before_school',
+            'weekday_after_school',
+            'weekday_am',
+            'weekday_pm',
+            'weekday_all_day',
+            'weekend_am',
+            'weekend_pm',
+            'weekend_all_day',
             'overnight_care'
         )
 
@@ -59,6 +77,39 @@ class ChildcareType(models.Model):
             register = 'Childcare Register (voluntary part)'
         return register
 
+    def get_timings(self):
+        register = ''
+        weekday_before_school = self.weekday_before_school
+        weekday_after_school = self.weekday_after_school
+        weekday_am = self.weekday_am
+        weekday_pm = self.weekday_pm
+        weekday_all_day = self.weekday_all_day
+        weekend_am = self.weekend_am
+        weekend_pm = self.weekend_pm
+        weekend_all_day = self.weekend_all_day
+        if weekday_before_school:
+            register += 'Weekday (before school),'
+        if weekday_after_school:
+            register += 'Weekday (after school),'
+        if weekday_am:
+            register += 'Weekday (morning),'
+        if weekday_pm:
+            register += 'Weekday (afternoon),'
+        if weekday_all_day:
+            register += 'Weekday (all day),'
+        if weekend_am:
+            register += 'Weekend (morning),'
+        if weekend_pm:
+            register += 'Weekend (afternoon),'
+        if weekend_all_day:
+            register += 'Weekend (all day),'
+
+        register = register.rstrip(',')
+        register = register.replace(',', ', ')
+
+        return register
+
+
     def get_bool_as_string(self, bool_field):
         if bool_field:
             return 'Yes'
@@ -72,6 +123,8 @@ class ChildcareType(models.Model):
             {"name": "Looking after 5 to 7 year olds? ", "value": self.get_bool_as_string(self.five_to_eight)},
             {"name": "Looking after 8 year olds and older? ", "value": self.get_bool_as_string(self.eight_plus)},
             {"name": "Registers", "value": self.get_register_name()},
+            {"name": "Number of childcare places", "value": self.childcare_places},
+            {"name": "When will the childcare occur", "value": self.get_timings()},
             {"name": "Looking after children overnight?", "value": self.get_bool_as_string(self.overnight_care)}
         ]
 

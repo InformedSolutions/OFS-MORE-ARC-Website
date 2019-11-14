@@ -44,6 +44,8 @@ def type_of_childcare_age_groups(request):
         'five': childcare_type.five_to_eight,
         'eight': childcare_type.eight_plus,
         'register': register_name,
+        'childcare_places': childcare_type.childcare_places,
+        'childcare_times': childcare_type.get_timings(),
         'overnight_care': childcare_type.overnight_care
     }
     log.debug("Render type of childcare page")
