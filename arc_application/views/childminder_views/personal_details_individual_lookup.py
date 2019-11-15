@@ -106,9 +106,9 @@ def fetch_childminder_pith_data(adult_id, application_id):
         home_address = AdultInHomeAddress.objects.get(
             adult_id=adult_personal_details.adult_id,
         )
-    # In older records adults might not have separately saved addresses, use that of the applicant
+    # In older records adults might not have separately saved addresses, use that of the childcare address
     except ObjectDoesNotExist:
-        home_address = ApplicantHomeAddress.objects.get(application_id=application_id, current_address=True)
+        home_address = ApplicantHomeAddress.objects.get(application_id=application_id, childcare_address=True)
 
     return {
         'first_name': adult_personal_details.first_name,
