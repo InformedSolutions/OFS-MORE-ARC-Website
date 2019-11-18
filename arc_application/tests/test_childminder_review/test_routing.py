@@ -1087,7 +1087,7 @@ class PeopleInTheHomeFunctionalTests(TestCase):
         response = self.client.get(reverse('other_people_summary'), data={'id': self.application.pk})
 
         utils.assertSummaryField(response, 'Does anyone aged 16 or over live or work in the home?', 'Yes',
-                                 heading='Adults in the home')
+                                 heading='Adults in the home where childcare takes place')
         utils.assertSummaryField(response, 'Title', 'Mr', heading='Joe Anthony Bloggs')
         utils.assertSummaryField(response, 'Name', 'Joe Anthony Bloggs', heading='Joe Anthony Bloggs')
         # TODO: display of months on this page are inconsistent with other pages
@@ -2096,7 +2096,7 @@ class ReviewSummaryAndConfirmationFunctionalTests(TestCase):
         response = self.client.get(reverse('arc-summary'), data={'id': self.application.pk})
 
         utils.assertSummaryField(response, 'Does anyone aged 16 or over live or work in your home?', 'Yes',
-                                 heading='Adults in the home')
+                                 heading='Adults in the home where childcare takes place')
 
         utils.assertSummaryField(response, 'Name', 'Joe Anthony Bloggs', heading='Joe Anthony Bloggs')
         # TODO: display of months on this page are inconsistent with other pages
