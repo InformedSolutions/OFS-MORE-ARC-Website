@@ -14,8 +14,8 @@ link_dict = {
     'Childcare training': 'childcare_training_check_summary',
     'Health declaration booklet': 'health_check_answers',
     'Criminal record checks': 'dbs_check_summary',
-    'Adults in the home': 'other_people_summary',
-    'Children in the home': 'other_people_summary',
+    'Adults in the home where childcare takes place': 'other_people_summary',
+    'Children in the home where childcare takes place': 'other_people_summary',
     'First reference': 'references_summary',
     'Second reference': 'references_summary'
 }
