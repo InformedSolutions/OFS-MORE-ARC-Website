@@ -18,8 +18,6 @@ class ChildcareType(models.Model):
     weekday_am = models.NullBooleanField(blank=True, null=True)
     weekday_pm = models.NullBooleanField(blank=True, null=True)
     weekday_all_day = models.NullBooleanField(blank=True, null=True)
-    weekend_am = models.NullBooleanField(blank=True, null=True)
-    weekend_pm = models.NullBooleanField(blank=True, null=True)
     weekend_all_day = models.NullBooleanField(blank=True, null=True)
     overnight_care = models.NullBooleanField()
 
@@ -46,8 +44,6 @@ class ChildcareType(models.Model):
             'weekday_am',
             'weekday_pm',
             'weekday_all_day',
-            'weekend_am',
-            'weekend_pm',
             'weekend_all_day',
             'overnight_care'
         )
@@ -84,8 +80,6 @@ class ChildcareType(models.Model):
         weekday_am = self.weekday_am
         weekday_pm = self.weekday_pm
         weekday_all_day = self.weekday_all_day
-        weekend_am = self.weekend_am
-        weekend_pm = self.weekend_pm
         weekend_all_day = self.weekend_all_day
         if weekday_before_school:
             register += 'Weekday (before school),'
@@ -97,12 +91,8 @@ class ChildcareType(models.Model):
             register += 'Weekday (afternoon),'
         if weekday_all_day:
             register += 'Weekday (all day),'
-        if weekend_am:
-            register += 'Weekend (morning),'
-        if weekend_pm:
-            register += 'Weekend (afternoon),'
         if weekend_all_day:
-            register += 'Weekend (all day),'
+            register += 'Weekend,'
 
         register = register.rstrip(',')
         register = register.replace(',', ', ')
@@ -123,8 +113,8 @@ class ChildcareType(models.Model):
             {"name": "Looking after 5 to 7 year olds? ", "value": self.get_bool_as_string(self.five_to_eight)},
             {"name": "Looking after 8 year olds and older? ", "value": self.get_bool_as_string(self.eight_plus)},
             {"name": "Registers", "value": self.get_register_name()},
-            {"name": "Number of childcare places", "value": self.childcare_places},
-            {"name": "When will the childcare be provided", "value": self.get_timings()},
+            {"name": "How many children will you care for aged between 5 and 8 years old?", "value": self.childcare_places},
+            {"name": "When will you be providing childcare?", "value": self.get_timings()},
             {"name": "Looking after children overnight?", "value": self.get_bool_as_string(self.overnight_care)}
         ]
 
