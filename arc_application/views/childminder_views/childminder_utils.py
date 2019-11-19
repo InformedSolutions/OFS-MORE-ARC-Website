@@ -256,7 +256,7 @@ def load_json(application_id_local, ordered_models, recurse, apply_filtering_for
             if application.working_in_other_childminder_home is False:
                 log.debug("Conditional logic: Show people in the home table")
                 table_list.append([
-                    {"title": "Adults in the home", "id": application_id_local},
+                    {"title": "Adults in the home where childcare takes place", "id": application_id_local},
                     {"name": "Does anyone aged 16 or over live or work in your home?",
                      "value": 'Yes' if application.adults_in_home else 'No'}
                 ])

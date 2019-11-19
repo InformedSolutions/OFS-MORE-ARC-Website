@@ -88,14 +88,14 @@ class Application(models.Model):
 
     def get_summary_table_adult(self):
         return [
-            {"title": "Adults in the home", "id": self.pk},
+            {"title": "Adults in the home where childcare takes place", "id": self.pk},
             {"name": "Does anyone aged 16 or over live or work in your home?",
              "value": self.get_bool_as_string(self.adults_in_home)}
         ]
 
     def get_summary_table_child(self):
         return [
-            {"title": "Children in the home", "id": self.pk},
+            {"title": "Children in the home where childcare takes place", "id": self.pk},
             {"name": "Do children under 16 live in the home?",
              "value": self.get_bool_as_string(self.children_in_home)}
         ]
