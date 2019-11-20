@@ -107,16 +107,27 @@ class ChildcareType(models.Model):
             return 'No'
 
     def get_summary_table(self):
-        return [
-            {"title": "Type of childcare", "id": self.pk},
-            {"name": "Looking after 0 to 5 year olds?", "value": self.get_bool_as_string(self.zero_to_five)},
-            {"name": "Looking after 5 to 7 year olds? ", "value": self.get_bool_as_string(self.five_to_eight)},
-            {"name": "Looking after 8 year olds and older? ", "value": self.get_bool_as_string(self.eight_plus)},
-            {"name": "Registers", "value": self.get_register_name()},
-            {"name": "How many children will you care for aged between 5 and 8 years old?", "value": self.childcare_places},
-            {"name": "When will you be providing childcare?", "value": self.get_timings()},
-            {"name": "Looking after children overnight?", "value": self.get_bool_as_string(self.overnight_care)}
-        ]
+        if self.childcare_places != None:
+            return [
+                {"title": "Type of childcare", "id": self.pk},
+                {"name": "Looking after 0 to 5 year olds?", "value": self.get_bool_as_string(self.zero_to_five)},
+                {"name": "Looking after 5 to 7 year olds? ", "value": self.get_bool_as_string(self.five_to_eight)},
+                {"name": "Looking after 8 year olds and older? ", "value": self.get_bool_as_string(self.eight_plus)},
+                {"name": "Registers", "value": self.get_register_name()},
+                {"name": "How many children will you care for aged between 5 and 8 years old?", "value": self.childcare_places},
+                {"name": "When will you be providing childcare?", "value": self.get_timings()},
+                {"name": "Looking after children overnight?", "value": self.get_bool_as_string(self.overnight_care)}
+            ]
+        else:
+            return [
+                {"title": "Type of childcare", "id": self.pk},
+                {"name": "Looking after 0 to 5 year olds?", "value": self.get_bool_as_string(self.zero_to_five)},
+                {"name": "Looking after 5 to 7 year olds? ", "value": self.get_bool_as_string(self.five_to_eight)},
+                {"name": "Looking after 8 year olds and older? ", "value": self.get_bool_as_string(self.eight_plus)},
+                {"name": "Registers", "value": self.get_register_name()},
+                {"name": "When will you be providing childcare?", "value": self.get_timings()},
+                {"name": "Looking after children overnight?", "value": self.get_bool_as_string(self.overnight_care)}
+            ]
 
     class Meta:
         db_table = 'CHILDCARE_TYPE'
