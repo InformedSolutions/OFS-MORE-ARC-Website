@@ -33,3 +33,7 @@ DATABASES = {
         'PORT': os.environ.get('POSTGRES_PORT')
     }
 }
+
+MIGRATION_MODULES = {
+    'arc_application': 'arc_application.tests.test_migrations',
+}

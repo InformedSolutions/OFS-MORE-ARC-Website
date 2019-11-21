@@ -66,7 +66,6 @@ class NannyUpdateEmailView(NannyChangeDetails):
     field = NannyChangeDetails.field[0]
     form_class = NannyUpdateEmail
     page_title = "Update the applicant's email"
-    log.debug("Rendering update personal details - change email")
 
 
 class NannyUpdatePhoneNumberView(NannyChangeDetails):

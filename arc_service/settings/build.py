@@ -23,3 +23,7 @@ DATABASES = {
     }
 }
 
+MIGRATION_MODULES = {
+    'arc_application': 'arc_application.tests.test_migrations',
+}
+
