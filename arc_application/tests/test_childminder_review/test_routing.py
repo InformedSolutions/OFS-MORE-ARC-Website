@@ -233,6 +233,7 @@ class PersonalDetailsPageFunctionalTests(TestCase):
         utils.assertRedirectView(response, 'first_aid_training_summary')
 
     def test_submit_sets_task_to_started_if_linking_not_complete(self):
+        # test that the task status is set to started if submitted without completing linking
 
         url = reverse('personal_details_summary') + '?id=' + self.application.application_id
         data = {'id': self.application.application_id}
@@ -245,6 +246,7 @@ class PersonalDetailsPageFunctionalTests(TestCase):
         self.assertEqual(arc_record.personal_details_review, 'IN PROGRESS')
 
     def test_submit_sets_task_to_done_if_linking_complete(self):
+        # test task status is set to completed if submitted with linking completed
 
         url = reverse('personal_details_summary') + '?id=' + self.application.application_id
         data = {'id': self.application.application_id}
@@ -263,6 +265,7 @@ class PersonalDetailsPageFunctionalTests(TestCase):
         self.assertEqual(arc_record.personal_details_review, 'COMPLETED')
 
     def test_linking_details_appear_on_page(self):
+        # test the individual ID appears on the review page following linking
 
         url = reverse('personal_details_summary') + '?id=' + self.application.application_id
         data = {'id': self.application.application_id}
@@ -279,6 +282,7 @@ class PersonalDetailsPageFunctionalTests(TestCase):
         utils.assertSummaryField(response, 'Individual ID', '12345678', heading='Individual lookup')
 
     def test_linking_details_appear_on_page_not_known_to_ofsted(self):
+        # test not known to ofsted is shown on review page where no link is found
 
         url = reverse('personal_details_summary') + '?id=' + self.application.application_id
         data = {'id': self.application.application_id}
@@ -1585,6 +1589,7 @@ class PeopleInTheHomeFunctionalTests(TestCase):
         return data
 
     def test_submit_sets_task_to_started_if_linking_not_complete(self):
+        # test task status is started if submitted before completing linking
         url = reverse('other_people_summary') + '?id=' + self.application.application_id
         data = self._make_post_data(adults=1)
         data.update({
@@ -1599,7 +1604,7 @@ class PeopleInTheHomeFunctionalTests(TestCase):
         self.assertEqual(arc_record.people_in_home_review, 'IN PROGRESS')
 
     def test_submit_sets_task_to_done_if_linking_complete(self):
-
+        # test tasks status set to completed if submitted with  linking complete
         url = reverse('other_people_summary') + '?id=' + self.application.application_id
         data = self._make_post_data(adults=1)
         data.update({
@@ -1622,6 +1627,7 @@ class PeopleInTheHomeFunctionalTests(TestCase):
         self.assertEqual(arc_record.people_in_home_review, 'COMPLETED')
 
     def test_linking_details_appear_on_page(self):
+        # test individual ID displayed if link amde
 
         url = reverse('other_people_summary') + '?id=' + self.application.application_id
         data = self._make_post_data(adults=1)
@@ -1640,6 +1646,7 @@ class PeopleInTheHomeFunctionalTests(TestCase):
         utils.assertSummaryField(response, 'Individual ID', '12345678', heading='Individual lookup')
 
     def test_linking_details_appear_on_page_not_known_to_ofsted(self):
+        # test not known to ofsted displayed if no link  made
 
         url = reverse('other_people_summary') + '?id=' + self.application.application_id
         data = self._make_post_data(adults=1)

@@ -271,6 +271,7 @@ class ReviewPersonalDetailsTests(NannyReviewFuncTestsBase):
         utils.assertSummaryField(response, 'End date', '07/12/2004', heading=heading)
 
     def test_submit_sets_task_to_started_if_linking_not_complete(self):
+        # test task status set to started if submitted before linking is completed
         self.nanny_gateway.previous_registration_read_response.status_code = 404
 
         response = self.client.post(reverse('nanny_personal_details_summary') + '?id=' + self.test_app_id)
@@ -281,6 +282,7 @@ class ReviewPersonalDetailsTests(NannyReviewFuncTestsBase):
         self.assertEqual(arc_record.personal_details_review, 'IN PROGRESS')
 
     def test_submit_sets_task_to_done_if_linking_complete(self):
+        # test task status is set to completed if submitted with linking completed
         self.nanny_gateway.previous_registration_read_response.record = {'application_id': self.test_app_id,
                                         'previous_registration': True,
                                         'individual_id': 12345678}
@@ -293,6 +295,7 @@ class ReviewPersonalDetailsTests(NannyReviewFuncTestsBase):
         self.assertEqual(arc_record.personal_details_review, 'COMPLETED')
 
     def test_linking_details_appear_on_page(self):
+        # test individual ID appears on review page if link made
         self.nanny_gateway.previous_registration_read_response.record = {'application_id': self.test_app_id,
                                         'previous_registration': True,
                                         'individual_id': 12345678}
@@ -303,6 +306,7 @@ class ReviewPersonalDetailsTests(NannyReviewFuncTestsBase):
         utils.assertSummaryField(response, 'Individual ID', '12345678', heading='Individual lookup')
 
     def test_linking_details_appear_on_page_not_known_to_ofsted(self):
+        # test not known ofsted appear on page  if no link was found
         self.nanny_gateway.previous_registration_read_response.record = {'application_id': self.test_app_id,
                                         'previous_registration': False,
                                         'individual_id': 0}
