@@ -1584,6 +1584,79 @@ class PeopleInTheHomeFunctionalTests(TestCase):
 
         return data
 
+    def test_submit_sets_task_to_started_if_linking_not_complete(self):
+        url = reverse('other_people_summary') + '?id=' + self.application.application_id
+        data = self._make_post_data(adults=1)
+        data.update({
+            'adult-0-cygnum_relationship': 'Brother',
+        })
+
+        response = self.client.post(url, data)
+
+        arc_record = models.Arc.objects.get(application_id=self.application.pk)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(arc_record.people_in_home_review, 'IN PROGRESS')
+
+    def test_submit_sets_task_to_done_if_linking_complete(self):
+
+        url = reverse('other_people_summary') + '?id=' + self.application.application_id
+        data = self._make_post_data(adults=1)
+        data.update({
+            'adult-0-cygnum_relationship': 'Brother',
+        })
+
+        adult = models.AdultInHome.objects.get(adult_id='da2265c2-2d65-4214-bfef-abcfe59b75aa')
+
+        previous_registration = models.OtherPersonPreviousRegistrationDetails.objects.create(
+            person_id=adult,
+            previous_registration=True,
+            individual_id=12345678
+        )
+
+        response = self.client.post(url, data)
+
+        arc_record = models.Arc.objects.get(application_id=self.application.pk)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(arc_record.people_in_home_review, 'COMPLETED')
+
+    def test_linking_details_appear_on_page(self):
+
+        url = reverse('other_people_summary') + '?id=' + self.application.application_id
+        data = self._make_post_data(adults=1)
+
+        adult = models.AdultInHome.objects.get(adult_id='da2265c2-2d65-4214-bfef-abcfe59b75aa')
+
+        previous_registration = models.OtherPersonPreviousRegistrationDetails.objects.create(
+            person_id=adult,
+            previous_registration=True,
+            individual_id=12345678
+        )
+
+        response = self.client.get(url, data)
+
+        self.assertEqual(response.status_code, 200)
+        utils.assertSummaryField(response, 'Individual ID', '12345678', heading='Individual lookup')
+
+    def test_linking_details_appear_on_page_not_known_to_ofsted(self):
+
+        url = reverse('other_people_summary') + '?id=' + self.application.application_id
+        data = self._make_post_data(adults=1)
+
+        adult = models.AdultInHome.objects.get(adult_id='da2265c2-2d65-4214-bfef-abcfe59b75aa')
+
+        previous_registration = models.OtherPersonPreviousRegistrationDetails.objects.create(
+            person_id=adult,
+            previous_registration=False,
+            individual_id=0
+        )
+
+        response = self.client.get(url, data)
+
+        self.assertEqual(response.status_code, 200)
+        utils.assertSummaryField(response, 'Individual ID', 'Not known to Ofsted', heading='Individual lookup')
+
 
 @tag('http')
 class AdultPreviousNamesFunctionalTests(TestCase):
