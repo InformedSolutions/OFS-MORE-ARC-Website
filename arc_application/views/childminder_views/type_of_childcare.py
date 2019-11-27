@@ -37,7 +37,7 @@ def type_of_childcare_age_groups(request):
 
     application_id_local = request.GET["id"]
     childcare_type = ChildcareType.objects.get(application_id=application_id_local)
-    register_name = get_register_name(childcare_type)
+    register_name = childcare_type.get_register_name()
     variables = {
         'application_id': str(application_id_local),
         'zero': childcare_type.zero_to_five,
@@ -51,36 +51,3 @@ def type_of_childcare_age_groups(request):
     log.debug("Render type of childcare page")
     return render(request, 'childminder_templates/childcare-age-groups.html', variables)
 
-
-def get_register_name(childcare_type):
-    """
-    Method to get the names of the registers to which the applicant is applying
-    :param childcare_type: ChildcareType record
-    :return: string
-    """
-    zero_to_five = childcare_type.zero_to_five
-    five_to_eight = childcare_type.five_to_eight
-    eight_plus = childcare_type.eight_plus
-    register = ''
-    if zero_to_five and five_to_eight and eight_plus:
-        log.debug("zero_to_five and five_to_eight and eight_plus")
-        register = 'Early Years Register and Childcare Register (both parts)'
-    if not zero_to_five and five_to_eight and eight_plus:
-        log.debug("five_to_eight and eight_plus only")
-        register = 'Childcare Register (both parts)'
-    if zero_to_five and not five_to_eight and not eight_plus:
-        log.debug("zero_to_five only")
-        register = 'Early Years Register'
-    if zero_to_five and five_to_eight and not eight_plus:
-        log.debug("zero_to_five and five_to_eight only")
-        register = 'Early Years Register and Childcare Register (compulsory part)'
-    if zero_to_five and not five_to_eight and eight_plus:
-        log.debug("zero_to_five and eight_plus only")
-        register = 'Early Years Register and Childcare Register (voluntary part)'
-    if not zero_to_five and five_to_eight and not eight_plus:
-        log.debug("five_to_eight only")
-        register = 'Childcare Register (compulsory part)'
-    if not zero_to_five and not five_to_eight and eight_plus:
-        log.debug("eight_plus only")
-        register = 'Childcare Register (voluntary part)'
-    return register
