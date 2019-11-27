@@ -270,6 +270,48 @@ class ReviewPersonalDetailsTests(NannyReviewFuncTestsBase):
         utils.assertSummaryField(response, 'Start date', '03/12/2004', heading=heading)
         utils.assertSummaryField(response, 'End date', '07/12/2004', heading=heading)
 
+    def test_submit_sets_task_to_started_if_linking_not_complete(self):
+        self.nanny_gateway.previous_registration_read_response.status_code = 404
+
+        response = self.client.post(reverse('nanny_personal_details_summary') + '?id=' + self.test_app_id)
+
+        arc_record = Arc.objects.get(application_id=self.test_app_id)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(arc_record.personal_details_review, 'IN PROGRESS')
+
+    def test_submit_sets_task_to_done_if_linking_complete(self):
+        self.nanny_gateway.previous_registration_read_response.record = {'application_id': self.test_app_id,
+                                        'previous_registration': True,
+                                        'individual_id': 12345678}
+
+        response = self.client.post(reverse('nanny_personal_details_summary') + '?id=' + self.test_app_id)
+
+        arc_record = Arc.objects.get(application_id=self.test_app_id)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(arc_record.personal_details_review, 'COMPLETED')
+
+    def test_linking_details_appear_on_page(self):
+        self.nanny_gateway.previous_registration_read_response.record = {'application_id': self.test_app_id,
+                                        'previous_registration': True,
+                                        'individual_id': 12345678}
+
+        response = self.client.get(reverse('nanny_personal_details_summary') + '?id=' + self.test_app_id)
+
+        self.assertEqual(response.status_code, 200)
+        utils.assertSummaryField(response, 'Individual ID', '12345678', heading='Individual lookup')
+
+    def test_linking_details_appear_on_page_not_known_to_ofsted(self):
+        self.nanny_gateway.previous_registration_read_response.record = {'application_id': self.test_app_id,
+                                        'previous_registration': False,
+                                        'individual_id': 0}
+
+        response = self.client.get(reverse('nanny_personal_details_summary') + '?id=' + self.test_app_id)
+
+        self.assertEqual(response.status_code, 200)
+        utils.assertSummaryField(response, 'Individual ID', 'Not known to Ofsted', heading='Individual lookup')
+
 
 class PreviousRegistrationTests(NannyReviewFuncTestsBase):
 

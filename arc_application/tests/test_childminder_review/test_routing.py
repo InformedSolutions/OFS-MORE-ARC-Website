@@ -232,6 +232,67 @@ class PersonalDetailsPageFunctionalTests(TestCase):
         self.assertEqual(response.status_code, 302)
         utils.assertRedirectView(response, 'first_aid_training_summary')
 
+    def test_submit_sets_task_to_started_if_linking_not_complete(self):
+
+        url = reverse('personal_details_summary') + '?id=' + self.application.application_id
+        data = {'id': self.application.application_id}
+
+        response = self.client.post(url, data)
+
+        arc_record = models.Arc.objects.get(application_id=self.application.pk)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(arc_record.personal_details_review, 'IN PROGRESS')
+
+    def test_submit_sets_task_to_done_if_linking_complete(self):
+
+        url = reverse('personal_details_summary') + '?id=' + self.application.application_id
+        data = {'id': self.application.application_id}
+
+        previous_registration = models.PreviousRegistrationDetails.objects.create(
+            application_id=self.application,
+            previous_registration=True,
+            individual_id=12345678
+        )
+
+        response = self.client.post(url, data)
+
+        arc_record = models.Arc.objects.get(application_id=self.application.pk)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(arc_record.personal_details_review, 'COMPLETED')
+
+    def test_linking_details_appear_on_page(self):
+
+        url = reverse('personal_details_summary') + '?id=' + self.application.application_id
+        data = {'id': self.application.application_id}
+
+        previous_registration = models.PreviousRegistrationDetails.objects.create(
+            application_id=self.application,
+            previous_registration=True,
+            individual_id=12345678
+        )
+
+        response = self.client.get(url, data)
+
+        self.assertEqual(response.status_code, 200)
+        utils.assertSummaryField(response, 'Individual ID', '12345678', heading='Individual lookup')
+
+    def test_linking_details_appear_on_page_not_known_to_ofsted(self):
+
+        url = reverse('personal_details_summary') + '?id=' + self.application.application_id
+        data = {'id': self.application.application_id}
+
+        previous_registration = models.PreviousRegistrationDetails.objects.create(
+            application_id=self.application,
+            previous_registration=False,
+            individual_id=0
+        )
+
+        response = self.client.get(url, data)
+
+        self.assertEqual(response.status_code, 200)
+        utils.assertSummaryField(response, 'Individual ID', 'Not known to Ofsted', heading='Individual lookup')
 
 @tag('http')
 class ApplicantPreviousNamesFunctionalTests(TestCase):
