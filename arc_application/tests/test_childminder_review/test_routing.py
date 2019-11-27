@@ -232,6 +232,71 @@ class PersonalDetailsPageFunctionalTests(TestCase):
         self.assertEqual(response.status_code, 302)
         utils.assertRedirectView(response, 'first_aid_training_summary')
 
+    def test_submit_sets_task_to_started_if_linking_not_complete(self):
+        # test that the task status is set to started if submitted without completing linking
+
+        url = reverse('personal_details_summary') + '?id=' + self.application.application_id
+        data = {'id': self.application.application_id}
+
+        response = self.client.post(url, data)
+
+        arc_record = models.Arc.objects.get(application_id=self.application.pk)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(arc_record.personal_details_review, 'IN PROGRESS')
+
+    def test_submit_sets_task_to_done_if_linking_complete(self):
+        # test task status is set to completed if submitted with linking completed
+
+        url = reverse('personal_details_summary') + '?id=' + self.application.application_id
+        data = {'id': self.application.application_id}
+
+        previous_registration = models.PreviousRegistrationDetails.objects.create(
+            application_id=self.application,
+            previous_registration=True,
+            individual_id=12345678
+        )
+
+        response = self.client.post(url, data)
+
+        arc_record = models.Arc.objects.get(application_id=self.application.pk)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(arc_record.personal_details_review, 'COMPLETED')
+
+    def test_linking_details_appear_on_page(self):
+        # test the individual ID appears on the review page following linking
+
+        url = reverse('personal_details_summary') + '?id=' + self.application.application_id
+        data = {'id': self.application.application_id}
+
+        previous_registration = models.PreviousRegistrationDetails.objects.create(
+            application_id=self.application,
+            previous_registration=True,
+            individual_id=12345678
+        )
+
+        response = self.client.get(url, data)
+
+        self.assertEqual(response.status_code, 200)
+        utils.assertSummaryField(response, 'Individual ID', '12345678', heading='Individual lookup')
+
+    def test_linking_details_appear_on_page_not_known_to_ofsted(self):
+        # test not known to ofsted is shown on review page where no link is found
+
+        url = reverse('personal_details_summary') + '?id=' + self.application.application_id
+        data = {'id': self.application.application_id}
+
+        previous_registration = models.PreviousRegistrationDetails.objects.create(
+            application_id=self.application,
+            previous_registration=False,
+            individual_id=0
+        )
+
+        response = self.client.get(url, data)
+
+        self.assertEqual(response.status_code, 200)
+        utils.assertSummaryField(response, 'Individual ID', 'Not known to Ofsted', heading='Individual lookup')
 
 @tag('http')
 class ApplicantPreviousNamesFunctionalTests(TestCase):
@@ -1522,6 +1587,82 @@ class PeopleInTheHomeFunctionalTests(TestCase):
             data['{}-MAX_NUM_FORMS'.format(form_type)] = '1000'
 
         return data
+
+    def test_submit_sets_task_to_started_if_linking_not_complete(self):
+        # test task status is started if submitted before completing linking
+        url = reverse('other_people_summary') + '?id=' + self.application.application_id
+        data = self._make_post_data(adults=1)
+        data.update({
+            'adult-0-cygnum_relationship': 'Brother',
+        })
+
+        response = self.client.post(url, data)
+
+        arc_record = models.Arc.objects.get(application_id=self.application.pk)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(arc_record.people_in_home_review, 'IN PROGRESS')
+
+    def test_submit_sets_task_to_done_if_linking_complete(self):
+        # test tasks status set to completed if submitted with  linking complete
+        url = reverse('other_people_summary') + '?id=' + self.application.application_id
+        data = self._make_post_data(adults=1)
+        data.update({
+            'adult-0-cygnum_relationship': 'Brother',
+        })
+
+        adult = models.AdultInHome.objects.get(adult_id='da2265c2-2d65-4214-bfef-abcfe59b75aa')
+
+        previous_registration = models.OtherPersonPreviousRegistrationDetails.objects.create(
+            person_id=adult,
+            previous_registration=True,
+            individual_id=12345678
+        )
+
+        response = self.client.post(url, data)
+
+        arc_record = models.Arc.objects.get(application_id=self.application.pk)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(arc_record.people_in_home_review, 'COMPLETED')
+
+    def test_linking_details_appear_on_page(self):
+        # test individual ID displayed if link amde
+
+        url = reverse('other_people_summary') + '?id=' + self.application.application_id
+        data = self._make_post_data(adults=1)
+
+        adult = models.AdultInHome.objects.get(adult_id='da2265c2-2d65-4214-bfef-abcfe59b75aa')
+
+        previous_registration = models.OtherPersonPreviousRegistrationDetails.objects.create(
+            person_id=adult,
+            previous_registration=True,
+            individual_id=12345678
+        )
+
+        response = self.client.get(url, data)
+
+        self.assertEqual(response.status_code, 200)
+        utils.assertSummaryField(response, 'Individual ID', '12345678', heading='Individual lookup')
+
+    def test_linking_details_appear_on_page_not_known_to_ofsted(self):
+        # test not known to ofsted displayed if no link  made
+
+        url = reverse('other_people_summary') + '?id=' + self.application.application_id
+        data = self._make_post_data(adults=1)
+
+        adult = models.AdultInHome.objects.get(adult_id='da2265c2-2d65-4214-bfef-abcfe59b75aa')
+
+        previous_registration = models.OtherPersonPreviousRegistrationDetails.objects.create(
+            person_id=adult,
+            previous_registration=False,
+            individual_id=0
+        )
+
+        response = self.client.get(url, data)
+
+        self.assertEqual(response.status_code, 200)
+        utils.assertSummaryField(response, 'Individual ID', 'Not known to Ofsted', heading='Individual lookup')
 
 
 @tag('http')
