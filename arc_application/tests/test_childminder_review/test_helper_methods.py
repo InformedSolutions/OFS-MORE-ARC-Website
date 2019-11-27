@@ -4,7 +4,8 @@ from django.test import TestCase, tag
 from ...models import ChildcareType
 from ...tests.utils import create_childminder_application, create_arc_user
 from ...childminder_task_util import get_number_of_tasks
-from ...views.childminder_views.type_of_childcare import get_register_name
+# from ...views.childminder_views.type_of_childcare import get_register_name
+
 from ...views.childminder_views import personal_details_individual_lookup
 
 
@@ -108,7 +109,7 @@ class ChildminderTypeOfChildcareHelperUnitTests(TestCase):
         childcare_type.eight_plus = True
         childcare_type.save()
 
-        register = get_register_name(childcare_type)
+        register = childcare_type.get_register_name()
         self.assertEqual('Early Years Register and Childcare Register (both parts)', register)
 
         childcare_type.zero_to_five = False
@@ -116,7 +117,7 @@ class ChildminderTypeOfChildcareHelperUnitTests(TestCase):
         childcare_type.eight_plus = True
         childcare_type.save()
 
-        register = get_register_name(childcare_type)
+        register = childcare_type.get_register_name()
         self.assertEqual('Childcare Register (both parts)', register)
 
         childcare_type.zero_to_five = True
@@ -124,7 +125,7 @@ class ChildminderTypeOfChildcareHelperUnitTests(TestCase):
         childcare_type.eight_plus = False
         childcare_type.save()
 
-        register = get_register_name(childcare_type)
+        register = childcare_type.get_register_name()
         self.assertEqual('Early Years Register', register)
 
         childcare_type.zero_to_five = True
@@ -132,7 +133,7 @@ class ChildminderTypeOfChildcareHelperUnitTests(TestCase):
         childcare_type.eight_plus = False
         childcare_type.save()
 
-        register = get_register_name(childcare_type)
+        register = childcare_type.get_register_name()
         self.assertEqual('Early Years Register and Childcare Register (compulsory part)', register)
 
         childcare_type.zero_to_five = True
@@ -140,7 +141,7 @@ class ChildminderTypeOfChildcareHelperUnitTests(TestCase):
         childcare_type.eight_plus = True
         childcare_type.save()
 
-        register = get_register_name(childcare_type)
+        register = childcare_type.get_register_name()
         self.assertEqual('Early Years Register and Childcare Register (voluntary part)', register)
 
         childcare_type.zero_to_five = False
@@ -148,7 +149,7 @@ class ChildminderTypeOfChildcareHelperUnitTests(TestCase):
         childcare_type.eight_plus = False
         childcare_type.save()
 
-        register = get_register_name(childcare_type)
+        register = childcare_type.get_register_name()
         self.assertEqual('Childcare Register (compulsory part)', register)
 
         childcare_type.zero_to_five = False
@@ -156,8 +157,73 @@ class ChildminderTypeOfChildcareHelperUnitTests(TestCase):
         childcare_type.eight_plus = True
         childcare_type.save()
 
-        register = get_register_name(childcare_type)
+        register = childcare_type.get_register_name()
         self.assertEqual('Childcare Register (voluntary part)', register)
+
+    def test_get_timings(self):
+        """
+        Tests the get_timings for childcare function
+        """
+        user = create_arc_user()
+        application = create_childminder_application(user.pk)
+        childcare_type = ChildcareType.objects.get(application_id=application.pk)
+
+        childcare_type.weekday_before_school = True
+        childcare_type.weekday_after_school = True
+        childcare_type.weekday_am = True
+        childcare_type.weekday_pm = True
+        childcare_type.weekday_all_day = True
+        childcare_type.weekend_all_day = True
+        childcare_type.save()
+
+        timings = childcare_type.get_timings()
+
+        self.assertEqual(
+            'Weekday (before school), Weekday (after school), Weekday (morning), Weekday (afternoon), Weekday (all day), Weekend',
+            timings)
+
+        childcare_type.weekday_before_school = False
+        childcare_type.save()
+
+        timings = childcare_type.get_timings()
+
+        self.assertEqual( 'Weekday (after school), Weekday (morning), Weekday (afternoon), Weekday (all day), Weekend',
+                          timings)
+
+        childcare_type.weekday_after_school = False
+        childcare_type.save()
+
+        timings = childcare_type.get_timings()
+
+        self.assertEqual('Weekday (morning), Weekday (afternoon), Weekday (all day), Weekend', timings)
+
+        childcare_type.weekday_am = False
+        childcare_type.save()
+
+        timings = childcare_type.get_timings()
+
+        self.assertEqual('Weekday (afternoon), Weekday (all day), Weekend', timings)
+
+        childcare_type.weekday_pm = False
+        childcare_type.save()
+
+        timings = childcare_type.get_timings()
+
+        self.assertEqual('Weekday (all day), Weekend', timings)
+
+        childcare_type.weekday_all_day = False
+        childcare_type.save()
+
+        timings = childcare_type.get_timings()
+
+        self.assertEqual('Weekend', timings)
+
+        childcare_type.weekend_all_day = False
+        childcare_type.save()
+
+        timings = childcare_type.get_timings()
+
+        self.assertEqual('', timings)
 
 
 @tag('unit')
