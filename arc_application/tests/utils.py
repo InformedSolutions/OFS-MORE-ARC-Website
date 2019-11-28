@@ -288,6 +288,189 @@ class StubNannyGatewayActions:
         resp.record = record if record is not None else {}
         return resp
 
+class StubHMGatewayActions:
+    """
+    Stub that returns static data for household member gateway endpoints. Can be instantiated, tweaked and discarded for
+    each test
+    """
+
+    def __init__(self):
+        self.dpa_auth_record = {
+            "token_id": "51cdabff-a9c5-4032-bf50-0c8d1dd90888",
+            "URN": "EY456721",
+            "date_of_birth_day": 25,
+            "date_of_birth_month": 5,
+            "date_of_birth_year": 1981,
+            "postcode": "BH21 4AY",
+            "individual_id": "1786117",
+        }
+        self.dpa_auth_read_response = self.make_response(record=self.dpa_auth_record)
+
+        self.adult_record = {
+            "adult_id": "ffc54793-4694-4d33-9d7b-e9aa8c0ad2a3",
+            "date_of_birth": "1980-03-31",
+            "get_full_name": "Adult Test Adults",
+            "start_date": None,
+            "end_date": None,
+            "order": 1,
+            "first_name": "Adult",
+            "middle_names": "Test",
+            "last_name": "Adults",
+            "birth_day": 31,
+            "birth_month": 3,
+            "birth_year": 1980,
+            "relationship": "Husband",
+            "email": "test@test.com",
+            "dbs_certificate_number": "",
+            "lived_abroad": None,
+            "military_base": None,
+            "capita": None,
+            "enhanced_check": None,
+            "on_update": None,
+            "certificate_information": "",
+            "within_three_months": None,
+            "token": None,
+            "health_check_status": "To do",
+            "email_resent": 0,
+            "email_resent_timestamp": None,
+            "validated": False,
+            "current_treatment": None,
+            "serious_illness": None,
+            "known_to_council": None,
+            "reasons_known_to_council_health_check": "",
+            "hospital_admission": None,
+            "name_start_day": None,
+            "name_start_month": None,
+            "name_start_year": None,
+            "name_end_day": None,
+            "name_end_month": None,
+            "name_end_year": None,
+            "token_id": "51cdabff-a9c5-4032-bf50-0c8d1dd90888",
+            "adult_status": 'DRAFTING'
+        }
+        self.adult_read_response = self.make_response(record=self.adult_record)
+
+        self.previous_registration_record = {
+            'application_id': 'ffc54793-4694-4d33-9d7b-e9aa8c0ad2a3',
+            'previous_registration_id': '9835bf4b-9ba9-4162-a25b-4c56e7d33d67',
+            'previous_registration': True,
+            'individual_id': '12345567',
+            'five_years_in_UK': True
+        }
+        self.previous_registration_read_response = self.make_response(record=self.previous_registration_record)
+
+        self.previous_name_record = {
+            'application_id': 'ffc54793-4694-4d33-9d7b-e9aa8c0ad2a3',
+            'previous_name_id': '9835bf4b-9ba9-4162-a25b-4c56e7d33d67',
+            'first_name': 'Robin',
+            'middle_names': '',
+            'last_name': 'Hood',
+            'start_day': 1,
+            'start_month': 12,
+            'start_year': 2003,
+            'end_day': 3,
+            'end_month': 12,
+            'end_year': 2004,
+            'order': 0
+        }
+        self.previous_name_read_response = self.make_response(record=self.previous_name_record)
+
+        self.home_address_record = {
+            'application_id': 'ffc54793-4694-4d33-9d7b-e9aa8c0ad2a3',
+            'home_address_id': '9935bf3b-8ba9-4162-a25b-4c55e7d33d67',
+            'street_line1': 'Test',
+            'street_line2': None,
+            'town': 'Middle Earth',
+            'county': None,
+            'postcode': 'WA14 4PA',
+            'childcare_address': False,
+        }
+        self.home_address_read_response = self.make_response(record=self.home_address_record)
+
+        self.previous_address_record = {
+            'previous_address_id': '88888888-4444-4444-4444-121212121212',
+            'person_id': '998fd8ec-b96b-4a71-a1a1-a7a3ae186729',
+            'person_type': 'APPLICANT',
+            'street_line1': '1 Street Road',
+            'street_line2': '',
+            'town': 'Cityston',
+            'county': 'Greater Countyshire',
+            'country': '',
+            'postcode': 'M9 9MP',
+            'moved_in_date': '2016-06-02',
+            'moved_out_date': '2018-02-23',
+            'order': 0,
+        }
+        self.previous_address_read_response = self.make_response(record=self.previous_address_record)
+        self.previous_address_list_response = self.make_response(record=[self.previous_address_record])
+
+        self.application_record = {
+            "application_id": "3afa6904-074f-49c6-ade0-3abc9eea0111",
+            "token_id": "51cdabff-a9c5-4032-bf50-0c8d1dd90888"
+        }
+        self.application_read_response = self.make_response(record=self.application_record)
+
+        self.arc_comments_record = \
+            {
+                "review_id": "a4f5aafd-d985-42fc-a984-e12326307e8e",
+                "token_id": "9aa5fe94-34d8-4263-9228-8e020774b5f2",
+                "table_pk": "8a132ff0-ac62-47e1-9b24-662c30e66243",
+                "endpoint_name": "adult",
+                "field_name": "health_check_status",
+                "comment": "Health questions status",
+                "flagged": True
+            },
+
+        self.arc_comments_read_response = self.make_response(404)
+        self.arc_comments_list_response = self.make_response(404)
+
+        self.timeline_log_record = {}
+        self.timeline_log_read_response = self.make_response(record=self.timeline_log_record)
+
+        self.default_list_response = {
+            'adult': self.make_response(record=[self.adult_record]),
+            'arc-comments': self.arc_comments_list_response
+        }
+        self.default_read_response = self.make_response()
+        self.default_create_response = self.make_response()
+        self.default_patch_response = self.make_response()
+        self.default_put_response = self.make_response()
+        self.default_delete_response = self.make_response()
+
+        self.endpoint_mapping = {
+            'application': 'application',
+            'dpa-auth': 'dpa_auth',
+            'adult': 'adult',
+            'arc-comments': 'arc_comments',
+            'previous-name': 'previous_name',
+            'previous-address': 'previous_address',
+            'timeline-log': 'timeline_log',
+        }
+
+    def list(self, endpoint, *_, **__):
+        return getattr(self, '{}_list_response'.format(self.endpoint_mapping[endpoint]), self.default_list_response[endpoint])
+
+    def read(self, endpoint, *_, **__):
+        return getattr(self, '{}_read_response'.format(self.endpoint_mapping[endpoint]), self.default_read_response)
+
+    def create(self, endpoint, *_, **__):
+        return getattr(self, '{}_create_response'.format(self.endpoint_mapping[endpoint]), self.default_create_response)
+
+    def patch(self, endpoint, *_, **__):
+        return getattr(self, '{}_patch_response'.format(self.endpoint_mapping[endpoint]), self.default_patch_response)
+
+    def put(self, endpoint, *_, **__):
+        return getattr(self, '{}_put_response'.format(self.endpoint_mapping[endpoint]), self.default_put_response)
+
+    def delete(self, endpoint, *_, **__):
+        return getattr(self, '{}_delete_response'.format(self.endpoint_mapping[endpoint]), self.default_delete_response)
+
+    # noinspection PyMethodMayBeStatic
+    def make_response(self, status=200, record=None):
+        resp = HttpResponse()
+        resp.status_code = status
+        resp.record = record if record is not None else {}
+        return resp
 
 # CamelCase naming to match unittest module
 def assertXPath(response, xpath):
@@ -582,6 +765,14 @@ def create_nanny_review(application_id, user_id=None):
         # user_id field is non-null and uses empty string when no user is assigned
         user_id=user_id if user_id is not None else '',
         app_type='Nanny',
+    )
+
+def create_adult_review(application_id, user_id=None):
+    return Arc.objects.create(
+        application_id=application_id,
+        # user_id field is non-null and uses empty string when no user is assigned
+        user_id=user_id if user_id is not None else '',
+        app_type='Adult update'
     )
 
 
