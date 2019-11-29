@@ -291,7 +291,7 @@ class PreviousRegistrationTests(HMReviewFuncTestsBase):
         """
         Test to ensure that the page for entering previous registration details can be rendered.
         """
-        response = self.client.get(reverse('nanny_previous_registration') + '?id=' + self.test_app_id)
+        response = self.client.get(reverse('adults-previous-registration') + '?id=' + self.test_app_id)
 
         self.assertEqual(response.status_code, 200)
         utils.assertView(response, adult_previous_registration_view)
@@ -510,8 +510,8 @@ class HMPreviousNamesTests(HMReviewFuncTestsBase):
 
     def test_submit_confirm_calls_create_on_data_inputted(self):
 
-        with patch.object(HMGatewayActions, 'list') as nanny_api_list, \
-                patch.object(HMGatewayActions, 'create') as nanny_api_create:
+        with patch.object(HMGatewayActions, 'list') as hm_api_list, \
+                patch.object(HMGatewayActions, 'create') as hm_api_create:
             url = '{0}?id={1}'.format(reverse('adult-update-previous-names'), self.test_app_id)
 
             data = self._make_post_data(2, 'Confirm and continue', last_is_new=True)
@@ -535,7 +535,7 @@ class HMPreviousNamesTests(HMReviewFuncTestsBase):
             }
 
             self.assertEqual(302, response.status_code)
-            nanny_api_create.assert_called_with('previous-name', params=valid_data_dict)
+            hm_api_create.assert_called_with('previous-name', params=valid_data_dict)
 
     def _make_post_data(self, num_names, action=None, last_is_new=False):
         data = {
@@ -572,13 +572,13 @@ class ReviewSummaryAndConfirmationFunctionalTests(HMReviewFuncTestsBase):
 
     @patch('arc_application.messaging.application_exporter.ApplicationExporter.export_childminder_application')
     @patch('arc_application.messaging.application_exporter.ApplicationExporter.export_nanny_application')
-    @patch('arc_application.messaging.application_exporter.ApplicationExporter.export_adult_application')
+    @patch('arc_application.messaging.application_exporter.ApplicationExporter.export_adult_update_application')
     @patch('arc_application.views.base.datetime', new=MockDatetime)
     def test_submit_summary_releases_application_as_accepted_in_database_if_no_tasks_flagged(self, *_):
 
         # set up gateway mocks to record changes to application fields
         app_field_updates = {}
-        ok_response = self.nanny_gateway.make_response(200)
+        ok_response = self.hm_gateway.make_response(200)
 
         def record_field_updates(endpoint, params):
             if endpoint == 'application' and params['adult_id'] == self.test_app_id:
@@ -624,13 +624,13 @@ class ReviewSummaryAndConfirmationFunctionalTests(HMReviewFuncTestsBase):
 
     @patch('arc_application.messaging.application_exporter.ApplicationExporter.export_childminder_application')
     @patch('arc_application.messaging.application_exporter.ApplicationExporter.export_nanny_application')
-    @patch('arc_application.messaging.application_exporter.ApplicationExporter.export_adult_application')
+    @patch('arc_application.messaging.application_exporter.ApplicationExporter.export_adult_update_application')
     @patch('datetime.datetime', new=MockDatetime)
     def test_submit_summary_releases_application_as_needing_info_in_database_if_tasks_have_been_flagged(self, *_):
 
         # set up gateway mocks to record changes to application fields
         app_field_updates = {}
-        ok_response = self.HM_gateway.make_response(200)
+        ok_response = self.hm_gateway.make_response(200)
 
         def record_field_updates(endpoint, params):
             if endpoint == 'application' and params['adult_id'] == self.test_app_id:
@@ -648,13 +648,13 @@ class ReviewSummaryAndConfirmationFunctionalTests(HMReviewFuncTestsBase):
         APP_TASKS_ALL = APP_TASKS_TO_BE_FLAGGED + APP_TASKS_NOT_TO_BE_FLAGGED
 
         for task in APP_TASKS_ALL:
-            self.HM_gateway.HM_application['{}_status'.format(task)] = APP_STATUS_COMPLETED
-            self.HM_gateway.HM_application['{}_arc_flagged'.format(task)] = False
+            self.hm_gateway.hm_application['{}_status'.format(task)] = APP_STATUS_COMPLETED
+            self.hm_gateway.hm_application['{}_arc_flagged'.format(task)] = False
 
-        self.HM_gateway.HM_application['declarations_status'] = APP_STATUS_COMPLETED
-        self.HM_gateway.HM_application['application_status'] = APP_STATUS_REVIEW
+        self.hm_gateway.hm_application['declarations_status'] = APP_STATUS_COMPLETED
+        self.hm_gateway.hm_application['application_status'] = APP_STATUS_REVIEW
 
-        arc = Arc.objects.get(adult_id=self.test_app_id)
+        arc = Arc.objects.get(application_id=self.test_app_id)
 
         for task in ARC_TASKS_UNFLAGGED:
             setattr(arc, '{}_review'.format(task), ARC_STATUS_COMPLETED)
@@ -664,7 +664,7 @@ class ReviewSummaryAndConfirmationFunctionalTests(HMReviewFuncTestsBase):
         arc.save()
 
         # id must be both GET and POST parameter
-        self.client.post(reverse('new_adults') + '?id=' + self.test_app_id, data={'id': self.test_app_id})
+        self.client.post(reverse(new_adults_summary) + '?id=' + self.test_app_id, data={'id': self.test_app_id})
 
         # not in accepted status
         self.assertTrue('date_accepted' not in app_field_updates
