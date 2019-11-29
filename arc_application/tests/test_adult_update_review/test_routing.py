@@ -9,8 +9,8 @@ from django.conf import settings
 from arc_application.tests.utils import create_arc_user
 from ...models import Arc
 from ...services.db_gateways import HMGatewayActions, IdentityGatewayActions
-from ...views import new_adults_summary, adults_previous_address_change, adult_previous_registration_view,\
-    adult_arc_summary, NannyContactDetailsSummary, NannyArcSummary
+from ...views import new_adults_summary, adults_previous_address_change, adult_previous_registration_view, \
+    adult_update_view
 from ...tests import utils
 
 ARC_STATUS_FLAGGED = 'FLAGGED'
@@ -41,7 +41,7 @@ class HMReviewFuncTestsBase(TestCase):
             setattr(self, 'ngw_{}_mock'.format(meth), mk)
 
         # create arc record for test application
-        self.test_app_id = self.hm_gateway.hm_application['application_id']
+        self.test_app_id = self.hm_gateway.hm_application['adult_id']
         self.arc_record = utils.create_adult_review(self.test_app_id, self.arc_user.pk)
 
         # stub out the identity gateway and store mock for read method
@@ -107,206 +107,182 @@ class ReviewTaskListTests(HMReviewFuncTestsBase):
         self.skipTest('testNotImplemented')
 
 
-class ReviewSignInDetailsTests(HMReviewFuncTestsBase):
-
-    def test_can_render_sign_in_details_page(self):
-        """
-        Test to ensure that the page for flagging sign in details can be rendered.
-        """
-        response = self.client.get(reverse('nanny_contact_summary') + '?id=' + self.test_app_id)
-
-        self.assertEqual(response.status_code, 200)
-        utils.assertView(response, NannyContactDetailsSummary.as_view())
-
-    def test_sign_in_details_redirects_to_personal_details(self):
-        """
-        Test that a POST request to the sign in details page redirects to the personal details page.
-        """
-        response = self.client.post(reverse('hm_contact_summary') + '?id=' + self.test_app_id,
-                                    data={
-                                        'id': self.test_app_id
-                                    })
-
-        self.assertEqual(response.status_code, 302)
-        utils.assertRedirectView(response, new_adults_summary)
-
-
-class ReviewPersonalDetailsTests(HMReviewFuncTestsBase):
-
-    def test_can_render_personal_details_page(self):
-        """
-        Test to ensure that the page for flagging personal details can be rendered.
-        """
-        response = self.client.get(reverse('new_adults_summary') + '?id=' + self.test_app_id)
-
-        self.assertEqual(response.status_code, 200)
-        utils.assertView(response, new_adults_summary)
-
-    def test_flagging_personal_details_creates_arc_comments(self):
-        """
-        Test to ensure that personal details can be flagged.
-        """
-        self.skipTest('This test is failing due to endpoints, but the lived_abroad field '
-                      'will be removed from here anyway. FIXME then.')
-        fields_to_flag = [
-            'name',
-            'date_of_birth',
-            'relationship',
-            'email',
-            'PITH_mobile_number',
-            'PITH_address',
-            'known_to_social_services',
-            'reasons_known_to_social_services'
-        ]
-
-        post_data = self._create_post_data(fields_to_flag)
-
-        self.client.post(reverse('nanny_personal_details_summary') + '?id=' + self.test_app_id, data=post_data)
-
-        for field in fields_to_flag:
-            self._assert_create_call_made_with_given_params(self.ngw_create_mock, 'arc-comments', params={
-                'application_id': self.test_app_id,
-                'endpoint_name': ['applicant-personal-details', 'applicant-home-address'],
-                'field_name': field,
-                'comment': 'Flagged',
-                'flagged': True,
-            })
-
-    def test_flagging_personal_details_sets_status_to_flagged(self, ):
-        fields_to_flag = [
-            'name',
-            'date_of_birth',
-            'relationship',
-            'email',
-            'PITH_mobile_number',
-            'PITH_address',
-            'known_to_social_services',
-            'reasons_known_to_social_services'
-        ]
-
-        post_data = self._create_post_data(fields_to_flag)
-
-        self.client.post(reverse('new_adults_summary') + '?id=' + self.test_app_id, data=post_data)
-
-        self.assertEqual(Arc.objects.get(pk=self.test_app_id).personal_details_review, 'FLAGGED')
-
-    def test_flagging_name_only_sets_personal_details_status_to_flagged(self):
-        fields_to_flag = [
-            'name'
-        ]
-
-        post_data = self._create_post_data(fields_to_flag)
-
-        self.client.post(reverse('new_adults_summary') + '?id=' + self.test_app_id, data=post_data)
-
-        self.assertEqual(Arc.objects.get(pk=self.test_app_id).personal_details_review, 'FLAGGED')
-
-    def test_not_flagging_personal_details_sets_status_to_reviewed(self):
-        self.client.post(reverse('new_adults_summary') + '?id=' + self.test_app_id,
-                         data={
-                             'id': self.test_app_id,
-                         })
-
-        self.assertEqual(Arc.objects.get(pk=self.test_app_id).personal_details_review, 'COMPLETED')
-
-    def test_submit_redirects_to_childcare_address_page_if_valid(self):
-        fields_to_flag = [
-            'name',
-            'date_of_birth',
-            'lived_abroad',
-            'known_to_social_services',
-            'reasons_known_to_social_services'
-        ]
-
-        post_data = self._create_post_data(fields_to_flag)
-        response = self.client.post(reverse('new_adults_summary') + '?id=' + self.test_app_id,
-                                    data=post_data)
-
-        self.assertEqual(response.status_code, 302)
-
-    def test_shows_Add_Previous_Names_button(self):
-        # GET request to personal details summary
-        response = self.client.get(reverse('new_adults_summary') + '?id=' + self.test_app_id)
-
-        # Assert that the 'Add previous names' button is on the page.
-        utils.assertXPath(response, '//a[@href="{url}?id={app_id}"]'.format(
-            url=reverse('adult-update-previous-names'), app_id=self.test_app_id))
-
-    def test_shows_previous_names_in_creation_order(self):
-        self.nanny_gateway.previous_name_list_response = self.nanny_gateway.make_response(record=[
-            self.nanny_gateway.previous_name_record,
-            {
-                'application_id': 'ffc54793-4694-4d33-9d7b-e9aa8c0ad2a3',
-                'previous_name_id': '9935bf3b-8ba9-4162-a25b-4c55e7d33d67',
-                'first_name': 'Hi',
-                'middle_names': 'Hello',
-                'last_name': 'Hey',
-                'start_day': 3,
-                'start_month': 12,
-                'start_year': 2004,
-                'end_day': 7,
-                'end_month': 12,
-                'end_year': 2004,
-                'order': 1
-            }
-        ])
-
-        response = self.client.get(reverse('new_adults_summary') + '?id=' + self.test_app_id)
-        self.assertEqual(200, response.status_code)
-
-        heading = "Name and date of birth"
-        utils.assertSummaryField(response, 'Previous name 1', 'Robin Hood', heading=heading)
-        utils.assertSummaryField(response, 'Start date', '01/12/2003', heading=heading)
-        utils.assertSummaryField(response, 'End date', '03/12/2004', heading=heading)
-        utils.assertSummaryField(response, 'Previous name 2', 'Hi Hello Hey', heading=heading)
-        utils.assertSummaryField(response, 'Start date', '03/12/2004', heading=heading)
-        utils.assertSummaryField(response, 'End date', '07/12/2004', heading=heading)
-
-    def test_submit_sets_task_to_started_if_linking_not_complete(self):
-        # test task status set to started if submitted before linking is completed
-        self.HM_gateway.previous_registration_read_response.status_code = 404
-
-        response = self.client.post(reverse('new_adults_summary') + '?id=' + self.test_app_id)
-
-        arc_record = Arc.objects.get(application_id=self.test_app_id)
-
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(arc_record.personal_details_review, 'IN PROGRESS')
-
-    def test_submit_sets_task_to_done_if_linking_complete(self):
-        # test task status is set to completed if submitted with linking completed
-        self.HM_gateway.previous_registration_read_response.record = {'application_id': self.test_app_id,
-                                        'previous_registration': True,
-                                        'individual_id': 12345678}
-
-        response = self.client.post(reverse('new_adults_summary') + '?id=' + self.test_app_id)
-
-        arc_record = Arc.objects.get(application_id=self.test_app_id)
-
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(arc_record.personal_details_review, 'COMPLETED')
-
-    def test_linking_details_appear_on_page(self):
-        # test individual ID appears on review page if link made
-        self.HM_gateway.previous_registration_read_response.record = {'application_id': self.test_app_id,
-                                        'previous_registration': True,
-                                        'individual_id': 12345678}
-
-        response = self.client.get(reverse('new_adults_summary') + '?id=' + self.test_app_id)
-
-        self.assertEqual(response.status_code, 200)
-        utils.assertSummaryField(response, 'Individual ID', '12345678', heading='Individual lookup')
-
-    def test_linking_details_appear_on_page_not_known_to_ofsted(self):
-        # test not known ofsted appear on page  if no link was found
-        self.HM_gateway.previous_registration_read_response.record = {'application_id': self.test_app_id,
-                                        'previous_registration': False,
-                                        'individual_id': 0}
-
-        response = self.client.get(reverse('new_adults_summary') + '?id=' + self.test_app_id)
-
-        self.assertEqual(response.status_code, 200)
-        utils.assertSummaryField(response, 'Individual ID', 'Not known to Ofsted', heading='Individual lookup')
+# class ReviewPersonalDetailsTests(HMReviewFuncTestsBase):
+#
+#     def test_can_render_personal_details_page(self):
+#         """
+#         Test to ensure that the page for flagging personal details can be rendered.
+#         """
+#         response = self.client.get(reverse('new_adults_summary') + '?id=' + self.test_app_id)
+#
+#         self.assertEqual(response.status_code, 200)
+#         utils.assertView(response, new_adults_summary)
+#
+#     def test_flagging_personal_details_creates_arc_comments(self):
+#         """
+#         Test to ensure that personal details can be flagged.
+#         """
+#         self.skipTest('This test is failing due to endpoints, but the lived_abroad field '
+#                       'will be removed from here anyway. FIXME then.')
+#         fields_to_flag = [
+#             'name',
+#             'date_of_birth',
+#             'relationship',
+#             'email',
+#             'PITH_mobile_number',
+#             'PITH_address',
+#             'known_to_social_services',
+#             'reasons_known_to_social_services'
+#         ]
+#
+#         post_data = self._create_post_data(fields_to_flag)
+#
+#         self.client.post(reverse('nanny_personal_details_summary') + '?id=' + self.test_app_id, data=post_data)
+#
+#         for field in fields_to_flag:
+#             self._assert_create_call_made_with_given_params(self.ngw_create_mock, 'arc-comments', params={
+#                 'adult_id': self.test_app_id,
+#                 'endpoint_name': ['applicant-personal-details', 'applicant-home-address'],
+#                 'field_name': field,
+#                 'comment': 'Flagged',
+#                 'flagged': True,
+#             })
+#
+#     def test_flagging_personal_details_sets_status_to_flagged(self, ):
+#         fields_to_flag = [
+#             'name',
+#             'date_of_birth',
+#             'relationship',
+#             'email',
+#             'PITH_mobile_number',
+#             'PITH_address',
+#             'known_to_social_services',
+#             'reasons_known_to_social_services'
+#         ]
+#
+#         post_data = self._create_post_data(fields_to_flag)
+#
+#         self.client.post(reverse('new_adults_summary') + '?id=' + self.test_app_id, data=post_data)
+#
+#         self.assertEqual(Arc.objects.get(pk=self.test_app_id).personal_details_review, 'FLAGGED')
+#
+#     def test_flagging_name_only_sets_personal_details_status_to_flagged(self):
+#         fields_to_flag = [
+#             'name'
+#         ]
+#
+#         post_data = self._create_post_data(fields_to_flag)
+#
+#         self.client.post(reverse('new_adults_summary') + '?id=' + self.test_app_id, data=post_data)
+#
+#         self.assertEqual(Arc.objects.get(pk=self.test_app_id).personal_details_review, 'FLAGGED')
+#
+#     def test_not_flagging_personal_details_sets_status_to_reviewed(self):
+#         self.client.post(reverse('new_adults_summary') + '?id=' + self.test_app_id,
+#                          data={
+#                              'id': self.test_app_id,
+#                          })
+#
+#         self.assertEqual(Arc.objects.get(pk=self.test_app_id).personal_details_review, 'COMPLETED')
+#
+#     def test_submit_redirects_to_childcare_address_page_if_valid(self):
+#         fields_to_flag = [
+#             'name',
+#             'date_of_birth',
+#             'lived_abroad',
+#             'known_to_social_services',
+#             'reasons_known_to_social_services'
+#         ]
+#
+#         post_data = self._create_post_data(fields_to_flag)
+#         response = self.client.post(reverse('new_adults_summary') + '?id=' + self.test_app_id,
+#                                     data=post_data)
+#
+#         self.assertEqual(response.status_code, 302)
+#
+#     def test_shows_Add_Previous_Names_button(self):
+#         # GET request to personal details summary
+#         response = self.client.get(reverse('new_adults_summary') + '?id=' + self.test_app_id)
+#
+#         # Assert that the 'Add previous names' button is on the page.
+#         utils.assertXPath(response, '//a[@href="{url}?id={app_id}"]'.format(
+#             url=reverse('adult-update-previous-names'), app_id=self.test_app_id))
+#
+#     def test_shows_previous_names_in_creation_order(self):
+#         self.nanny_gateway.previous_name_list_response = self.nanny_gateway.make_response(record=[
+#             self.nanny_gateway.previous_name_record,
+#             {
+#                 'adult_id': 'ffc54793-4694-4d33-9d7b-e9aa8c0ad2a3',
+#                 'previous_name_id': '9935bf3b-8ba9-4162-a25b-4c55e7d33d67',
+#                 'first_name': 'Hi',
+#                 'middle_names': 'Hello',
+#                 'last_name': 'Hey',
+#                 'start_day': 3,
+#                 'start_month': 12,
+#                 'start_year': 2004,
+#                 'end_day': 7,
+#                 'end_month': 12,
+#                 'end_year': 2004,
+#                 'order': 1
+#             }
+#         ])
+#
+#         response = self.client.get(reverse('new_adults_summary') + '?id=' + self.test_app_id)
+#         self.assertEqual(200, response.status_code)
+#
+#         heading = "Name and date of birth"
+#         utils.assertSummaryField(response, 'Previous name 1', 'Robin Hood', heading=heading)
+#         utils.assertSummaryField(response, 'Start date', '01/12/2003', heading=heading)
+#         utils.assertSummaryField(response, 'End date', '03/12/2004', heading=heading)
+#         utils.assertSummaryField(response, 'Previous name 2', 'Hi Hello Hey', heading=heading)
+#         utils.assertSummaryField(response, 'Start date', '03/12/2004', heading=heading)
+#         utils.assertSummaryField(response, 'End date', '07/12/2004', heading=heading)
+#
+#     def test_submit_sets_task_to_started_if_linking_not_complete(self):
+#         # test task status set to started if submitted before linking is completed
+#         self.HM_gateway.previous_registration_read_response.status_code = 404
+#
+#         response = self.client.post(reverse('new_adults_summary') + '?id=' + self.test_app_id)
+#
+#         arc_record = Arc.objects.get(adult_id=self.test_app_id)
+#
+#         self.assertEqual(response.status_code, 302)
+#         self.assertEqual(arc_record.personal_details_review, 'IN PROGRESS')
+#
+#     def test_submit_sets_task_to_done_if_linking_complete(self):
+#         # test task status is set to completed if submitted with linking completed
+#         self.HM_gateway.previous_registration_read_response.record = {'adult_id': self.test_app_id,
+#                                         'previous_registration': True,
+#                                         'individual_id': 12345678}
+#
+#         response = self.client.post(reverse('new_adults_summary') + '?id=' + self.test_app_id)
+#
+#         arc_record = Arc.objects.get(adult_id=self.test_app_id)
+#
+#         self.assertEqual(response.status_code, 302)
+#         self.assertEqual(arc_record.personal_details_review, 'COMPLETED')
+#
+#     def test_linking_details_appear_on_page(self):
+#         # test individual ID appears on review page if link made
+#         self.HM_gateway.previous_registration_read_response.record = {'adult_id': self.test_app_id,
+#                                         'previous_registration': True,
+#                                         'individual_id': 12345678}
+#
+#         response = self.client.get(reverse('new_adults_summary') + '?id=' + self.test_app_id)
+#
+#         self.assertEqual(response.status_code, 200)
+#         utils.assertSummaryField(response, 'Individual ID', '12345678', heading='Individual lookup')
+#
+#     def test_linking_details_appear_on_page_not_known_to_ofsted(self):
+#         # test not known ofsted appear on page  if no link was found
+#         self.HM_gateway.previous_registration_read_response.record = {'adult_id': self.test_app_id,
+#                                         'previous_registration': False,
+#                                         'individual_id': 0}
+#
+#         response = self.client.get(reverse('new_adults_summary') + '?id=' + self.test_app_id)
+#
+#         self.assertEqual(response.status_code, 200)
+#         utils.assertSummaryField(response, 'Individual ID', 'Not known to Ofsted', heading='Individual lookup')
 
 
 class PreviousRegistrationTests(HMReviewFuncTestsBase):
@@ -340,7 +316,7 @@ class PreviousRegistrationTests(HMReviewFuncTestsBase):
          Test to assert that clicking 'Continue' on the guidance page takes you to the
          'Type-Of-Childcare-Training' page.
         """
-        self.HM_gateway.previous_registration_read_response.record = None
+        self.hm_gateway.previous_registration_read_response.record = None
 
         data = {'id': self.test_app_id}
 
@@ -350,7 +326,7 @@ class PreviousRegistrationTests(HMReviewFuncTestsBase):
         utils.assertView(response, adult_previous_registration_view)
 
 
-class NannyPreviousNamesTests(HMReviewFuncTestsBase):
+class HMPreviousNamesTests(HMReviewFuncTestsBase):
 
     def setUp(self):
         super().setUp()
@@ -385,9 +361,9 @@ class NannyPreviousNamesTests(HMReviewFuncTestsBase):
         """
         Test can render previous name form
         """
-        application_id = self.test_app_id
+        adult_id = self.test_app_id
         url = '{0}?id={1}'.format(
-            reverse('nanny_previous_names'), application_id)
+            reverse('adult-update-previous-names'), adult_id)
 
         response = self.client.get(url)
 
@@ -400,7 +376,7 @@ class NannyPreviousNamesTests(HMReviewFuncTestsBase):
         """
         with patch.object(HMGatewayActions, 'list') as HM_api_list:
             prev_name_record_2 = {
-                'application_id': '998fd8ec-b96b-4a71-a1a1-a7a3ae186729',
+                'adult_id': '998fd8ec-b96b-4a71-a1a1-a7a3ae186729',
                 'previous_name_id': '9935bf3b-8ba9-4162-a25b-4c55e7d33d67',
                 'first_name': 'Buffy',
                 'middle_names': '',
@@ -413,12 +389,12 @@ class NannyPreviousNamesTests(HMReviewFuncTestsBase):
                 'end_year': 2004,
                 'order': 1
             }
-            HM_api_list.return_value.record = [self.HM_gateway.previous_name_record, prev_name_record_2]
+            HM_api_list.return_value.record = [self.hm_gateway.previous_name_record, prev_name_record_2]
 
             HM_api_list.return_value.status_code = 200
-            application_id = self.test_app_id
+            adult_id = self.test_app_id
 
-            url = '{0}?id={1}'.format(reverse('adult-update-previous-names'), application_id)
+            url = '{0}?id={1}'.format(reverse('adult-update-previous-names'), adult_id)
 
             response = self.client.get(url)
 
@@ -462,7 +438,7 @@ class NannyPreviousNamesTests(HMReviewFuncTestsBase):
     def test_submit_confirm_returns_to_page_with_error_if_any_not_valid(self):
 
         with patch.object(HMGatewayActions, 'list') as HM_api_list:
-            prev_name_record_2 = {'application_id': '998fd8ec-b96b-4a71-a1a1-a7a3ae186729',
+            prev_name_record_2 = {'adult_id': '998fd8ec-b96b-4a71-a1a1-a7a3ae186729',
                                   'previous_name_id': '9935bf3b-8ba9-4162-a25b-4c55e7d33d67',
                                   'first_name': 'Buffy',
                                   'middle_names': '',
@@ -477,9 +453,9 @@ class NannyPreviousNamesTests(HMReviewFuncTestsBase):
             HM_api_list.return_value.record = [prev_name_record_2]
 
             HM_api_list.return_value.status_code = 200
-            application_id = self.test_app_id
+            adult_id = self.test_app_id
 
-            url = '{0}?id={1}'.format(reverse('adult-update-previous-names'), application_id)
+            url = '{0}?id={1}'.format(reverse('adult-update-previous-names'), adult_id)
 
             data = self._make_post_data(2, 'Confirm and continue', last_is_new=True)
             data.update(self.valid_previous_name_data[0])
@@ -500,7 +476,7 @@ class NannyPreviousNamesTests(HMReviewFuncTestsBase):
     def test_submit_confirm_redirects_to_personal_details_summary_if_all_valid(self):
 
         with patch.object(HMGatewayActions, 'list') as HM_api_list:
-            prev_name_record_2 = {'application_id': '998fd8ec-b96b-4a71-a1a1-a7a3ae186729',
+            prev_name_record_2 = {'adult_id': '998fd8ec-b96b-4a71-a1a1-a7a3ae186729',
                                   'previous_name_id': '9935bf3b-8ba9-4162-a25b-4c55e7d33d67',
                                   'first_name': 'Buffy',
                                   'middle_names': '',
@@ -515,9 +491,9 @@ class NannyPreviousNamesTests(HMReviewFuncTestsBase):
 
             HM_api_list.return_value.record = [prev_name_record_2]
             HM_api_list.return_value.status_code = 200
-            application_id = self.test_app_id
+            adult_id = self.test_app_id
 
-            url = '{0}?id={1}'.format(reverse('adult-update-previous-names'), application_id)
+            url = '{0}?id={1}'.format(reverse('adult-update-previous-names'), adult_id)
 
             data = self._make_post_data(2, 'Confirm and continue', last_is_new=True)
             data.update(self.valid_previous_name_data[0])
@@ -545,7 +521,7 @@ class NannyPreviousNamesTests(HMReviewFuncTestsBase):
             response = self.client.post(url, data)
 
             valid_data_dict = {
-                'application_id': self.test_app_id,
+                'adult_id': self.test_app_id,
                 'first_name': self.valid_previous_name_data[1]['form-1-first_name'],
                 'middle_names': self.valid_previous_name_data[1]['form-1-middle_names'],
                 'last_name': self.valid_previous_name_data[1]['form-1-last_name'],
@@ -581,7 +557,7 @@ class ReviewSummaryAndConfirmationFunctionalTests(HMReviewFuncTestsBase):
         response = self.client.get(reverse('new_adults') + '?id=' + self.test_app_id)
 
         self.assertEqual(response.status_code, 200)
-        utils.assertView(response, adult_arc_summary)
+        utils.assertView(response, adult_update_view)
 
     def test_submit_summary_sends_accepted_email_if_no_tasks_flagged(self):
         self.skipTest('testNotImplemented')
@@ -605,7 +581,7 @@ class ReviewSummaryAndConfirmationFunctionalTests(HMReviewFuncTestsBase):
         ok_response = self.nanny_gateway.make_response(200)
 
         def record_field_updates(endpoint, params):
-            if endpoint == 'application' and params['application_id'] == self.test_app_id:
+            if endpoint == 'application' and params['adult_id'] == self.test_app_id:
                 app_field_updates.update(params)
             return ok_response
 
@@ -623,7 +599,7 @@ class ReviewSummaryAndConfirmationFunctionalTests(HMReviewFuncTestsBase):
         self.HM_gateway.HM_application['declarations_status'] = APP_STATUS_COMPLETED
         self.HM_gateway.HM_application['application_status'] = APP_STATUS_REVIEW
 
-        arc = Arc.objects.get(application_id=self.test_app_id)
+        arc = Arc.objects.get(adult_id=self.test_app_id)
 
         for task in ARC_TASKS_ALL:
             setattr(arc, '{}_review'.format(task), ARC_STATUS_COMPLETED)
@@ -648,15 +624,16 @@ class ReviewSummaryAndConfirmationFunctionalTests(HMReviewFuncTestsBase):
 
     @patch('arc_application.messaging.application_exporter.ApplicationExporter.export_childminder_application')
     @patch('arc_application.messaging.application_exporter.ApplicationExporter.export_nanny_application')
+    @patch('arc_application.messaging.application_exporter.ApplicationExporter.export_adult_application')
     @patch('datetime.datetime', new=MockDatetime)
     def test_submit_summary_releases_application_as_needing_info_in_database_if_tasks_have_been_flagged(self, *_):
 
         # set up gateway mocks to record changes to application fields
         app_field_updates = {}
-        ok_response = self.nanny_gateway.make_response(200)
+        ok_response = self.HM_gateway.make_response(200)
 
         def record_field_updates(endpoint, params):
-            if endpoint == 'application' and params['application_id'] == self.test_app_id:
+            if endpoint == 'application' and params['adult_id'] == self.test_app_id:
                 app_field_updates.update(params)
             return ok_response
 
@@ -664,20 +641,20 @@ class ReviewSummaryAndConfirmationFunctionalTests(HMReviewFuncTestsBase):
         self.ngw_put_mock.side_effect = record_field_updates
         self.ngw_patch_mock.side_effect = record_field_updates
 
-        ARC_TASKS_FLAGGED = ['childcare_address', 'childcare_training', 'dbs', 'insurance_cover', 'login_details']
-        ARC_TASKS_UNFLAGGED = ['personal_details', 'first_aid']
-        APP_TASKS_TO_BE_FLAGGED = ['childcare_address', 'childcare_training', 'dbs', 'insurance_cover', 'login_details']
+        ARC_TASKS_FLAGGED = ['login_details']
+        ARC_TASKS_UNFLAGGED = ['personal_details']
+        APP_TASKS_TO_BE_FLAGGED = ['login_details']
         APP_TASKS_NOT_TO_BE_FLAGGED = ['personal_details', 'first_aid']
         APP_TASKS_ALL = APP_TASKS_TO_BE_FLAGGED + APP_TASKS_NOT_TO_BE_FLAGGED
 
         for task in APP_TASKS_ALL:
-            self.nanny_gateway.nanny_application['{}_status'.format(task)] = APP_STATUS_COMPLETED
-            self.nanny_gateway.nanny_application['{}_arc_flagged'.format(task)] = False
+            self.HM_gateway.HM_application['{}_status'.format(task)] = APP_STATUS_COMPLETED
+            self.HM_gateway.HM_application['{}_arc_flagged'.format(task)] = False
 
-        self.nanny_gateway.nanny_application['declarations_status'] = APP_STATUS_COMPLETED
-        self.nanny_gateway.nanny_application['application_status'] = APP_STATUS_REVIEW
+        self.HM_gateway.HM_application['declarations_status'] = APP_STATUS_COMPLETED
+        self.HM_gateway.HM_application['application_status'] = APP_STATUS_REVIEW
 
-        arc = Arc.objects.get(application_id=self.test_app_id)
+        arc = Arc.objects.get(adult_id=self.test_app_id)
 
         for task in ARC_TASKS_UNFLAGGED:
             setattr(arc, '{}_review'.format(task), ARC_STATUS_COMPLETED)
@@ -687,7 +664,7 @@ class ReviewSummaryAndConfirmationFunctionalTests(HMReviewFuncTestsBase):
         arc.save()
 
         # id must be both GET and POST parameter
-        self.client.post(reverse('nanny_arc_summary') + '?id=' + self.test_app_id, data={'id': self.test_app_id})
+        self.client.post(reverse('new_adults') + '?id=' + self.test_app_id, data={'id': self.test_app_id})
 
         # not in accepted status
         self.assertTrue('date_accepted' not in app_field_updates

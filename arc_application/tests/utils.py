@@ -306,7 +306,7 @@ class StubHMGatewayActions:
         }
         self.dpa_auth_read_response = self.make_response(record=self.dpa_auth_record)
 
-        self.adult_record = {
+        self.hm_application = {
             "adult_id": "ffc54793-4694-4d33-9d7b-e9aa8c0ad2a3",
             "date_of_birth": "1980-03-31",
             "get_full_name": "Adult Test Adults",
@@ -348,7 +348,7 @@ class StubHMGatewayActions:
             "token_id": "51cdabff-a9c5-4032-bf50-0c8d1dd90888",
             "adult_status": 'DRAFTING'
         }
-        self.adult_read_response = self.make_response(record=self.adult_record)
+        self.adult_read_response = self.make_response(record=self.hm_application)
 
         self.previous_registration_record = {
             'application_id': 'ffc54793-4694-4d33-9d7b-e9aa8c0ad2a3',
@@ -374,6 +374,7 @@ class StubHMGatewayActions:
             'order': 0
         }
         self.previous_name_read_response = self.make_response(record=self.previous_name_record)
+        self.previous_name_list_response = self.make_response(record=[self.previous_name_record])
 
         self.home_address_record = {
             'application_id': 'ffc54793-4694-4d33-9d7b-e9aa8c0ad2a3',
@@ -383,9 +384,9 @@ class StubHMGatewayActions:
             'town': 'Middle Earth',
             'county': None,
             'postcode': 'WA14 4PA',
-            'childcare_address': False,
         }
         self.home_address_read_response = self.make_response(record=self.home_address_record)
+        self.home_address_list_response = self.make_response(record=[self.home_address_record])
 
         self.previous_address_record = {
             'previous_address_id': '88888888-4444-4444-4444-121212121212',
@@ -424,13 +425,31 @@ class StubHMGatewayActions:
         self.arc_comments_read_response = self.make_response(404)
         self.arc_comments_list_response = self.make_response(404)
 
+        self.previous_registration_record = {
+            'application_id': '3afa6904-074f-49c6-ade0-3abc9eea0111',
+            'previous_registration_id': '9835bf3b-8ba9-4162-a25b-4c55e7d33d69',
+            'previous_registration': True,
+            'individual_id': '12345567',
+            'five_years_in_UK': True
+        }
+
+        self.previous_registration_read_response = self.make_response(record=self.previous_registration_record)
+        self.previous_registration_list_response = self.make_response(record=self.previous_registration_record)
+
         self.timeline_log_record = {}
         self.timeline_log_read_response = self.make_response(record=self.timeline_log_record)
 
         self.default_list_response = {
-            'adult': self.make_response(record=[self.adult_record]),
-            'arc-comments': self.arc_comments_list_response
-        }
+            'adult': self.make_response(record=[self.hm_application]),
+            'arc-comments': self.arc_comments_list_response,
+            'dpa-auth': self.dpa_auth_read_response,
+            'previous-name': self.previous_name_list_response,
+            'adult-in-home-address': self.home_address_list_response,
+            'previous-address': self.previous_address_list_response,
+            'previous-registration': self.previous_registration_list_response
+                  }
+
+        # self.default_list_response = self.make_response()
         self.default_read_response = self.make_response()
         self.default_create_response = self.make_response()
         self.default_patch_response = self.make_response()
@@ -445,10 +464,14 @@ class StubHMGatewayActions:
             'previous-name': 'previous_name',
             'previous-address': 'previous_address',
             'timeline-log': 'timeline_log',
+            'previous-registration': 'previous_registration',
+            'adult-in-home-address': 'adult_address'
         }
 
     def list(self, endpoint, *_, **__):
-        return getattr(self, '{}_list_response'.format(self.endpoint_mapping[endpoint]), self.default_list_response[endpoint])
+        return getattr(self, '{}_list_response'.format(
+            self.endpoint_mapping[endpoint]),
+                       self.default_list_response[endpoint])
 
     def read(self, endpoint, *_, **__):
         return getattr(self, '{}_read_response'.format(self.endpoint_mapping[endpoint]), self.default_read_response)
