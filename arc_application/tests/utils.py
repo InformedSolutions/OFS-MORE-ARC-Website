@@ -161,9 +161,9 @@ class StubNannyGatewayActions:
             'application_id': '998fd8ec-b96b-4a71-a1a1-a7a3ae186729',
             'home_address_id': '9935bf3b-8ba9-4162-a25b-4c55e7d33d67',
             'street_line1': 'Test',
-            'street_line2': None,
+            'street_line2': '',
             'town': 'Middle Earth',
-            'county': None,
+            'county': '',
             'postcode': 'WA14 4PA',
             'childcare_address': False,
         }
@@ -313,6 +313,7 @@ class StubHMGatewayActions:
             "start_date": None,
             "end_date": None,
             "order": 1,
+            "title": 'Lord',
             "first_name": "Adult",
             "middle_names": "Test",
             "last_name": "Adults",
@@ -346,7 +347,12 @@ class StubHMGatewayActions:
             "name_end_month": None,
             "name_end_year": None,
             "token_id": "51cdabff-a9c5-4032-bf50-0c8d1dd90888",
-            "adult_status": 'DRAFTING'
+            "adult_status": 'DRAFTING',
+            "PITH_same_address": False,
+            'PITH_mobile_number': '07123123123',
+            'currently_being_treated': False,
+            'has_serious_illness': False,
+            'has_hospital_admissions': False
         }
         self.adult_read_response = self.make_response(record=self.hm_application)
 
@@ -380,9 +386,9 @@ class StubHMGatewayActions:
             'application_id': 'ffc54793-4694-4d33-9d7b-e9aa8c0ad2a3',
             'home_address_id': '9935bf3b-8ba9-4162-a25b-4c55e7d33d67',
             'street_line1': 'Test',
-            'street_line2': None,
+            'street_line2': '',
             'town': 'Middle Earth',
-            'county': None,
+            'county': '',
             'postcode': 'WA14 4PA',
         }
         self.home_address_read_response = self.make_response(record=self.home_address_record)
@@ -430,8 +436,12 @@ class StubHMGatewayActions:
             'previous_registration_id': '9835bf3b-8ba9-4162-a25b-4c55e7d33d69',
             'previous_registration': True,
             'individual_id': '12345567',
-            'five_years_in_UK': True
+            'five_years_in_UK': True,
+            'adult_id': "ffc54793-4694-4d33-9d7b-e9aa8c0ad2a3"
         }
+
+        self.serious_illness_read_response = self.make_response(record=[])
+        self.hospital_admissions_read_response = self.make_response(record=[])
 
         self.previous_registration_read_response = self.make_response(record=self.previous_registration_record)
         self.previous_registration_list_response = self.make_response(record=self.previous_registration_record)
@@ -446,7 +456,9 @@ class StubHMGatewayActions:
             'previous-name': self.previous_name_list_response,
             'adult-in-home-address': self.home_address_list_response,
             'previous-address': self.previous_address_list_response,
-            'previous-registration': self.previous_registration_list_response
+            'previous-registration': self.previous_registration_list_response,
+            'serious-illness': self.serious_illness_read_response,
+            'hospital-admissions': self.hospital_admissions_read_response
                   }
 
         # self.default_list_response = self.make_response()
@@ -465,7 +477,9 @@ class StubHMGatewayActions:
             'previous-address': 'previous_address',
             'timeline-log': 'timeline_log',
             'previous-registration': 'previous_registration',
-            'adult-in-home-address': 'adult_address'
+            'adult-in-home-address': 'home_address',
+            'serious-illness':'serious_illness',
+            'hospital-admissions': 'hospital_admissions'
         }
 
     def list(self, endpoint, *_, **__):

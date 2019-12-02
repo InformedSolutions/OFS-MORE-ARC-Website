@@ -10,7 +10,7 @@ from arc_application.tests.utils import create_arc_user
 from ...models import Arc
 from ...services.db_gateways import HMGatewayActions, IdentityGatewayActions
 from ...views import new_adults_summary, adults_previous_address_change, adult_previous_registration_view, \
-    adult_update_view
+    adult_update_view, arc_summary
 from ...tests import utils
 
 ARC_STATUS_FLAGGED = 'FLAGGED'
@@ -97,17 +97,34 @@ class HMReviewFuncTestsBase(TestCase):
 
 class ReviewTaskListTests(HMReviewFuncTestsBase):
 
-    def test_complete_review_button_appears_if_all_tasks_reviewed(self):
-        self.skipTest('testNotImplemented')
+    def setUp(self):
 
-    def test_complete_review_button_appears_if_all_tasks_flagged(self):
-        self.skipTest('testNotImplemented')
+        # make sure we're logged in as an arc user for each test
+        self.arc_user = utils.create_arc_user()
+        self.client.login(username='arc_test', password='my_secret')
 
-    def test_complete_review_button_does_not_appear_if_not_all_tasks_flagged_or_reviewed(self):
-        self.skipTest('testNotImplemented')
+        # stub out the nanny gateway and store mocks for each method
+        self.hm_gateway = utils.StubHMGatewayActions()
+        for meth in ('read', 'list', 'put', 'patch', 'create', 'delete'):
+            mk = utils.patch_object_for_setUp(self, HMGatewayActions, meth,
+                                              side_effect=getattr(self.hm_gateway, meth))
+            setattr(self, 'ngw_{}_mock'.format(meth), mk)
 
+        # create arc record for test application
+        self.test_app_id = self.hm_gateway.hm_application['adult_id']
+        self.arc_record = utils.create_adult_review(self.test_app_id, self.arc_user.pk)
 
-# class ReviewPersonalDetailsTests(HMReviewFuncTestsBase):
+        # stub out the identity gateway and store mock for read method
+        self.identity_gateway = utils.StubIdentityGatewayActions()
+        for meth in ('read',):
+            mk = utils.patch_object_for_setUp(self, IdentityGatewayActions, meth,
+                                              side_effect=getattr(self.identity_gateway, meth))
+            setattr(self, 'igw_{}_mock'.format(meth), mk)
+
+    # -------------- #
+    # Helper methods #
+    # -------------- #
+
 #
 #     def test_can_render_personal_details_page(self):
 #         """
@@ -306,10 +323,11 @@ class PreviousRegistrationTests(HMReviewFuncTestsBase):
                 'individual_id': 1234567,
                 'five_years_in_UK': True}
 
-        response = self.client.post(reverse('adults-previous-registration') + '?id=' + self.test_app_id, data)
+        response = self.client.post(reverse('adults-previous-registration') + '?id=' + self.test_app_id, data)#
+        redirect_url = "/arc/review/new-adult?id={0}".format(self.test_app_id)
 
         self.assertEqual(response.status_code, 302)
-        utils.assertRedirectView(response, new_adults_summary)
+        self.assertEqual(response.url, redirect_url)
 
     def test_redirect_after_submitting_page_without_entering_details(self):
         """
@@ -503,10 +521,11 @@ class HMPreviousNamesTests(HMReviewFuncTestsBase):
             data['form-0-previous_name_id'] = prev_name_record_2['previous_name_id']
 
             response = self.client.post(url, data)
+            redirect_url = "/arc/review/new-adult?id={0}".format(adult_id)
 
             # Assert response redirected to personal_details_summary
             self.assertEqual(302, response.status_code)
-            utils.assertRedirectView(response, 'new_adults_summary')
+            self.assertEqual(response.url, redirect_url)
 
     def test_submit_confirm_calls_create_on_data_inputted(self):
 
@@ -557,7 +576,7 @@ class ReviewSummaryAndConfirmationFunctionalTests(HMReviewFuncTestsBase):
         response = self.client.get(reverse('new_adults') + '?id=' + self.test_app_id)
 
         self.assertEqual(response.status_code, 200)
-        utils.assertView(response, adult_update_view)
+        utils.assertView(response, arc_summary)
 
     def test_submit_summary_sends_accepted_email_if_no_tasks_flagged(self):
         self.skipTest('testNotImplemented')
@@ -570,120 +589,5 @@ class ReviewSummaryAndConfirmationFunctionalTests(HMReviewFuncTestsBase):
         def now():
             return datetime(2019, 2, 27, 17, 30, 5)
 
-    @patch('arc_application.messaging.application_exporter.ApplicationExporter.export_childminder_application')
-    @patch('arc_application.messaging.application_exporter.ApplicationExporter.export_nanny_application')
-    @patch('arc_application.messaging.application_exporter.ApplicationExporter.export_adult_update_application')
-    @patch('arc_application.views.base.datetime', new=MockDatetime)
-    def test_submit_summary_releases_application_as_accepted_in_database_if_no_tasks_flagged(self, *_):
 
-        # set up gateway mocks to record changes to application fields
-        app_field_updates = {}
-        ok_response = self.hm_gateway.make_response(200)
 
-        def record_field_updates(endpoint, params):
-            if endpoint == 'application' and params['adult_id'] == self.test_app_id:
-                app_field_updates.update(params)
-            return ok_response
-
-        self.ngw_delete_mock.side_effect = lambda e, p: self.fail()
-        self.ngw_put_mock.side_effect = record_field_updates
-        self.ngw_patch_mock.side_effect = record_field_updates
-
-        APP_TASKS_ALL = ['login_details', 'personal_details']
-        ARC_TASKS_ALL = ['login_details', 'personal_details']
-
-        for task in APP_TASKS_ALL:
-            self.HM_gateway.HM_application['{}_status'.format(task)] = APP_STATUS_COMPLETED
-            self.HM_gateway.HM_application['{}_arc_flagged'.format(task)] = False
-
-        self.HM_gateway.HM_application['declarations_status'] = APP_STATUS_COMPLETED
-        self.HM_gateway.HM_application['application_status'] = APP_STATUS_REVIEW
-
-        arc = Arc.objects.get(adult_id=self.test_app_id)
-
-        for task in ARC_TASKS_ALL:
-            setattr(arc, '{}_review'.format(task), ARC_STATUS_COMPLETED)
-
-        arc.save()
-
-        # id must be both GET and POST parameter
-        self.client.post(reverse('new_adults') + '?id=' + self.test_app_id, data={'id': self.test_app_id})
-
-        # in accepted status
-        self.assertTrue('date_accepted' in app_field_updates)
-        self.assertEqual(datetime(2019, 2, 27, 17, 30, 5), app_field_updates['date_accepted'])
-        self.assertTrue('application_status' in app_field_updates)
-        self.assertEqual(APP_STATUS_ACCEPTED, app_field_updates['application_status'])
-        # declaration unchanged
-        self.assertTrue('declarations_status' not in app_field_updates
-                        or app_field_updates['declarations_status'] == APP_STATUS_COMPLETED)
-
-        # unassigned from arc user
-        refetched_arc = Arc.objects.get(pk=arc.pk)
-        self.assertTrue(refetched_arc.user_id in ('', None))
-
-    @patch('arc_application.messaging.application_exporter.ApplicationExporter.export_childminder_application')
-    @patch('arc_application.messaging.application_exporter.ApplicationExporter.export_nanny_application')
-    @patch('arc_application.messaging.application_exporter.ApplicationExporter.export_adult_update_application')
-    @patch('datetime.datetime', new=MockDatetime)
-    def test_submit_summary_releases_application_as_needing_info_in_database_if_tasks_have_been_flagged(self, *_):
-
-        # set up gateway mocks to record changes to application fields
-        app_field_updates = {}
-        ok_response = self.hm_gateway.make_response(200)
-
-        def record_field_updates(endpoint, params):
-            if endpoint == 'application' and params['adult_id'] == self.test_app_id:
-                app_field_updates.update(params)
-            return ok_response
-
-        self.ngw_delete_mock.side_effect = lambda e, p: self.fail()
-        self.ngw_put_mock.side_effect = record_field_updates
-        self.ngw_patch_mock.side_effect = record_field_updates
-
-        ARC_TASKS_FLAGGED = ['login_details']
-        ARC_TASKS_UNFLAGGED = ['personal_details']
-        APP_TASKS_TO_BE_FLAGGED = ['login_details']
-        APP_TASKS_NOT_TO_BE_FLAGGED = ['personal_details', 'first_aid']
-        APP_TASKS_ALL = APP_TASKS_TO_BE_FLAGGED + APP_TASKS_NOT_TO_BE_FLAGGED
-
-        for task in APP_TASKS_ALL:
-            self.hm_gateway.hm_application['{}_status'.format(task)] = APP_STATUS_COMPLETED
-            self.hm_gateway.hm_application['{}_arc_flagged'.format(task)] = False
-
-        self.hm_gateway.hm_application['declarations_status'] = APP_STATUS_COMPLETED
-        self.hm_gateway.hm_application['application_status'] = APP_STATUS_REVIEW
-
-        arc = Arc.objects.get(application_id=self.test_app_id)
-
-        for task in ARC_TASKS_UNFLAGGED:
-            setattr(arc, '{}_review'.format(task), ARC_STATUS_COMPLETED)
-        for task in ARC_TASKS_FLAGGED:
-            setattr(arc, '{}_review'.format(task), ARC_STATUS_FLAGGED)
-
-        arc.save()
-
-        # id must be both GET and POST parameter
-        self.client.post(reverse(new_adults_summary) + '?id=' + self.test_app_id, data={'id': self.test_app_id})
-
-        # not in accepted status
-        self.assertTrue('date_accepted' not in app_field_updates
-                        or app_field_updates['date_accepted'] is None)
-        self.assertTrue('application_status' in app_field_updates)
-        self.assertEqual(APP_STATUS_FURTHER_INFO, app_field_updates['application_status'])
-        # declaration has been reset
-        self.assertTrue('declarations_status' in app_field_updates)
-        self.assertEqual(APP_STATUS_NOT_STARTED, app_field_updates['declarations_status'])
-
-        # unassigned from arc user
-        refetched_arc = Arc.objects.get(pk=arc.pk)
-        self.assertTrue(refetched_arc.user_id in ('', None))
-
-        # flagged tasks still recorded in arc record
-        for task in ARC_TASKS_FLAGGED:
-            self.assertEqual(ARC_STATUS_FLAGGED, getattr(refetched_arc, '{}_review'.format(task)))
-        for task in ARC_TASKS_UNFLAGGED:
-            self.assertEqual(ARC_STATUS_COMPLETED, getattr(refetched_arc, '{}_review'.format(task)))
-
-    def test_submit_releases_application_once_if_submitted_twice(self):
-        self.skipTest("testNotImplemented")
