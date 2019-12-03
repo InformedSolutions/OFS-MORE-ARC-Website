@@ -383,10 +383,5 @@ class ReviewSummaryAndConfirmationFunctionalTests(HMReviewFuncTestsBase):
         self.assertEqual(response.status_code, 200)
         utils.assertView(response, arc_summary)
 
-    class MockDatetime(datetime):
-        @staticmethod
-        def now():
-            return datetime(2019, 2, 27, 17, 30, 5)
-
 
 

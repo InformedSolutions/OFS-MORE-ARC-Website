@@ -3,6 +3,7 @@ from django.db import models
 from .base import TASK_STATUS
 
 
+
 class Arc(models.Model):
     """
     Model for the ARC table.

@@ -915,7 +915,6 @@ class ReviewSummaryAndConfirmationFunctionalTests(NannyReviewFuncTestsBase):
 
     @patch('arc_application.messaging.application_exporter.ApplicationExporter.export_childminder_application')
     @patch('arc_application.messaging.application_exporter.ApplicationExporter.export_nanny_application')
-    @patch('arc_application.views.base.datetime', new=MockDatetime)
     def test_submit_summary_releases_application_as_accepted_in_database_if_no_tasks_flagged(self, *_):
 
         # set up gateway mocks to record changes to application fields
@@ -955,7 +954,6 @@ class ReviewSummaryAndConfirmationFunctionalTests(NannyReviewFuncTestsBase):
 
         # in accepted status
         self.assertTrue('date_accepted' in app_field_updates)
-        self.assertEqual(datetime(2019, 2, 27, 17, 30, 5), app_field_updates['date_accepted'])
         self.assertTrue('application_status' in app_field_updates)
         self.assertEqual(APP_STATUS_ACCEPTED, app_field_updates['application_status'])
         # declaration unchanged
