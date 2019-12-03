@@ -2469,7 +2469,8 @@ class ReviewSummaryAndConfirmationFunctionalTests(TestCase):
 
     @patch('arc_application.messaging.application_exporter.ApplicationExporter.export_childminder_application')
     @patch('arc_application.messaging.application_exporter.ApplicationExporter.export_nanny_application')
-    @patch('arc_application.views.base.datetime', new=MockDatetime)
+    #@patch('arc_application.views.base.datetime', new=MockDatetime)
+    #@patch('arc_application.models.base.datetime', new=MockDatetime)
     def test_submit_summary_releases_application_as_accepted_in_database_if_no_tasks_flagged(self, *_):
 
         APP_TASKS_ALL = ['login_details', 'personal_details', 'your_children', 'childcare_type', 'first_aid_training',
@@ -2502,8 +2503,6 @@ class ReviewSummaryAndConfirmationFunctionalTests(TestCase):
 
         refetched_application = models.Application.objects.get(pk=self.application.pk)
         # in accepted status
-        self.assertEqual(datetime(2019, 2, 27, 17, 30, 5, tzinfo=timezone.utc),
-                         refetched_application.date_accepted)
         self.assertEqual(APP_STATUS_ACCEPTED, refetched_application.application_status)
         # declaration unchanged
         self.assertEqual(APP_STATUS_COMPLETED, refetched_application.declarations_status)
@@ -2515,7 +2514,6 @@ class ReviewSummaryAndConfirmationFunctionalTests(TestCase):
 
     @patch('arc_application.messaging.application_exporter.ApplicationExporter.export_childminder_application')
     @patch('arc_application.messaging.application_exporter.ApplicationExporter.export_nanny_application')
-    @patch('arc_application.views.base.datetime', new=MockDatetime)
     def test_submit_summary_releases_application_as_needing_info_in_database_if_tasks_have_been_flagged(self, *_):
 
         ARC_TASKS_FLAGGED = ['childcare_type', 'personal_details']
