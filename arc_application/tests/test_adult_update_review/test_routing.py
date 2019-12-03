@@ -95,6 +95,17 @@ class HMReviewFuncTestsBase(TestCase):
             'The "create" method was called using the "{0}" endpoint, but not with the specified parameters.'.format(
                 endpoint))
 
+class AdultUpdateReviewTests(HMReviewFuncTestsBase):
+
+    def test_can_render_adult_review_page(self):
+        """
+        Test to ensure that the page for reviewing an adult update can be rendered
+        """
+        response = self.client.get(reverse('new_adults_summary') +  '?id=' + self.test_app_id)
+
+        self.assertEqual(response.status_code, 200)
+        utils.assertView(response, adult_update_view.new_adults_summary)
+
 
 class PreviousRegistrationTests(HMReviewFuncTestsBase):
 

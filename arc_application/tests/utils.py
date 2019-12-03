@@ -352,7 +352,8 @@ class StubHMGatewayActions:
             'PITH_mobile_number': '07123123123',
             'currently_being_treated': False,
             'has_serious_illness': False,
-            'has_hospital_admissions': False
+            'has_hospital_admissions': False,
+            'cygnum_relationship_to_childminder': 'test'
         }
         self.adult_read_response = self.make_response(record=self.hm_application)
 
