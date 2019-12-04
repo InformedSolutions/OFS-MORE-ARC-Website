@@ -16,6 +16,7 @@ from django.utils.safestring import mark_safe
 # Initiate logging
 log = logging.getLogger('')
 
+
 @login_required
 @group_required(settings.ARC_GROUP)
 @user_assigned_application
@@ -61,31 +62,31 @@ def get_application_summary_variables(application_id):
 
     return variables
 
+
 def load_json(adult_id):
     table_list = []
     record = HMGatewayActions().list('adult', params={'adult_id': adult_id}).record[0]
     # main adult details table
     if record['middle_names'] is not None or record['middle_names'] != '':
-        full_name = record['first_name'] + " " +record['middle_names'] + " " + record['last_name']
+        full_name = record['first_name'] + " " + record['middle_names'] + " " + record['last_name']
     else:
         full_name = record['first_name'] + " " + record['last_name']
 
-    #get adults address
+    # get adults address
     adult_address_response = HMGatewayActions().read('adult-in-home-address',
                                                      params={'adult_id': record['adult_id']})
     if adult_address_response.status_code == 200:
         adult_address_record = adult_address_response.record
         address_string = ' '.join([adult_address_record['street_line1'], adult_address_record['street_line2'],
-                                         adult_address_record['town'],
-                                         adult_address_record['county'], adult_address_record['postcode']])
+                                   adult_address_record['town'],
+                                   adult_address_record['county'], adult_address_record['postcode']])
     else:
         address_string = ''
 
-
     link = reverse("new_adults_summary") + '?id=' + adult_id
     summary_table = [
-            {"title": full_name,
-             "id": record['adult_id']},
+        {"title": full_name,
+         "id": record['adult_id']},
         {"name": "Health questions status",
          "value": record['health_check_status'],
          "field": 'health_check_status'},
@@ -93,83 +94,83 @@ def load_json(adult_id):
 
     if record['title'] != '':
         summary_table.extend([{"name": "Title",
-                              "value": record['title'],
-                              "field": "title"}])
+                               "value": record['title'],
+                               "field": "title"}])
 
     summary_table.extend([
-            {"name": "Name",
-             "value": full_name,
-             'field': "full_name"},
-            {"name": "Date of birth",
-             "value": datetime.datetime(record['birth_year'], record['birth_month'], record['birth_day']).strftime('%d/%m/%Y'),
-             "field": "date_of_birth"},
-            {"name": "Relationship",
-             "value": record['relationship'],
-             "field": "relationship"},
-            {"name": "Email",
-             "value": record['email'],
-             'field': "email"},
-            {"name": "Phone number",
-             "value": record['PITH_mobile_number'],
-             'field': "PITH_mobile_number"},
-            {"name": "Address",
-             "value": address_string,
-             'field': "PITH_same_address"},
-            {"name": "Lived abroad in the last 5 years?",
-             "value": 'Yes' if record['lived_abroad'] else 'No',
-             'field': "lived_abroad"},
-            {"name": "Lived or worked on British military base in the last 5 years?",
-             "value": 'Yes' if record['military_base'] else 'No',
-             'field': 'military_base'}
-            ])
+        {"name": "Name",
+         "value": full_name,
+         'field': "full_name"},
+        {"name": "Date of birth",
+         "value": datetime.datetime(record['birth_year'], record['birth_month'], record['birth_day']).strftime(
+             '%d/%m/%Y'),
+         "field": "date_of_birth"},
+        {"name": "Relationship",
+         "value": record['relationship'],
+         "field": "relationship"},
+        {"name": "Email",
+         "value": record['email'],
+         'field': "email"},
+        {"name": "Phone number",
+         "value": record['PITH_mobile_number'],
+         'field': "PITH_mobile_number"},
+        {"name": "Address",
+         "value": address_string,
+         'field': "PITH_same_address"},
+        {"name": "Lived abroad in the last 5 years?",
+         "value": 'Yes' if record['lived_abroad'] else 'No',
+         'field': "lived_abroad"},
+        {"name": "Lived or worked on British military base in the last 5 years?",
+         "value": 'Yes' if record['military_base'] else 'No',
+         'field': 'military_base'}
+    ])
 
     if record['enhanced_check']:
 
         summary_table += [
-                {"name": "Did they get their DBS check from the Ofsted DBS application website?",
-                 "value": 'Yes' if record['capita'] else 'No',
-                'field':'capita'},
-            ]
+            {"name": "Did they get their DBS check from the Ofsted DBS application website?",
+             "value": 'Yes' if record['capita'] else 'No',
+             'field': 'capita'},
+        ]
 
         if record['capita']:
             summary_table += [
-                    {"name": "Is it dated within the last 3 months?",
-                     "value": 'Yes' if record['within_three_months'] else 'No',
-                     'field': "capita"}
-                ]
-
-        summary_table += [
-                {"name": "DBS certificate number",
-                "value": record['dbs_certificate_number'],
-                 "field": 'dbs_certificate_number'},
+                {"name": "Is it dated within the last 3 months?",
+                 "value": 'Yes' if record['within_three_months'] else 'No',
+                 'field': "capita"}
             ]
 
+        summary_table += [
+            {"name": "DBS certificate number",
+             "value": record['dbs_certificate_number'],
+             "field": 'dbs_certificate_number'},
+        ]
 
     summary_table += [
-            {"name": "Enhanced DBS check for home-based childcare?",
-             "value": 'Yes' if record['enhanced_check'] else 'No',
-             "field": 'enhanced_check'}
-        ]
+        {"name": "Enhanced DBS check for home-based childcare?",
+         "value": 'Yes' if record['enhanced_check'] else 'No',
+         "field": 'enhanced_check'}
+    ]
 
     if record['enhanced_check'] and not (record['capita'] or record['within_three_months']):
         summary_table += [
-                {"name": "DBS Update Service?",
-                 "value": 'Yes' if record['on_update'] else 'No',
-                 'field': "on_update"}
-            ]
+            {"name": "DBS Update Service?",
+             "value": 'Yes' if record['on_update'] else 'No',
+             'field': "on_update"}
+        ]
 
     summary_table += [
-            {"name": "Known to council social Services in regards to their own children?",
-             "value": "Yes" if record['known_to_council'] else "No",
-             'field': "known_to_council"}
-        ]
+        {"name": "Known to council social Services in regards to their own children?",
+         "value": "Yes" if record['known_to_council'] else "No",
+         'field': "known_to_council"}
+    ]
 
     if record['known_to_council']:
         summary_table += [
-                {"name": "Tell us why",
-                 "value": record['reasons_known_to_council_health_check'],
-                 'field': "reasons_known_to_council_health_check"}
-            ]
+            {"name": "Tell us why",
+             "value": record['reasons_known_to_council_health_check'],
+             'field': "reasons_known_to_council_health_check"}
+        ]
 
     previous_registration_response = HMGatewayActions().read("previous-registration", params={'adult_id': adult_id})
     if previous_registration_response.status_code == 200:
@@ -179,11 +180,12 @@ def load_json(adult_id):
                                         "value": prev_reg_record["individual_id"] if prev_reg_record[
                                             "previous_registration"] else 'Not known to Ofsted',
                                         "index": 1,
-                                        "link": reverse("adults-previous-registration") + '?id=' + adult_id},
+                                        "link": reverse("personal_details_individual_lookup") + '?id=' +
+                                                prev_reg_record['adult_id'] + '&referrer=household_member&adult_id=' +
+                                                prev_reg_record['adult_id']},
                                        ]
 
         table_list.append(previous_registration_table)
-
 
     for row in summary_table:
         field = row["field"] if row.get("field") else ''
@@ -194,9 +196,9 @@ def load_json(adult_id):
     current_treatment_table = [
         {"title": "Current treatment",
          "id": record['adult_id']},
-           {"name": "Are you currently being treated by your GP, another doctor or a hospital?",
-            "value": 'Yes' if record["currently_being_treated"] else 'No'}
-        ]
+        {"name": "Are you currently being treated by your GP, another doctor or a hospital?",
+         "value": 'Yes' if record["currently_being_treated"] else 'No'}
+    ]
 
     if record["currently_being_treated"]:
         current_treatment_table.append(
@@ -207,7 +209,7 @@ def load_json(adult_id):
     serious_illness_table = [
         {"title": "Serious illnesses",
          "id": record['adult_id']},
-       {"name": "Have you had any serious illnesses within the last five years?",
+        {"name": "Have you had any serious illnesses within the last five years?",
          "value": 'Yes' if record["has_serious_illness"] else 'No'}
     ]
 
@@ -215,19 +217,21 @@ def load_json(adult_id):
         response = HMGatewayActions().list("serious-illness", params={'adult_id': adult_id})
         if response.status_code == 200:
             for serious_illness in response.record:
-                serious_illness["start_date"] = datetime.datetime.strptime(serious_illness['start_date'], '%Y-%m-%d').strftime(
-            '%d/%m/%Y')
-                serious_illness["end_date"] = datetime.datetime.strptime(serious_illness['end_date'], '%Y-%m-%d').strftime(
-            '%d/%m/%Y')
+                serious_illness["start_date"] = datetime.datetime.strptime(serious_illness['start_date'],
+                                                                           '%Y-%m-%d').strftime(
+                    '%d/%m/%Y')
+                serious_illness["end_date"] = datetime.datetime.strptime(serious_illness['end_date'],
+                                                                         '%Y-%m-%d').strftime(
+                    '%d/%m/%Y')
                 serious_illness_table.append(
                     {"name": serious_illness["description"],
-                    "value": serious_illness["start_date"] + " to " + serious_illness["end_date"]}
-        )
+                     "value": serious_illness["start_date"] + " to " + serious_illness["end_date"]}
+                )
 
     hospital_admission_table = [
         {"title": "Hospital admissions",
          "id": record['adult_id']},
-           {"name": "Have you been admitted to hospital in the last 2 years?",
+        {"name": "Have you been admitted to hospital in the last 2 years?",
          "value": 'Yes' if record["has_hospital_admissions"] else 'No'}
     ]
 
@@ -259,8 +263,9 @@ def load_json(adult_id):
         address_record = previous_address_response.record
 
     if previous_names_response.status_code == 200 or previous_address_response.status_code == 200:
-        previous_names_address_table = [{"title": full_name + "'s previous names and addresses", "id": record['adult_id']}
-                                       ]
+        previous_names_address_table = [
+            {"title": full_name + "'s previous names and addresses", "id": record['adult_id']}
+            ]
         if name_record is not None:
             link = reverse("adult-update-previous-names") + '?id=' + adult_id
             for i in range(0, len(name_record)):
@@ -269,47 +274,48 @@ def load_json(adult_id):
                     adult_name = name['first_name'] + " " + name['middle_names'] + " " + name['last_name']
                 else:
                     name['name'] = name['first_name'] + " " + name['last_name']
-                previous_names_address_table.append({"name":"Previous name " + str(i+1),
+                previous_names_address_table.append({"name": "Previous name " + str(i + 1),
                                                      "value": adult_name,
                                                      'link': link})
                 previous_names_address_table.append({"name": 'Start date',
                                                      "value": datetime.datetime(name['start_year'], name['start_month'],
-                                                                                             name['start_day']).strftime('%d %m %Y'),
+                                                                                name['start_day']).strftime('%d %m %Y'),
                                                      'link': link})
                 previous_names_address_table.append({"name": 'End date',
                                                      "value": datetime.datetime(name['end_year'], name['end_month'],
-                                                             name['end_day']).strftime('%d %m %Y'),
+                                                                                name['end_day']).strftime('%d %m %Y'),
                                                      'link': link})
 
         if address_record is not None:
             for i in range(0, len(address_record)):
                 address = address_record[i]
                 full_address = address['street_line1'] + ", " + address['street_line2'] + ", " + address['town']
-                link = reverse("adult_add_previous_address_change") + '?id=' + adult_id + '&address_id=' + address['previous_address_id']
+                link = reverse("adult_add_previous_address_change") + '?id=' + adult_id + '&address_id=' + address[
+                    'previous_address_id']
                 if address['county'] != '':
                     full_address = full_address + ", " + address['county']
-                full_address = full_address + ", " +address['country'] + ', ' + address['postcode']
+                full_address = full_address + ", " + address['country'] + ', ' + address['postcode']
 
-                previous_names_address_table.append({"name": "Previous address " + str(i+1),
+                previous_names_address_table.append({"name": "Previous address " + str(i + 1),
                                                      "value": full_address,
                                                      'link': link})
                 previous_names_address_table.append({"name": 'Moved in',
-                                                     "value": datetime.datetime.strptime(address['moved_in_date'], '%Y-%m-%d').strftime('%d %m %Y'),
+                                                     "value": datetime.datetime.strptime(address['moved_in_date'],
+                                                                                         '%Y-%m-%d').strftime(
+                                                         '%d %m %Y'),
                                                      'link': link})
                 previous_names_address_table.append({"name": 'Moved out',
-                                                     "value": datetime.datetime.strptime(address['moved_out_date'], '%Y-%m-%d').strftime('%d %m %Y'),
-                                                     "link": link })
+                                                     "value": datetime.datetime.strptime(address['moved_out_date'],
+                                                                                         '%Y-%m-%d').strftime(
+                                                         '%d %m %Y'),
+                                                     "link": link})
 
         table_list.append(previous_names_address_table)
 
-
-
-
-
     return table_list
 
+
 def add_comment(id, field, row):
-    comment_response = HMGatewayActions().list('arc-comments', params={'table_pk':id, 'field_name':field})
+    comment_response = HMGatewayActions().list('arc-comments', params={'table_pk': id, 'field_name': field})
     if comment_response.status_code == 200:
         row['comment'] = comment_response.record[0]['comment']
-

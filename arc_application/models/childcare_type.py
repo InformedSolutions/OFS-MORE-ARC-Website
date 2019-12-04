@@ -12,6 +12,7 @@ class ChildcareType(models.Model):
     zero_to_five = models.BooleanField()
     five_to_eight = models.BooleanField()
     eight_plus = models.BooleanField()
+    test_field = models.NullBooleanField(blank=True, null=True)
     childcare_places = models.IntegerField(blank=True, null=True)
     weekday_before_school = models.NullBooleanField(blank=True, null=True)
     weekday_after_school = models.NullBooleanField(blank=True, null=True)
