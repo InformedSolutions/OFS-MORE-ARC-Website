@@ -1133,7 +1133,7 @@ class PeopleInTheHomeFunctionalTests(TestCase):
         self.application.save()
 
         adult = models.AdultInHome.objects.get(application_id=self.application.pk)
-        adult.title =  'Mr'
+        adult.title = 'Mr'
         adult.first_name = 'Joe'
         adult.middle_names = 'Anthony'
         adult.last_name = 'Bloggs'
@@ -1160,6 +1160,7 @@ class PeopleInTheHomeFunctionalTests(TestCase):
         utils.assertSummaryField(response, 'Relationship', 'Uncle', heading='Joe Anthony Bloggs')
         utils.assertSummaryField(response, 'Email', 'foo@example.com', heading='Joe Anthony Bloggs')
         utils.assertSummaryField(response, 'Phone number', '07700 900040', heading='Joe Anthony Bloggs')
+        utils.assertSummaryField(response, 'Address', 'Same as home address', heading="Joe Anthony Bloggs")
         utils.assertSummaryField(response, 'Lived abroad in the last 5 years?', 'No', heading='Joe Anthony Bloggs')
         # military base field is conditional
         utils.assertSummaryField(response, 'Did they get their DBS check from the Ofsted DBS application website?',
@@ -1167,6 +1168,29 @@ class PeopleInTheHomeFunctionalTests(TestCase):
         # last three months field is conditional
         utils.assertSummaryField(response, 'DBS certificate number', '123456789012', heading='Joe Anthony Bloggs')
         # enhanced-check and on-update fields are conditional
+
+    def test_displays_address_if_not_applicant_home_address(self):
+
+        self.application.adults_in_home = True
+        self.application.working_in_other_childminder_home = False
+        self.application.save()
+
+        adult = models.AdultInHome.objects.get(application_id=self.application.pk)
+        adult.PITH_same_address = False
+        adult.save
+
+        models.AdultInHome.objects.create(
+            application_id=self.application,
+            first_name='Freda', middle_names='Annabel', last_name='Smith',
+            birth_day=1, birth_month=2, birth_year=1983,
+            dbs_certificate_number='123456789013',
+            capita=True,
+            within_three_months=False,
+            certificate_information='',
+        )
+
+        adult_address_record = models.AdultInHomeAddress.objects.get(application_id=self.application_pk)
+
 
     def test_displays_adult_military_base_field_if_caring_for_zero_to_five_year_olds(self):
         self.application.adults_in_home = True
