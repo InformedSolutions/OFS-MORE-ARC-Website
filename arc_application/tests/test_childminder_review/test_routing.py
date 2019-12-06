@@ -833,15 +833,21 @@ class ApplicantPreviousAddressesFunctionalTests(TestCase):
             moved_out_day=15, moved_out_month=3, moved_out_year=2019
         )
 
-        url = '{0}?id={1}&state=entry&person_id={1}&type=APPLICANT'.format(
+        if not models.PreviousAddress.objects.filter(person_id=application_id).exists():
+            raise AssertionError('No previous address record was found')
+
+        url = '{0}?id={1}&state=entry&person_id={1}&person_type=APPLICANT'.format(
             reverse('personal_details_previous_addresses'), application_id)
 
         response = self.client.get(url)
-        # response = self.client.get(reverse('other_people_summary'), data={'id': self.application.pk, 'state': 'entry',
-        #                                                                   'person_id': self.application.pk,
-        #                                                                   'type': 'APPLICANT'})
 
         self.assertEqual(200, response.status_code)
+
+        utils.assertXPath(
+            response,
+            ('//input[normalize-space(@type)="text" and contains(normalize-space(@address), "{field}") '
+             'and normalize-space(@text)="{name}"]').format(field='Previous Address 1: ',
+                                                             name='Informed, Manchester Road Altrincham Greater Manchester WA14 4PA'), heading= 'Previous home addressesgit co')
 
         for addresses in [
             ('Informed', 'Manchester Road', 'Altrincham', 'Greater Manchester', 'WA14 4PA', '1', '1', '2018', '1', '1',
@@ -1426,7 +1432,7 @@ class PeopleInTheHomeFunctionalTests(TestCase):
 
         models.PreviousAddress.objects.create(
             person_id=adult1.adult_id,
-            other_person_type='APPLICANT',
+            person_type='APPLICANT',
             street_line1='Informed', street_line2='Manchester Road', town='Altrincham',
             county='Greater Manchester', postcode='WA14 4PA',
             moved_in_day=1, moved_in_month=1, moved_in_year=2018,
@@ -1434,7 +1440,7 @@ class PeopleInTheHomeFunctionalTests(TestCase):
         )
         models.PreviousAddress.objects.create(
             person_id=adult1.adult_id,
-            other_person_type='APPLICANT',
+            person_type='APPLICANT',
             street_line1='Fortis', street_line2='Manchester Road', town='Altrincham',
             county='Greater Manchester', postcode='WA14 4PA',
             moved_in_day=1, moved_in_month=1, moved_in_year=2019,
