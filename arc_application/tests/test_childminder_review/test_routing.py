@@ -762,6 +762,7 @@ class ApplicantPreviousAddressesFunctionalTests(TestCase):
     def setUp(self):
         self.arc_user = create_arc_user()
         self.application = create_childminder_application(self.arc_user.pk)
+
         self.client.login(username='arc_test', password='my_secret')
         self.valid_previous_address_data = [
             {
