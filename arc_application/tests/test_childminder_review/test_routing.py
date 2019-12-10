@@ -10,6 +10,7 @@ from django.urls import reverse
 from ... import models
 from ...tests import utils
 from ...tests.utils import create_childminder_application, create_arc_user
+from ...views import type_of_childcare_age_groups
 
 log = logging.getLogger('')
 
@@ -39,7 +40,12 @@ class SignInDetailsPageFunctionalTests(TestCase):
         utils.assertView(response, 'contact_summary')
 
     def test_submit_redirects_to_type_of_childcare_page_if_valid(self):
-        self.skipTest('testNotImplemented')
+        application_id = self.application.application_id
+        data = {'id': application_id}
+        response = self.client.post(reverse('contact_summary'), data)
+
+        self.assertEqual(response.status_code, 302)
+        utils.assertRedirectView(response, type_of_childcare_age_groups)
 
 
 @tag('http')
@@ -57,7 +63,12 @@ class TypeOfChildcarePageFunctionalTests(TestCase):
         utils.assertView(response, 'type_of_childcare_age_groups')
 
     def test_submit_redirects_to_personal_details_page_if_valid(self):
-        self.skipTest('testNotImplemented')
+        application_id = self.application.application_id
+        data = {'id': application_id}
+        response = self.client.post(reverse('type_of_childcare_age_groups'), data)
+
+        self.assertEqual(response.status_code, 302)
+        utils.assertRedirectView(response, 'personal_details_summary')
 
 
 @tag('http')
@@ -115,7 +126,37 @@ class PersonalDetailsPageFunctionalTests(TestCase):
             url=reverse('personal_details_previous_names'), app_id=self.application.pk))
 
     def test_shows_previous_addresses(self):
-        self.skipTest('testNotImplemented')
+        application_id = self.application.application_id
+
+        models.PreviousAddress.objects.create(
+            person_id=application_id,
+            person_type='APPLICANT',
+            street_line1='Informed', street_line2='Manchester Road', town='Altrincham',
+            county='Greater Manchester', postcode='WA14 4PA',
+            moved_in_day=1, moved_in_month=1, moved_in_year=2018,
+            moved_out_day=1, moved_out_month=1, moved_out_year=2019
+        )
+        models.PreviousAddress.objects.create(
+            person_id=application_id,
+            person_type='APPLICANT',
+            street_line1='Fortis', street_line2='Manchester Road', town='Altrincham',
+            county='Greater Manchester', postcode='WA14 4PA',
+            moved_in_day=1, moved_in_month=1, moved_in_year=2019,
+            moved_out_day=15, moved_out_month=3, moved_out_year=2019
+        )
+
+        response = self.client.get(reverse('personal_details_summary'), data={'id': self.application.pk})
+        self.assertEqual(200, response.status_code)
+
+        heading = "Home and childcare address"
+        utils.assertSummaryField(response,
+                                 'Your home address', (['1 Test Street', 'Testville', 'Testshire', 'WA14 4PX', '']),
+                                 heading="Home and childcare address")
+        utils.assertSummaryField(response, 'Your previous home address 1', 'Fortis', heading=heading)
+        utils.assertSummaryField(response, 'Moved in', '31 March 1980', heading=heading)
+        utils.assertSummaryField(response, 'Moved out', 'Billy Bob Billington-Bobbington', heading=heading)
+        utils.assertSummaryField(response, 'Start date', '25/12/1988', heading=heading)
+        utils.assertSummaryField(response, 'End date', '13/08/1999', heading=heading)
 
     def test_show_Add_Previous_Addresses_button(self):
         self.skipTest('testNotImplemented')

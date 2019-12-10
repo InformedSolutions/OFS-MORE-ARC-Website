@@ -54,7 +54,7 @@ def contact_summary(request):
 
         log.debug("Handling submissions for contact details page")
 
-        default = '/childcare/age-groups'
+        default = '/childcare/age-groups/'
         redirect_link = redirect_selection(request, default)
         return HttpResponseRedirect(settings.URL_PREFIX + redirect_link + '?id=' + application_id_local)
 

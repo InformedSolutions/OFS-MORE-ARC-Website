@@ -650,6 +650,13 @@ def create_childminder_application(user_id=None):
         zero_to_five=True,
         five_to_eight=True,
         eight_plus=True,
+        childcare_places=2,
+        weekday_before_school=True,
+        weekday_after_school=True,
+        weekday_am=False,
+        weekday_pm=False,
+        weekday_all_day=False,
+        weekend_all_day=True,
         overnight_care=True
     )
 
@@ -842,7 +849,7 @@ def assertSummaryField(response, label, value, heading=None):
         assertXPath(response, _heading_xpath(heading))
 
     assertXPath(response, _field_xpath(label, heading))
-    assertXPathValue(response, _field_value_xpath(label, heading), value, strip=True)
+    assertXPathValue(response, _field_value_xpath(label, heading), value, strip=False)
 
 
 def assertNotSummaryField(response, label, heading=None):
