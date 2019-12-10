@@ -766,15 +766,15 @@ class ApplicantPreviousAddressesFunctionalTests(TestCase):
         self.client.login(username='arc_test', password='my_secret')
         self.valid_previous_address_data = [
             {
-                'form-0-previous_address_id': '888888884444AAAA4444121212121212',
-                'initial-form-0-previous_address_id': '888888884444AAAA4444121212121212',
+                'form-0-previous_address_id': '9ff03d12-888a-4541-b964-d3cc7c8db8f5',
+                'initial-form-0-previous_address_id': '9ff03d12-888a-4541-b964-d3cc7c8db8f5',
                 'form-0-person_id': self.application.pk,
                 'form-0-other_person_type': 'APPLICANT',
                 'form-0-street_line1': 'Informed Solutions Ltd',
                 'form-0-street_line2': 'Manchester Road',
                 'form-0-town': 'Altrincham',
                 'form-0-county': 'Greater Manchester',
-                'form-0-postcode': 'Wa14 4PA',
+                'form-0-postcode': 'WA14 4PA',
                 'form-0-moved_in_date_0': '10',  # Day
                 'form-0-moved_in_date_1': '03',  # Month
                 'form-0-moved_in_date_2': '1996',  # Year
@@ -783,15 +783,15 @@ class ApplicantPreviousAddressesFunctionalTests(TestCase):
                 'form-0-moved_out_date_2': '1996',  # Year
             },
             {
-                'form-1-previous_address_id': '888888884444AAAA4444121212121212',
-                'initial-form-1-previous_address_id': '888888884444AAAA4444121212121212',
+                'form-1-previous_address_id': '9ff04d12-888a-4541-b964-d3cc7c8db8f5',
+                'initial-form-1-previous_address_id': '9ff04d12-888a-4541-b964-d3cc7c8db8f5',
                 'form-1-person_id': self.application.pk,
                 'form-1-other_person_type': 'APPLICANT',
                 'form-1-street_line1': 'Fortis',
                 'form-1-street_line2': 'Manchester Road',
                 'form-1-town': 'Altrincham',
                 'form-1-county': 'Greater Manchester',
-                'form-1-postcode': 'Wa14 4PA',
+                'form-1-postcode': 'WA14 4PA',
                 'form-1-moved_in_date_0': '15',  # Day
                 'form-1-moved_in_date_1': '08',  # Month
                 'form-1-moved_in_date_2': '1996',  # Year
@@ -833,9 +833,6 @@ class ApplicantPreviousAddressesFunctionalTests(TestCase):
             moved_out_day=15, moved_out_month=3, moved_out_year=2019
         )
 
-        if not models.PreviousAddress.objects.filter(person_id=application_id).exists():
-            raise AssertionError('No previous address record was found')
-
         url = '{0}?id={1}&state=entry&person_id={1}&person_type=APPLICANT'.format(
             reverse('personal_details_previous_addresses'), application_id)
 
@@ -843,60 +840,69 @@ class ApplicantPreviousAddressesFunctionalTests(TestCase):
 
         self.assertEqual(200, response.status_code)
 
-        utils.assertXPath(
-            response,
-            ('//input[normalize-space(@type)="text" and contains(normalize-space(@address), "{field}") '
-             'and normalize-space(@text)="{name}"]').format(field='Previous Address 1: ',
-                                                             name='Informed, Manchester Road Altrincham Greater Manchester WA14 4PA'), heading= 'Previous home addressesgit co')
-
         for addresses in [
             ('Informed', 'Manchester Road', 'Altrincham', 'Greater Manchester', 'WA14 4PA', '1', '1', '2018', '1', '1',
              '2019'),
             ('Fortis', 'Manchester Road', 'Altrincham', 'Greater Manchester', 'WA14 4PA', '1', '1', '2019', '15', '3',
              '2019')]:
-            for field, address in [('street_line1', addresses[0]), ('street_line2', addresses[1]),
-                                   ('town', addresses[2]),
-                                   ('county', addresses[3]), ('postcode', addresses[4]),
-                                   ('moved_in_date_0', addresses[5]), ('moved_in_date_1', addresses[6]),
-                                   ('moved_in_date_2', addresses[7]),
-                                   ('moved_out_date_0', addresses[8]), ('moved_out_date_1', addresses[9]),
-                                   ('moved_out_date_2', addresses[10])]:
-                utils.assertXPath(
-                    response,
-                    ('//input[normalize-space(@type)="text" and contains(normalize-space(@address), "{field}") '
-                     'and normalize-space(@value)="{name}"]').format(field=field, name=address)
-                )
+            for value in [(addresses[0]), (addresses[1]), (addresses[2]), (addresses[3]), (addresses[4]), (addresses[5]),
+                          (addresses[6]), (addresses[7]), (addresses[8]), (addresses[9]), (addresses[10])]:
+                utils.assertXPath(response,
+                    'normalize-space(//input[normalize-space(@type)="text" and normalize-space(@name)="{value}"]/@value)'
+                                  .format(value=value)
+                                  )
 
     def test_submit_confirm_returns_to_page_with_error_if_any_not_valid(self):
 
         application_id = self.application.application_id
 
-        data = self._make_post_data(2, 'Confirm and continue')
+        data = self._make_post_data(2, 'Save and continue')
         data.update(self.valid_previous_address_data[0])
         data.update(self.valid_previous_address_data[1])
 
         # make second one invalid
-        data['form-1-moved_in_date_0'] = 32
+        data['moved_in_date_0'] = 32
 
-        url = '{0}?id={1}&person_id={1}&type=APPLICANT'.format(
+        url = '{0}?id={1}&state=entry&person_id={1}&person_type=APPLICANT'.format(
             reverse('personal_details_previous_addresses'), application_id)
 
         response = self.client.post(url, data)
 
         self.assertEqual(200, response.status_code)
-        utils.assertView(response, 'add_applicant_previous_address')
+        utils.assertView(response, 'personal_details_previous_address')
         utils.assertXPath(response, '//*[normalize-space(@class)="field-error" '
                                     'or normalize-space(@class)="error-message"]')
 
     def test_submit_address_confirm_redirects_to_personal_details_summary_if_all_valid(self):
 
         application_id = self.application.application_id
-        data = self._make_post_data(2, 'Confirm and continue')
-        data.update(self.valid_previous_address_data[0])
-        data.update(self.valid_previous_address_data[1])
 
-        url = '{0}?id={1}&person_id={1}&type=APPLICANT'.format(reverse('personal_details_previous_addresses'),
-                                                               application_id)
+        adult1 = models.PreviousAddress.objects.create(
+            person_id=application_id,
+            person_type='APPLICANT',
+            street_line1='Informed Solutions Ltd', street_line2='Manchester Road', town='Altrincham',
+            county='Greater Manchester', postcode='WA14 4PA',
+            moved_in_day=10, moved_in_month=3, moved_in_year=1996,
+            moved_out_day=15, moved_out_month=8, moved_out_year=1996
+        )
+
+        data = self._make_post_data(2, last_is_new=True)
+        data.update(self.valid_previous_address_data[0])
+        data.update({'state': 'manual', 'save-and-continue': 'Save and continue'})
+
+        translate = {}
+        for k, v in data.items():
+            if 'form-0-' in k:
+                new_key = k.replace('form-0-', '')
+            else:
+                new_key = k
+            translate[k] = new_key
+
+        for old, new in translate.items():
+            data[new] = data.pop(old)
+
+        url = '{0}?id={1}&person_id={1}&person_type=APPLICANT'.format(
+            reverse('personal_details_previous_addresses'), application_id)
         response = self.client.post(url, data)
 
         # Assert response redirected to personal_details_summary
@@ -907,27 +913,38 @@ class ApplicantPreviousAddressesFunctionalTests(TestCase):
 
         application_id = self.application.application_id
 
-        data = self._make_post_data(2, 'Confirm and continue')
-        data.update(self.valid_previous_address_data[0])
+        models.PreviousAddress.objects.create(
+            person_id=application_id,
+            person_type='APPLICANT',
+            street_line1='Informed Solutions Ltd', street_line2='Manchester Road', town='Altrincham',
+            county='Greater Manchester', postcode='WA14 4PA',
+            moved_in_day=10, moved_in_month=3, moved_in_year=1996,
+            moved_out_day=15, moved_out_month=8, moved_out_year=1996
+        )
 
-        url = '{0}?id={1}&person_id={1}&type=APPLICANT'.format(reverse('personal_details_previous_addresses'),
-                                                               application_id)
+        data = self._make_post_data(2, 'Save and continue')
+        data.update(self.valid_previous_address_data[0])
+        data.update(self.valid_previous_address_data[1])
+
+        url = '{0}?id={1}&state=entry&person_id={1}&person_type=APPLICANT'.format(
+            reverse('personal_details_previous_addresses'), application_id)
+
         response = self.client.post(url, data)
 
-        self.assertEqual(302, response.status_code)
+        self.assertEqual(200, response.status_code)
 
         # Assert application was updated
-        if not models.PreviousName.objects.filter(person_id=application_id).exists():
+        if not models.PreviousAddress.objects.filter(person_id=application_id).exists():
             raise AssertionError('No previous address record was found')
 
         previous_address_record = models.PreviousAddress.objects.get(person_id=application_id)
 
-        self.assertEqual(previous_address_record.other_person_type, data['form-0-other_person_type'])
+        self.assertEqual(previous_address_record.person_type, data['form-0-other_person_type'])
         self.assertEqual(previous_address_record.street_line1, data['form-0-street_line1'])
         self.assertEqual(previous_address_record.street_line2, data['form-0-street_line2'])
         self.assertEqual(previous_address_record.town, data['form-0-town'])
-        self.assertEqual(previous_address_record.county, int(data['form-0-county']))
-        self.assertEqual(previous_address_record.postcode, int(data['form-0-postcode']))
+        self.assertEqual(previous_address_record.county, data['form-0-county'])
+        self.assertEqual(previous_address_record.postcode, data['form-0-postcode'])
         self.assertEqual(previous_address_record.moved_in_day, int(data['form-0-moved_in_date_0']))
         self.assertEqual(previous_address_record.moved_in_month, int(data['form-0-moved_in_date_1']))
         self.assertEqual(previous_address_record.moved_in_year, int(data['form-0-moved_in_date_2']))
@@ -939,37 +956,70 @@ class ApplicantPreviousAddressesFunctionalTests(TestCase):
 
         application_id = self.application.application_id
 
-        # Send a post request with an 'action':'Add another address'.
-        data = self._make_post_data(1, 'Add another address')
-        data.update(self.valid_previous_name_data[0])
+        adult1 = models.PreviousAddress.objects.create(
+            person_id=application_id,
+            person_type='APPLICANT',
+            street_line1='Informed Solutions Ltd', street_line2='Manchester Road', town='Altrincham',
+            county='Greater Manchester', postcode='WA14 4PA',
+            moved_in_day=10, moved_in_month=3, moved_in_year=1996,
+            moved_out_day=15, moved_out_month=8, moved_out_year=1996
+        )
 
-        url = '{0}?id={1}&person_id={1}&type=APPLICANT'.format(
+        # Send a post request with an 'action':'Add another address'.
+        data = self._make_post_data(2)
+        data.update(self.valid_previous_address_data[0])
+        data.update({'state': 'selection', 'add-another': 'Add another address', 'address': '0'})
+
+        translate = {}
+        for k, v in data.items():
+            if 'form-0-' in k:
+                new_key = k.replace('form-0-', '')
+            else:
+                new_key = k
+            translate[k] = new_key
+
+        for old, new in translate.items():
+            data[new] = data.pop(old)
+
+        url = '{0}?id={1}&person_id={1}&person_type=APPLICANT'.format(
             reverse('personal_details_previous_addresses'), application_id)
         response = self.client.post(url, data)
 
         # Assert that the page returned was the same page.
-        self.assertEqual(302, response.status_code)
-        utils.assertRedirectView(response, 'add_applicant_previous_address')
+        self.assertEqual(200, response.status_code)
+        # utils.assertRedirectView(response, 'personal_details_previous_addresses')
 
         # exactly one of each
-        for field, value in [('street_line1', ''), ('street_line1', 'Informed'),
-                             ('street_line2', ''), ('street_line2', '80 Manchester Road'),
-                             ('town', ''), ('town', 'Altrincham'),
-                             ('county', ''), ('county', 'GM'),
-                             ('postcode', ''), ('postcode', 'WA14 4PA'),
-                             ('moved_in_date_0', ''), ('moved_in_date_0', '10'),
-                             ('moved_in_date_1', ''), ('moved_in_date_1', '3'),
-                             ('moved_in_date_2', ''), ('moved_in_date_2', '1996'),
-                             ('moved_out_date_0', ''), ('moved_out_date_0', '15'),
-                             ('moved_out_date_1', ''), ('moved_out_date_1', '8'),
-                             ('moved_out_date_2', ''), ('moved_out_date_2', '1996')]:
-            utils.assertXPathCount(
-                response,
-                ('//input[normalize-space(@type)="text" and normalize-space(@value)="{value}" '
-                 'and contains(normalize-space(@address), "{field}")]').format(field=field, value=value),
-                1
-            )
+        for field, value in [('Previous address 1: ', ''), ('Previous address 1: ',
+                                                            'Informed Solutions Ltd<br/>\nManchester '
+                                                            'Road<br/>\nAltrincham<br/>\nGreater '
+                                                            'Manchester<br/>\n\nWA14 4PA'),
+                             ('id_moved_in_date_1', ''), ('id_moved_in_date_1', '10'),
+                             ('id_moved_in_date_2', ''), ('id_moved_in_date_2', '3'),
+                             ('id_moved_in_date_3', ''), ('id_moved_in_date_3', '1996'),
+                             ('id_moved_out_date_1', ''), ('id_moved_out_date_1', '15'),
+                             ('id_moved_out_date_2', ''), ('id_moved_out_date_2', '8'),
+                             ('id_moved_out_date_3', ''), ('id_moved_out_date_3', '1996')]:
+            utils.assertXPath(response,
+                              'normalize-space(//input[normalize-space(@type)="text" and normalize-space(@name)="{'
+                              'value}"]/@value) '
+                              .format(value=value)
+                              )
 
+    def _make_post_data(self, num_addresses, action=None, last_is_new=False):
+        data = {
+            'id': self.application.pk,
+            'person_id': self.application.pk,
+            'state': 'entry',
+            'person_type': 'APPLICANT',
+            'form-TOTAL_FORMS': num_addresses,
+            'form-INITIAL_FORMS': num_addresses - 1 if last_is_new else num_addresses,
+            'form-MIN_NUM_FORMS': 0,
+            'form-MAX_NUM_FORMS': 1000,
+        }
+        if action is not None:
+            data['action'] = action
+        return data
 
 @tag('http')
 class FirstAidPageFunctionalTests(TestCase):
@@ -1449,10 +1499,19 @@ class PeopleInTheHomeFunctionalTests(TestCase):
 
         response = self.client.get(reverse('other_people_summary'), data={'id': self.application.pk})
 
-        utils.assertSummaryField(response, 'Previous address 1',
-                                 'Informed Manchester Road Altrincham Greater Manchester WA14 4PA')
-        utils.assertSummaryField(response, 'Previous address 2',
-                                 'Fortis Manchester Road Altrincham Greater Manchester WA14 4PA')
+        for addresses in [
+            ('Informed', 'Manchester Road', 'Altrincham', 'Greater Manchester', 'WA14 4PA', '1', '1', '2018', '1', '1',
+             '2019'),
+            ('Fortis', 'Manchester Road', 'Altrincham', 'Greater Manchester', 'WA14 4PA', '1', '1', '2019', '15', '3',
+             '2019')]:
+            for value in [(addresses[0]), (addresses[1]), (addresses[2]), (addresses[3]), (addresses[4]),
+                          (addresses[5]),
+                          (addresses[6]), (addresses[7]), (addresses[8]), (addresses[9]), (addresses[10])]:
+                utils.assertXPath(response,
+                                  'normalize-space(//input[normalize-space(@type)="text" and normalize-space(@name)="{value}"]/@value)'
+                                  .format(value=value)
+                                  )
+
 
     def test_shows_Add_Previous_Addresses_button_for_each_adult(self):
 
