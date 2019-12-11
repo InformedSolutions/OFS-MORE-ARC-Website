@@ -2364,11 +2364,21 @@ class ReferencesPageFunctionalTests(TestCase):
         reloaded_application = models.Application.objects.get(pk=self.application.application_id)
         self.assertTrue(reloaded_application.references_arc_flagged)
 
-    # def test_submit_redirects_to_task_list_page_if_valid(self):
-    #
-    #     response = self.client.post(reverse('references_summary'), data={'id': self.application.pk})
-    #     self.assertEqual(response.status_code, 302)
-    #     utils.assertRedirectView(response, 'task_list')
+    def test_submit_redirects_to_task_list_page_if_valid(self):
+        data = {'id': self.application.pk,
+                'form-full_name_comments': '', 'form-relationship_comments': '', 'form-time_known_comments': '',
+                'form-address_comments': '', 'form-phone_number_comments': '', 'form-email_address_comments': '',
+                'form2-full_name_comments': '', 'form2-relationship_comments': '',
+                'form2-time_known_comments': '', 'form2-address_comments': '', 'form2-phone_number_comments': '',
+                'form2-email_address_comments': ''
+                }
+
+        # Act
+        # response = self.client.post(reverse('references_summary') + '?id=' + self.application.pk,
+        #                             data={'id': self.application.pk})
+        response = self.client.post(reverse('references_summary')+ '?id=' + self.application.pk, data)
+        self.assertEqual(response.status_code, 302)
+        utils.assertRedirectView(response, 'task_list')
 
 
 @tag('http')
