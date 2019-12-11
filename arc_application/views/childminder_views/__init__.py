@@ -1,3 +1,5 @@
 from .contact_details import contact_summary
 from .review import PreviousRegistrationDetailsView, OtherPersonPreviousRegistrationDetailsView
 from .type_of_childcare import type_of_childcare_age_groups
+from .childcare_training_check import  ChildcareTrainingCheckSummaryView
+from .task_list import task_list

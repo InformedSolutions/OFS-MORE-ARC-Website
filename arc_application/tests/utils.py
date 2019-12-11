@@ -544,11 +544,15 @@ def assertXPathValue(response, xpath, expected_value, strip=False):
     :param expected_value: The content expected to be found
     :param strip: (optional) Run results through str.strip to trim whitespace
     """
-    if strip and not isinstance(expected_value, str):
-        raise ValueError('strip parameter only applies to expected str type')
+    if strip:
+        if isinstance(expected_value, str):
+            expected_value = expected_value.strip()
+        elif isinstance(expected_value, list):
+            expected_value = list(map(str.strip, expected_value))
+        else:
+            raise ValueError('Expected str or list to strip at {}'.format(expected_value))
 
     result = _do_xpath(response, xpath)
-
     if strip:
         if isinstance(result, str):
             result = result.strip()
@@ -849,7 +853,7 @@ def assertSummaryField(response, label, value, heading=None):
         assertXPath(response, _heading_xpath(heading))
 
     assertXPath(response, _field_xpath(label, heading))
-    assertXPathValue(response, _field_value_xpath(label, heading), value, strip=False)
+    assertXPathValue(response, _field_value_xpath(label, heading), value, strip=True)
 
 
 def assertNotSummaryField(response, label, heading=None):

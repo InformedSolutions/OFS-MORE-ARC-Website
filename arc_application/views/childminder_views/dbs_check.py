@@ -58,7 +58,7 @@ def dbs_check_summary(request):
                 show_references = get_show_references(application_id_local)
 
                 if show_people_in_the_home:
-                    default = '/people/summary'
+                    default = '/people/summary/'
                     log.debug("Conditional logic - Direct to people in the home task next")
                 elif show_references:
                     default = '/references/summary'

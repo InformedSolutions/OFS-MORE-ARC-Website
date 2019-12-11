@@ -10,7 +10,7 @@ from django.urls import reverse
 from ... import models
 from ...tests import utils
 from ...tests.utils import create_childminder_application, create_arc_user
-from ...views import type_of_childcare_age_groups
+from ... import views
 
 log = logging.getLogger('')
 
@@ -45,7 +45,7 @@ class SignInDetailsPageFunctionalTests(TestCase):
         response = self.client.post(reverse('contact_summary'), data)
 
         self.assertEqual(response.status_code, 302)
-        utils.assertRedirectView(response, type_of_childcare_age_groups)
+        utils.assertRedirectView(response, views.type_of_childcare_age_groups)
 
 
 @tag('http')
@@ -122,9 +122,12 @@ class PersonalDetailsPageFunctionalTests(TestCase):
         response = self.client.get(reverse('personal_details_summary') + '?id=' + self.application.application_id)
 
         # Assert that the 'Add previous names' button is on the page.
-        utils.assertXPath(response, '//a[@href="{url}?id={app_id}&person_id={app_id}&type=APPLICANT"]'.format(
-            url=reverse('personal_details_previous_names'), app_id=self.application.pk))
+        utils.assertXPath(response, '//a[@href="{url}'.format(
+            url='{0}?id={1}&state=entry&person_id={1}&type=APPLICANT'.format(
+            reverse('personal_details_previous_addresses'), self.application.pk)))
 
+        # url = '{0}?id={1}&state=entry&person_id={1}&type=APPLICANT'.format(
+        #   reverse('personal_details_previous_addresses'), self.application.pk)
     def test_shows_previous_addresses(self):
         application_id = self.application.application_id
 
@@ -148,18 +151,32 @@ class PersonalDetailsPageFunctionalTests(TestCase):
         response = self.client.get(reverse('personal_details_summary'), data={'id': self.application.pk})
         self.assertEqual(200, response.status_code)
 
+        for addresses in [
+            ('Informed', 'Manchester Road', 'Altrincham', 'Greater Manchester', 'WA14 4PA', ''),
+            ('Fortis', 'Manchester Road', 'Altrincham', 'Greater Manchester', 'WA14 4PA', ''),
+            ('1 Test Street', 'Testville', 'Testshire', 'WA14 4PX', '','')]:
+            for value in [(addresses[0]), (addresses[1]), (addresses[2]), (addresses[3]), (addresses[4]), (addresses[5])]:
+                utils.assertXPath(response,
+                    'normalize-space(//input[normalize-space(@type)="text" and normalize-space(@name)="{value}"]/@value)'
+                                  .format(value=value)
+                                  )
+
         heading = "Home and childcare address"
-        utils.assertSummaryField(response,
-                                 'Your home address', (['1 Test Street', 'Testville', 'Testshire', 'WA14 4PX', '']),
-                                 heading="Home and childcare address")
-        utils.assertSummaryField(response, 'Your previous home address 1', 'Fortis', heading=heading)
-        utils.assertSummaryField(response, 'Moved in', '31 March 1980', heading=heading)
-        utils.assertSummaryField(response, 'Moved out', 'Billy Bob Billington-Bobbington', heading=heading)
-        utils.assertSummaryField(response, 'Start date', '25/12/1988', heading=heading)
-        utils.assertSummaryField(response, 'End date', '13/08/1999', heading=heading)
+        utils.assertSummaryField(response, 'Your previous home address 1', 'Informed', heading=heading)
+        utils.assertSummaryField(response, 'Your previous home address 2', 'Fortis', heading=heading)
+        utils.assertSummaryField(response, 'Moved in', '01 January 2018', heading=heading)
+        utils.assertSummaryField(response, 'Moved out', '01 January 2019', heading=heading)
+        utils.assertSummaryField(response, 'Moved in', '01 January 2019', heading=heading)
+        utils.assertSummaryField(response, 'Moved out', '15 March 2019', heading=heading)
+        utils.assertSummaryField(response, 'Childcare address', 'Same as home address')
+        utils.assertSummaryField(response, 'Is this another childminder\'s home?', 'No')
 
     def test_show_Add_Previous_Addresses_button(self):
-        self.skipTest('testNotImplemented')
+        response = self.client.get(reverse('personal_details_summary') + '?id=' + self.application.application_id)
+
+        # Assert that the 'Add previous addresses' button is on the page.
+        utils.assertXPath(response, '//a[@href="{url}?id={app_id}&state=entry&person_id={app_id}&person_type=APPLICANT"]'.format(
+            url=reverse('personal_details_previous_addresses'), app_id=self.application.pk))
 
     def test_submitting_comment_for_field_on_personal_details_page_adds_flag_in_database(self):
 
@@ -1117,7 +1134,11 @@ class FirstAidPageFunctionalTests(TestCase):
         self.assertTrue(reloaded_application.first_aid_training_arc_flagged)
 
     def test_submit_redirects_to_childcare_training_page_if_valid(self):
-        self.skipTest('testNotImplemented')
+        data = {'id': self.application.pk}
+        response = self.client.post(reverse('first_aid_training_summary'), data)
+
+        self.assertEqual(response.status_code, 302)
+        utils.assertRedirectView(response, views.ChildcareTrainingCheckSummaryView.as_view())
 
 
 @tag('http')
@@ -1134,8 +1155,24 @@ class ChildcareTrainingPageFunctionalTests(TestCase):
         self.assertEqual(200, response.status_code)
         utils.assertView(response, 'ChildcareTrainingCheckSummaryView')
 
-    def test_submit_redirects_to_health_declaration_page_if_valid(self):
-        self.skipTest('testNotImplemented')
+    def test_submit_redirects_to_health_declaration_page_if_valid_childcare_zero_to_five(self):
+        data = {'id': self.application.pk}
+        response = self.client.post(reverse('childcare_training_check_summary'), data)
+        models.ChildcareType.objects.get(application_id=self.application.pk).zero_to_five = True
+        self.assertEqual(response.status_code, 302)
+        utils.assertRedirectView(response, 'health_check_answers')
+
+    def test_submit_redirects_to_dbs_check_page_if_valid_childcare_over_five(self):
+        data = {'id': self.application.pk}
+
+        childcare_type = models.ChildcareType.objects.get(application_id=self.application.pk)
+        childcare_type.zero_to_five = False
+        childcare_type.save()
+
+        response = self.client.post(reverse('childcare_training_check_summary'), data)
+
+        self.assertEqual(response.status_code, 302)
+        utils.assertRedirectView(response, 'dbs_check_summary')
 
 
 @tag('http')
@@ -1153,7 +1190,12 @@ class HealthDeclarationPageFunctionalTests(TestCase):
         utils.assertView(response, 'health_check_answers')
 
     def test_submit_redirects_to_criminal_record_page_if_valid(self):
-        self.skipTest('testNotImplemented')
+        data = {'id': self.application.pk}
+
+        response = self.client.post(reverse('health_check_answers'), data)
+
+        self.assertEqual(response.status_code, 302)
+        utils.assertRedirectView(response, 'dbs_check_summary')
 
 
 @tag('http')
@@ -1211,7 +1253,12 @@ class CriminalRecordCheckPageFunctionalTests(TestCase):
         self.assertTrue(reloaded_application.criminal_record_check_arc_flagged)
 
     def test_submit_redirects_to_people_in_home_page_if_valid(self):
-        self.skipTest('testNotImplemented')
+        data = {'id': self.application.pk}
+
+        response = self.client.post(reverse('dbs_check_summary'), data)
+
+        self.assertEqual(response.status_code, 302)
+        utils.assertRedirectView(response, 'other_people_summary')
 
 
 @tag('http')
@@ -2317,8 +2364,11 @@ class ReferencesPageFunctionalTests(TestCase):
         reloaded_application = models.Application.objects.get(pk=self.application.application_id)
         self.assertTrue(reloaded_application.references_arc_flagged)
 
-    def test_submit_redirects_to_task_list_page_if_valid(self):
-        self.skipTest('testNotImplemented')
+    # def test_submit_redirects_to_task_list_page_if_valid(self):
+    #
+    #     response = self.client.post(reverse('references_summary'), data={'id': self.application.pk})
+    #     self.assertEqual(response.status_code, 302)
+    #     utils.assertRedirectView(response, 'task_list')
 
 
 @tag('http')
