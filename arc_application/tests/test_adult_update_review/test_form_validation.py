@@ -1,5 +1,7 @@
 import datetime
 from unittest.mock import patch
+from unittest import skipUnless
+from django.conf import settings
 
 from django.test import TestCase, tag
 
@@ -8,6 +10,7 @@ from ..utils import create_childminder_application, create_arc_user
 from ...forms.previous_names import PersonPreviousNameForm
 
 @tag('unit')
+@skipUnless(settings.ENABLE_HM, 'Skipping test as HM feature toggle equated to False')
 class ReviewPersonalDetailsPreviousNamesFormValidationTests(TestCase):
     form = PersonPreviousNameForm
 
@@ -331,6 +334,7 @@ class ReviewPersonalDetailsPreviousNamesFormValidationTests(TestCase):
 
 
 @tag('unit')
+@skipUnless(settings.ENABLE_HM, 'Skipping test as HM feature toggle equated to False')
 class PersonalDetailsPreviousAddressEnterPostCodeFormValidationTests(TestCase):
     """
     Tests to check that the PreviousAddress ENTER PostCode Form validates correctly.
@@ -354,6 +358,7 @@ class PersonalDetailsPreviousAddressEnterPostCodeFormValidationTests(TestCase):
 
 
 @tag('unit')
+@skipUnless(settings.ENABLE_HM, 'Skipping test as HM feature toggle equated to False')
 class PersonalDetailsPreviousAddressSelectPostCodeFormValidationTests(TestCase):
     """
     Tests to check that the PreviousAddress SELECT PostCode Form validates correctly.
@@ -696,6 +701,7 @@ class PersonalDetailsPreviousAddressSelectPostCodeFormValidationTests(TestCase):
 
 
 @tag('unit')
+@skipUnless(settings.ENABLE_HM, 'Skipping test as HM feature toggle equated to False')
 class PersonalDetailsPreviousAddressManualPostCodeFormValidationTests(TestCase):
     """
     Tests to check that the PreviousAddress MANUAL PostCode Form validates correctly.

@@ -25,6 +25,7 @@ APP_STATUS_ACCEPTED = 'ACCEPTED'
 
 
 @tag('http')
+@skipUnless(settings.ENABLE_HM, 'Skipping test as HM feature toggle equated to False')
 class HMReviewFuncTestsBase(TestCase):
 
     def setUp(self):
@@ -106,7 +107,7 @@ class AdultUpdateReviewTests(HMReviewFuncTestsBase):
         self.assertEqual(response.status_code, 200)
         utils.assertView(response, adult_update_view.new_adults_summary)
 
-
+@skipUnless(settings.ENABLE_HM, 'Skipping test as HM feature toggle equated to False')
 class PreviousRegistrationTests(HMReviewFuncTestsBase):
 
     def test_can_render_previous_registration_page(self):
@@ -148,7 +149,7 @@ class PreviousRegistrationTests(HMReviewFuncTestsBase):
         self.assertEqual(response.status_code, 200)
         utils.assertView(response, adult_previous_registration_view)
 
-
+@skipUnless(settings.ENABLE_HM, 'Skipping test as HM feature toggle equated to False')
 class HMPreviousNamesTests(HMReviewFuncTestsBase):
 
     def setUp(self):
@@ -373,7 +374,7 @@ class HMPreviousNamesTests(HMReviewFuncTestsBase):
             data['action'] = action
         return data
 
-
+@skipUnless(settings.ENABLE_HM, 'Skipping test as HM feature toggle equated to False')
 class ReviewSummaryAndConfirmationFunctionalTests(HMReviewFuncTestsBase):
 
     def test_can_render_arc_summary_page(self):
