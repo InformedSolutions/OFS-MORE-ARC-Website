@@ -26,6 +26,20 @@ APP_STATUS_ACCEPTED = 'ACCEPTED'
 
 
 @tag('http')
+class TaskListPageFunctionalTests(TestCase):
+
+    def setUp(self):
+        self.arc_user = create_arc_user()
+        self.application = create_childminder_application(self.arc_user.pk)
+        self.client.login(username='arc_test', password='my_secret')
+
+    def test_can_render_page(self):
+        response = self.client.get(reverse('task_list'), data={'id': self.application.pk})
+
+        self.assertEqual(200, response.status_code)
+        utils.assertView(response, 'task_list')
+
+@tag('http')
 class SignInDetailsPageFunctionalTests(TestCase):
 
     def setUp(self):
@@ -122,12 +136,9 @@ class PersonalDetailsPageFunctionalTests(TestCase):
         response = self.client.get(reverse('personal_details_summary') + '?id=' + self.application.application_id)
 
         # Assert that the 'Add previous names' button is on the page.
-        utils.assertXPath(response, '//a[@href="{url}'.format(
-            url='{0}?id={1}&state=entry&person_id={1}&type=APPLICANT'.format(
-            reverse('personal_details_previous_addresses'), self.application.pk)))
+        utils.assertXPath(response, '//a[@href="{url}?id={app_id}&person_id={app_id}&type=APPLICANT"]'.format(
+            url=reverse('personal_details_previous_names'), app_id=self.application.pk))
 
-        # url = '{0}?id={1}&state=entry&person_id={1}&type=APPLICANT'.format(
-        #   reverse('personal_details_previous_addresses'), self.application.pk)
     def test_shows_previous_addresses(self):
         application_id = self.application.application_id
 
@@ -1260,6 +1271,41 @@ class CriminalRecordCheckPageFunctionalTests(TestCase):
         self.assertEqual(response.status_code, 302)
         utils.assertRedirectView(response, 'other_people_summary')
 
+    def test_submit_redirects_to_references_if_no_other_people(self):
+
+        application = models.Application.objects.get(application_id=self.application.pk)
+        application.adults_in_home = False
+        application.working_in_other_childminder_home = True
+        application.own_children = False
+        application.save()
+
+        data = {'id': self.application.pk}
+
+        response = self.client.post(reverse('dbs_check_summary'), data)
+
+        self.assertEqual(response.status_code, 302)
+        utils.assertRedirectView(response, 'references_summary')
+
+    def test_submit_redirects_to_task_list_if_no_other_people_and_children_over_five(self):
+
+        application = models.Application.objects.get(application_id=self.application.pk)
+        application.adults_in_home = False
+        application.working_in_other_childminder_home = True
+
+        application.save()
+
+        childcare_type = models.ChildcareType.objects.get(application_id=self.application.pk)
+        childcare_type.zero_to_five = False
+        childcare_type.five_to_eight = False
+        childcare_type.save()
+        data = {'id': self.application.pk}
+
+        response = self.client.post(reverse('dbs_check_summary'), data)
+
+        self.assertEqual(response.status_code, 302)
+        utils.assertRedirectView(response, 'task_list')
+
+
 
 @tag('http')
 class PeopleInTheHomeFunctionalTests(TestCase):
@@ -1777,7 +1823,26 @@ class PeopleInTheHomeFunctionalTests(TestCase):
         response = self.client.post(reverse('other_people_summary'), data)
 
         self.assertEqual(302, response.status_code)
+        log.debug('the response url is: {}'.format(response.url))
         utils.assertRedirectView(response, 'references_summary')
+        self.assertTrue(response.url.endswith('?id=' + self.application.application_id))
+
+    def test_submit_redirects_to_task_list_if_valid_and_over_five(self):
+
+        data = self._make_post_data(adults=1)
+        data.update({
+            'adult-0-cygnum_relationship': 'Brother',
+        })
+
+        childcare_type = models.ChildcareType.objects.get(application_id=self.application.pk)
+        childcare_type.zero_to_five = False
+        childcare_type.five_to_eight = False
+        childcare_type.save()
+
+        response = self.client.post(reverse('other_people_summary'), data)
+
+        self.assertEqual(302, response.status_code)
+        utils.assertRedirectView(response, 'task_list')
         self.assertTrue(response.url.endswith('?id=' + self.application.application_id))
 
     def _make_post_data(self, adults=0, children=0, own_children=0, own_child_addresses=0):
@@ -2365,17 +2430,8 @@ class ReferencesPageFunctionalTests(TestCase):
         self.assertTrue(reloaded_application.references_arc_flagged)
 
     def test_submit_redirects_to_task_list_page_if_valid(self):
-        data = {'id': self.application.pk,
-                'form-full_name_comments': '', 'form-relationship_comments': '', 'form-time_known_comments': '',
-                'form-address_comments': '', 'form-phone_number_comments': '', 'form-email_address_comments': '',
-                'form2-full_name_comments': '', 'form2-relationship_comments': '',
-                'form2-time_known_comments': '', 'form2-address_comments': '', 'form2-phone_number_comments': '',
-                'form2-email_address_comments': ''
-                }
+        response = self.client.post(reverse('references_summary'), data={'id': self.application.pk})
 
-        # Act
-        # response = self.client.post(reverse('references_summary') + '?id=' + self.application.pk,
-        #                             data={'id': self.application.pk})
         response = self.client.post(reverse('references_summary')+ '?id=' + self.application.pk, data)
         self.assertEqual(response.status_code, 302)
         utils.assertRedirectView(response, 'task_list')
@@ -2432,7 +2488,36 @@ class ReviewSummaryAndConfirmationFunctionalTests(TestCase):
         utils.assertSummaryField(response, 'End date', '08 December 2013', heading=head)
 
     def test_displays_applicants_previous_addresses(self):
-        self.skipTest('testNotImplemented')
+
+        application_id = self.application.application_id
+
+        models.PreviousAddress.objects.create(
+            person_id=application_id,
+            person_type='APPLICANT',
+            street_line1='Informed', street_line2='Manchester Road', town='Altrincham',
+            county='Greater Manchester', postcode='WA14 4PA',
+            moved_in_day=1, moved_in_month=1, moved_in_year=2018,
+            moved_out_day=1, moved_out_month=1, moved_out_year=2019
+        )
+        models.PreviousAddress.objects.create(
+            person_id=application_id,
+            person_type='APPLICANT',
+            street_line1='Fortis', street_line2='Manchester Road', town='Altrincham',
+            county='Greater Manchester', postcode='WA14 4PA',
+            moved_in_day=1, moved_in_month=1, moved_in_year=2019,
+            moved_out_day=15, moved_out_month=3, moved_out_year=2019
+        )
+
+        response = self.client.get(reverse('arc-summary'), data={'id': self.application.pk})
+        self.assertEqual(200, response.status_code)
+
+        heading = "Previous addresses"
+        utils.assertSummaryField(response, 'Previous address 1', 'Informed, Manchester Road, Altrincham, WA14 4PA', heading=heading)
+        utils.assertSummaryField(response, 'Previous address 2', 'Fortis, Manchester Road, Altrincham, WA14 4PA', heading=heading)
+        utils.assertSummaryField(response, 'Moved in date', '01 January 2018', heading=heading)
+        utils.assertSummaryField(response, 'Moved out date', '01 January 2019', heading=heading)
+        utils.assertSummaryField(response, 'Moved in date', '01 January 2019', heading=heading)
+        utils.assertSummaryField(response, 'Moved out date', '15 March 2019', heading=heading)
 
     def test_displays_adults_main_info_that_is_always_shown(self):
 
@@ -2681,7 +2766,51 @@ class ReviewSummaryAndConfirmationFunctionalTests(TestCase):
         utils.assertSummaryField(response, 'End date', '01 January 2002', heading=head2)
 
     def test_display_adult_previous_addresses(self):
-        self.skipTest('testNotImplemented')
+
+        self.application.adults_in_home = True
+        self.application.working_in_other_childminder_home = False
+        self.application.save()
+        adult1 = models.AdultInHome.objects.get(application_id=self.application.pk)
+        adult1.PITH_same_address = False
+        adult1.street_line1 = '221B Baker Street'
+        adult1.street_line2 = ''
+        adult1.county = 'Greater London'
+        adult1.postcode = 'NW1 6XE'
+        adult1.first_name = 'Joe'
+        adult1.middle_names = 'Anthony'
+        adult1.last_name = 'Bloggs'
+        adult1.save()
+
+        models.PreviousAddress.objects.create(
+            person_id=adult1.adult_id,
+            person_type='ADULT',
+            street_line1='Informed', street_line2='Manchester Road', town='Altrincham',
+            county='Greater Manchester', postcode='WA14 4PA',
+            moved_in_day=1, moved_in_month=1, moved_in_year=2018,
+            moved_out_day=1, moved_out_month=1, moved_out_year=2019
+        )
+        models.PreviousAddress.objects.create(
+            person_id=adult1.adult_id,
+            person_type='ADULT',
+            street_line1='Fortis', street_line2='Manchester Road', town='Altrincham',
+            county='Greater Manchester', postcode='WA14 4PA',
+            moved_in_day=1, moved_in_month=1, moved_in_year=2019,
+            moved_out_day=15, moved_out_month=3, moved_out_year=2019
+        )
+
+        response = self.client.get(reverse('arc-summary'), data={'id': self.application.pk})
+        self.assertEqual(200, response.status_code)
+
+        head1 = "Joe Anthony Bloggs's previous names and addresses"
+        utils.assertSummaryField(response, 'Previous address 1', 'Informed, Manchester Road, Altrincham, WA14 4PA',
+                                 heading=head1)
+        utils.assertSummaryField(response, 'Previous address 2', 'Fortis, Manchester Road, Altrincham, WA14 4PA',
+                                 heading=head1)
+        utils.assertSummaryField(response, 'Moved in date', '01 January 2018', heading=head1)
+        utils.assertSummaryField(response, 'Moved out date', '01 January 2019', heading=head1)
+        utils.assertSummaryField(response, 'Moved in date', '01 January 2019', heading=head1)
+        utils.assertSummaryField(response, 'Moved out date', '15 March 2019', heading=head1)
+
 
     class MockDatetime(datetime):
         @classmethod

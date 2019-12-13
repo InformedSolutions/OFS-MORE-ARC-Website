@@ -73,7 +73,7 @@ urlpatterns = [
     url(r'^applications-summary/$', ApplicationsSummaryView.as_view(), name='applications-summary'),
 
     # childminder application review
-    url(r'^review/$', task_list, name='task_list'),
+    url(r'^review/', task_list, name='task_list'),
     url(r'^account/summary/', contact_summary, name='contact_summary'),
     url(r'^childcare/age-groups/', type_of_childcare_age_groups, name='type_of_childcare_age_groups'),
     url(r'^personal-details/summary/', personal_details_summary, name='personal_details_summary'),
