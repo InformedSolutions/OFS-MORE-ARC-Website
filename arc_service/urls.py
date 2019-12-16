@@ -173,11 +173,8 @@ if settings.ENABLE_NANNIES:
 if settings.URL_PREFIX:
     prefixed_url_pattern = []
     for pat in urlpatterns:
-        print(pat)
         pat.regex = re.compile(r"^%s/%s" % (settings.URL_PREFIX[1:], pat.regex.pattern[1:]))
-        print(pat.regex)
         prefixed_url_pattern.append(pat)
-    print(prefixed_url_pattern)
     urlpatterns = prefixed_url_pattern
 
 if settings.DEBUG:
