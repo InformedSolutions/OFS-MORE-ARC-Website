@@ -197,8 +197,10 @@ def personal_details_individual_lookup(request):
     elif referrer_type == 'childminder_pith':
         adult_id = request.GET.get('adult_id')
         context = fetch_childminder_pith_data(adult_id, application_id)
+        context.update({'initial_page': True})
     else:
         context = DATA_FETCHER_MAPPING[referrer_type](application_id)
+        context.update({'initial_page': True})
 
     context['form'] = form
 
@@ -319,11 +321,14 @@ def personal_details_individual_lookup_search_result(request):
     # Fetch context from a referrer app for 'Applicant's data' box
     if not application_id or referrer_type not in DATA_FETCHER_MAPPING:
         context = {}
+        context.update({'search_result': True})
     elif referrer_type == 'childminder_pith':
         adult_id = request.GET.get('adult_id')
         context = fetch_childminder_pith_data(adult_id, application_id)
+        context.update({'search_result': True})
     else:
         context = DATA_FETCHER_MAPPING[referrer_type](application_id)
+        context.update({'search_result': True})
         adult_id = ''
 
     context.update({
@@ -334,7 +339,7 @@ def personal_details_individual_lookup_search_result(request):
         'adult_id': adult_id
     })
 
-    return render(request, 'childminder_templates/personal-details-individual-lookup-search-result.html', context)
+    return render(request, 'childminder_templates/personal-details-individual-lookup.html', context)
 
 @login_required
 @group_required(settings.ARC_GROUP, raise_exception=True)
@@ -388,11 +393,14 @@ def personal_details_individual_lookup_search_choice(request):
     # Fetch context from a referrer app for 'Applicant's data' box
     if not application_id or referrer_type not in DATA_FETCHER_MAPPING:
         context = {}
+        context.update({'search_choice': True})
     elif referrer_type == 'childminder_pith':
         adult_id = request.GET.get('adult_id')
         context = fetch_childminder_pith_data(adult_id, application_id)
+        context.update({'search_choice': True})
     else:
         context = DATA_FETCHER_MAPPING[referrer_type](application_id)
+        context.update({'search_choice': True})
 
     context.update({
         'individuals': individuals,
@@ -403,7 +411,7 @@ def personal_details_individual_lookup_search_choice(request):
         'adult_id': adult_id
     })
 
-    return render(request, 'childminder_templates/personal-detials-individual-lookup-search-choice.html', context)
+    return render(request, 'childminder_templates/personal-details-individual-lookup.html', context)
 
 
 def mark_not_known_to_ofsted(referrer_type, application_id, adult_id=None):
