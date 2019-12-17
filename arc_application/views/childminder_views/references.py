@@ -69,7 +69,6 @@ def references_summary(request):
                 default = '/review/'
                 redirect_link = redirect_selection(request, default)
                 log.debug("Handling submissions for references page - save successful")
-                print(settings.URL_PREFIX + redirect_link + '?id=' + application_id_local)
                 return HttpResponseRedirect(settings.URL_PREFIX + redirect_link + '?id=' + application_id_local)
             else:
                 log.debug("Handling submissions for references page - save unsuccessful")
