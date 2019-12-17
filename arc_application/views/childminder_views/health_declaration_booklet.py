@@ -47,7 +47,7 @@ def health_check_answers(request):
                 status = Arc.objects.get(pk=application_id_local)
                 status.health_review = section_status
                 status.save()
-                default = '/dbs-check/summary'
+                default = '/dbs-check/summary/'
                 redirect_link = redirect_selection(request, default)
 
                 log.debug("Handling submissions for health declaration page - save successful")

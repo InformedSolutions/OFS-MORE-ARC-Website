@@ -30,7 +30,7 @@ def type_of_childcare_age_groups(request):
         status = Arc.objects.get(pk=application_id_local)
         status.childcare_type_review = 'COMPLETED'
         status.save()
-        default = '/personal-details/summary'
+        default = '/personal-details/summary/'
         redirect_link = redirect_selection(request, default)
         log.debug("Handling submissions for type of childcare")
         return HttpResponseRedirect(settings.URL_PREFIX + redirect_link + '?id=' + application_id_local)

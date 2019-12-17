@@ -55,7 +55,7 @@ def first_aid_training_summary(request):
                 status = Arc.objects.get(pk=application_id_local)
                 status.first_aid_review = section_status
                 status.save()
-                default = '/childcare-training-check/summary'
+                default = '/childcare-training-check/summary/'
                 redirect_link = redirect_selection(request, default)
 
                 log.debug("Handling submissions for first aid training page - save successful")

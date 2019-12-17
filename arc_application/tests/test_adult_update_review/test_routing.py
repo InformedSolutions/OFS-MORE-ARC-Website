@@ -102,7 +102,7 @@ class AdultUpdateReviewTests(HMReviewFuncTestsBase):
         """
         Test to ensure that the page for reviewing an adult update can be rendered
         """
-        response = self.client.get(reverse('new_adults_summary') +  '?id=' + self.test_app_id)
+        response = self.client.get(reverse('new_adults_summary') + '?id=' + self.test_app_id)
 
         self.assertEqual(response.status_code, 200)
         utils.assertView(response, adult_update_view.new_adults_summary)
@@ -129,7 +129,7 @@ class PreviousRegistrationTests(HMReviewFuncTestsBase):
                 'individual_id': 1234567,
                 'five_years_in_UK': True}
 
-        response = self.client.post(reverse('adults-previous-registration') + '?id=' + self.test_app_id, data)#
+        response = self.client.post(reverse('adults-previous-registration') + '?id=' + self.test_app_id, data)
         redirect_url = "/arc/review/new-adult?id={0}".format(self.test_app_id)
 
         self.assertEqual(response.status_code, 302)

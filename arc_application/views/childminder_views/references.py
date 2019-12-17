@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 import logging
 
 from ...forms.childminder_forms.form import ReferencesForm, ReferencesForm2
@@ -66,7 +66,7 @@ def references_summary(request):
                 status = Arc.objects.get(pk=application_id_local)
                 status.references_review = section_status
                 status.save()
-                default = '/review'
+                default = '/review/'
                 redirect_link = redirect_selection(request, default)
                 log.debug("Handling submissions for references page - save successful")
                 return HttpResponseRedirect(settings.URL_PREFIX + redirect_link + '?id=' + application_id_local)
