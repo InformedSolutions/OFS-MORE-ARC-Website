@@ -63,7 +63,7 @@
         <tbody>
 
         {% for row in rows %}
-        {% if row.id|template_string_in_list:'home_address lived_abroad previous_home_address' %}
+        {% if row.id|template_string_in_list:'home_address moved_in_date lived_abroad previous_home_address' %}
         {% include 'nanny_general_table_template.html' %}
         {% endif %}
         {% endfor %}
