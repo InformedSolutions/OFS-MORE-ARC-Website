@@ -327,18 +327,4 @@ class NannyPersonalDetailsSummary(NannyARCFormView):
         personal_details['name_end_month'] = end_date.month
         personal_details['name_end_year'] = end_date.year
 
-        previous_addresses = self.list_records(actions, 'previous-address',
-                                               {'person_id': self.application_id, 'person_type': 'APPLICANT'})
-        if previous_addresses is not None and len(previous_addresses) > 0:
-            # moved_out_date is a string but due to iso format, lexicographical order will be
-            # equivalent to chronological
-            sorted_previous_addresses = sorted(previous_addresses, key=itemgetter('moved_out_date'), reverse=True)
-            address_start_date = datetime.datetime.strptime(sorted_previous_addresses[0]['moved_out_date'],
-                                                            '%Y-%m-%d').date()
-        else:
-            address_start_date = date_of_birth
-
-        personal_details['moved_in_date'] = address_start_date
-        personal_details['moved_out_date'] = end_date
-
         actions.put('applicant-personal-details', params=personal_details)
