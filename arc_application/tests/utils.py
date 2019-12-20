@@ -111,7 +111,8 @@ class StubNannyGatewayActions:
             'last_name': 'Selenium',
             'date_of_birth': '2000-01-01',
             'known_to_social_services': True,
-            'reasons_known_to_social_services': 'An IMPORTANT reason'
+            'reasons_known_to_social_services': 'An IMPORTANT reason',
+            'moved_in_date': '2019-01-01'
         }
         self.personal_details_read_response = self.make_response(record=self.personal_details_record)
 
