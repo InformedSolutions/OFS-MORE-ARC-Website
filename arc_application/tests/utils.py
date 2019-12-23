@@ -19,6 +19,7 @@ class StubIdentityGatewayActions:
     Stub that returns static data for identity gateway endpoints. Can be instantiated, tweaked and discarded for
     each test
     """
+
     def __init__(self):
         self.identity_record = {
             'email': 'test@informed.com',
@@ -292,6 +293,7 @@ class StubNannyGatewayActions:
         resp.record = record if record is not None else {}
         return resp
 
+
 class StubHMGatewayActions:
     """
     Stub that returns static data for household member gateway endpoints. Can be instantiated, tweaked and discarded for
@@ -464,7 +466,7 @@ class StubHMGatewayActions:
             'previous-registration': self.previous_registration_list_response,
             'serious-illness': self.serious_illness_read_response,
             'hospital-admissions': self.hospital_admissions_read_response
-                  }
+        }
 
         # self.default_list_response = self.make_response()
         self.default_read_response = self.make_response()
@@ -483,7 +485,7 @@ class StubHMGatewayActions:
             'timeline-log': 'timeline_log',
             'previous-registration': 'previous_registration',
             'adult-in-home-address': 'home_address',
-            'serious-illness':'serious_illness',
+            'serious-illness': 'serious_illness',
             'hospital-admissions': 'hospital_admissions'
         }
 
@@ -513,6 +515,7 @@ class StubHMGatewayActions:
         resp.status_code = status
         resp.record = record if record is not None else {}
         return resp
+
 
 # CamelCase naming to match unittest module
 def assertXPath(response, xpath):
@@ -610,7 +613,6 @@ def assertRedirectView(response, expected_view_obj):
 
 
 def create_childminder_application(user_id=None):
-
     application = Application.objects.create(
         application_type='CHILDMINDER',
         application_id='da2265c2-2d65-4214-bfef-abcfe59b75aa',
@@ -650,7 +652,10 @@ def create_childminder_application(user_id=None):
         application_id=application,
         birth_day='01',
         birth_month='01',
-        birth_year='2001'
+        birth_year='2001',
+        moved_in_day=1,
+        moved_in_month=12,
+        moved_in_year=2000
     )
 
     ChildcareType.objects.create(
@@ -732,7 +737,7 @@ def create_childminder_application(user_id=None):
         cautions_convictions=True
     )
 
-    AdultInHome.objects.create(
+    adult = AdultInHome.objects.create(
         adult_id='da2265c2-2d65-4214-bfef-abcfe59b75aa',
         application_id=application,
         adult=1,
@@ -745,6 +750,17 @@ def create_childminder_application(user_id=None):
         relationship='Test',
         dbs_certificate_number='123456789012',
     )
+
+    AdultInHomeAddress.objects.create(application_id=application,
+                                      adult_id=adult,
+                                      street_line1='221B Baker Street',
+                                      street_line2='',
+                                      county='Greater London',
+                                      postcode='NW1 6XE',
+                                      moved_in_day=1,
+                                      moved_in_month=1,
+                                      moved_in_year=2000
+                                      )
 
     ChildInHome.objects.create(
         child_id='da2265c2-2d65-4214-bfef-abcfe59b75aa',
@@ -819,6 +835,7 @@ def create_nanny_review(application_id, user_id=None):
         user_id=user_id if user_id is not None else '',
         app_type='Nanny',
     )
+
 
 def create_adult_review(application_id, user_id=None):
     return Arc.objects.create(
@@ -919,4 +936,3 @@ def patch_object_for_setUp(test_case, *args, **kwargs):
     patcher = unittest.mock.patch.object(*args, **kwargs)
     test_case.addCleanup(patcher.stop)
     return patcher.start()
-
