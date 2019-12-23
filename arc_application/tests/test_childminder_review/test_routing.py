@@ -1378,12 +1378,16 @@ class PeopleInTheHomeFunctionalTests(TestCase):
         adult.PITH_same_address = False
         adult.save()
 
-        models.AdultInHomeAddress.objects.create(application_id=self.application,
+        adult_address = models.AdultInHomeAddress.objects.get(application_id=self.application,
                                                  adult_id=adult,
                                                  street_line1='221B Baker Street',
                                                  street_line2='',
                                                  county='Greater London',
-                                                 postcode='NW1 6XE')
+                                                 postcode='NW1 6XE',
+                                                 moved_in_day=1,
+                                                 moved_in_month=1,
+                                                 moved_in_year=2000
+                                                 )
 
         response = self.client.get(reverse('other_people_summary'), data={'id': self.application.pk})
 
@@ -1917,7 +1921,6 @@ class PeopleInTheHomeFunctionalTests(TestCase):
             previous_registration=True,
             individual_id=12345678
         )
-
         response = self.client.get(url, data)
 
         self.assertEqual(response.status_code, 200)
@@ -1936,7 +1939,6 @@ class PeopleInTheHomeFunctionalTests(TestCase):
             previous_registration=False,
             individual_id=0
         )
-
         response = self.client.get(url, data)
 
         self.assertEqual(response.status_code, 200)
@@ -2614,7 +2616,7 @@ class ReviewSummaryAndConfirmationFunctionalTests(TestCase):
         adult1.capita = False
         adult1.save()
 
-        models.AdultInHome.objects.create(
+        adult2 = models.AdultInHome.objects.create(
             application_id=self.application,
             first_name='Freda', middle_names='Annabel', last_name='Smith',
             birth_day=1, birth_month=2, birth_year=1983,
@@ -2623,6 +2625,12 @@ class ReviewSummaryAndConfirmationFunctionalTests(TestCase):
             within_three_months=False,
             certificate_information='',
         )
+
+        models.AdultInHomeAddress.objects.create(
+            application_id=self.application, adult_id=adult2,
+            moved_in_day=2,
+            moved_in_month=2,
+            moved_in_year=2000)
 
         response = self.client.get(reverse('arc-summary'), data={'id': self.application.pk})
 
@@ -2645,7 +2653,7 @@ class ReviewSummaryAndConfirmationFunctionalTests(TestCase):
         adult1.on_update = True
         adult1.save()
 
-        models.AdultInHome.objects.create(
+        adult2 = models.AdultInHome.objects.create(
             application_id=self.application,
             first_name='Freda', middle_names='Annabel', last_name='Smith',
             birth_day=1, birth_month=2, birth_year=1983,
@@ -2656,6 +2664,12 @@ class ReviewSummaryAndConfirmationFunctionalTests(TestCase):
             enhanced_check=None,
             on_update=True,
         )
+
+        models.AdultInHomeAddress.objects.create(
+            application_id=self.application, adult_id=adult2,
+            moved_in_day=2,
+            moved_in_month=2,
+            moved_in_year=2000)
 
         response = self.client.get(reverse('arc-summary'), data={'id': self.application.pk})
 
@@ -2693,7 +2707,7 @@ class ReviewSummaryAndConfirmationFunctionalTests(TestCase):
             on_update=False,
         )
 
-        models.AdultInHome.objects.create(
+        adult2 = models.AdultInHome.objects.create(
             application_id=self.application,
             first_name='Jim', middle_names='Bob', last_name='Robertson',
             birth_day=1, birth_month=3, birth_year=1985,
@@ -2704,6 +2718,12 @@ class ReviewSummaryAndConfirmationFunctionalTests(TestCase):
             enhanced_check=None,
             on_update=None,
         )
+
+        models.AdultInHomeAddress.objects.create(
+            application_id=self.application, adult_id=adult2,
+            moved_in_day=2,
+            moved_in_month=2,
+            moved_in_year=2000)
 
         response = self.client.get(reverse('arc-summary'), data={'id': self.application.pk})
 

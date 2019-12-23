@@ -56,6 +56,7 @@ def other_people_summary(request):
     adult_email_list = []
     adult_mobile_number_list = []
     adult_same_address_list = []
+    adult_PITH_moved_in_list = []
     adult_dbs_cert_numbers = []
     adult_dbs_on_capitas = []
     adult_dbs_is_recents = []
@@ -102,6 +103,9 @@ def other_people_summary(request):
     linking_complete = True
     for adult in adults:
 
+        adult_address = AdultInHomeAddress.objects.filter(application_id=application_id_local,
+                                                          adult_id=adult.pk)
+
         if adult.middle_names and adult.middle_names != '':
             name = adult.first_name + ' ' + adult.middle_names + ' ' + adult.last_name
         else:
@@ -110,8 +114,6 @@ def other_people_summary(request):
         if adult.PITH_same_address is None:
                 adult_address_string = 'N/A'
         elif not adult.PITH_same_address:
-            adult_address = AdultInHomeAddress.objects.filter(application_id=application_id_local,
-                                                                   adult_id=adult.pk)
             if adult_address.count() > 0:
                 adult_address = AdultInHomeAddress.objects.get(application_id=application_id_local,
                                                   adult_id=adult.pk)
@@ -124,6 +126,13 @@ def other_people_summary(request):
         else:
                 adult_address_string = 'Same as home address'
 
+        if AdultInHomeAddress.objects.filter(application_id=application_id_local,
+                                                          adult_id=adult.pk).count() > 0:
+            adult_address = AdultInHomeAddress.objects.get(application_id=application_id_local,
+                                                          adult_id=adult.pk)
+            adult_PITH_moved_in_list.append(adult_address.get_moved_in_date())
+        else:
+            adult_PITH_moved_in_list.append('N/A')
         adult_record_list.append(adult)
         adult_id_list.append(adult.adult_id)
         adult_health_check_status_list.append(adult.health_check_status)
@@ -196,7 +205,7 @@ def other_people_summary(request):
         adult_lists = list(
             zip(adult_record_list, adult_id_list, adult_health_check_status_list, adult_title_list, adult_name_list,
                 adult_birth_day_list, adult_birth_month_list, adult_birth_year_list, adult_relationship_list,
-                adult_email_list, adult_mobile_number_list, adult_same_address_list, adult_dbs_cert_numbers,
+                adult_email_list, adult_mobile_number_list, adult_same_address_list, adult_PITH_moved_in_list, adult_dbs_cert_numbers,
                 adult_dbs_on_capitas, adult_dbs_is_recents, adult_dbs_is_enhanceds, adult_dbs_on_updates,
                 adult_lived_abroad, adult_military_base, formset_adult, current_illnesses,
                 serious_illnesses, hospital_admissions, local_authorities, adult_enhanced_checks,
@@ -367,7 +376,7 @@ def other_people_summary(request):
             adult_lists = list(zip(adult_record_list, adult_id_list, adult_health_check_status_list, adult_title_list,
                                    adult_name_list,  adult_birth_day_list, adult_birth_month_list, adult_birth_year_list,
                                    adult_relationship_list, adult_email_list, adult_mobile_number_list,
-                                   adult_same_address_list, adult_dbs_cert_numbers, adult_dbs_on_capitas,
+                                   adult_same_address_list, adult_PITH_moved_in_list,  adult_dbs_cert_numbers, adult_dbs_on_capitas,
                                    adult_dbs_is_recents, adult_dbs_is_enhanceds, adult_dbs_on_updates,
                                    adult_lived_abroad, adult_military_base, adult_formset, current_illnesses,
                                    serious_illnesses, hospital_admissions, local_authorities, adult_enhanced_checks,
