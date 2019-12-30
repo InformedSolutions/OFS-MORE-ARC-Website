@@ -130,7 +130,10 @@ def other_people_summary(request):
                                                           adult_id=adult.pk).count() > 0:
             adult_address = AdultInHomeAddress.objects.get(application_id=application_id_local,
                                                           adult_id=adult.pk)
-            adult_PITH_moved_in_list.append(adult_address.get_moved_in_date())
+            if adult_address.moved_in_year != None:
+                adult_PITH_moved_in_list.append(adult_address.get_moved_in_date())
+            else:
+                adult_PITH_moved_in_list.append('N/A')
         else:
             adult_PITH_moved_in_list.append('N/A')
         adult_record_list.append(adult)

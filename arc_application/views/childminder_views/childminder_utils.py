@@ -342,7 +342,8 @@ def load_json(application_id_local, ordered_models, recurse, apply_filtering_for
                                                      adult_id=record.pk).count() > 0:
                     adult_address = AdultInHomeAddress.objects.get(application_id=application_id_local,
                                                                    adult_id=record.pk)
-                    table.insert(9, {"name": "Moved in", "value": adult_address.get_moved_in_date()}, )
+                    if adult_address.moved_in_year != None:
+                        table.insert(9, {"name": "Moved in", "value": adult_address.get_moved_in_date()}, )
                 # else:
                 #     table.insert(9, {"name": "Moved in", "value": adult_address.get_moved_in_date()}, )
                 table.insert(8, {"name": "Address", "value": adult_address_string})
