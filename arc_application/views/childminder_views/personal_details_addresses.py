@@ -226,10 +226,6 @@ def postcode_submission(request):
         previous_address_record.moved_out_date = moved_out_date
         previous_address_record.save()
 
-        # If updating a record related to the applicant, set their moved in/out dates for their current address
-        if previous_address_record.person_type == 'APPLICANT':
-            update_applicant_current_address(previous_address_record.person_id)
-
         if 'save-and-continue' in request.POST:
             log.debug("Handling submissions for previous address page - following save and continue")
             return HttpResponseRedirect(build_url('personal_details_summary', get={'id': request.POST['id']}))
@@ -285,9 +281,6 @@ def personal_details_previous_address_change(request):
 
             address_record.save()
 
-            # If updating a record related to the applicant, set their moved in/out dates for their current address
-            if address_record.person_type == 'APPLICANT':
-                update_applicant_current_address(address_record.person_id)
             log.debug("Handling submissions for change previous address page")
             return HttpResponseRedirect(build_url('personal_details_summary', get={'id': context['id']}))
 
