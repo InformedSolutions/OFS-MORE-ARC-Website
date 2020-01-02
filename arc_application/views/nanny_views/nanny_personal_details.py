@@ -94,8 +94,9 @@ class NannyPersonalDetailsSummary(NannyARCFormView):
         county = home_address['county']
         postcode = home_address['postcode']
 
-        moved_in_string = personal_details['moved_in_date']
-        moved_in_date = self.format_date(moved_in_string)
+        moved_in_date = personal_details['moved_in_date']
+        if moved_in_date is not None:
+            moved_in_date = self.format_date(moved_in_date)
 
         known_to_social_services = personal_details['known_to_social_services']
         reasons_known_to_social_services = personal_details['reasons_known_to_social_services']
