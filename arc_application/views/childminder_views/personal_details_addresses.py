@@ -452,7 +452,6 @@ def get_latest_moved_out_date(previous_address_list):
     # Construct a list of moved_out_dates, removes redundant data
     moved_out_date_list = [address.moved_out_date for address in previous_address_list if
                            address.moved_out_date is not None]
-    log.debug('Moved out date list = {}'.format(moved_out_date_list))
     # Return the first element of the sorted list, as this will be the greatest moved_out_date
     latest_moved_out_date = sorted(moved_out_date_list, reverse=True)[0]
     return latest_moved_out_date
