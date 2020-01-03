@@ -9,7 +9,7 @@ from django.shortcuts import render
 from ...decorators import group_required, user_assigned_application
 from ...models import ApplicantPersonalDetails, ApplicantName, ApplicantHomeAddress, Arc, Application, PreviousName
 from ...review_util import request_to_comment, save_comments, redirect_selection
-from ...views.childminder_views.personal_details_addresses import get_stored_addresses, update_applicant_current_address
+from ...views.childminder_views.personal_details_addresses import get_stored_addresses # , update_applicant_current_address
 from ...forms.childminder_forms.form import PersonalDetailsForm, PreviousRegistrationDetails
 
 log = logging.getLogger()
@@ -157,7 +157,7 @@ def personal_details_summary(request):
             name_record.end_year = today.year
             name_record.save()
 
-            update_applicant_current_address(application_id_local)
+            # update_applicant_current_address(application_id_local)
 
             # update arc status
             arc_record = Arc.objects.get(pk=application_id_local)
@@ -188,6 +188,7 @@ def personal_details_summary(request):
         'town': home_address_record.town,
         'county': home_address_record.county,
         'postcode': home_address_record.postcode,
+        'moved_in_date': personal_details_record.get_moved_in_date if personal_details_record.moved_in_year is not None else None,
         'location_of_childcare': childcare_address_record.current_address,
         'childcare_street_line1': childcare_address_record.street_line1,
         'childcare_street_line2': childcare_address_record.street_line2,

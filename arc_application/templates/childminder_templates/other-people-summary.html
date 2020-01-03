@@ -72,7 +72,7 @@
             </tbody>
         </table>
 
-        {% for record, id, health_check_status, title, name, day, month, year, relationship, email, PITH_mobile_number,PITH_same_address, dbs_certificate_number, dbs_on_capita, dbs_is_recent, enhanced_check, on_update, lived_abroad, military_base, formsetadult, current_illness_set, serious_illness_set, hospital_admission_set, reasons_known_to_council_health_check, enhanced_check, previous_names, previous_addresses in adult_lists %}
+        {% for record, id, health_check_status, title, name, day, month, year, relationship, email, PITH_mobile_number,PITH_same_address, PITH_moved_in, dbs_certificate_number, dbs_on_capita, dbs_is_recent, enhanced_check, on_update, lived_abroad, military_base, formsetadult, current_illness_set, serious_illness_set, hospital_admission_set, reasons_known_to_council_health_check, enhanced_check, previous_names, previous_addresses in adult_lists %}
 
         <table class="check-your-answers form-group">
             <thead>
@@ -316,6 +316,18 @@
                     </div>
                 </td>
             </tr>
+            {% if PITH_moved_in %}
+            <tr>
+                <td style="word-wrap: break-word">
+                    Moved in
+                </td>
+                <td style="word-wrap: break-word">
+                    {{PITH_moved_in}}
+                </td>
+                <td class="change-answer">
+                </td>
+            </tr>
+            {% endif %}
             {# ================================== #}
             <tr>
                 <td style="word-wrap: break-word">
