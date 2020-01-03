@@ -62,7 +62,6 @@ class AdultInHomeAddress(models.Model):
         self.moved_in_month = moved_in_date.month
         self.moved_in_day = moved_in_date.day
 
-
     def get_summary_table(self, ):
         adult_record = AdultInHome.objects.filter(application_id=self.application_id, adult_id=self.adult_id)
 

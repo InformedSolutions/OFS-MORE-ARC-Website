@@ -202,14 +202,16 @@ def load_json(application_id_local, ordered_models, recurse, apply_filtering_for
                 table_list.append([
                     {"title": "Your home and childcare address", "id": application_id_local},
                     {"name": "Your home address", "value": home_address, 'pk': home_address_record.pk, "index": 1},
-                    {"name": "Moved in", "value": ApplicantPersonalDetails.objects.get(
-                        application_id=application_id_local).get_moved_in_date(), "index": 2},
                     {"name": "Childcare address", "value": childcare_address, 'pk': childcare_address_record.pk,
                      "index": 3},
                     {"name": "Is this another childminder's home?",
                      "value": get_bool_as_string(working_in_other_childminder_home), 'pk': application_id_local,
                      "index": 6}
                 ])
+                if ApplicantPersonalDetails.objects.get(
+                        application_id=application_id_local).moved_in_year is not None:
+                    table_list.append([{"name": "Moved in", "value": ApplicantPersonalDetails.objects.get(
+                        application_id=application_id_local).get_moved_in_date(), "index": 2},])
 
             # If the address is only a home address
             if home_address_record != childcare_address_record:
@@ -220,14 +222,16 @@ def load_json(application_id_local, ordered_models, recurse, apply_filtering_for
                 table_list.append([
                     {"title": "Your home and childcare address", "id": application_id_local},
                     {"name": "Your home address", "value": home_address, 'pk': home_address_record.pk, "index": 1},
-                    {"name": "Moved in", "value": ApplicantPersonalDetails.objects.get(
-                        application_id=application_id_local).get_moved_in_date(), "index": 2},
                     {"name": "Childcare address", "value": childcare_address, 'pk': childcare_address_record.pk,
                      "index": 3},
                     {"name": "Is this another childminder's home?",
                      "value": get_bool_as_string(working_in_other_childminder_home), 'pk': application_id_local,
                      "index": 4}
                 ])
+                if ApplicantPersonalDetails.objects.get(
+                        application_id=application_id_local).moved_in_year is not None:
+                    table_list.append([{"name": "Moved in", "value": ApplicantPersonalDetails.objects.get(
+                        application_id=application_id_local).get_moved_in_date(), "index": 2},])
 
                 if own_children:
                     log.debug("Add known to social services questions")
@@ -342,10 +346,8 @@ def load_json(application_id_local, ordered_models, recurse, apply_filtering_for
                                                      adult_id=record.pk).count() > 0:
                     adult_address = AdultInHomeAddress.objects.get(application_id=application_id_local,
                                                                    adult_id=record.pk)
-                    if adult_address.moved_in_year != None:
+                    if adult_address.moved_in_year is not None:
                         table.insert(9, {"name": "Moved in", "value": adult_address.get_moved_in_date()}, )
-                # else:
-                #     table.insert(9, {"name": "Moved in", "value": adult_address.get_moved_in_date()}, )
                 table.insert(8, {"name": "Address", "value": adult_address_string})
                 if recurse:
                     table_list = table_list + table

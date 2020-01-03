@@ -133,9 +133,9 @@ def other_people_summary(request):
             if adult_address.moved_in_year != None:
                 adult_PITH_moved_in_list.append(adult_address.get_moved_in_date())
             else:
-                adult_PITH_moved_in_list.append('N/A')
+                adult_PITH_moved_in_list.append(None)
         else:
-            adult_PITH_moved_in_list.append('N/A')
+            adult_PITH_moved_in_list.append(None)
         adult_record_list.append(adult)
         adult_id_list.append(adult.adult_id)
         adult_health_check_status_list.append(adult.health_check_status)
