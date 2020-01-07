@@ -107,36 +107,42 @@ class ApplicationsSummaryView(View):
         context = {}
         childminder_data = self.get_childminder_data()
         nanny_data = self.get_nanny_data()
+        hm_data = self.get_hm_data()
         context["rows"] = [
             {
                 'id': 'draft',
                 'name': 'Draft',
                 'childminder': childminder_data['draft_applications'],
-                'nanny': nanny_data['draft_applications']
+                'nanny': nanny_data['draft_applications'],
+                'hm': hm_data['draft_applications']
             },
             {
                 'id': 'total_submitted',
                 'name': 'Total submitted',
                 'childminder': childminder_data['non_draft_applications'],
-                'nanny': nanny_data['non_draft_applications']
+                'nanny': nanny_data['non_draft_applications'],
+                'hm': hm_data['non_draft_applications']
             },
             {
                 'id': 'new',
                 'name': 'New',
                 'childminder': childminder_data['new_applications'],
-                'nanny': nanny_data['new_applications']
+                'nanny': nanny_data['new_applications'],
+                'hm': hm_data['new_applications']
             },
             {
                 'id': 'returned',
                 'name': 'Returned',
                 'childminder': childminder_data['returned_applications'],
-                'nanny': nanny_data['returned_applications']
+                'nanny': nanny_data['returned_applications'],
+                'hm': hm_data['returned_applications']
             },
             {
                 'id': 'pending',
                 'name': 'Processed to Cygnum',
                 'childminder': childminder_data['pending_applications'],
-                'nanny': nanny_data['pending_applications']
+                'nanny': nanny_data['pending_applications'],
+                'hm': hm_data['pending_applications']
             }
         ]
         return context
