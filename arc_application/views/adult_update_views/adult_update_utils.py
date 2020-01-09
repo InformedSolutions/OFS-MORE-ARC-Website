@@ -1,5 +1,4 @@
 from arc_application.services.db_gateways import HMGatewayActions
-
 from .adult_update_summary import load_json
 
 

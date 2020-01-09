@@ -10,6 +10,7 @@ from ...decorators import group_required, user_assigned_application
 from ...forms.adult_update_forms.adult_update_form import NewAdultForm
 from .review import new_adults_initial_population, request_to_comment, save_comments
 from ...services.db_gateways import HMGatewayActions
+from .adult_update_summary import format_date
 from ...models import Arc, AdultInHomeAddress
 from operator import itemgetter
 
@@ -42,6 +43,7 @@ def new_adults_summary(request):
     adult_birth_day_list = []
     adult_birth_month_list = []
     adult_birth_year_list = []
+    adult_moved_in_date_list = []
     adult_relationship_list = []
     adult_email_list = []
     adult_same_address_list = []
@@ -98,6 +100,7 @@ def new_adults_summary(request):
         adult_email_list.append(adult['email'])
         adult_mobile_number_list.append(adult['PITH_mobile_number'])
         adult_same_address_list.append(adult_address_string)
+        adult_moved_in_date_list.append(format_date(adult['moved_in_date']) if adult['moved_in_date'] else None)
         adult_dbs_is_enhanceds.append(adult['enhanced_check'])
         adult_dbs_cert_numbers.append(adult['dbs_certificate_number'] if adult['enhanced_check'] else None)
         adult_dbs_on_capitas.append(adult['capita'] if adult['enhanced_check'] else None)
@@ -182,7 +185,7 @@ def new_adults_summary(request):
         adult_lists = list(zip(adult_record_list, adult_id_list, adult_health_check_status_list, adult_title_list,
                                adult_name_list, adult_birth_day_list,adult_birth_month_list, adult_birth_year_list,
                                adult_relationship_list, adult_email_list, adult_mobile_number_list,
-                               adult_same_address_list,adult_dbs_cert_numbers, adult_dbs_on_capitas,
+                               adult_same_address_list, adult_moved_in_date_list, adult_dbs_on_capitas, adult_dbs_cert_numbers,
                                adult_dbs_is_recents, adult_dbs_is_enhanceds,adult_dbs_on_updates, adult_lived_abroad,
                                adult_military_base, formset_adult, serious_illnesses, hospital_admissions,
                                local_authorities,adult_previous_name_lists_list, adult_previous_address_lists_list))
@@ -256,8 +259,8 @@ def new_adults_summary(request):
             adult_lists = list(zip(adult_record_list, adult_id_list, adult_health_check_status_list, adult_title_list,
                                    adult_name_list, adult_birth_day_list, adult_birth_month_list, adult_birth_year_list,
                                    adult_relationship_list, adult_email_list, adult_mobile_number_list,
-                                   adult_same_address_list, adult_dbs_cert_numbers, adult_dbs_on_capitas,
-                                   adult_dbs_is_recents, adult_dbs_is_enhanceds, adult_dbs_on_updates,
+                                   adult_same_address_list, adult_moved_in_date_list, adult_dbs_cert_numbers,
+                                   adult_dbs_on_capitas, adult_dbs_is_recents, adult_dbs_is_enhanceds, adult_dbs_on_updates,
                                    adult_lived_abroad, adult_military_base, adult_formset, serious_illnesses,
                                    hospital_admissions, local_authorities, adult_previous_name_lists_list,
                                    adult_previous_address_lists_list))
@@ -301,14 +304,17 @@ def handle_previous_name_and_address_dates(adult_id, adult_record):
     new_adult_record['name_end_year'] = end_date.year
 
     previous_addresses_response = actions.list('previous-address', params={'adult_id': adult_id})
-    if previous_addresses_response.status_code == 200:
-        previous_addresses = previous_addresses_response.record
-        # moved_out_date is a string but due to iso format, lexicographical order will be
-        # equivalent to chronological
-        sorted_previous_addresses = sorted(previous_addresses, key=itemgetter('moved_out_date'), reverse=True)
-        address_start_date = sorted_previous_addresses[0]['moved_out_date']
+    if adult_record['moved_in_date'] == '':
+        if previous_addresses_response.status_code == 200:
+            previous_addresses = previous_addresses_response.record
+            # moved_out_date is a string but due to iso format, lexicographical order will be
+            # equivalent to chronological
+            sorted_previous_addresses = sorted(previous_addresses, key=itemgetter('moved_out_date'), reverse=True)
+            address_start_date = sorted_previous_addresses[0]['moved_out_date']
+        else:
+            address_start_date = adult_record['date_of_birth']
     else:
-        address_start_date = adult_record['date_of_birth']
+        address_start_date = adult_record['moved_in_date']
 
     new_adult_record['moved_in_date'] = address_start_date
     new_adult_record['moved_out_date'] = end_date
