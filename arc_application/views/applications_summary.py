@@ -4,7 +4,8 @@ from django.views import View
 from django.utils.decorators import method_decorator
 from django.shortcuts import render
 from ..models import Application
-from .. services.db_gateways import NannyGatewayActions
+from .. services.db_gateways import NannyGatewayActions, HMGatewayActions
+from django.conf import settings
 
 # Initiate logging
 log = logging.getLogger()
@@ -64,6 +65,40 @@ class ApplicationsSummaryView(View):
         nanny_data['non_draft_applications'] = total_applications - nanny_data["draft_applications"]
 
         return nanny_data
+
+    def get_hm_data(self):
+        """
+        Function to return a dictionary of data for additional household member applications at different statuses
+        :return: dictionary of household members data
+        """
+        household_member_data = {}
+        # get applications at draft stage
+        draft_apps_response = HMGatewayActions().list("adult", params={'adult_status': "DRAFTING"})
+        household_member_data['draft_applications'] = len(
+            draft_apps_response.record) if draft_apps_response.status_code == 200 else 0
+
+        # get new applications
+        new_apps_response = HMGatewayActions().list("adult", params={'adult_status': "SUBMITTED"})
+        household_member_data['new_applications'] = len(new_apps_response.record) if new_apps_response.status_code == 200 else 0
+
+        # get returned applications
+        returned_apps_response = HMGatewayActions().list("adult",
+                                                            params={'adult_status': "FURTHER_INFORMATION"})
+        household_member_data['returned_applications'] = len(
+            returned_apps_response.record) if returned_apps_response.status_code == 200 else 0
+
+        # get pending applications
+        pending_apps_response = HMGatewayActions().list("adult",
+                                                           params={'adult_status': "ACCEPTED"})
+        household_member_data['pending_applications'] = len(
+            pending_apps_response.record) if pending_apps_response.status_code == 200 else 0
+
+        # get all applications
+        total_applications = len(HMGatewayActions().list("adult", params={}).record)
+        # take any applications in draft off the number of total applications
+        household_member_data['non_draft_applications'] = total_applications - household_member_data["draft_applications"]
+
+        return household_member_data
               
     def get_context_data(self):
         """
@@ -73,36 +108,46 @@ class ApplicationsSummaryView(View):
         context = {}
         childminder_data = self.get_childminder_data()
         nanny_data = self.get_nanny_data()
+        context['enable_hm'] = False
+        hm_data = {}
+        if settings.ENABLE_HM:
+            hm_data = self.get_hm_data()
+            context['enable_hm'] = True
         context["rows"] = [
             {
                 'id': 'draft',
                 'name': 'Draft',
                 'childminder': childminder_data['draft_applications'],
-                'nanny': nanny_data['draft_applications']
+                'nanny': nanny_data['draft_applications'],
+                'hm': hm_data['draft_applications'] if hm_data.get('draft_applications') else 0
             },
             {
                 'id': 'total_submitted',
                 'name': 'Total submitted',
                 'childminder': childminder_data['non_draft_applications'],
-                'nanny': nanny_data['non_draft_applications']
+                'nanny': nanny_data['non_draft_applications'],
+                'hm': hm_data['non_draft_applications'] if hm_data.get('non_draft_applications') else 0
             },
             {
                 'id': 'new',
                 'name': 'New',
                 'childminder': childminder_data['new_applications'],
-                'nanny': nanny_data['new_applications']
+                'nanny': nanny_data['new_applications'],
+                'hm': hm_data['new_applications'] if hm_data.get('new_applications') else 0
             },
             {
                 'id': 'returned',
                 'name': 'Returned',
                 'childminder': childminder_data['returned_applications'],
-                'nanny': nanny_data['returned_applications']
+                'nanny': nanny_data['returned_applications'],
+                'hm': hm_data['returned_applications'] if hm_data.get('returned_applications') else 0
             },
             {
                 'id': 'pending',
                 'name': 'Processed to Cygnum',
                 'childminder': childminder_data['pending_applications'],
-                'nanny': nanny_data['pending_applications']
+                'nanny': nanny_data['pending_applications'],
+                'hm': hm_data['pending_applications'] if hm_data.get('pending_applications') else 0
             }
         ]
         return context

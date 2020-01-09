@@ -14,6 +14,9 @@
             <th>Type</th>
             <th class="col-center">Childminder applications</th>
             <th class="col-center">Nanny applications</th>
+            {% if enable_hm %}
+            <th class="col-center">New association</th>
+            {% endif %}
         </tr>
         </thead>
         {% for row in rows %}
@@ -25,6 +28,9 @@
             {% endif %}
             <td class="col-xs-1 col-center">{{row.childminder}}</td>
             <td class="col-xs-1 col-center">{{row.nanny}}</td>
+            {% if enable_hm %}
+            <td class="col-xs-1 col-center">{{row.hm}}</td>
+            {% endif %}
         </tr>
         {% endfor %}
 </table>
