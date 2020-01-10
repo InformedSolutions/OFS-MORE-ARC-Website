@@ -72,10 +72,14 @@ class ApplicationsSummaryView(View):
         :return: dictionary of household members data
         """
         household_member_data = {}
-        # get applications at draft stage
+        # get applications at draft stage, some of which will be in the 'waiting' status
         draft_apps_response = HMGatewayActions().list("adult", params={'adult_status': "DRAFTING"})
-        household_member_data['draft_applications'] = len(
+        waiting_apps_response = HMGatewayActions().list("adult", params={'adult_status': 'WAITING'})
+        draft_applications = len(
             draft_apps_response.record) if draft_apps_response.status_code == 200 else 0
+        waiting_applications = len(
+            waiting_apps_response.record) if waiting_apps_response.status_code == 200 else 0
+        household_member_data['draft_applications'] = draft_applications + waiting_applications
 
         # get new applications
         new_apps_response = HMGatewayActions().list("adult", params={'adult_status': "SUBMITTED"})
