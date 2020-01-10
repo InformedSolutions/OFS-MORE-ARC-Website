@@ -117,6 +117,12 @@ def load_json(adult_id):
         {"name": "Address",
          "value": address_string,
          'field': "PITH_same_address"},
+    ])
+    if record['moved_in_date']:
+        summary_table.extend([{"name": "Moved in",
+                               "value": format_date(record['moved_in_date']),
+                               "field": "moved_in_date"}])
+    summary_table.extend([
         {"name": "Lived abroad in the last 5 years?",
          "value": 'Yes' if record['lived_abroad'] else 'No',
          'field': "lived_abroad"},
@@ -319,3 +325,12 @@ def add_comment(id, field, row):
     comment_response = HMGatewayActions().list('arc-comments', params={'table_pk': id, 'field_name': field})
     if comment_response.status_code == 200:
         row['comment'] = comment_response.record[0]['comment']
+
+def format_date(record_date):
+    """
+    Intended to format a date as returned from the HMGateway
+    :param record_date: String in format 'YYYY-MM-DD'
+    :return: String in format 'DD MM YYYY'
+    """
+    return_date = date(*map(int, record_date.split('-')))
+    return return_date.strftime('%d %m %Y')

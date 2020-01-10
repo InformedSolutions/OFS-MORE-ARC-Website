@@ -356,6 +356,7 @@ class StubHMGatewayActions:
             "token_id": "51cdabff-a9c5-4032-bf50-0c8d1dd90888",
             "adult_status": 'DRAFTING',
             "PITH_same_address": False,
+            'moved_in_date': None,
             'PITH_mobile_number': '07123123123',
             'currently_being_treated': False,
             'has_serious_illness': False,
