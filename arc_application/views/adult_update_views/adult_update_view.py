@@ -10,7 +10,6 @@ from ...decorators import group_required, user_assigned_application
 from ...forms.adult_update_forms.adult_update_form import NewAdultForm
 from .review import new_adults_initial_population, request_to_comment, save_comments
 from ...services.db_gateways import HMGatewayActions
-from .adult_update_summary import format_date
 from ...models import Arc, AdultInHomeAddress
 from operator import itemgetter
 
@@ -100,7 +99,8 @@ def new_adults_summary(request):
         adult_email_list.append(adult['email'])
         adult_mobile_number_list.append(adult['PITH_mobile_number'])
         adult_same_address_list.append(adult_address_string)
-        adult_moved_in_date_list.append(format_date(adult['moved_in_date']) if adult['moved_in_date'] else None)
+        adult_moved_in_date_list.append(datetime.strptime(adult['moved_in_date'],'%Y-%m-%d').strftime(
+                                                         '%d %m %Y')) if adult['moved_in_date'] else None
         adult_dbs_is_enhanceds.append(adult['enhanced_check'])
         adult_dbs_cert_numbers.append(adult['dbs_certificate_number'] if adult['enhanced_check'] else None)
         adult_dbs_on_capitas.append(adult['capita'] if adult['enhanced_check'] else None)
