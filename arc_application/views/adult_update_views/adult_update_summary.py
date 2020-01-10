@@ -1,5 +1,5 @@
 import logging
-from datetime import datetime
+from datetime import datetime, date
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
@@ -120,7 +120,8 @@ def load_json(adult_id):
     ])
     if record['moved_in_date']:
         summary_table.extend([{"name": "Moved in",
-                               "value": format_date(record['moved_in_date']),
+                               "value": datetime.datetime.strptime(record['moved_in_date'],'%Y-%m-%d').strftime(
+                                                         '%d %m %Y'),
                                "field": "moved_in_date"}])
     summary_table.extend([
         {"name": "Lived abroad in the last 5 years?",
@@ -326,11 +327,3 @@ def add_comment(id, field, row):
     if comment_response.status_code == 200:
         row['comment'] = comment_response.record[0]['comment']
 
-def format_date(record_date):
-    """
-    Intended to format a date as returned from the HMGateway
-    :param record_date: String in format 'YYYY-MM-DD'
-    :return: String in format 'DD MM YYYY'
-    """
-    return_date = date(*map(int, record_date.split('-')))
-    return return_date.strftime('%d %m %Y')
