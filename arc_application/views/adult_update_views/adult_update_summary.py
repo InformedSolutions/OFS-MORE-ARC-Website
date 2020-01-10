@@ -118,7 +118,7 @@ def load_json(adult_id):
          "value": address_string,
          'field': "PITH_same_address"},
     ])
-    if record['moved_in_date'] != '':
+    if record['moved_in_date']:
         summary_table.extend([{"name": "Moved in",
                                "value": format_date(record['moved_in_date']),
                                "field": "moved_in_date"}])
