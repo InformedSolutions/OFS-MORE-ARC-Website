@@ -4,7 +4,7 @@ import re
 from django.db.models import Q
 
 from ..models import Application, ApplicantName
-from ..services.db_gateways import NannyGatewayActions
+from ..services.db_gateways import NannyGatewayActions, HMGatewayActions
 
 
 class SearchService:
@@ -26,7 +26,7 @@ class SearchService:
 
         # Search both Childminder and Nanny applications
         if application_type == 'All':
-            search_results = SearchService._search_childminders_and_nannies(*search_args)
+            search_results = SearchService._search_all(*search_args)
 
         # Search Childminder applications only
         elif application_type == 'Childminder':
@@ -35,6 +35,9 @@ class SearchService:
         # Search Nanny applications only
         elif application_type == 'Nanny':
             search_results = SearchService._search_nannies(*search_args)
+
+        elif application_type == 'New Association':
+            search_results = SearchService._search_new_associations(*search_args)
 
         else:
             raise ValueError('application_type was set to {0}, an unexpected value.')
@@ -45,6 +48,19 @@ class SearchService:
         return ordered_results
 
     @staticmethod
+    def _search_all(name, dob, home_postcode, care_location_postcode, reference):
+        search_args = (name, dob, home_postcode, care_location_postcode, reference)
+
+        cm_search_results = SearchService._search_childminders(*search_args)
+        nanny_search_results = SearchService._search_nannies(*search_args)
+        new_association_search_results = SearchService._search_new_associations(*search_args)
+
+        combined_results = SearchService.__combine_search_results(cm_search_results, nanny_search_results,
+                                                                  search_list3=new_association_search_results)
+
+        return combined_results
+
+
     def _search_childminders_and_nannies(name, dob, home_postcode, care_location_postcode, reference):
         search_args = (name, dob, home_postcode, care_location_postcode, reference)
 
@@ -72,6 +88,26 @@ class SearchService:
         params = {key: val for key, val in params_list if val}
 
         search_results_response = nanny_actions.list('arc-search', params=params)
+
+        return search_results_response.record
+
+    @staticmethod
+    def _search_new_associations(name, date_of_birth, home_postcode, care_location_postcode, application_reference):
+        """
+        Function for handling the searching of nanny applications.
+        Gets nanny applications by use of the gateway_actions API by formulating a request (params) with the passed parameters.
+        :return: API response record
+        """
+        hm_actions = HMGatewayActions()
+
+        params_list = [('name', name),
+                       ('date_of_birth', date_of_birth),
+                       ('home_postcode', home_postcode),
+                       ('care_location_postcode', care_location_postcode),
+                       ('application_reference', application_reference)]
+        params = {key: val for key, val in params_list if val}
+
+        search_results_response = hm_actions.list('arc-search', params=params)
 
         return search_results_response.record
 
@@ -235,13 +271,16 @@ class SearchService:
             return ""
 
     @staticmethod
-    def __combine_search_results(search_list1, search_list2):
+    def __combine_search_results(search_list1, search_list2, search_list3=None):
         """
         Combines two search_lists into a single list.
         :return:
         """
         combined_list = search_list1.copy()
         combined_list += search_list2
+
+        if search_list3 is not None:
+            combined_list += search_list3
 
         return combined_list
 
@@ -298,7 +337,7 @@ class SearchService:
         :param submission_type: String of application's status, e.g 'DRAFTING'.
         :return: String containing a relevant label.
         """
-        if submission_type == 'DRAFTING':
+        if submission_type == 'DRAFTING' or submission_type == "WAITING":
             return 'Draft'
         elif submission_type == 'ACCEPTED':
             return 'Pending checks'
