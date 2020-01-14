@@ -96,8 +96,9 @@ class HouseholdMemberAuditLog(View):
 
     def get_context_data(self):
         context = dict()
-        application_id = self.request.GET.get('id')
-        context['application_reference'] = HMGatewayActions().read('application', params={'application_id': application_id}).record['application_reference']
+        adult_id = self.request.GET.get('id')
+        token_id = HMGatewayActions().read('adult', params={'adult_id': adult_id}).record['token_id']
+        context['application_reference'] = HMGatewayActions().read('dpa-auth', params={'token_id': token_id}).record['URN']
 
         if has_group(self.request.user, settings.CONTACT_CENTRE):
             context['back'] = reverse('search')
