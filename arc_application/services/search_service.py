@@ -60,17 +60,6 @@ class SearchService:
 
         return combined_results
 
-
-    def _search_childminders_and_nannies(name, dob, home_postcode, care_location_postcode, reference):
-        search_args = (name, dob, home_postcode, care_location_postcode, reference)
-
-        cm_search_results = SearchService._search_childminders(*search_args)
-        nanny_search_results = SearchService._search_nannies(*search_args)
-
-        combined_results = SearchService.__combine_search_results(cm_search_results, nanny_search_results)
-
-        return combined_results
-
     @staticmethod
     def _search_nannies(name, date_of_birth, home_postcode, care_location_postcode, application_reference):
         """

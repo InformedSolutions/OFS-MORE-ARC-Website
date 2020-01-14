@@ -6,9 +6,9 @@ from django.shortcuts import render
 from django.utils.decorators import method_decorator
 from django.views import View
 
-from ...views.adult_update_summary import arc_summary
+from .adult_update_summary import get_application_summary_variables
 from ..base import has_group
-from ...services.db_gateways import NannyGatewayActions
+from ...services.db_gateways import HMGatewayActions, IdentityGatewayActions
 
 # Initiate logging
 log = logging.getLogger()
@@ -19,7 +19,7 @@ class AdultUpdateSearchSummary(View):
     View to render the Search Application Summary
     Shares many similarities with the NannyArcSummary View
     """
-    TEMPLATE_NAME = 'nanny_search_summary.html'
+    TEMPLATE_NAME = 'adult_update_templates/hm_search_summary.html'
 
     def get(self, request):
         application_id = request.GET["id"]
@@ -37,51 +37,16 @@ class AdultUpdateSearchSummary(View):
         :param application_id: Reviewed application's id.
         :return: Context dictionary.
         """
-        application_reference = NannyArcSummary.get_application_reference(application_id)
-        publish_details = NannyArcSummary.get_publish_details(application_id)
+        context = get_application_summary_variables(application_id)
+        adult_record = HMGatewayActions().get('adult', params={'adult_id': application_id}).record
+        applicant_record = IdentityGatewayActions().get('user-details', params={'application_id': adult_record['token_id']}).record
 
-        context_function_list = get_nanny_summary_functions()
-        context_list = [self.try_get_context_data(context_func, application_id) for context_func in context_function_list]
-
-        context_list = [context_dict for context_dict in context_list if context_dict is not None]
-
-        # Remove all change_links
-        for context_dict in context_list:
-            context_dict['change_link'] = None
-            for row in context_dict['rows']:
-                row['change_link'] = None
-
-        # Custom change_links for each individual field within the contact_details_context
-        # This context is assumed to be at context_list[0].
-
-        context_list[0]['search_table'] = True
-        context_list[0]['rows'][0]['change_link'] = 'nanny_update_email_address'
-        context_list[0]['rows'][1]['change_link'] = 'nanny_update_phone_number'
-        context_list[0]['rows'][2]['change_link'] = 'nanny_update_add_number'
-
-        valid_context_list = [context for context in context_list if context]
-
-        context = {
-            'application_id': application_id,
-            'application_reference': application_reference,
-            'context_list': valid_context_list,
-            'summary_page': True,
-            'publish_details': publish_details
-        }
-
+        applicant_details_summary = [
+                {"title": "Applicant's details",
+            "id": applicant_record['token_id']},
+            {"name": "Email Address",
+            "value": applicant_record['email']},
+            ]
+        context.add(0, applicant_details_summary)
+        context = context[:2]
         return context
-
-    @staticmethod
-    def try_get_context_data(get_context_data_func, app_id):
-        """
-        The application summary page can be reached without the application being completed.
-        As such, calling get_context_data will sometimes return AttributeErrors when trying to get certain DB records.
-        If this occurs, it is assumed the task for that application is not completed and does not display that data.
-        :param get_context_data_func: A view's get_context_data or create_context function
-        :param app_id: An application id, used to call the context func with.
-        :return: A context dictionary or None.
-        """
-        try:
-            return get_context_data_func(app_id)
-        except AttributeError:
-            return None
