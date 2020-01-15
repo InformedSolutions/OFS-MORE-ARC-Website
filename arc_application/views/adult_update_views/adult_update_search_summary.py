@@ -6,7 +6,7 @@ from django.shortcuts import render
 from django.utils.decorators import method_decorator
 from django.views import View
 
-from .adult_update_summary import get_application_summary_variables
+from .adult_update_summary import load_json
 from ..base import has_group
 from ...services.db_gateways import HMGatewayActions, IdentityGatewayActions
 
@@ -37,16 +37,31 @@ class AdultUpdateSearchSummary(View):
         :param application_id: Reviewed application's id.
         :return: Context dictionary.
         """
-        context = get_application_summary_variables(application_id)
-        adult_record = HMGatewayActions().get('adult', params={'adult_id': application_id}).record
-        applicant_record = IdentityGatewayActions().get('user-details', params={'application_id': adult_record['token_id']}).record
+        json = load_json(application_id)
+        adult_record = HMGatewayActions().read('adult', params={'adult_id': application_id}).record
+        token_id = adult_record['token_id']
+        applicant_record = IdentityGatewayActions().read('user', params={'application_id': adult_record['token_id']}).record
+        dpa_auth = HMGatewayActions().read('dpa-auth', params={'token_id': token_id})
+        ey_number = dpa_auth.record['URN']
 
+        # add in applicant's login details
         applicant_details_summary = [
-                {"title": "Applicant's details",
-            "id": applicant_record['token_id']},
-            {"name": "Email Address",
-            "value": applicant_record['email']},
-            ]
-        context.add(0, applicant_details_summary)
-        context = context[:2]
+                    {"title": "Applicant's details",
+                    "id": token_id},
+                    {"name": "Email address",
+                    "value": applicant_record['email'],
+                     "link": 'this is a link'},
+                    {"name": 'Phone number',
+                    "value": applicant_record['mobile_number'],
+                     "link": 'this is a link'}
+                ]
+
+        json.insert(0, applicant_details_summary)
+        json = json[:2]
+
+        context = {
+            'json': json,
+            'application_id': application_id,
+            'ey_number': ey_number
+        }
         return context

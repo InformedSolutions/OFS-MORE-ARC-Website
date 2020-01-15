@@ -1,18 +1,26 @@
 {% extends 'govuk_template.html' %}
-{% block page_title %}Check and confirm all the details{% endblock %}
+{% block page_title %}Adult summary{% endblock %}
 {% load static %}
 {% load govuk_template_base %}
 {% block inner_content %}
 {% include 'back-button.html' %}
 
-<h1 class="form-title heading-large">
-    Check and confirm all the details
-</h1>
+<div>
+    <div class="column-two-thirds">
+        <div class="grid-row">
+            <h1 class="heading-large">Adult summary</h1>
+            <h2 class="heading-medium">
+                Application number: {{ ey_number }}
+            </h2>
+        </div>
+    </div>
 
-
-<h2 class="heading-medium">
-    Application number: {{ ey_number }}
-</h2>
+    <div class="column-third information-panel">
+        <b class="bold">Application history:</b>
+        <br/>
+        <a href="/arc/auditlog/?id={{application_id}}&app_type=New%20Association">Audit log</a>
+    </div>
+</div>
 {% with "4" as col %}
 
 {% for section in json %}
@@ -59,7 +67,7 @@
                         {{row.value}}
                      </td>
 
-                    {% if row.title == 'Applicant Details' and row.link %}
+                    {% if row.name in ['Email address', Phone number'] and row.link %}
                         <td class="change-answer">
                             <a href="{{row.link}}">Change</a>
                         </td>
@@ -75,10 +83,8 @@
 {% endfor %}
 {% endwith %}
 
-<form method="post">
-    {% csrf_token %}
-    <input type="submit" class="button" value="Confirm and continue"/>
-    <input type="hidden" value="{{application_id}}" name="id"/>
+<form method="get" action="/arc/search">
+    <input type="submit" class="button" value="Continue"/>
 </form>
 
 {% endblock %}
