@@ -7,8 +7,9 @@ from django.utils.decorators import method_decorator
 from django.views import View
 
 from ...views.adult_update_summary import arc_summary
+from .adult_update_view import get_adult_update_summary_functions
 from ..base import has_group
-from ...services.db_gateways import NannyGatewayActions
+from ...services.db_gateways import HMGatewayActions
 
 # Initiate logging
 log = logging.getLogger()
@@ -24,7 +25,7 @@ class AdultUpdateSearchSummary(View):
     def get(self, request):
         application_id = request.GET["id"]
         context = self.create_context(application_id)
-        #log_user_opened_application(request, application_id)
+        log_user_opened_application(request, application_id)
         log.debug("Rendering adult update search summary")
         return render(request, self.TEMPLATE_NAME, context=context)
 
@@ -37,10 +38,14 @@ class AdultUpdateSearchSummary(View):
         :param application_id: Reviewed application's id.
         :return: Context dictionary.
         """
-        application_reference = NannyArcSummary.get_application_reference(application_id)
-        publish_details = NannyArcSummary.get_publish_details(application_id)
 
-        context_function_list = get_nanny_summary_functions()
+        adult = HMGatewayActions().read('adult', params={'adult_id': application_id})
+        token_id = adult.record['token_id']
+        dpa_auth = HMGatewayActions().read('dpa-auth', params={'token_id': token_id})
+        application_reference = dpa_auth.record['URN']
+        publish_details = adult.record['share_info_declare']
+
+        context_function_list = get_adult_update_summary_functions()
         context_list = [self.try_get_context_data(context_func, application_id) for context_func in context_function_list]
 
         context_list = [context_dict for context_dict in context_list if context_dict is not None]
@@ -55,9 +60,9 @@ class AdultUpdateSearchSummary(View):
         # This context is assumed to be at context_list[0].
 
         context_list[0]['search_table'] = True
-        context_list[0]['rows'][0]['change_link'] = 'nanny_update_email_address'
-        context_list[0]['rows'][1]['change_link'] = 'nanny_update_phone_number'
-        context_list[0]['rows'][2]['change_link'] = 'nanny_update_add_number'
+        context_list[0]['rows'][0]['change_link'] = 'adult_update_email_address'
+        context_list[0]['rows'][1]['change_link'] = 'adult_update_phone_number'
+        context_list[0]['rows'][2]['change_link'] = 'adult_update_add_number'
 
         valid_context_list = [context for context in context_list if context]
 
@@ -85,3 +90,27 @@ class AdultUpdateSearchSummary(View):
             return get_context_data_func(app_id)
         except AttributeError:
             return None
+
+def log_user_opened_application(request, application_id):
+    extra_data = {
+        'action': 'opened by',
+        'entity': 'new association'
+    }
+
+    if has_group(request.user, settings.CONTACT_CENTRE):
+        extra_data['user_type'] = 'contact centre'
+    elif has_group(request.user, settings.ARC_GROUP):
+        extra_data['user_type'] = 'reviewer'
+    else:
+        return
+
+    log_data = {
+        'object_id': application_id,
+        'template': 'timeline_logger/application_action.txt',
+        'user': request.user.username,
+        'extra_data': json.dumps(extra_data)
+    }
+
+    HMGatewayActions().create('timeline-log', params=log_data)
+
+    return None

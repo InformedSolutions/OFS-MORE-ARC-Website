@@ -1,5 +1,15 @@
 from arc_application.services.db_gateways import HMGatewayActions
 from .adult_update_summary import load_json
+from .adult_update_view import new_adults_summary
+
+
+def get_adult_update_summary_functions():
+    """
+    Function for returning function pointers to retrieving adult context data
+    """
+    return [
+        new_adults_summary.create_context
+    ]
 
 
 def get_adult_update_summary_variables(adult_id):

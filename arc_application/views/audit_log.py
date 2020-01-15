@@ -26,10 +26,11 @@ def audit_log_dispatcher(request):
     elif request.GET['app_type'] == 'Nanny':
         return HttpResponseRedirect(reverse('nanny-auditlog') + '?id=' + request.GET['id'])
         # return NannyAuditLog.as_view()(request)
-    elif request.GET['app_type'] == 'Adult update':
+    elif request.GET['app_type'] == 'New Association':
         return HttpResponseRedirect(reverse('hm-auditlog') + '?id=' + request.GET['id'])
     else:
-        raise ValueError('The "app_type" request.GET QueryDict does not equal either "Childminder" nor "Nanny".')
+        raise ValueError('The "app_type" request.GET QueryDict does not equal either "Childminder" nor "Nanny" nor "'
+                         'New Association".')
 
 
 class ChildminderAuditlog(ListView):
