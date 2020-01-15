@@ -5,10 +5,13 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from django.utils.decorators import method_decorator
 from django.views import View
-
 from .adult_update_summary import load_json
 from ..base import has_group
 from ...services.db_gateways import HMGatewayActions, IdentityGatewayActions
+from ...views.adult_update_summary import arc_summary
+from .adult_update_view import get_adult_update_summary_functions
+from ..base import has_group
+
 
 # Initiate logging
 log = logging.getLogger()
@@ -24,7 +27,7 @@ class AdultUpdateSearchSummary(View):
     def get(self, request):
         application_id = request.GET["id"]
         context = self.create_context(application_id)
-        #log_user_opened_application(request, application_id)
+        log_user_opened_application(request, application_id)
         log.debug("Rendering adult update search summary")
         return render(request, self.TEMPLATE_NAME, context=context)
 
@@ -59,9 +62,50 @@ class AdultUpdateSearchSummary(View):
         json.insert(0, applicant_details_summary)
         json = json[:2]
 
+
         context = {
             'json': json,
             'application_id': application_id,
             'ey_number': ey_number
         }
         return context
+
+    @staticmethod
+    def try_get_context_data(get_context_data_func, app_id):
+        """
+        The application summary page can be reached without the application being completed.
+        As such, calling get_context_data will sometimes return AttributeErrors when trying to get certain DB records.
+        If this occurs, it is assumed the task for that application is not completed and does not display that data.
+        :param get_context_data_func: A view's get_context_data or create_context function
+        :param app_id: An application id, used to call the context func with.
+        :return: A context dictionary or None.
+        """
+        try:
+            return get_context_data_func(app_id)
+        except AttributeError:
+            return None
+
+def log_user_opened_application(request, application_id):
+    extra_data = {
+        'action': 'opened by',
+        'entity': 'new association'
+    }
+
+    if has_group(request.user, settings.CONTACT_CENTRE):
+        extra_data['user_type'] = 'contact centre'
+    elif has_group(request.user, settings.ARC_GROUP):
+        extra_data['user_type'] = 'reviewer'
+    else:
+        return
+
+    log_data = {
+        'object_id': application_id,
+        'template': 'timeline_logger/application_action.txt',
+        'user': request.user.username,
+        'extra_data': json.dumps(extra_data)
+    }
+
+    HMGatewayActions().create('timeline-log', params=log_data)
+
+    return None
+

@@ -7,7 +7,7 @@ OFS-MORE-CCN3: Apply to be a Childminder Beta
 import re
 
 from arc_application.views.base import  custom_login, error_403, error_404, error_500, release
-from arc_application.views.audit_log import audit_log_dispatcher, NannyAuditLog
+from arc_application.views.audit_log import audit_log_dispatcher, NannyAuditLog, HouseholdMemberAuditLog
 from arc_application.views.arc_user_summary import ARCUserSummaryView
 
 # Childminder Views
@@ -102,6 +102,7 @@ urlpatterns = [
     # audit log
     url(r'^auditlog/$', login_required(audit_log_dispatcher), name='auditlog'),
     url(r'^audit-log/index', login_required(NannyAuditLog.as_view()), name='nanny-auditlog'),
+    url(r'^audit-log/hm_index', login_required(HouseholdMemberAuditLog.as_view()), name='hm-auditlog'),
 
     # search
     url(r'^search/', search, name='search'),
