@@ -62,8 +62,6 @@ class AdultUpdateSearchSummary(View):
                 ]
 
         json.insert(0, applicant_details_summary)
-        json = json[:2]
-
 
         context = {
             'json': json,
