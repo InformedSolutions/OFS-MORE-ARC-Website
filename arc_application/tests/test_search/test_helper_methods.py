@@ -38,7 +38,8 @@ class SearchServiceUnitTests(TestCase):
     @tag('unit')
     @patch('arc_application.services.search_service.SearchService._search_nannies')
     @patch('arc_application.services.search_service.SearchService._search_childminders')
-    def test_search_all(self, mock_search_childminders, mock_search_nannies):
+    @patch('arc_application.services.search_service.SearchService._search_new_associations')
+    def test_search_all(self, mock_search_childminders, mock_search_nannies, mock_search_new_associations):
         """
         Test to see if Childminder is being searched with 'All' application_type.
         :param mock_search_childminders: Mock for _search_childminders method in SearchService.
@@ -48,6 +49,7 @@ class SearchServiceUnitTests(TestCase):
 
         self.assertTrue(mock_search_childminders.call_count == 1)
         self.assertTrue(mock_search_nannies.call_count == 1)
+        self.assertTrue(mock_search_new_associations.call_count == 1)
 
     @tag('unit')
     def test_ordering(self):
