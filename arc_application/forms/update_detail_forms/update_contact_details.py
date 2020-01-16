@@ -64,7 +64,7 @@ class UpdatePhoneNumber(GOVUKForm):
         if re.match(settings.REGEX['MOBILE'], no_space_mobile_number) is None:
             raise forms.ValidationError('Enter a valid phone number')
         if len(no_space_mobile_number) > 11:
-            raise forms.ValidationError('Enter a phone number')
+            raise forms.ValidationError('Enter a valid phone number')
         return mobile_number
 
 

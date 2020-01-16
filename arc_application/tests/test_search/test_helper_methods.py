@@ -38,7 +38,7 @@ class SearchServiceUnitTests(TestCase):
     @tag('unit')
     @patch('arc_application.services.search_service.SearchService._search_nannies')
     @patch('arc_application.services.search_service.SearchService._search_childminders')
-    def test_search_both_childminder_and_nannies(self, mock_search_childminders, mock_search_nannies):
+    def test_search_all(self, mock_search_childminders, mock_search_nannies):
         """
         Test to see if Childminder is being searched with 'All' application_type.
         :param mock_search_childminders: Mock for _search_childminders method in SearchService.

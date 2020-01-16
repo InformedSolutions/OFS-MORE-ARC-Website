@@ -2,7 +2,7 @@ import datetime
 import re
 
 from django.db.models import Q
-
+from django.conf import settings
 from ..models import Application, ApplicantName
 from ..services.db_gateways import NannyGatewayActions, HMGatewayActions
 
@@ -55,6 +55,7 @@ class SearchService:
         nanny_search_results = SearchService._search_nannies(*search_args)
         new_association_search_results = SearchService._search_new_associations(*search_args)
 
+
         combined_results = SearchService.__combine_search_results(cm_search_results, nanny_search_results,
                                                                   search_list3=new_association_search_results)
 
@@ -87,18 +88,24 @@ class SearchService:
         Gets nanny applications by use of the gateway_actions API by formulating a request (params) with the passed parameters.
         :return: API response record
         """
-        hm_actions = HMGatewayActions()
+        if settings.ENABLE_HM:
+            hm_actions = HMGatewayActions()
 
-        params_list = [('name', name),
+            params_list = [('name', name),
                        ('date_of_birth', date_of_birth),
                        ('home_postcode', home_postcode),
                        ('care_location_postcode', care_location_postcode),
                        ('application_reference', application_reference)]
-        params = {key: val for key, val in params_list if val}
+            params = {key: val for key, val in params_list if val}
 
-        search_results_response = hm_actions.list('arc-search', params=params)
+            search_results_response = hm_actions.list('arc-search', params=params)
 
-        return search_results_response.record
+            search_results_record = search_results_response.record
+
+        else:
+            search_results_record = []
+
+        return search_results_record
 
     @staticmethod
     def _search_childminders(name, dob, home_postcode, care_location_postcode, reference):
