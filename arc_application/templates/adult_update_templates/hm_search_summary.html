@@ -71,6 +71,8 @@
                         <td class="change-answer">
                             <a href="{% url row.pd_link %}?id={{ application_id }}">Change</a>
                         </td>
+                    {% else %}
+                    <td></td>
                     {% endif %}
                 </tr>
             {% if forloop.last %}
