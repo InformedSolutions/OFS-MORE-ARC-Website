@@ -43,12 +43,16 @@ class AdultUpdateSearchSummary(View):
         token_id = adult_record['token_id']
         applicant_record = IdentityGatewayActions().read('user', params={'application_id': adult_record['token_id']}).record
         dpa_auth = HMGatewayActions().read('dpa-auth', params={'token_id': token_id})
-        ey_number = dpa_auth.record['URN']
+        dpa_record = dpa_auth.record
+        ey_number = dpa_record['URN']
+        applicant_name = '{0} {1}'.format(dpa_record['first_name'], dpa_record['last_name'])
 
         # add in applicant's login details
         applicant_details_summary = [
                     {"title": "Applicant's details",
                     "id": token_id},
+                    {"name": "Name",
+                    "value": applicant_name},
                     {"name": "Email address",
                     "value": applicant_record['email'],
                      "pd_link": 'hm_update_email_address'},
