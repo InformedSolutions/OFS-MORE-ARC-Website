@@ -36,7 +36,7 @@ class SearchService:
         elif application_type == 'Nanny':
             search_results = SearchService._search_nannies(*search_args)
 
-        elif application_type == 'New Association':
+        elif application_type == 'Association':
             search_results = SearchService._search_new_associations(*search_args)
 
         else:

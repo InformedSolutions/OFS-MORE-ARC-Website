@@ -8,8 +8,6 @@ from django.views import View
 from .adult_update_summary import load_json
 from ..base import has_group
 from ...services.db_gateways import HMGatewayActions, IdentityGatewayActions
-from ...views.adult_update_summary import arc_summary
-from .adult_update_view import get_adult_update_summary_functions
 from ..base import has_group
 
 
@@ -53,10 +51,10 @@ class AdultUpdateSearchSummary(View):
                     "id": token_id},
                     {"name": "Email address",
                     "value": applicant_record['email'],
-                     "link": 'this is a link'},
+                     "pd_link": 'hm_update_email_address'},
                     {"name": 'Phone number',
                     "value": applicant_record['mobile_number'],
-                     "link": 'this is a link'}
+                     "pd_link": 'hm_update_phone_number'}
                 ]
 
         json.insert(0, applicant_details_summary)

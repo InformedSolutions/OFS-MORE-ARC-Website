@@ -1580,7 +1580,7 @@ class SearchForm(GOVUKForm):
         ('All', 'All'),
         ('Childminder', 'Childminder'),
         ('Nanny', 'Nanny'),
-        ('New Association', 'New Association')
+        ('Association', 'Association')
     )
 
     reference_search_field = forms.CharField(label='Application number', required=False)

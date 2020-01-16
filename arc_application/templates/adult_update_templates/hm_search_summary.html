@@ -67,9 +67,9 @@
                         {{row.value}}
                      </td>
 
-                    {% if row.name in ['Email address', Phone number'] and row.link %}
+                    {% if row.pd_link %}
                         <td class="change-answer">
-                            <a href="{{row.link}}">Change</a>
+                            <a href="{% url row.pd_link %}?id={{ application_id }}">Change</a>
                         </td>
                     {% endif %}
                 </tr>
