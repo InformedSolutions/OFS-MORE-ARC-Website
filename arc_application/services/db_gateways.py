@@ -190,7 +190,8 @@ class HMGatewayActions(DBGatewayActions):
         'previous-address': 'previous_address_id',
         'previous-name': 'previous_name_id',
         'setting-address': 'token_id',
-        'adult-in-home-address': 'adult_id'
+        'adult-in-home-address': 'adult_id',
+        'arc-search': 'adult_id'
     }
 
     target_url_prefix = settings.HM_GATEWAY_URL + '/api/v1/'

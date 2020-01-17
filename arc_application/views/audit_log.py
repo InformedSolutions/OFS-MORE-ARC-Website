@@ -10,7 +10,7 @@ from django.shortcuts import HttpResponseRedirect
 
 from timeline_logger.models import TimelineLog
 
-from ..services.db_gateways import NannyGatewayActions
+from ..services.db_gateways import NannyGatewayActions, HMGatewayActions
 from ..models import Application
 from .base import has_group
 
@@ -26,8 +26,11 @@ def audit_log_dispatcher(request):
     elif request.GET['app_type'] == 'Nanny':
         return HttpResponseRedirect(reverse('nanny-auditlog') + '?id=' + request.GET['id'])
         # return NannyAuditLog.as_view()(request)
+    elif request.GET['app_type'] == 'Association':
+        return HttpResponseRedirect(reverse('hm-auditlog') + '?id=' + request.GET['id'])
     else:
-        raise ValueError('The "app_type" request.GET QueryDict does not equal either "Childminder" nor "Nanny".')
+        raise ValueError('The "app_type" request.GET QueryDict does not equal either "Childminder" nor "Nanny" nor "'
+                         'New Association".')
 
 
 class ChildminderAuditlog(ListView):
@@ -69,6 +72,34 @@ class NannyAuditLog(View):
         context = dict()
         application_id = self.request.GET.get('id')
         context['application_reference'] = NannyGatewayActions().read('application', params={'application_id': application_id}).record['application_reference']
+
+        if has_group(self.request.user, settings.CONTACT_CENTRE):
+            context['back'] = reverse('search')
+            context['cc_user'] = True
+
+        if has_group(self.request.user, settings.ARC_GROUP):
+            context['arc_user'] = True
+            context['back'] = reverse('task_list') + '?id=' + self.request.GET.get('id')
+
+        context['object_list'] = self.get_object_list()
+
+        return context
+
+    def get(self, request):
+        return render(request, self.template_name, context=self.get_context_data())
+    
+class HouseholdMemberAuditLog(View):
+    template_name = "auditlog_list.html"
+
+    def get_object_list(self):
+        api_response = HMGatewayActions().list('timeline-log', params={'object_id': self.request.GET['id']})
+        return [MockTimelineLog(**log) for log in api_response.record]
+
+    def get_context_data(self):
+        context = dict()
+        adult_id = self.request.GET.get('id')
+        token_id = HMGatewayActions().read('adult', params={'adult_id': adult_id}).record['token_id']
+        context['application_reference'] = HMGatewayActions().read('dpa-auth', params={'token_id': token_id}).record['URN']
 
         if has_group(self.request.user, settings.CONTACT_CENTRE):
             context['back'] = reverse('search')

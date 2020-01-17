@@ -276,7 +276,7 @@ class AdultUpdateApplicationHandler(GenericApplicationHandler):
         extra_data = {
             'user_type': 'reviewer',
             'action': 'assigned to',
-            'entity': 'application'
+            'entity': 'new association'
         }
 
         log_data = {

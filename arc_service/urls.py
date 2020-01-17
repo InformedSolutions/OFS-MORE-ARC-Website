@@ -7,7 +7,7 @@ OFS-MORE-CCN3: Apply to be a Childminder Beta
 import re
 
 from arc_application.views.base import  custom_login, error_403, error_404, error_500, release
-from arc_application.views.audit_log import audit_log_dispatcher, NannyAuditLog
+from arc_application.views.audit_log import audit_log_dispatcher, NannyAuditLog, HouseholdMemberAuditLog
 from arc_application.views.arc_user_summary import ARCUserSummaryView
 
 # Childminder Views
@@ -29,6 +29,7 @@ from arc_application.views.childminder_views.type_of_childcare import type_of_ch
 from arc_application.views.childminder_views.arc_summary import arc_summary
 from arc_application.views.contact_centre.change_details import UpdateEmailView, UpdatePhoneNumberView, \
     UpdateAddPhoneNumberView
+from arc_application.views.contact_centre.hm_change_details import HMUpdateEmailView, HMUpdatePhoneNumberView
 from arc_application.contact_centre import search
 from arc_application.views.contact_centre.nanny_change_details import NannyUpdateEmailView, \
     NannyUpdateAddPhoneNumberView, NannyUpdatePhoneNumberView
@@ -102,6 +103,7 @@ urlpatterns = [
     # audit log
     url(r'^auditlog/$', login_required(audit_log_dispatcher), name='auditlog'),
     url(r'^audit-log/index', login_required(NannyAuditLog.as_view()), name='nanny-auditlog'),
+    url(r'^audit-log/hm_index', login_required(HouseholdMemberAuditLog.as_view()), name='hm-auditlog'),
 
     # search
     url(r'^search/', search, name='search'),
@@ -117,6 +119,11 @@ urlpatterns = [
         name='nanny_update_phone_number'),
     url(r'^contact-centre/nanny/contact-details/add-phone-number', NannyUpdateAddPhoneNumberView.as_view(),
         name='nanny_update_add_number'),
+    url(r'^contact-centre/adult-update/contact-details/email-address',
+                                HMUpdateEmailView.as_view(),
+        name='hm_update_email_address'),
+    url(r'^contact-centre/adult-update/contact-details/phone-number', HMUpdatePhoneNumberView.as_view(),
+        name='hm_update_phone_number'),
     url(r'^personal-details/previous-registration', PreviousRegistrationDetailsView.as_view(),
         name='previous_registration_details')]
 

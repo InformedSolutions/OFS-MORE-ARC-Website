@@ -135,7 +135,7 @@ def log_arc_flag_action(application_id, arc_user, flagged_field, verbose_task_na
         'user_type': 'reviewer',
         'formatted_field': flagged_field.replace("_", " "),
         'action': 'flagged by',
-        'entity': 'application',
+        'entity': 'new association',
         'task_name': verbose_task_name
     }
 
