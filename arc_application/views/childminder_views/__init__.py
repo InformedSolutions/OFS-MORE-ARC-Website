@@ -1,3 +1,5 @@
-from arc_application.views.childminder_views.review import *
-from arc_application.views.childminder_views.arc_summary import *
-from arc_application.views.childminder_views.contact_details import *
+from .contact_details import contact_summary
+from .review import PreviousRegistrationDetailsView, OtherPersonPreviousRegistrationDetailsView
+from .type_of_childcare import type_of_childcare_age_groups
+from .childcare_training_check import ChildcareTrainingCheckSummaryView
+from .task_list import task_list

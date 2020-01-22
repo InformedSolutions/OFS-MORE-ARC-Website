@@ -1,13 +1,16 @@
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+import logging
 
 from ...forms.childminder_forms.form import ReferencesForm, ReferencesForm2
-from arc_application.models import Application, Arc, Reference
-from arc_application.review_util import redirect_selection, request_to_comment, save_comments
-from arc_application.decorators import group_required, user_assigned_application
+from ...models import Application, Arc, Reference
+from ...review_util import redirect_selection, request_to_comment, save_comments
+from ...decorators import group_required, user_assigned_application
 
+# Initiate logging
+log = logging.getLogger('')
 
 @login_required
 @group_required(settings.ARC_GROUP)
@@ -63,16 +66,17 @@ def references_summary(request):
                 status = Arc.objects.get(pk=application_id_local)
                 status.references_review = section_status
                 status.save()
-                default = '/review'
+                default = '/review/'
                 redirect_link = redirect_selection(request, default)
-
+                log.debug("Handling submissions for references page - save successful")
                 return HttpResponseRedirect(settings.URL_PREFIX + redirect_link + '?id=' + application_id_local)
             else:
-
+                log.debug("Handling submissions for references page - save unsuccessful")
                 return render(request, '500.html')
 
     first_reference_record = Reference.objects.get(application_id=application_id_local, reference=1)
     second_reference_record = Reference.objects.get(application_id=application_id_local, reference=2)
+    first_reference_title = first_reference_record.title
     first_reference_first_name = first_reference_record.first_name
     first_reference_last_name = first_reference_record.last_name
     first_reference_relationship = first_reference_record.relationship
@@ -86,6 +90,7 @@ def references_summary(request):
     first_reference_postcode = first_reference_record.postcode
     first_reference_phone_number = first_reference_record.phone_number
     first_reference_email = first_reference_record.email
+    second_reference_title = second_reference_record.title
     second_reference_first_name = second_reference_record.first_name
     second_reference_last_name = second_reference_record.last_name
     second_reference_relationship = second_reference_record.relationship
@@ -103,11 +108,11 @@ def references_summary(request):
 
     form.error_summary_title = 'There was a problem (first reference)'
     form2.error_summary_title = 'There was a problem (second reference)'
-
     variables = {
         'form': form,
         'form2': form2,
         'application_id': application_id_local,
+        'first_reference_title': first_reference_title,
         'first_reference_first_name': first_reference_first_name,
         'first_reference_last_name': first_reference_last_name,
         'first_reference_relationship': first_reference_relationship,
@@ -121,6 +126,7 @@ def references_summary(request):
         'first_reference_postcode': first_reference_postcode,
         'first_reference_phone_number': first_reference_phone_number,
         'first_reference_email': first_reference_email,
+        'second_reference_title': second_reference_title,
         'second_reference_first_name': second_reference_first_name,
         'second_reference_last_name': second_reference_last_name,
         'second_reference_relationship': second_reference_relationship,
@@ -137,4 +143,5 @@ def references_summary(request):
         'references_status': application.references_status
     }
 
+    log.debug("Render references page")
     return render(request, 'childminder_templates/references-summary.html', variables)

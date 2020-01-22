@@ -17,11 +17,13 @@ from arc_application.views.childminder_views.dbs_check import dbs_check_summary
 from arc_application.views.childminder_views.childcare_training_check import ChildcareTrainingCheckSummaryView
 from arc_application.views.childminder_views.first_aid_training import first_aid_training_summary
 from arc_application.views.childminder_views.health_declaration_booklet import health_check_answers
-from arc_application.views.childminder_views.other_people_addresses import address_state_dispatcher
-from arc_application.views.childminder_views.other_people_in_home import other_people_summary, add_previous_name
-from arc_application.views.childminder_views.personal_details import personal_details_summary, add_applicant_previous_name
+from arc_application.views.childminder_views.other_people_addresses import people_in_the_home_previous_address, people_in_the_home_previous_address_change
+from arc_application.views.childminder_views.other_people_in_home import other_people_summary
+from arc_application.views.childminder_views.previous_names import add_previous_name
+from arc_application.views.childminder_views.personal_details import personal_details_summary
 from arc_application.views.childminder_views.references import references_summary
-from arc_application.views.childminder_views import review, PreviousRegistrationDetailsView, OtherPersonPreviousRegistrationDetailsView
+from arc_application.views.childminder_views.review import review, PreviousRegistrationDetailsView, \
+    OtherPersonPreviousRegistrationDetailsView
 from arc_application.views.childminder_views.task_list import task_list
 from arc_application.views.childminder_views.type_of_childcare import type_of_childcare_age_groups
 from arc_application.views.childminder_views.arc_summary import arc_summary
@@ -32,19 +34,24 @@ from arc_application.views.contact_centre.nanny_change_details import NannyUpdat
     NannyUpdateAddPhoneNumberView, NannyUpdatePhoneNumberView
 from arc_application.views.search_router import SearchRouter
 from arc_application.views import upload_capita_dbs
+from arc_application.views.applications_summary import ApplicationsSummaryView
+from arc_application.views.adult_update_views.adult_update_view import new_adults_summary
+from arc_application.views.adult_update_views.adult_previous_registration import adult_previous_registration_view
+from arc_application.views.adult_update_views.adult_update_summary import arc_summary as adult_arc_summary
+from arc_application.views.adult_update_views.confirmation import returned_adult, accepted_adult
+from arc_application.views.adult_update_views.adult_previous_addresses import adult_update_previous_address
+from arc_application.views.adult_update_views.add_previous_names import adult_update_add_previous_name
+from arc_application.views.adult_update_views.adult_previous_addresses import adults_previous_address_change
 
 # Nanny Views
 
-from arc_application.views.nanny_views.nanny_task_list import NannyTaskList
-from arc_application.views.nanny_views.nanny_contact_details import NannyContactDetailsSummary
-from arc_application.views.nanny_views.nanny_personal_details import NannyPersonalDetailsSummary
-from arc_application.views.nanny_views.nanny_childcare_address import NannyChildcareAddressSummary
-from arc_application.views.nanny_views.nanny_first_aid import NannyFirstAidTrainingSummary
-from arc_application.views.nanny_views.nanny_childcare_training import NannyChildcareTrainingSummary
-from arc_application.views.nanny_views.nanny_dbs_check import NannyDbsCheckSummary
-from arc_application.views.nanny_views.nanny_insurance_cover import NannyInsuranceCoverSummary
-from arc_application.views.nanny_views.nanny_arc_summary import NannyArcSummary
-from arc_application.views.nanny_views.nanny_arc_summary_confirmation import NannyArcSummaryConfirmation
+from arc_application.views.nanny_views import (
+    NannyTaskList, NannyContactDetailsSummary, NannyPersonalDetailsSummary, NannyPreviousRegistrationView,
+    NannyChildcareAddressSummary, NannyFirstAidTrainingSummary, NannyChildcareTrainingSummary,
+    NannyDbsCheckSummary, NannyInsuranceCoverSummary, NannyArcSummary, NannyArcSummaryConfirmation,
+    NannyChangePreviousAddressView, NannyAddPreviousAddressSearchView, NannyAddPreviousAddressSelectView,
+    NannyAddPreviousAddressManualView, nanny_add_previous_name
+)
 
 from django.conf import settings
 from django.conf.urls import include, url
@@ -52,7 +59,8 @@ from django.contrib import admin
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import logout
 
-from arc_application.views.childminder_views.personal_details_addresses import personal_details_previous_address
+from arc_application.views.childminder_views.personal_details_addresses import personal_details_previous_address, personal_details_previous_address_change
+from arc_application.views.childminder_views.personal_details_individual_lookup import personal_details_individual_lookup, personal_details_individual_lookup_search_result, personal_details_individual_lookup_search_choice
 
 urlpatterns = [
 
@@ -62,23 +70,31 @@ urlpatterns = [
     url(r'^logout/', logout, {'next_page': settings.URL_PREFIX + '/login'}),
     url(r'^summary/', ARCUserSummaryView.as_view(), name='summary'),
     url(r'^upload-capita-dbs/$', upload_capita_dbs, name='Upload-Capita-DBS'),
+    url(r'^applications-summary/$', ApplicationsSummaryView.as_view(), name='applications-summary'),
 
     # childminder application review
     url(r'^review/$', task_list, name='task_list'),
     url(r'^account/summary/', contact_summary, name='contact_summary'),
     url(r'^childcare/age-groups/', type_of_childcare_age_groups, name='type_of_childcare_age_groups'),
     url(r'^personal-details/summary/', personal_details_summary, name='personal_details_summary'),
-    url(r'^personal-details/previous-names/', add_applicant_previous_name, name='personal_details_previous_names'),
+    url(r'^personal-details/previous-names/', add_previous_name, name='personal_details_previous_names'),
+    url(r'^personal-details/individual-lookup/$', personal_details_individual_lookup, name='personal_details_individual_lookup'),
+    url(r'^personal-details/individual-lookup/results/$', personal_details_individual_lookup_search_result, name='personal_details_individual_lookup_search_result'),
+    url(r'^personal-details/individual-lookup/results/compare/', personal_details_individual_lookup_search_choice, name='personal_details_individual_lookup_search_choice'),
     url(r'^personal-details/previous-addresses', personal_details_previous_address,
         name='personal_details_previous_addresses'),
+    url(r'^personal-details/previous-address$', personal_details_previous_address_change, name='personal_details_previous_addresses_change'),
     url(r'^first-aid/summary/', first_aid_training_summary, name='first_aid_training_summary'),
     url(r'^dbs-check/summary/', dbs_check_summary, name='dbs_check_summary'),
-    url(r'^childcare-training-check/summary/', ChildcareTrainingCheckSummaryView.as_view(), name='childcare_training_check_summary'),
+    url(r'^childcare-training-check/summary/', ChildcareTrainingCheckSummaryView.as_view(),
+        name='childcare_training_check_summary'),
     url(r'^references/summary/', references_summary, name='references_summary'),
     url(r'^people/summary/', other_people_summary, name='other_people_summary'),
     url(r'^people/previous-names', add_previous_name, name='other-people-previous-names'),
-    url(r'^people/previous-addresses', address_state_dispatcher, name='other-people-previous-addresses'),
-    url(r'^people/previous-registration$', OtherPersonPreviousRegistrationDetailsView.as_view(), name='other-people-previous-registration'),
+    url(r'^people/previous-addresses', people_in_the_home_previous_address, name='other-people-previous-addresses'),
+    url(r'^people/previous-address', people_in_the_home_previous_address_change, name='other-people-previous-addresses-change'),
+    url(r'^people/previous-registration$', OtherPersonPreviousRegistrationDetailsView.as_view(),
+        name='other-people-previous-registration'),
     url(r'^health/check-answers/', health_check_answers, name='health_check_answers'),
     url(r'^confirmation/', review, name='review'),
     url(r'^arc-summary/', arc_summary, name='arc-summary'),
@@ -102,7 +118,28 @@ urlpatterns = [
     url(r'^contact-centre/nanny/contact-details/add-phone-number', NannyUpdateAddPhoneNumberView.as_view(),
         name='nanny_update_add_number'),
     url(r'^personal-details/previous-registration', PreviousRegistrationDetailsView.as_view(),
-        name='previous_registration_details'),
+        name='previous_registration_details')]
+
+
+if settings.ENABLE_HM:
+    # adult update urls
+    urlpatterns += [
+    url(r'^review/new-adult$', new_adults_summary,
+        name='new_adults_summary'),
+    url(r'^review/new-adult-summary', adult_arc_summary,
+        name='new_adults'),
+    url(r'^review/approved', accepted_adult,
+        name='adults-confirmation'),
+    url(r'^review/new-adult/previous-registration', adult_previous_registration_view,
+        name='adults-previous-registration'),
+    url(r'^review/returned', returned_adult,
+        name='adults-returned'),
+    url(r'^review/new-adult/previous-addresses', adult_update_previous_address,
+        name='adult_add_previous_address'),
+    url(r'^review/new-adult/previous-address', adults_previous_address_change,
+        name='adult_add_previous_address_change'),
+    url(r'^review/new-adult/previous-names', adult_update_add_previous_name, name='adult-update-previous-names')
+
 ]
 
 # nanny application review
@@ -110,7 +147,20 @@ if settings.ENABLE_NANNIES:
     urlpatterns += [
         url(r'^nanny/review/', NannyTaskList.as_view(), name='nanny_task_list'),
         url(r'^nanny/contact-details/', NannyContactDetailsSummary.as_view(), name='nanny_contact_summary'),
-        url(r'^nanny/personal-details/', NannyPersonalDetailsSummary.as_view(), name='nanny_personal_details_summary'),
+        url(r'^nanny/personal-details/review/', NannyPersonalDetailsSummary.as_view(),
+            name='nanny_personal_details_summary'),
+        url(r'^nanny/personal-details/previous-address/', NannyChangePreviousAddressView.as_view(),
+            name='nanny_change_previous_address'),
+        url(r'^nanny/personal-details/previous-addresses/select/', NannyAddPreviousAddressSelectView.as_view(),
+            name='nanny_add_previous_address_select'),
+        url(r'^nanny/personal-details/previous-addresses/manual/', NannyAddPreviousAddressManualView.as_view(),
+            name='nanny_add_previous_address_manual'),
+        url(r'^nanny/personal-details/previous-addresses/', NannyAddPreviousAddressSearchView.as_view(),
+            name='nanny_add_previous_address_search'),
+        url(r'^nanny/personal-details/previous-registration/', NannyPreviousRegistrationView.as_view(),
+            name='nanny_previous_registration'),
+        url(r'^nanny/personal-details/previous-names/', nanny_add_previous_name,
+            name='nanny_previous_names'),
         url(r'^nanny/childcare-address/', NannyChildcareAddressSummary.as_view(),
             name='nanny_childcare_address_summary'),
         url(r'^nanny/first-aid-training/', NannyFirstAidTrainingSummary.as_view(),

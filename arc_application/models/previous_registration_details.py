@@ -17,5 +17,11 @@ class PreviousRegistrationDetails(models.Model):
     def get_id(cls, app_id):
         return cls.objects.get(application_id=app_id)
 
+    def get_summary_table(self):
+        return [
+            {"title": "Individual lookup", "id": self.pk},
+            {"name": "Individual Id", "value": self.individual_id if self.previous_registration else 'Not known to Ofsted'},
+        ]
+
     class Meta:
         db_table = 'PREVIOUS_REGISTRATION_DETAILS'

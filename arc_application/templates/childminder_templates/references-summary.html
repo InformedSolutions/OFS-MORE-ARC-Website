@@ -27,7 +27,19 @@
         </tr>
         </thead>
         <tbody>
+        {% if first_reference_title is not None %}
         <tr>
+            <td>
+                Title
+            </td>
+            <td style="word-wrap: break-word">
+                {{first_reference_title}}
+            </td>
+            <td class="change-answer">
+            </td>
+        </tr>
+        <tr>
+            {% endif %}
             <td>
                 Full name
             </td>
@@ -242,6 +254,18 @@
         </tr>
         </thead>
         <tbody>
+        {% if second_reference_title is not None %}
+        <tr>
+            <td>
+                Title
+            </td>
+            <td style="word-wrap: break-word">
+                {{second_reference_title}}
+            </td>
+            <td class="change-answer">
+            </td>
+        </tr>
+        {% endif %}
         <tr>
             <td>
                 Full name

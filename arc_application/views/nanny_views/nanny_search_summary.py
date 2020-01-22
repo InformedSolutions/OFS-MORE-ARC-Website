@@ -1,15 +1,17 @@
 import json
-
+import logging
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from django.utils.decorators import method_decorator
 from django.views import View
 
-from arc_application.views import NannyArcSummary
+from ...views import NannyArcSummary, get_nanny_summary_functions
 from ..base import has_group
 from ...services.db_gateways import NannyGatewayActions
 
+# Initiate logging
+log = logging.getLogger()
 
 @method_decorator(login_required, name='get')
 class NannySearchSummary(View):
@@ -23,6 +25,7 @@ class NannySearchSummary(View):
         application_id = request.GET["id"]
         context = self.create_context(application_id)
         log_user_opened_application(request, application_id)
+        log.debug("Rendering nanny search summary")
         return render(request, self.TEMPLATE_NAME, context=context)
 
     def create_context(self, application_id):
@@ -37,14 +40,20 @@ class NannySearchSummary(View):
         application_reference = NannyArcSummary.get_application_reference(application_id)
         publish_details = NannyArcSummary.get_publish_details(application_id)
 
-        context_function_list = NannyArcSummary.get_context_function_list()
+        context_function_list = get_nanny_summary_functions()
+        context_list = [self.try_get_context_data(context_func, application_id) for context_func in context_function_list]
 
-        context_list = [self.try_get_context_data(context_func, application_id) for context_func in
-                        context_function_list if
-                        context_func]
+        context_list = [context_dict for context_dict in context_list if context_dict is not None]
+
+        # Remove all change_links
+        for context_dict in context_list:
+            context_dict['change_link'] = None
+            for row in context_dict['rows']:
+                row['change_link'] = None
 
         # Custom change_links for each individual field within the contact_details_context
         # This context is assumed to be at context_list[0].
+
         context_list[0]['search_table'] = True
         context_list[0]['rows'][0]['change_link'] = 'nanny_update_email_address'
         context_list[0]['rows'][1]['change_link'] = 'nanny_update_phone_number'
@@ -52,15 +61,11 @@ class NannySearchSummary(View):
 
         valid_context_list = [context for context in context_list if context]
 
-        # Remove 'Review: ' from page titles.
-        for context in valid_context_list:
-            context['title'] = context['title'][7:]
-
         context = {
             'application_id': application_id,
             'application_reference': application_reference,
             'context_list': valid_context_list,
-            'summary_page': False,
+            'summary_page': True,
             'publish_details': publish_details
         }
 

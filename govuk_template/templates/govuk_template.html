@@ -46,6 +46,9 @@
                    <a href="{% url 'Upload-Capita-DBS' %}" class="{% if link.link_is_view_name and link.link == request.resolver_match.view_name %}active{% endif %}">DBS Upload</a>
                  </li>
               {% endif %}
+                <li>
+                  <a href="{% url 'applications-summary' %}" class="{% if link.link_is_view_name and link.link == request.resolver_match.view_name %}active{% endif %}">Applications summary</a>
+                </li>
                <li>
                  <a href="{{ URL_PREFIX }}/logout" class="{% if link.link_is_view_name and link.link == request.resolver_match.view_name %}active{% endif %}">Sign out</a>
                </li>

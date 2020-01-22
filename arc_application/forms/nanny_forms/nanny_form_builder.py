@@ -2,7 +2,7 @@ from django import forms
 from django.forms import formset_factory
 from django.utils.functional import cached_property
 
-from arc_application import custom_field_widgets
+from arc_application.widgets import CustomCheckboxInput, Textarea
 
 
 class NannyFormBuilder:
@@ -64,13 +64,13 @@ class NannyFormBuilder:
         for field in self.field_names:
             self.form_fields[field + '_declare'] = forms.BooleanField(
                                                         label='This information is correct',
-                                                        widget=custom_field_widgets.CustomCheckboxInput,
+                                                        widget=CustomCheckboxInput,
                                                         required=False
                                                     )
             self.form_fields[field + '_comments'] = forms.CharField(
                                                         label='Enter your reasoning',
                                                         help_text='(Tip: be clear and concise)',
-                                                        widget=custom_field_widgets.Textarea,
+                                                        widget=Textarea,
                                                         required=False,
                                                         max_length=500
                                                     )
@@ -98,13 +98,18 @@ sign_in_form_fields = [
 personal_details_fields = [
     'name',
     'date_of_birth',
-    'lived_abroad',
     'known_to_social_services',
     'reasons_known_to_social_services'
 ]
 
 home_address_fields = [
     'home_address',
+]
+
+previous_registration_fields = [
+    'previous_registration',
+    'individual_id',
+    'five_years_in_UK'
 ]
 
 where_you_will_work_fields = [
@@ -128,10 +133,8 @@ childcare_training_fields = [
 
 dbs_check_fields = [
     'lived_abroad',
-    'is_ofsted_dbs',
     'on_dbs_update_service',
     'dbs_number',
-    'convictions',
     'enhanced_check',
     'within_three_months'
 ]
@@ -147,6 +150,7 @@ children_living_with_you_fields = [
 
 PersonalDetailsForm       = NannyFormBuilder(personal_details_fields, api_endpoint_name='applicant-personal-details').create_form()
 HomeAddressForm           = NannyFormBuilder(home_address_fields, api_endpoint_name='applicant-home-address').create_form()
+PreviousRegistrationForm  = NannyFormBuilder(previous_registration_fields, api_endpoint_name='previous-registration-details').create_form()
 WhereYouWillWorkForm      = NannyFormBuilder(where_you_will_work_fields, api_endpoint_name='application').create_form()
 ChildcareAddressFormset   = NannyFormBuilder(childcare_address_fields, api_endpoint_name='childcare-address').create_formset()
 FirstAidForm              = NannyFormBuilder(first_aid_training_fields, api_endpoint_name='first-aid').create_form()

@@ -6,8 +6,8 @@ from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 
 from timeline_logger.models import TimelineLog
 
-from arc_application.models import Arc, Application, ApplicantName
-from arc_application.services.db_gateways import NannyGatewayActions
+from ..models import Arc, Application, ApplicantName
+from ..services.db_gateways import NannyGatewayActions, HMGatewayActions
 
 
 class GenericApplicationHandler:
@@ -36,6 +36,9 @@ class GenericApplicationHandler:
         for assigned_application in assigned_applications:
             if assigned_application.app_type == 'Childminder':
                 table_data.append(self.__get_childminder_table_data(assigned_application.application_id))
+
+            if settings.ENABLE_HM  and assigned_application.app_type == 'Adult update':
+                table_data.append(self.__get_adult_update_table_data(assigned_application.application_id))
                 
             if settings.ENABLE_NANNIES:
                 if assigned_application.app_type == 'Nanny':
@@ -57,8 +60,8 @@ class GenericApplicationHandler:
 
         application_record = NannyGatewayActions().read('application', params={'application_id': str(application_id)}).record
         row_data['application_id'] = application_record['application_id']
-        row_data['date_submitted'] = datetime.strptime(application_record['date_submitted'][:10], '%Y-%M-%d').strftime('%d/%m/%Y')
-        row_data['last_accessed'] = datetime.strptime(application_record['date_updated'][:10], '%Y-%M-%d').strftime('%d/%m/%Y')
+        row_data['date_submitted'] = datetime.strptime(application_record['date_submitted'][:10], '%Y-%m-%d').strftime('%d/%m/%Y')
+        row_data['last_accessed'] = datetime.strptime(application_record['date_updated'][:10], '%Y-%m-%d').strftime('%d/%m/%Y')
         row_data['app_type'] = 'Nanny'
 
         personal_details_record = NannyGatewayActions().read(
@@ -83,16 +86,44 @@ class GenericApplicationHandler:
 
         return row_data
 
+    def __get_adult_update_table_data(self, application_id):
+        row_data = dict()
+
+        adult_record = HMGatewayActions().read('adult',
+                                                        params={'adult_id': str(application_id)}).record
+        row_data['application_id'] = adult_record['adult_id']
+        row_data['date_submitted'] = datetime.strptime(adult_record['date_submitted'][:10], '%Y-%m-%d').strftime(
+            '%d/%m/%Y')
+        row_data['last_accessed'] = datetime.strptime(adult_record['date_updated'][:10], '%Y-%m-%d').strftime(
+            '%d/%m/%Y')
+        row_data['app_type'] = 'Adult update'
+
+        dpa_auth_record = HMGatewayActions().read('dpa-auth', params={'token_id': adult_record['token_id']}).record
+        applicant_name = dpa_auth_record['first_name'] + " " + dpa_auth_record['last_name']
+
+        row_data['applicant_name'] = applicant_name
+
+        return row_data
+
 
 class ChildminderApplicationHandler(GenericApplicationHandler):
 
     def _get_oldest_app_id(self):
-        childminder_apps_for_review = Application.objects.filter(application_status='SUBMITTED')
+        childminder_apps_for_review = list(Application.objects.filter(
+            application_status='SUBMITTED'))
+        resubmitted_apps = []
+        submitted_apps = []
+        if any(childminder_apps_for_review):
+            for app in childminder_apps_for_review:
+                if app.date_updated > app.date_submitted:
+                    resubmitted_apps.append(app)
 
-        if childminder_apps_for_review.exists():
-            childminder_apps_for_review = childminder_apps_for_review.order_by('date_updated')
-            return childminder_apps_for_review[0].application_id
-
+        if any(resubmitted_apps):
+            resubmitted_apps = sorted(resubmitted_apps, key=lambda i: i.date_updated)
+            return resubmitted_apps[0].application_id
+        elif any(childminder_apps_for_review):
+            submitted_apps = sorted(childminder_apps_for_review, key=lambda i: i.date_updated)
+            return submitted_apps[0].application_id
         else:
             raise ObjectDoesNotExist('No applications available.')
 
@@ -134,11 +165,21 @@ class NannyApplicationHandler(GenericApplicationHandler):
 
     def _get_oldest_app_id(self):
         response = NannyGatewayActions().list(
-            'application', params={'application_status': 'SUBMITTED', 'ordering': 'date_submitted'})
+            'application', params={'application_status': 'SUBMITTED'})
 
         if response.status_code == 200:
+            resubmitted_apps = []
             submitted_apps = response.record
-            return submitted_apps[0]['application_id']
+            for app in submitted_apps:
+                if app['date_updated'] > app['date_submitted']:
+                    resubmitted_apps.append(app)
+
+            if any(resubmitted_apps):
+                resubmitted_apps = sorted(resubmitted_apps, key=lambda i: i['date_updated'])
+                return resubmitted_apps[0]['application_id']
+            else:
+                submitted_apps = sorted(submitted_apps, key=lambda i: i['date_submitted'])
+                return submitted_apps[0]['application_id']
 
         else:
             raise ObjectDoesNotExist('No applications available.')
@@ -183,4 +224,70 @@ class NannyApplicationHandler(GenericApplicationHandler):
 
     def _list_tasks_for_review(self):
         example_application = NannyGatewayActions().list('application', params={}).record[0]
+        return [i[:-12] for i in example_application.keys() if i[-12:] == '_arc_flagged']
+
+
+class AdultUpdateApplicationHandler(GenericApplicationHandler):
+
+    def _get_oldest_app_id(self):
+        response = HMGatewayActions().list(
+            'adult', params={'adult_status': 'SUBMITTED'})
+
+        if response.status_code == 200:
+            resubmitted_apps = []
+            submitted_apps = response.record
+            for app in submitted_apps:
+                if app['date_resubmitted'] is not None:
+                    resubmitted_apps.append(app)
+
+            if any(resubmitted_apps):
+                resubmitted_apps = sorted(resubmitted_apps, key=lambda i: i['date_resubmitted'])
+                return resubmitted_apps[0]['adult_id']
+            else:
+                submitted_apps = sorted(submitted_apps, key=lambda i: i['date_submitted'])
+                return submitted_apps[0]['adult_id']
+
+        else:
+            raise ObjectDoesNotExist('No applications available.')
+
+    def _assign_app_to_user(self, adult_id):
+        app_record = HMGatewayActions().read('adult', params={'adult_id': adult_id}).record
+        app_record['adult_status'] = 'ARC_REVIEW'
+        HMGatewayActions().put('adult', params=app_record)
+
+        if not Arc.objects.filter(pk=adult_id).exists():
+            app_review = Arc.objects.create(application_id=adult_id)
+
+            for field in self._list_tasks_for_review():
+                setattr(app_review, field, 'NOT_STARTED')
+
+            app_review.app_type = 'Adult update'
+            app_review.last_accessed = app_record['date_updated']
+            app_review.user_id = self.arc_user.id
+            app_review.save()
+
+        else:
+            arc_user = Arc.objects.get(pk=adult_id)
+            arc_user.last_accessed = app_record['date_updated']
+            arc_user.user_id = self.arc_user.id
+            arc_user.save()
+
+        # Log assigning application to ARC user.
+        extra_data = {
+            'user_type': 'reviewer',
+            'action': 'assigned to',
+            'entity': 'application'
+        }
+
+        log_data = {
+            'object_id': app_record['adult_id'],
+            'template': 'timeline_logger/application_action.txt',
+            'user': self.arc_user.username,
+            'extra_data': json.dumps(extra_data)
+        }
+
+        HMGatewayActions().create('timeline-log', params=log_data)
+
+    def _list_tasks_for_review(self):
+        example_application = HMGatewayActions().list('adult', params={}).record[0]
         return [i[:-12] for i in example_application.keys() if i[-12:] == '_arc_flagged']

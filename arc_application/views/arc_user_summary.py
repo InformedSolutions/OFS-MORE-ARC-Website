@@ -1,13 +1,16 @@
+import logging
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from django.views import View
 from django.utils.decorators import method_decorator
-from arc_service import settings
 
-from arc_application.services.application_handler import ChildminderApplicationHandler, GenericApplicationHandler, NannyApplicationHandler
+from ..services.application_handler import ChildminderApplicationHandler, GenericApplicationHandler, \
+    NannyApplicationHandler, AdultUpdateApplicationHandler
 
+# Initiate logging
+log = logging.getLogger()
 
 @method_decorator(login_required, name='get')
 @method_decorator(login_required, name='post')
@@ -16,12 +19,14 @@ class ARCUserSummaryView(View):
 
     def get(self, request):
         context = self.get_context_data()
+        log.debug("Rendering arc user summary")
         return render(request, self.template_name, context=context)
 
     def post(self, request):
 
         if settings.ENABLE_NANNIES:
             if 'add_nanny_application' in request.POST:
+                log.debug("Conditional logic: show nanny arc")
                 app_handler = NannyApplicationHandler(arc_user=request.user)
         else:
             context = self.get_context_data()
@@ -31,6 +36,9 @@ class ARCUserSummaryView(View):
 
         if 'add_childminder_application' in request.POST:
             app_handler = ChildminderApplicationHandler(arc_user=request.user)
+
+        elif settings.ENABLE_HM  and 'add_adult_update_application' in request.POST:
+            app_handler = AdultUpdateApplicationHandler(arc_user=request.user)
 
         try:
             app_handler.add_application_from_pool()
@@ -48,6 +56,7 @@ class ARCUserSummaryView(View):
             context['error_title'] = 'You have reached the limit'
             context['error_text'] = 'You have already reached the maximum (' + str(settings.APPLICATION_LIMIT) + ') applications'
 
+        log.debug("Rendering arc user summary")
         return render(request, self.template_name, context=context)
 
     def get_context_data(self):
@@ -63,5 +72,6 @@ class ARCUserSummaryView(View):
             context['empty'] = 'true'
 
         context['enable_nannies'] = settings.ENABLE_NANNIES
+        context['enable_hm'] = settings.ENABLE_HM
 
         return context

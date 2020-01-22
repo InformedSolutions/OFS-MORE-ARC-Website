@@ -1,8 +1,11 @@
-from arc_application.forms.nanny_forms.nanny_form_builder import ChildcareAddressFormset, WhereYouWillWorkForm
-from arc_application.services.db_gateways import NannyGatewayActions
+import logging
+from ...forms.nanny_forms.nanny_form_builder import ChildcareAddressFormset, WhereYouWillWorkForm
+from ...services.db_gateways import NannyGatewayActions
 
 from .nanny_form_view import NannyARCFormView
 
+# Initiate logging
+log = logging.getLogger()
 
 class NannyChildcareAddressSummary(NannyARCFormView):
     template_name = 'nanny_general_template.html'
@@ -43,11 +46,10 @@ class NannyChildcareAddressSummary(NannyARCFormView):
         home_address_info = nanny_actions.read('applicant-home-address',
                                                params={'application_id': application_id,
                                                        'current_address': True}).record
-        childcare_address_info = nanny_actions.read('applicant-home-address',
-                                               params={'application_id': application_id,
-                                                       'childcare_address': True}).record
+        childcare_address_status = nanny_actions.read('applicant-home-address',
+                                               params={'application_id': application_id}).record
 
-        if home_address_info == childcare_address_info:
+        if childcare_address_status['childcare_address']:
             work_at_home_bool = 'Yes'
         else:
             work_at_home_bool = 'No'
@@ -84,7 +86,7 @@ class NannyChildcareAddressSummary(NannyARCFormView):
                     'name': 'Childcare address',
                     'info': home_address_locations,
                     'formset': childcare_address_formset
-                },
+                }
             ]
         }
 

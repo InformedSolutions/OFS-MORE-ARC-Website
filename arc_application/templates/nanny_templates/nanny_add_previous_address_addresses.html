@@ -1,0 +1,16 @@
+{% for addr in previous_addresses %}
+<p>
+    Previous address {{ forloop.counter }}:
+</p>
+<p>
+    {% if addr.street_line1 %} {{ addr.street_line1 }}<br/> {% endif %}
+    {% if addr.street_line2 %} {{ addr.street_line2 }}<br/> {% endif %}
+    {% if addr.town %} {{ addr.town }}<br/> {% endif %}
+    {% if addr.county %} {{ addr.county }}<br/> {% endif %}
+    {% if addr.postcode %} {{ addr.postcode }}<br/> {% endif %}
+</p>
+<p>
+    <input type="submit" class="hidden-link-2" name="delete-{{ addr.previous_address_id }}"
+           value="Remove this address" />
+</p>
+{% endfor %}

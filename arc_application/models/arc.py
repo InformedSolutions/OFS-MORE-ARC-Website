@@ -3,6 +3,7 @@ from django.db import models
 from .base import TASK_STATUS
 
 
+
 class Arc(models.Model):
     """
     Model for the ARC table.
@@ -27,6 +28,10 @@ class Arc(models.Model):
     childcare_address_review = models.CharField(choices=TASK_STATUS, max_length=50, default='NOT_STARTED', blank=True,
                                                 null=True)
     insurance_cover_review = models.CharField(choices=TASK_STATUS, max_length=50, default='NOT_STARTED', blank=True,
+                                              null=True)
+
+    # Adult update field
+    adult_update_review = models.CharField(choices=TASK_STATUS, max_length=50, default='NOT_STARTED', blank=True,
                                               null=True)
 
     @classmethod

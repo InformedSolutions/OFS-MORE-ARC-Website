@@ -1,4 +1,6 @@
 import json
+import logging
+from datetime import datetime
 
 from django import forms
 from django.conf import settings
@@ -10,14 +12,17 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.utils.http import urlsafe_base64_decode
 from django.utils.text import capfirst
+
+import copy
+
 from govuk_forms.forms import GOVUKForm
 from timeline_logger.models import TimelineLog
-from arc_application.review_util import reset_declaration
+from ..review_util import reset_declaration
+from ..models import Application, Arc
+from ..services.db_gateways import NannyGatewayActions, HMGatewayActions
 
-from arc_application.models import Application, Arc
-
-from arc_application.services.db_gateways import NannyGatewayActions
-
+# Initiate logging
+log = logging.getLogger()
 
 def custom_login(request):
     """
@@ -42,7 +47,7 @@ def custom_login(request):
             username = form.cleaned_data.get('username')
             password = form.cleaned_data.get('password')
             user = authenticate(username=username, password=password)
-
+            log.debug("Handing submissions for login page")
             if user is not None and has_group(user, settings.ARC_GROUP) and not has_group(user,
                                                                                           settings.CONTACT_CENTRE):
                 auth_login(request, user)
@@ -62,6 +67,7 @@ def custom_login(request):
     variables = {
         'form': form
     }
+    log.debug("Rendering arc login page")
     return render(request, 'registration/login.html', variables)
 
 
@@ -94,39 +100,92 @@ def release(request, application_id):
 @login_required
 def release_application(request, application_id, status):
     """
-    Release application- essentiall remove the user_id field so that it's not assigned to anyone but the review status
-    should remain
+    Release application, settings fields as appropriate for the specified new status.
+
+    Essential to remove the user_id field so that it's not assigned to anyone but the review
+    status should remain
 
     :param request: HTTP Request
-    :param application_id: Childminder app id (PK)
+    :param application_id: Childminder/Nanny/Etc application id (PK)
     :param status: what status to update the application with on release
     :return: Either redirect on success, or return error page (TBC)
     """
     if Application.objects.filter(application_id=application_id).exists():
+
         app = Application.objects.get(application_id=application_id)
+        APP_ORIGINAL = copy.deepcopy(app)
+
+        if status == 'FURTHER_INFORMATION':
+            reset_declaration(app)
+        elif status == 'ACCEPTED' and not APP_ORIGINAL.application_status == 'ACCEPTED':
+            app.date_accepted = datetime.now()
+
         app.application_status = status
         app.save()
 
-        # reset declaration task
-        if status == 'FURTHER_INFORMATION':
-            reset_declaration(app)
+        # If the application is being set to 'ACCEPTED' but has already been accepted, skip this.
+        if status == 'ACCEPTED' and not APP_ORIGINAL.application_status == 'ACCEPTED':
+            app.date_accepted = datetime.now()
+
+            # Import used here explicitly to prevent circular import
+            from ..messaging import ApplicationExporter
+
+            # If the application does not contain a legacy prefix, export for submission to NOO.
+            if 'CM' not in app.application_reference:
+                ApplicationExporter.export_childminder_application(application_id)
 
     # If application_id doesn't correspond to a Childminder application, it must be a Nanny one.
-    else:
+    elif settings.ENABLE_NANNIES and NannyGatewayActions().read('application', params={'application_id': application_id}).status_code == 200:
         nanny_api_response = NannyGatewayActions().read('application', params={'application_id': application_id})
         app = nanny_api_response.record
+        APP_ORIGINAL = app.copy()
+
+        if status == 'FURTHER_INFORMATION':
+            app['declarations_status'] = 'NOT_STARTED'
+        elif status == 'ACCEPTED' and not APP_ORIGINAL['application_status'] == 'ACCEPTED':
+            app['date_accepted'] = datetime.now()
+
         app['application_status'] = status
         NannyGatewayActions().put('application', params=app)
 
+        if status == 'ACCEPTED' and not APP_ORIGINAL['application_status'] == 'ACCEPTED':
+            app['date_accepted'] = datetime.now()
+
+            from ..messaging import ApplicationExporter
+            application_reference = app['application_reference']
+            ApplicationExporter.export_nanny_application(application_id, application_reference)
+
+    elif settings.ENABLE_HM:
+        hm_api_response = HMGatewayActions().read('adult', params={'adult_id': application_id})
+        app = hm_api_response.record
+
+        if status == 'FURTHER_INFORMATION':
+            app['declarations_status'] = 'NOT_STARTED'
+        elif status == 'ACCEPTED':
+            app['date_accepted'] = datetime.now()
+
+            # Import used here explicitly to prevent circular import
+            from ..messaging import ApplicationExporter
+
+            ApplicationExporter.export_adult_update_application(application_id)
+
+        elif status == 'ARC REVIEW':
+            app['adult_status'] = 'SUBMITTED'
+
+        app['adult_status'] = status
+        HMGatewayActions().put('adult', params=app)
+
+
+    # keep arc record but un-assign user from it
     if Arc.objects.filter(application_id=application_id).exists():
         arc = Arc.objects.get(pk=application_id)
         arc.user_id = ''
         arc.save()
-        log_applcation_release(request, arc, app, status)
+        log_application_release(request, arc, app, status)
         return HttpResponseRedirect('/arc/summary')
 
 
-def log_applcation_release(request, arc_object, app, status):
+def log_application_release(request, arc_object, app, status):
     log_action = {
         'COMPLETED': 'completed by',
         'FURTHER_INFORMATION': 'returned by',
@@ -143,15 +202,17 @@ def log_applcation_release(request, arc_object, app, status):
             extra_data={'user_type': 'reviewer', 'action': log_action[status], 'entity': 'application'}
         )
 
-    elif isinstance(app, dict):  # If handling a Nanny application.
+    elif settings.ENABLE_NANNIES and isinstance(app, dict):  # If handling a Nanny application.
         extra_data = {
                 'user_type': 'reviewer',
                 'action': log_action[status],
                 'entity': 'application'
             }
 
+        id = app['application_id'] if app.get('application_id') else app['adult_id']
+
         log_data = {
-            'object_id': app['application_id'],
+            'object_id': id,
             'template': 'timeline_logger/application_action.txt',
             'user': request.user.username,
             'extra_data': json.dumps(extra_data)

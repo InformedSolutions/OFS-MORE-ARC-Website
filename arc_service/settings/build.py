@@ -1,6 +1,6 @@
 from .base import *
 
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
@@ -21,5 +21,9 @@ DATABASES = {
         'HOST': os.environ.get('POSTGRES_HOST', 'ofsted-postgres'),
         'PORT': os.environ.get('POSTGRES_PORT', '5432')
     }
+}
+
+MIGRATION_MODULES = {
+    'arc_application': 'arc_application.tests.test_migrations',
 }
 

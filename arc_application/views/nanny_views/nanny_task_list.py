@@ -1,13 +1,16 @@
+import logging
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from django.utils.decorators import method_decorator
 from django.views import View
 
-from arc_application.models import Arc
-from arc_application.services.db_gateways import NannyGatewayActions
-from arc_application.services.nanny_view_helpers import parse_date_of_birth, \
+from ...models import Arc
+from ...services.db_gateways import NannyGatewayActions
+from ...services.nanny_view_helpers import parse_date_of_birth, \
     nanny_all_reviewed
 
+# Initiate logging
+log = logging.getLogger()
 
 @method_decorator(login_required, name='get')
 class NannyTaskList(View):
@@ -19,7 +22,7 @@ class NannyTaskList(View):
         application_id = request.GET["id"]
 
         context = self.create_context(application_id, request)
-
+        log.debug("Rendering nanny task list")
         return render(request, self.TEMPLATE_NAME, context=context)
 
     def create_context(self, application_id, request):

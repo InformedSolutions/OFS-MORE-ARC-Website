@@ -2,6 +2,7 @@
 {% block page_title %}Review: people in the home{% endblock %}
 {% load static %}
 {% load govuk_template_base %}
+{% load alt_text_extras %}
 
 {% block inner_content %}
 {% include 'back-button.html' %}
@@ -36,7 +37,7 @@
             <tr>
                 <th colspan="3">
                     <div class="heading-medium">
-                        Adults in the home
+                        Adults in the home where childcare takes place
                     </div>
                 </th>
             </tr>
@@ -71,7 +72,8 @@
             </tbody>
         </table>
 
-        {% for record, id, health_check_status, name, day, month, year, relationship, email, dbs_certificate_number, dbs_on_capita, dbs_is_recent, enhanced_check, on_update, lived_abroad, military_base, formsetadult, current_illness_set, serious_illness_set, hospital_admission_set, reasons_known_to_council_health_check, enhanced_check in adult_lists %}
+        {% for record, id, health_check_status, title, name, day, month, year, relationship, email, PITH_mobile_number,PITH_same_address, PITH_moved_in, dbs_certificate_number, dbs_on_capita, dbs_is_recent, enhanced_check, on_update, lived_abroad, military_base, formsetadult, current_illness_set, serious_illness_set, hospital_admission_set, reasons_known_to_council_health_check, enhanced_check, previous_names, previous_addresses in adult_lists %}
+
         <table class="check-your-answers form-group">
             <thead>
             <tr>
@@ -112,6 +114,19 @@
                 </td>
             </tr>
             {# ================================== #}
+            {% if title is not None %}
+            <tr>
+                <td style="word-wrap: break-word">
+                    Title
+                </td>
+                <td style="word-wrap: break-word">
+                    {{title}}
+                </td>
+                <td class="change-answer">
+
+                </td>
+            </tr>
+            {% endif %}
             <tr>
                 <td style="word-wrap: break-word">
                     Name
@@ -268,6 +283,54 @@
             {# ================================== #}
             <tr>
                 <td style="word-wrap: break-word">
+                    Phone number
+                </td>
+                <td style="word-wrap: break-word" colspan="2">
+                    {{PITH_mobile_number}}
+                </td>
+            </tr>
+            {# ================================== #}
+            <tr>
+                <td style="word-wrap: break-word">
+                    Address
+                </td>
+                <td style="word-wrap: break-word">
+                    {{PITH_same_address}}
+                </td>
+                <td class="change-answer">
+                    {{ formsetadult.PITH_same_address_declare }}
+                </td>
+            </tr>
+            <tr class="js-hidden" id="PITH_same_address{{formsetadult.instance_id.initial}}">
+                <td colspan="1">
+                    <div>
+                        Enter your reasoning
+                    </div>
+                    <div>
+                        {{ formsetadult.PITH_same_address_comments.help_text}}
+                    </div>
+                </td>
+                <td colspan="2">
+                    <div>
+                        {{ formsetadult.PITH_same_address_comments}}
+                    </div>
+                </td>
+            </tr>
+            {% if PITH_moved_in %}
+            <tr>
+                <td style="word-wrap: break-word">
+                    Moved in
+                </td>
+                <td style="word-wrap: break-word">
+                    {{PITH_moved_in}}
+                </td>
+                <td class="change-answer">
+                </td>
+            </tr>
+            {% endif %}
+            {# ================================== #}
+            <tr>
+                <td style="word-wrap: break-word">
                     {{ formsetadult.lived_abroad_comments.label }}
                 </td>
                 <td style="word-wrap: break-word">
@@ -406,7 +469,7 @@
             {% if on_update is not None %}
             <tr>
                 <td style="word-wrap: break-word">
-                    On the update service?
+                    On the DBS Update Service?
                 </td>
                 <td style="word-wrap: break-word">
                     {{ on_update|yesno:"Yes,No" }}
@@ -466,10 +529,147 @@
             <tbody>
 
         </table>
+
+        {% if previous_names or previous_addresses %}
+        <table class="check-your-answers form-group">
+            <thead>
+            <tr>
+                <th colspan="3">
+                    <div class="heading-medium">
+                        {{name}}'s previous names and addresses
+                    </div>
+                </th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for prevname in previous_names %}
+            <tr>
+                <td>
+                    Previous name {{ forloop.counter }}
+                </td>
+                <td>
+                    {{ prevname.name }}
+                </td>
+                <td class="change-answer">
+                    <a href="{% url 'other-people-previous-names' %}?id={{ application_id }}&person_id={{ id }}&type=ADULT"
+                        alt="Change the {{ forloop.counter|inflect }} previous name">Change</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Start date
+                </td>
+                <td>
+                    {{ prevname.start_date|date:'j F Y' }}
+                </td>
+                <td class="change-answer">
+                    <a href="{% url 'other-people-previous-names' %}?id={{ application_id }}&person_id={{ id }}&type=ADULT"
+                        alt="Change the start date for the {{ forloop.counter|inflect }} previous name">Change</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    End date
+                </td>
+                <td>
+                    {{ prevname.end_date|date:'j F Y' }}
+                </td>
+                <td class="change-answer">
+                    <a href="{% url 'other-people-previous-names' %}?id={{ application_id }}&person_id={{ id }}&type=ADULT"
+                        alt="Change the end date for the {{ forloop.counter|inflect }} previous name">Change</a>
+                </td>
+            </tr>
+            {% endfor %}
+            {% for address in previous_addresses %}
+            <tr>
+                <td>
+                    Previous address {{ forloop.counter }}
+                </td>
+                <td>
+                    {{address.street_line1}}{% if address.street_line1 %}<br />{% endif %}
+                    {{address.street_line2}}{% if address.street_line2 %}<br />{% endif %}
+                    {{address.town}}{% if address.town %}<br />{% endif %}
+                    {{address.county}}{% if address.county %}<br />{% endif %}
+                    {{address.country}}{% if address.country %}<br />{% endif %}
+                    {{address.postcode}}{% if address.postcode %}<br />{% endif %}
+                </td>
+                <td class="change-answer">
+                    <a href="{% url 'other-people-previous-addresses-change' %}?id={{ application_id }}&state=change&person_id={{id}}&person_type=ADULT&address_id={{address.previous_name_id}}"
+                    alt="Change the {{ forloop.counter|inflect }} previous address">Change</a>
+                </td>
+            </tr>
+
+            {% if address.moved_in_date %}
+            <tr>
+                <td>
+                    Moved in
+                </td>
+                <td>
+                    {{ address.moved_in_date|date:"d F Y" }}
+                </td>
+                <td class="change-answer">
+                    <a href="{% url 'other-people-previous-addresses-change' %}?id={{ application_id }}&state=change&person_id={{ application_id }}&person_type=APPLICANT&address_id={{address.pk}}"
+                       alt="Change the move in date for {{ forloop.counter|inflect }} previous address">Change</a>
+                </td>
+
+            </tr>
+            {% endif %}
+
+            {% if address.moved_out_date %}
+            <tr>
+                <td>
+                    Moved out
+                </td>
+                <td>
+                    {{ address.moved_out_date|date:"d F Y" }}
+                </td>
+                <td class="change-answer">
+                    <a href="{% url 'other-people-previous-addresses-change' %}?id={{ application_id }}&state=change&person_id={{ application_id }}&person_type=APPLICANT&address_id={{address.pk}}"
+                       alt="Change the move out date for {{ forloop.counter|inflect }} previous address">Change</a>
+                </td>
+            </tr>
+            {% endif %}
+            {% endfor %}
+            </tbody>
+        </table>
+        {% endif %}
+
         <a href="{% url 'other-people-previous-names' %}?id={{ application_id }}&person_id={{ id }}&type=ADULT" class="button button-secondary">Add previous names</a>
         <br>
         <a href="{% url 'other-people-previous-addresses' %}?id={{ application_id }}&state=entry&person_id={{id}}&person_type=ADULT" class="button button-secondary">Add previous addresses</a>
 
+
+        {% for dict in previous_registration_lists %}
+        {% if dict.adult_id == id %}
+        {% include "individual_lookup_table.html" with referrer="childminder_pith"  adult_id=id individual_id=dict.prev_reg.individual_id %}
+        {% endif %}
+        {% endfor %}
+
+
+        <table class="check-your-answers form-group">
+            <thead>
+            <tr>
+                <th colspan="3">
+                    <div class="heading-medium">
+                        {{ name }} relationship
+                    </div>
+                </th>
+            </tr>
+            </thead>
+            <tbody>
+                <td colspan="1">
+                    <label id="{{ formsetadult.cygnum_relationship.auto_id }}-label">
+                        {{ formsetadult.cygnum_relationship.label }}
+                    </label>
+                </td>
+                <td colspan="2">
+                    {% for error in formsetadult.cygnum_relationship.errors %}
+                      <span class="error-message">{{ error }}</span>
+                    {% endfor %}
+                    {{ formsetadult.cygnum_relationship }}
+                </td>
+            </tbody>
+        </table>
 
 
          <table class="check-your-answers">
@@ -491,10 +691,10 @@
                     <td class=summary-column> {{ record.current_treatment|yesno:"Yes,No" }} </td>
                 </tr>
 
-                {% for treatment in current_illness_set %}
+                {% for record in current_illness_set %}
                 <tr>
                     <td class=summary-column>Details of the illness or condition</td>
-                    <td class=summary-column>{{ treatment.description }}</td>
+                    <td class=summary-column>{{ record.illness_details }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -558,7 +758,6 @@
             </tbody>
         </table>
 
-        <a href="{% url 'other-people-previous-registration' %}?id={{ application_id }}&person_id={{ id }}" class="button button-secondary">Add previous registration details</a>
         {% endfor %}
 
         <table class="check-your-answers form-group">
@@ -566,7 +765,7 @@
             <tr>
                 <th colspan="3">
                     <div class="heading-medium">
-                        Children in the home
+                        Children in the home where childcare takes place
                     </div>
                 </th>
             </tr>
@@ -894,7 +1093,7 @@
                 </td>
                 {% elif child.birth_month == 10 %}
                 <td style="word-wrap: break-word">
-                    {{day}} October {{ child.birth_year }}
+                    {{ child.birth_day}} October {{ child.birth_year }}
                 </td>
                 {% elif child.birth_month == 11 %}
                 <td style="word-wrap: break-word">
@@ -974,87 +1173,9 @@
         {% endif %}
 
         {% for id, name, previous_names, previous_addresses in adult_ebulk_lists %}
-        <table class="check-your-answers form-group">
-            <thead>
-            <tr>
-                <th colspan="3">
-                    <div class="heading-medium">
-                        {{name}}'s eBulk details
-                    </div>
-                </th>
-            </tr>
-            </thead>
-            <tbody>
-            {% for name in previous_names %}
-            <tr>
-                <td>
-                    Previous name ({{ forloop.counter }})
-                </td>
-                <td>
-                    {{ name.first_name }} {{name.middle_names}} {{name.last_name}}
-                </td>
-                <td class="change-answer">
-                    <a href="{% url 'other-people-previous-names' %}?id={{ application_id }}&person_id={{ id }}&type=ADULT&referrer=list">Change</a>
-                </td>
-            </tr>
-            {% endfor %}
-            {% for address in previous_addresses%}
-            <tr>
-                <td>
-                    Previous address ({{ forloop.counter }})
-                </td>
-                <td>
-                    {{address.street_line1}}{% if address.street_line1 %}<br />{% endif %}
-                    {{address.street_line2}}{% if address.street_line2 %}<br />{% endif %}
-                    {{address.town}}{% if address.town %}<br />{% endif %}
-                    {{address.county}}{% if address.county %}<br />{% endif %}
-                    {{address.country}}{% if address.country %}<br />{% endif %}
-                    {{address.postcode}}{% if address.postcode %}<br />{% endif %}
-                </td>
-                <td class="change-answer">
-                    <a href="{% url 'other-people-previous-addresses' %}?id={{ application_id }}&state=update&person_id={{id}}&person_type=ADULT&address_id={{address.previous_name_id}}">Change</a>
-                </td>
-            </tr>
-            {% endfor %}
-            </tbody>
-        </table>
+
         {% endfor %}
 
-
-        {% for id, name, previous_registrations in previous_registration_lists %}
-        {% for previous_registration in previous_registrations %}
-                <table class="check-your-answers form-group">
-                    <thead>
-                    <tr>
-                        <th colspan="3">
-                            <div class="heading-medium">
-                                {{name}} previous registration
-                            </div>
-                        </th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr>
-                        <td>Has the applicant previously registered with Ofsted?</td>
-                        <td>{{ previous_registration.previous_registration|yesno:"Yes,No" }}</td>
-                        <td><a href="{% url 'other-people-previous-registration' %}?id={{ application_id }}&person_id={{id}}">Change</a></td>
-                    </tr>
-                    {% if previous_registration.previous_registration %}
-                    <tr>
-                        <td>Individual ID</td>
-                        <td>{{ previous_registration.individual_id }}</td>
-                        <td><a href="{% url 'other-people-previous-registration' %}?id={{ application_id }}&person_id={{id}}">Change</a></td>
-                    </tr>
-                    {% endif %}
-                    <tr>
-                        <td>Has the applicant lived in England for more than 5 years</td>
-                        <td>{{ previous_registration.five_years_in_UK|yesno:"Yes,No" }}</td>
-                        <td><a href="{% url 'other-people-previous-registration' %}?id={{ application_id }}&person_id={{id}}">Change</a></td>
-                    </tr>
-                    </tbody>
-                </table>
-                    {% endfor %}
-        {% endfor %}
 
         <input type="submit" class="button" value="Confirm and continue"/>
         <input type="hidden" value="{{application_id}}" name="id"/>

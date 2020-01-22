@@ -3,8 +3,8 @@ import re
 
 from django.db.models import Q
 
-from arc_application.models import Application, ApplicantName
-from arc_application.services.db_gateways import NannyGatewayActions
+from ..models import Application, ApplicantName
+from ..services.db_gateways import NannyGatewayActions
 
 
 class SearchService:

@@ -6,12 +6,14 @@ SERVER_LABEL = 'Test_1'
 ARC_GROUP = 'arc'
 CONTACT_CENTRE = 'contact-centre'
 
-DBS_URL = os.environ.get('APP_DBS_URL')
-
 NOTIFY_URL = os.environ.get('APP_NOTIFY_URL')
 
 # Base URL of addressing-service gateway
 ADDRESSING_URL = os.environ.get('APP_ADDRESSING_URL')
+
+IDENTITY_URL = os.environ.get('APP_IDENTITY_URL')
+
+NANNY_GATEWAY_URL = os.environ.get('APP_NANNY_GATEWAY_URL')
 
 # Base URL of DBS-api application
 DBS_URL = os.environ.get('APP_DBS_URL')
@@ -19,9 +21,17 @@ DBS_URL = os.environ.get('APP_DBS_URL')
 # Bool to determine whether to enable or disable nanny applications showing
 # Default: False
 ENABLE_NANNIES = os.environ.get('ENABLE_NANNIES') in ['true', True, 'True']
+# default: False
+# if false then adult update applications cannot be accessed in ARC
+ENABLE_HM = os.environ.get('ENABLE_HM') in ['true', True, 'True']
+
+HM_GATEWAY_URL = os.environ.get("APP_HM_GATEWAY_URL")
 
 # Address of Childminder application
 CHILDMINDER_EMAIL_VALIDATION_URL = os.environ.get('CHILDMINDER_EMAIL_VALIDATION_URL')
+
+# Base URL of the the integration adapter
+INTEGRATION_ADAPTER_URL = os.environ.get('APP_INTEGRATION_ADAPTER')
 
 # Address of Nanny application
 NANNY_PUBLIC_URL = os.environ.get('NANNY_PUBLIC_URL')
@@ -170,7 +180,7 @@ REGEX = {
              "5})|(?:\d{4}\)?[\s-]?(?:\d{5}|\d{3}[\s-]?\d{3}))|(?:\d{3}\)?[\s-]?\d{3}[\s-]?\d{3,4})|(?:\d{2}\)?["
              "\s-]?\d{4}[\s-]?\d{4}))(?:[\s-]?(?:x|ext\.?|\#)\d{3,4})?$",
     "INTERNATIONAL_PHONE": "^(\+|[0-9])[0-9]{5,20}$",
-    "POSTCODE_UPPERCASE": "^[A-Z]{1,2}[0-9]{1,2}[A-Z]?[0-9][A-Z][A-Z]$",
+    "POSTCODE_UPPERCASE": "^[A-Z]{1,2}[0-9][A-Z0-9]?[0-9][ABD-HJLNP-UW-Z]{2}$",
     "LAST_NAME": "^[A-zÀ-ÿ- ']+$",
     "MIDDLE_NAME": "^[A-zÀ-ÿ- ']+$",
     "FIRST_NAME": "^[A-zÀ-ÿ- ']+$",
@@ -219,3 +229,16 @@ LOGGING = {
       },
     },
 }
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+    }
+}
+
+CM_APPLICATION_QUEUE_NAME = os.environ.get('SQS_QUEUE_PREFIX') + "_CM_APPLICATION_QUEUE"
+NA_APPLICATION_QUEUE_NAME = os.environ.get('SQS_QUEUE_PREFIX') + "_NA_APPLICATION_QUEUE"
+ADDITIONAL_ADULT_APPLICATION_QUEUE_NAME = os.environ.get('SQS_QUEUE_PREFIX') + "_ADULT_UPDATE_APPLICATION_QUEUE"
+
+AWS_SQS_ACCESS_KEY_ID = os.environ.get('AWS_SQS_ACCESS_KEY_ID')
+AWS_SQS_SECRET_ACCESS_KEY = os.environ.get('AWS_SQS_SECRET_ACCESS_KEY')

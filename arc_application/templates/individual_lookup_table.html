@@ -1,0 +1,31 @@
+<table class="check-your-answers form-group">
+    <thead>
+    <tr>
+        <th colspan="3">
+            <div class="heading-medium">
+                Individual lookup
+            </div>
+        </th>
+    </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+                Individual ID
+            </td>
+            <td>
+                {% if individual_id == 0 %}Not known to Ofsted{% endif %}
+                {% if individual_id > 0 %}{{ individual_id }}{% endif %}
+            </td>
+            <td class="amend-search">
+
+                {% if individual_id >= 0 %}
+                    <a href="{% url 'personal_details_individual_lookup' %}?id={{ application_id }}&referrer={{ referrer }}&adult_id={{ adult_id }}">Amend search</a>
+                {% endif %}
+            </td>
+        </tr>
+    </tbody>
+</table>
+{% if individual_id == None %}
+    <a href="{% url 'personal_details_individual_lookup' %}?id={{ application_id }}&referrer={{ referrer }}&adult_id={{ adult_id }}" class="button button-secondary">Search for individual</a>
+{% endif %}

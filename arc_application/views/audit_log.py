@@ -10,8 +10,8 @@ from django.shortcuts import HttpResponseRedirect
 
 from timeline_logger.models import TimelineLog
 
-from arc_application.services.db_gateways import NannyGatewayActions
-from arc_application.models import Application
+from ..services.db_gateways import NannyGatewayActions
+from ..models import Application
 from .base import has_group
 
 
@@ -95,7 +95,7 @@ class MockTimelineLog:
     MockTimelineLog is an adapter class for the template and the Nanny Gateway's returned dicts.
     """
     def __init__(self, **kwargs):
-        self.timestamp = datetime.strptime(kwargs.pop('timestamp'), '%Y-%m-%dT%H:%M:%S.%fZ')
+        self.timestamp = datetime.strptime(kwargs.pop('timestamp')[0:-6], '%Y-%m-%dT%H:%M:%S.%f')
         for key, value in kwargs.items():
             setattr(self, key, value)
 

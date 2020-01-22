@@ -1,7 +1,7 @@
 import abc
 import json
 
-from arc_application.models import Arc
+from ..models import Arc
 from .db_gateways import NannyGatewayActions
 
 
@@ -284,7 +284,7 @@ def get_form_initial_values(form, application_id):
         if api_response.status_code == 200:
             arc_comments_record = api_response.record[0]
             initial[field_name + '_declare'] = True
-            initial[field_name + '_comments'] = arc_comments_record['comment']
+            initial[field_name + '_comments'] = arc_comments_record['comment'] if 'comment' in arc_comments_record else ''
         else:
             initial[field_name + '_declare'] = False
             initial[field_name + '_comments'] = ''

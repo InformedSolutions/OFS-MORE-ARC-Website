@@ -11,6 +11,8 @@ class Reference(models.Model):
     reference = models.IntegerField(blank=True)
     first_name = models.CharField(max_length=100, blank=True)
     last_name = models.CharField(max_length=100, blank=True)
+    title = models.CharField(max_length=100, blank=True)
+    other_title = models.CharField(max_length=100, blank=True, null=True)
     relationship = models.CharField(max_length=100, blank=True)
     years_known = models.IntegerField(blank=True)
     months_known = models.IntegerField(blank=True)
@@ -71,15 +73,28 @@ class Reference(models.Model):
         return 'First' if self.reference == 1 else 'Second'
 
     def get_summary_table(self):
-        return [
-            {"title": self.get_ref_as_string() + " reference", "id": self.pk},
-            {"name": "Name", "value": self.first_name + ' ' + self.last_name},
-            {"name": "How they know you", "value": self.relationship},
-            {"name": "Known for", "value": self.get_time_known()},
-            {"name": "Address", "value": self.get_address()},
-            {"name": "Phone number", "value": self.phone_number},
-            {"name": "Email address", "value": self.email}
-        ]
+        if self.title is not None:
+            return [
+                {"title": self.get_ref_as_string() + " reference", "id": self.pk},
+                {"name": "Title", "value": self.title},
+                {"name": "Name", "value": self.first_name + ' ' + self.last_name},
+                {"name": "How they know you", "value": self.relationship},
+                {"name": "Known for", "value": self.get_time_known()},
+                {"name": "Address", "value": self.get_address()},
+                {"name": "Phone number", "value": self.phone_number},
+                {"name": "Email address", "value": self.email}
+            ]
+        else:
+            return [
+                {"title": self.get_ref_as_string() + " reference", "id": self.pk},
+                {"name": "Name", "value": self.first_name + ' ' + self.last_name},
+                {"name": "How they know you", "value": self.relationship},
+                {"name": "Known for", "value": self.get_time_known()},
+                {"name": "Address", "value": self.get_address()},
+                {"name": "Phone number", "value": self.phone_number},
+                {"name": "Email address", "value": self.email}
+            ]
+
 
     class Meta:
         db_table = 'REFERENCE'
