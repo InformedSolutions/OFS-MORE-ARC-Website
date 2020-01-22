@@ -88,8 +88,6 @@ def arc_summary(request):
         variables = get_application_summary_variables(application_id_local)
         log.debug("Rendering arc summary page")
 
-<<<<<<< HEAD
-=======
         if application.working_in_other_childminder_home is False:
             ordered_models.append(AdultInHome)
             ordered_models.append(Application)
@@ -111,7 +109,6 @@ def arc_summary(request):
             'application_reference': application_reference,
             'publish_details': publish_details
         }
->>>>>>> master
         return render(request, 'childminder_templates/arc-summary.html', variables)
 
     elif request.method == 'POST':
