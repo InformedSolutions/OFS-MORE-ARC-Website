@@ -74,7 +74,6 @@ name_field_dict = {
     'known_pith': 'known_to_social_services_pith',
     'reasons_known_pith': 'reasons_known_to_social_services_pith',
 }
->>>>>>> master
 
 # Initiate logging
 log = logging.getLogger('')
