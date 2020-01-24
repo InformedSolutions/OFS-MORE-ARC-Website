@@ -195,6 +195,7 @@ def postcode_submission(request):
             line2 = request.POST['street_line2']
             town = request.POST['town']
             county = request.POST['county']
+            country = request.POST['country']
             postcode = request.POST['postcode']
 
         else:
@@ -224,7 +225,7 @@ def postcode_submission(request):
             street_line2=line2,
             town=town,
             county=county,
-            country='United Kingdom',
+            country=country,
             postcode=postcode,
             moved_in_date=moved_in_date,
             moved_out_date=moved_out_date,
@@ -285,7 +286,7 @@ def adults_previous_address_change(request):
             address_record['street_line2'] = current_form.cleaned_data['street_line2']
             address_record['town'] = current_form.cleaned_data['town']
             address_record['county'] = current_form.cleaned_data['county']
-            address_record['country'] = 'United Kingdom'
+            address_record['country'] = current_form.cleaned_data['country']
             address_record['postcode'] = current_form.cleaned_data['postcode']
 
             # Update previous address moved in/out dates

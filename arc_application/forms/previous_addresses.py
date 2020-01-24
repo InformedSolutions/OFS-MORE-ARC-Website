@@ -133,8 +133,10 @@ class PreviousAddressManualForm(GOVUKForm):
     ERROR_MESSAGE_TOWN_TOO_LONG = 'The name of the town or city must be under 50 characters long'
     ERROR_MESSAGE_COUNTY_INVALID = 'Spell out the name of the county using letters'
     ERROR_MESSAGE_COUNTY_TOO_LONG = 'The name of the county must be under 50 characters long'
-    ERROR_MESSAGE_POSTCODE_BLANK = 'Please enter your postcode'
-    ERROR_MESSAGE_POSTCODE_INVALID = 'Enter a real postcode'
+    ERROR_MESSAGE_COUNTRY_BLANK = 'Please enter the name of the country'
+    ERROR_MESSAGE_COUNTRY_INVALID = 'Spell out the name of the country using letters'
+    ERROR_MESSAGE_COUNTRY_TOO_LONG = 'The name of the country must be under 50 characters long'
+    ERROR_MESSAGE_POSTCODE_INVALID = 'Please enter a valid postcode that is less than eight characters'
 
     # Moved in/out date validation messages
     ERROR_MESSAGE_DATE_BLANK = 'Enter the full date, including the day, month and year'
@@ -178,10 +180,15 @@ class PreviousAddressManualForm(GOVUKForm):
         required=False
     )
 
-    postcode = forms.CharField(
-        label='Postcode',
+    country = forms.CharField(
+        label='Country',
         required=True,
-        error_messages={'required': ERROR_MESSAGE_POSTCODE_BLANK}
+        error_messages={'required': ERROR_MESSAGE_COUNTRY_BLANK}
+    )
+
+    postcode = forms.CharField(
+        label='Postcode (optional',
+        required=False,
     )
 
     moved_in_date = form_fields.CustomSplitDateField(
@@ -301,3 +308,28 @@ class PreviousAddressManualForm(GOVUKForm):
             if len(county) > 50:
                 raise forms.ValidationError(self.ERROR_MESSAGE_COUNTY_TOO_LONG)
         return county
+
+    def clean_country(self):
+        """
+        Country validation
+        :return: string
+        """
+        country = self.cleaned_data['country']
+        if re.match(settings.REGEX['COUNTRY'], country) is None:
+            raise forms.ValidationError(self.ERROR_MESSAGE_COUNTRY_INVALID)
+        if len(country) > 50:
+            raise forms.ValidationError(self.ERROR_MESSAGE_COUNTRY_TOO_LONG)
+        return country
+
+    def clean_postcode(self):
+        """
+        Postcode validation
+        :return: string
+        """
+        postcode = self.cleaned_data['postcode']
+        if postcode != '':
+            postcode_no_space = postcode.replace(" ", "")
+            postcode_uppercase = postcode_no_space.upper()
+            if re.match(settings.REGEX['POSTCODE_MANUAL'], postcode_uppercase) is None:
+                raise forms.ValidationError(self.ERROR_MESSAGE_POSTCODE_INVALID)
+        return postcode
