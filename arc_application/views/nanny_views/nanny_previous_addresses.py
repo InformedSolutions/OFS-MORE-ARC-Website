@@ -31,6 +31,7 @@ class _NannyPreviousAddressViewBase(FormView):
             'street_line2': rec['street_line2'],
             'town': rec['town'],
             'county': rec['county'],
+            'country': rec['country'],
             'postcode': rec['postcode'],
             'moved_in_date': datetime.datetime.strptime(rec['moved_in_date'], '%Y-%m-%d').date(),
             'moved_out_date': datetime.datetime.strptime(rec['moved_out_date'], '%Y-%m-%d').date(),
@@ -44,6 +45,7 @@ class _NannyPreviousAddressViewBase(FormView):
         rec['street_line2'] = data['street_line2']
         rec['town'] = data['town']
         rec['county'] = data['county']
+        rec['country'] = data['country']
         rec['postcode'] = data['postcode']
         rec['moved_in_date'] = data['moved_in_date'].strftime('%Y-%m-%d')
         rec['moved_out_date'] = data['moved_out_date'].strftime('%Y-%m-%d')
@@ -308,7 +310,7 @@ class NannyAddPreviousAddressManualView(_NannyPreviousAddressViewBase):
     def get_initial(self):
         initial = super().get_initial()
 
-        for p in ('street_line1', 'street_line2', 'town', 'county', 'postcode'):
+        for p in ('street_line1', 'street_line2', 'town', 'county', 'country' 'postcode'):
             val = self.request.GET.get(p, None)
             if val:
                 initial[p] = val
@@ -326,6 +328,13 @@ class NannyAddPreviousAddressManualView(_NannyPreviousAddressViewBase):
             initial['moved_out_date'] = datetime.date(move_out_year, move_out_month, move_out_day)
 
         return initial
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        application_id = self.request.GET['id']
+        dbs_check = NannyGatewayActions().read('dbs-check', params={'application_id': application_id}).record
+        kwargs['lived_abroad'] =  dbs_check['lived_abroad']
+        return kwargs
 
     def get_context_data(self, **kwargs):
         application_id = self.request.GET['id']
@@ -377,7 +386,7 @@ class NannyAddPreviousAddressManualView(_NannyPreviousAddressViewBase):
         person_type = self.request.GET['type']
         params = {'id': application_id, 'person_id': person_id, 'type': person_type}
 
-        for p in ('street_line1', 'street_line2', 'town', 'county', 'postcode',
+        for p in ('street_line1', 'street_line2', 'town', 'county', 'country', 'postcode',
                   'moved_in_date_0', 'moved_in_date_1', 'moved_in_date_2',
                   'moved_out_date_0', 'moved_out_date_1', 'moved_out_date_2'):
             params[p] = self.request.POST[p]

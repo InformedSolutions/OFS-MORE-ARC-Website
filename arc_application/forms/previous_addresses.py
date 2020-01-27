@@ -136,7 +136,8 @@ class PreviousAddressManualForm(GOVUKForm):
     ERROR_MESSAGE_COUNTRY_BLANK = 'Please enter the name of the country'
     ERROR_MESSAGE_COUNTRY_INVALID = 'Spell out the name of the country using letters'
     ERROR_MESSAGE_COUNTRY_TOO_LONG = 'The name of the country must be under 50 characters long'
-    ERROR_MESSAGE_POSTCODE_INVALID = 'Please enter a valid postcode that is less than eight characters'
+    ERROR_MESSAGE_POSTCODE_BLANK = 'Please enter their postcode'
+    ERROR_MESSAGE_POSTCODE_INVALID = 'Please enter a valid postcode'
 
     # Moved in/out date validation messages
     ERROR_MESSAGE_DATE_BLANK = 'Enter the full date, including the day, month and year'
@@ -187,8 +188,9 @@ class PreviousAddressManualForm(GOVUKForm):
     )
 
     postcode = forms.CharField(
-        label='Postcode (optional',
-        required=False,
+        label='Postcode',
+        required=True,
+        error_messages={'required': ERROR_MESSAGE_POSTCODE_BLANK}
     )
 
     moved_in_date = form_fields.CustomSplitDateField(
@@ -243,6 +245,7 @@ class PreviousAddressManualForm(GOVUKForm):
         Setup initial data for the manual form
         """
         record = kwargs.pop('record', None)
+        lived_abroad = kwargs.pop('lived_abroad', None)
         super().__init__(*args, **kwargs)
 
         if record:
@@ -250,9 +253,21 @@ class PreviousAddressManualForm(GOVUKForm):
             self.fields['street_line2'].initial = record.street_line2
             self.fields['town'].initial = record.town
             self.fields['county'].initial = record.county
+            self.fields['country'].initial = record.country
             self.fields['postcode'].initial = record.postcode
             self.fields['moved_in_date'].initial = record.moved_in_date
             self.fields['moved_out_date'].initial = record.moved_out_date
+
+        if not lived_abroad:
+            self.base_fields['country'].required = False
+            self.base_fields['postcode'].required = True
+            self.base_fields['country'].label = 'Country (optional)'
+            self.base_fields['postcode'].label = 'Postcode'
+        if lived_abroad:
+            self.base_fields['postcode'].required = False
+            self.base_fields['country'].required = True
+            self.base_fields['country'].label = 'Country'
+            self.base_fields['postcode'].label = 'Postcode (optional)'
 
     def clean(self):
         super().clean()
@@ -315,10 +330,11 @@ class PreviousAddressManualForm(GOVUKForm):
         :return: string
         """
         country = self.cleaned_data['country']
-        if re.match(settings.REGEX['COUNTRY'], country) is None:
-            raise forms.ValidationError(self.ERROR_MESSAGE_COUNTRY_INVALID)
-        if len(country) > 50:
-            raise forms.ValidationError(self.ERROR_MESSAGE_COUNTRY_TOO_LONG)
+        if country != '':
+            if re.match(settings.REGEX['COUNTRY'], country) is None:
+                raise forms.ValidationError(self.ERROR_MESSAGE_COUNTRY_INVALID)
+            if len(country) > 50:
+                raise forms.ValidationError(self.ERROR_MESSAGE_COUNTRY_TOO_LONG)
         return country
 
     def clean_postcode(self):
@@ -330,6 +346,10 @@ class PreviousAddressManualForm(GOVUKForm):
         if postcode != '':
             postcode_no_space = postcode.replace(" ", "")
             postcode_uppercase = postcode_no_space.upper()
-            if re.match(settings.REGEX['POSTCODE_MANUAL'], postcode_uppercase) is None:
-                raise forms.ValidationError(self.ERROR_MESSAGE_POSTCODE_INVALID)
+            if not self.base_fields['postcode'].required:
+                if re.match(settings.REGEX['POSTCODE_MANUAL'], postcode_uppercase) is None:
+                    raise forms.ValidationError(self.ERROR_MESSAGE_POSTCODE_INVALID)
+            else:
+                if re.match(settings.REGEX['POSTCODE_UPPERCASE'], postcode_uppercase) is None:
+                    raise forms.ValidationError(self.ERROR_MESSAGE_POSTCODE_INVALID)
         return postcode

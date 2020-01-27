@@ -10,7 +10,7 @@ from ...address_helper import AddressHelper
 from ...decorators import group_required, user_assigned_application
 from ...forms.previous_addresses import PreviousAddressEntryForm, PreviousAddressSelectForm, \
     PreviousAddressManualForm
-from ...models import PreviousAddress, ApplicantPersonalDetails
+from ...models import PreviousAddress, ApplicantPersonalDetails, CriminalRecordCheck
 from ...review_util import build_url
 
 # Initiate logging
@@ -152,19 +152,20 @@ def postcode_manual(request, remove=False, swap_to_manual=False, address=None):
     """
     context = get_context(request)
     context['state'] = 'manual'
+    lived_abroad = CriminalRecordCheck.objects.get(application_id=context['id']).lived_abroad
 
     if request.method == 'GET' or remove is True or swap_to_manual is True:
         if not swap_to_manual:
-            context['form'] = PreviousAddressManualForm()
+            context['form'] = PreviousAddressManualForm(lived_abroad=lived_abroad)
         else:
             # If you've come from the address selection page, then populate the form with the entered data
-            context['form'] = PreviousAddressManualForm(initial=address)
+            context['form'] = PreviousAddressManualForm(initial=address, lived_abroad=lived_abroad)
 
         log.debug("Render previous address - manual entry page")
         return render(request, 'childminder_templates/previous-address-manual.html', context)
 
     elif request.method == 'POST':
-        current_form = PreviousAddressManualForm(request.POST)
+        current_form = PreviousAddressManualForm(request.POST, lived_abroad=lived_abroad)
         context['postcode'] = request.POST['postcode']
         context['form'] = current_form
 
@@ -181,12 +182,16 @@ def postcode_submission(request):
     :param request: Standard Httprequest object
     :return:
     """
+    context = get_context(request)
+    lived_abroad = CriminalRecordCheck.objects.get(application_id=context['id']).lived_abroad
+
     if request.method == 'POST':
         if request.POST['state'] == 'manual':
             line1 = request.POST['street_line1']
             line2 = request.POST['street_line2']
             town = request.POST['town']
             county = request.POST['county']
+            country = request.POST['country']
             postcode = request.POST['postcode']
 
         else:
@@ -217,7 +222,7 @@ def postcode_submission(request):
             street_line2=line2,
             town=town,
             county=county,
-            country='United Kingdom',
+            country=country if lived_abroad else 'United Kingdom',
             postcode=postcode
         )
 
@@ -246,6 +251,7 @@ def personal_details_previous_address_change(request):
     context = get_context(request)
     request_data = getattr(request, request.method)
     remove_address_pk = get_remove_address_pk(request_data)
+    lived_abroad = CriminalRecordCheck.objects.get(application_id=context['id']).lived_abroad
 
     if remove_address_pk is not None:
         remove_previous_address(previous_name_id=remove_address_pk)
@@ -254,7 +260,7 @@ def personal_details_previous_address_change(request):
 
     if request.method == 'GET':
         record = get_previous_address(pk=request.GET['address_id'])
-        context['form'] = PreviousAddressManualForm(record=record)
+        context['form'] = PreviousAddressManualForm(record=record, lived_abroad=lived_abroad)
         log.debug("Render change previous address page")
         return render(request, 'childminder_templates/previous-address-change.html', context)
 
@@ -262,7 +268,7 @@ def personal_details_previous_address_change(request):
         address_id = context['address_id']
         address_record = get_previous_address(address_id)
 
-        current_form = PreviousAddressManualForm(request.POST)
+        current_form = PreviousAddressManualForm(request.POST, lived_abroad=lived_abroad)
         context['form'] = current_form
 
         if current_form.is_valid():

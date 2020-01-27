@@ -160,19 +160,19 @@ def postcode_manual(request, remove=False, swap_to_manual=False, address=None):
     """
     context = get_context(request)
     context['state'] = 'manual'
+    lived_abroad = HMGatewayActions().read('adult', params={'adult_id': context['id']}).record['lived_abroad']
 
     if request.method == 'GET' or remove is True or swap_to_manual is True:
         if not swap_to_manual:
-            context['form'] = PreviousAddressManualForm()
+            context['form'] = PreviousAddressManualForm(lived_abroad=lived_abroad)
         else:
             # If you've come from the address selection page, then populate the form with the entered data
-            context['form'] = PreviousAddressManualForm(initial=address)
-
+            context['form'] = PreviousAddressManualForm(initial=address, lived_abroad=lived_abroad)
         log.debug("Rendering other people previous addresses - manual entry page")
         return render(request, 'adult_update_templates/previous-address-manual.html', context)
 
     elif request.method == 'POST':
-        current_form = PreviousAddressManualForm(request.POST)
+        current_form = PreviousAddressManualForm(request.POST, lived_abroad=lived_abroad)
         context['postcode'] = request.POST['postcode']
         context['form'] = current_form
 
@@ -189,6 +189,9 @@ def postcode_submission(request):
     :param request: Standard Httprequest object
     :return:
     """
+    context = get_context(request)
+    lived_abroad = HMGatewayActions().read('adult', params={'adult_id': context['id']}).record['lived_abroad']
+
     if request.method == 'POST':
         if request.POST['state'] == 'manual':
             line1 = request.POST['street_line1']
@@ -225,7 +228,7 @@ def postcode_submission(request):
             street_line2=line2,
             town=town,
             county=county,
-            country=country,
+            country=country if lived_abroad else 'United Kingdom',
             postcode=postcode,
             moved_in_date=moved_in_date,
             moved_out_date=moved_out_date,
@@ -258,6 +261,7 @@ def adults_previous_address_change(request):
     context = get_context(request)
     request_data = getattr(request, request.method)
     remove_address_pk = get_remove_address_pk(request_data)
+    lived_abroad = HMGatewayActions().read('adult', params={'adult_id': context['id']}).record['lived_abroad']
 
     if remove_address_pk is not None:
         remove_previous_address(remove_address_pk)
@@ -268,7 +272,7 @@ def adults_previous_address_change(request):
         record = get_previous_address(pk=request.GET['address_id'])
         record['moved_in_date'] = datetime.strptime(record['moved_in_date'], '%Y-%m-%d')
         record['moved_out_date'] = datetime.strptime(record['moved_out_date'], '%Y-%m-%d')
-        context['form'] = PreviousAddressManualForm(initial=record)
+        context['form'] = PreviousAddressManualForm(initial=record, lived_abroad=lived_abroad)
         log.debug("Rendering other people previous address - change address page")
         return render(request, 'adult_update_templates/previous-address-change.html', context)
 
@@ -276,7 +280,7 @@ def adults_previous_address_change(request):
         address_id = context['address_id']
         address_record = get_previous_address(address_id)
 
-        current_form = PreviousAddressManualForm(request.POST)
+        current_form = PreviousAddressManualForm(request.POST, lived_abroad=lived_abroad)
         context['form'] = current_form
 
         if current_form.is_valid():
