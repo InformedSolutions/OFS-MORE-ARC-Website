@@ -398,6 +398,7 @@ class StubHMGatewayActions:
             'street_line2': '',
             'town': 'Middle Earth',
             'county': '',
+            'country': 'United Kingdom',
             'postcode': 'WA14 4PA',
         }
         self.home_address_read_response = self.make_response(record=self.home_address_record)
@@ -736,7 +737,8 @@ def create_childminder_application(user_id=None):
         criminal_record_id='da2265c2-2d65-4214-bfef-abcfe59b75aa',
         application_id=application,
         dbs_certificate_number='123456654321',
-        cautions_convictions=True
+        cautions_convictions=True,
+        lived_abroad=False
     )
 
     adult = AdultInHome.objects.create(

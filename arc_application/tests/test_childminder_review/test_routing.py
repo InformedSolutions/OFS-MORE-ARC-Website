@@ -843,6 +843,7 @@ class ApplicantPreviousAddressesFunctionalTests(TestCase):
                 'form-0-street_line2': 'Manchester Road',
                 'form-0-town': 'Altrincham',
                 'form-0-county': 'Greater Manchester',
+                'form-0-country': 'United Kingdom',
                 'form-0-postcode': 'WA14 4PA',
                 'form-0-moved_in_date_0': '10',  # Day
                 'form-0-moved_in_date_1': '03',  # Month
@@ -860,6 +861,7 @@ class ApplicantPreviousAddressesFunctionalTests(TestCase):
                 'form-1-street_line2': 'Manchester Road',
                 'form-1-town': 'Altrincham',
                 'form-1-county': 'Greater Manchester',
+                'form-1-country': 'United Kingdom',
                 'form-1-postcode': 'WA14 4PA',
                 'form-1-moved_in_date_0': '15',  # Day
                 'form-1-moved_in_date_1': '08',  # Month

@@ -717,7 +717,10 @@ class PersonalDetailsPreviousAddressManualPostCodeFormValidationTests(TestCase):
     ERROR_MESSAGE_TOWN_TOO_LONG = 'The name of the town or city must be under 50 characters long'
     ERROR_MESSAGE_COUNTY_INVALID = 'Please spell out the name of the county using letters'
     ERROR_MESSAGE_COUNTY_TOO_LONG = 'The name of the county must be under 50 characters long'
-    ERROR_MESSAGE_POSTCODE_BLANK = 'Please enter your postcode'
+    ERROR_MESSAGE_COUNTRY_BLANK = 'Please enter the name of the country'
+    ERROR_MESSAGE_COUNTRY_INVALID = 'Spell out the name of the country using letters'
+    ERROR_MESSAGE_COUNTRY_TOO_LONG = 'The name of the country must be under 50 characters long'
+    ERROR_MESSAGE_POSTCODE_BLANK = 'Please enter their postcode'
     ERROR_MESSAGE_POSTCODE_INVALID = 'Please enter a valid postcode'
 
     # Moved in/out date validation messages
@@ -742,6 +745,7 @@ class PersonalDetailsPreviousAddressManualPostCodeFormValidationTests(TestCase):
         'street_line2': '',
         'town': 'Preston',
         'county': 'Lancashire',
+        'country': 'United Kingdom',
         'postcode': 'PR2 3SQ'
     }
 

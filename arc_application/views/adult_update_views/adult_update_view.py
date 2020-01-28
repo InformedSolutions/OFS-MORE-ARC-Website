@@ -83,7 +83,8 @@ def new_adults_summary(request):
             adult_address_record = adult_address_response.record
             adult_address_string = ' '.join([adult_address_record['street_line1'], adult_address_record['street_line2'],
                                           adult_address_record['town'],
-                                          adult_address_record['county'], adult_address_record['postcode']])
+                                          adult_address_record['county'], adult_address_record['country'],
+                                              adult_address_record['postcode']])
         else:
             adult_address_string = ''
 
