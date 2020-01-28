@@ -210,6 +210,7 @@ class NannyPersonalDetailsSummary(NannyARCFormView):
                         'street_line2': prev_addr['street_line2'],
                         'town': prev_addr['town'],
                         'county': prev_addr['county'],
+                        'country': prev_addr['country'] if not '' else '',
                         'postcode': prev_addr['postcode'],
                     },
                     'change_link': addr_change_view,

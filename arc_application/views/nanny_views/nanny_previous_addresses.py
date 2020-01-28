@@ -113,6 +113,13 @@ class NannyChangePreviousAddressView(_NannyPreviousAddressViewBase):
         log.debug("Handling submissions for nanny previous address - address view - delete address")
         return super().post(request, *args, **kwargs)
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        application_id = self.request.GET['id']
+        dbs_check = NannyGatewayActions().read('dbs-check', params={'application_id': application_id}).record
+        kwargs['lived_abroad'] = dbs_check['lived_abroad']
+        return kwargs
+
     def get_initial(self):
         initial = super().get_initial()
         address_id = self.request.GET['previous_address_id']
@@ -333,7 +340,7 @@ class NannyAddPreviousAddressManualView(_NannyPreviousAddressViewBase):
         kwargs = super().get_form_kwargs()
         application_id = self.request.GET['id']
         dbs_check = NannyGatewayActions().read('dbs-check', params={'application_id': application_id}).record
-        kwargs['lived_abroad'] =  dbs_check['lived_abroad']
+        kwargs['lived_abroad'] = dbs_check['lived_abroad']
         return kwargs
 
     def get_context_data(self, **kwargs):
@@ -355,8 +362,11 @@ class NannyAddPreviousAddressManualView(_NannyPreviousAddressViewBase):
         person_id = self.request.GET['person_id']
         person_type = self.request.GET['type']
 
+        dbs_check = NannyGatewayActions().read('dbs-check', params={'application_id': person_id}).record
+        lived_abroad = dbs_check['lived_abroad']
+        if not lived_abroad:
+            form.cleaned_data['country'] = 'United Kingdom'
         self._add_address(person_id, person_type, form.cleaned_data)
-
         return super().form_valid(form)
 
     def get_success_url(self):
