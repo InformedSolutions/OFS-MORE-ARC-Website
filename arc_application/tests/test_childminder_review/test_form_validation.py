@@ -737,6 +737,7 @@ class PersonalDetailsPreviousAddressManualPostCodeFormValidationTests(TestCase):
         'street_line2': '',
         'town': 'Preston',
         'county': 'Lancashire',
+        'country': 'United Kingdom',
         'postcode': 'PR2 3SQ'
     }
 
