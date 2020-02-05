@@ -2,11 +2,12 @@ import json
 
 from django.conf import settings
 from django.core import serializers
+from django.contrib.auth.models import User
 
 from ..models import Application, ApplicantName, ApplicantHomeAddress, ApplicantPersonalDetails, AdultInHome, \
     ChildInHome, PreviousName, PreviousAddress, HealthCheckHospital, HealthCheckSerious, HealthCheckCurrent, \
     CriminalRecordCheck, ChildcareType, ChildcareTraining, FirstAidTraining, HealthDeclarationBooklet, \
-    PreviousRegistrationDetails, Reference, UserDetails, OtherPersonPreviousRegistrationDetails, AdultInHomeAddress
+    PreviousRegistrationDetails, Reference, UserDetails, OtherPersonPreviousRegistrationDetails, AdultInHomeAddress, Arc
 
 from .document_generator import DocumentGenerator
 
@@ -127,6 +128,10 @@ class ApplicationExporter:
         user_details = UserDetails.objects.filter(application_id=application_id)
         export['user_details'] = serializers.serialize('json', list(user_details))
 
+        arc_user_id = Arc.objects.get(application_id=application_id).user_id
+        arc_username = User.objects.get(id=arc_user_id).username
+        export['arc_username'] = json.dumps([{'fields': {'arc_username': arc_username}}])
+
         # Create document exports
 
         documents = {'EYC': DocumentGenerator.get_full_childminder_application_summary(application_id)}
@@ -235,6 +240,10 @@ class ApplicationExporter:
 
         export['documents'] = json.dumps(documents)
 
+        arc_user_id = Arc.objects.get(application_id=application_id).user_id
+        arc_username = User.objects.get(id=arc_user_id).username
+        export['arc_username'] = json.dumps([{'fields': {'arc_username': arc_username}}])
+
         na_application_sqs_handler.send_message(export)
 
     @staticmethod
@@ -324,5 +333,8 @@ class ApplicationExporter:
         export['adults_in_home'] = json.dumps([adult_details_export])
         export['additional_adult_details'] = json.dumps([additional_adult_details_export])
         export['documents'] = json.dumps({'EY2': [adult_document_object]})
+        arc_user_id = Arc.objects.get(application_id=adult_id).user_id
+        arc_username = User.objects.get(id=arc_user_id).username
+        export['arc_username'] = json.dumps([{'fields': {'arc_username': arc_username}}])
 
         adult_update_application_sqs_handler.send_message(export)
