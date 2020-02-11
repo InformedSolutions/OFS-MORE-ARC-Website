@@ -202,7 +202,7 @@ def log_application_release(request, arc_object, app, status):
             extra_data={'user_type': 'reviewer', 'action': log_action[status], 'entity': 'application'}
         )
 
-    elif settings.ENABLE_NANNIES and isinstance(app, dict):  # If handling a Nanny application.
+    elif settings.ENABLE_NANNIES and isinstance(app, dict) and arc_object.app_type == 'Nanny':  # If handling a Nanny application.
         extra_data = {
                 'user_type': 'reviewer',
                 'action': log_action[status],
@@ -219,6 +219,24 @@ def log_application_release(request, arc_object, app, status):
         }
 
         NannyGatewayActions().create('timeline-log', params=log_data)
+
+    elif settings.ENABLE_HM and isinstance(app, dict) and arc_object.app_type == 'Adult update':  # If handling a New Association application.
+        extra_data = {
+                'user_type': 'reviewer',
+                'action': log_action[status],
+                'entity': 'new association'
+            }
+
+        id = app['application_id'] if app.get('application_id') else app['adult_id']
+
+        log_data = {
+            'object_id': id,
+            'template': 'timeline_logger/application_action.txt',
+            'user': request.user.username,
+            'extra_data': json.dumps(extra_data)
+        }
+
+        HMGatewayActions().create('timeline-log', params=log_data)
 
 
 ######################################################################################################

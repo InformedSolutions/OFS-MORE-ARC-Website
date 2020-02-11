@@ -1,0 +1,92 @@
+{% extends 'govuk_template.html' %}
+{% block page_title %}Adult summary{% endblock %}
+{% load static %}
+{% load govuk_template_base %}
+{% block inner_content %}
+{% include 'back-button.html' %}
+
+<div>
+    <div class="column-two-thirds">
+        <div class="grid-row">
+            <h1 class="heading-large">Adult summary</h1>
+            <h2 class="heading-medium">
+                Application number: {{ ey_number }}
+            </h2>
+        </div>
+    </div>
+
+    <div class="column-third information-panel">
+        <b class="bold">Application history:</b>
+        <br/>
+        <a href="/arc/auditlog/?id={{application_id}}&app_type=New%20Association">Audit log</a>
+    </div>
+</div>
+{% with "4" as col %}
+
+{% for section in json %}
+<div class="two-thirds">
+<table class="check-your-answers form-group">
+    {% for row in section %}
+        {% if row.title %}
+            {% if not forloop.first %}
+            </tbody>
+            {% endif %}
+            <thead>
+                <tr>
+                    <th colspan="{{ col }}">
+                        <div class="heading-medium">
+                            {{row.title}}
+                        </div>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+        {% else %}
+            {% if row.comment.split %}
+                <tr class="error-row">
+                    <td colspan="3" class="error-container notice">
+                        <i class="icon icon-important">
+                           <span class="visually-hidden">Warning</span>
+                         </i>
+                         <strong class="bold-small">
+                            {{ row.comment }}
+                          </strong>
+                    </td>
+                </tr>
+                <tr class="error-row">
+                    <td class="error-field-label">
+            {% else %}
+                <tr>
+                    <td>
+            {% endif %}
+
+                        {{row.name}}
+                     </td>
+
+                     <td>
+                        {{row.value}}
+                     </td>
+
+                    {% if row.pd_link %}
+                        <td class="change-answer">
+                            <a href="{% url row.pd_link %}?id={{ application_id }}">Change</a>
+                        </td>
+                    {% else %}
+                    <td></td>
+                    {% endif %}
+                </tr>
+            {% if forloop.last %}
+            </tbody>
+            {% endif %}
+        {% endif %}
+    {% endfor %}
+</table>
+</div>
+{% endfor %}
+{% endwith %}
+
+<form method="get" action="/arc/search">
+    <input type="submit" class="button" value="Continue"/>
+</form>
+
+{% endblock %}

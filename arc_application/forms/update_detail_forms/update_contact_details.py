@@ -62,9 +62,9 @@ class UpdatePhoneNumber(GOVUKForm):
         mobile_number = self.cleaned_data['mobile_number']
         no_space_mobile_number = mobile_number.replace(' ', '')
         if re.match(settings.REGEX['MOBILE'], no_space_mobile_number) is None:
-            raise forms.ValidationError('TBC')
+            raise forms.ValidationError('Enter a valid phone number')
         if len(no_space_mobile_number) > 11:
-            raise forms.ValidationError('TBC')
+            raise forms.ValidationError('Enter a valid phone number')
         return mobile_number
 
 
