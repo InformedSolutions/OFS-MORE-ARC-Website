@@ -60,9 +60,11 @@ class ApplicationsSummaryView(View):
             pending_apps_response.record) if pending_apps_response.status_code == 200 else 0
 
         # get all applications
-        total_applications = len(NannyGatewayActions().list("application", params={}).record)
+        total_apps_response = NannyGatewayActions().list("application", params={})
+        total_applications = len(total_apps_response.record) if total_apps_response.status_code == 200 else 0
         # take any applications in draft off the number of total applications
-        nanny_data['non_draft_applications'] = total_applications - nanny_data["draft_applications"]
+        nanny_data['non_draft_applications'] = total_applications - nanny_data[
+            "draft_applications"]
 
         return nanny_data
 
@@ -98,7 +100,8 @@ class ApplicationsSummaryView(View):
             pending_apps_response.record) if pending_apps_response.status_code == 200 else 0
 
         # get all applications
-        total_applications = len(HMGatewayActions().list("adult", params={}).record)
+        total_apps_response = HMGatewayActions().list("adult", params={})
+        total_applications = len(total_apps_response.record) if total_apps_response.status_code == 200 else 0
         # take any applications in draft off the number of total applications
         household_member_data['non_draft_applications'] = total_applications - household_member_data["draft_applications"]
 
