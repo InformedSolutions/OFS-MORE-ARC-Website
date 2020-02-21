@@ -150,7 +150,7 @@ class ChildminderApplicationHandler(GenericApplicationHandler):
             arc_user.save()
 
         TimelineLog.objects.create(
-            content_object=self.arc_user,
+            content_object=application_record,
             user=self.arc_user,
             template='timeline_logger/application_action.txt',
             extra_data={'user_type': 'reviewer', 'action': 'assigned to', 'entity': 'application'}
