@@ -45,7 +45,7 @@ class _NannyPreviousAddressViewBase(FormView):
         rec['street_line2'] = data['street_line2']
         rec['town'] = data['town']
         rec['county'] = data['county']
-        rec['country'] = data['country']
+        rec['country'] = data['country'] if data.get('country') else ''
         rec['postcode'] = data['postcode']
         rec['moved_in_date'] = data['moved_in_date'].strftime('%Y-%m-%d')
         rec['moved_out_date'] = data['moved_out_date'].strftime('%Y-%m-%d')
