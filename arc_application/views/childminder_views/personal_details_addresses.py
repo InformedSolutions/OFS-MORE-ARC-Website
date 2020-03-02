@@ -201,7 +201,8 @@ def postcode_submission(request):
             line2 = selected_address['line2']
             town = selected_address['townOrCity']
             county = ''
-            country = 'United Kingdom'
+            if lived_abroad:
+                country = selected_address['country'] if selected_address.get('country') else 'United Kingdom'
             postcode = selected_address['postcode']
 
         moved_in_day = int(request.POST['moved_in_date_0'])
