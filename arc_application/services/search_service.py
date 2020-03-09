@@ -3,7 +3,7 @@ import re
 
 from django.db.models import Q
 from django.conf import settings
-from ..models import Application, ApplicantName
+from ..models import Application, ApplicantName, ApplicantHomeAddress
 from ..services.db_gateways import NannyGatewayActions, HMGatewayActions
 
 
@@ -218,7 +218,8 @@ class SearchService:
         )
 
         address_query.add(home_address_query, Q.OR)
-        address_query.add(childcare_address_query, Q.AND)
+        if ApplicantHomeAddress.objects.filter(childcare_address=True, postcode=care_location_postcode).count() > 0:
+            address_query.add(childcare_address_query, Q.AND)
 
         query.add(address_query, Q.AND)
 
