@@ -125,7 +125,7 @@ class ApplicationsSummaryView(View):
             adult_apps = 0
             nanny_apps = 0
             for item in cm_applications:
-                if item.date_submitted == initial_date:
+                if item.date_submitted.date() == initial_date.date():
                     cm_apps += 1
             if adult_response.status_code == 200:
                 adults_submitted = adult_response.record
@@ -139,11 +139,12 @@ class ApplicationsSummaryView(View):
             if nanny_response.status_code == 200:
                 nannies_submitted = nanny_response.record
                 for nanny in nannies_submitted:
-                    if nanny['date_submitted'] == initial_date and not None:
+                    if datetime.strptime(
+                            nanny['date_submitted'], "%Y-%m-%dT%H:%M:%S.%fZ").date() == initial_date.date() and not None:
                         nanny_apps += 1
 
-            apps_in_queue['Date'] = initial_date.isoformat()
-            apps_in_queue['Date'] = {'Childminder': cm_apps, 'Adult': adult_apps, 'Nanny': nanny_apps}
+            #apps_in_queue[initial_date.date()] = initial_date.isoformat()
+            apps_in_queue[initial_date.date()] = {'Childminder': cm_apps, 'Adult': adult_apps, 'Nanny': nanny_apps}
             initial_date += delta
 
         return (apps_in_queue)
