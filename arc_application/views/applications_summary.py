@@ -4,8 +4,9 @@ from django.views import View
 from django.utils.decorators import method_decorator
 from django.shortcuts import render
 from ..models import Application, Arc
+from .audit_log import MockTimelineLog
 from timeline_logger.models import TimelineLog
-from .. services.db_gateways import NannyGatewayActions, HMGatewayActions
+from ..services.db_gateways import NannyGatewayActions, HMGatewayActions
 from django.conf import settings
 from datetime import datetime, timedelta
 
@@ -151,37 +152,52 @@ class ApplicationsSummaryView(View):
 
         return (apps_in_queue)
 
-    def application_history(self, app_id):
+    def application_history(self, app_id, app_type):
         """
         function to list the history of an application extracted from the timeline log
         :return Dictionary grouped by application id, then by date, then by historical item"""
+        dictionary = {}
+        if app_type == 'Childminder':
+            timelinelog = TimelineLog.objects.filter(object_id=str(app_id[0])).order_by('-timestamp')
+        elif app_type == 'Adult':
+            api_response = HMGatewayActions().list('timeline-log', params={'object_id': app_id})
+            if api_response.status_code == 200:
+                timelinelog = [MockTimelineLog(**log) for log in api_response.record]
+            else:
+                return dictionary
+        elif app_type == 'Nanny':
+            api_response = NannyGatewayActions().list('timeline-log', params={'object_id': app_id})
+            if api_response.status_code == 200:
+                timelinelog = [MockTimelineLog(**log) for log in api_response.record]
+            else:
+                return dictionary
+        else:
+            return dictionary
 
-        application_history = {}
-        application_history['Childminder'] = {}
-        application_history['Adult'] = {}
-        application_history['Nanny'] = {}
-        cm_timelinelog = TimelineLog.objects.filter(object_id=str(app_id[0])).order_by('-timestamp')
-        nanny_timelinelog_response = NannyGatewayActions().list('timeline-log', params={'object_id': str(app_id[0])})
-        adult_timelinelog_response = HMGatewayActions().list('timeline-log', params={'object_id': str(app_id[0])})
-        for item in cm_timelinelog:
-            self.extract_timeline_history(item, application_history['Childminder'])
-        #for item in adult_timelinelog:
-        return application_history
 
-    def extract_timeline_history(self, entry, dictionary):
+        return self.extract_timeline_history(timelinelog)
 
-        if entry.extra_data['action'] == 'created by':
-            dictionary[entry.timestamp] = {'created by': entry.extra_data['user_type']}
-        elif entry.extra_data['action'] == 'submitted by':
-            dictionary[entry.timestamp] = {'submitted by': entry.extra_data['user_type']}
-        elif entry.extra_data['action'] == 'assigned to':
-            dictionary[entry.timestamp] = {'assigned_to': str(entry.user)}
-        elif entry.extra_data['action'] == 'returned by':
-            dictionary[entry.timestamp] = {'returned_by': str(entry.user)}
-        elif entry.extra_data['action'] == 'resubmitted by':
-            dictionary[entry.timestamp] = {'resubmitted_by': entry.extra_data['user_type']}
-        elif entry.extra_data['action'] == 'accepted by':
-            dictionary[entry.timestamp] = {'accepted_by': entry.extra_data['user_type']}
+    def extract_timeline_history(self, timelinelog):
+        """
+
+        :param entry: one row from the timeline logger model
+        :param dictionary: dictionary key that related to the application in question
+        :return: A dictionary containing the relevant history of an application
+        """
+        dictionary = {}
+        for entry in timelinelog:
+            if entry.extra_data['action'] == 'created by':
+                dictionary[entry.timestamp] = {'created by': entry.extra_data['user_type']}
+            elif entry.extra_data['action'] == 'submitted by':
+                dictionary[entry.timestamp] = {'submitted by': entry.extra_data['user_type']}
+            elif entry.extra_data['action'] == 'assigned to':
+                dictionary[entry.timestamp] = {'assigned_to': str(entry.user)}
+            elif entry.extra_data['action'] == 'returned by':
+                dictionary[entry.timestamp] = {'returned_by': str(entry.user)}
+            elif entry.extra_data['action'] == 'resubmitted by':
+                dictionary[entry.timestamp] = {'resubmitted_by': entry.extra_data['user_type']}
+            elif entry.extra_data['action'] == 'accepted by':
+                dictionary[entry.timestamp] = {'accepted_by': entry.extra_data['user_type']}
         return dictionary
     # def extract_applications_returned(self):
     #     """
@@ -209,16 +225,29 @@ class ApplicationsSummaryView(View):
         nanny_data = self.get_nanny_data()
         context['enable_hm'] = False
         hm_data = {}
+        application_history = {}
         apps_in_queue = self.extract_applications_in_queue()
         cm_application_id_list = Application.objects.all().values_list('application_id')
-        adult_application_response = HMGatewayActions().list('adult', params={})
-        if adult_application_response == 200:
-            adult_application_records = adult_application_response.record
-        nanny_applications_response = NannyGatewayActions().list('application')
-        if nanny_applications_response == 200:
-            nanny_applications_records = nanny_applications_response.record
+        application_history['Childminder'] = {}
         for app_id in cm_application_id_list:
-            application_history = self.application_history(app_id)
+            application_history['Childminder'][str(app_id[0])] = self.application_history(app_id, 'Childminder')
+
+        adult_application_response = HMGatewayActions().list('adult', params={})
+        if adult_application_response.status_code == 200:
+            adult_application_records = adult_application_response.record
+            application_history['Adult'] = {}
+            for record in adult_application_records:
+                app_id = record['adult_id']
+                application_history['Adult'][app_id] = self.application_history(app_id, 'Adult')
+
+        nanny_applications_response = NannyGatewayActions().list('application', params={})
+        if nanny_applications_response.status_code == 200:
+            nanny_applications_records = nanny_applications_response.record
+            application_history['Nanny'] = {}
+            for record in nanny_applications_records:
+                application_history['Nanny'][record['application_id']] = self.application_history(
+                    record['application_id'], 'Nanny')
+
         if settings.ENABLE_HM:
             hm_data = self.get_hm_data()
             context['enable_hm'] = True
