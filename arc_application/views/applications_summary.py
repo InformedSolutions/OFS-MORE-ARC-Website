@@ -179,9 +179,7 @@ class ApplicationsSummaryView(View):
 
     def extract_timeline_history(self, timelinelog):
         """
-
-        :param entry: one row from the timeline logger model
-        :param dictionary: dictionary key that related to the application in question
+        :param timelinelog: A queryset containing all the events that have occurred to an application.
         :return: A dictionary containing the relevant history of an application
         """
         dictionary = {}
@@ -199,34 +197,10 @@ class ApplicationsSummaryView(View):
             elif entry.extra_data['action'] == 'accepted by':
                 dictionary[entry.timestamp] = {'accepted_by': entry.extra_data['user_type']}
         return dictionary
-    # def extract_applications_returned(self):
-    #     """
-    #     function to list the history of returned and rereturned applications on a given day.
-    #     :return: Dictionary of adults, childminder and nannies returned or rereturned by day
-    #     """
-    #     now = datetime.now()
-    #     initial_date = datetime(2020, 2, 19, 0, 0)
-    #     delta = timedelta(days=1)
-    #     cm_application_id_list = Application.objects.all().values_list('application_id')
-    #     cm_returned = {}
-    #     for app_id in cm_application_id_list:
-    #         app_id
-    #         cm_timelinelog = TimelineLog.objects.filter(object_id=str(app_id[0])).order_by('-timestamp')
-    #         cm_timelinelog
 
-              
-    def get_context_data(self):
-        """
-        method to get all row data for the applications summary
-        :return: context data
-        """
-        context = {}
-        childminder_data = self.get_childminder_data()
-        nanny_data = self.get_nanny_data()
-        context['enable_hm'] = False
-        hm_data = {}
+    def get_application_histories(self):
+
         application_history = {}
-        apps_in_queue = self.extract_applications_in_queue()
         cm_application_id_list = Application.objects.all().values_list('application_id')
         application_history['Childminder'] = {}
         for app_id in cm_application_id_list:
@@ -248,6 +222,50 @@ class ApplicationsSummaryView(View):
                 application_history['Nanny'][record['application_id']] = self.application_history(
                     record['application_id'], 'Nanny')
 
+        return application_history
+
+    def get_applications_rereturned(self):
+        """
+        function to list the history of returned and rereturned applications on a given day.
+        :return: Dictionary of adults, childminder and nannies returned or rereturned by day
+        """
+
+        returned_apps = {}
+        now = datetime.now()
+        initial_date = datetime(2020, 2, 19, 0, 0)
+        delta = timedelta(days=1)
+        applications_history = self.get_application_histories()
+        app_types = ['Childminder', 'Adult', 'Nanny']
+        while initial_date <= now:
+            cm_apps = 0
+            adult_apps = 0
+            nanny_apps = 0
+            for app_type in app_types:
+                for app_id in applications_history[app_type]:
+                    for date in applications_history[app_type][app_id]:
+                        if date.date() == initial_date.date() and applications_history[app_type][app_id][date] == 'returned_by':
+                            cm_apps +=1
+
+            returned_apps[initial_date.date()] = {'Childminder': cm_apps, 'Adult': adult_apps, 'Nanny': nanny_apps,
+                                                  'Total': (cm_apps + adult_apps + nanny_apps)
+                                                  }
+            initial_date += delta
+
+        return (returned_apps)
+
+    def get_context_data(self):
+        """
+        method to get all row data for the applications summary
+        :return: context data
+        """
+        context = {}
+        childminder_data = self.get_childminder_data()
+        nanny_data = self.get_nanny_data()
+        context['enable_hm'] = False
+        hm_data = {}
+        apps_in_queue = self.extract_applications_in_queue()
+        applications_history = self.get_application_histories()
+        returned_apps = self.get_applications_rereturned()
         if settings.ENABLE_HM:
             hm_data = self.get_hm_data()
             context['enable_hm'] = True
