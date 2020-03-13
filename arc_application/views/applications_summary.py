@@ -243,9 +243,13 @@ class ApplicationsSummaryView(View):
             for app_type in app_types:
                 for app_id in applications_history[app_type]:
                     for date in applications_history[app_type][app_id]:
-                        if date.date() == initial_date.date() and applications_history[app_type][app_id][date] == 'returned_by':
-                            cm_apps +=1
-
+                        if date.date() == initial_date.date() and 'returned_by' in applications_history[app_type][app_id][date]:
+                            if app_type == 'Childminder':
+                                cm_apps += 1
+                            elif app_type == 'Adult':
+                                adult_apps += 1
+                            elif app_type == 'Nanny':
+                                nanny_apps += 1
             returned_apps[initial_date.date()] = {'Childminder': cm_apps, 'Adult': adult_apps, 'Nanny': nanny_apps,
                                                   'Total': (cm_apps + adult_apps + nanny_apps)
                                                   }
