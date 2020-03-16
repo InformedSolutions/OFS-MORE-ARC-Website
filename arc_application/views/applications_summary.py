@@ -9,6 +9,7 @@ from timeline_logger.models import TimelineLog
 from ..services.db_gateways import NannyGatewayActions, HMGatewayActions
 from django.conf import settings
 from datetime import datetime, timedelta
+from collections import OrderedDict
 
 # Initiate logging
 log = logging.getLogger()
@@ -196,6 +197,7 @@ class ApplicationsSummaryView(View):
                 dictionary[entry.timestamp] = {'resubmitted_by': entry.extra_data['user_type']}
             elif entry.extra_data['action'] == 'accepted by':
                 dictionary[entry.timestamp] = {'accepted_by': entry.extra_data['user_type']}
+        dictionary = OrderedDict(sorted(dictionary.items(), key=lambda t: t[0]))
         return dictionary
 
     def get_application_histories(self):
@@ -251,13 +253,65 @@ class ApplicationsSummaryView(View):
                                 adult_apps += 1
                             elif app_type == 'Nanny':
                                 nanny_apps += 1
-                    returned_apps[initial_date.date()] = {'Childminder': cm_apps, 'Adult': adult_apps,
-                                                          'Nanny': nanny_apps,
-                                                          'Total': (cm_apps + adult_apps + nanny_apps)
-                                                          }
+            returned_apps[initial_date.date()] = {'Childminder': cm_apps, 'Adult': adult_apps,
+                                                  'Nanny': nanny_apps,
+                                                  'Total': (cm_apps + adult_apps + nanny_apps)
+                                                  }
             initial_date += delta
 
         return (returned_apps)
+
+    def get_applications_processed(self):
+        """
+        Get how many applications that are submitted on a day end up being returned
+        :return: Dictionary of values representing number of returned applications by date and by application type
+        """
+
+        processed_apps = {}
+        now = datetime.now()
+        initial_date = datetime(2020, 2, 19, 0, 0)
+        delta = timedelta(days=1)
+        applications_history = self.get_application_histories()
+        app_types = ['Childminder', 'Adult', 'Nanny']
+        while initial_date <= now:
+            cm_apps = 0
+            cm_apps_returned = 0
+            adult_apps = 0
+            adult_apps_returned = 0
+            nanny_apps = 0
+            nanny_apps_returned = 0
+            for app_type in app_types:
+                for app_id in applications_history[app_type]:
+                    date_list = list(applications_history[app_type][app_id].keys())
+                    for i in range(0, len(date_list)):
+                        for entry in applications_history[app_type][app_id][date_list[i]]:
+                            if date_list[i].date() == initial_date.date() and entry == 'submitted by' or entry == 'resubmitted by':
+                                reduced_dict = {your_key: applications_history[app_type][app_id][your_key] for your_key in date_list[i:]}
+                                if app_type == 'Childminder':
+                                    cm_apps += 1
+                                    cm_apps_returned += self.check_if_returned(reduced_dict)
+                                elif app_type == 'Adult':
+                                    adult_apps += 1
+                                    adult_apps_returned += self.check_if_returned(reduced_dict)
+                                elif app_type == 'Nanny':
+                                    nanny_apps += 1
+                                    nanny_apps += self.check_if_returned(reduced_dict)
+
+            processed_apps[initial_date.date()] = {'Childminder': cm_apps,
+                                                   'Adult': adult_apps,
+                                                    'Nanny': nanny_apps,
+                                                    'Total': (cm_apps + adult_apps + nanny_apps)
+                                                  }
+
+            initial_date += delta
+        return processed_apps
+
+    def check_if_returned(self, dict):
+        for date in dict:
+            for entry in dict[date]:
+                if entry == 'returned_by':
+                    return 1
+        return 0
 
     def get_context_data(self):
         """
@@ -270,8 +324,8 @@ class ApplicationsSummaryView(View):
         context['enable_hm'] = False
         hm_data = {}
         apps_in_queue = self.extract_applications_in_queue()
-        applications_history = self.get_application_histories()
         returned_apps = self.get_applications_rereturned()
+        processed_apps = self.get_applications_processed()
         if settings.ENABLE_HM:
             hm_data = self.get_hm_data()
             context['enable_hm'] = True
