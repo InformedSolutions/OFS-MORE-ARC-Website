@@ -34,30 +34,34 @@
         </tr>
         {% endfor %}
 </table>
+    <br>
 
     <p>
         <img src="{% static 'download-button.png' %}" class="icon-ofsted-download icon-align" alt="Download"/>
-        <a href="https://www.gov.uk/government/uploads/system/uploads/attachment_data/file/381218/Health_20declaration_20booklet.pdf"
-           target="_blank" alt="Download 'Health Declaration Booklet'">Applications In Queue</a>
-        (PDF, 174KB, 16 pages)
+        <a href="{% url 'applications-in-queue' %}"
+           target="_blank" alt="Download Applications in Queue">Applications In Queue</a>
+        (CSV)
     </p>
+    <br>
     <p>
         <img src="{% static 'download-button.png' %}" class="icon-ofsted-download icon-align" alt="Download"/>
-        <a href="https://www.gov.uk/government/uploads/system/uploads/attachment_data/file/381218/Health_20declaration_20booklet.pdf"
-           target="_blank" alt="Download 'Health Declaration Booklet'">Applications returned</a>
-        (PDF, 174KB, 16 pages)
+        <a href="{% url 'applications-returned' %}"
+           target="_blank" alt="Download Applications Returned">Applications returned</a>
+        (CSV)
     </p>
+    <br>
     <p>
         <img src="{% static 'download-button.png' %}" class="icon-ofsted-download icon-align" alt="Download"/>
-        <a href="https://www.gov.uk/government/uploads/system/uploads/attachment_data/file/381218/Health_20declaration_20booklet.pdf"
-           target="_blank" alt="Download 'Health Declaration Booklet'">Applications processed</a>
-        (PDF, 174KB, 16 pages)
+        <a href="{% url 'applications-processed' %}"
+           target="_blank" alt="Download Applications Processed">Applications processed</a>
+        (CSV)
     </p>
+    <br>
     <p>
         <img src="{% static 'download-button.png' %}" class="icon-ofsted-download icon-align" alt="Download"/>
-        <a href="https://www.gov.uk/government/uploads/system/uploads/attachment_data/file/381218/Health_20declaration_20booklet.pdf"
-           target="_blank" alt="Download 'Health Declaration Booklet'">Applications assigned to</a>
-        (PDF, 174KB, 16 pages)
+        <a href="{% url 'applications-assigned' %}"
+           target="_blank" alt="Download Applications Assigned to">Applications assigned to</a>
+        (CSV)
     </p>
 </div>
 
