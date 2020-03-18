@@ -116,7 +116,7 @@ class ApplicationsInQueueView(DailyReportingBaseView):
     def get_applications_in_queue(self):
         """
         function to list any application that has a status of SUBMITTED, grouped by date and by application.
-        :return: dictionary of adult, childminder and nanny totals submitted but unassigned each day
+        :return: list of adult, childminder and nanny totals submitted but unassigned each day
         """
         now = datetime.now()
         initial_date = datetime(2020, 2, 19, 0, 0)
@@ -182,8 +182,8 @@ class ApplicationsReturnedView(DailyReportingBaseView):
 
     def get_applications_returned(self):
         """
-        function to list the history of returned and rereturned applications on a given day.
-        :return: Dictionary of adults, childminder and nannies returned or rereturned by day
+        function to list the history of returned and returned applications on a given day.
+        :return: List of adults, childminder and nannies returned or returned by day
         """
 
         returned_apps = []
@@ -254,7 +254,7 @@ class ApplicationsProcessedView(DailyReportingBaseView):
     def get_applications_processed(self):
         """
         Get how many applications that are submitted on a day end up being returned
-        :return: Dictionary of values representing number of returned applications by date and by application type
+        :return: List of values representing number of returned applications by date and by application type
         """
 
         processed_apps = []
@@ -376,7 +376,7 @@ class ApplicationsAssignedView(DailyReportingBaseView):
     def get_applications_assigned(self):
         """
         Snapshot in time showing all applications and who they have been most recently assigned to
-        :return: Dictionary with every URN and who the application has most recently been assigned to
+        :return: List with every URN and who the application has most recently been assigned to
         """
 
         assigned_apps = []
