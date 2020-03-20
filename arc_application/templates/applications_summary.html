@@ -34,6 +34,35 @@
         </tr>
         {% endfor %}
 </table>
+    <br>
+
+    <p>
+        <img src="{% static 'download-button.png' %}" class="icon-ofsted-download icon-align" alt="Download"/>
+        <a href="{% url 'applications-in-queue' %}"
+           target="_blank" alt="Download Applications in Queue">Applications In Queue</a>
+        (CSV)
+    </p>
+    <br>
+    <p>
+        <img src="{% static 'download-button.png' %}" class="icon-ofsted-download icon-align" alt="Download"/>
+        <a href="{% url 'applications-returned' %}"
+           target="_blank" alt="Download Applications Returned">Applications returned</a>
+        (CSV)
+    </p>
+    <br>
+    <p>
+        <img src="{% static 'download-button.png' %}" class="icon-ofsted-download icon-align" alt="Download"/>
+        <a href="{% url 'applications-processed' %}"
+           target="_blank" alt="Download Applications Processed">Applications processed</a>
+        (CSV)
+    </p>
+    <br>
+    <p>
+        <img src="{% static 'download-button.png' %}" class="icon-ofsted-download icon-align" alt="Download"/>
+        <a href="{% url 'applications-assigned' %}"
+           target="_blank" alt="Download Applications Assigned to">Applications assigned to</a>
+        (CSV)
+    </p>
 </div>
 
 {% endblock %}
