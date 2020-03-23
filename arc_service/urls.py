@@ -36,7 +36,7 @@ from arc_application.views.contact_centre.nanny_change_details import NannyUpdat
 from arc_application.views.search_router import SearchRouter
 from arc_application.views import upload_capita_dbs
 from arc_application.views.applications_summary import ApplicationsSummaryView
-from arc_application.views.daily_reporting import ApplicationsInQueueView, ApplicationsReturnedView, ApplicationsProcessedView, ApplicationsAssignedView
+from arc_application.views.daily_reporting import ApplicationsInQueueView, ApplicationsReturnedView, ApplicationsProcessedView, ApplicationsAssignedView, ApplicationsAuditLogView
 from arc_application.views.adult_update_views.adult_update_view import new_adults_summary
 from arc_application.views.adult_update_views.adult_previous_registration import adult_previous_registration_view
 from arc_application.views.adult_update_views.adult_update_summary import arc_summary as adult_arc_summary
@@ -77,6 +77,7 @@ urlpatterns = [
     url(r'^applications-returned/$', ApplicationsReturnedView.as_view(), name='applications-returned'),
     url(r'^applications-processed/$', ApplicationsProcessedView.as_view(), name='applications-processed'),
     url(r'^applications-assigned/$', ApplicationsAssignedView.as_view(), name='applications-assigned'),
+    url(r'^applications-audit-log/$', ApplicationsAuditLogView.as_view(), name='applications-audit-log'),
 
     # childminder application review
     url(r'^review/$', task_list, name='task_list'),

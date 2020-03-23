@@ -62,7 +62,7 @@ class DailyReportingBaseView(View):
             elif entry.extra_data['action'] == 'resubmitted by':
                 dictionary[entry.timestamp] = {'resubmitted_by': entry.extra_data['user_type']}
             elif entry.extra_data['action'] == 'accepted by':
-                dictionary[entry.timestamp] = {'accepted_by': entry.extra_data['user_type']}
+                dictionary[entry.timestamp] = {'accepted_by': str(entry.user)}
         dictionary = OrderedDict(sorted(dictionary.items(), key=lambda t: t[0]))
         return dictionary
 
@@ -380,7 +380,6 @@ class ApplicationsAssignedView(DailyReportingBaseView):
         """
 
         assigned_apps = []
-        row = 0
         applications_history = self.get_application_histories()
         app_types = ['Childminder', 'Adult', 'Nanny']
         for app_type in app_types:
@@ -408,7 +407,6 @@ class ApplicationsAssignedView(DailyReportingBaseView):
                             'application_reference']
                         assigned_apps.append({'URN': urn, 'Caseworker': arc_user, 'Type': 'Nanny', 'Action': 'Assigned',
                                               'Date/Time': date})
-                row += 1
 
         return assigned_apps
 
@@ -418,3 +416,79 @@ class ApplicationsAssignedView(DailyReportingBaseView):
                 if entry == 'assigned_to':
                     return (True, dict[date][entry], date)
         return False, None, None
+
+@method_decorator(login_required, name='get')
+class ApplicationsAuditLogView(DailyReportingBaseView):
+
+    def get(self, request):
+        context = self.get_applications_audit_log()
+        now = datetime.now()
+        now = datetime.strftime(now, "%Y%m%dT%H%M")
+        csv_columns = ['URN', 'Caseworker', 'Type',
+                       'Action', 'Date/Time']
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename="Applications_Audit_Log_{}.csv"'.format(now)
+        log.debug("Download applications assigned (Reporting)")
+
+        writer = csv.DictWriter(response, fieldnames=csv_columns)
+        writer.writeheader()
+        for data in context:
+            writer.writerow(data)
+
+        return response
+
+    def get_applications_audit_log(self):
+        """
+        Snapshot in time showing the history of each application
+        :return: List with every URN and who the application has most recently been assigned to
+        """
+
+        audit_log = []
+        applications_history = self.get_application_histories()
+        app_types = ['Childminder', 'Adult', 'Nanny']
+        for app_type in app_types:
+            for app_id in applications_history[app_type]:
+                for date in applications_history[app_type][app_id]:
+                    formatted_date = datetime.strftime(date, "%d/%m/%y %H:%M")
+                    if 'created by' in applications_history[app_type][app_id][date]:
+                        action = 'Created'
+                        arc_user = ''
+                    elif 'assigned_to' in applications_history[app_type][app_id][date]:
+                        username = applications_history[app_type][app_id][date]['assigned_to']
+                        first_name = User.objects.get(username=username).first_name
+                        last_name = User.objects.get(username=username).last_name
+                        if first_name is not '':
+                            arc_user = '{0} {1}'.format(first_name, last_name if not '' else "")
+                        else:
+                            arc_user = username
+                        action = 'Assigned'
+                    elif 'accepted_by' in applications_history[app_type][app_id][date]:
+                        username = applications_history[app_type][app_id][date]['accepted_by']
+                        first_name = User.objects.get(username=username).first_name
+                        last_name = User.objects.get(username=username).last_name
+                        if first_name is not '':
+                            arc_user = '{0} {1}'.format(first_name, last_name if not '' else "")
+                        else:
+                            arc_user = username
+                        action = 'Processed to Cygnum'
+                    elif 'resubmitted_by' in applications_history[app_type][app_id][date]:
+                        arc_user = ''
+                        action = 'Resubmitted'
+                    elif 'returned_by' in applications_history[app_type][app_id][date]:
+                        arc_user = ''
+                        action = 'Returned'
+                    if app_type == 'Childminder':
+                        urn = Application.objects.get(application_id=app_id).application_reference
+                        audit_log.append({'URN': urn, 'Caseworker': arc_user, 'Type': 'CM', 'Action': action,
+                                                  'Date/Time': formatted_date})
+                    elif app_type == 'Adult':
+                        urn = HMGatewayActions().list('dpa-auth', params={'adult_id': app_id}).record[0]['URN']
+                        audit_log.append({'URN': urn, 'Caseworker': arc_user, 'Type': 'New Association',
+                                              'Action': action, 'Date/Time': formatted_date})
+                    elif app_type == 'Nanny':
+                        urn = NannyGatewayActions().list('application', params={'application_id': app_id}).record[0][
+                            'application_reference']
+                        audit_log.append({'URN': urn, 'Caseworker': arc_user, 'Type': 'Nanny', 'Action': action,
+                                              'Date/Time': formatted_date})
+
+        return audit_log
