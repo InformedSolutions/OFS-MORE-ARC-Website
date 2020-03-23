@@ -63,6 +63,8 @@ class DailyReportingBaseView(View):
                 dictionary[entry.timestamp] = {'resubmitted_by': entry.extra_data['user_type']}
             elif entry.extra_data['action'] == 'accepted by':
                 dictionary[entry.timestamp] = {'accepted_by': str(entry.user)}
+            elif entry.extra_data['action'] == 'released by':
+                dictionary[entry.timestamp] = {'released_by': str(entry.user)}
         dictionary = OrderedDict(sorted(dictionary.items(), key=lambda t: t[0]))
         return dictionary
 
@@ -125,6 +127,9 @@ class ApplicationsInQueueView(DailyReportingBaseView):
         nanny_response = NannyGatewayActions().list('application', params={"application_status": 'SUBMITTED'})
         cm_applications = list(Application.objects.filter(application_status='SUBMITTED', ))
         apps_in_queue = []
+        cm_app_total = 0
+        adult_app_total = 0
+        nanny_app_total = 0
         while initial_date <= now:
             cm_apps = 0
             adult_apps = 0
@@ -132,15 +137,18 @@ class ApplicationsInQueueView(DailyReportingBaseView):
             for item in cm_applications:
                 if item.date_submitted.date() == initial_date.date():
                     cm_apps += 1
+                    cm_app_total += 1
             if adult_response.status_code == 200:
                 adults_submitted = adult_response.record
                 for adult in adults_submitted:
                     if adult['date_resubmitted'] is None and datetime.strptime(
                             adult['date_submitted'], "%Y-%m-%dT%H:%M:%S.%fZ").date() == initial_date.date():
                         adult_apps += 1
+                        adult_app_total += 1
                     elif adult['date_resubmitted'] is not None and datetime.strptime(
                             adult['date_resubmitted'], "%Y-%m-%dT%H:%M:%S.%fZ").date() == initial_date.date():
                         adult_apps += 1
+                        adult_app_total += 1
             if nanny_response.status_code == 200:
                 nannies_submitted = nanny_response.record
                 for nanny in nannies_submitted:
@@ -148,6 +156,7 @@ class ApplicationsInQueueView(DailyReportingBaseView):
                             nanny['date_submitted'],
                             "%Y-%m-%dT%H:%M:%S.%fZ").date() == initial_date.date() and not None:
                         nanny_apps += 1
+                        nanny_app_total += 1
 
             apps_in_queue.append({'Date': datetime.strftime(initial_date, "%d %B %Y"),
                                   'Childminder in Queue': cm_apps,
@@ -156,6 +165,12 @@ class ApplicationsInQueueView(DailyReportingBaseView):
                                   'All Services in Queue': (cm_apps + adult_apps + nanny_apps)
                                  })
             initial_date += delta
+
+        apps_in_queue.append(
+            {'Date': 'Total', 'Childminder in Queue': cm_app_total, 'New Association in Queue': adult_app_total,
+             'Nanny in Queue': nanny_app_total,
+             'All Services in Queue': (cm_app_total + adult_app_total + nanny_app_total)
+             })
 
         return (apps_in_queue)
 
@@ -453,6 +468,9 @@ class ApplicationsAuditLogView(DailyReportingBaseView):
                     if 'created by' in applications_history[app_type][app_id][date]:
                         action = 'Created'
                         arc_user = ''
+                    elif 'submitted by' in applications_history[app_type][app_id][date]:
+                        action = 'Submitted'
+                        arc_user = ''
                     elif 'assigned_to' in applications_history[app_type][app_id][date]:
                         username = applications_history[app_type][app_id][date]['assigned_to']
                         first_name = User.objects.get(username=username).first_name
@@ -475,8 +493,25 @@ class ApplicationsAuditLogView(DailyReportingBaseView):
                         arc_user = ''
                         action = 'Resubmitted'
                     elif 'returned_by' in applications_history[app_type][app_id][date]:
-                        arc_user = ''
+                        username = applications_history[app_type][app_id][date]['returned_by']
+                        first_name = User.objects.get(username=username).first_name
+                        last_name = User.objects.get(username=username).last_name
+                        if first_name is not '':
+                            arc_user = '{0} {1}'.format(first_name, last_name if not '' else "")
+                        else:
+                            arc_user = username
+                        arc_user = username
                         action = 'Returned'
+                    elif 'released_by' in applications_history[app_type][app_id][date]:
+                        username = applications_history[app_type][app_id][date]['released_by']
+                        first_name = User.objects.get(username=username).first_name
+                        last_name = User.objects.get(username=username).last_name
+                        if first_name is not '':
+                            arc_user = '{0} {1}'.format(first_name, last_name if not '' else "")
+                        else:
+                            arc_user = username
+                        arc_user = username
+                        action = 'Released'
                     if app_type == 'Childminder':
                         urn = Application.objects.get(application_id=app_id).application_reference
                         audit_log.append({'URN': urn, 'Caseworker': arc_user, 'Type': 'CM', 'Action': action,
