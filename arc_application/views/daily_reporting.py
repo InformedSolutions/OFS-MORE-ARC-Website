@@ -427,7 +427,7 @@ class ApplicationsAuditLogView(DailyReportingBaseView):
         csv_columns = ['URN', 'Caseworker', 'Type',
                        'Action', 'Date/Time']
         response = HttpResponse(content_type='text/csv')
-        response['Content-Disposition'] = 'attachment; filename="Applications_Assigned_{}.csv"'.format(now)
+        response['Content-Disposition'] = 'attachment; filename="Applications_Audit_Log_{}.csv"'.format(now)
         log.debug("Download applications assigned (Reporting)")
 
         writer = csv.DictWriter(response, fieldnames=csv_columns)
@@ -451,33 +451,8 @@ class ApplicationsAuditLogView(DailyReportingBaseView):
                 for date in applications_history[app_type][app_id]:
                     formatted_date = datetime.strftime(date, "%d/%m/%y %H:%M")
                     if 'created by' in applications_history[app_type][app_id][date]:
-                        if app_type == 'Childminder':
-                            urn = Application.objects.get(application_id=app_id).application_reference
-                            audit_log.append({'URN': urn, 'Caseworker': '', 'Type': 'CM', 'Action': 'Created',
-                                                      'Date/Time': formatted_date})
-                        elif app_type == 'Adult':
-                            urn = HMGatewayActions().list('dpa-auth', params={'adult_id': app_id}).record[0]['URN']
-                            audit_log.append({'URN': urn, 'Caseworker': '', 'Type': 'New Association',
-                                                  'Action': 'Created', 'Date/Time': formatted_date})
-                        elif app_type == 'Nanny':
-                            urn = NannyGatewayActions().list('application', params={'application_id': app_id}).record[0][
-                                'application_reference']
-                            audit_log.append({'URN': urn, 'Caseworker': '', 'Type': 'Nanny', 'Action': 'Created',
-                                                  'Date/Time': formatted_date})
-                    elif 'submitted by' in applications_history[app_type][app_id][date]:
-                        if app_type == 'Childminder':
-                            urn = Application.objects.get(application_id=app_id).application_reference
-                            audit_log.append({'URN': urn, 'Caseworker': '', 'Type': 'CM', 'Action': 'Submitted',
-                                                      'Date/Time': formatted_date})
-                        elif app_type == 'Adult':
-                            urn = HMGatewayActions().list('dpa-auth', params={'adult_id': app_id}).record[0]['URN']
-                            audit_log.append({'URN': urn, 'Caseworker': '', 'Type': 'New Association',
-                                                  'Action': 'Submitted', 'Date/Time': formatted_date})
-                        elif app_type == 'Nanny':
-                            urn = NannyGatewayActions().list('application', params={'application_id': app_id}).record[0][
-                                'application_reference']
-                            audit_log.append({'URN': urn, 'Caseworker': '', 'Type': 'Nanny', 'Action': 'Submitted',
-                                                  'Date/Time': formatted_date})
+                        action = 'Created'
+                        arc_user = ''
                     elif 'assigned_to' in applications_history[app_type][app_id][date]:
                         username = applications_history[app_type][app_id][date]['assigned_to']
                         first_name = User.objects.get(username=username).first_name
@@ -486,19 +461,7 @@ class ApplicationsAuditLogView(DailyReportingBaseView):
                             arc_user = '{0} {1}'.format(first_name, last_name if not '' else "")
                         else:
                             arc_user = username
-                        if app_type == 'Childminder':
-                            urn = Application.objects.get(application_id=app_id).application_reference
-                            audit_log.append({'URN': urn, 'Caseworker': arc_user, 'Type': 'CM', 'Action': 'Assigned',
-                                                      'Date/Time': formatted_date})
-                        elif app_type == 'Adult':
-                            urn = HMGatewayActions().list('dpa-auth', params={'adult_id': app_id}).record[0]['URN']
-                            audit_log.append({'URN': urn, 'Caseworker': arc_user, 'Type': 'New Association',
-                                                  'Action': 'Assigned', 'Date/Time': formatted_date})
-                        elif app_type == 'Nanny':
-                            urn = NannyGatewayActions().list('application', params={'application_id': app_id}).record[0][
-                                'application_reference']
-                            audit_log.append({'URN': urn, 'Caseworker': arc_user, 'Type': 'Nanny', 'Action': 'Assigned',
-                                                  'Date/Time': formatted_date})
+                        action = 'Assigned'
                     elif 'accepted_by' in applications_history[app_type][app_id][date]:
                         username = applications_history[app_type][app_id][date]['accepted_by']
                         first_name = User.objects.get(username=username).first_name
@@ -507,46 +470,25 @@ class ApplicationsAuditLogView(DailyReportingBaseView):
                             arc_user = '{0} {1}'.format(first_name, last_name if not '' else "")
                         else:
                             arc_user = username
-                        if app_type == 'Childminder':
-                            urn = Application.objects.get(application_id=app_id).application_reference
-                            audit_log.append({'URN': urn, 'Caseworker': arc_user, 'Type': 'CM', 'Action': 'Processed to Cygnum',
-                                                      'Date/Time': formatted_date})
-                        elif app_type == 'Adult':
-                            urn = HMGatewayActions().list('dpa-auth', params={'adult_id': app_id}).record[0]['URN']
-                            audit_log.append({'URN': urn, 'Caseworker': arc_user, 'Type': 'New Association',
-                                                  'Action': 'Processed to Cygnum', 'Date/Time': formatted_date})
-                        elif app_type == 'Nanny':
-                            urn = NannyGatewayActions().list('application', params={'application_id': app_id}).record[0][
-                                'application_reference']
-                            audit_log.append({'URN': urn, 'Caseworker': arc_user, 'Type': 'Nanny', 'Action': 'Processed to Cygnum',
-                                                  'Date/Time': formatted_date})
+                        action = 'Processed to Cygnum'
                     elif 'resubmitted_by' in applications_history[app_type][app_id][date]:
-                        if app_type == 'Childminder':
-                            urn = Application.objects.get(application_id=app_id).application_reference
-                            audit_log.append({'URN': urn, 'Caseworker': '', 'Type': 'CM', 'Action': 'Resubmitted',
-                                                      'Date/Time': formatted_date})
-                        elif app_type == 'Adult':
-                            urn = HMGatewayActions().list('dpa-auth', params={'adult_id': app_id}).record[0]['URN']
-                            audit_log.append({'URN': urn, 'Caseworker': '', 'Type': 'New Association',
-                                                  'Action': 'Resubmitted', 'Date/Time': formatted_date})
-                        elif app_type == 'Nanny':
-                            urn = NannyGatewayActions().list('application', params={'application_id': app_id}).record[0][
-                                'application_reference']
-                            audit_log.append({'URN': urn, 'Caseworker': '', 'Type': 'Nanny', 'Action': 'Resubmitted',
-                                                  'Date/Time': formatted_date})
+                        arc_user = ''
+                        action = 'Resubmitted'
                     elif 'returned_by' in applications_history[app_type][app_id][date]:
-                        if app_type == 'Childminder':
-                            urn = Application.objects.get(application_id=app_id).application_reference
-                            audit_log.append({'URN': urn, 'Caseworker': '', 'Type': 'CM', 'Action': 'Returned',
-                                                      'Date/Time': formatted_date})
-                        elif app_type == 'Adult':
-                            urn = HMGatewayActions().list('dpa-auth', params={'adult_id': app_id}).record[0]['URN']
-                            audit_log.append({'URN': urn, 'Caseworker': '', 'Type': 'New Association',
-                                                  'Action': 'Returned', 'Date/Time': formatted_date})
-                        elif app_type == 'Nanny':
-                            urn = NannyGatewayActions().list('application', params={'application_id': app_id}).record[0][
-                                'application_reference']
-                            audit_log.append({'URN': urn, 'Caseworker': '', 'Type': 'Nanny', 'Action': 'Returned',
+                        arc_user = ''
+                        action = 'Returned'
+                    if app_type == 'Childminder':
+                        urn = Application.objects.get(application_id=app_id).application_reference
+                        audit_log.append({'URN': urn, 'Caseworker': arc_user, 'Type': 'CM', 'Action': action,
                                                   'Date/Time': formatted_date})
+                    elif app_type == 'Adult':
+                        urn = HMGatewayActions().list('dpa-auth', params={'adult_id': app_id}).record[0]['URN']
+                        audit_log.append({'URN': urn, 'Caseworker': arc_user, 'Type': 'New Association',
+                                              'Action': action, 'Date/Time': formatted_date})
+                    elif app_type == 'Nanny':
+                        urn = NannyGatewayActions().list('application', params={'application_id': app_id}).record[0][
+                            'application_reference']
+                        audit_log.append({'URN': urn, 'Caseworker': arc_user, 'Type': 'Nanny', 'Action': action,
+                                              'Date/Time': formatted_date})
 
         return audit_log
