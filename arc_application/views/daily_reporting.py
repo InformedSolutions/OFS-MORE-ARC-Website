@@ -63,6 +63,8 @@ class DailyReportingBaseView(View):
                 dictionary[entry.timestamp] = {'resubmitted_by': entry.extra_data['user_type']}
             elif entry.extra_data['action'] == 'accepted by':
                 dictionary[entry.timestamp] = {'accepted_by': str(entry.user)}
+            elif entry.extra_data['action'] == 'released by':
+                dictionary[entry.timestamp] = {'released_by': str(entry.user)}
         dictionary = OrderedDict(sorted(dictionary.items(), key=lambda t: t[0]))
         return dictionary
 
@@ -156,6 +158,15 @@ class ApplicationsInQueueView(DailyReportingBaseView):
                                   'All Services in Queue': (cm_apps + adult_apps + nanny_apps)
                                  })
             initial_date += delta
+
+        apps_in_queue.append(
+            {'Date': 'Total', 'Childminder in Queue': len(cm_applications),
+             'New Association in Queue': len(adult_response.record) if adult_response.status_code == 200 else 0,
+             'Nanny in Queue': len(nanny_response.record) if nanny_response.status_code == 200 else 0,
+             'All Services in Queue': (len(cm_applications) +
+                                       (len(adult_response.record) if adult_response.status_code == 200 else 0) +
+                                       (len(nanny_response.record) if nanny_response.status_code == 200 else 0))
+             })
 
         return (apps_in_queue)
 
@@ -453,6 +464,9 @@ class ApplicationsAuditLogView(DailyReportingBaseView):
                     if 'created by' in applications_history[app_type][app_id][date]:
                         action = 'Created'
                         arc_user = ''
+                    elif 'submitted by' in applications_history[app_type][app_id][date]:
+                        action = 'Submitted'
+                        arc_user = ''
                     elif 'assigned_to' in applications_history[app_type][app_id][date]:
                         username = applications_history[app_type][app_id][date]['assigned_to']
                         first_name = User.objects.get(username=username).first_name
@@ -475,8 +489,25 @@ class ApplicationsAuditLogView(DailyReportingBaseView):
                         arc_user = ''
                         action = 'Resubmitted'
                     elif 'returned_by' in applications_history[app_type][app_id][date]:
-                        arc_user = ''
+                        username = applications_history[app_type][app_id][date]['returned_by']
+                        first_name = User.objects.get(username=username).first_name
+                        last_name = User.objects.get(username=username).last_name
+                        if first_name is not '':
+                            arc_user = '{0} {1}'.format(first_name, last_name if not '' else "")
+                        else:
+                            arc_user = username
+                        arc_user = username
                         action = 'Returned'
+                    elif 'released_by' in applications_history[app_type][app_id][date]:
+                        username = applications_history[app_type][app_id][date]['released_by']
+                        first_name = User.objects.get(username=username).first_name
+                        last_name = User.objects.get(username=username).last_name
+                        if first_name is not '':
+                            arc_user = '{0} {1}'.format(first_name, last_name if not '' else "")
+                        else:
+                            arc_user = username
+                        arc_user = username
+                        action = 'Released'
                     if app_type == 'Childminder':
                         urn = Application.objects.get(application_id=app_id).application_reference
                         audit_log.append({'URN': urn, 'Caseworker': arc_user, 'Type': 'CM', 'Action': action,
