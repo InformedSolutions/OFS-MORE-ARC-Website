@@ -127,9 +127,6 @@ class ApplicationsInQueueView(DailyReportingBaseView):
         nanny_response = NannyGatewayActions().list('application', params={"application_status": 'SUBMITTED'})
         cm_applications = list(Application.objects.filter(application_status='SUBMITTED', ))
         apps_in_queue = []
-        cm_app_total = 0
-        adult_app_total = 0
-        nanny_app_total = 0
         while initial_date <= now:
             cm_apps = 0
             adult_apps = 0
@@ -137,18 +134,15 @@ class ApplicationsInQueueView(DailyReportingBaseView):
             for item in cm_applications:
                 if item.date_submitted.date() == initial_date.date():
                     cm_apps += 1
-                    cm_app_total += 1
             if adult_response.status_code == 200:
                 adults_submitted = adult_response.record
                 for adult in adults_submitted:
                     if adult['date_resubmitted'] is None and datetime.strptime(
                             adult['date_submitted'], "%Y-%m-%dT%H:%M:%S.%fZ").date() == initial_date.date():
                         adult_apps += 1
-                        adult_app_total += 1
                     elif adult['date_resubmitted'] is not None and datetime.strptime(
                             adult['date_resubmitted'], "%Y-%m-%dT%H:%M:%S.%fZ").date() == initial_date.date():
                         adult_apps += 1
-                        adult_app_total += 1
             if nanny_response.status_code == 200:
                 nannies_submitted = nanny_response.record
                 for nanny in nannies_submitted:
@@ -156,7 +150,6 @@ class ApplicationsInQueueView(DailyReportingBaseView):
                             nanny['date_submitted'],
                             "%Y-%m-%dT%H:%M:%S.%fZ").date() == initial_date.date() and not None:
                         nanny_apps += 1
-                        nanny_app_total += 1
 
             apps_in_queue.append({'Date': datetime.strftime(initial_date, "%d %B %Y"),
                                   'Childminder in Queue': cm_apps,
@@ -167,9 +160,12 @@ class ApplicationsInQueueView(DailyReportingBaseView):
             initial_date += delta
 
         apps_in_queue.append(
-            {'Date': 'Total', 'Childminder in Queue': cm_app_total, 'New Association in Queue': adult_app_total,
-             'Nanny in Queue': nanny_app_total,
-             'All Services in Queue': (cm_app_total + adult_app_total + nanny_app_total)
+            {'Date': 'Total', 'Childminder in Queue': len(cm_applications),
+             'New Association in Queue': len(adult_response.record) if adult_response.status_code == 200 else 0,
+             'Nanny in Queue': len(nanny_response.record) if nanny_response.status_code == 200 else 0,
+             'All Services in Queue': (len(cm_applications) +
+                                       (len(adult_response.record) if adult_response.status_code == 200 else 0) +
+                                       (len(nanny_response.record) if nanny_response.status_code == 200 else 0))
              })
 
         return (apps_in_queue)
