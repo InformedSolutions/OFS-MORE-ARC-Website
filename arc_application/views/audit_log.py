@@ -35,7 +35,6 @@ def audit_log_dispatcher(request):
 
 class ChildminderAuditlog(ListView):
     template_name = "auditlog_list.html"
-    paginate_by = settings.TIMELINE_PAGINATE_BY
 
     def get_queryset(self, **kwargs):
         app_id = self.request.GET.get('id')
