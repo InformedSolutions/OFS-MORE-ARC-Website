@@ -11,7 +11,7 @@ from ...address_helper import AddressHelper
 from ...decorators import group_required, user_assigned_application
 from ...forms.previous_addresses import PreviousAddressEntryForm, PreviousAddressSelectForm, \
     PreviousAddressManualForm
-from ...models import PreviousAddress
+from ...models import PreviousAddress, AdultInHome
 from ...review_util import build_url
 
 # Initiate logging
@@ -154,19 +154,20 @@ def postcode_manual(request, remove=False, swap_to_manual=False, address=None):
     """
     context = get_context(request)
     context['state'] = 'manual'
+    lived_abroad = AdultInHome.objects.get(application_id=context['id']).lived_abroad
 
     if request.method == 'GET' or remove is True or swap_to_manual is True:
         if not swap_to_manual:
-            context['form'] = PreviousAddressManualForm()
+            context['form'] = PreviousAddressManualForm(lived_abroad=lived_abroad)
         else:
             # If you've come from the address selection page, then populate the form with the entered data
-            context['form'] = PreviousAddressManualForm(initial=address)
+            context['form'] = PreviousAddressManualForm(initial=address, lived_abroad=lived_abroad)
 
         log.debug("Rendering other people previous addresses - manual entry page")
         return render(request, 'childminder_templates/previous-address-manual.html', context)
 
     elif request.method == 'POST':
-        current_form = PreviousAddressManualForm(request.POST)
+        current_form = PreviousAddressManualForm(request.POST, lived_abroad=lived_abroad)
         context['postcode'] = request.POST['postcode']
         context['form'] = current_form
 
@@ -183,12 +184,16 @@ def postcode_submission(request):
     :param request: Standard Httprequest object
     :return:
     """
+    context = get_context(request)
+    lived_abroad = AdultInHome.objects.get(application_id=context['id']).lived_abroad
+
     if request.method == 'POST':
         if request.POST['state'] == 'manual':
             line1 = request.POST['street_line1']
             line2 = request.POST['street_line2']
             town = request.POST['town']
             county = request.POST['county']
+            country = request.POST['country']
             postcode = request.POST['postcode']
 
         else:
@@ -198,6 +203,8 @@ def postcode_submission(request):
             line2 = selected_address['line2']
             town = selected_address['townOrCity']
             county = ''
+            if lived_abroad:
+                country = selected_address['country'] if selected_address.get('country') else 'United Kingdom'
             postcode = selected_address['postcode']
 
         moved_in_day = int(request.POST['moved_in_date_0'])
@@ -219,7 +226,7 @@ def postcode_submission(request):
             street_line2=line2,
             town=town,
             county=county,
-            country='United Kingdom',
+            country=country if lived_abroad else 'United Kingdom',
             postcode=postcode
         )
 
