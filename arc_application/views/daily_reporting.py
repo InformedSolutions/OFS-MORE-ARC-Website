@@ -396,6 +396,10 @@ class ApplicationsAssignedView(DailyReportingBaseView):
         for app_type in app_types:
             for app_id in applications_history[app_type]:
                 assigned, username, date = self.check_assigned(applications_history[app_type][app_id])
+                adult_response = HMGatewayActions().list('adult', params={"adult_id": app_id,
+                                                                        "adult_status": 'ARC_REVIEW'})
+                nanny_response = NannyGatewayActions().list('application', params={"application_id": app_id,
+                                                                                 "application_status": 'ARC_REVIEW'})
                 if assigned:
                     first_name = User.objects.get(username=username).first_name
                     last_name = User.objects.get(username=username).last_name
@@ -405,19 +409,22 @@ class ApplicationsAssignedView(DailyReportingBaseView):
                         arc_user = username
                     date = datetime.strftime(date, "%d/%m/%y %H:%M")
                     if app_type == 'Childminder':
-                        urn = Application.objects.get(application_id=app_id).application_reference
-                        assigned_apps.append({'URN': urn, 'Caseworker': arc_user, 'Type': 'CM', 'Action': 'Assigned',
-                                              'Date/Time': date})
+                        if Application.objects.filter(application_id=app_id, application_status='ARC_REVIEW').exists():
+                            urn = Application.objects.get(application_id=app_id).application_reference
+                            assigned_apps.append({'URN': urn, 'Caseworker': arc_user, 'Type': 'CM', 'Action': 'Assigned',
+                                                  'Date/Time': date})
                     elif app_type == 'Adult':
-                        urn = HMGatewayActions().list('dpa-auth', params={'adult_id': app_id}).record[0]['URN']
-                        assigned_apps.append({'URN': urn, 'Caseworker': arc_user, 'Type': 'New Association',
-                                              'Action': 'Assigned',
-                                              'Date/Time': date})
+                        if adult_response.status_code == 200:
+                            urn = HMGatewayActions().list('dpa-auth', params={'adult_id': app_id}).record[0]['URN']
+                            assigned_apps.append({'URN': urn, 'Caseworker': arc_user, 'Type': 'New Association',
+                                                  'Action': 'Assigned',
+                                                  'Date/Time': date})
                     elif app_type == 'Nanny':
-                        urn = NannyGatewayActions().list('application', params={'application_id': app_id}).record[0][
-                            'application_reference']
-                        assigned_apps.append({'URN': urn, 'Caseworker': arc_user, 'Type': 'Nanny', 'Action': 'Assigned',
-                                              'Date/Time': date})
+                        if nanny_response.status_code == 200:
+                            urn = NannyGatewayActions().list('application', params={'application_id': app_id}).record[0][
+                                'application_reference']
+                            assigned_apps.append({'URN': urn, 'Caseworker': arc_user, 'Type': 'Nanny', 'Action': 'Assigned',
+                                                  'Date/Time': date})
 
         return assigned_apps
 
