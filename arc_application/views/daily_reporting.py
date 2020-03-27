@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.views import View
 from django.utils.decorators import method_decorator
 from django.shortcuts import render
-from ..models import Application, Arc
+from ..models import Application, Arc, ApplicantName
 import csv
 from django.http import HttpResponse
 from django.contrib.auth.models import User
@@ -283,9 +283,6 @@ class ApplicationsProcessedView(DailyReportingBaseView):
         delta = timedelta(days=1)
         applications_history = self.get_application_histories()
         app_types = ['Childminder', 'Adult', 'Nanny']
-        cm_app_total = 0
-        adult_app_total = 0
-        nanny_app_total = 0
         while initial_date <= now:
             cm_apps = 0
             cm_apps_returned = 0
@@ -300,17 +297,19 @@ class ApplicationsProcessedView(DailyReportingBaseView):
                         for entry in applications_history[app_type][app_id][date_list[i]]:
                             if date_list[i].date() == initial_date.date():
                                 if entry == 'submitted by' or entry == 'resubmitted by':
-                                    reduced_dict = {your_key: applications_history[app_type][app_id][your_key] for
-                                                    your_key in date_list[i:]}
                                     if app_type == 'Childminder':
                                         cm_apps += 1
-                                        cm_apps_returned += self.check_if_returned(reduced_dict)
                                     elif app_type == 'Adult':
                                         adult_apps += 1
-                                        adult_apps_returned += self.check_if_returned(reduced_dict)
                                     elif app_type == 'Nanny':
                                         nanny_apps += 1
-                                        nanny_apps_returned += self.check_if_returned(reduced_dict)
+                                elif entry == 'returned_by':
+                                    if app_type == 'Childminder':
+                                        cm_apps_returned += 1
+                                    elif app_type == 'Adult':
+                                        adult_apps_returned += 1
+                                    elif app_type == 'Nanny':
+                                        nanny_apps_returned += 1
             total_received = (cm_apps + adult_apps + nanny_apps)
             total_returned = (cm_apps_returned + adult_apps_returned + nanny_apps_returned)
             processed_apps.append({'Date': datetime.strftime(initial_date, "%d %B %Y"),
@@ -356,7 +355,7 @@ class ApplicationsProcessedView(DailyReportingBaseView):
                                'New Association % returned': (
                                                                          total_adult_returned / total_adult_received) * 100 if total_adult_received and total_adult_returned is not 0 else 0,
                                'Nanny Received': total_nanny_received,
-                               'Nanny Returned': nanny_apps_returned,
+                               'Nanny Returned': total_nanny_returned,
                                'Nanny % returned': (
                                                                total_nanny_returned / total_nanny_received) * 100 if total_nanny_received and total_nanny_returned is not 0 else 0,
                                'All services Received': total_all_services_received,
@@ -364,13 +363,6 @@ class ApplicationsProcessedView(DailyReportingBaseView):
                                'All services % returned': total_all_services_returned / total_all_services_received * 100 if total_all_services_received and total_all_services_returned is not 0 else 0
                                })
         return processed_apps
-
-    def check_if_returned(self, dict):
-        for date in dict:
-            for entry in dict[date]:
-                if entry == 'returned_by':
-                    return 1
-        return 0
 
 
 @method_decorator(login_required, name='get')
@@ -381,7 +373,8 @@ class ApplicationsAssignedView(DailyReportingBaseView):
         now = datetime.now()
         now = datetime.strftime(now, "%Y%m%dT%H%M")
         csv_columns = ['URN', 'Caseworker', 'Type',
-                       'Action', 'Date/Time']
+                       'Action', 'Created Date/Time',
+                       'Assigned to Date/Time']
         response = HttpResponse(content_type='text/csv')
         response['Content-Disposition'] = 'attachment; filename="Applications_Assigned_{}.csv"'.format(now)
         log.debug("Download applications assigned (Reporting)")
@@ -412,32 +405,35 @@ class ApplicationsAssignedView(DailyReportingBaseView):
                     if Application.objects.filter(application_id=app_id, application_status='ARC_REVIEW').exists():
                         urn = Application.objects.get(application_id=app_id).application_reference
                         user_id = Arc.objects.get(application_id=app_id).user_id
-                        date = datetime.strptime(Arc.objects.get(application_id=app_id).last_accessed,
-                                          "%Y-%m-%d %H:%M:%S.%f+00:00")
-                        formatted_date = datetime.strftime(date, "%d/%m/%y %H:%M")
+                        formatted_created_date = datetime.strftime(list(applications_history[app_type][app_id])[0], "%d/%m/%y %H:%M")
+                        formatted_assigned_date = datetime.strftime(list(applications_history[app_type][app_id])[-1], "%d/%m/%y %H:%M")
                         assigned_apps.append({'URN': urn, 'Caseworker': self.get_user(user_id),
                                               'Type': 'CM', 'Action': 'Assigned',
-                                              'Date/Time': formatted_date})
+                                              'Created Date/Time': formatted_created_date,
+                                              'Assigned to Date/Time': formatted_assigned_date})
                 elif app_type == 'Adult':
                     if adult_response.status_code == 200:
                         urn = HMGatewayActions().list('dpa-auth', params={'adult_id': app_id}).record[0]['URN']
                         user_id = Arc.objects.get(application_id=app_id).user_id
-                        date = datetime.strptime(Arc.objects.get(application_id=app_id).last_accessed,
-                                                 "%Y-%m-%dT%H:%M:%S.%fZ")
-                        formatted_date = datetime.strftime(date, "%d/%m/%y %H:%M")
+                        formatted_created_date = datetime.strftime(list(applications_history[app_type][app_id])[0], "%d/%m/%y %H:%M")
+                        formatted_assigned_date = datetime.strftime(list(applications_history[app_type][app_id])[-1], "%d/%m/%y %H:%M")
                         assigned_apps.append({'URN': urn, 'Caseworker': self.get_user(user_id), 'Type': 'New Association',
                                               'Action': 'Assigned',
-                                              'Date/Time': formatted_date})
+                                              'Created Date/Time': formatted_created_date,
+                                              'Assigned to Date/Time': formatted_assigned_date})
                 elif app_type == 'Nanny':
                     if nanny_response.status_code == 200:
                         urn = NannyGatewayActions().list('application', params={'application_id': app_id}).record[0][
                             'application_reference']
                         user_id = Arc.objects.get(application_id=app_id).user_id
-                        date = datetime.strptime(Arc.objects.get(application_id=app_id).last_accessed,
-                                                 "%Y-%m-%dT%H:%M:%S.%fZ")
-                        formatted_date = datetime.strftime(date, "%d/%m/%y %H:%M")
-                        assigned_apps.append({'URN': urn, 'Caseworker': self.get_user(user_id), 'Type': 'Nanny', 'Action': 'Assigned',
-                                              'Date/Time': formatted_date})
+                        formatted_created_date = datetime.strftime(list(applications_history[app_type][app_id])[0],
+                                                                   "%d/%m/%y %H:%M")
+                        formatted_assigned_date = datetime.strftime(list(applications_history[app_type][app_id])[-1],
+                                                                    "%d/%m/%y %H:%M")
+                        assigned_apps.append({'URN': urn, 'Caseworker': self.get_user(user_id), 'Type': 'Nanny',
+                                              'Action': 'Assigned',
+                                              'Created Date/Time': formatted_created_date,
+                                              'Assigned to Date/Time': formatted_assigned_date})
 
         return assigned_apps
 
@@ -448,7 +444,7 @@ class ApplicationsAuditLogView(DailyReportingBaseView):
         context = self.get_applications_audit_log()
         now = datetime.now()
         now = datetime.strftime(now, "%Y%m%dT%H%M")
-        csv_columns = ['URN', 'Caseworker', 'Type',
+        csv_columns = ['URN', 'Name', 'Caseworker', 'Type',
                        'Action', 'Date/Time']
         response = HttpResponse(content_type='text/csv')
         response['Content-Disposition'] = 'attachment; filename="Applications_Audit_Log_{}.csv"'.format(now)
@@ -522,17 +518,27 @@ class ApplicationsAuditLogView(DailyReportingBaseView):
                         arc_user = username
                         action = 'Released'
                     if app_type == 'Childminder':
+                        if ApplicantName.objects.filter(application_id=app_id).exists():
+                            name = ApplicantName.objects.get(application_id=app_id)
+                            full_name = name.first_name + " " + name.last_name
+                        else:
+                            full_name = ''
                         urn = Application.objects.get(application_id=app_id).application_reference
-                        audit_log.append({'URN': urn, 'Caseworker': arc_user, 'Type': 'CM', 'Action': action,
+                        audit_log.append({'URN': urn, 'Name': full_name,
+                                          'Caseworker': arc_user, 'Type': 'CM', 'Action': action,
                                                   'Date/Time': formatted_date})
                     elif app_type == 'Adult':
                         urn = HMGatewayActions().list('dpa-auth', params={'adult_id': app_id}).record[0]['URN']
-                        audit_log.append({'URN': urn, 'Caseworker': arc_user, 'Type': 'New Association',
+                        audit_log.append({'URN': urn, 'Name': HMGatewayActions().list('adult', params={'adult_id': app_id}).record[0]['get_full_name'],
+                                          'Caseworker': arc_user, 'Type': 'New Association',
                                               'Action': action, 'Date/Time': formatted_date})
                     elif app_type == 'Nanny':
                         urn = NannyGatewayActions().list('application', params={'application_id': app_id}).record[0][
                             'application_reference']
-                        audit_log.append({'URN': urn, 'Caseworker': arc_user, 'Type': 'Nanny', 'Action': action,
+                        record = NannyGatewayActions().list('applicant-personal-details', params={'application_id': app_id}).record[0]
+                        full_name = record['first_name'] + " " + record['last_name']
+                        audit_log.append({'URN': urn, 'Name': full_name,
+                                          'Caseworker': arc_user, 'Type': 'Nanny', 'Action': action,
                                               'Date/Time': formatted_date})
 
         return audit_log
