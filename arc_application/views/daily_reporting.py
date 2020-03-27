@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.views import View
 from django.utils.decorators import method_decorator
 from django.shortcuts import render
-from ..models import Application
+from ..models import Application, Arc
 import csv
 from django.http import HttpResponse
 from django.contrib.auth.models import User
@@ -95,7 +95,16 @@ class DailyReportingBaseView(View):
 
         return application_history
 
-# @method_decorator(login_required, name='get')
+    def get_user(self, user_id):
+        first_name = User.objects.get(id=user_id).first_name
+        last_name = User.objects.get(id=user_id).last_name
+        if first_name is not '':
+            arc_user = '{0} {1}'.format(first_name, last_name if not '' else "")
+        else:
+            arc_user = User.objects.get(id=user_id).username
+        return arc_user
+
+@method_decorator(login_required, name='get')
 class ApplicationsInQueueView(DailyReportingBaseView):
 
     def get(self, request):
@@ -396,38 +405,42 @@ class ApplicationsAssignedView(DailyReportingBaseView):
         app_types = ['Childminder', 'Adult', 'Nanny']
         for app_type in app_types:
             for app_id in applications_history[app_type]:
-                assigned, username, date = self.check_assigned(applications_history[app_type][app_id])
-                if assigned:
-                    first_name = User.objects.get(username=username).first_name
-                    last_name = User.objects.get(username=username).last_name
-                    if first_name is not '':
-                        arc_user = '{0} {1}'.format(first_name, last_name if not '' else "")
-                    else:
-                        arc_user = username
-                    date = datetime.strftime(date, "%d/%m/%y %H:%M")
-                    if app_type == 'Childminder':
+                adult_response = HMGatewayActions().list('adult', params={"adult_id": app_id,
+                                                                        "adult_status": 'ARC_REVIEW'})
+                nanny_response = NannyGatewayActions().list('application', params={"application_id": app_id,
+                                                                                 "application_status": 'ARC_REVIEW'})
+                if app_type == 'Childminder':
+                    if Application.objects.filter(application_id=app_id, application_status='ARC_REVIEW').exists():
                         urn = Application.objects.get(application_id=app_id).application_reference
-                        assigned_apps.append({'URN': urn, 'Caseworker': arc_user, 'Type': 'CM', 'Action': 'Assigned',
-                                              'Date/Time': date})
-                    elif app_type == 'Adult':
+                        user_id = Arc.objects.get(application_id=app_id).user_id
+                        date = datetime.strptime(Arc.objects.get(application_id=app_id).last_accessed,
+                                          "%Y-%m-%d %H:%M:%S.%f+00:00")
+                        formatted_date = datetime.strftime(date, "%d/%m/%y %H:%M")
+                        assigned_apps.append({'URN': urn, 'Caseworker': self.get_user(user_id),
+                                              'Type': 'CM', 'Action': 'Assigned',
+                                              'Date/Time': formatted_date})
+                elif app_type == 'Adult':
+                    if adult_response.status_code == 200:
                         urn = HMGatewayActions().list('dpa-auth', params={'adult_id': app_id}).record[0]['URN']
-                        assigned_apps.append({'URN': urn, 'Caseworker': arc_user, 'Type': 'New Association',
+                        user_id = Arc.objects.get(application_id=app_id).user_id
+                        date = datetime.strptime(Arc.objects.get(application_id=app_id).last_accessed,
+                                                 "%Y-%m-%dT%H:%M:%S.%fZ")
+                        formatted_date = datetime.strftime(date, "%d/%m/%y %H:%M")
+                        assigned_apps.append({'URN': urn, 'Caseworker': self.get_user(user_id), 'Type': 'New Association',
                                               'Action': 'Assigned',
-                                              'Date/Time': date})
-                    elif app_type == 'Nanny':
+                                              'Date/Time': formatted_date})
+                elif app_type == 'Nanny':
+                    if nanny_response.status_code == 200:
                         urn = NannyGatewayActions().list('application', params={'application_id': app_id}).record[0][
                             'application_reference']
-                        assigned_apps.append({'URN': urn, 'Caseworker': arc_user, 'Type': 'Nanny', 'Action': 'Assigned',
-                                              'Date/Time': date})
+                        user_id = Arc.objects.get(application_id=app_id).user_id
+                        date = datetime.strptime(Arc.objects.get(application_id=app_id).last_accessed,
+                                                 "%Y-%m-%dT%H:%M:%S.%fZ")
+                        formatted_date = datetime.strftime(date, "%d/%m/%y %H:%M")
+                        assigned_apps.append({'URN': urn, 'Caseworker': self.get_user(user_id), 'Type': 'Nanny', 'Action': 'Assigned',
+                                              'Date/Time': formatted_date})
 
         return assigned_apps
-
-    def check_assigned(self, dict):
-        for date in dict:
-            for entry in dict[date]:
-                if entry == 'assigned_to':
-                    return (True, dict[date][entry], date)
-        return False, None, None
 
 @method_decorator(login_required, name='get')
 class ApplicationsAuditLogView(DailyReportingBaseView):
