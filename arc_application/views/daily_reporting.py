@@ -256,10 +256,10 @@ class ApplicationsProcessedView(DailyReportingBaseView):
         context = self.get_applications_processed()
         now = datetime.now()
         now = datetime.strftime(now, "%Y%m%dT%H%M")
-        csv_columns = ['Date', 'Childminder Received', 'Childminder Returned', 'Childminder % returned',
-                       'New Association Received', 'New Association Returned', 'New Association % returned',
-                       'Nanny Received', 'Nanny Returned', 'Nanny % returned',
-                       'All services Received', 'All services Returned', 'All services % returned']
+        csv_columns = ['Date', 'Childminder Accepted', 'Childminder Returned', 'Childminder % processed',
+                       'New Association Accepted', 'New Association Returned', 'New Association % processed',
+                       'Nanny Accepted', 'Nanny Returned', 'Nanny % processed',
+                       'All services Accepted', 'All services Returned', 'All services % processed']
         response = HttpResponse(content_type='text/csv')
         response['Content-Disposition'] = 'attachment; filename="Applications_Processed_{}.csv"'.format(now)
         log.debug("Rendering applications summary (Reporting)")
@@ -296,7 +296,7 @@ class ApplicationsProcessedView(DailyReportingBaseView):
                     for i in range(0, len(date_list)):
                         for entry in applications_history[app_type][app_id][date_list[i]]:
                             if date_list[i].date() == initial_date.date():
-                                if entry == 'submitted by' or entry == 'resubmitted by':
+                                if entry == 'accepted_by':
                                     if app_type == 'Childminder':
                                         cm_apps += 1
                                     elif app_type == 'Adult':
@@ -310,57 +310,54 @@ class ApplicationsProcessedView(DailyReportingBaseView):
                                         adult_apps_returned += 1
                                     elif app_type == 'Nanny':
                                         nanny_apps_returned += 1
-            total_received = (cm_apps + adult_apps + nanny_apps)
+            total_accepted = (cm_apps + adult_apps + nanny_apps)
             total_returned = (cm_apps_returned + adult_apps_returned + nanny_apps_returned)
             processed_apps.append({'Date': datetime.strftime(initial_date, "%d %B %Y"),
-                                   'Childminder Received': cm_apps,
+                                   'Childminder Accepted': cm_apps,
                                    'Childminder Returned': cm_apps_returned,
-                                   'Childminder % returned': (cm_apps_returned / cm_apps) * 100 if cm_apps and cm_apps_returned is not 0 else 0,
-                                   'New Association Received': adult_apps,
+                                   'Childminder % processed': (cm_apps_returned / (cm_apps + cm_apps_returned)) * 100 if cm_apps and cm_apps_returned is not 0 else 0,
+                                   'New Association Accepted': adult_apps,
                                    'New Association Returned': adult_apps_returned,
-                                   'New Association % returned': (adult_apps_returned / adult_apps) * 100 if adult_apps and adult_apps_returned is not 0 else 0,
-                                   'Nanny Received': nanny_apps,
+                                   'New Association % processed': (adult_apps_returned / (adult_apps + adult_apps_returned)) * 100 if adult_apps and adult_apps_returned is not 0 else 0,
+                                   'Nanny Accepted': nanny_apps,
                                    'Nanny Returned': nanny_apps_returned,
-                                   'Nanny % returned': (nanny_apps_returned / nanny_apps) * 100 if nanny_apps and nanny_apps_returned is not 0 else 0,
-                                   'All services Received': total_received,
+                                   'Nanny % processed': (nanny_apps_returned / nanny_apps + (nanny_apps_returned)) * 100 if nanny_apps and nanny_apps_returned is not 0 else 0,
+                                   'All services Accepted': total_accepted,
                                    'All services Returned': total_returned,
-                                   'All services % returned': total_returned / total_received * 100 if total_received and total_returned is not 0 else 0
+                                   'All services % processed': (total_returned / (total_accepted + total_returned)) * 100 if total_accepted and total_returned is not 0 else 0
                                    })
 
             initial_date += delta
-        total_cm_received = 0
+        total_cm_accepted = 0
         total_cm_returned = 0
-        total_adult_received = 0
+        total_adult_accepted = 0
         total_adult_returned = 0
-        total_nanny_received = 0
+        total_nanny_accepted = 0
         total_nanny_returned = 0
-        total_all_services_received = 0
+        total_all_services_accepted = 0
         total_all_services_returned = 0
         for i in processed_apps:
-            total_cm_received += i['Childminder Received']
+            total_cm_accepted += i['Childminder Accepted']
             total_cm_returned += i['Childminder Returned']
-            total_adult_received += i['New Association Received']
+            total_adult_accepted += i['New Association Accepted']
             total_adult_returned += i['New Association Returned']
-            total_nanny_received += i['Nanny Received']
+            total_nanny_accepted += i['Nanny Accepted']
             total_nanny_returned += i['Nanny Returned']
-            total_all_services_received += i['All services Received']
+            total_all_services_accepted += i['All services Accepted']
             total_all_services_returned += i['All services Returned']
         processed_apps.append({'Date': 'Total',
-                               'Childminder Received': total_cm_received,
+                               'Childminder Accepted': total_cm_accepted,
                                'Childminder Returned': total_cm_returned,
-                               'Childminder % returned': (
-                                                                     total_cm_returned / total_cm_received) * 100 if total_cm_received and total_cm_returned is not 0 else 0,
-                               'New Association Received': total_adult_received,
+                               'Childminder % processed': (total_cm_returned / (total_cm_accepted + total_cm_returned)) * 100 if total_cm_accepted and total_cm_returned is not 0 else 0,
+                               'New Association Accepted': total_adult_accepted,
                                'New Association Returned': total_adult_returned,
-                               'New Association % returned': (
-                                                                         total_adult_returned / total_adult_received) * 100 if total_adult_received and total_adult_returned is not 0 else 0,
-                               'Nanny Received': total_nanny_received,
+                               'New Association % processed': (total_adult_returned / (total_adult_accepted + total_adult_returned)) * 100 if total_adult_accepted and total_adult_returned is not 0 else 0,
+                               'Nanny Accepted': total_nanny_accepted,
                                'Nanny Returned': total_nanny_returned,
-                               'Nanny % returned': (
-                                                               total_nanny_returned / total_nanny_received) * 100 if total_nanny_received and total_nanny_returned is not 0 else 0,
-                               'All services Received': total_all_services_received,
+                               'Nanny % processed': (total_nanny_returned / (total_nanny_accepted + total_nanny_returned)) * 100 if total_nanny_accepted and total_nanny_returned is not 0 else 0,
+                               'All services Accepted': total_all_services_accepted,
                                'All services Returned': total_all_services_returned,
-                               'All services % returned': total_all_services_returned / total_all_services_received * 100 if total_all_services_received and total_all_services_returned is not 0 else 0
+                               'All services % processed': (total_all_services_returned / (total_all_services_accepted + total_all_services_returned)) * 100 if total_all_services_accepted and total_all_services_returned is not 0 else 0
                                })
         return processed_apps
 
