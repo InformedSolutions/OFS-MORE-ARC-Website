@@ -156,8 +156,8 @@ class ApplicationsInQueueView(DailyReportingBaseView):
                 nannies_submitted = nanny_response.record
                 for nanny in nannies_submitted:
                     if datetime.strptime(
-                            nanny['date_submitted'],
-                            "%Y-%m-%dT%H:%M:%S.%fZ").date() == initial_date.date() and not None:
+                            nanny['date_submitted'][:19],
+                            "%Y-%m-%dT%H:%M:%S").date() == initial_date.date() and not None:
                         nanny_apps += 1
 
             apps_in_queue.append({'Date': datetime.strftime(initial_date, "%d %B %Y"),
