@@ -348,16 +348,16 @@ class ApplicationsProcessedView(DailyReportingBaseView):
         processed_apps.append({'Date': 'Total',
                                'Childminder Processed to Cygnum': total_cm_accepted,
                                'Childminder Returned': total_cm_returned,
-                               'Childminder % processed': (total_cm_returned / (total_cm_accepted + total_cm_returned)) * 100 if total_cm_returned is not 0 else 0,
+                               'Childminder % returned': (total_cm_returned / (total_cm_accepted + total_cm_returned)) * 100 if total_cm_returned is not 0 else 0,
                                'New Association Processed to Cygnum': total_adult_accepted,
                                'New Association Returned': total_adult_returned,
-                               'New Association % processed': (total_adult_returned / (total_adult_accepted + total_adult_returned)) * 100 if total_adult_returned is not 0 else 0,
+                               'New Association % returned': (total_adult_returned / (total_adult_accepted + total_adult_returned)) * 100 if total_adult_returned is not 0 else 0,
                                'Nanny Processed to Cygnum': total_nanny_accepted,
                                'Nanny Returned': total_nanny_returned,
-                               'Nanny % processed': (total_nanny_returned / (total_nanny_accepted + total_nanny_returned)) * 100 if total_nanny_returned is not 0 else 0,
+                               'Nanny % returned': (total_nanny_returned / (total_nanny_accepted + total_nanny_returned)) * 100 if total_nanny_returned is not 0 else 0,
                                'All services Processed to Cygnum': total_all_services_accepted,
                                'All services Returned': total_all_services_returned,
-                               'All services % processed': (total_all_services_returned / (total_all_services_accepted + total_all_services_returned)) * 100 if total_all_services_returned is not 0 else 0
+                               'All services % returned': (total_all_services_returned / (total_all_services_accepted + total_all_services_returned)) * 100 if total_all_services_returned is not 0 else 0
                                })
         return processed_apps
 
