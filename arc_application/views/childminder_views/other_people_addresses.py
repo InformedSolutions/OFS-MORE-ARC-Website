@@ -154,7 +154,7 @@ def postcode_manual(request, remove=False, swap_to_manual=False, address=None):
     """
     context = get_context(request)
     context['state'] = 'manual'
-    lived_abroad = AdultInHome.objects.get(application_id=context['id']).lived_abroad
+    lived_abroad = AdultInHome.objects.get(adult_id=context['person_id']).lived_abroad
 
     if request.method == 'GET' or remove is True or swap_to_manual is True:
         if not swap_to_manual:
@@ -185,7 +185,7 @@ def postcode_submission(request):
     :return:
     """
     context = get_context(request)
-    lived_abroad = AdultInHome.objects.get(application_id=context['id']).lived_abroad
+    lived_abroad = AdultInHome.objects.get(adult_id=context['person_id']).lived_abroad
 
     if request.method == 'POST':
         if request.POST['state'] == 'manual':
@@ -253,6 +253,7 @@ def people_in_the_home_previous_address_change(request):
     :return:
     """
     context = get_context(request)
+    lived_abroad = AdultInHome.objects.get(adult_id=context['person_id']).lived_abroad
     request_data = getattr(request, request.method)
     remove_address_pk = get_remove_address_pk(request_data)
 
@@ -263,7 +264,7 @@ def people_in_the_home_previous_address_change(request):
 
     if request.method == 'GET':
         record = get_previous_address(pk=request.GET['address_id'])
-        context['form'] = PreviousAddressManualForm(record=record)
+        context['form'] = PreviousAddressManualForm(record=record, lived_abroad=lived_abroad)
         log.debug("Rendering other people previous address - change address page")
         return render(request, 'childminder_templates/previous-address-change.html', context)
 
@@ -271,7 +272,7 @@ def people_in_the_home_previous_address_change(request):
         address_id = context['address_id']
         address_record = get_previous_address(address_id)
 
-        current_form = PreviousAddressManualForm(request.POST)
+        current_form = PreviousAddressManualForm(request.POST, lived_abroad=lived_abroad)
         context['form'] = current_form
 
         if current_form.is_valid():
@@ -281,7 +282,8 @@ def people_in_the_home_previous_address_change(request):
             address_record.street_line2 = current_form.cleaned_data['street_line2']
             address_record.town = current_form.cleaned_data['town']
             address_record.county = current_form.cleaned_data['county']
-            address_record.country = 'United Kingdom'
+            if lived_abroad:
+                address_record.country = current_form.cleaned_data['country'] if current_form.cleaned_data['country'] else 'United Kingdom'
             address_record.postcode = current_form.cleaned_data['postcode']
 
             # Update previous address moved in/out dates
