@@ -34,8 +34,8 @@
         </tr>
         {% endfor %}
 </table>
+    {% if cc_user %}
     <br>
-
     <p>
         <img src="{% static 'download-button.png' %}" class="icon-ofsted-download icon-align" alt="Download"/>
         <a href="{% url 'applications-in-queue' %}"
@@ -70,6 +70,7 @@
            target="_blank" alt="Download Applications Audit Log">Applications Audit Log</a>
         (CSV)
     </p>
+    {% endif %}
 </div>
 
 {% endblock %}

@@ -6,6 +6,7 @@ from django.shortcuts import render
 from ..models import Application
 from ..services.db_gateways import NannyGatewayActions, HMGatewayActions
 from django.conf import settings
+from .base import has_group
 
 # Initiate logging
 log = logging.getLogger()
@@ -17,7 +18,7 @@ class ApplicationsSummaryView(View):
     template_name = "applications_summary.html"
 
     def get(self, request):
-        context = self.get_context_data()
+        context = self.get_context_data(request)
         log.debug("Rendering applications summary (Reporting)")
         return render(request, self.template_name, context=context)
 
@@ -115,12 +116,16 @@ class ApplicationsSummaryView(View):
 
         return household_member_data
 
-    def get_context_data(self):
+    def get_context_data(self, request):
         """
         method to get all row data for the applications summary
         :return: context data
         """
         context = {}
+
+        cc_user = has_group(request.user, settings.CONTACT_CENTRE)
+        if cc_user and request.user.is_authenticated():
+            context['cc_user'] = True
         childminder_data = self.get_childminder_data()
         nanny_data = self.get_nanny_data()
         context['enable_hm'] = False

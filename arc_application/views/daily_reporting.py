@@ -13,6 +13,7 @@ from ..services.db_gateways import NannyGatewayActions, HMGatewayActions
 from django.conf import settings
 from datetime import datetime, timedelta
 from collections import OrderedDict
+from ..decorators import group_required
 
 
 # Initiate logging
