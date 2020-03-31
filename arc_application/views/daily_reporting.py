@@ -321,7 +321,7 @@ class ApplicationsProcessedView(DailyReportingBaseView):
                                    'New Association % processed': (adult_apps_returned / (adult_apps + adult_apps_returned)) * 100 if adult_apps_returned is not 0 else 0,
                                    'Nanny Processed to Cygnum': nanny_apps,
                                    'Nanny Returned': nanny_apps_returned,
-                                   'Nanny % processed': (nanny_apps_returned / nanny_apps + (nanny_apps_returned)) * 100 if nanny_apps_returned is not 0 else 0,
+                                   'Nanny % processed': ((nanny_apps_returned / (nanny_apps + nanny_apps_returned)) * 100) if nanny_apps_returned is not 0 else 0,
                                    'All services Processed to Cygnum': total_accepted,
                                    'All services Returned': total_returned,
                                    'All services % processed': (total_returned / (total_accepted + total_returned)) * 100 if total_returned is not 0 else 0
