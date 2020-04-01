@@ -2,15 +2,13 @@ import logging
 from django.contrib.auth.decorators import login_required
 from django.views import View
 from django.utils.decorators import method_decorator
-from django.shortcuts import render
 from ..models import Application, Arc, ApplicantName
 import csv
-from django.http import HttpResponse
+from django.http import HttpResponse, StreamingHttpResponse
 from django.contrib.auth.models import User
 from .audit_log import MockTimelineLog
 from timeline_logger.models import TimelineLog
 from ..services.db_gateways import NannyGatewayActions, HMGatewayActions
-from django.conf import settings
 from datetime import datetime, timedelta
 from collections import OrderedDict
 from ..decorators import group_required
@@ -19,7 +17,15 @@ from ..decorators import group_required
 # Initiate logging
 log = logging.getLogger()
 
-class DailyReportingBaseView(View):
+class Echo(View):
+    """An object that implements just the write method of the file-like
+    interface.
+    """
+    def write(self, value):
+        """Write the value by returning it, instead of storing in a buffer."""
+        return value
+
+class DailyReportingBaseView(Echo):
 
     def application_history(self, app_id, app_type):
         """
@@ -113,14 +119,12 @@ class ApplicationsInQueueView(DailyReportingBaseView):
         now = datetime.strftime(now, "%Y%m%dT%H%M")
         csv_columns = ['Date', 'Childminder in Queue', 'New Association in Queue',
                        'Nanny in Queue', 'All Services in Queue']
-        response = HttpResponse(content_type='text/csv')
+        pseudo_buffer = Echo()
+        writer = csv.DictWriter(pseudo_buffer,  fieldnames=csv_columns)
+        response = StreamingHttpResponse((writer.writerow(data) for data in context),
+                                         content_type="text/csv")
         response['Content-Disposition'] = 'attachment; filename="Applications_in_Queue_{}.csv"'.format(now)
         log.debug("Rendering applications summary (Reporting)")
-
-        writer = csv.DictWriter(response, fieldnames=csv_columns)
-        writer.writeheader()
-        for data in context:
-            writer.writerow(data)
 
         return response
 
@@ -136,7 +140,12 @@ class ApplicationsInQueueView(DailyReportingBaseView):
         adult_response = HMGatewayActions().list('adult', params={"adult_status": 'SUBMITTED'})
         nanny_response = NannyGatewayActions().list('application', params={"application_status": 'SUBMITTED'})
         cm_applications = list(Application.objects.filter(application_status='SUBMITTED', ))
-        apps_in_queue = []
+        apps_in_queue = [({'Date': 'Date',
+                                  'Childminder in Queue': 'Childminder in Queue',
+                                  'New Association in Queue': 'New Association in Queue',
+                                  'Nanny in Queue': 'Nanny in Queue',
+                                  'All Services in Queue':  'All Services in Queue'
+                                 })]
         while initial_date <= now:
             cm_apps = 0
             adult_apps = 0
@@ -148,10 +157,10 @@ class ApplicationsInQueueView(DailyReportingBaseView):
                 adults_submitted = adult_response.record
                 for adult in adults_submitted:
                     if adult['date_resubmitted'] is None and datetime.strptime(
-                            adult['date_submitted'], "%Y-%m-%dT%H:%M:%S.%fZ").date() == initial_date.date():
+                            adult['date_submitted'][:19], "%Y-%m-%dT%H:%M:%S").date() == initial_date.date():
                         adult_apps += 1
                     elif adult['date_resubmitted'] is not None and datetime.strptime(
-                            adult['date_resubmitted'], "%Y-%m-%dT%H:%M:%S.%fZ").date() == initial_date.date():
+                            adult['date_resubmitted'][:19], "%Y-%m-%dT%H:%M:%S").date() == initial_date.date():
                         adult_apps += 1
             if nanny_response.status_code == 200:
                 nannies_submitted = nanny_response.record
@@ -190,14 +199,12 @@ class ApplicationsReturnedView(DailyReportingBaseView):
         now = datetime.strftime(now, "%Y%m%dT%H%M")
         csv_columns = ['Date', 'Childminder returned', 'New Association returned',
                        'Nanny returned', 'All services returned']
-        response = HttpResponse(content_type='text/csv')
+        pseudo_buffer = Echo()
+        writer = csv.DictWriter(pseudo_buffer, fieldnames=csv_columns)
+        response = StreamingHttpResponse((writer.writerow(data) for data in context),
+                                         content_type="text/csv")
         response['Content-Disposition'] = 'attachment; filename="Applications_Returned_{}.csv"'.format(now)
         log.debug("Rendering applications summary (Reporting)")
-
-        writer = csv.DictWriter(response, fieldnames=csv_columns)
-        writer.writeheader()
-        for data in context:
-            writer.writerow(data)
 
         return response
 
@@ -207,7 +214,11 @@ class ApplicationsReturnedView(DailyReportingBaseView):
         :return: List of adults, childminder and nannies returned or returned by day
         """
 
-        returned_apps = []
+        returned_apps = [({'Date': 'Date',
+                           'Childminder returned': 'Childminder returned',
+                           'New Association returned': 'New Association returned',
+                           'Nanny returned': 'Nanny returned',
+                           'All services returned': 'All services returned'})]
         now = datetime.now()
         initial_date = datetime(2020, 2, 19, 0, 0)
         delta = timedelta(days=1)
@@ -261,14 +272,12 @@ class ApplicationsProcessedView(DailyReportingBaseView):
                        'New Association Processed to Cygnum', 'New Association Returned', 'New Association % returned',
                        'Nanny Processed to Cygnum', 'Nanny Returned', 'Nanny % returned',
                        'All services Processed to Cygnum', 'All services Returned', 'All services % returned']
-        response = HttpResponse(content_type='text/csv')
+        pseudo_buffer = Echo()
+        writer = csv.DictWriter(pseudo_buffer, fieldnames=csv_columns)
+        response = StreamingHttpResponse((writer.writerow(data) for data in context),
+                                         content_type="text/csv")
         response['Content-Disposition'] = 'attachment; filename="Applications_Processed_{}.csv"'.format(now)
         log.debug("Rendering applications summary (Reporting)")
-
-        writer = csv.DictWriter(response, fieldnames=csv_columns)
-        writer.writeheader()
-        for data in context:
-            writer.writerow(data)
 
         return response
 
@@ -278,7 +287,19 @@ class ApplicationsProcessedView(DailyReportingBaseView):
         :return: List of values representing number of returned applications by date and by application type
         """
 
-        processed_apps = []
+        processed_apps = [({'Date': 'Date',
+                            'Childminder Processed to Cygnum': 'Childminder Processed to Cygnum',
+                            'Childminder Returned': 'Childminder Returned',
+                            'Childminder % returned': 'Childminder % returned',
+                            'New Association Processed to Cygnum':  'New Association Processed to Cygnum',
+                            'New Association Returned': 'New Association Returned',
+                            'New Association % returned': 'New Association % returned',
+                            'Nanny Processed to Cygnum': 'Nanny Processed to Cygnum',
+                            'Nanny Returned': 'Nanny Returned',
+                            'Nanny % returned': 'Nanny % returned',
+                            'All services Processed to Cygnum': 'All services Processed to Cygnum',
+                            'All services Returned': 'All services Returned',
+                            'All services % returned': 'All services % returned'})]
         now = datetime.now()
         initial_date = datetime(2020, 2, 19, 0, 0)
         delta = timedelta(days=1)
@@ -337,7 +358,7 @@ class ApplicationsProcessedView(DailyReportingBaseView):
         total_nanny_returned = 0
         total_all_services_accepted = 0
         total_all_services_returned = 0
-        for i in processed_apps:
+        for i in processed_apps[1:]:
             total_cm_accepted += i['Childminder Processed to Cygnum']
             total_cm_returned += i['Childminder Returned']
             total_adult_accepted += i['New Association Processed to Cygnum']
@@ -373,14 +394,12 @@ class ApplicationsAssignedView(DailyReportingBaseView):
         csv_columns = ['URN', 'Caseworker', 'Type',
                        'Action', 'Created Date/Time',
                        'Assigned to Date/Time']
-        response = HttpResponse(content_type='text/csv')
+        pseudo_buffer = Echo()
+        writer = csv.DictWriter(pseudo_buffer, fieldnames=csv_columns)
+        response = StreamingHttpResponse((writer.writerow(data) for data in context),
+                                         content_type="text/csv")
         response['Content-Disposition'] = 'attachment; filename="Applications_Assigned_{}.csv"'.format(now)
         log.debug("Download applications assigned (Reporting)")
-
-        writer = csv.DictWriter(response, fieldnames=csv_columns)
-        writer.writeheader()
-        for data in context:
-            writer.writerow(data)
 
         return response
 
@@ -390,7 +409,12 @@ class ApplicationsAssignedView(DailyReportingBaseView):
         :return: List with every URN and who the application has most recently been assigned to
         """
 
-        assigned_apps = []
+        assigned_apps = [({'URN': 'URN',
+                           'Caseworker': 'Caseworker',
+                           'Type': 'Type',
+                           'Action': 'Action',
+                           'Created Date/Time': 'Created Date/Time',
+                           'Assigned to Date/Time': 'Assigned to Date/Time'})]
         applications_history = self.get_application_histories()
         app_types = ['Childminder', 'Adult', 'Nanny']
         for app_type in app_types:
@@ -444,14 +468,12 @@ class ApplicationsAuditLogView(DailyReportingBaseView):
         now = datetime.strftime(now, "%Y%m%dT%H%M")
         csv_columns = ['URN', 'Name', 'Caseworker', 'Type',
                        'Action', 'Date/Time']
-        response = HttpResponse(content_type='text/csv')
+        pseudo_buffer = Echo()
+        writer = csv.DictWriter(pseudo_buffer, fieldnames=csv_columns)
+        response = StreamingHttpResponse((writer.writerow(data) for data in context),
+                                         content_type="text/csv")
         response['Content-Disposition'] = 'attachment; filename="Applications_Audit_Log_{}.csv"'.format(now)
         log.debug("Download applications assigned (Reporting)")
-
-        writer = csv.DictWriter(response, fieldnames=csv_columns)
-        writer.writeheader()
-        for data in context:
-            writer.writerow(data)
 
         return response
 
@@ -461,7 +483,13 @@ class ApplicationsAuditLogView(DailyReportingBaseView):
         :return: List with every URN and who the application has most recently been assigned to
         """
 
-        audit_log = []
+        audit_log = [({'URN': 'URN',
+                       'Name': 'Name',
+                       'Caseworker': 'Caseworker',
+                       'Type': 'Type',
+                       'Action': 'Action',
+                       'Date/Time': 'Date/Time',
+                       })]
         applications_history = self.get_application_histories()
         app_types = ['Childminder', 'Adult', 'Nanny']
         for app_type in app_types:
@@ -476,19 +504,25 @@ class ApplicationsAuditLogView(DailyReportingBaseView):
                         arc_user = ''
                     elif 'assigned_to' in applications_history[app_type][app_id][date]:
                         username = applications_history[app_type][app_id][date]['assigned_to']
-                        first_name = User.objects.get(username=username).first_name
-                        last_name = User.objects.get(username=username).last_name
-                        if first_name is not '':
-                            arc_user = '{0} {1}'.format(first_name, last_name if not '' else "")
+                        if User.objects.filter(username=username).exists():
+                            first_name = User.objects.get(username=username).first_name
+                            last_name = User.objects.get(username=username).last_name
+                            if first_name is not '':
+                                arc_user = '{0} {1}'.format(first_name, last_name if not '' else "")
+                            else:
+                                arc_user = username
                         else:
                             arc_user = username
                         action = 'Assigned'
                     elif 'accepted_by' in applications_history[app_type][app_id][date]:
                         username = applications_history[app_type][app_id][date]['accepted_by']
-                        first_name = User.objects.get(username=username).first_name
-                        last_name = User.objects.get(username=username).last_name
-                        if first_name is not '':
-                            arc_user = '{0} {1}'.format(first_name, last_name if not '' else "")
+                        if User.objects.filter(username=username).exists():
+                            first_name = User.objects.get(username=username).first_name
+                            last_name = User.objects.get(username=username).last_name
+                            if first_name is not '':
+                                arc_user = '{0} {1}'.format(first_name, last_name if not '' else "")
+                            else:
+                                arc_user = username
                         else:
                             arc_user = username
                         action = 'Processed to Cygnum'
@@ -497,23 +531,27 @@ class ApplicationsAuditLogView(DailyReportingBaseView):
                         action = 'Resubmitted'
                     elif 'returned_by' in applications_history[app_type][app_id][date]:
                         username = applications_history[app_type][app_id][date]['returned_by']
-                        first_name = User.objects.get(username=username).first_name
-                        last_name = User.objects.get(username=username).last_name
-                        if first_name is not '':
-                            arc_user = '{0} {1}'.format(first_name, last_name if not '' else "")
+                        if User.objects.filter(username=username).exists():
+                            first_name = User.objects.get(username=username).first_name
+                            last_name = User.objects.get(username=username).last_name
+                            if first_name is not '':
+                                arc_user = '{0} {1}'.format(first_name, last_name if not '' else "")
+                            else:
+                                arc_user = username
                         else:
                             arc_user = username
-                        arc_user = username
                         action = 'Returned'
                     elif 'released_by' in applications_history[app_type][app_id][date]:
                         username = applications_history[app_type][app_id][date]['released_by']
-                        first_name = User.objects.get(username=username).first_name
-                        last_name = User.objects.get(username=username).last_name
-                        if first_name is not '':
-                            arc_user = '{0} {1}'.format(first_name, last_name if not '' else "")
+                        if User.objects.filter(username=username).exists():
+                            first_name = User.objects.get(username=username).first_name
+                            last_name = User.objects.get(username=username).last_name
+                            if first_name is not '':
+                                arc_user = '{0} {1}'.format(first_name, last_name if not '' else "")
+                            else:
+                                arc_user = username
                         else:
                             arc_user = username
-                        arc_user = username
                         action = 'Released'
                     if app_type == 'Childminder':
                         if ApplicantName.objects.filter(application_id=app_id).exists():
