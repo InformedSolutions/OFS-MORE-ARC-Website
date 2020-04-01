@@ -19,7 +19,7 @@ class GenericApplicationHandler:
         self.arc_user = arc_user
 
     def __get_assigned_applications(self):
-        return Arc.objects.filter(user_id=self.arc_user.id)
+        return Arc.objects.filter(user_id=self.arc_user.id).order_by('last_accessed')
 
     def add_application_from_pool(self):
         app_id = self._get_oldest_app_id()
@@ -94,8 +94,12 @@ class GenericApplicationHandler:
         row_data['application_id'] = adult_record['adult_id']
         row_data['date_submitted'] = datetime.strptime(adult_record['date_submitted'][:10], '%Y-%m-%d').strftime(
             '%d/%m/%Y')
-        row_data['last_accessed'] = datetime.strptime(adult_record['date_updated'][:10], '%Y-%m-%d').strftime(
-            '%d/%m/%Y')
+        if adult_record['date_resubmitted'] is not None:
+            row_data['last_accessed'] = datetime.strptime(adult_record['date_resubmitted'][:10], '%Y-%m-%d').strftime(
+                '%d/%m/%Y')
+        else:
+            row_data['last_accessed'] = datetime.strptime(adult_record['date_updated'][:10], '%Y-%m-%d').strftime(
+                '%d/%m/%Y')
         row_data['app_type'] = 'Adult update'
 
         dpa_auth_record = HMGatewayActions().read('dpa-auth', params={'token_id': adult_record['token_id']}).record
@@ -111,17 +115,8 @@ class ChildminderApplicationHandler(GenericApplicationHandler):
     def _get_oldest_app_id(self):
         childminder_apps_for_review = list(Application.objects.filter(
             application_status='SUBMITTED'))
-        resubmitted_apps = []
-        submitted_apps = []
-        if any(childminder_apps_for_review):
-            for app in childminder_apps_for_review:
-                if app.date_updated > app.date_submitted:
-                    resubmitted_apps.append(app)
 
-        if any(resubmitted_apps):
-            resubmitted_apps = sorted(resubmitted_apps, key=lambda i: i.date_updated)
-            return resubmitted_apps[0].application_id
-        elif any(childminder_apps_for_review):
+        if any(childminder_apps_for_review):
             submitted_apps = sorted(childminder_apps_for_review, key=lambda i: i.date_updated)
             return submitted_apps[0].application_id
         else:
@@ -168,18 +163,9 @@ class NannyApplicationHandler(GenericApplicationHandler):
             'application', params={'application_status': 'SUBMITTED'})
 
         if response.status_code == 200:
-            resubmitted_apps = []
             submitted_apps = response.record
-            for app in submitted_apps:
-                if app['date_updated'] > app['date_submitted']:
-                    resubmitted_apps.append(app)
-
-            if any(resubmitted_apps):
-                resubmitted_apps = sorted(resubmitted_apps, key=lambda i: i['date_updated'])
-                return resubmitted_apps[0]['application_id']
-            else:
-                submitted_apps = sorted(submitted_apps, key=lambda i: i['date_submitted'])
-                return submitted_apps[0]['application_id']
+            submitted_apps = sorted(submitted_apps, key=lambda i: i['date_updated'])
+            return submitted_apps[0]['application_id']
 
         else:
             raise ObjectDoesNotExist('No applications available.')
@@ -234,18 +220,9 @@ class AdultUpdateApplicationHandler(GenericApplicationHandler):
             'adult', params={'adult_status': 'SUBMITTED'})
 
         if response.status_code == 200:
-            resubmitted_apps = []
             submitted_apps = response.record
-            for app in submitted_apps:
-                if app['date_resubmitted'] is not None:
-                    resubmitted_apps.append(app)
-
-            if any(resubmitted_apps):
-                resubmitted_apps = sorted(resubmitted_apps, key=lambda i: i['date_resubmitted'])
-                return resubmitted_apps[0]['adult_id']
-            else:
-                submitted_apps = sorted(submitted_apps, key=lambda i: i['date_submitted'])
-                return submitted_apps[0]['adult_id']
+            submitted_apps = sorted(submitted_apps, key=lambda i: i['date_updated'])
+            return submitted_apps[0]['adult_id']
 
         else:
             raise ObjectDoesNotExist('No applications available.')

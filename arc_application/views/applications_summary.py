@@ -4,18 +4,21 @@ from django.views import View
 from django.utils.decorators import method_decorator
 from django.shortcuts import render
 from ..models import Application
-from .. services.db_gateways import NannyGatewayActions, HMGatewayActions
+from ..services.db_gateways import NannyGatewayActions, HMGatewayActions
 from django.conf import settings
+from .base import has_group
 
 # Initiate logging
 log = logging.getLogger()
 
+
 @method_decorator(login_required, name='get')
 class ApplicationsSummaryView(View):
+
     template_name = "applications_summary.html"
 
     def get(self, request):
-        context = self.get_context_data()
+        context = self.get_context_data(request)
         log.debug("Rendering applications summary (Reporting)")
         return render(request, self.template_name, context=context)
 
@@ -30,7 +33,8 @@ class ApplicationsSummaryView(View):
         cm_data['draft_applications'] = len(list(Application.objects.filter(application_status="DRAFTING")))
         cm_data['non_draft_applications'] = len(list(Application.objects.exclude(application_status="DRAFTING")))
         cm_data['new_applications'] = len(list(Application.objects.filter(application_status="SUBMITTED")))
-        cm_data['returned_applications'] = len(list(Application.objects.filter(application_status="FURTHER_INFORMATION")))
+        cm_data['returned_applications'] = len(
+            list(Application.objects.filter(application_status="FURTHER_INFORMATION")))
         cm_data['pending_applications'] = len(list(Application.objects.filter(application_status="ACCEPTED")))
 
         return cm_data
@@ -43,19 +47,22 @@ class ApplicationsSummaryView(View):
         nanny_data = {}
         # get applications at draft stage
         draft_apps_response = NannyGatewayActions().list("application", params={'application_status': "DRAFTING"})
-        nanny_data['draft_applications'] = len(draft_apps_response.record) if draft_apps_response.status_code == 200 else 0
+        nanny_data['draft_applications'] = len(
+            draft_apps_response.record) if draft_apps_response.status_code == 200 else 0
 
         # get new applications
         new_apps_response = NannyGatewayActions().list("application", params={'application_status': "SUBMITTED"})
         nanny_data['new_applications'] = len(new_apps_response.record) if new_apps_response.status_code == 200 else 0
 
         # get returned applications
-        returned_apps_response = NannyGatewayActions().list("application", params={'application_status': "FURTHER_INFORMATION"})
-        nanny_data['returned_applications'] = len(returned_apps_response.record) if returned_apps_response.status_code == 200 else 0
+        returned_apps_response = NannyGatewayActions().list("application",
+                                                            params={'application_status': "FURTHER_INFORMATION"})
+        nanny_data['returned_applications'] = len(
+            returned_apps_response.record) if returned_apps_response.status_code == 200 else 0
 
         # get pending applications
         pending_apps_response = NannyGatewayActions().list("application",
-                                                            params={'application_status': "ACCEPTED"})
+                                                           params={'application_status': "ACCEPTED"})
         nanny_data['pending_applications'] = len(
             pending_apps_response.record) if pending_apps_response.status_code == 200 else 0
 
@@ -85,17 +92,18 @@ class ApplicationsSummaryView(View):
 
         # get new applications
         new_apps_response = HMGatewayActions().list("adult", params={'adult_status': "SUBMITTED"})
-        household_member_data['new_applications'] = len(new_apps_response.record) if new_apps_response.status_code == 200 else 0
+        household_member_data['new_applications'] = len(
+            new_apps_response.record) if new_apps_response.status_code == 200 else 0
 
         # get returned applications
         returned_apps_response = HMGatewayActions().list("adult",
-                                                            params={'adult_status': "FURTHER_INFORMATION"})
+                                                         params={'adult_status': "FURTHER_INFORMATION"})
         household_member_data['returned_applications'] = len(
             returned_apps_response.record) if returned_apps_response.status_code == 200 else 0
 
         # get pending applications
         pending_apps_response = HMGatewayActions().list("adult",
-                                                           params={'adult_status': "ACCEPTED"})
+                                                        params={'adult_status': "ACCEPTED"})
         household_member_data['pending_applications'] = len(
             pending_apps_response.record) if pending_apps_response.status_code == 200 else 0
 
@@ -103,16 +111,21 @@ class ApplicationsSummaryView(View):
         total_apps_response = HMGatewayActions().list("adult", params={})
         total_applications = len(total_apps_response.record) if total_apps_response.status_code == 200 else 0
         # take any applications in draft off the number of total applications
-        household_member_data['non_draft_applications'] = total_applications - household_member_data["draft_applications"]
+        household_member_data['non_draft_applications'] = total_applications - household_member_data[
+            "draft_applications"]
 
         return household_member_data
-              
-    def get_context_data(self):
+
+    def get_context_data(self, request):
         """
         method to get all row data for the applications summary
         :return: context data
         """
         context = {}
+
+        cc_user = has_group(request.user, settings.CONTACT_CENTRE)
+        if cc_user and request.user.is_authenticated():
+            context['cc_user'] = True
         childminder_data = self.get_childminder_data()
         nanny_data = self.get_nanny_data()
         context['enable_hm'] = False

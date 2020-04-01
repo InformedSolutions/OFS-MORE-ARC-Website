@@ -17,16 +17,25 @@ class ApplicationsSummaryFunctionalTests(TestCase):
     Testing the applications summary page
     """
     def setUp(self):
-        self.user = User.objects.create_user(
+        self.user1 = User.objects.create_user(
             username='governor_tARCin',
             email='test@test.com',
             password='my_secret'
         )
         g = Group.objects.create(name=settings.ARC_GROUP)
-        g.user_set.add(self.user)
+        g.user_set.add(self.user1)
+        self.user2 = User.objects.create_user(
+            username='cc_user',
+            email='test1@test.com',
+            password='my_secret'
+        )
+        e = Group.objects.create(name=settings.CONTACT_CENTRE)
+        e.user_set.add(self.user2)
 
         global arc_test_user
-        arc_test_user = self.user
+        global cc_test_user
+        arc_test_user = self.user1
+        cc_test_user = self.user2
 
         self.client.login(username='governor_tARCin', password='my_secret')
 
