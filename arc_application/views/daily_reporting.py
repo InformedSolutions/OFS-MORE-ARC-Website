@@ -11,6 +11,8 @@ from timeline_logger.models import TimelineLog
 from ..services.db_gateways import NannyGatewayActions, HMGatewayActions
 from datetime import datetime, timedelta
 from collections import OrderedDict
+import time
+
 from ..decorators import group_required
 
 
@@ -109,6 +111,13 @@ class DailyReportingBaseView(Echo):
         else:
             arc_user = User.objects.get(id=user_id).username
         return arc_user
+
+    def dict_looper(self, d):
+        for k, v in d.items():
+            if isinstance(v, dict):
+                self.dict_looper(v)
+            else:
+                log.debug("{0} : {1}".format(k, v))
 
 @method_decorator(login_required, name='get')
 class ApplicationsInQueueView(DailyReportingBaseView):
@@ -416,13 +425,10 @@ class ApplicationsAssignedView(DailyReportingBaseView):
                            'Created Date/Time': 'Created Date/Time',
                            'Assigned to Date/Time': 'Assigned to Date/Time'})]
         applications_history = self.get_application_histories()
+        self.dict_looper(applications_history)
         app_types = ['Childminder', 'Adult', 'Nanny']
         for app_type in app_types:
             for app_id in applications_history[app_type]:
-                adult_response = HMGatewayActions().list('adult', params={"adult_id": app_id,
-                                                                        "adult_status": 'ARC_REVIEW'})
-                nanny_response = NannyGatewayActions().list('application', params={"application_id": app_id,
-                                                                                 "application_status": 'ARC_REVIEW'})
                 if app_type == 'Childminder':
                     if Application.objects.filter(application_id=app_id, application_status='ARC_REVIEW').exists():
                         urn = Application.objects.get(application_id=app_id).application_reference
@@ -434,6 +440,8 @@ class ApplicationsAssignedView(DailyReportingBaseView):
                                               'Created Date/Time': formatted_created_date,
                                               'Assigned to Date/Time': formatted_assigned_date})
                 elif app_type == 'Adult':
+                    adult_response = HMGatewayActions().list('adult', params={"adult_id": app_id,
+                                                                              "adult_status": 'ARC_REVIEW'})
                     if adult_response.status_code == 200:
                         urn = HMGatewayActions().list('dpa-auth', params={'adult_id': app_id}).record[0]['URN']
                         user_id = Arc.objects.get(application_id=app_id).user_id
@@ -444,6 +452,8 @@ class ApplicationsAssignedView(DailyReportingBaseView):
                                               'Created Date/Time': formatted_created_date,
                                               'Assigned to Date/Time': formatted_assigned_date})
                 elif app_type == 'Nanny':
+                    nanny_response = NannyGatewayActions().list('application', params={"application_id": app_id,
+                                                                                       "application_status": 'ARC_REVIEW'})
                     if nanny_response.status_code == 200:
                         urn = NannyGatewayActions().list('application', params={'application_id': app_id}).record[0][
                             'application_reference']
