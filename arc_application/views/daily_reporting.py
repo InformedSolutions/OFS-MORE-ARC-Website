@@ -35,7 +35,7 @@ class DailyReportingBaseView(Echo):
         :return Dictionary grouped by application id, then by date, then by historical item"""
         dictionary = {}
         if app_type == 'Childminder':
-            timelinelog = TimelineLog.objects.filter(object_id=str(app_id[0])).order_by('-timestamp')
+            timelinelog = TimelineLog.objects.filter(object_id=app_id).order_by('-timestamp')
         elif app_type == 'Adult':
             api_response = HMGatewayActions().list('timeline-log', params={'object_id': app_id})
             if api_response.status_code == 200:
@@ -83,7 +83,7 @@ class DailyReportingBaseView(Echo):
         cm_application_id_list = Application.objects.all().values_list('application_id')
         application_history['Childminder'] = {}
         for app_id in cm_application_id_list:
-            application_history['Childminder'][str(app_id[0])] = self.application_history(app_id, 'Childminder')
+            application_history['Childminder'][str(app_id[0])] = self.application_history(str(app_id[0]), 'Childminder')
 
         adult_application_response = HMGatewayActions().list('adult', params={})
         if adult_application_response.status_code == 200:
@@ -111,13 +111,6 @@ class DailyReportingBaseView(Echo):
         else:
             arc_user = User.objects.get(id=user_id).username
         return arc_user
-
-    def dict_looper(self, d):
-        for k, v in d.items():
-            if isinstance(v, dict):
-                self.dict_looper(v)
-            else:
-                log.debug("{0} : {1}".format(k, v))
 
 @method_decorator(login_required, name='get')
 class ApplicationsInQueueView(DailyReportingBaseView):
@@ -424,48 +417,46 @@ class ApplicationsAssignedView(DailyReportingBaseView):
                            'Action': 'Action',
                            'Created Date/Time': 'Created Date/Time',
                            'Assigned to Date/Time': 'Assigned to Date/Time'})]
-        applications_history = self.get_application_histories()
-        self.dict_looper(applications_history)
-        app_types = ['Childminder', 'Adult', 'Nanny']
-        for app_type in app_types:
-            for app_id in applications_history[app_type]:
-                if app_type == 'Childminder':
-                    if Application.objects.filter(application_id=app_id, application_status='ARC_REVIEW').exists():
-                        urn = Application.objects.get(application_id=app_id).application_reference
-                        user_id = Arc.objects.get(application_id=app_id).user_id
-                        formatted_created_date = datetime.strftime(list(applications_history[app_type][app_id])[0], "%d/%m/%y %H:%M")
-                        formatted_assigned_date = datetime.strftime(list(applications_history[app_type][app_id])[-1], "%d/%m/%y %H:%M")
-                        assigned_apps.append({'URN': urn, 'Caseworker': self.get_user(user_id),
-                                              'Type': 'CM', 'Action': 'Assigned',
-                                              'Created Date/Time': formatted_created_date,
-                                              'Assigned to Date/Time': formatted_assigned_date})
-                elif app_type == 'Adult':
-                    adult_response = HMGatewayActions().list('adult', params={"adult_id": app_id,
-                                                                              "adult_status": 'ARC_REVIEW'})
-                    if adult_response.status_code == 200:
-                        urn = HMGatewayActions().list('dpa-auth', params={'adult_id': app_id}).record[0]['URN']
-                        user_id = Arc.objects.get(application_id=app_id).user_id
-                        formatted_created_date = datetime.strftime(list(applications_history[app_type][app_id])[0], "%d/%m/%y %H:%M")
-                        formatted_assigned_date = datetime.strftime(list(applications_history[app_type][app_id])[-1], "%d/%m/%y %H:%M")
-                        assigned_apps.append({'URN': urn, 'Caseworker': self.get_user(user_id), 'Type': 'New Association',
-                                              'Action': 'Assigned',
-                                              'Created Date/Time': formatted_created_date,
-                                              'Assigned to Date/Time': formatted_assigned_date})
-                elif app_type == 'Nanny':
-                    nanny_response = NannyGatewayActions().list('application', params={"application_id": app_id,
-                                                                                       "application_status": 'ARC_REVIEW'})
-                    if nanny_response.status_code == 200:
-                        urn = NannyGatewayActions().list('application', params={'application_id': app_id}).record[0][
-                            'application_reference']
-                        user_id = Arc.objects.get(application_id=app_id).user_id
-                        formatted_created_date = datetime.strftime(list(applications_history[app_type][app_id])[0],
-                                                                   "%d/%m/%y %H:%M")
-                        formatted_assigned_date = datetime.strftime(list(applications_history[app_type][app_id])[-1],
-                                                                    "%d/%m/%y %H:%M")
-                        assigned_apps.append({'URN': urn, 'Caseworker': self.get_user(user_id), 'Type': 'Nanny',
-                                              'Action': 'Assigned',
-                                              'Created Date/Time': formatted_created_date,
-                                              'Assigned to Date/Time': formatted_assigned_date})
+        adult_response = HMGatewayActions().list('adult', params={"adult_status": 'ARC_REVIEW'})
+        nanny_response = NannyGatewayActions().list('application', params={"application_status": 'ARC_REVIEW'})
+        cm_applications = list(Application.objects.filter(application_status='ARC_REVIEW', ))
+        for app in cm_applications:
+            app_id = app.application_id
+            cm_assigned_history = self.application_history(app_id, 'Childminder')
+            urn = Application.objects.get(application_id=app_id).application_reference
+            user_id = Arc.objects.get(application_id=app_id).user_id
+            formatted_created_date = datetime.strftime(list(cm_assigned_history)[0], "%d/%m/%y %H:%M")
+            formatted_assigned_date = datetime.strftime(list(cm_assigned_history)[-1], "%d/%m/%y %H:%M")
+            assigned_apps.append({'URN': urn, 'Caseworker': self.get_user(user_id),
+                                  'Type': 'CM', 'Action': 'Assigned',
+                                  'Created Date/Time': formatted_created_date,
+                                  'Assigned to Date/Time': formatted_assigned_date})
+
+        if adult_response.status_code == 200:
+            adults_assigned = adult_response.record
+            for adult in adults_assigned:
+                adult_assigned_history = self.application_history(adult['adult_id'], 'Adult')
+                urn = HMGatewayActions().list('dpa-auth', params={'adult_id': adult['adult_id']}).record[0]['URN']
+                user_id = Arc.objects.get(application_id=app_id).user_id
+                formatted_created_date = datetime.strftime(list(adult_assigned_history)[0], "%d/%m/%y %H:%M")
+                formatted_assigned_date = datetime.strftime(list(adult_assigned_history)[-1], "%d/%m/%y %H:%M")
+                assigned_apps.append({'URN': urn, 'Caseworker': self.get_user(user_id), 'Type': 'New Association',
+                                      'Action': 'Assigned',
+                                      'Created Date/Time': formatted_created_date,
+                                      'Assigned to Date/Time': formatted_assigned_date})
+
+        if nanny_response.status_code == 200:
+            nannies_assigned = nanny_response.record
+            for nanny in nannies_assigned:
+                nanny_assigned_history = self.application_history(nanny['application_id'], 'Nanny')
+                urn = nanny['application_reference']
+                user_id = Arc.objects.get(application_id=nanny['application_id']).user_id
+                formatted_created_date = datetime.strftime(list(nanny_assigned_history)[0], "%d/%m/%y %H:%M")
+                formatted_assigned_date = datetime.strftime(list(nanny_assigned_history)[-1], "%d/%m/%y %H:%M")
+                assigned_apps.append({'URN': urn, 'Caseworker': self.get_user(user_id), 'Type': 'Nanny',
+                                      'Action': 'Assigned',
+                                      'Created Date/Time': formatted_created_date,
+                                      'Assigned to Date/Time': formatted_assigned_date})
 
         return assigned_apps
 
@@ -581,8 +572,12 @@ class ApplicationsAuditLogView(DailyReportingBaseView):
                     elif app_type == 'Nanny':
                         urn = NannyGatewayActions().list('application', params={'application_id': app_id}).record[0][
                             'application_reference']
-                        record = NannyGatewayActions().list('applicant-personal-details', params={'application_id': app_id}).record[0]
-                        full_name = record['first_name'] + " " + record['last_name']
+                        response = NannyGatewayActions().list('applicant-personal-details', params={'application_id': app_id})
+                        if response.status_code == 200:
+                            record = response.record[0]
+                            full_name = record['first_name'] + " " + record['last_name']
+                        else:
+                            full_name = ''
                         audit_log.append({'URN': urn, 'Name': full_name,
                                           'Caseworker': arc_user, 'Type': 'Nanny', 'Action': action,
                                               'Date/Time': formatted_date})
