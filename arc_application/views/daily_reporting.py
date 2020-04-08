@@ -61,19 +61,19 @@ class DailyReportingBaseView(Echo):
         dictionary = {}
         for entry in timelinelog:
             if entry.extra_data['action'] == 'created by':
-                dictionary[entry.timestamp] = {'created by': entry.extra_data['user_type']}
+                dictionary[entry.timestamp] = {'Created': entry.extra_data['user_type']}
             elif entry.extra_data['action'] == 'submitted by':
-                dictionary[entry.timestamp] = {'submitted by': entry.extra_data['user_type']}
+                dictionary[entry.timestamp] = {'Submitted': entry.extra_data['user_type']}
             elif entry.extra_data['action'] == 'assigned to':
-                dictionary[entry.timestamp] = {'assigned_to': str(entry.user)}
+                dictionary[entry.timestamp] = {'Assigned': str(entry.user)}
             elif entry.extra_data['action'] == 'returned by':
-                dictionary[entry.timestamp] = {'returned_by': str(entry.user)}
+                dictionary[entry.timestamp] = {'Returned': str(entry.user)}
             elif entry.extra_data['action'] == 'resubmitted by':
-                dictionary[entry.timestamp] = {'resubmitted_by': entry.extra_data['user_type']}
+                dictionary[entry.timestamp] = {'Resubmitted': entry.extra_data['user_type']}
             elif entry.extra_data['action'] == 'accepted by':
-                dictionary[entry.timestamp] = {'accepted_by': str(entry.user)}
+                dictionary[entry.timestamp] = {'Processed to Cygnum': str(entry.user)}
             elif entry.extra_data['action'] == 'released by':
-                dictionary[entry.timestamp] = {'released_by': str(entry.user)}
+                dictionary[entry.timestamp] = {'Released': str(entry.user)}
         dictionary = OrderedDict(sorted(dictionary.items(), key=lambda t: t[0]))
         return dictionary
 
@@ -126,7 +126,7 @@ class ApplicationsInQueueView(DailyReportingBaseView):
         response = StreamingHttpResponse((writer.writerow(data) for data in context),
                                          content_type="text/csv")
         response['Content-Disposition'] = 'attachment; filename="Applications_in_Queue_{}.csv"'.format(now)
-        log.debug("Rendering applications summary (Reporting)")
+        log.debug("Rendering applications in queue (Reporting)")
 
         return response
 
@@ -206,7 +206,7 @@ class ApplicationsReturnedView(DailyReportingBaseView):
         response = StreamingHttpResponse((writer.writerow(data) for data in context),
                                          content_type="text/csv")
         response['Content-Disposition'] = 'attachment; filename="Applications_Returned_{}.csv"'.format(now)
-        log.debug("Rendering applications summary (Reporting)")
+        log.debug("Rendering applications returned (Reporting)")
 
         return response
 
@@ -279,7 +279,7 @@ class ApplicationsProcessedView(DailyReportingBaseView):
         response = StreamingHttpResponse((writer.writerow(data) for data in context),
                                          content_type="text/csv")
         response['Content-Disposition'] = 'attachment; filename="Applications_Processed_{}.csv"'.format(now)
-        log.debug("Rendering applications summary (Reporting)")
+        log.debug("Rendering applications processed (Reporting)")
 
         return response
 
@@ -474,9 +474,23 @@ class ApplicationsAuditLogView(DailyReportingBaseView):
         response = StreamingHttpResponse((writer.writerow(data) for data in context),
                                          content_type="text/csv")
         response['Content-Disposition'] = 'attachment; filename="Applications_Audit_Log_{}.csv"'.format(now)
-        log.debug("Download applications assigned (Reporting)")
+        log.debug("Download application audit log (Reporting)")
 
         return response
+
+    def get_user_from_username(self, username):
+        if username == 'applicant':
+            return ''
+        elif username == 'adult':
+            return ''
+        else:
+            first_name = User.objects.get(username=username).first_name
+            last_name = User.objects.get(username=username).last_name
+            if first_name is not '':
+                arc_user = '{0} {1}'.format(first_name, last_name if not '' else "")
+            else:
+                arc_user = User.objects.get(username=username).username
+            return arc_user
 
     def get_applications_audit_log(self):
         """
@@ -492,94 +506,42 @@ class ApplicationsAuditLogView(DailyReportingBaseView):
                        'Date/Time': 'Date/Time',
                        })]
         applications_history = self.get_application_histories()
-        app_types = ['Childminder', 'Adult', 'Nanny']
-        for app_type in app_types:
-            for app_id in applications_history[app_type]:
-                for date in applications_history[app_type][app_id]:
-                    formatted_date = datetime.strftime(date, "%d/%m/%y %H:%M")
-                    if 'created by' in applications_history[app_type][app_id][date]:
-                        action = 'Created'
-                        arc_user = ''
-                    elif 'submitted by' in applications_history[app_type][app_id][date]:
-                        action = 'Submitted'
-                        arc_user = ''
-                    elif 'assigned_to' in applications_history[app_type][app_id][date]:
-                        username = applications_history[app_type][app_id][date]['assigned_to']
-                        if User.objects.filter(username=username).exists():
-                            first_name = User.objects.get(username=username).first_name
-                            last_name = User.objects.get(username=username).last_name
-                            if first_name is not '':
-                                arc_user = '{0} {1}'.format(first_name, last_name if not '' else "")
-                            else:
-                                arc_user = username
-                        else:
-                            arc_user = username
-                        action = 'Assigned'
-                    elif 'accepted_by' in applications_history[app_type][app_id][date]:
-                        username = applications_history[app_type][app_id][date]['accepted_by']
-                        if User.objects.filter(username=username).exists():
-                            first_name = User.objects.get(username=username).first_name
-                            last_name = User.objects.get(username=username).last_name
-                            if first_name is not '':
-                                arc_user = '{0} {1}'.format(first_name, last_name if not '' else "")
-                            else:
-                                arc_user = username
-                        else:
-                            arc_user = username
-                        action = 'Processed to Cygnum'
-                    elif 'resubmitted_by' in applications_history[app_type][app_id][date]:
-                        arc_user = ''
-                        action = 'Resubmitted'
-                    elif 'returned_by' in applications_history[app_type][app_id][date]:
-                        username = applications_history[app_type][app_id][date]['returned_by']
-                        if User.objects.filter(username=username).exists():
-                            first_name = User.objects.get(username=username).first_name
-                            last_name = User.objects.get(username=username).last_name
-                            if first_name is not '':
-                                arc_user = '{0} {1}'.format(first_name, last_name if not '' else "")
-                            else:
-                                arc_user = username
-                        else:
-                            arc_user = username
-                        action = 'Returned'
-                    elif 'released_by' in applications_history[app_type][app_id][date]:
-                        username = applications_history[app_type][app_id][date]['released_by']
-                        if User.objects.filter(username=username).exists():
-                            first_name = User.objects.get(username=username).first_name
-                            last_name = User.objects.get(username=username).last_name
-                            if first_name is not '':
-                                arc_user = '{0} {1}'.format(first_name, last_name if not '' else "")
-                            else:
-                                arc_user = username
-                        else:
-                            arc_user = username
-                        action = 'Released'
-                    if app_type == 'Childminder':
-                        if ApplicantName.objects.filter(application_id=app_id).exists():
-                            name = ApplicantName.objects.get(application_id=app_id)
-                            full_name = name.first_name + " " + name.last_name
-                        else:
-                            full_name = ''
-                        urn = Application.objects.get(application_id=app_id).application_reference
-                        audit_log.append({'URN': urn, 'Name': full_name,
-                                          'Caseworker': arc_user, 'Type': 'CM', 'Action': action,
-                                                  'Date/Time': formatted_date})
-                    elif app_type == 'Adult':
-                        urn = HMGatewayActions().list('dpa-auth', params={'adult_id': app_id}).record[0]['URN']
-                        audit_log.append({'URN': urn, 'Name': HMGatewayActions().list('adult', params={'adult_id': app_id}).record[0]['get_full_name'],
-                                          'Caseworker': arc_user, 'Type': 'New Association',
-                                              'Action': action, 'Date/Time': formatted_date})
-                    elif app_type == 'Nanny':
-                        urn = NannyGatewayActions().list('application', params={'application_id': app_id}).record[0][
-                            'application_reference']
-                        response = NannyGatewayActions().list('applicant-personal-details', params={'application_id': app_id})
-                        if response.status_code == 200:
-                            record = response.record[0]
-                            full_name = record['first_name'] + " " + record['last_name']
-                        else:
-                            full_name = ''
-                        audit_log.append({'URN': urn, 'Name': full_name,
-                                          'Caseworker': arc_user, 'Type': 'Nanny', 'Action': action,
-                                              'Date/Time': formatted_date})
 
+        for k1, v1 in applications_history.items():
+            for k2, v2 in v1.items():
+                if k1 == 'Childminder':
+                    if ApplicantName.objects.filter(application_id=k2).exists():
+                        name = ApplicantName.objects.get(application_id=k2)
+                        full_name = name.first_name + " " + name.last_name
+                    else:
+                        full_name = ''
+                    urn = Application.objects.get(application_id=k2).application_reference
+                elif k1 == 'Adult':
+                    urn = HMGatewayActions().list('dpa-auth', params={'adult_id': k2}).record[0]['URN']
+                    full_name = HMGatewayActions().list('adult', params={'adult_id': k2}).record[0]['get_full_name']
+                elif k1 == 'Nanny':
+                    urn = NannyGatewayActions().list('application', params={'application_id': k2}).record[0][
+                        'application_reference']
+                    response = NannyGatewayActions().list('applicant-personal-details',
+                                                          params={'application_id': k2})
+                    if response.status_code == 200:
+                        record = response.record[0]
+                        full_name = record['first_name'] + " " + record['last_name']
+                    else:
+                        full_name = ''
+                for k3, v3 in v2.items():
+                    formatted_date = datetime.strftime(k3, "%d/%m/%y %H:%M")
+                    k4, v4 = list(v3.keys())[0], list(v3.values())[0]
+                    if k1 == 'Childminder':
+                        audit_log.append({'URN': urn, 'Name': full_name,
+                                          'Caseworker': self.get_user_from_username(v4), 'Type': 'CM', 'Action': k4,
+                                          'Date/Time': formatted_date})
+                    elif k1 == 'Adult':
+                        audit_log.append({'URN': urn, 'Name': full_name,
+                                          'Caseworker': self.get_user_from_username(v4), 'Type': 'New Association',
+                                          'Action': k4, 'Date/Time': formatted_date})
+                    elif k1 == 'Nanny':
+                        audit_log.append({'URN': urn, 'Name': full_name,
+                                          'Caseworker': self.get_user_from_username(v4), 'Type': 'Nanny', 'Action': k4,
+                                          'Date/Time': formatted_date})
         return audit_log
