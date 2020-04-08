@@ -4,16 +4,13 @@ from django.views import View
 from django.utils.decorators import method_decorator
 from ..models import Application, Arc, ApplicantName
 import csv
-from django.http import HttpResponse, StreamingHttpResponse
+from django.http import StreamingHttpResponse
 from django.contrib.auth.models import User
 from .audit_log import MockTimelineLog
 from timeline_logger.models import TimelineLog
 from ..services.db_gateways import NannyGatewayActions, HMGatewayActions
 from datetime import datetime, timedelta
 from collections import OrderedDict
-import time
-
-from ..decorators import group_required
 
 
 # Initiate logging
