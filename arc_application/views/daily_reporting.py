@@ -390,6 +390,7 @@ class ApplicationsAssignedView(DailyReportingBaseView):
     def get(self, request):
         context = self.get_applications_assigned()
         now = datetime.now()
+        time.sleep(310)
         now = datetime.strftime(now, "%Y%m%dT%H%M")
         csv_columns = ['URN', 'Caseworker', 'Type',
                        'Action', 'Created Date/Time',
