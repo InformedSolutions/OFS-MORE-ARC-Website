@@ -11,6 +11,7 @@ from timeline_logger.models import TimelineLog
 from ..services.db_gateways import NannyGatewayActions, HMGatewayActions
 from datetime import datetime, timedelta
 from collections import OrderedDict
+import time
 
 
 # Initiate logging
@@ -464,6 +465,7 @@ class ApplicationsAuditLogView(DailyReportingBaseView):
         context = self.get_applications_audit_log()
         now = datetime.now()
         now = datetime.strftime(now, "%Y%m%dT%H%M")
+        time.sleep(610)
         csv_columns = ['URN', 'Name', 'Caseworker', 'Type',
                        'Action', 'Date/Time']
         pseudo_buffer = Echo()
