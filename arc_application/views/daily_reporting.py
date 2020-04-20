@@ -209,7 +209,7 @@ class ApplicationsReturnedView(DailyReportingBaseView):
 
     def get_applications_returned(self):
         """
-        function to list the history of returned and returned applications on a given day.
+        function to list the history of returned and re-returned applications on a given day.
         :return: List of adults, childminder and nannies returned or returned by day
         """
 
@@ -233,7 +233,7 @@ class ApplicationsReturnedView(DailyReportingBaseView):
             for app_type in app_types:
                 for app_id in applications_history[app_type]:
                     for date in applications_history[app_type][app_id]:
-                        if date.date() == initial_date.date() and 'returned_by' in \
+                        if date.date() == initial_date.date() and 'Returned' in \
                                 applications_history[app_type][app_id][date]:
                             if app_type == 'Childminder':
                                 cm_apps += 1
@@ -317,14 +317,14 @@ class ApplicationsProcessedView(DailyReportingBaseView):
                     for i in range(0, len(date_list)):
                         for entry in applications_history[app_type][app_id][date_list[i]]:
                             if date_list[i].date() == initial_date.date():
-                                if entry == 'accepted_by':
+                                if entry == 'Processed to Cygnum':
                                     if app_type == 'Childminder':
                                         cm_apps += 1
                                     elif app_type == 'Adult':
                                         adult_apps += 1
                                     elif app_type == 'Nanny':
                                         nanny_apps += 1
-                                elif entry == 'returned_by':
+                                elif entry == 'Returned':
                                     if app_type == 'Childminder':
                                         cm_apps_returned += 1
                                     elif app_type == 'Adult':
@@ -434,7 +434,7 @@ class ApplicationsAssignedView(DailyReportingBaseView):
             for adult in adults_assigned:
                 adult_assigned_history = self.application_history(adult['adult_id'], 'Adult')
                 urn = HMGatewayActions().list('dpa-auth', params={'adult_id': adult['adult_id']}).record[0]['URN']
-                user_id = Arc.objects.get(application_id=app_id).user_id
+                user_id = Arc.objects.get(application_id=adult['adult_id']).user_id
                 formatted_created_date = datetime.strftime(list(adult_assigned_history)[0], "%d/%m/%y %H:%M")
                 formatted_assigned_date = datetime.strftime(list(adult_assigned_history)[-1], "%d/%m/%y %H:%M")
                 assigned_apps.append({'URN': urn, 'Caseworker': self.get_user(user_id), 'Type': 'New Association',
