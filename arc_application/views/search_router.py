@@ -19,7 +19,7 @@ class SearchRouter(View):
             return self.cc_summary_view(request)
         elif app_type == 'Nanny':
             return self.NannySearchSummary_view(request, *args, **kwargs)
-        elif app_type == 'Association':
+        elif app_type == 'New Association':
             return self.AdultUpdateSearchSummary_view(request, *args, **kwargs)
         else:
             return ValueError('app_type is {0} but should have been "Nanny" or "Childminder"'.format(app_type))
