@@ -150,24 +150,20 @@ class ApplicationsInQueueView(DailyReportingBaseView):
             adult_apps = 0
             nanny_apps = 0
             for item in cm_applications:
-                if item.date_submitted.date() == initial_date.date():
-                    cm_apps += 1
+                app_id = item.application_id
+                cm_submitted_history = OrderedDict(reversed(list(self.application_history(app_id, 'Childminder').items())))
+                cm_apps += self.check_submission(cm_submitted_history, initial_date)
             if adult_response.status_code == 200:
                 adults_submitted = adult_response.record
                 for adult in adults_submitted:
-                    if adult['date_resubmitted'] is None and datetime.strptime(
-                            adult['date_submitted'][:19], "%Y-%m-%dT%H:%M:%S").date() == initial_date.date():
-                        adult_apps += 1
-                    elif adult['date_resubmitted'] is not None and datetime.strptime(
-                            adult['date_resubmitted'][:19], "%Y-%m-%dT%H:%M:%S").date() == initial_date.date():
-                        adult_apps += 1
+                    adult_submitted_history = OrderedDict(reversed(list(self.application_history(adult['adult_id'], 'Adult').items())))
+                    adult_apps += self.check_submission(adult_submitted_history, initial_date)
             if nanny_response.status_code == 200:
                 nannies_submitted = nanny_response.record
                 for nanny in nannies_submitted:
-                    if datetime.strptime(
-                            nanny['date_submitted'][:19],
-                            "%Y-%m-%dT%H:%M:%S").date() == initial_date.date() and not None:
-                        nanny_apps += 1
+                    nanny_submitted_history = OrderedDict(reversed(list(self.application_history(
+                        nanny['application_id'], 'Nanny').items())))
+                    nanny_apps += self.check_submission(nanny_submitted_history, initial_date)
 
             apps_in_queue.append({'Date': datetime.strftime(initial_date, "%d %B %Y"),
                                   'Childminder in Queue': cm_apps,
@@ -187,6 +183,18 @@ class ApplicationsInQueueView(DailyReportingBaseView):
              })
 
         return (apps_in_queue)
+
+    def check_submission(self, dictionary, initial_date):
+        for k1, v1 in dictionary.items():
+            if k1.date() == initial_date.date():
+                k2, v2 = list(v1.keys())[0], list(v1.values())[0]
+                if k2 == 'Resubmitted':
+                    apps = 1
+                    return apps
+                elif k2 == 'Submitted':
+                    apps = 1
+                    return apps
+        return 0
 
 
 @method_decorator(login_required, name='get')
