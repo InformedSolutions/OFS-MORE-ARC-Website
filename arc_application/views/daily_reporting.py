@@ -145,30 +145,42 @@ class ApplicationsInQueueView(DailyReportingBaseView):
                                   'Nanny in Queue': 'Nanny in Queue',
                                   'All Services in Queue':  'All Services in Queue'
                                  })]
+        cm_application_submitted_date = []
+        adult_application_submitted_date = []
+        nanny_application_submitted_date = []
+
+        for item in cm_applications:
+            app_id = item.application_id
+            cm_submitted_history = OrderedDict(reversed(list(self.application_history(app_id, 'Childminder').items())))
+            cm_application_submitted_date.append(self.check_submission(cm_submitted_history))
+
+        if adult_response.status_code == 200:
+            adults_submitted = adult_response.record
+            for adult in adults_submitted:
+                adult_submitted_history = OrderedDict(
+                    reversed(list(self.application_history(adult['adult_id'], 'Adult').items())))
+                adult_application_submitted_date.append(self.check_submission(adult_submitted_history))
+
+        if nanny_response.status_code == 200:
+            nannies_submitted = nanny_response.record
+            for nanny in nannies_submitted:
+                nanny_submitted_history = OrderedDict(reversed(list(self.application_history(
+                    nanny['application_id'], 'Nanny').items())))
+                nanny_application_submitted_date.append(self.check_submission(nanny_submitted_history))
+
         while initial_date <= now:
             cm_apps = 0
             adult_apps = 0
             nanny_apps = 0
-            for item in cm_applications:
-                if item.date_submitted.date() == initial_date.date():
+            for date in cm_application_submitted_date:
+                if date.date() == initial_date.date():
                     cm_apps += 1
-            if adult_response.status_code == 200:
-                adults_submitted = adult_response.record
-                for adult in adults_submitted:
-                    if adult['date_resubmitted'] is None and datetime.strptime(
-                            adult['date_submitted'][:19], "%Y-%m-%dT%H:%M:%S").date() == initial_date.date():
-                        adult_apps += 1
-                    elif adult['date_resubmitted'] is not None and datetime.strptime(
-                            adult['date_resubmitted'][:19], "%Y-%m-%dT%H:%M:%S").date() == initial_date.date():
-                        adult_apps += 1
-            if nanny_response.status_code == 200:
-                nannies_submitted = nanny_response.record
-                for nanny in nannies_submitted:
-                    if datetime.strptime(
-                            nanny['date_submitted'][:19],
-                            "%Y-%m-%dT%H:%M:%S").date() == initial_date.date() and not None:
-                        nanny_apps += 1
-
+            for date in adult_application_submitted_date:
+                if date.date() == initial_date.date():
+                    adult_apps += 1
+            for date in nanny_application_submitted_date:
+                if date.date() == initial_date.date():
+                    nanny_apps += 1
             apps_in_queue.append({'Date': datetime.strftime(initial_date, "%d %B %Y"),
                                   'Childminder in Queue': cm_apps,
                                   'New Association in Queue': adult_apps,
@@ -187,6 +199,15 @@ class ApplicationsInQueueView(DailyReportingBaseView):
              })
 
         return (apps_in_queue)
+
+    def check_submission(self, dictionary):
+        for k1, v1 in dictionary.items():
+            k2, v2 = list(v1.keys())[0], list(v1.values())[0]
+            if k2 == 'Resubmitted':
+                return k1
+            elif k2 == 'Submitted':
+                return k1
+        return False
 
 
 @method_decorator(login_required, name='get')
@@ -481,13 +502,16 @@ class ApplicationsAuditLogView(DailyReportingBaseView):
         elif username == 'adult':
             return ''
         else:
-            first_name = User.objects.get(username=username).first_name
-            last_name = User.objects.get(username=username).last_name
-            if first_name is not '':
-                arc_user = '{0} {1}'.format(first_name, last_name if not '' else "")
+            if User.objects.filter(username=username).exists():
+                first_name = User.objects.get(username=username).first_name
+                last_name = User.objects.get(username=username).last_name
+                if first_name is not '':
+                    arc_user = '{0} {1}'.format(first_name, last_name if not '' else "")
+                else:
+                    arc_user = User.objects.get(username=username).username
+                return arc_user
             else:
-                arc_user = User.objects.get(username=username).username
-            return arc_user
+                return username
 
     def get_applications_audit_log(self):
         """
