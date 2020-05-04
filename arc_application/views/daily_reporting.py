@@ -101,15 +101,15 @@ class DailyReportingBaseView(Echo):
         return application_history
 
     def get_user(self, user_id):
-        if User.objects.filter(id=user_id).exists():
+        if user_id == '':
+            return user_id
+        else:
             first_name = User.objects.get(id=user_id).first_name
             last_name = User.objects.get(id=user_id).last_name
             if first_name is not '':
                 arc_user = '{0} {1}'.format(first_name, last_name if not '' else "")
             else:
                 arc_user = User.objects.get(id=user_id).username
-        else:
-            arc_user = ''
         return arc_user
 
 @method_decorator(login_required, name='get')
