@@ -442,7 +442,10 @@ class ApplicationsAssignedView(DailyReportingBaseView):
             app_id = app.application_id
             cm_assigned_history = self.application_history(app_id, 'Childminder')
             urn = Application.objects.get(application_id=app_id).application_reference
-            user_id = Arc.objects.get(application_id=app_id).user_id
+            if Arc.objects.filter(application_id=app_id).exists():
+                user_id = Arc.objects.get(application_id=app_id).user_id
+            else:
+                user_id = ''
             formatted_created_date = datetime.strftime(list(cm_assigned_history)[0], "%d/%m/%y %H:%M")
             formatted_assigned_date = datetime.strftime(list(cm_assigned_history)[-1], "%d/%m/%y %H:%M")
             assigned_apps.append({'URN': urn, 'Caseworker': self.get_user(user_id),
@@ -455,7 +458,10 @@ class ApplicationsAssignedView(DailyReportingBaseView):
             for adult in adults_assigned:
                 adult_assigned_history = self.application_history(adult['adult_id'], 'Adult')
                 urn = HMGatewayActions().list('dpa-auth', params={'adult_id': adult['adult_id']}).record[0]['URN']
-                user_id = Arc.objects.get(application_id=adult['adult_id']).user_id
+                if Arc.objects.filter(application_id=adult['adult_id']).exists():
+                    user_id = Arc.objects.get(application_id=adult['adult_id']).user_id
+                else:
+                    user_id = ''
                 formatted_created_date = datetime.strftime(list(adult_assigned_history)[0], "%d/%m/%y %H:%M")
                 formatted_assigned_date = datetime.strftime(list(adult_assigned_history)[-1], "%d/%m/%y %H:%M")
                 assigned_apps.append({'URN': urn, 'Caseworker': self.get_user(user_id), 'Type': 'New Association',
@@ -468,7 +474,10 @@ class ApplicationsAssignedView(DailyReportingBaseView):
             for nanny in nannies_assigned:
                 nanny_assigned_history = self.application_history(nanny['application_id'], 'Nanny')
                 urn = nanny['application_reference']
-                user_id = Arc.objects.get(application_id=nanny['application_id']).user_id
+                if Arc.objects.filter(application_id=nanny['application_id']).exists():
+                    user_id = Arc.objects.get(application_id=nanny['application_id']).user_id
+                else:
+                    user_id = ''
                 formatted_created_date = datetime.strftime(list(nanny_assigned_history)[0], "%d/%m/%y %H:%M")
                 formatted_assigned_date = datetime.strftime(list(nanny_assigned_history)[-1], "%d/%m/%y %H:%M")
                 assigned_apps.append({'URN': urn, 'Caseworker': self.get_user(user_id), 'Type': 'Nanny',
