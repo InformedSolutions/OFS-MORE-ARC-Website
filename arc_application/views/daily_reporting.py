@@ -460,7 +460,7 @@ class ApplicationsAssignedView(DailyReportingBaseView):
             adults_assigned = adult_response.record
             for adult in adults_assigned:
                 adult_assigned_history = self.application_history(adult['adult_id'], 'Adult')
-                urn = HMGatewayActions().list('dpa-auth', params={'adult_id': adult['adult_id']}).record[0]['URN']
+                urn = HMGatewayActions().list('dpa-auth', params={'token_id': adult['token_id']}).record[0]['URN']
                 if Arc.objects.filter(application_id=adult['adult_id']).exists():
                     user_id = Arc.objects.get(application_id=adult['adult_id']).user_id
                 else:
