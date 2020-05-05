@@ -461,6 +461,7 @@ class ApplicationsAssignedView(DailyReportingBaseView):
             for adult in adults_assigned:
                 adult_assigned_history = self.application_history(adult['adult_id'], 'Adult')
                 urn = HMGatewayActions().list('dpa-auth', params={'token_id': adult['token_id']}).record[0]['URN']
+                log.debug('URN = {}, adult_id = {}'.format(urn, adult['adult_id']))
                 if Arc.objects.filter(application_id=adult['adult_id']).exists():
                     user_id = Arc.objects.get(application_id=adult['adult_id']).user_id
                 else:
@@ -550,7 +551,8 @@ class ApplicationsAuditLogView(DailyReportingBaseView):
                         full_name = ''
                     urn = Application.objects.get(application_id=k2).application_reference
                 elif k1 == 'Adult':
-                    urn = HMGatewayActions().list('dpa-auth', params={'adult_id': k2}).record[0]['URN']
+                    adult_record = HMGatewayActions().list('adult', params={'adult_id': k2}).record[0]
+                    urn = HMGatewayActions().list('dpa-auth', params={'token_id': adult_record['token_id']}).record[0]['URN']
                     full_name = HMGatewayActions().list('adult', params={'adult_id': k2}).record[0]['get_full_name']
                 elif k1 == 'Nanny':
                     urn = NannyGatewayActions().list('application', params={'application_id': k2}).record[0][
