@@ -9,7 +9,7 @@ import logging
 from ...decorators import group_required, user_assigned_application
 from ...models import *
 from ...utils import has_group
-from .childminder_utils import get_application_summary_variables, load_json
+from .childminder_utils import get_application_summary_variables, load_json, add_comments
 
 # Initiate logging
 log = logging.getLogger('')
@@ -58,6 +58,7 @@ def cc_summary(request):
             log.debug("Conditional logic: Show health declarations and references tables")
 
         json = load_json(application_id_local, ordered_models, False)
+        json = add_comments(json, application_id_local, add_change_links=False)
         json[0][1]['link'] = (reverse('update_email') + '?id=' + str(application_id_local))
         json[0][2]['link'] = (reverse('update_phone_number') + '?id=' + str(application_id_local))
         json[0][3]['link'] = (reverse('update_add_number') + '?id=' + str(application_id_local))
