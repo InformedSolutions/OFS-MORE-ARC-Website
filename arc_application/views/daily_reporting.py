@@ -101,12 +101,15 @@ class DailyReportingBaseView(Echo):
         return application_history
 
     def get_user(self, user_id):
-        first_name = User.objects.get(id=user_id).first_name
-        last_name = User.objects.get(id=user_id).last_name
-        if first_name is not '':
-            arc_user = '{0} {1}'.format(first_name, last_name if not '' else "")
+        if user_id == '':
+            return user_id
         else:
-            arc_user = User.objects.get(id=user_id).username
+            first_name = User.objects.get(id=user_id).first_name
+            last_name = User.objects.get(id=user_id).last_name
+            if first_name is not '':
+                arc_user = '{0} {1}'.format(first_name, last_name if not '' else "")
+            else:
+                arc_user = User.objects.get(id=user_id).username
         return arc_user
 
 @method_decorator(login_required, name='get')
@@ -145,30 +148,42 @@ class ApplicationsInQueueView(DailyReportingBaseView):
                                   'Nanny in Queue': 'Nanny in Queue',
                                   'All Services in Queue':  'All Services in Queue'
                                  })]
+        cm_application_submitted_date = []
+        adult_application_submitted_date = []
+        nanny_application_submitted_date = []
+
+        for item in cm_applications:
+            app_id = item.application_id
+            cm_submitted_history = OrderedDict(reversed(list(self.application_history(app_id, 'Childminder').items())))
+            cm_application_submitted_date.append(self.check_submission(cm_submitted_history))
+
+        if adult_response.status_code == 200:
+            adults_submitted = adult_response.record
+            for adult in adults_submitted:
+                adult_submitted_history = OrderedDict(
+                    reversed(list(self.application_history(adult['adult_id'], 'Adult').items())))
+                adult_application_submitted_date.append(self.check_submission(adult_submitted_history))
+
+        if nanny_response.status_code == 200:
+            nannies_submitted = nanny_response.record
+            for nanny in nannies_submitted:
+                nanny_submitted_history = OrderedDict(reversed(list(self.application_history(
+                    nanny['application_id'], 'Nanny').items())))
+                nanny_application_submitted_date.append(self.check_submission(nanny_submitted_history))
+
         while initial_date <= now:
             cm_apps = 0
             adult_apps = 0
             nanny_apps = 0
-            for item in cm_applications:
-                if item.date_submitted.date() == initial_date.date():
+            for date in cm_application_submitted_date:
+                if date.date() == initial_date.date():
                     cm_apps += 1
-            if adult_response.status_code == 200:
-                adults_submitted = adult_response.record
-                for adult in adults_submitted:
-                    if adult['date_resubmitted'] is None and datetime.strptime(
-                            adult['date_submitted'][:19], "%Y-%m-%dT%H:%M:%S").date() == initial_date.date():
-                        adult_apps += 1
-                    elif adult['date_resubmitted'] is not None and datetime.strptime(
-                            adult['date_resubmitted'][:19], "%Y-%m-%dT%H:%M:%S").date() == initial_date.date():
-                        adult_apps += 1
-            if nanny_response.status_code == 200:
-                nannies_submitted = nanny_response.record
-                for nanny in nannies_submitted:
-                    if datetime.strptime(
-                            nanny['date_submitted'][:19],
-                            "%Y-%m-%dT%H:%M:%S").date() == initial_date.date() and not None:
-                        nanny_apps += 1
-
+            for date in adult_application_submitted_date:
+                if date.date() == initial_date.date():
+                    adult_apps += 1
+            for date in nanny_application_submitted_date:
+                if date.date() == initial_date.date():
+                    nanny_apps += 1
             apps_in_queue.append({'Date': datetime.strftime(initial_date, "%d %B %Y"),
                                   'Childminder in Queue': cm_apps,
                                   'New Association in Queue': adult_apps,
@@ -187,6 +202,15 @@ class ApplicationsInQueueView(DailyReportingBaseView):
              })
 
         return (apps_in_queue)
+
+    def check_submission(self, dictionary):
+        for k1, v1 in dictionary.items():
+            k2, v2 = list(v1.keys())[0], list(v1.values())[0]
+            if k2 == 'Resubmitted':
+                return k1
+            elif k2 == 'Submitted':
+                return k1
+        return False
 
 
 @method_decorator(login_required, name='get')
@@ -421,7 +445,10 @@ class ApplicationsAssignedView(DailyReportingBaseView):
             app_id = app.application_id
             cm_assigned_history = self.application_history(app_id, 'Childminder')
             urn = Application.objects.get(application_id=app_id).application_reference
-            user_id = Arc.objects.get(application_id=app_id).user_id
+            if Arc.objects.filter(application_id=app_id).exists():
+                user_id = Arc.objects.get(application_id=app_id).user_id
+            else:
+                user_id = ''
             formatted_created_date = datetime.strftime(list(cm_assigned_history)[0], "%d/%m/%y %H:%M")
             formatted_assigned_date = datetime.strftime(list(cm_assigned_history)[-1], "%d/%m/%y %H:%M")
             assigned_apps.append({'URN': urn, 'Caseworker': self.get_user(user_id),
@@ -433,8 +460,12 @@ class ApplicationsAssignedView(DailyReportingBaseView):
             adults_assigned = adult_response.record
             for adult in adults_assigned:
                 adult_assigned_history = self.application_history(adult['adult_id'], 'Adult')
-                urn = HMGatewayActions().list('dpa-auth', params={'adult_id': adult['adult_id']}).record[0]['URN']
-                user_id = Arc.objects.get(application_id=adult['adult_id']).user_id
+                urn = HMGatewayActions().list('dpa-auth', params={'token_id': adult['token_id']}).record[0]['URN']
+                log.debug('URN = {}, adult_id = {}'.format(urn, adult['adult_id']))
+                if Arc.objects.filter(application_id=adult['adult_id']).exists():
+                    user_id = Arc.objects.get(application_id=adult['adult_id']).user_id
+                else:
+                    user_id = ''
                 formatted_created_date = datetime.strftime(list(adult_assigned_history)[0], "%d/%m/%y %H:%M")
                 formatted_assigned_date = datetime.strftime(list(adult_assigned_history)[-1], "%d/%m/%y %H:%M")
                 assigned_apps.append({'URN': urn, 'Caseworker': self.get_user(user_id), 'Type': 'New Association',
@@ -447,7 +478,10 @@ class ApplicationsAssignedView(DailyReportingBaseView):
             for nanny in nannies_assigned:
                 nanny_assigned_history = self.application_history(nanny['application_id'], 'Nanny')
                 urn = nanny['application_reference']
-                user_id = Arc.objects.get(application_id=nanny['application_id']).user_id
+                if Arc.objects.filter(application_id=nanny['application_id']).exists():
+                    user_id = Arc.objects.get(application_id=nanny['application_id']).user_id
+                else:
+                    user_id = ''
                 formatted_created_date = datetime.strftime(list(nanny_assigned_history)[0], "%d/%m/%y %H:%M")
                 formatted_assigned_date = datetime.strftime(list(nanny_assigned_history)[-1], "%d/%m/%y %H:%M")
                 assigned_apps.append({'URN': urn, 'Caseworker': self.get_user(user_id), 'Type': 'Nanny',
@@ -481,13 +515,16 @@ class ApplicationsAuditLogView(DailyReportingBaseView):
         elif username == 'adult':
             return ''
         else:
-            first_name = User.objects.get(username=username).first_name
-            last_name = User.objects.get(username=username).last_name
-            if first_name is not '':
-                arc_user = '{0} {1}'.format(first_name, last_name if not '' else "")
+            if User.objects.filter(username=username).exists():
+                first_name = User.objects.get(username=username).first_name
+                last_name = User.objects.get(username=username).last_name
+                if first_name is not '':
+                    arc_user = '{0} {1}'.format(first_name, last_name if not '' else "")
+                else:
+                    arc_user = User.objects.get(username=username).username
+                return arc_user
             else:
-                arc_user = User.objects.get(username=username).username
-            return arc_user
+                return username
 
     def get_applications_audit_log(self):
         """
@@ -514,7 +551,8 @@ class ApplicationsAuditLogView(DailyReportingBaseView):
                         full_name = ''
                     urn = Application.objects.get(application_id=k2).application_reference
                 elif k1 == 'Adult':
-                    urn = HMGatewayActions().list('dpa-auth', params={'adult_id': k2}).record[0]['URN']
+                    adult_record = HMGatewayActions().list('adult', params={'adult_id': k2}).record[0]
+                    urn = HMGatewayActions().list('dpa-auth', params={'token_id': adult_record['token_id']}).record[0]['URN']
                     full_name = HMGatewayActions().list('adult', params={'adult_id': k2}).record[0]['get_full_name']
                 elif k1 == 'Nanny':
                     urn = NannyGatewayActions().list('application', params={'application_id': k2}).record[0][
