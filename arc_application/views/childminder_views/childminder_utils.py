@@ -78,7 +78,7 @@ name_field_dict = {
 """
 
 
-def add_comments(json, app_id):
+def add_comments(json, app_id, add_change_links=True):
     for table in json:
         if isinstance(table[0], list):
             add_comments(table, app_id)
@@ -129,7 +129,8 @@ def add_comments(json, app_id):
                     field = name_field_dict.get(name, '')
 
                 row['comment'] = get_comment(id, field)
-                row['link'] = reverse(label) + '?id=' + app_id
+                if add_change_links:
+                    row['link'] = reverse(label) + '?id=' + app_id
             row = row
     return json
 
