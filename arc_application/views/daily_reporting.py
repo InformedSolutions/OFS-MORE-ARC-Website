@@ -11,7 +11,8 @@ from timeline_logger.models import TimelineLog
 from ..services.db_gateways import NannyGatewayActions, HMGatewayActions
 from datetime import datetime, timedelta
 from collections import OrderedDict
-
+import uuid
+from django.utils import timezone
 
 # Initiate logging
 log = logging.getLogger()
@@ -509,6 +510,33 @@ class ApplicationsAuditLogView(DailyReportingBaseView):
 
         return response
 
+    def generate_cm_apps(self, application_id):
+        application = Application.objects.create(
+            application_id=application_id,
+            application_type='CHILDMINDER',
+            application_status='DRAFTING',
+            cygnum_urn='',
+            login_details_status='COMPLETED',
+            personal_details_status='NOT_STARTED',
+            childcare_type_status='COMPLETED',
+            first_aid_training_status='COMPLETED',
+            childcare_training_status='COMPLETED',
+            criminal_record_check_status='COMPLETED',
+            health_status='COMPLETED',
+            references_status='COMPLETED',
+            people_in_home_status='STARTED',
+            declarations_status='NOT_STARTED',
+            date_created=timezone.now(),
+            date_updated=timezone.now(),
+            date_accepted=None,
+        )
+        TimelineLog.objects.create(
+            content_object=application,
+            user=None,
+            template='timeline_logger/application_action.txt',
+            extra_data={'user_type': 'applicant', 'action': 'created by', 'entity': 'application'}
+        )
+
     def get_user_from_username(self, username):
         if username == 'applicant':
             return ''
@@ -540,6 +568,18 @@ class ApplicationsAuditLogView(DailyReportingBaseView):
                        'Date/Time': 'Date/Time',
                        })]
         applications_history = self.get_application_histories()
+
+        # run the below loop to create 10,000 applications, around 5mins to do
+
+        # for i in range(0, 10000):
+        #     application_id = uuid.uuid4()
+        #     log.debug('Creating application number {}'.format(i))
+        #     self.generate_cm_apps(application_id)
+
+
+        # untested so far
+        # cm_view = Application.objects.all().prefetch_related('applicant-name', 'arc', 'user')
+
 
         for k1, v1 in applications_history.items():
             for k2, v2 in v1.items():
