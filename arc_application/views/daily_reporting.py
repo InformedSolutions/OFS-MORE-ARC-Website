@@ -1,5 +1,6 @@
 import logging
 from django.contrib.auth.decorators import login_required
+from django.core.exceptions import ObjectDoesNotExist
 from django.views import View
 from django.utils.decorators import method_decorator
 from ..models import Application, Arc, ApplicantName
@@ -76,13 +77,9 @@ class DailyReportingBaseView(Echo):
         return dictionary
 
     def get_application_histories(self):
-
         application_history = {}
-        cm_application_id_list = Application.objects.all().values_list('application_id')
-        application_history['Childminder'] = {}
-        for app_id in cm_application_id_list:
-            application_history['Childminder'][str(app_id[0])] = self.application_history(str(app_id[0]), 'Childminder')
 
+        # Fetch all new adult applications and store in dict of <id, application>
         adult_application_response = HMGatewayActions().list('adult', params={})
         if adult_application_response.status_code == 200:
             adult_application_records = adult_application_response.record
@@ -91,6 +88,7 @@ class DailyReportingBaseView(Echo):
                 app_id = record['adult_id']
                 application_history['Adult'][app_id] = self.application_history(app_id, 'Adult')
 
+        # Fetch all nanny applications and store in dict of <id, application>
         nanny_applications_response = NannyGatewayActions().list('application', params={})
         if nanny_applications_response.status_code == 200:
             nanny_applications_records = nanny_applications_response.record
@@ -559,6 +557,7 @@ class ApplicationsAuditLogView(DailyReportingBaseView):
         Snapshot in time showing the history of each application
         :return: List with every URN and who the application has most recently been assigned to
         """
+        start = datetime.now()
 
         audit_log = [({'URN': 'URN',
                        'Name': 'Name',
@@ -576,47 +575,57 @@ class ApplicationsAuditLogView(DailyReportingBaseView):
         #     log.debug('Creating application number {}'.format(i))
         #     self.generate_cm_apps(application_id)
 
+        # Add childminder applications to audit log
+        childminder_applications = Application.objects.all()
+        for application in childminder_applications:
+            try:
+                name = ApplicantName.objects.get(application_id=application.pk)
+                full_name = name.first_name + ' ' + name.last_name
+            except ObjectDoesNotExist:
+                full_name = ""
+            urn = application.application_reference
+            history = self.application_history(application.pk, 'Childminder')
+            for timestamp, event in history.items():
+                action = list(event.keys())[0]
+                user = list(event.values())[0]
+                formatted_date = datetime.strftime(timestamp, "%d/%m/%y %H:%M")
+                audit_log.append({'URN': urn, 'Name': full_name,
+                                  'Caseworker': self.get_user_from_username(user), 'Type': 'CM', 'Action': action,
+                                  'Date/Time': formatted_date})
 
-        # untested so far
-        # cm_view = Application.objects.all().prefetch_related('applicant-name', 'arc', 'user')
-
-
-        for k1, v1 in applications_history.items():
-            for k2, v2 in v1.items():
-                if k1 == 'Childminder':
-                    if ApplicantName.objects.filter(application_id=k2).exists():
-                        name = ApplicantName.objects.get(application_id=k2)
-                        full_name = name.first_name + " " + name.last_name
-                    else:
-                        full_name = ''
-                    urn = Application.objects.get(application_id=k2).application_reference
-                elif k1 == 'Adult':
-                    adult_record = HMGatewayActions().list('adult', params={'adult_id': k2}).record[0]
-                    urn = HMGatewayActions().list('dpa-auth', params={'token_id': adult_record['token_id']}).record[0]['URN']
-                    full_name = HMGatewayActions().list('adult', params={'adult_id': k2}).record[0]['get_full_name']
-                elif k1 == 'Nanny':
-                    urn = NannyGatewayActions().list('application', params={'application_id': k2}).record[0][
+        # Add Adult and Nanny applications to the audit log.
+        for application_type, applications in applications_history.items():
+            for id, application in applications.items():
+                if application_type == 'Adult':
+                    adult_record = HMGatewayActions().list('adult', params={'adult_id': id}).record[0]
+                    urn = HMGatewayActions().list('dpa-auth', params={'token_id': adult_record['token_id']}).record[0][
+                        'URN']
+                    full_name = HMGatewayActions().list('adult', params={'adult_id': id}).record[0]['get_full_name']
+                elif application_type == 'Nanny':
+                    urn = NannyGatewayActions().list('application', params={'application_id': id}).record[0][
                         'application_reference']
                     response = NannyGatewayActions().list('applicant-personal-details',
-                                                          params={'application_id': k2})
+                                                          params={'application_id': id})
                     if response.status_code == 200:
                         record = response.record[0]
                         full_name = record['first_name'] + " " + record['last_name']
                     else:
                         full_name = ''
-                for k3, v3 in v2.items():
-                    formatted_date = datetime.strftime(k3, "%d/%m/%y %H:%M")
-                    k4, v4 = list(v3.keys())[0], list(v3.values())[0]
-                    if k1 == 'Childminder':
+                for timestamp, event in application.items():
+                    formatted_date = datetime.strftime(timestamp, "%d/%m/%y %H:%M")
+                    action, user = list(event.keys())[0], list(event.values())[0]
+                    if application_type == 'Childminder':
                         audit_log.append({'URN': urn, 'Name': full_name,
-                                          'Caseworker': self.get_user_from_username(v4), 'Type': 'CM', 'Action': k4,
+                                          'Caseworker': self.get_user_from_username(user), 'Type': 'CM', 'Action': action,
                                           'Date/Time': formatted_date})
-                    elif k1 == 'Adult':
+                    elif application_type == 'Adult':
                         audit_log.append({'URN': urn, 'Name': full_name,
-                                          'Caseworker': self.get_user_from_username(v4), 'Type': 'New Association',
-                                          'Action': k4, 'Date/Time': formatted_date})
-                    elif k1 == 'Nanny':
+                                          'Caseworker': self.get_user_from_username(user), 'Type': 'New Association',
+                                          'Action': action, 'Date/Time': formatted_date})
+                    elif application_type == 'Nanny':
                         audit_log.append({'URN': urn, 'Name': full_name,
-                                          'Caseworker': self.get_user_from_username(v4), 'Type': 'Nanny', 'Action': k4,
+                                          'Caseworker': self.get_user_from_username(user), 'Type': 'Nanny', 'Action': action,
                                           'Date/Time': formatted_date})
+        end = datetime.now()
+        print(f'Audit log generated in: {end - start}')
         return audit_log
