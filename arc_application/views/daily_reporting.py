@@ -9,8 +9,9 @@ from django.http import StreamingHttpResponse
 from django.contrib.auth.models import User
 from .audit_log import MockTimelineLog
 from timeline_logger.models import TimelineLog
-from ..services.db_gateways import NannyGatewayActions, HMGatewayActions
+from ..services.db_gateways import NannyGatewayActions, HMGatewayActions, IdentityGatewayActions
 from datetime import datetime, timedelta
+import time
 from collections import OrderedDict
 import uuid
 from django.utils import timezone
@@ -535,6 +536,120 @@ class ApplicationsAuditLogView(DailyReportingBaseView):
             extra_data={'user_type': 'applicant', 'action': 'created by', 'entity': 'application'}
         )
 
+    def generate_hm_apps(self, adult_id, token_id, i):
+        adult_record = {
+            "adult_id": adult_id,
+            "date_of_birth": "1980-03-31",
+            "get_full_name": "Adult Test Adults",
+            "start_date": None,
+            "end_date": None,
+            "order": i,
+            "first_name": "Adult",
+            "middle_names": "Test",
+            "last_name": "Adults",
+            "birth_day": 31,
+            "birth_month": 3,
+            "birth_year": 1980,
+            "relationship": "Husband",
+            "email": "test@test.com",
+            "dbs_certificate_number": "",
+            "lived_abroad": None,
+            "military_base": None,
+            "capita": None,
+            "enhanced_check": None,
+            "on_update": None,
+            "certificate_information": "",
+            "within_three_months": None,
+            "token": None,
+            "health_check_status": "To do",
+            "email_resent": 0,
+            "email_resent_timestamp": None,
+            "validated": False,
+            "current_treatment": None,
+            "serious_illness": None,
+            "known_to_council": None,
+            "reasons_known_to_council_health_check": "",
+            "hospital_admission": None,
+            "name_start_day": None,
+            "name_start_month": None,
+            "name_start_year": None,
+            "name_end_day": None,
+            "name_end_month": None,
+            "name_end_year": None,
+            "token_id": token_id,
+            "adult_status": 'DRAFTING'
+        }
+
+        dpa_auth_record = {
+            "token_id": token_id,
+            "URN": "EY456721",
+            "date_of_birth_day": 25,
+            "date_of_birth_month": 5,
+            "date_of_birth_year": 1981,
+            "postcode": "BH21 4AY",
+            "individual_id": "1786117",
+        }
+
+        identity_record = {
+            'email': 'tester@informed.com',
+            'application_id': token_id,
+            'magic_link_sms': '12345',
+            'sms_resend_attempts': 0,
+            'mobile_number': '000000000012',
+            'magic_link_email': 'ABCDEFGHIJKL',
+            'add_phone_number': '',
+            'change_email': 'test@informed.com',
+            'email_expiry_date': int(time.time()),
+            'service': 'HOUSEHOLD_MEMBERS'
+        }
+
+        IdentityGatewayActions().create('user', params=identity_record)
+        HMGatewayActions().create('dpa-auth', params=dpa_auth_record)
+        HMGatewayActions().create('adult', params=adult_record)
+
+
+    def generate_nanny_apps(self, application_id):
+
+        nanny_application = {
+            'application_status': 'DRAFTING',
+            'application_id': application_id,
+            'date_submitted': '2018-07-31 17:20:46.011717+00',
+            'date_updated': '2018-07-31 17:20:46.011717+00',
+            'childcare_training_status': 'COMPLETED',
+            'login_details_status': 'COMPLETED',
+            'personal_details_status': 'COMPLETED',
+            'dbs_status': 'COMPLETED',
+            'address_to_be_provided': True,
+            'login_details_arc_flagged': False,
+            'personal_details_arc_flagged': False,
+            'childcare_address_status': 'COMPLETED',
+            'childcare_address_arc_flagged': False,
+            'first_aid_status': 'COMPLETED',
+            'first_aid_arc_flagged': False,
+            'childcare_training_arc_flagged': False,
+            'dbs_arc_flagged': False,
+            'insurance_cover_status': 'COMPLETED',
+            'insurance_cover_arc_flagged': False,
+            'application_reference': 'NA000001',
+            'information_correct_declare': True
+        }
+
+        personal_details_record = {
+            'application_id': application_id,
+            'title': 'Darth',
+            'first_name': 'The Dark Lord',
+            'middle_names': '',
+            'last_name': 'Selenium',
+            'date_of_birth': '2000-01-01',
+            'lived_abroad': True,
+            'known_to_social_services': True,
+            'reasons_known_to_social_services': 'Some Important Reason',
+            'moved_in_date': '2019-01-01'
+        }
+
+        NannyGatewayActions().create('application', params=nanny_application)
+        NannyGatewayActions().create('applicant-personal-details', params=personal_details_record)
+
     def get_user_from_username(self, username):
         if username == 'applicant':
             return ''
@@ -566,14 +681,20 @@ class ApplicationsAuditLogView(DailyReportingBaseView):
                        'Action': 'Action',
                        'Date/Time': 'Date/Time',
                        })]
-        applications_history = self.get_application_histories()
+        # applications_history = self.get_application_histories()
 
         # run the below loop to create 10,000 applications, around 5mins to do
 
-        # for i in range(0, 10000):
-        #     application_id = uuid.uuid4()
+        for i in range(0, 8000):
+            application_id = uuid.uuid4()
+            log.debug('Creating application number {}'.format(i))
+            self.generate_nanny_apps(application_id)
+
+        # for i in range(0,8000):
+        #     adult_id = uuid.uuid4()
+        #     token_id = uuid.uuid4()
         #     log.debug('Creating application number {}'.format(i))
-        #     self.generate_cm_apps(application_id)
+        #     self.generate_hm_apps(adult_id, token_id, i)
 
         # Add childminder applications to audit log
         childminder_applications = Application.objects.all()
