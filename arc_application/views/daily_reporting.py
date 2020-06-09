@@ -681,14 +681,14 @@ class ApplicationsAuditLogView(DailyReportingBaseView):
                        'Action': 'Action',
                        'Date/Time': 'Date/Time',
                        })]
-        # applications_history = self.get_application_histories()
+        applications_history = self.get_application_histories()
 
         # run the below loop to create 10,000 applications, around 5mins to do
 
-        for i in range(0, 8000):
-            application_id = uuid.uuid4()
-            log.debug('Creating application number {}'.format(i))
-            self.generate_nanny_apps(application_id)
+        # for i in range(0, 8000):
+        #     application_id = uuid.uuid4()
+        #     log.debug('Creating application number {}'.format(i))
+        #     self.generate_nanny_apps(application_id)
 
         # for i in range(0,8000):
         #     adult_id = uuid.uuid4()
