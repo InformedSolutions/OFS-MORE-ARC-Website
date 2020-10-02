@@ -613,7 +613,21 @@ class ApplicationsAuditLogView(DailyReportingBaseView):
 
         for k1, v1 in applications_history.items():
             for k2, v2 in v1.items():
-                if v2['extra_data']['action'] == 'flagged by':
+                if v2['extra_data']['action'] == 'created by':
+                    action = 'Created'
+                elif v2['extra_data']['action'] == 'submitted by':
+                    action = 'Submitted'
+                elif v2['extra_data']['action'] == 'assigned to':
+                    action = 'Assigned'
+                elif v2['extra_data']['action'] == 'returned by':
+                    action = 'Returned'
+                elif v2['extra_data']['action'] == 'resubmitted by':
+                    action = 'Resubmitted'
+                elif v2['extra_data']['action'] == 'accepted by':
+                    action = 'Processed to Cygnum'
+                elif v2['extra_data']['action'] == 'released by':
+                    action = 'Released'
+                else:
                     continue
                 app_id=k2.split(',')[0]
                 if k1 == 'Childminder':
@@ -650,16 +664,16 @@ class ApplicationsAuditLogView(DailyReportingBaseView):
                 if k1 == 'Childminder':
                     audit_log.append({'URN': urn, 'Name': full_name,
                                       'Caseworker': self.get_user_from_username(v2['extra_data']['user_type'],v2['user']),
-                                      'Type': 'CM', 'Action': v2['extra_data']['action'],
+                                      'Type': 'CM', 'Action': action,
                                       'Date/Time': formatted_date})
                 elif k1 == 'Adult':
                     audit_log.append({'URN': urn, 'Name': full_name,
                                       'Caseworker': self.get_user_from_username(v2['extra_data']['user_type'],v2['user']),
                                       'Type': 'New Association',
-                                      'Action': v2['extra_data']['action'], 'Date/Time': formatted_date})
+                                      'Action': action, 'Date/Time': formatted_date})
                 elif k1 == 'Nanny':
                     audit_log.append({'URN': urn, 'Name': full_name,
                                       'Caseworker': self.get_user_from_username(v2['extra_data']['user_type'],v2['user']),
-                                      'Type': 'Nanny', 'Action': v2['extra_data']['action'],
+                                      'Type': 'Nanny', 'Action': action,
                                       'Date/Time': formatted_date})
         return audit_log
