@@ -613,6 +613,8 @@ class ApplicationsAuditLogView(DailyReportingBaseView):
 
         for k1, v1 in applications_history.items():
             for k2, v2 in v1.items():
+                if v2['extra_data']['action'] == 'flagged by':
+                    continue
                 app_id=k2.split(',')[0]
                 if k1 == 'Childminder':
                     if app_id in all_cm_application_names:
