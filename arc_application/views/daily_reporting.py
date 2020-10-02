@@ -544,12 +544,12 @@ class ApplicationsAuditLogView(DailyReportingBaseView):
         elif user_type == 'adult':
             return ''
         else:
-            if user_id == type(int):
+            if type(user_id) == int:
                 if User.objects.filter(id=user_id).exists():
                     return self.get_user(user_id)
                 else:
                     return user_type
-            if user_id == type(str):
+            if type(user_id) == str:
                 if User.objects.filter(username=user_id).exists():
                     first_name = User.objects.get(username=user_id).first_name
                     last_name = User.objects.get(username=user_id).last_name
