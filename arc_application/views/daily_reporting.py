@@ -551,7 +551,13 @@ class ApplicationsAuditLogView(DailyReportingBaseView):
                     return user_type
             if user_id == type(str):
                 if User.objects.filter(username=user_id).exists():
-                    return self.get_user(user_id)
+                    first_name = User.objects.get(username=user_id).first_name
+                    last_name = User.objects.get(username=user_id).last_name
+                    if first_name is not '':
+                        arc_user = '{0} {1}'.format(first_name, last_name if not '' else "")
+                    else:
+                        arc_user = User.objects.get(username=user_id).username
+                    return arc_user
                 else:
                     return user_type
 
