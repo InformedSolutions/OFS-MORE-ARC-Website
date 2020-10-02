@@ -624,6 +624,7 @@ class ApplicationsAuditLogView(DailyReportingBaseView):
                     else:
                         urn = ''
                 elif k1 == 'Adult':
+                    logging.debug("Adult record at this point looks like: {}".format(all_adult_records[app_id]))
                     if all_adult_records[app_id]['token_id'] in all_adult_dpa_records:
                         urn = all_adult_dpa_records[all_adult_records[app_id]['token_id']]['urn']
                     else:
