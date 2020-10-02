@@ -559,7 +559,7 @@ class ApplicationsAuditLogView(DailyReportingBaseView):
                         arc_user = User.objects.get(username=user_id).username
                     return arc_user
                 else:
-                    return user_type
+                    return ''
 
     def get_applications_audit_log(self):
         """
