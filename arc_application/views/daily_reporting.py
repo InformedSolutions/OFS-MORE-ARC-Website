@@ -71,7 +71,6 @@ class DailyReportingBaseView(Echo):
         :param timelinelog: A queryset containing all the events that have occurred to an application.
         :return: A dictionary containing the relevant history of an application
         """
-        start = datetime.now()
         dictionary = {}
         if app_id is not False:
             for entry in timelinelog:
@@ -288,11 +287,10 @@ class ApplicationsReturnedView(DailyReportingBaseView):
         while initial_date <= now:
             cm_apps = 0
             adult_apps = 0
-            nanny_ = 0
+            nanny_apps = 0
             for app_type in app_types:
-                for app_id in list(applications_history[app_type]):
-                    if applications_history[app_type][app_id]['timestamp'].date() == initial_date.date() and 'returned by' in \
-                            applications_history[app_type][app_id]['extra_data']['action']:
+                for app_id in applications_history[app_type]:
+                    if applications_history[app_type][app_id]['timestamp'].date() == initial_date.date() and 'returned by' == applications_history[app_type][app_id]['extra_data']['action']:
                         if app_type == 'Childminder':
                             cm_apps += 1
                             cm_app_total += 1
@@ -360,7 +358,7 @@ class ApplicationsProcessedView(DailyReportingBaseView):
         now = datetime.now()
         initial_date = datetime(2020, 2, 19, 0, 0)
         delta = timedelta(days=1)
-        applications_history = self.get_application_histories()
+        applications_history = self.get_application_histories(app_id=False)
         app_types = ['Childminder', 'Adult', 'Nanny']
         while initial_date <= now:
             cm_apps = 0
@@ -371,24 +369,21 @@ class ApplicationsProcessedView(DailyReportingBaseView):
             nanny_apps_returned = 0
             for app_type in app_types:
                 for app_id in applications_history[app_type]:
-                    date_list = list(applications_history[app_type][app_id].keys())
-                    for i in range(0, len(date_list)):
-                        for entry in applications_history[app_type][app_id][date_list[i]]:
-                            if date_list[i].date() == initial_date.date():
-                                if entry == 'Processed to Cygnum':
-                                    if app_type == 'Childminder':
-                                        cm_apps += 1
-                                    elif app_type == 'Adult':
-                                        adult_apps += 1
-                                    elif app_type == 'Nanny':
-                                        nanny_apps += 1
-                                elif entry == 'Returned':
-                                    if app_type == 'Childminder':
-                                        cm_apps_returned += 1
-                                    elif app_type == 'Adult':
-                                        adult_apps_returned += 1
-                                    elif app_type == 'Nanny':
-                                        nanny_apps_returned += 1
+                    if applications_history[app_type][app_id]['timestamp'].date() == initial_date.date():
+                        if applications_history[app_type][app_id]['extra_data']['action'] == 'accepted by':
+                            if app_type == 'Childminder':
+                                cm_apps += 1
+                            elif app_type == 'Adult':
+                                adult_apps += 1
+                            elif app_type == 'Nanny':
+                                nanny_apps += 1
+                        elif applications_history[app_type][app_id]['extra_data']['action'] == 'returned by':
+                            if app_type == 'Childminder':
+                                cm_apps_returned += 1
+                            elif app_type == 'Adult':
+                                adult_apps_returned += 1
+                            elif app_type == 'Nanny':
+                                nanny_apps_returned += 1
             total_accepted = (cm_apps + adult_apps + nanny_apps)
             total_returned = (cm_apps_returned + adult_apps_returned + nanny_apps_returned)
             processed_apps.append({'Date': datetime.strftime(initial_date, "%d %B %Y"),
