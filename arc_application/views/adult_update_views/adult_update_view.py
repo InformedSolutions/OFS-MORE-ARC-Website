@@ -189,7 +189,7 @@ def new_adults_summary(request):
                                adult_same_address_list, adult_moved_in_date_list,  adult_dbs_cert_numbers, adult_dbs_on_capitas,
                                adult_dbs_is_recents, adult_dbs_is_enhanceds,adult_dbs_on_updates, adult_lived_abroad,
                                adult_military_base, formset_adult, serious_illnesses, hospital_admissions,
-                               local_authorities,adult_previous_name_lists_list, adult_previous_address_lists_list))
+                               local_authorities, adult_previous_name_lists_list, adult_previous_address_lists_list))
 
 
         variables = {
