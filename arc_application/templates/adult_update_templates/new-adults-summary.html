@@ -498,8 +498,7 @@
                     {{ prevname.name }}
                 </td>
                 <td class="change-answer">
-                    <a href="{% url 'adult-update-previous-names' %}?id={{ application_id }}"
-                        alt="Change the {{ forloop.counter|inflect }} previous name">Change</a>
+
                 </td>
             </tr>
             <tr>
@@ -510,8 +509,6 @@
                     {{ prevname.start_date}}
                 </td>
                 <td class="change-answer">
-                    <a href="{% url 'adult-update-previous-names' %}?id={{ application_id }}"
-                        alt="Change the start date for the {{ forloop.counter|inflect }} previous name">Change</a>
                 </td>
             </tr>
             <tr>
@@ -522,8 +519,6 @@
                     {{ prevname.end_date }}
                 </td>
                 <td class="change-answer">
-                    <a href="{% url 'adult-update-previous-names' %}?id={{ application_id }}"
-                        alt="Change the end date for the {{ forloop.counter|inflect }} previous name">Change</a>
                 </td>
             </tr>
             {% endfor %}
@@ -541,8 +536,6 @@
                     {{address.postcode}}{% if address.postcode %}<br />{% endif %}
                 </td>
                 <td class="change-answer">
-                    <a href="{% url 'adult_add_previous_address_change' %}?id={{ application_id }}&state=change&address_id={{address.previous_address_id}}"
-                    alt="Change the {{ forloop.counter|inflect }} previous address">Change</a>
                 </td>
             </tr>
 
@@ -555,8 +548,6 @@
                     {{ address.moved_in_date}}
                 </td>
                 <td class="change-answer">
-                    <a href="{% url 'adult_add_previous_address_change' %}?id={{ application_id }}&state=change&address_id={{address.previous_address_id}}"
-                       alt="Change the move in date for {{ forloop.counter|inflect }} previous address">Change</a>
                 </td>
 
             </tr>
@@ -571,8 +562,6 @@
                     {{ address.moved_out_date }}
                 </td>
                 <td class="change-answer">
-                    <a href="{% url 'adult_add_previous_address_change' %}?id={{ application_id }}&state=change&address_id={{address.previous_address_id}}"
-                       alt="Change the move out date for {{ forloop.counter|inflect }} previous address">Change</a>
                 </td>
             </tr>
             {% endif %}
@@ -580,9 +569,6 @@
             </tbody>
         </table>
         {% endif %}
-
-        <a href="{% url 'adult-update-previous-names' %}/?id={{application_id}}" class="button button-secondary">Add previous names</a><br>
-        <a href="{% url 'adult_add_previous_address' %}?id={{ application_id }}&state=entry" class="button button-secondary">Add previous addresses</a>
 
         {% for dict in previous_registration_lists %}
         {% if dict.adult_id == id %}
