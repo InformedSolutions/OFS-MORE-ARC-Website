@@ -9,7 +9,7 @@ from django.conf import settings
 from arc_application.tests.utils import create_arc_user
 from ...models import Arc
 from ...services.db_gateways import HMGatewayActions, IdentityGatewayActions
-from ...views import new_adults_summary, adults_previous_address_change, adult_previous_registration_view, \
+from ...views import new_adults_summary, adult_previous_registration_view, \
     adult_update_view, arc_summary
 from ...tests import utils
 
