@@ -1,7 +1,6 @@
 """
 OFS-MORE-CCN3: Apply to be a Childminder Beta
 -- urls.py --
-
 @author: Informed Solutions
 """
 import re
