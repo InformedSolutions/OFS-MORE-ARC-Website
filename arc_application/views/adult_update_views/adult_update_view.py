@@ -12,6 +12,7 @@ from .review import new_adults_initial_population, request_to_comment, save_comm
 from ...services.db_gateways import HMGatewayActions
 from ...models import Arc, AdultInHomeAddress
 from operator import itemgetter
+from datetime import datetime
 
 # Initiate logging
 log = logging.getLogger('')
@@ -87,6 +88,7 @@ def new_adults_summary(request):
                                               adult_address_record['postcode']])
         else:
             adult_address_string = ''
+        adult['date_of_birth'] = datetime.strptime(adult['date_of_birth'], '%Y-%m-%d')
 
         adult_record_list.append(adult)
         adult_id_list.append(adult['adult_id'])
@@ -153,10 +155,10 @@ def new_adults_summary(request):
                     prev_name['name'] = prev_name['first_name'] + " "  + prev_name['last_name']
 
                 prev_name['start_date'] = datetime(prev_name['start_year'], prev_name['start_month'], prev_name['start_day']).strftime(
-            '%d %m %Y')
+            '%d %b %Y')
                 prev_name['end_date'] = datetime(prev_name['end_year'], prev_name['end_month'],
                                                         prev_name['end_day']).strftime(
-                    '%d %m %Y')
+                    '%d %b %Y')
             adult_previous_name_lists_list.append(previous_name_response.record)
         else:
             adult_previous_name_lists_list.append(None)
@@ -165,9 +167,9 @@ def new_adults_summary(request):
         if previous_address_response.status_code == 200:
             for prev_address in previous_address_response.record:
                 prev_address['moved_in_date'] = datetime.strptime(prev_address['moved_in_date'], '%Y-%m-%d').strftime(
-            '%d %m %Y')
+            '%d %b %Y')
                 prev_address['moved_out_date'] = datetime.strptime(prev_address['moved_out_date'], '%Y-%m-%d').strftime(
-                    '%d %m %Y')
+                    '%d %b %Y')
             adult_previous_address_lists_list.append(previous_address_response.record)
         else:
             adult_previous_address_lists_list.append(None)
