@@ -64,22 +64,14 @@ def get_application_summary_variables(application_id):
     return variables
 
 def get_summary_data(adult_id):
-    address_history = get_address_history(adult_id)
-    current_address = get_current_address(adult_id)
-    current_address_values = get_current_address_values(adult_id)
-    previous_names = get_previous_names(adult_id)
-    health_questions = get_health_questions(adult_id)
     context = {
-        'address_history': address_history['history'],
-        'prev_addresses_exist': address_history['prev_addresses_exist'],
-        'prev_address_gap_exist': address_history['prev_address_gap_exist'],
-        'current_address': current_address,
-        'current_address_values': current_address_values,
-        'name_history': previous_names,
-        'health_questions': health_questions,
+        'address_history': get_address_history(adult_id),
+        'current_address': get_current_address(adult_id),
+        'current_address_values': get_current_address_values(adult_id),
+        'name_history': get_previous_names(adult_id),
+        'health_questions': get_health_questions(adult_id),
         'individual_lookup': get_individual_lookup(adult_id),
         'field_comments': get_all_comments(adult_id)
-        #'adult_id': adult_id
     }
     return context
 
@@ -91,7 +83,6 @@ def get_all_comments(adult_id):
         if field_name[-8:] == '_declare':
             comment_response = get_comment(adult_id, field_name[:-8])
             if comment_response is not None:
-                #field_name_list.append([field_name[:-8], comment_response])
                 field_name_dict[field_name[:-8]] = comment_response
 
     return field_name_dict
@@ -135,8 +126,6 @@ def get_address_history(adult_id):
     prev_address_gaps = get_previous_address_gaps(adult_id)
     history = sorted((prev_addresses + prev_address_gaps),
                      key=lambda address: address['moved_in_date'] if address['moved_in_date'] else 0)
-    prev_addresses_exist = True if len(prev_addresses) > 0 else False
-    prev_address_gap_exist = True if len(prev_address_gaps) > 0 else False
     gapCounter = 1
     addressCounter = 1
     for address in history:
@@ -150,10 +139,7 @@ def get_address_history(adult_id):
             history[order]['previous_address_id'] = history[order]['missing_address_gap_id']
             history[order]['title'] = f"Previous address gap {gapCounter}"
             gapCounter += 1
-    return {'history': history,
-            'prev_addresses_exist': prev_addresses_exist,
-            'prev_address_gap_exist': prev_address_gap_exist
-            }
+    return history
 
 
 def get_previous_addresses(adult_id):
@@ -191,51 +177,50 @@ def get_previous_names(adult_id):
         for name in previous_names_list: previous_names_list[previous_names_list.index(name)][
             'title'] = f"Previous Name {previous_names_list.index(name)}"
         context['current_name_start_date'] = previous_names_list[-1]['end_date']
-        #context['birth_name'] = previous_names_list[0]
-    #context['previous_names'] = previous_names_list[1:]
     context['previous_names'] = previous_names_list
     context['previous_name_valid'] = False if not previous_names_list[1:] else True
     return context
 
 
 def get_health_questions(adult_id):
-    context = dict()
     adult_response = HMGatewayActions().list('adult', params={'adult_id': adult_id})
     serious_illnesses = []
     hospital_admissions = []
 
     if adult_response.status_code == 200:
         adult_records = adult_response.record[0]
-        context['current_name_start_date'] = datetime.datetime.strptime(adult_records['date_of_birth'], '%Y-%m-%d').date()
+
+        context = {
+            'current_name_start_date': datetime.datetime.strptime(adult_records['date_of_birth'], '%Y-%m-%d').date(),
+            'current_treatment_bool': adult_records['currently_being_treated'],
+            'current_treatment_details': adult_records['illness_details'],
+            'your_children_bool': adult_records['known_to_council'],
+            'your_children_reasons': adult_records['reasons_known_to_council_health_check'],
+            'serious_illness_bool': adult_records['has_serious_illness'],
+            'hospital_admission_bool': adult_records['has_hospital_admissions'],
+            'current_name': adult_records['get_full_name'],
+            'title': adult_records['title'],
+            'DoB': datetime.datetime(adult_records['birth_year'], adult_records['birth_month'],
+                                               adult_records['birth_day']).date(),
+            'relationship': adult_records['relationship'],
+            'email': adult_records['email'],
+            'PITH_mobile_number': adult_records['PITH_mobile_number'],
+            'capita': adult_records['capita'],
+            'within_three_months': adult_records['within_three_months'],
+            'dbs_certificate_number': adult_records['dbs_certificate_number'],
+            'enhanced_check': adult_records['enhanced_check'],
+            'on_update': adult_records['on_update'],
+            'known_to_council': adult_records['known_to_council'],
+            'reasons_known_to_council_health_check': adult_records['reasons_known_to_council_health_check'],
+            'health_check_status': adult_records['health_check_status']
+        }
+
         serious_illness_response = HMGatewayActions().list('serious-illness', params={'adult_id': adult_id})
         hospital_admissions_response = HMGatewayActions().list('hospital-admissions', params={'adult_id': adult_id})
-
         context[
             'serious_illness_set'] = serious_illness_response.record if serious_illness_response.status_code == 200 else []
         context[
             'hospital_admission_set'] = hospital_admissions_response.record if hospital_admissions_response.status_code == 200 else []
-        context['current_treatment_bool'] = adult_records['currently_being_treated']
-        context['current_treatment_details'] = adult_records['illness_details']
-        context['your_children_bool'] = adult_records['known_to_council']
-        context['your_children_reasons'] = adult_records['reasons_known_to_council_health_check']
-        context['serious_illness_bool'] = adult_records['has_serious_illness']
-        context['hospital_admission_bool'] = adult_records['has_hospital_admissions']
-        context['current_name'] = adult_records['get_full_name']
-        context['title'] = adult_records['title']
-        context['DoB'] = datetime.datetime(adult_records['birth_year'], adult_records['birth_month'], adult_records['birth_day']).date()
-        context['relationship'] = adult_records['relationship']
-        context['email'] = adult_records['email']
-        context['PITH_mobile_number'] = adult_records['PITH_mobile_number']
-        context['capita'] = adult_records['capita']
-        context['within_three_months'] = adult_records['within_three_months']
-        context['dbs_certificate_number'] = adult_records['dbs_certificate_number']
-        context['enhanced_check'] = adult_records['enhanced_check']
-        context['on_update'] = adult_records['on_update']
-        context['known_to_council'] = adult_records['known_to_council']
-        context['reasons_known_to_council_health_check'] = adult_records['reasons_known_to_council_health_check']
-        context['health_check_status'] = adult_records['health_check_status']
-
-
 
         serious_illness_list = HMGatewayActions().list('serious-illness', params={'adult_id': adult_id})
         hospital_admissions_list = HMGatewayActions().list('hospital-admissions', params={'adult_id': adult_id})

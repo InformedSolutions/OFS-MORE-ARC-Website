@@ -238,9 +238,6 @@ def new_adults_summary(request):
                         HMGatewayActions().put('adult',
                                                params={'adult_id': adult_id_local, 'arc_flagged': False, 'token_id': token_id})
 
-
-            #handle_previous_name_and_address_dates(adult_id_local, adults[0])
-
             log.debug("Redirect to summary")
             redirect_link = reverse('new_adults')
             log.debug("Handling submissions for new adult review page")
