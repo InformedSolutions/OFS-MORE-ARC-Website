@@ -63,7 +63,6 @@ def new_adults_summary(request):
     adult_address_querysets = []
     adult_previous_registrations = []
     adult_previous_name_lists_list = []
-    adult_previous_address_lists_list = []
 
     # Set up bool to track whether linking has been completed for all adults in this application
     linking_complete = True
@@ -103,7 +102,7 @@ def new_adults_summary(request):
         adult_mobile_number_list.append(adult['PITH_mobile_number'])
         adult_same_address_list.append(adult_address_string)
         adult_moved_in_date_list.append(datetime.strptime(adult['moved_in_date'],'%Y-%m-%d').strftime(
-                                                         '%d %m %Y')) if adult['moved_in_date'] else None
+                                                         '%d %b %Y')) if adult['moved_in_date'] else None
         adult_dbs_is_enhanceds.append(adult['enhanced_check'])
         adult_dbs_cert_numbers.append(adult['dbs_certificate_number'] if adult['enhanced_check'] else None)
         adult_dbs_on_capitas.append(adult['capita'] if adult['enhanced_check'] else None)
@@ -117,9 +116,9 @@ def new_adults_summary(request):
         if serious_illnesses_response.status_code == 200:
             for record in serious_illnesses_response.record:
                 record["start_date"] = datetime.strptime(record['start_date'], '%Y-%m-%d').strftime(
-            '%d/%m/%Y')
+            '%d %b %Y')
                 record["end_date"] = datetime.strptime(record['end_date'], '%Y-%m-%d').strftime(
-            '%d/%m/%Y')
+            '%d %b %Y')
             serious_illnesses.append(serious_illnesses_response.record)
         else:
             serious_illnesses.append(None)
@@ -127,9 +126,9 @@ def new_adults_summary(request):
         if hospital_admissions_response.status_code == 200:
             for record in hospital_admissions_response.record:
                 record["start_date"] = datetime.strptime(record['start_date'], '%Y-%m-%d').strftime(
-            '%d/%m/%Y')
+            '%d %b %Y')
                 record["end_date"] = datetime.strptime(record['end_date'], '%Y-%m-%d').strftime(
-            '%d/%m/%Y')
+            '%d %b %Y')
             hospital_admissions.append(hospital_admissions_response.record)
         else:
             hospital_admissions.append(None)
@@ -163,16 +162,7 @@ def new_adults_summary(request):
         else:
             adult_previous_name_lists_list.append(None)
 
-        previous_address_response = HMGatewayActions().list('previous-address', params={'adult_id':adult_id})
-        if previous_address_response.status_code == 200:
-            for prev_address in previous_address_response.record:
-                prev_address['moved_in_date'] = datetime.strptime(prev_address['moved_in_date'], '%Y-%m-%d').strftime(
-            '%d %b %Y')
-                prev_address['moved_out_date'] = datetime.strptime(prev_address['moved_out_date'], '%Y-%m-%d').strftime(
-                    '%d %b %Y')
-            adult_previous_address_lists_list.append(previous_address_response.record)
-        else:
-            adult_previous_address_lists_list.append(None)
+        previous_address_gap_history = get_address_history(adult_id)
 
 
     if request.method == 'GET':
@@ -191,7 +181,7 @@ def new_adults_summary(request):
                                adult_same_address_list, adult_moved_in_date_list,  adult_dbs_cert_numbers, adult_dbs_on_capitas,
                                adult_dbs_is_recents, adult_dbs_is_enhanceds,adult_dbs_on_updates, adult_lived_abroad,
                                adult_military_base, formset_adult, serious_illnesses, hospital_admissions,
-                               local_authorities, adult_previous_name_lists_list, adult_previous_address_lists_list))
+                               local_authorities, adult_previous_name_lists_list))
 
 
         variables = {
@@ -199,7 +189,8 @@ def new_adults_summary(request):
             'application_id': adult_id_local,
             'adult_lists': adult_lists,
             'previous_registration_lists': adult_previous_registrations,
-            'linking_complete': linking_complete
+            'linking_complete': linking_complete,
+            'previous_addresses': previous_address_gap_history
 
         }
         log.debug("Rendering new adults in the home page")
@@ -265,8 +256,7 @@ def new_adults_summary(request):
                                    adult_same_address_list, adult_moved_in_date_list, adult_dbs_cert_numbers,
                                    adult_dbs_on_capitas, adult_dbs_is_recents, adult_dbs_is_enhanceds, adult_dbs_on_updates,
                                    adult_lived_abroad, adult_military_base, adult_formset, serious_illnesses,
-                                   hospital_admissions, local_authorities, adult_previous_name_lists_list,
-                                   adult_previous_address_lists_list))
+                                   hospital_admissions, local_authorities, adult_previous_name_lists_list))
 
             for adult_form, adult_name in zip(adult_formset, adult_name_list):
                 adult_form.error_summary_title = 'There was a problem (' + adult_name + ')'
@@ -323,3 +313,42 @@ def handle_previous_name_and_address_dates(adult_id, adult_record):
     new_adult_record['moved_out_date'] = end_date
 
     actions.put('adult', params=new_adult_record)
+
+
+def get_address_history(adult_id):
+    prev_addresses = get_previous_addresses(adult_id)
+    prev_address_gaps = get_previous_address_gaps(adult_id)
+    history = sorted((prev_addresses + prev_address_gaps),
+                     key=lambda address: address['moved_in_date'] if address['moved_in_date'] else 0)
+    gapCounter = 1
+    addressCounter = 1
+    for address in history:
+        order = history.index(address)
+        history[order].update({'moved_in_date': datetime.strptime(address['moved_in_date'], "%Y-%m-%d").date()})
+        history[order].update({'moved_out_date': datetime.strptime(address['moved_out_date'], "%Y-%m-%d").date()})
+        if 'previous_address_id' in history[order].keys():
+            history[order]['title'] = f"Previous address {addressCounter}"
+            addressCounter += 1
+        else:
+            history[order]['previous_address_id'] = history[order]['missing_address_gap_id']
+            history[order]['title'] = f"Previous address gap {gapCounter}"
+            gapCounter += 1
+    return history
+
+
+def get_previous_addresses(adult_id):
+    response = HMGatewayActions().list('previous-address', params={'adult_id': adult_id})
+    if response.status_code == 200:
+        addresses = response.record
+        return addresses
+    else:
+        return []
+
+
+def get_previous_address_gaps(adult_id):
+    response = HMGatewayActions().list('previous-address-gap', params={'adult_id': adult_id})
+    if response.status_code == 200:
+        addresses = response.record
+        return addresses
+    else:
+        return []
