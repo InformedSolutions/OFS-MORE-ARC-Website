@@ -239,7 +239,7 @@ def new_adults_summary(request):
                                                params={'adult_id': adult_id_local, 'arc_flagged': False, 'token_id': token_id})
 
 
-            handle_previous_name_and_address_dates(adult_id_local, adults[0])
+            #handle_previous_name_and_address_dates(adult_id_local, adults[0])
 
             log.debug("Redirect to summary")
             redirect_link = reverse('new_adults')
@@ -266,7 +266,9 @@ def new_adults_summary(request):
                 'application_id': adult_id_local,
                 'adult_lists': adult_lists,
                 'previous_registration_lists': adult_previous_registrations,
-                'linking_complete': linking_complete}
+                'linking_complete': linking_complete,
+                'previous_addresses': previous_address_gap_history
+            }
 
             log.debug("Render new adult review page")
             return render(request, 'adult_update_templates/new-adults-summary.html', variables)

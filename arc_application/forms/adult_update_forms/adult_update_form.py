@@ -314,6 +314,43 @@ class NewAdultForm(GOVUKForm):
         """
         return self.helper_clean('enhanced_check')
 
+    # SoW8 Additional Fields
+
+    def clean_current_name_comments(self):
+        """
+        PITH current_name comments validation
+        :return: string
+        """
+        return self.helper_clean('current_name')
+
+    def clean_known_by_other_names_comments(self):
+        """
+        PITH known_by_other_names comments validation
+        :return: string
+        """
+        return self.helper_clean('known_by_other_names')
+
+    def clean_name_history_comments(self):
+        """
+        PITH name_history comments validation
+        :return: string
+        """
+        return self.helper_clean('name_history')
+
+    def clean_address_history_comments(self):
+        """
+        PITH address_history comments validation
+        :return: string
+        """
+        return self.helper_clean('address_history')
+
+    def clean_PITH_address_moved_in_comments(self):
+        """
+        PITH PITH_address_moved_in comments validation
+        :return: string
+        """
+        return self.helper_clean('PITH_address_moved_in')
+
     def helper_clean(self, field):
         """
         Validation helper method
