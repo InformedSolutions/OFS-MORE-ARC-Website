@@ -233,6 +233,8 @@ def get_health_questions(adult_id):
         context['on_update'] = adult_records['on_update']
         context['known_to_council'] = adult_records['known_to_council']
         context['reasons_known_to_council_health_check'] = adult_records['reasons_known_to_council_health_check']
+        context['health_check_status'] = adult_records['health_check_status']
+
 
 
         serious_illness_list = HMGatewayActions().list('serious-illness', params={'adult_id': adult_id})

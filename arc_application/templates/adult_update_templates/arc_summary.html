@@ -9,9 +9,6 @@
     Check and confirm all the details
 </h1>
 
-{{ summary_data.field_comments }}
-
-
 <h2 class="heading-medium">
     Application number: {{ ey_number }}
 </h2>
@@ -63,14 +60,14 @@
                     Health questions status
                 </td>
                 <td style="word-wrap: break-word">
-                    {{health_check_status}}
+                    {{summary_data.health_questions.health_check_status}}
                 </td>
                 <td class="change-answer">
                     <a href="new-adult?id={{application_id}}" alt = "Change">Change</a>
                 </td>
             </tr>
             {# ================== Title ================== #}
-            {% if title != '' %}
+            {% if summary_data.health_questions.title != '' %}
             <tr>
                 <td style="word-wrap: break-word">
                     Title
