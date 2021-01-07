@@ -21,12 +21,6 @@ class NewAdultForm(GOVUKForm):
                                                    widget=widgets.Textarea,
                                                    required=False, max_length=500)
 
-    full_name_declare = forms.BooleanField(label='This information is correct',
-                                           widget=widgets.CustomCheckboxInput, required=False)
-    full_name_comments = forms.CharField(label='Name', help_text='(Tip: be clear and concise)',
-                                         widget=widgets.Textarea,
-                                         required=False, max_length=500)
-
     date_of_birth_declare = forms.BooleanField(label='This information is correct',
                                                widget=widgets.CustomCheckboxInput, required=False)
     date_of_birth_comments = forms.CharField(label='Date of birth', help_text='(Tip: be clear and concise)',
@@ -169,6 +163,38 @@ class NewAdultForm(GOVUKForm):
                                                                      help_text='(Tip: be clear and concise)',
                                                                      widget=widgets.Textarea,
                                                                      required=False, max_length=500)
+    # SoW8 Additional Fields
+    current_name_declare = forms.BooleanField(label='Current name',
+                                           widget=widgets.CustomCheckboxInput, required=False)
+    current_name_comments = forms.CharField(label='Current name comments',
+                                         help_text='(Tip: be clear and concise)',
+                                         widget=widgets.Textarea,
+                                         required=False, max_length=500)
+    known_by_other_names_declare = forms.BooleanField(label='Known by other names',
+                                              widget=widgets.CustomCheckboxInput, required=False)
+    known_by_other_names_comments = forms.CharField(label='Known by other names comments',
+                                            help_text='(Tip: be clear and concise)',
+                                            widget=widgets.Textarea,
+                                            required=False, max_length=500)
+    name_history_declare = forms.BooleanField(label='Name history',
+                                                      widget=widgets.CustomCheckboxInput, required=False)
+    name_history_comments = forms.CharField(label='Name history comments',
+                                                    help_text='(Tip: be clear and concise)',
+                                                    widget=widgets.Textarea,
+                                                    required=False, max_length=500)
+    PITH_address_moved_in_declare = forms.BooleanField(label='Current address moved in',
+                                              widget=widgets.CustomCheckboxInput, required=False)
+    PITH_address_moved_in_comments = forms.CharField(label='Current address moved in comments',
+                                            help_text='(Tip: be clear and concise)',
+                                            widget=widgets.Textarea,
+                                            required=False, max_length=500)
+    address_history_declare = forms.BooleanField(label='Address history',
+                                                      widget=widgets.CustomCheckboxInput, required=False)
+    address_history_comments = forms.CharField(label='Address history comments',
+                                                    help_text='(Tip: be clear and concise)',
+                                                    widget=widgets.Textarea,
+                                                    required=False, max_length=500)
+
 
     # This is the id appended to all htmls names ot make the individual form instance unique, this is given a value in
     # the init
@@ -182,7 +208,6 @@ class NewAdultForm(GOVUKForm):
         # Make all checkbox names refer the the name with the correct instance id, making each conditional reveal unique
         checkboxes = [
             ((self.fields['health_check_status_declare']), 'health_check_status' + id_value),
-            ((self.fields['full_name_declare']), 'full_name' + id_value),
             ((self.fields['date_of_birth_declare']), 'date_of_birth' + id_value),
             ((self.fields['relationship_declare']), 'relationship' + id_value),
             ((self.fields['email_declare']), 'email' + id_value),
@@ -192,6 +217,12 @@ class NewAdultForm(GOVUKForm):
             ((self.fields['on_update_declare']), 'on_update' + id_value),
             ((self.fields['lived_abroad_declare']), 'lived_abroad' + id_value),
             ((self.fields['military_base_declare']), 'military_base' + id_value),
+            # SoW8 Additional
+            ((self.fields['current_name_declare']), 'current_name' + id_value),
+            ((self.fields['known_by_other_names_declare']), 'known_by_other_names' + id_value),
+            ((self.fields['name_history_declare']), 'name_history' + id_value),
+            ((self.fields['PITH_address_moved_in_declare']), 'PITH_address_moved_in' + id_value),
+            ((self.fields['address_history_declare']), 'address_history' + id_value),
         ]
 
         for box in checkboxes:
@@ -205,13 +236,6 @@ class NewAdultForm(GOVUKForm):
         :return: string
         """
         return self.helper_clean('health_check_status')
-
-    def clean_full_name_comments(self):
-        """
-        Full name comments validation
-        :return: string
-        """
-        return self.helper_clean('full_name')
 
     def clean_date_of_birth_comments(self):
         """
@@ -275,6 +299,43 @@ class NewAdultForm(GOVUKForm):
         :return: string
         """
         return self.helper_clean('enhanced_check')
+
+    # SoW8 Additional Fields
+
+    def clean_current_name_comments(self):
+        """
+        PITH current_name comments validation
+        :return: string
+        """
+        return self.helper_clean('current_name')
+
+    def clean_known_by_other_names_comments(self):
+        """
+        PITH known_by_other_names comments validation
+        :return: string
+        """
+        return self.helper_clean('known_by_other_names')
+
+    def clean_name_history_comments(self):
+        """
+        PITH name_history comments validation
+        :return: string
+        """
+        return self.helper_clean('name_history')
+
+    def clean_address_history_comments(self):
+        """
+        PITH address_history comments validation
+        :return: string
+        """
+        return self.helper_clean('address_history')
+
+    def clean_PITH_address_moved_in_comments(self):
+        """
+        PITH PITH_address_moved_in comments validation
+        :return: string
+        """
+        return self.helper_clean('PITH_address_moved_in')
 
     def helper_clean(self, field):
         """

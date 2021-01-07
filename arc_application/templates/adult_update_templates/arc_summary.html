@@ -9,71 +9,749 @@
     Check and confirm all the details
 </h1>
 
-
 <h2 class="heading-medium">
     Application number: {{ ey_number }}
 </h2>
-{% with "4" as col %}
 
-{% for section in json %}
-<div class="two-thirds">
+{# Individual Lookup #}
 <table class="check-your-answers form-group">
-    {% for row in section %}
-        {% if row.title %}
-            {% if not forloop.first %}
-            </tbody>
-            {% endif %}
-            <thead>
-                <tr>
-                    <th colspan="{{ col }}">
-                        <div class="heading-medium">
-                            {{row.title}}
-                        </div>
-                    </th>
-                </tr>
-            </thead>
-            <tbody>
+    <thead>
+    <tr>
+        <th colspan="3">
+            <div class="heading-medium">
+                Individual lookup
+            </div>
+        </th>
+    </tr>
+    </thead>
+    <tbody>
+    <td>
+        Individual ID
+    </td>
+    <td>
+        {% if summary_data.individual_lookup %}
+            {{ summary_data.individual_lookup }}
         {% else %}
-            {% if row.comment.split %}
-                <tr class="error-row">
-                    <td colspan="3" class="error-container notice">
-                        <i class="icon icon-important">
-                           <span class="visually-hidden">Warning</span>
-                         </i>
-                         <strong class="bold-small">
-                            {{ row.comment }}
-                          </strong>
-                    </td>
-                </tr>
-                <tr class="error-row">
-                    <td class="error-field-label">
-            {% else %}
-                <tr>
-                    <td>
-            {% endif %}
-
-                        {{row.name}}
-                     </td>
-
-                     <td>
-                        {{row.value}}
-                     </td>
-
-                    {% if row.link %}
-                        <td class="change-answer">
-                            <a href="{{row.link}}">Change</a>
-                        </td>
-                    {% endif %}
-                </tr>
-            {% if forloop.last %}
-            </tbody>
-            {% endif %}
+            Not known to Ofsted
         {% endif %}
-    {% endfor %}
+    </td>
+    <td class="change-answer">
+        <a href="../personal-details/individual-lookup?id={{application_id}}&referrer=household_member&adult_id={{application_id}}" alt = "Change">Change</a>
+    </td>
+    </tbody>
 </table>
-</div>
-{% endfor %}
-{% endwith %}
+
+{# Personal Details #}
+<table class="check-your-answers form-group">
+            <thead>
+            <tr>
+                <th colspan="3">
+                    <div class="heading-medium">
+                        {{ summary_data.health_questions.current_name }}
+                    </div>
+                </th>
+            </tr>
+            </thead>
+
+            <tbody>
+            {# ================== Health Question Status ================== #}
+            <tr>
+                <td style="word-wrap: break-word">
+                    Health questions status
+                </td>
+                <td style="word-wrap: break-word">
+                    {{summary_data.health_questions.health_check_status}}
+                </td>
+                <td class="change-answer">
+                    <a href="new-adult?id={{application_id}}" alt = "Change">Change</a>
+                </td>
+            </tr>
+            {# ================== Title ================== #}
+            {% if summary_data.health_questions.title != '' %}
+            <tr>
+                <td style="word-wrap: break-word">
+                    Title
+                </td>
+                <td style="word-wrap: break-word">
+                    {{ summary_data.health_questions.title }}
+                </td>
+                <td class="change-answer">
+                    <a href="new-adult?id={{application_id}}" alt = "Change">Change</a>
+                </td>
+
+            </tr>
+            {% endif %}
+            {# ================== DoB ================== #}
+            {% if summary_data.field_comments.date_of_birth %}
+            <tr class="error-row">
+                <td colspan="3" class="error-container notice">
+                    <i class="icon icon-important">
+                        <span class="visually-hidden">Warning</span>
+                    </i>
+                    <strong class="bold-small">
+                        {{ summary_data.field_comments.date_of_birth }}
+                    </strong>
+                </td>
+            </tr>
+            <tr class="error-row">
+                <td class="error-field-label">
+            {% else %}
+            <tr>
+                <td style="word-wrap: break-word">
+            {% endif %}
+                    Date of birth
+                </td>
+                <td style="word-wrap: break-word">
+                    {{ summary_data.health_questions.DoB |date:"j M Y" }}
+                </td>
+                <td class="change-answer">
+                    <a href="new-adult?id={{application_id}}" alt = "Change">Change</a>
+                </td>
+            </tr>
+            {# ================== Relationship ================== #}
+            {% if summary_data.field_comments.relationship %}
+            <tr class="error-row">
+                <td colspan="3" class="error-container notice">
+                    <i class="icon icon-important">
+                        <span class="visually-hidden">Warning</span>
+                    </i>
+                    <strong class="bold-small">
+                        {{ summary_data.field_comments.relationship }}
+                    </strong>
+                </td>
+            </tr>
+            <tr class="error-row">
+                <td class="error-field-label">
+            {% else %}
+            <tr>
+                <td style="word-wrap: break-word">
+            {% endif %}
+                    Relationship
+                </td>
+                <td style="word-wrap: break-word">
+                    {{ summary_data.health_questions.relationship }}
+                </td>
+                <td class="change-answer">
+                    <a href="new-adult?id={{application_id}}" alt = "Change">Change</a>
+                </td>
+            </tr>
+            {# ================== Email ================== #}
+            {% if summary_data.field_comments.email %}
+            <tr class="error-row">
+                <td colspan="3" class="error-container notice">
+                    <i class="icon icon-important">
+                        <span class="visually-hidden">Warning</span>
+                    </i>
+                    <strong class="bold-small">
+                        {{ summary_data.field_comments.email }}
+                    </strong>
+                </td>
+            </tr>
+            <tr class="error-row">
+                <td class="error-field-label">
+            {% else %}
+            <tr>
+                <td style="word-wrap: break-word">
+            {% endif %}
+                    Email
+                </td>
+                <td style="word-wrap: break-word">
+                    {{ summary_data.health_questions.email }}
+                </td>
+                <td class="change-answer">
+                    <a href="new-adult?id={{application_id}}" alt = "Change">Change</a>
+                </td>
+            </tr>
+            {# ================== Phone Number ================== #}
+            <tr>
+                <td style="word-wrap: break-word">
+                    Phone number
+                </td>
+                <td style="word-wrap: break-word">
+                    {{ summary_data.health_questions.PITH_mobile_number }}
+                </td>
+                <td class="change-answer">
+                    <a href="new-adult?id={{application_id}}" alt = "Change">Change</a>
+                </td>
+            </tr>
+            {# ================== DBS ================== #}
+            {% if summary_data.health_questions.enhanced_check %}
+            <tr>
+                <td style="word-wrap: break-word">
+                    Did they get their DBS check from the Ofsted DBS application website?
+                </td>
+                <td style="word-wrap: break-word">
+                    {{ summary_data.health_questions.capita|yesno:"Yes,No" }}
+                </td>
+                <td class="change-answer">
+                    <a href="new-adult?id={{application_id}}" alt = "Change">Change</a>
+                </td>
+            </tr>
+            {# ================== DBS Is Recent ================== #}
+            {% if summary_data.health_questions.on_capita %}
+            <tr>
+                <td style="word-wrap: break-word">
+                    Is it dated within the last 3 months?
+                </td>
+                <td style="word-wrap: break-word">
+                    {{ summary_data.health_questions.within_three_months|yesno:"Yes,No" }}
+                </td>
+                <td class="change-answer">
+                    <a href="new-adult?id={{application_id}}" alt = "Change">Change</a>
+                </td>
+            </tr>
+            {% endif %}
+            {# ================== DBS Number ================== #}
+            {% if summary_data.field_comments.dbs_certificate_number %}
+            <tr class="error-row">
+                <td colspan="3" class="error-container notice">
+                    <i class="icon icon-important">
+                        <span class="visually-hidden">Warning</span>
+                    </i>
+                    <strong class="bold-small">
+                        {{ summary_data.field_comments.dbs_certificate_number }}
+                    </strong>
+                </td>
+            </tr>
+            <tr class="error-row">
+                <td class="error-field-label">
+            {% else %}
+            <tr>
+                <td style="word-wrap: break-word">
+            {% endif %}
+                    DBS certificate number
+                </td>
+                <td style="word-wrap: break-word">
+                    {{ summary_data.health_questions.dbs_certificate_number }}
+                </td>
+                <td class="change-answer">
+                    <a href="new-adult?id={{application_id}}" alt = "Change">Change</a>
+                </td>
+            </tr>
+            {% endif %}
+            {# ================== Enhance DBS ================== #}
+            {% if summary_data.health_questions.enhanced_check is not None %}
+            {% if summary_data.field_comments.enhanced_check %}
+            <tr class="error-row">
+                <td colspan="3" class="error-container notice">
+                    <i class="icon icon-important">
+                        <span class="visually-hidden">Warning</span>
+                    </i>
+                    <strong class="bold-small">
+                        {{ summary_data.field_comments.enhanced_check }}
+                    </strong>
+                </td>
+            </tr>
+            <tr class="error-row">
+                <td class="error-field-label">
+            {% else %}
+            <tr>
+                <td style="word-wrap: break-word">
+            {% endif %}
+                    Enhanced DBS check for home-based childcare?
+                </td>
+                <td style="word-wrap: break-word">
+                    {{ summary_data.health_questions.enhanced_check|yesno:"Yes,No" }}
+                </td>
+                <td class="change-answer">
+                    <a href="new-adult?id={{application_id}}" alt = "Change">Change</a>
+                </td>
+            </tr>
+            {% endif %}
+            {# ================== DBS Update Service ================== #}
+            {% if summary_data.health_questions.on_update is not None %}
+            {% if summary_data.field_comments.on_update %}
+            <tr class="error-row">
+                <td colspan="3" class="error-container notice">
+                    <i class="icon icon-important">
+                        <span class="visually-hidden">Warning</span>
+                    </i>
+                    <strong class="bold-small">
+                        {{ summary_data.field_comments.on_update }}
+                    </strong>
+                </td>
+            </tr>
+            <tr class="error-row">
+                <td class="error-field-label">
+            {% else %}
+            <tr>
+                <td style="word-wrap: break-word">
+            {% endif %}
+                    On the DBS Update Service?
+                </td>
+                <td style="word-wrap: break-word">
+                    {{ summary_data.health_questions.on_update|yesno:"Yes,No" }}
+                </td>
+                <td class="change-answer">
+                    <a href="new-adult?id={{application_id}}" alt = "Change">Change</a>
+                </td>
+            </tr>
+            {% endif %}
+            {# ================== Known to Council ================== #}
+            <tr>
+                <td style="word-wrap: break-word">
+                    Known to council social Services in regards to their own children?
+                </td>
+                <td style="word-wrap: break-word">
+                    {{ summary_data.health_questions.known_to_council|yesno:"Yes,No" }}
+                </td>
+                <td class="change-answer">
+                    <a href="new-adult?id={{application_id}}" alt = "Change">Change</a>
+                </td>
+            </tr>
+            {# ================== Reasons Known to Council ================== #}
+            {% if summary_data.health_questions.known_to_council is True %}
+            <tr>
+                <td style="word-wrap: break-word">
+                    Tell us why
+                </td>
+                <td style="word-wrap: break-word">
+                    {{ summary_data.health_questions.reasons_known_to_council_health_check }}
+                </td>
+                <td class="change-answer">
+                    <a href="new-adult?id={{application_id}}" alt = "Change">Change</a>
+                </td>
+            </tr>
+            {% endif %}
+            </tbody>
+        </table>
+
+{# Current Name #}
+<table class="check-your-answers form-group">
+    <thead>
+    <tr>
+        <th colspan="3">
+            <div class="heading-medium">
+                Current Name
+            </div>
+        </th>
+    </tr>
+    </thead>
+    <tbody>
+    {% if summary_data.field_comments.current_name %}
+    <tr class="error-row">
+        <td colspan="3" class="error-container notice">
+            <i class="icon icon-important">
+                <span class="visually-hidden">Warning</span>
+            </i>
+            <strong class="bold-small">
+                {{ summary_data.field_comments.current_name }}
+            </strong>
+        </td>
+    </tr>
+    <tr class="error-row">
+        <td class="error-field-label">
+            {% else %}
+    <tr>
+        <td style="word-wrap: break-word">
+            {% endif %}
+            Current name
+        </td>
+        <td>
+            {{ summary_data.health_questions.current_name }}
+        </td>
+        <td class="change-answer">
+            <a href="new-adult?id={{application_id}}" alt = "Change">Change</a>
+        </td>
+    </tr>
+    {% if summary_data.field_comments.known_by_other_names %}
+    <tr class="error-row">
+        <td colspan="3" class="error-container notice">
+            <i class="icon icon-important">
+                <span class="visually-hidden">Warning</span>
+            </i>
+            <strong class="bold-small">
+                {{ summary_data.field_comments.known_by_other_names }}
+            </strong>
+        </td>
+    </tr>
+    <tr class="error-row">
+        <td class="error-field-label">
+            {% else %}
+    <tr>
+        <td style="word-wrap: break-word">
+            {% endif %}
+            Have you previously been known by any other names?
+        </td>
+        <td>
+            {{ summary_data.name_history.previous_names|yesno:"Yes,No" }}
+        </td>
+        <td class="change-answer">
+            <a href="new-adult?id={{application_id}}" alt = "Change">Change</a>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+{# Name History #}
+{% if summary_data.name_history.previous_names %}
+<table class="check-your-answers form-group">
+    <thead>
+    <tr>
+        <th colspan="2">
+            <div class="heading-medium">
+                Name History
+            </div>
+        </th>
+        <th colspan="1">
+            <div class="change-answer">
+                <a href="new-adult?id={{application_id}}" alt = "Change">Change</a>
+            </div>
+        </th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for prevname in summary_data.name_history.previous_names %}
+        {% if summary_data.field_comments.name_history and forloop.counter == 1 %}
+            {% firstof "error-row" as css_class_name %}
+            {% firstof "error-field-label" as css_class_label %}
+            <tr class="error-row">
+                <td colspan="3" class="error-container notice">
+                    <i class="icon icon-important">
+                        <span class="visually-hidden">Warning</span>
+                    </i>
+                    <strong class="bold-small">
+                        {{ summary_data.field_comments.name_history }}
+                    </strong>
+                </td>
+            </tr>
+            <tr class="error-row">
+                <td class="error-field-label">
+        {% else %}
+            <tr class="{{ css_class_name }}">
+                <td class="{{ css_class_label }}" style="word-wrap: break-word">
+        {% endif %}
+                Previous name {{ forloop.counter }}
+            </td>
+            <td>
+                {{ prevname.full_name }}
+            </td>
+            <td class="change-answer">
+
+            </td>
+        </tr>
+        <tr class="{{ css_class_name }}">
+            <td class="{{ css_class_label }}">
+                Start date
+            </td>
+            <td>
+                {{ prevname.start_date|date:"j M Y" }}
+            </td>
+            <td class="change-answer">
+            </td>
+        </tr>
+        <tr class="{{ css_class_name }}">
+            <td class="{{ css_class_label }}">
+                End date
+            </td>
+            <td>
+                {{ prevname.end_date|date:"j M Y" }}
+            </td>
+            <td class="change-answer">
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endif %}
+
+{# Current Address #}
+<table class="check-your-answers form-group">
+    <thead>
+    <tr>
+        <th colspan="3">
+            <div class="heading-medium">
+                Current Address
+            </div>
+        </th>
+    </tr>
+    </thead>
+    <tbody>
+    {% if summary_data.field_comments.PITH_same_address %}
+    <tr class="error-row">
+        <td colspan="3" class="error-container notice">
+            <i class="icon icon-important">
+                <span class="visually-hidden">Warning</span>
+            </i>
+            <strong class="bold-small">
+                {{ summary_data.field_comments.PITH_same_address }}
+            </strong>
+        </td>
+    </tr>
+    <tr class="error-row">
+        <td class="error-field-label">
+            {% else %}
+    <tr>
+        <td style="word-wrap: break-word">
+            {% endif %}
+            Current address
+        </td>
+        <td style="word-wrap: break-word">
+            {% with current_address=summary_data.current_address %}
+            {{ current_address.street_line1 }}{% if current_address.street_line2 %}<br/>{% endif %}
+            {{ current_address.street_line2 }}{% if current_address.town %}<br/>{% endif %}
+            {{ current_address.town }}{% if current_address.county %}<br/>{% endif %}
+            {{ current_address.county }}{% if current_address.country %}<br/>{% endif %}
+            {{ current_address.country}}
+            {% endwith %}
+        </td>
+        <td class="change-answer">
+            <a href="new-adult?id={{application_id}}" alt = "Change">Change</a>
+        </td>
+    </tr>
+    {% if summary_data.current_address_values.moved_in_date %}
+    {% if summary_data.field_comments.PITH_address_moved_in %}
+    <tr class="error-row">
+        <td colspan="3" class="error-container notice">
+            <i class="icon icon-important">
+                <span class="visually-hidden">Warning</span>
+            </i>
+            <strong class="bold-small">
+                {{ summary_data.field_comments.PITH_address_moved_in }}
+            </strong>
+        </td>
+    </tr>
+    <tr class="error-row">
+        <td class="error-field-label">
+            {% else %}
+    <tr>
+        <td style="word-wrap: break-word">
+            {% endif %}
+            Moved in
+        </td>
+        <td style="word-wrap: break-word">
+            {{summary_data.current_address_values.moved_in_date}}
+        </td>
+        <td class="change-answer">
+            <a href="new-adult?id={{application_id}}" alt = "Change">Change</a>
+        </td>
+    </tr>
+    {% endif %}
+    {% if summary_data.field_comments.lived_abroad %}
+    <tr class="error-row">
+        <td colspan="3" class="error-container notice">
+            <i class="icon icon-important">
+                <span class="visually-hidden">Warning</span>
+            </i>
+            <strong class="bold-small">
+                {{ summary_data.field_comments.lived_abroad }}
+            </strong>
+        </td>
+    </tr>
+    <tr class="error-row">
+        <td class="error-field-label">
+            {% else %}
+    <tr>
+        <td style="word-wrap: break-word">
+            {% endif %}
+            Have you lived outside of the UK in the past five years?
+        </td>
+        <td style="word-wrap: break-word">
+            {{ summary_data.current_address_values.lived_abroad|yesno:"Yes,No"}}
+        </td>
+        <td class="change-answer">
+            <a href="new-adult?id={{application_id}}" alt = "Change">Change</a>
+        </td>
+    </tr>
+    {% if summary_data.field_comments.military_base %}
+    <tr class="error-row">
+        <td colspan="3" class="error-container notice">
+            <i class="icon icon-important">
+                <span class="visually-hidden">Warning</span>
+            </i>
+            <strong class="bold-small">
+                {{ summary_data.field_comments.military_base }}
+            </strong>
+        </td>
+    </tr>
+    <tr class="error-row">
+        <td class="error-field-label">
+            {% else %}
+    <tr>
+        <td style="word-wrap: break-word">
+            {% endif %}
+            Have you lived or worked on a British military base outside of the UK in the past five years?
+        </td>
+        <td style="word-wrap: break-word">
+            {{ summary_data.current_address_values.military_base|yesno:"Yes,No" }}
+        </td>
+        <td class="change-answer">
+            <a href="new-adult?id={{application_id}}" alt = "Change">Change</a>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+{# Address History #}
+{% if summary_data.address_history %}
+<table class="check-your-answers form-group">
+    <thead>
+    <tr>
+        <th colspan="2">
+            <div class="heading-medium">
+                Address History
+            </div>
+        </th>
+        <th colspan="1">
+            <div class="change-answer">
+                <a href="new-adult?id={{application_id}}" alt = "Change">Change</a>
+            </div>
+        </th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for address in summary_data.address_history %}
+    {% if summary_data.field_comments.address_history and forloop.counter == 1 %}
+    {% firstof "error-row" as css_class_name %}
+    {% firstof "error-field-label" as css_class_label %}
+    <tr class="error-row">
+        <td colspan="3" class="error-container notice">
+            <i class="icon icon-important">
+                <span class="visually-hidden">Warning</span>
+            </i>
+            <strong class="bold-small">
+                {{ summary_data.field_comments.address_history }}
+            </strong>
+        </td>
+    </tr>
+    <tr class="error-row">
+        <td class="error-field-label">
+    {% else %}
+    <tr class="{{ css_class_name }}">
+        <td class="{{ css_class_label }}" style="word-wrap: break-word">
+    {% endif %}
+    {% if address.street_line1 %}
+            {{ address.title }}
+        </td>
+        <td >
+            {{ address.street_line1 }}{% if address.street_line2 %}<br/>{% endif %}
+            {{ address.street_line2 }}{% if address.town %}<br/>{% endif %}
+            {{ address.town }}{% if address.county %}<br/>{% endif %}
+            {{ address.county }}{% if address.country %}<br/>{% endif %}
+            {{ address.country}}</td>
+        <td class="change-answer"></td>
+    </tr>
+    <tr class="{{ css_class_name }}">
+        <td class="{{ css_class_label }}">Date moved in</td>
+        <td>{{ address.moved_in_date|date:"j M Y" }}</td>
+        <td class="change-answer"></td>
+    </tr>
+    <tr class="{{ css_class_name }}">
+        <td class="{{ css_class_label }}">Date moved out</td>
+        <td >{{ address.moved_out_date|date:"j M Y" }}</td>
+        <td class="change-answer"></td>
+    </tr>
+    {% else %}
+            {{ address.title }}
+        </td>
+        <td>{{ address.gap_reason }}</td>
+        <td class="change-answer"></td>
+    </tr>
+    <tr class="{{ css_class_name }}">
+        <td class="{{ css_class_label }}">Start date</td>
+        <td>{{ address.moved_in_date|date:"j M Y" }}</td>
+        <td class="change-answer"></td>
+    </tr>
+    <tr class="{{ css_class_name }}">
+        <td class="{{ css_class_label }}">End date</td>
+        <td>{{ address.moved_out_date|date:"j M Y" }}</td>
+        <td class="change-answer"></td>
+    </tr>
+    {% endif %}
+    {% endfor %}
+    </tbody>
+</table>
+{% endif %}
+
+{# Current Treatment #}
+<table class="check-your-answers">
+    <colgroup>
+        <col class="summary-column">
+        <col class="summary-column">
+        <col class="change-answer">
+    </colgroup>
+    <thead>
+    <th colspan="3">
+        <h2 class="heading-medium">
+            Current treatment
+        </h2>
+    </th>
+    </thead>
+    <tbody>
+    <tr>
+        <td class=summary-column> Are you currently being treated by your GP, another doctor or a hospital?</td>
+        <td class=summary-column> {{ summary_data.health_questions.current_treatment_bool|yesno:"Yes,No" }}</td>
+    </tr>
+    {% if summary_data.health_questions.current_treatment_bool %}
+    <tr>
+        <td class=summary-column>Details of the illness or condition</td>
+        <td class=summary-column>{{ summary_data.health_questions.current_treatment_details }}</td>
+    </tr>
+    {% endif %}
+    </tbody>
+</table>
+
+{# Serious Illnesses #}
+<table class="check-your-answers">
+    <colgroup>
+        <col class="summary-column">
+        <col class="summary-column">
+        <col class="change-answer">
+    </colgroup>
+    <thead>
+    <th colspan="3">
+        <h2 class="heading-medium">
+            Serious illnesses
+        </h2>
+    </th>
+    </thead>
+    <tbody>
+    <tr>
+        <td class=summary-column>Have you had any serious illnesses within the last five years?</td>
+        <td class=summary-column>{{ summary_data.health_questions.serious_illness_bool|yesno:"Yes,No" }}</td>
+    </tr>
+    {% if summary_data.health_questions.serious_illness_bool %}
+    {% for illness in summary_data.health_questions.serious_illnesses %}
+    <tr>
+        <td class=summary-column>{{ illness.description }}</td>
+        <td class=summary-column>{{ illness.start_date }} to {{ illness.end_date}}</td>
+    </tr>
+    {% endfor %}
+    {% endif %}
+    </tbody>
+</table>
+
+{# Hospital Admissions #}
+<table class="check-your-answers">
+    <colgroup>
+        <col class="summary-column">
+        <col class="summary-column">
+        <col class="change-answer">
+    </colgroup>
+    <thead>
+    <th colspan="3">
+        <h2 class="heading-medium">
+            Hospital admissions
+        </h2>
+    </th>
+    </thead>
+    <tbody>
+    <tr>
+        <td>Have you been admitted to hospital in the last 2 years?</td>
+        <td>{{ summary_data.health_questions.hospital_admission_bool|yesno:"Yes,No" }}</td>
+    </tr>
+    {% if summary_data.health_questions.hospital_admission_bool %}
+    {% for illness in summary_data.health_questions.hospital_admissions %}
+    <tr>
+        <td>{{ illness.description }}</td>
+        <td>{{ illness.start_date}} to {{ illness.end_date}}</td>
+    </tr>
+    {% endfor %}
+    {% endif %}
+    </tbody>
+</table>
+
+<br/>
 
 <form method="post">
     {% csrf_token %}
