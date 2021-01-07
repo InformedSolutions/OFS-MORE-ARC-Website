@@ -21,12 +21,6 @@ class NewAdultForm(GOVUKForm):
                                                    widget=widgets.Textarea,
                                                    required=False, max_length=500)
 
-    full_name_declare = forms.BooleanField(label='This information is correct',
-                                           widget=widgets.CustomCheckboxInput, required=False)
-    full_name_comments = forms.CharField(label='Name', help_text='(Tip: be clear and concise)',
-                                         widget=widgets.Textarea,
-                                         required=False, max_length=500)
-
     date_of_birth_declare = forms.BooleanField(label='This information is correct',
                                                widget=widgets.CustomCheckboxInput, required=False)
     date_of_birth_comments = forms.CharField(label='Date of birth', help_text='(Tip: be clear and concise)',
@@ -161,7 +155,7 @@ class NewAdultForm(GOVUKForm):
 
     known_to_council_comments = forms.CharField(
         label='Known to council social Services in regards to their own children?',
-        help_text='Known to council (Tip: be clear and concise)',
+        help_text='(Tip: be clear and concise)',
         widget=widgets.Textarea, required=False,
         max_length=500)
 
@@ -214,7 +208,6 @@ class NewAdultForm(GOVUKForm):
         # Make all checkbox names refer the the name with the correct instance id, making each conditional reveal unique
         checkboxes = [
             ((self.fields['health_check_status_declare']), 'health_check_status' + id_value),
-            #((self.fields['full_name_declare']), 'full_name' + id_value),
             ((self.fields['date_of_birth_declare']), 'date_of_birth' + id_value),
             ((self.fields['relationship_declare']), 'relationship' + id_value),
             ((self.fields['email_declare']), 'email' + id_value),
@@ -243,13 +236,6 @@ class NewAdultForm(GOVUKForm):
         :return: string
         """
         return self.helper_clean('health_check_status')
-
-    def clean_full_name_comments(self):
-        """
-        Full name comments validation
-        :return: string
-        """
-        return self.helper_clean('full_name')
 
     def clean_date_of_birth_comments(self):
         """
