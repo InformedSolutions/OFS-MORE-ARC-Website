@@ -356,12 +356,13 @@ class StubHMGatewayActions:
             "token_id": "51cdabff-a9c5-4032-bf50-0c8d1dd90888",
             "adult_status": 'DRAFTING',
             "PITH_same_address": False,
-            'moved_in_date': None,
             'PITH_mobile_number': '07123123123',
             'currently_being_treated': False,
             'has_serious_illness': False,
+            'illness_details': False,
             'has_hospital_admissions': False,
-            'cygnum_relationship_to_childminder': 'test'
+            'cygnum_relationship_to_childminder': 'test',
+            'moved_in_date': '2000-12-12'
         }
         self.adult_read_response = self.make_response(record=self.hm_application)
 
@@ -421,6 +422,15 @@ class StubHMGatewayActions:
         self.previous_address_read_response = self.make_response(record=self.previous_address_record)
         self.previous_address_list_response = self.make_response(record=[self.previous_address_record])
 
+        self.previous_address_gap_record = {
+            'missing_address_gap_id': '88888888-4444-4444-4444-121212121213',
+            'gap_reason': 'Travelling',
+            'moved_in_date': '2016-12-12',
+            'moved_out_date': '2018-12-12',
+        }
+        self.previous_address_gap_read_response = self.make_response(record=self.previous_address_gap_record)
+        self.previous_address_gap_list_response = self.make_response(record=[self.previous_address_gap_record])
+
         self.application_record = {
             "application_id": "3afa6904-074f-49c6-ade0-3abc9eea0111",
             "token_id": "51cdabff-a9c5-4032-bf50-0c8d1dd90888"
@@ -466,6 +476,7 @@ class StubHMGatewayActions:
             'previous-name': self.previous_name_list_response,
             'adult-in-home-address': self.home_address_list_response,
             'previous-address': self.previous_address_list_response,
+            'previous-address-gap': self.previous_address_gap_list_response,
             'previous-registration': self.previous_registration_list_response,
             'serious-illness': self.serious_illness_read_response,
             'hospital-admissions': self.hospital_admissions_read_response
@@ -485,6 +496,7 @@ class StubHMGatewayActions:
             'arc-comments': 'arc_comments',
             'previous-name': 'previous_name',
             'previous-address': 'previous_address',
+            'previous-address-gap': 'previous_address_gap',
             'timeline-log': 'timeline_log',
             'previous-registration': 'previous_registration',
             'adult-in-home-address': 'home_address',
