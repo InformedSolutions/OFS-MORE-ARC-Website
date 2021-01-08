@@ -13,6 +13,7 @@ from ...services.db_gateways import HMGatewayActions
 from ...models import Arc, AdultInHomeAddress
 from operator import itemgetter
 from datetime import datetime
+from .adult_update_summary import get_previous_names, get_address_history
 
 # Initiate logging
 log = logging.getLogger('')
@@ -141,29 +142,10 @@ def new_adults_summary(request):
             linking_complete = False
 
         adult_previous_registrations.append({'adult_id': adult_id, 'prev_reg': adult_prev_reg})
-            
 
-
-        # previous_name_response = HMGatewayActions().list('previous-name', params={'adult_id': adult_id})
-        # if previous_name_response.status_code == 200:
-        #     for prev_name in previous_name_response.record:
-        #         if prev_name['middle_names'] != '' or prev_name['middle_names'] is not None:
-        #             prev_name['name'] = prev_name['first_name'] + " " + prev_name['middle_names'] + " " + prev_name['last_name']
-        #         else:
-        #             prev_name['name'] = prev_name['first_name'] + " "  + prev_name['last_name']
-        #
-        #         prev_name['start_date'] = datetime(prev_name['start_year'], prev_name['start_month'], prev_name['start_day']).strftime(
-        #     '%d %b %Y')
-        #         prev_name['end_date'] = datetime(prev_name['end_year'], prev_name['end_month'],
-        #                                                 prev_name['end_day']).strftime(
-        #             '%d %b %Y')
-        #     adult_previous_name_lists_list.append(previous_name_response.record)
-        # else:
-        #     adult_previous_name_lists_list.append(None)
         name_history = get_previous_names(adult_id)
 
         previous_address_gap_history = get_address_history(adult_id)
-
 
     if request.method == 'GET':
         # Defines the static form at the top of the page
@@ -200,7 +182,7 @@ def new_adults_summary(request):
     elif request.method == 'POST':
 
         adult_formset = AdultFormSet(request.POST, prefix='adult')
-        #
+
         if adult_formset.is_valid():
             adult_data_list = adult_formset.cleaned_data
 
@@ -288,29 +270,6 @@ def flag_health_check(adult_id, adult_comments, token_id):
                                                               })
 
 
-def get_previous_names(adult_id):
-    context = dict()
-    previous_names_list = []
-    previous_names_response = HMGatewayActions().list('previous-name', params={'adult_id': adult_id})
-
-    if previous_names_response.status_code == 200:
-        previous_names = previous_names_response.record
-        for previous_name in previous_names:
-            previous_name['start_date'] = date(previous_name['start_year'], previous_name['start_month'], previous_name['start_day'])
-            previous_name['end_date'] = date(previous_name['end_year'], previous_name['end_month'], previous_name['end_day'])
-            previous_name['full_name'] = previous_name['first_name'] + ' ' + previous_name['last_name']
-            previous_names_list.append(previous_name)
-        previous_names_list = sorted(previous_names_list,
-                                     key=lambda name: name['start_date'] if name['start_date'] else 0)
-        for name in previous_names_list: previous_names_list[previous_names_list.index(name)][
-            'title'] = f"Previous Name {previous_names_list.index(name)}"
-        context['current_name_start_date'] = previous_names_list[-1]['end_date']
-        context['birth_name'] = previous_names_list[0]
-    context['previous_names'] = previous_names_list[1:]
-    context['previous_name_valid'] = False if not previous_names_list[1:] else True
-    return context
-
-
 def handle_previous_name_and_address_dates(adult_id, adult_record):
     """
     Sets start and end dates for current name and address in db
@@ -352,42 +311,3 @@ def handle_previous_name_and_address_dates(adult_id, adult_record):
     new_adult_record['moved_out_date'] = end_date
 
     actions.put('adult', params=new_adult_record)
-
-
-def get_address_history(adult_id):
-    prev_addresses = get_previous_addresses(adult_id)
-    prev_address_gaps = get_previous_address_gaps(adult_id)
-    history = sorted((prev_addresses + prev_address_gaps),
-                     key=lambda address: address['moved_in_date'] if address['moved_in_date'] else 0)
-    gapCounter = 1
-    addressCounter = 1
-    for address in history:
-        order = history.index(address)
-        history[order].update({'moved_in_date': datetime.strptime(address['moved_in_date'], "%Y-%m-%d").date()})
-        history[order].update({'moved_out_date': datetime.strptime(address['moved_out_date'], "%Y-%m-%d").date()})
-        if 'previous_address_id' in history[order].keys():
-            history[order]['title'] = f"Previous address {addressCounter}"
-            addressCounter += 1
-        else:
-            history[order]['previous_address_id'] = history[order]['missing_address_gap_id']
-            history[order]['title'] = f"Previous address gap {gapCounter}"
-            gapCounter += 1
-    return history
-
-
-def get_previous_addresses(adult_id):
-    response = HMGatewayActions().list('previous-address', params={'adult_id': adult_id})
-    if response.status_code == 200:
-        addresses = response.record
-        return addresses
-    else:
-        return []
-
-
-def get_previous_address_gaps(adult_id):
-    response = HMGatewayActions().list('previous-address-gap', params={'adult_id': adult_id})
-    if response.status_code == 200:
-        addresses = response.record
-        return addresses
-    else:
-        return []
