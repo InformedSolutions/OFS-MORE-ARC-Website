@@ -19,7 +19,7 @@
         {% csrf_token %}
         {{ formset_adult.management_form }}
 
-        {% for record, id, health_check_status, title, name, day, month, year, relationship, email,PITH_mobile_number, same_address, moved_in_date, dbs_certificate_number, dbs_on_capita, dbs_is_recent, enhanced_check, on_update, lived_abroad,  military_base, formsetadult, serious_illness_set, hospital_admission_set, reasons_known_to_council_health_check, previous_names in adult_lists %}
+        {% for record, id, health_check_status, title, name, day, month, year, relationship, email,PITH_mobile_number, same_address, moved_in_date, dbs_certificate_number, dbs_on_capita, dbs_is_recent, enhanced_check, on_update, lived_abroad,  military_base, formsetadult, serious_illness_set, hospital_admission_set, reasons_known_to_council_health_check in adult_lists %}
 
         <table class="check-your-answers form-group">
             <thead>
@@ -406,8 +406,9 @@
             </tbody>
         </table>
 
+        {{ name_history }}
         {# Name History #}
-        {% if previous_names %}
+        {% if name_history %}
         <table class="check-your-answers form-group">
             <thead>
             <tr>
@@ -424,13 +425,43 @@
             </tr>
             </thead>
             <tbody>
-            {% for prevname in previous_names %}
+            <tr class="js-hidden" id="name_history{{formsetadult.instance_id.initial}}">
+                    <td colspan="1">
+                        <div>
+                            Enter your reasoning
+                        </div>
+                        <div>
+                            {{ formsetadult.name_history_comments.help_text }}
+                        </div>
+                    </td>
+                    <td colspan="2">
+                        <div>
+                            {{ formsetadult.name_history_comments }}
+                        </div>
+                    </td>
+                </tr>
+            <tr>
+                <td>Name at birth</td>
+                <td>{{ name_history.birth_name.full_name }}</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>Start date</td>
+                <td>{{ name_history.birth_name.start_date|date:"j M Y" }}</td>
+                <td></td>
+            </tr>
+            <tr >
+                <td>End date</td>
+                <td>{{ name_history.birth_name.end_date|date:"j M Y" }}</td>
+                <td></td>
+            </tr>
+            {% for prevname in name_history.previous_names %}
             <tr>
                 <td>
-                    Previous name {{ forloop.counter }}
+                    {{ prevname.title }}
                 </td>
                 <td>
-                    {{ prevname.name }}
+                    {{ prevname.full_name }}
                 </td>
                 <td class="change-answer">
 
@@ -457,21 +488,6 @@
                 </td>
             </tr>
             {% endfor %}
-            <tr class="js-hidden" id="name_history{{formsetadult.instance_id.initial}}">
-                    <td colspan="1">
-                        <div>
-                            Enter your reasoning
-                        </div>
-                        <div>
-                            {{ formsetadult.name_history_comments.help_text }}
-                        </div>
-                    </td>
-                    <td colspan="2">
-                        <div>
-                            {{ formsetadult.name_history_comments }}
-                        </div>
-                    </td>
-                </tr>
             </tbody>
         </table>
 
@@ -616,6 +632,21 @@
             </tr>
             </thead>
             <tbody>
+            <tr class="js-hidden" id="address_history{{formsetadult.instance_id.initial}}">
+                    <td colspan="1">
+                        <div>
+                            Enter your reasoning
+                        </div>
+                        <div>
+                            {{ formsetadult.address_history_comments.help_text }}
+                        </div>
+                    </td>
+                    <td colspan="2">
+                        <div>
+                            {{ formsetadult.address_history_comments }}
+                        </div>
+                    </td>
+                </tr>
             {% for address in previous_addresses %}
                 {% if address.street_line1 %}
                     <tr>
@@ -656,21 +687,6 @@
                     </tr>
                 {% endif %}
             {% endfor %}
-            <tr class="js-hidden" id="address_history{{formsetadult.instance_id.initial}}">
-                    <td colspan="1">
-                        <div>
-                            Enter your reasoning
-                        </div>
-                        <div>
-                            {{ formsetadult.address_history_comments.help_text }}
-                        </div>
-                    </td>
-                    <td colspan="2">
-                        <div>
-                            {{ formsetadult.address_history_comments }}
-                        </div>
-                    </td>
-                </tr>
             </tbody>
         </table>
         {% endif %}

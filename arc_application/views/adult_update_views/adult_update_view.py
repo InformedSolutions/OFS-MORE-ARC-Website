@@ -62,7 +62,6 @@ def new_adults_summary(request):
     adult_name_querysets = []
     adult_address_querysets = []
     adult_previous_registrations = []
-    adult_previous_name_lists_list = []
 
     # Set up bool to track whether linking has been completed for all adults in this application
     linking_complete = True
@@ -145,22 +144,23 @@ def new_adults_summary(request):
             
 
 
-        previous_name_response = HMGatewayActions().list('previous-name', params={'adult_id': adult_id})
-        if previous_name_response.status_code == 200:
-            for prev_name in previous_name_response.record:
-                if prev_name['middle_names'] != '' or prev_name['middle_names'] is not None:
-                    prev_name['name'] = prev_name['first_name'] + " " + prev_name['middle_names'] + " " + prev_name['last_name']
-                else:
-                    prev_name['name'] = prev_name['first_name'] + " "  + prev_name['last_name']
-
-                prev_name['start_date'] = datetime(prev_name['start_year'], prev_name['start_month'], prev_name['start_day']).strftime(
-            '%d %b %Y')
-                prev_name['end_date'] = datetime(prev_name['end_year'], prev_name['end_month'],
-                                                        prev_name['end_day']).strftime(
-                    '%d %b %Y')
-            adult_previous_name_lists_list.append(previous_name_response.record)
-        else:
-            adult_previous_name_lists_list.append(None)
+        # previous_name_response = HMGatewayActions().list('previous-name', params={'adult_id': adult_id})
+        # if previous_name_response.status_code == 200:
+        #     for prev_name in previous_name_response.record:
+        #         if prev_name['middle_names'] != '' or prev_name['middle_names'] is not None:
+        #             prev_name['name'] = prev_name['first_name'] + " " + prev_name['middle_names'] + " " + prev_name['last_name']
+        #         else:
+        #             prev_name['name'] = prev_name['first_name'] + " "  + prev_name['last_name']
+        #
+        #         prev_name['start_date'] = datetime(prev_name['start_year'], prev_name['start_month'], prev_name['start_day']).strftime(
+        #     '%d %b %Y')
+        #         prev_name['end_date'] = datetime(prev_name['end_year'], prev_name['end_month'],
+        #                                                 prev_name['end_day']).strftime(
+        #             '%d %b %Y')
+        #     adult_previous_name_lists_list.append(previous_name_response.record)
+        # else:
+        #     adult_previous_name_lists_list.append(None)
+        name_history = get_previous_names(adult_id)
 
         previous_address_gap_history = get_address_history(adult_id)
 
@@ -181,7 +181,7 @@ def new_adults_summary(request):
                                adult_same_address_list, adult_moved_in_date_list,  adult_dbs_cert_numbers, adult_dbs_on_capitas,
                                adult_dbs_is_recents, adult_dbs_is_enhanceds,adult_dbs_on_updates, adult_lived_abroad,
                                adult_military_base, formset_adult, serious_illnesses, hospital_admissions,
-                               local_authorities, adult_previous_name_lists_list))
+                               local_authorities))
 
 
         variables = {
@@ -190,7 +190,8 @@ def new_adults_summary(request):
             'adult_lists': adult_lists,
             'previous_registration_lists': adult_previous_registrations,
             'linking_complete': linking_complete,
-            'previous_addresses': previous_address_gap_history
+            'previous_addresses': previous_address_gap_history,
+            'name_history': name_history
 
         }
         log.debug("Rendering new adults in the home page")
@@ -253,7 +254,7 @@ def new_adults_summary(request):
                                    adult_same_address_list, adult_moved_in_date_list, adult_dbs_cert_numbers,
                                    adult_dbs_on_capitas, adult_dbs_is_recents, adult_dbs_is_enhanceds, adult_dbs_on_updates,
                                    adult_lived_abroad, adult_military_base, adult_formset, serious_illnesses,
-                                   hospital_admissions, local_authorities, adult_previous_name_lists_list))
+                                   hospital_admissions, local_authorities))
 
             for adult_form, adult_name in zip(adult_formset, adult_name_list):
                 adult_form.error_summary_title = 'There was a problem (' + adult_name + ')'
@@ -264,11 +265,35 @@ def new_adults_summary(request):
                 'adult_lists': adult_lists,
                 'previous_registration_lists': adult_previous_registrations,
                 'linking_complete': linking_complete,
-                'previous_addresses': previous_address_gap_history
+                'previous_addresses': previous_address_gap_history,
+                'name_history': name_history
             }
 
             log.debug("Render new adult review page")
             return render(request, 'adult_update_templates/new-adults-summary.html', variables)
+
+
+def get_previous_names(adult_id):
+    context = dict()
+    previous_names_list = []
+    previous_names_response = HMGatewayActions().list('previous-name', params={'adult_id': adult_id})
+
+    if previous_names_response.status_code == 200:
+        previous_names = previous_names_response.record
+        for previous_name in previous_names:
+            previous_name['start_date'] = date(previous_name['start_year'], previous_name['start_month'], previous_name['start_day'])
+            previous_name['end_date'] = date(previous_name['end_year'], previous_name['end_month'], previous_name['end_day'])
+            previous_name['full_name'] = previous_name['first_name'] + ' ' + previous_name['last_name']
+            previous_names_list.append(previous_name)
+        previous_names_list = sorted(previous_names_list,
+                                     key=lambda name: name['start_date'] if name['start_date'] else 0)
+        for name in previous_names_list: previous_names_list[previous_names_list.index(name)][
+            'title'] = f"Previous Name {previous_names_list.index(name)}"
+        context['current_name_start_date'] = previous_names_list[-1]['end_date']
+        context['birth_name'] = previous_names_list[0]
+    context['previous_names'] = previous_names_list[1:]
+    context['previous_name_valid'] = False if not previous_names_list[1:] else True
+    return context
 
 
 def handle_previous_name_and_address_dates(adult_id, adult_record):
