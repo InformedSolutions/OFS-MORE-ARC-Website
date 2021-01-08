@@ -239,6 +239,8 @@ def new_adults_summary(request):
                         HMGatewayActions().put('adult',
                                                params={'adult_id': adult_id_local, 'arc_flagged': False, 'token_id': token_id})
 
+            flag_health_check(adult_id, adult_comments, token_id)
+
             log.debug("Redirect to summary")
             redirect_link = reverse('new_adults')
             log.debug("Handling submissions for new adult review page")
@@ -271,6 +273,19 @@ def new_adults_summary(request):
 
             log.debug("Render new adult review page")
             return render(request, 'adult_update_templates/new-adults-summary.html', variables)
+
+
+def flag_health_check(adult_id, adult_comments, token_id):
+    if adult_comments:
+        already_flagged = True if adult_comments[0][2] == 'health_check_status' else False
+        if not already_flagged:
+            HMGatewayActions().create('arc-comments', params={'table_pk': adult_id,
+                                                              'field_name': 'health_check_status',
+                                                              'comment': 'This is flagged because another field has been',
+                                                              'flagged': True,
+                                                              'token_id': token_id,
+                                                              'endpoint_name': 'adult'
+                                                              })
 
 
 def get_previous_names(adult_id):
