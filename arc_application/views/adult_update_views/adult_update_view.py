@@ -13,6 +13,7 @@ from ...services.db_gateways import HMGatewayActions
 from ...models import Arc, AdultInHomeAddress
 from operator import itemgetter
 from datetime import datetime
+from .adult_update_summary import get_previous_names, get_address_history
 
 # Initiate logging
 log = logging.getLogger('')
@@ -62,7 +63,6 @@ def new_adults_summary(request):
     adult_name_querysets = []
     adult_address_querysets = []
     adult_previous_registrations = []
-    adult_previous_name_lists_list = []
 
     # Set up bool to track whether linking has been completed for all adults in this application
     linking_complete = True
@@ -142,28 +142,10 @@ def new_adults_summary(request):
             linking_complete = False
 
         adult_previous_registrations.append({'adult_id': adult_id, 'prev_reg': adult_prev_reg})
-            
 
-
-        previous_name_response = HMGatewayActions().list('previous-name', params={'adult_id': adult_id})
-        if previous_name_response.status_code == 200:
-            for prev_name in previous_name_response.record:
-                if prev_name['middle_names'] != '' or prev_name['middle_names'] is not None:
-                    prev_name['name'] = prev_name['first_name'] + " " + prev_name['middle_names'] + " " + prev_name['last_name']
-                else:
-                    prev_name['name'] = prev_name['first_name'] + " "  + prev_name['last_name']
-
-                prev_name['start_date'] = datetime(prev_name['start_year'], prev_name['start_month'], prev_name['start_day']).strftime(
-            '%d %b %Y')
-                prev_name['end_date'] = datetime(prev_name['end_year'], prev_name['end_month'],
-                                                        prev_name['end_day']).strftime(
-                    '%d %b %Y')
-            adult_previous_name_lists_list.append(previous_name_response.record)
-        else:
-            adult_previous_name_lists_list.append(None)
+        name_history = get_previous_names(adult_id)
 
         previous_address_gap_history = get_address_history(adult_id)
-
 
     if request.method == 'GET':
         # Defines the static form at the top of the page
@@ -181,7 +163,7 @@ def new_adults_summary(request):
                                adult_same_address_list, adult_moved_in_date_list,  adult_dbs_cert_numbers, adult_dbs_on_capitas,
                                adult_dbs_is_recents, adult_dbs_is_enhanceds,adult_dbs_on_updates, adult_lived_abroad,
                                adult_military_base, formset_adult, serious_illnesses, hospital_admissions,
-                               local_authorities, adult_previous_name_lists_list))
+                               local_authorities))
 
 
         variables = {
@@ -190,7 +172,8 @@ def new_adults_summary(request):
             'adult_lists': adult_lists,
             'previous_registration_lists': adult_previous_registrations,
             'linking_complete': linking_complete,
-            'previous_addresses': previous_address_gap_history
+            'previous_addresses': previous_address_gap_history,
+            'name_history': name_history
 
         }
         log.debug("Rendering new adults in the home page")
@@ -199,7 +182,7 @@ def new_adults_summary(request):
     elif request.method == 'POST':
 
         adult_formset = AdultFormSet(request.POST, prefix='adult')
-        #
+
         if adult_formset.is_valid():
             adult_data_list = adult_formset.cleaned_data
 
@@ -238,6 +221,8 @@ def new_adults_summary(request):
                         HMGatewayActions().put('adult',
                                                params={'adult_id': adult_id_local, 'arc_flagged': False, 'token_id': token_id})
 
+            flag_health_check(adult_id, adult_comments, token_id)
+
             log.debug("Redirect to summary")
             redirect_link = reverse('new_adults')
             log.debug("Handling submissions for new adult review page")
@@ -253,7 +238,7 @@ def new_adults_summary(request):
                                    adult_same_address_list, adult_moved_in_date_list, adult_dbs_cert_numbers,
                                    adult_dbs_on_capitas, adult_dbs_is_recents, adult_dbs_is_enhanceds, adult_dbs_on_updates,
                                    adult_lived_abroad, adult_military_base, adult_formset, serious_illnesses,
-                                   hospital_admissions, local_authorities, adult_previous_name_lists_list))
+                                   hospital_admissions, local_authorities))
 
             for adult_form, adult_name in zip(adult_formset, adult_name_list):
                 adult_form.error_summary_title = 'There was a problem (' + adult_name + ')'
@@ -264,11 +249,25 @@ def new_adults_summary(request):
                 'adult_lists': adult_lists,
                 'previous_registration_lists': adult_previous_registrations,
                 'linking_complete': linking_complete,
-                'previous_addresses': previous_address_gap_history
+                'previous_addresses': previous_address_gap_history,
+                'name_history': name_history
             }
 
             log.debug("Render new adult review page")
             return render(request, 'adult_update_templates/new-adults-summary.html', variables)
+
+
+def flag_health_check(adult_id, adult_comments, token_id):
+    if adult_comments:
+        already_flagged = True if adult_comments[0][2] == 'health_check_status' else False
+        if not already_flagged:
+            HMGatewayActions().create('arc-comments', params={'table_pk': adult_id,
+                                                              'field_name': 'health_check_status',
+                                                              'comment': 'This is flagged because another field has been',
+                                                              'flagged': True,
+                                                              'token_id': token_id,
+                                                              'endpoint_name': 'adult'
+                                                              })
 
 
 def handle_previous_name_and_address_dates(adult_id, adult_record):
@@ -312,42 +311,3 @@ def handle_previous_name_and_address_dates(adult_id, adult_record):
     new_adult_record['moved_out_date'] = end_date
 
     actions.put('adult', params=new_adult_record)
-
-
-def get_address_history(adult_id):
-    prev_addresses = get_previous_addresses(adult_id)
-    prev_address_gaps = get_previous_address_gaps(adult_id)
-    history = sorted((prev_addresses + prev_address_gaps),
-                     key=lambda address: address['moved_in_date'] if address['moved_in_date'] else 0)
-    gapCounter = 1
-    addressCounter = 1
-    for address in history:
-        order = history.index(address)
-        history[order].update({'moved_in_date': datetime.strptime(address['moved_in_date'], "%Y-%m-%d").date()})
-        history[order].update({'moved_out_date': datetime.strptime(address['moved_out_date'], "%Y-%m-%d").date()})
-        if 'previous_address_id' in history[order].keys():
-            history[order]['title'] = f"Previous address {addressCounter}"
-            addressCounter += 1
-        else:
-            history[order]['previous_address_id'] = history[order]['missing_address_gap_id']
-            history[order]['title'] = f"Previous address gap {gapCounter}"
-            gapCounter += 1
-    return history
-
-
-def get_previous_addresses(adult_id):
-    response = HMGatewayActions().list('previous-address', params={'adult_id': adult_id})
-    if response.status_code == 200:
-        addresses = response.record
-        return addresses
-    else:
-        return []
-
-
-def get_previous_address_gaps(adult_id):
-    response = HMGatewayActions().list('previous-address-gap', params={'adult_id': adult_id})
-    if response.status_code == 200:
-        addresses = response.record
-        return addresses
-    else:
-        return []

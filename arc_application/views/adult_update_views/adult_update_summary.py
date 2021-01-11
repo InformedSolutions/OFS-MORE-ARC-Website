@@ -177,7 +177,8 @@ def get_previous_names(adult_id):
         for name in previous_names_list: previous_names_list[previous_names_list.index(name)][
             'title'] = f"Previous Name {previous_names_list.index(name)}"
         context['current_name_start_date'] = previous_names_list[-1]['end_date']
-    context['previous_names'] = previous_names_list
+        context['birth_name'] = previous_names_list[0]
+    context['previous_names'] = previous_names_list[1:]
     context['previous_name_valid'] = False if not previous_names_list[1:] else True
     return context
 

@@ -52,11 +52,25 @@
                 </th>
             </tr>
             </thead>
-
             <tbody>
             {# ================== Health Question Status ================== #}
+            {% if summary_data.field_comments.health_check_status %}
+            <tr class="error-row">
+                <td colspan="3" class="error-container notice">
+                    <i class="icon icon-important">
+                        <span class="visually-hidden">Warning</span>
+                    </i>
+                    <strong class="bold-small">
+                        {{ summary_data.field_comments.health_check_status }}
+                    </strong>
+                </td>
+            </tr>
+            <tr class="error-row">
+                <td class="error-field-label">
+            {% else %}
             <tr>
                 <td style="word-wrap: break-word">
+            {% endif %}
                     Health questions status
                 </td>
                 <td style="word-wrap: break-word">
@@ -401,26 +415,45 @@
     </tr>
     </thead>
     <tbody>
-    {% for prevname in summary_data.name_history.previous_names %}
-        {% if summary_data.field_comments.name_history and forloop.counter == 1 %}
-            {% firstof "error-row" as css_class_name %}
-            {% firstof "error-field-label" as css_class_label %}
-            <tr class="error-row">
-                <td colspan="3" class="error-container notice">
-                    <i class="icon icon-important">
-                        <span class="visually-hidden">Warning</span>
-                    </i>
-                    <strong class="bold-small">
-                        {{ summary_data.field_comments.name_history }}
-                    </strong>
-                </td>
-            </tr>
-            <tr class="error-row">
-                <td class="error-field-label">
+    {% if summary_data.field_comments.name_history %}
+        {% firstof "error-row" as css_class_name %}
+        {% firstof "error-field-label" as css_class_label %}
+        <tr class="error-row">
+            <td colspan="3" class="error-container notice">
+                <i class="icon icon-important">
+                    <span class="visually-hidden">Warning</span>
+                </i>
+                <strong class="bold-small">
+                    {{ summary_data.field_comments.name_history }}
+                </strong>
+            </td>
+        </tr>
+        <tr class="error-row">
+            <td class="error-field-label">
         {% else %}
-            <tr class="{{ css_class_name }}">
-                <td class="{{ css_class_label }}" style="word-wrap: break-word">
+        <tr class="{{ css_class_name }}">
+            <td class="{{ css_class_label }}" style="word-wrap: break-word">
         {% endif %}
+                Name at birth
+            </td>
+            <td>
+                {{ summary_data.name_history.birth_name.full_name }}
+            </td>
+            <td></td>
+        </tr>
+        <tr {{ error_css_class_name }}>
+            <td class={{css_class_name}}>Start date</td>
+            <td>{{ summary_data.name_history.birth_name.start_date|date:"j M Y" }}</td>
+            <td></td>
+        </tr>
+        <tr {{ error_css_class_name }}>
+            <td class={{css_class_name}}>End date</td>
+            <td>{{ summary_data.name_history.birth_name.end_date|date:"j M Y" }}</td>
+            <td></td>
+        </tr>
+    {% for prevname in summary_data.name_history.previous_names %}
+        <tr class="{{ css_class_name }}">
+            <td class="{{ css_class_label }}">
                 Previous name {{ forloop.counter }}
             </td>
             <td>
