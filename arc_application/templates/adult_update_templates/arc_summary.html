@@ -391,7 +391,7 @@
             Have you previously been known by any other names?
         </td>
         <td>
-            {{ summary_data.name_history.previous_names|yesno:"Yes,No" }}
+            {{ summary_data.name_history.previous_name_valid|yesno:"Yes,No" }}
         </td>
         <td class="change-answer">
             <a href="new-adult?id={{application_id}}" alt = "Change">Change</a>
@@ -401,7 +401,7 @@
 </table>
 
 {# Name History #}
-{% if summary_data.name_history.previous_names %}
+{% if summary_data.name_history.previous_name_valid %}
 <table class="check-your-answers form-group">
     <thead>
     <tr>
@@ -419,8 +419,8 @@
     </thead>
     <tbody>
     {% if summary_data.field_comments.name_history %}
-        {% firstof "error-row" as css_class_name %}
-        {% firstof "error-field-label" as css_class_label %}
+        {% firstof "error-row" as css_error_row_name %}
+        {% firstof "error-field-label" as css_error_text_name %}
         <tr class="error-row">
             <td colspan="3" class="error-container notice">
                 <i class="icon icon-important">
@@ -434,8 +434,8 @@
         <tr class="error-row">
             <td class="error-field-label">
         {% else %}
-        <tr class="{{ css_class_name }}">
-            <td class="{{ css_class_label }}" style="word-wrap: break-word">
+        <tr class="{{ css_error_row_name }}">
+            <td class="{{ css_error_text_name }}" style="word-wrap: break-word">
         {% endif %}
                 Name at birth
             </td>
@@ -444,19 +444,19 @@
             </td>
             <td></td>
         </tr>
-        <tr {{ error_css_class_name }}>
-            <td class={{css_class_name}}>Start date</td>
+        <tr {{ css_error_row_name }}>
+            <td class={{css_error_text_name}}>Start date</td>
             <td>{{ summary_data.name_history.birth_name.start_date|date:"j M Y" }}</td>
             <td></td>
         </tr>
-        <tr {{ error_css_class_name }}>
-            <td class={{css_class_name}}>End date</td>
+        <tr {{ css_error_row_name }}>
+            <td class={{css_error_text_name}}>End date</td>
             <td>{{ summary_data.name_history.birth_name.end_date|date:"j M Y" }}</td>
             <td></td>
         </tr>
     {% for prevname in summary_data.name_history.previous_names %}
-        <tr class="{{ css_class_name }}">
-            <td class="{{ css_class_label }}">
+        <tr class="{{ css_error_row_name }}">
+            <td class="{{ css_error_text_name }}">
                 Previous name {{ forloop.counter }}
             </td>
             <td>
@@ -466,8 +466,8 @@
 
             </td>
         </tr>
-        <tr class="{{ css_class_name }}">
-            <td class="{{ css_class_label }}">
+        <tr class="{{ css_error_row_name }}">
+            <td class="{{ css_error_text_name }}">
                 Start date
             </td>
             <td>
@@ -476,8 +476,8 @@
             <td class="change-answer">
             </td>
         </tr>
-        <tr class="{{ css_class_name }}">
-            <td class="{{ css_class_label }}">
+        <tr class="{{ css_error_row_name }}">
+            <td class="{{ css_error_text_name }}">
                 End date
             </td>
             <td>
@@ -638,8 +638,8 @@
     <tbody>
     {% for address in summary_data.address_history %}
     {% if summary_data.field_comments.address_history and forloop.counter == 1 %}
-    {% firstof "error-row" as css_class_name %}
-    {% firstof "error-field-label" as css_class_label %}
+    {% firstof "error-row" as css_error_row_address %}
+    {% firstof "error-field-label" as css_error_text_address %}
     <tr class="error-row">
         <td colspan="3" class="error-container notice">
             <i class="icon icon-important">
@@ -653,8 +653,8 @@
     <tr class="error-row">
         <td class="error-field-label">
     {% else %}
-    <tr class="{{ css_class_name }}">
-        <td class="{{ css_class_label }}" style="word-wrap: break-word">
+    <tr class="{{ css_error_row_address }}">
+        <td class="{{ css_error_text_address }}" style="word-wrap: break-word">
     {% endif %}
     {% if address.street_line1 %}
             {{ address.title }}
@@ -667,13 +667,13 @@
             {{ address.country}}</td>
         <td class="change-answer"></td>
     </tr>
-    <tr class="{{ css_class_name }}">
-        <td class="{{ css_class_label }}">Date moved in</td>
+    <tr class="{{ css_error_row_address }}">
+        <td class="{{ css_error_text_address }}">Date moved in</td>
         <td>{{ address.moved_in_date|date:"j M Y" }}</td>
         <td class="change-answer"></td>
     </tr>
-    <tr class="{{ css_class_name }}">
-        <td class="{{ css_class_label }}">Date moved out</td>
+    <tr class="{{ css_error_row_address }}">
+        <td class="{{ css_error_text_address }}">Date moved out</td>
         <td >{{ address.moved_out_date|date:"j M Y" }}</td>
         <td class="change-answer"></td>
     </tr>
@@ -683,13 +683,13 @@
         <td>{{ address.gap_reason }}</td>
         <td class="change-answer"></td>
     </tr>
-    <tr class="{{ css_class_name }}">
-        <td class="{{ css_class_label }}">Start date</td>
+    <tr class="{{ css_error_row_address }}">
+        <td class="{{ css_error_text_address }}">Start date</td>
         <td>{{ address.moved_in_date|date:"j M Y" }}</td>
         <td class="change-answer"></td>
     </tr>
-    <tr class="{{ css_class_name }}">
-        <td class="{{ css_class_label }}">End date</td>
+    <tr class="{{ css_error_row_address }}">
+        <td class="{{ css_error_text_address }}">End date</td>
         <td>{{ address.moved_out_date|date:"j M Y" }}</td>
         <td class="change-answer"></td>
     </tr>

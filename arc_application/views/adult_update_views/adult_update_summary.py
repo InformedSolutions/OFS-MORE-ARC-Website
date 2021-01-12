@@ -63,6 +63,7 @@ def get_application_summary_variables(application_id):
 
     return variables
 
+
 def get_summary_data(adult_id):
     context = {
         'address_history': get_address_history(adult_id),
@@ -179,7 +180,7 @@ def get_previous_names(adult_id):
         context['current_name_start_date'] = previous_names_list[-1]['end_date']
         context['birth_name'] = previous_names_list[0]
     context['previous_names'] = previous_names_list[1:]
-    context['previous_name_valid'] = False if not previous_names_list[1:] else True
+    context['previous_name_valid'] = False if not previous_names_list else True
     return context
 
 

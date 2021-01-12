@@ -382,7 +382,7 @@
                         Have you previously been known by any other names?
                     </td>
                     <td>
-                        {{ previous_names|yesno:"Yes,No" }}
+                        {{ name_history.previous_name_valid|yesno:"Yes,No" }}
                     </td>
                     <td>
                         {{ formsetadult.known_by_other_names_declare }}
@@ -407,7 +407,7 @@
         </table>
 
         {# Name History #}
-        {% if name_history %}
+        {% if name_history.birth_name %}
         <table class="check-your-answers form-group">
             <thead>
             <tr>
