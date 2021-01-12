@@ -16,7 +16,7 @@ class NewAdultForm(GOVUKForm):
 
     health_check_status_declare = forms.BooleanField(label='This information is correct',
                                                      widget=widgets.CustomCheckboxInput, required=False)
-    health_check_status_comments = forms.CharField(label='Health check status',
+    health_check_status_comments = forms.CharField(label='Personal questions status',
                                                    help_text='(Tip: be clear and concise)',
                                                    widget=widgets.Textarea,
                                                    required=False, max_length=500)

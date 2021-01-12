@@ -292,7 +292,7 @@ def load_json(adult_id):
     summary_table = [
         {"title": full_name,
          "id": record['adult_id']},
-        {"name": "Health questions status",
+        {"name": "Personal questions status",
          "value": record['health_check_status'],
          "field": 'health_check_status'},
     ]
