@@ -263,7 +263,7 @@ def flag_health_check(adult_id, adult_comments, token_id):
         if not already_flagged:
             HMGatewayActions().create('arc-comments', params={'table_pk': adult_id,
                                                               'field_name': 'health_check_status',
-                                                              'comment': 'This is flagged because another field has been',
+                                                              'comment': 'Please resend the personal questions so that the adult can review their answers',
                                                               'flagged': True,
                                                               'token_id': token_id,
                                                               'endpoint_name': 'adult'
