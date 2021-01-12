@@ -388,7 +388,7 @@
             Have you previously been known by any other names?
         </td>
         <td>
-            {{ summary_data.name_history.previous_names|yesno:"Yes,No" }}
+            {{ summary_data.name_history.previous_name_valid|yesno:"Yes,No" }}
         </td>
         <td class="change-answer">
             <a href="new-adult?id={{application_id}}" alt = "Change">Change</a>
@@ -398,7 +398,7 @@
 </table>
 
 {# Name History #}
-{% if summary_data.name_history.previous_names %}
+{% if summary_data.name_history.previous_name_valid %}
 <table class="check-your-answers form-group">
     <thead>
     <tr>
