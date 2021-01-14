@@ -261,6 +261,7 @@ def flag_health_check(adult_id, adult_comments, token_id):
     if adult_comments:
         already_flagged = True if adult_comments[0][2] == 'health_check_status' else False
         if not already_flagged:
+            # flag the health check
             HMGatewayActions().create('arc-comments', params={'table_pk': adult_id,
                                                               'field_name': 'health_check_status',
                                                               'comment': 'Please resend the personal questions so that the adult can review their answers',
@@ -268,6 +269,10 @@ def flag_health_check(adult_id, adult_comments, token_id):
                                                               'token_id': token_id,
                                                               'endpoint_name': 'adult'
                                                               })
+            # change health check status to started
+            HMGatewayActions().patch('adult', params={'adult_id': adult_id,
+                                                      'health_check_status': 'Started'})
+            
 
 
 def handle_previous_name_and_address_dates(adult_id, adult_record):
