@@ -171,7 +171,10 @@ def get_previous_names(adult_id):
         for previous_name in previous_names:
             previous_name['start_date'] = date(previous_name['start_year'], previous_name['start_month'], previous_name['start_day'])
             previous_name['end_date'] = date(previous_name['end_year'], previous_name['end_month'], previous_name['end_day'])
-            previous_name['full_name'] = previous_name['first_name'] + ' ' + previous_name['last_name']
+            previous_name['full_name'] = '{0}{1} {2}'.format(previous_name['first_name'],
+                                                             f" {previous_name['middle_names']}" if previous_name[
+                                                                 'middle_names'] else "",
+                                                             previous_name['last_name'])
             previous_names_list.append(previous_name)
         previous_names_list = sorted(previous_names_list,
                                      key=lambda name: name['start_date'] if name['start_date'] else 0)
