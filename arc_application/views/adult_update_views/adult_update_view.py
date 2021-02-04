@@ -258,9 +258,16 @@ def new_adults_summary(request):
 
 
 def flag_health_check(adult_id, adult_comments, token_id):
+    personal_questions = ['current_name', 'lived_abroad', 'military_base',
+                          'name_history', 'PITH_same_address', 'PITH_address_moved_in', 'address_history']
+
     if adult_comments:
+        flag_personal_questions = False
+        for comment in adult_comments:
+            if comment[2] in personal_questions:
+                flag_personal_questions = True
         already_flagged = True if adult_comments[0][2] == 'health_check_status' else False
-        if not already_flagged:
+        if not already_flagged and flag_personal_questions:
             # flag the health check
             HMGatewayActions().create('arc-comments', params={'table_pk': adult_id,
                                                               'field_name': 'health_check_status',
