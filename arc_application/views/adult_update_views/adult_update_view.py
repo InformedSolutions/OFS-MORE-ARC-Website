@@ -258,7 +258,7 @@ def new_adults_summary(request):
 
 
 def flag_health_check(adult_id, adult_comments, token_id):
-    personal_questions = ['current_name', 'lived_abroad', 'military_base',
+    personal_questions = ['current_name', 'lived_abroad', 'military_base', 'known_by_other_names',
                           'name_history', 'PITH_same_address', 'PITH_address_moved_in', 'address_history']
 
     if adult_comments:

@@ -53,8 +53,9 @@ def request_to_comment(table_key, table_name, user_request, application_id):
             if not user_request[param]:
                 existing_comment_response = HMGatewayActions().list('arc-comments',params={'table_pk':table_key, 'field_name':param[:-8]})
                 if existing_comment_response.status_code == 200:
-                    review_id = existing_comment_response.record[0]['review_id']
-                    HMGatewayActions().delete('arc-comments',params={'review_id': review_id})
+                    for comment in existing_comment_response.record:
+                        review_id = comment['review_id']
+                        HMGatewayActions().delete('arc-comments',params={'review_id': review_id})
 
             # Grabs the existing comment if it exists, returns None otherwise
             # Checkboxes set to on when they are ticked, param will always be the name of a field
