@@ -655,7 +655,9 @@
                             {{ address.street_line2 }}{% if address.town %}<br/>{% endif %}
                             {{ address.town }}{% if address.county %}<br/>{% endif %}
                             {{ address.county }}{% if address.country %}<br/>{% endif %}
-                            {{ address.country}}</td>
+                            {{ address.country}}{% if address.postcode %}<br/>{% endif %}
+                            {{ address.postcode}}
+                        </td>
                         <td class="change-answer"></td>
                     </tr>
                     <tr>

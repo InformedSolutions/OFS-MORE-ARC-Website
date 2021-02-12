@@ -528,7 +528,8 @@
             {{ current_address.street_line2 }}{% if current_address.town %}<br/>{% endif %}
             {{ current_address.town }}{% if current_address.county %}<br/>{% endif %}
             {{ current_address.county }}{% if current_address.country %}<br/>{% endif %}
-            {{ current_address.country}}
+            {{ current_address.country}}{% if current_address.postcode %}<br/>{% endif %}
+            {{ current_address.postcode}}
             {% endwith %}
         </td>
         <td class="change-answer">
@@ -664,7 +665,9 @@
             {{ address.street_line2 }}{% if address.town %}<br/>{% endif %}
             {{ address.town }}{% if address.county %}<br/>{% endif %}
             {{ address.county }}{% if address.country %}<br/>{% endif %}
-            {{ address.country}}</td>
+            {{ address.country}}{% if address.postcode %}<br/>{% endif %}
+            {{ address.postcode}}
+        </td>
         <td class="change-answer"></td>
     </tr>
     <tr class="{{ css_error_row_address }}">
